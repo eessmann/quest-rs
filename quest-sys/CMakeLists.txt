@@ -3,9 +3,10 @@ project(quest-sys LANGUAGES C CXX)
 
 # Export compile commands for IDE integration
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_CXX_STANDARD 20)
 
 # Apply feature flags from Cargo build.rs
-option(ENABLE_MULTITHREADING "Enable OpenMP multithreading" OFF)
+option(ENABLE_MULTITHREADING "Enable OpenMP multithreading" ON)
 option(ENABLE_DISTRIBUTION "Enable MPI distribution" OFF)
 option(ENABLE_CUDA "Enable CUDA GPU acceleration" OFF)
 option(ENABLE_CUQUANTUM "Enable NVIDIA cuQuantum library" OFF)
@@ -22,51 +23,7 @@ if(NOT QuEST_FOUND)
     find_package(QuEST MODULE QUIET)
 endif()
 
-# Second try: pkg-config as fallback
-if(NOT QuEST_FOUND)
-    find_package(PkgConfig QUIET)
-    if(PkgConfig_FOUND)
-        pkg_check_modules(QuEST QUIET QuEST)
-        if(QuEST_FOUND)
-            message(STATUS "Found QuEST using pkg-config")
-        endif()
-    endif()
-endif()
-
-# Third try: Manual search in common locations
-if(NOT QuEST_FOUND)
-    # Try to find the library in standard locations
-    find_library(QUEST_LIBRARY
-        NAMES QuEST libQuEST
-        PATHS
-            /usr/local/lib
-            /usr/lib
-            /usr/local/lib64
-            /usr/lib64
-            $ENV{QUEST_DIR}/lib
-            $ENV{QUEST_ROOT}/lib
-            $ENV{QUEST_DIR}/lib64
-            $ENV{QUEST_ROOT}/lib64
-    )
-
-    find_path(QUEST_INCLUDE_DIR
-        NAMES quest/include/quest.h
-        PATHS
-            /usr/local/include
-            /usr/include
-            $ENV{QUEST_DIR}/include
-            $ENV{QUEST_ROOT}/include
-    )
-
-    if(QUEST_LIBRARY AND QUEST_INCLUDE_DIR)
-        set(QuEST_FOUND TRUE)
-        set(QuEST_LIBRARIES ${QUEST_LIBRARY})
-        set(QuEST_INCLUDE_DIRS ${QUEST_INCLUDE_DIR})
-        message(STATUS "Found QuEST using manual search: ${QUEST_LIBRARY}")
-    endif()
-endif()
-
-# Fourth try: Look for QuEST source and build it
+# Look for QuEST source and build it
 if(NOT QuEST_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/QuEST/CMakeLists.txt")
     message(STATUS "QuEST source found in ${CMAKE_SOURCE_DIR}/QuEST, will build it")
 
@@ -147,3 +104,6 @@ else()
     # will fail with clear errors about missing QuEST
     message(WARNING "quest_dummy target will be created but may fail to build due to missing QuEST")
 endif()
+
+## temp
+add_subdirectory(src)
