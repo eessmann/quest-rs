@@ -1,0 +1,28 @@
+[package]
+name = "quest-sys"
+version = "0.1.0"
+edition = "2024"
+links = "QuEST"
+description = "Low-level Rust bindings to the QuEST C++ quantum simulation toolkit"
+license = "MIT"
+repository = "https://github.com/eessmann/quest-rs"
+readme = "README.md"
+keywords = ["quantum", "simulation", "ffi", "bindings"]
+categories = ["external-ffi-bindings", "science"]
+build = "build.rs"
+
+[dependencies]
+cxx = {version = "1.0.143", features = ["std", "alloc", "c++20"]}
+
+[build-dependencies]
+cmake = "0.1.54"
+cxx-build = { version = "1.0.143"}
+dirs = "6.0.0"
+
+[features]
+default = []
+openmp = []
+mpi = []
+cuda = []
+hip = []
+cuquantum = ["cuda"]
