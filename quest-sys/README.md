@@ -4,11 +4,23 @@ Low-level Rust bindings to the [QuEST](https://github.com/QuEST-Kit/QuEST) (Quan
 
 These bindings are intended to be a thin wrapper around the C++ API, with minimal abstractions. For a more idiomatic Rust interface, see the `quest-rs` crate.
 
-## Features
+## Prerequisites
 
-- Access to the core QuEST functionality
-- Bindings generated using the `cxx` crate
-- Support for various QuEST build configurations through Cargo features
+This crate requires a prebuilt QuEST installation. You must install QuEST on your system before using this crate.
+
+### Installing QuEST
+
+1. Clone and build the QuEST repository:
+
+```bash
+git clone https://github.com/QuEST-Kit/QuEST.git
+cd QuEST
+mkdir build && cd build
+cmake -DCMAKE_INSTALL_PREFIX=/path/to/install/quest ..
+cmake --build . --target install
+```
+
+For more details, see the [QuEST documentation](https://github.com/QuEST-Kit/QuEST#readme).
 
 ## Usage
 
@@ -19,6 +31,24 @@ Add this to your `Cargo.toml`:
 quest-rs-sys = "0.1.0"
 ```
 
+### Finding the QuEST Installation
+
+The build system will try to find QuEST in the following order:
+
+1. Using `QUEST_DIR` or `QUEST_ROOT` environment variables
+2. Using `CMAKE_PREFIX_PATH` environment variable
+3. Using pkg-config
+4. In standard system directories
+
+If QuEST cannot be found, the build will fail with an error message.
+
+Example with environment variables:
+
+```bash
+export QUEST_DIR=/path/to/quest/installation
+cargo build
+```
+
 ### Feature Flags
 
 - `openmp` - Enable OpenMP multithreading
@@ -26,19 +56,7 @@ quest-rs-sys = "0.1.0"
 - `cuda` - Enable CUDA GPU acceleration
 - `cuquantum` - Enable NVIDIA cuQuantum library (requires `cuda`)
 - `hip` - Enable AMD HIP GPU acceleration
-- `force-source-build` - Always build QuEST from source instead of using system-installed version
-
-### System-installed QuEST
-
-By default, the crate will first try to find an existing QuEST installation on your system:
-
-1. Using a custom path specified in `QUEST_DIR` or `QUEST_ROOT` environment variables
-2. Using pkg-config
-3. Checking common system library locations
-
-If QuEST is not found, the crate will automatically download and build QuEST from source.
-
-You can force building from source by enabling the `force-source-build` feature.
+- `build-from-source` - Build QuEST from source (not recommended; prefer system installation)
 
 ## Example
 
@@ -69,22 +87,30 @@ fn main() {
 }
 ```
 
-## Building
-
-The crate uses CMake to build the QuEST library, so you'll need:
+## Build Requirements
 
 - A C++20 compatible compiler
-- CMake 3.21+
+- CMake 3.15+
+- Preinstalled QuEST library
 
 Additional requirements based on features:
-- OpenMP for the `openmp` feature
-- MPI for the `mpi` feature
-- CUDA for the `cuda` feature
+- OpenMP development libraries for the `openmp` feature
+- MPI development libraries for the `mpi` feature
+- CUDA toolkit for the `cuda` feature
 - cuQuantum for the `cuquantum` feature
 - AMD ROCm for the `hip` feature
 
+## Troubleshooting
+
+If you encounter build errors:
+
+1. Make sure QuEST is properly installed
+2. Set `QUEST_DIR` or `QUEST_ROOT` to point to your QuEST installation
+3. For additional debug information, set the environment variable `QUEST_DEBUG=1`
+
 ## License
-- MIT license
+
+This crate is licensed under the MIT License. Note that QuEST itself has its own license.
 
 ## Acknowledgements
 
