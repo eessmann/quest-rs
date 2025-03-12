@@ -1,6 +1,4 @@
 #include "bindings.h"
-#include <stdexcept>
-#include <cstring>
 
 namespace quest_sys {
     // Calculations

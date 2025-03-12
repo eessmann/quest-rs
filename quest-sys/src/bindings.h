@@ -14,6 +14,22 @@ struct Quest_Complex {
     Quest_Complex() : re(0), im(0) {}
     Quest_Complex(const qcomp& c) : re(c.real()), im(c.imag()) {}
     operator qcomp() const { return qcomp(re, im); }
+
+    static Quest_Complex* from_qcomp_ptr(qcomp* ptr) {
+        static_assert(sizeof(Quest_Complex) == sizeof(qcomp), "Incompatible types for casting");
+        static_assert(offsetof(Quest_Complex, re) == 0 &&
+                      offsetof(Quest_Complex, im) == sizeof(double),
+            "Memory layout not as expected");
+        return reinterpret_cast<Quest_Complex*>(ptr);
+    }
+
+    static qcomp* to_qcomp_ptr(Quest_Complex* ptr) {
+        static_assert(sizeof(Quest_Complex) == sizeof(qcomp), "Incompatible types for casting");
+        static_assert(offsetof(Quest_Complex, re) == 0 &&
+                      offsetof(Quest_Complex, im) == sizeof(double),
+            "Memory layout not as expected");
+        return reinterpret_cast<qcomp*>(ptr);
+    }
 };
 
 
@@ -46,33 +62,29 @@ namespace quest_sys {
     Quest_Complex calcExpecNonHermitianFullStateDiagMatrPower(Qureg const& qureg, FullStateDiagMatr const& matrix, Quest_Complex exponent);
 
     // Channel
-    KrausMap createKrausMap(int numQubits, int numOperators);
-    void syncKrausMap(KrausMap map);
-    void destroyKrausMap(KrausMap map);
-    void reportKrausMap(KrausMap map);
+    std::unique_ptr<KrausMap> createKrausMap(int numQubits, int numOperators);
+    void syncKrausMap(KrausMap& map);
+    void destroyKrausMap(KrausMap& map);
+    void reportKrausMap(KrausMap const& map);
 
-    SuperOp createSuperOp(int numQubits);
-    void syncSuperOp(SuperOp op);
-    void destroySuperOp(SuperOp op);
-    void reportSuperOp(SuperOp op);
+    std::unique_ptr<SuperOp> createSuperOp(int numQubits);
+    void syncSuperOp(SuperOp& op);
+    void destroySuperOp(SuperOp& op);
+    void reportSuperOp(SuperOp const& op);
 
-    void setKrausMap(KrausMap map, std::vector<std::vector<std::vector<qcomp>>> matrices);
-    void setSuperOp(SuperOp op, std::vector<std::vector<qcomp>> matrix);
+    void setKrausMap(KrausMap& map, std::vector<std::vector<std::vector<Quest_Complex>>>& matrices);
+    void setSuperOp(SuperOp& op, std::vector<std::vector<Quest_Complex>>& matrix);
 
-    void setInlineKrausMap(KrausMap map, int numQb, int numOps, std::vector<std::vector<std::vector<qcomp>>> matrices);
-    void setInlineSuperOp(SuperOp op, int numQb, std::vector<std::vector<qcomp>> matrix);
-
-    KrausMap createInlineKrausMap(int numQubits, int numOperators, std::vector<std::vector<std::vector<qcomp>>> matrices);
-    SuperOp createInlineSuperOp(int numQubits, std::vector<std::vector<qcomp>> matrix);
+    std::unique_ptr<KrausMap> createInlineKrausMap(int numQubits, int numOperators, std::vector<std::vector<std::vector<Quest_Complex>>>& matrices);
+    std::unique_ptr<SuperOp> createInlineSuperOp(int numQubits, std::vector<std::vector<Quest_Complex>>& matrix);
 
     // Debug
-    void setSeeds(unsigned* seeds, int numSeeds);
+    void setSeeds(rust::Slice<const unsigned> seeds, int numSeeds);
     void setSeedsToDefault();
 
-    void getSeeds(unsigned* seeds);
-    int getNumSeeds();
+    std::vector<unsigned> getSeeds();
 
-    void invalidQuESTInputError(const char* msg, const char* func);
+    void invalidQuESTInputError(rust::String msg, rust::String func);
 
     void setValidationOn();
     void setValidationOff();
@@ -87,17 +99,17 @@ namespace quest_sys {
     qindex getGpuCacheSize();
     void clearGpuCache();
 
-    void getEnvironmentString(char str[200]);
+    rust::String getEnvironmentString();
 
     //  Decoherence
-    void mixDephasing(Qureg qureg, int qubit, qreal prob);
-    void mixTwoQubitDephasing(Qureg qureg, int qubit1, int qubit2, qreal prob);
-    void mixDepolarising(Qureg qureg, int qubit, qreal prob);
-    void mixTwoQubitDepolarising(Qureg qureg, int qubit1, int qubit2, qreal prob);
-    void mixDamping(Qureg qureg, int qubit, qreal prob);
-    void mixPaulis(Qureg qureg, int qubit, qreal probX, qreal probY, qreal probZ);
-    void mixQureg(Qureg qureg, Qureg other, qreal prob);
-    void mixKrausMap(Qureg qureg, int* qubits, int numQubits, KrausMap map);
+    void mixDephasing(Qureg& qureg, int qubit, qreal prob);
+    void mixTwoQubitDephasing(Qureg& qureg, int qubit1, int qubit2, qreal prob);
+    void mixDepolarising(Qureg& qureg, int qubit, qreal prob);
+    void mixTwoQubitDepolarising(Qureg& qureg, int qubit1, int qubit2, qreal prob);
+    void mixDamping(Qureg& qureg, int qubit, qreal prob);
+    void mixPaulis(Qureg& qureg, int qubit, qreal probX, qreal probY, qreal probZ);
+    void mixQureg(Qureg& qureg, Qureg& other, qreal prob);
+    void mixKrausMap(Qureg& qureg, rust::Slice<const int> qubits, KrausMap const& map);
 
     // Environment management
     void initQuESTEnv();
@@ -106,74 +118,72 @@ namespace quest_sys {
     void syncQuESTEnv();
     void reportQuESTEnv();
     bool isQuESTEnvInit();
-    QuESTEnv getQuESTEnv();
+    std::unique_ptr<QuESTEnv> getQuESTEnv();
 
     // Initialisation
-    void initBlankState(Qureg qureg);
-    void initZeroState(Qureg qureg);
-    void initPlusState(Qureg qureg);
-    void initPureState(Qureg qureg, Qureg pure);
-    void initClassicalState(Qureg qureg, qindex stateInd);
-    void initDebugState(Qureg qureg);
-    void initArbitraryPureState(Qureg qureg, qcomp* amps);
-    void initRandomPureState(Qureg qureg);
-    void initRandomMixedState(Qureg qureg, qindex numPureStates);
+    void initBlankState(Qureg& qureg);
+    void initZeroState(Qureg& qureg);
+    void initPlusState(Qureg& qureg);
+    void initPureState(Qureg& qureg, Qureg& pure);
+    void initClassicalState(Qureg& qureg, qindex stateInd);
+    void initDebugState(Qureg& qureg);
+    void initArbitraryPureState(Qureg& qureg, rust::Slice<const Quest_Complex> amps);
+    void initRandomPureState(Qureg& qureg);
+    void initRandomMixedState(Qureg& qureg, qindex numPureStates);
 
-    void setQuregAmps(Qureg qureg, qindex startInd, qcomp* amps, qindex numAmps);
-    void setDensityQuregAmps(Qureg qureg, qindex startRow, qindex startCol, qcomp** amps, qindex numRows, qindex numCols);
-    void setDensityQuregFlatAmps(Qureg qureg, qindex startInd, qcomp* amps, qindex numAmps);
-    void setQuregToClone(Qureg targetQureg, Qureg copyQureg);
-    void setQuregToSuperposition(qcomp facOut, Qureg out, qcomp fac1, Qureg qureg1, qcomp fac2, Qureg qureg2);
-    qreal setQuregToRenormalized(Qureg qureg);
-    void setQuregToPauliStrSum(Qureg qureg, PauliStrSum sum);
+    void setQuregAmps(Qureg& qureg, qindex startInd, rust::Slice<const Quest_Complex> amps);
+    void setDensityQuregAmps(Qureg& qureg, qindex startRow, qindex startCol, rust::Slice<const rust::Slice<const Quest_Complex>> amps);
+    void setDensityQuregFlatAmps(Qureg& qureg, qindex startInd, rust::Slice<const Quest_Complex> amps);
+    void setQuregToClone(Qureg& targetQureg, Qureg const& copyQureg);
+    void setQuregToSuperposition(Quest_Complex facOut, Qureg& out, Quest_Complex fac1, Qureg const& qureg1, qcomp fac2, Qureg const& qureg2);
+    qreal setQuregToRenormalized(Qureg& qureg);
+    void setQuregToPauliStrSum(Qureg& qureg, PauliStrSum const& sum);
 
     // Matrices
-    CompMatr1 getCompMatr1(std::vector<std::vector<qcomp>> in);
-    CompMatr2 getCompMatr2(std::vector<std::vector<qcomp>> in);
+    std::unique_ptr<CompMatr1> getCompMatr1(rust::Slice<const rust::Slice<const Quest_Complex>> in);
+    std::unique_ptr<CompMatr2> getCompMatr2(rust::Slice<const rust::Slice<const Quest_Complex>> in);
 
-    DiagMatr1 getDiagMatr1(std::vector<qcomp> in);
-    DiagMatr2 getDiagMatr2(std::vector<qcomp> in);
+    std::unique_ptr<DiagMatr1> getDiagMatr1(rust::Slice<const Quest_Complex> in);
+    std::unique_ptr<DiagMatr2> getDiagMatr2(rust::Slice<const Quest_Complex> in);
 
-    CompMatr createCompMatr(int numQubits);
-    DiagMatr createDiagMatr(int numQubits);
-    FullStateDiagMatr createFullStateDiagMatr(int numQubits);
-    FullStateDiagMatr createCustomFullStateDiagMatr(int numQubits, int useDistrib, int useGpuAccel);
+    std::unique_ptr<CompMatr> createCompMatr(int numQubits);
+    std::unique_ptr<DiagMatr> createDiagMatr(int numQubits);
+    std::unique_ptr<FullStateDiagMatr> createFullStateDiagMatr(int numQubits);
+    std::unique_ptr<FullStateDiagMatr> createCustomFullStateDiagMatr(int numQubits, int useDistrib, int useGpuAccel);
 
-    void destroyCompMatr(CompMatr matrix);
-    void destroyDiagMatr(DiagMatr matrix);
-    void destroyFullStateDiagMatr(FullStateDiagMatr matrix);
+    void destroyCompMatr(CompMatr& matrix);
+    void destroyDiagMatr(DiagMatr& matrix);
+    void destroyFullStateDiagMatr(FullStateDiagMatr& matrix);
 
-    void syncCompMatr(CompMatr matr);
-    void syncDiagMatr(DiagMatr matr);
-    void syncFullStateDiagMatr(FullStateDiagMatr matr);
+    void syncCompMatr(CompMatr& matr);
+    void syncDiagMatr(DiagMatr& matr);
+    void syncFullStateDiagMatr(FullStateDiagMatr& matr);
 
-    void setCompMatr(CompMatr out, std::vector<std::vector<qcomp>> in);
-    void setDiagMatr(DiagMatr out, std::vector<qcomp> in);
-    void setFullStateDiagMatr(FullStateDiagMatr out, qindex startInd, std::vector<qcomp> in);
+    void setCompMatr(CompMatr& out, rust::Slice<const rust::Slice<const Quest_Complex>> in);
+    void setDiagMatr(DiagMatr& out, rust::Slice<const Quest_Complex> in);
+    void setFullStateDiagMatr(FullStateDiagMatr& out, qindex startInd, rust::Slice<const Quest_Complex> in);
 
-    void setInlineCompMatr(CompMatr matr, int numQb, std::vector<std::vector<qcomp>> in);
-    void setInlineDiagMatr(DiagMatr matr, int numQb, std::vector<qcomp> in);
-    void setInlineFullStateDiagMatr(FullStateDiagMatr matr, qindex startInd, qindex numElems, std::vector<qcomp> in);
+    void setInlineCompMatr(CompMatr& matr, int numQb, rust::Slice<const rust::Slice<const Quest_Complex>> in);
+    void setInlineDiagMatr(DiagMatr& matr, int numQb, rust::Slice<const Quest_Complex> in);
+    void setInlineFullStateDiagMatr(FullStateDiagMatr& matr, qindex startInd, qindex numElems, rust::Slice<const Quest_Complex> in);
 
-    CompMatr createInlineCompMatr(int numQb, std::vector<std::vector<qcomp>> elems);
-    DiagMatr createInlineDiagMatr(int numQb, std::vector<qcomp> elems);
+    std::unique_ptr<CompMatr> createInlineCompMatr(int numQb, rust::Slice<const rust::Slice<const Quest_Complex>> elems);
+    std::unique_ptr<DiagMatr> createInlineDiagMatr(int numQb, rust::Slice<const Quest_Complex> elems);
 
-    void setDiagMatrFromMultiVarFunc(DiagMatr out, qcomp (*func)(qindex*), int* numQubitsPerVar, int numVars, int areSigned);
-    void setDiagMatrFromMultiDimLists(DiagMatr out, void* lists, int* numQubitsPerDim, int numDims);
+    void setDiagMatrFromMultiVarFunc(DiagMatr& out, rust::Fn<Quest_Complex(rust::Slice<const qindex>)> func, rust::Slice<const int> numQubitsPerVar, int numVars, int areSigned);
 
-    FullStateDiagMatr createFullStateDiagMatrFromPauliStrSum(PauliStrSum in);
-    void setFullStateDiagMatrFromPauliStrSum(FullStateDiagMatr out, PauliStrSum in);
-    void setFullStateDiagMatrFromMultiVarFunc(FullStateDiagMatr out, qcomp (*func)(qindex*), int* numQubitsPerVar, int numVars, int areSigned);
-    void setFullStateDiagMatrFromMultiDimLists(FullStateDiagMatr out, void* lists, int* numQubitsPerDim, int numDims);
+    std::unique_ptr<FullStateDiagMatr> createFullStateDiagMatrFromPauliStrSum(PauliStrSum const& in);
+    void setFullStateDiagMatrFromPauliStrSum(FullStateDiagMatr& out, PauliStrSum const& in);
+    void setFullStateDiagMatrFromMultiVarFunc(FullStateDiagMatr& out, rust::Fn<Quest_Complex(rust::Slice<const qindex>)> func, rust::Slice<const int> numQubitsPerVar, int numVars, int areSigned);
 
-    void reportCompMatr1(CompMatr1 matrix);
-    void reportCompMatr2(CompMatr2 matrix);
-    void reportCompMatr(CompMatr matrix);
+    void reportCompMatr1(CompMatr1 const& matrix);
+    void reportCompMatr2(CompMatr2 const& matrix);
+    void reportCompMatr(CompMatr const& matrix);
 
-    void reportDiagMatr1(DiagMatr1 matrix);
-    void reportDiagMatr2(DiagMatr2 matrix);
-    void reportDiagMatr(DiagMatr matrix);
-    void reportFullStateDiagMatr(FullStateDiagMatr matr);
+    void reportDiagMatr1(DiagMatr1 const& matrix);
+    void reportDiagMatr2(DiagMatr2 const& matrix);
+    void reportDiagMatr(DiagMatr const& matrix);
+    void reportFullStateDiagMatr(FullStateDiagMatr const& matr);
 
     // Operations
     /// CompMatr1
@@ -219,17 +229,17 @@ namespace quest_sys {
     void applyMultiStateControlledDiagMatr(Qureg, int* controls, int* states, int numControls, int* targets, int numTargets, DiagMatr matrix);
 
     /// DiagMatrPower
-    void multiplyDiagMatrPower(Qureg qureg, int* targets, int numTargets, DiagMatr matrix, qcomp exponent);
-    void applyDiagMatrPower(Qureg qureg, int* targets, int numTargets, DiagMatr matrix, qcomp exponent);
-    void applyControlledDiagMatrPower(Qureg qureg, int control, int* targets, int numTargets, DiagMatr matrix, qcomp exponent);
-    void applyMultiControlledDiagMatrPower(Qureg qureg, int* controls, int numControls, int* targets, int numTargets, DiagMatr matrix, qcomp exponent);
-    void applyMultiStateControlledDiagMatrPower(Qureg qureg, int* controls, int* states, int numControls, int* targets, int numTargets, DiagMatr matrix, qcomp exponent);
+    void multiplyDiagMatrPower(Qureg qureg, int* targets, int numTargets, DiagMatr matrix, Quest_Complex exponent);
+    void applyDiagMatrPower(Qureg qureg, int* targets, int numTargets, DiagMatr matrix, Quest_Complex exponent);
+    void applyControlledDiagMatrPower(Qureg qureg, int control, int* targets, int numTargets, DiagMatr matrix, Quest_Complex exponent);
+    void applyMultiControlledDiagMatrPower(Qureg qureg, int* controls, int numControls, int* targets, int numTargets, DiagMatr matrix, Quest_Complex exponent);
+    void applyMultiStateControlledDiagMatrPower(Qureg qureg, int* controls, int* states, int numControls, int* targets, int numTargets, DiagMatr matrix, Quest_Complex exponent);
 
     /// FullStateDiagMatr
     void multiplyFullStateDiagMatr(Qureg qureg, FullStateDiagMatr matrix);
-    void multiplyFullStateDiagMatrPower(Qureg qureg, FullStateDiagMatr matrix, qcomp exponent);
+    void multiplyFullStateDiagMatrPower(Qureg qureg, FullStateDiagMatr matrix, Quest_Complex exponent);
     void applyFullStateDiagMatr(Qureg qureg, FullStateDiagMatr matrix);
-    void applyFullStateDiagMatrPower(Qureg qureg, FullStateDiagMatr matrix, qcomp exponent);
+    void applyFullStateDiagMatrPower(Qureg qureg, FullStateDiagMatr matrix, Quest_Complex exponent);
 
     /// S gate
     void applyS(Qureg qureg, int target);
@@ -364,7 +374,7 @@ namespace quest_sys {
 
     // Pauli
     PauliStr getPauliStr(std::string paulis, std::vector<int> indices);
-    PauliStrSum createPauliStrSum(std::vector<PauliStr> strings, std::vector<qcomp> coeffs);
+    PauliStrSum createPauliStrSum(std::vector<PauliStr> strings, std::vector<Quest_Complex> coeffs);
     PauliStrSum createInlinePauliStrSum(std::string str);
     PauliStrSum createPauliStrSumFromFile(std::string fn);
     PauliStrSum createPauliStrSumFromReversedFile(std::string fn);
@@ -395,13 +405,12 @@ namespace quest_sys {
     void syncSubQuregToGpu  (Qureg qureg, qindex localStartInd, qindex numLocalAmps);
     void syncSubQuregFromGpu(Qureg qureg, qindex localStartInd, qindex numLocalAmps);
 
-    void getQuregAmps(qcomp* outAmps, Qureg qureg, qindex startInd, qindex numAmps);
-    void getDensityQuregAmps(qcomp** outAmps, Qureg qureg, qindex startRow, qindex startCol, qindex numRows, qindex numCols);
+    void getQuregAmps(Quest_Complex* outAmps, Qureg qureg, qindex startInd, qindex numAmps);
+    void getDensityQuregAmps(Quest_Complex** outAmps, Qureg qureg, qindex startRow, qindex startCol, qindex numRows, qindex numCols);
 
-    qcomp getQuregAmp(Qureg qureg, qindex index);
-    qcomp getDensityQuregAmp(Qureg qureg, qindex row, qindex column);
+    Quest_Complex getQuregAmp(Qureg qureg, qindex index);
+    Quest_Complex getDensityQuregAmp(Qureg qureg, qindex row, qindex column);
 
     // Types
-    qcomp getQcomp(qreal re, qreal im);
-    void reportQcomp(qcomp num);
+    void reportQcomp(Quest_Complex num);
 }
