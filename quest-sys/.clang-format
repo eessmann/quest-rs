@@ -1,0 +1,5 @@
+BasedOnStyle: Chromium
+Language: Cpp
+Standard: c++20
+SortIncludes: CaseInsensitive
+QualifierAlignment: Left
