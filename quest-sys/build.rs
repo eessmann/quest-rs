@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 use std::collections::{HashMap, HashSet};
 use serde_json::Value;
 
-fn main() {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("cargo:rerun-if-env-changed=QUEST_DIR");
     println!("cargo:rerun-if-env-changed=QUEST_ROOT");
     println!("cargo:rerun-if-env-changed=CMAKE_PREFIX_PATH");
@@ -270,35 +270,6 @@ fn main() {
         }
     }
 
-    // For tests, copy the library to the output directory as a backup strategy
-    if found_quest {
-        let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
-        let target_dir = out_dir.ancestors().nth(3).unwrap_or(&out_dir);
-        let debug_dir = target_dir.join("debug");
-
-        if let Some(lib_path) = library_paths.iter().next() {
-            let lib_dir = Path::new(lib_path);
-            let lib_name = if host_os == "windows" {
-                "QuEST.dll"
-            } else if host_os == "macos" {
-                "libQuEST.dylib"
-            } else {
-                "libQuEST.so"
-            };
-
-            let src_lib = lib_dir.join(lib_name);
-            let dst_lib = debug_dir.join(lib_name);
-
-            if src_lib.exists() {
-                println!("cargo:warning=Copying QuEST library from {} to {}", src_lib.display(), dst_lib.display());
-                if let Err(e) = fs::copy(&src_lib, &dst_lib) {
-                    println!("cargo:warning=Failed to copy library: {}", e);
-                }
-            } else {
-                println!("cargo:warning=Source library not found at {}", src_lib.display());
-            }
-        }
-    }
 
     if !found_quest {
         println!("cargo:warning=");
@@ -318,11 +289,10 @@ fn main() {
 
     // Build the cxx bridge
     let mut builder = cxx_build::bridge("src/lib.rs");
-
-    // Add include directories to the cxx bridge
-    for inc_dir in &include_dirs {
-        builder.include(inc_dir);
-    }
+    builder.cpp(true)
+        .std("c++20")
+        .include("src/bindings")
+        .includes(&include_dirs);
 
     // Add the required QuEST definitions from CMake to the cxx build
     println!("cargo:warning=Adding compile definitions to cxx_build:");
@@ -353,19 +323,33 @@ fn main() {
     }
 
     // Add the wrapper implementation
+    let cpp_files: Vec<_> = fs::read_dir("src/bindings")
+        .expect("Failed to read cpp directory")
+        .filter_map(Result::ok)
+        .map(|entry| entry.path())
+        .filter(|path| path.is_file())
+        .filter(|path| path
+            .extension()
+            .map_or(false, |ext| ext == "cpp"))
+        .collect();
+
     builder
-        .file("src/wrapper.cpp")
-        .std("c++20")
+        .files(cpp_files)
         .flag_if_supported("-Wno-unused-parameter");
 
     // Additional flags for different platforms
     if is_windows {
-        builder.flag_if_supported("/EHsc");
+        builder.flag_if_supported("/EHsc")
+            .flag_if_supported("/W4");
     } else {
-        builder.flag_if_supported("-Wno-unknown-pragmas");
+        builder.flag_if_supported("-Wno-unknown-pragmas")
+            .flag_if_supported("-Wall")
+            .flag_if_supported("-Wpedantic")
+            .flag_if_supported("-Wconversion");
     }
-
+    
     builder.compile("quest-sys-cxx");
+    Ok(())
 }
 
 fn find_quest_dummy_target(codemodel: &Value, reply_dir: &Path) -> Option<Value> {

@@ -8,8 +8,7 @@ mod ffi {
     }
 
     unsafe extern "C++" {
-        include!("quest-sys/bindings.h");
-
+        include!("bindings.h");
         type Quest_Complex;
     }
 }
