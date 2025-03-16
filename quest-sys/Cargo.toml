@@ -32,3 +32,11 @@ cuquantum = ["cuda"]
 build-from-source = []
 # Default to OpenMP for parallel execution
 default = ["openmp"]
+
+[dev-dependencies]
+approx = "0.5.1"
+libc = "0.2.171"
+
+[[example]]
+name = "min_example"
+path = "examples/min_example.rs"
