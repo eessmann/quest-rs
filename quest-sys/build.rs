@@ -315,22 +315,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // Build the cxx bridge
-    let rs_files: Vec<PathBuf> = vec![
-        "src/types.rs",
-        "src/calculations.rs",
-        "src/channel.rs",
-        "src/debug.rs",
-        "src/decoherence.rs",
-        "src/environment.rs",
-        "src/initialisation.rs",
-        "src/matrices.rs",
-        "src/operations.rs",
-        "src/qureg.rs",
-    ]
-    .iter()
-    .map(|&s| s.into())
-    .collect();
-    let mut builder = cxx_build::bridges(rs_files);
+    let mut builder = cxx_build::bridge("src/lib.rs");
     builder
         .cpp(true)
         .std("c++20")
