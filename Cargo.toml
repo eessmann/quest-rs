@@ -2,9 +2,27 @@
 name = "quest-rs"
 version = "0.1.0"
 edition = "2024"
+description = "Idiomatic Rust interface to the QuEST quantum simulation toolkit"
+license = "MIT"
+repository = "https://github.com/eessmann/quest-rs"
+readme = "README.md"
+keywords = ["quantum", "simulation"]
+categories = ["science", "simulation"]
 
 [workspace]
 resolver = "3"
 members = ["quest-sys"]
 
+[workspace.dependencies]
+cxx = { version = "1.0.148", features = ["std", "alloc", "c++20"] }
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = { version = "1.0.140"}
+
+
 [dependencies]
+quest-sys = { path = "./quest-sys", version = "0.1.0" }
+ndarray = { version = "0.16", features = ["default", "approx", "blas"] }
+num-complex = "0.4"
+thiserror = "2.0"
+cxx.workspace = true
+
