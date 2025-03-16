@@ -1,13 +1,15 @@
+use crate::types::ffi::*;
+
 #[cxx::bridge]
 pub mod ffi {
 
     // Types
     unsafe extern "C++" {
         // Opaque QuEST types
-        type Qureg;
-        type FullStateDiagMatr;
-        type PauliStr;
-        type PauliStrSum;
+        type Qureg = crate::types::ffi::Qureg;
+        type FullStateDiagMatr = crate::types::ffi::FullStateDiagMatr;
+        type PauliStr = crate::types::ffi::PauliStr;
+        type PauliStrSum = crate::types::ffi::PauliStrSum;
 
         // Common type
         type Quest_Complex = crate::types::ffi::Quest_Complex;

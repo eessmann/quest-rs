@@ -14,6 +14,7 @@ pub fn complex(re: f64, im: f64) -> types::ffi::Quest_Complex {
     types::ffi::Quest_Complex { re, im }
 }
 
+
 // Create a safe module with re-exports of commonly used functions
 pub mod safe {
     //pub use crate::environment::{init_quest_env, finalize_quest_env};
