@@ -21,7 +21,7 @@ void initPureState(Qureg& qureg, Qureg& pure) {
   ::initPureState(qureg, pure);
 }
 
-void initClassicalState(Qureg& qureg, qindex stateInd) {
+void initClassicalState(Qureg& qureg, Quest_Index stateInd) {
   ::initClassicalState(qureg, stateInd);
 }
 
@@ -39,12 +39,12 @@ void initRandomPureState(Qureg& qureg) {
   ::initRandomPureState(qureg);
 }
 
-void initRandomMixedState(Qureg& qureg, qindex numPureStates) {
+void initRandomMixedState(Qureg& qureg, Quest_Index numPureStates) {
   ::initRandomMixedState(qureg, numPureStates);
 }
 
 void setQuregAmps(Qureg& qureg,
-                  qindex startInd,
+                  Quest_Index startInd,
                   rust::Slice<const Quest_Complex> amps) {
   ::setQuregAmps(qureg, startInd,
                  Quest_Complex::to_qcomp_ptr(quest_helper::slice_to_ptr(amps)),
@@ -53,11 +53,11 @@ void setQuregAmps(Qureg& qureg,
 
 void setDensityQuregAmps(
     Qureg& qureg,
-    qindex startRow,
-    qindex startCol,
+    Quest_Index startRow,
+    Quest_Index startCol,
     rust::Slice<const rust::Slice<const Quest_Complex>> amps) {
-  int rows = amps.length();
-  int cols = amps[0].length();
+  int rows = static_cast<int>(amps.length());
+  int cols = static_cast<int>(amps[0].length());
 
   std::vector<qcomp*> tmp{};
   std::ranges::transform(amps, std::back_inserter(tmp), [](auto val) {
@@ -67,7 +67,7 @@ void setDensityQuregAmps(
 }
 
 void setDensityQuregFlatAmps(Qureg& qureg,
-                             qindex startInd,
+                             Quest_Index startInd,
                              rust::Slice<const Quest_Complex> amps) {
   ::setDensityQuregFlatAmps(
       qureg, startInd,
@@ -83,12 +83,12 @@ void setQuregToSuperposition(Quest_Complex facOut,
                              Qureg& out,
                              Quest_Complex fac1,
                              const Qureg& qureg1,
-                             qcomp fac2,
+                             Quest_Complex fac2,
                              const Qureg& qureg2) {
   ::setQuregToSuperposition(facOut, out, fac1, qureg1, fac2, qureg2);
 }
 
-qreal setQuregToRenormalized(Qureg& qureg) {
+Quest_Real setQuregToRenormalized(Qureg& qureg) {
   return ::setQuregToRenormalized(qureg);
 }
 

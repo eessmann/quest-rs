@@ -39,33 +39,30 @@ void reportSuperOp(const SuperOp& op) {
 
 void setKrausMap(
     KrausMap& map,
-    std::vector<std::vector<std::vector<Quest_Complex>>>& matrices) {
-  auto mat = quest_helper::transform_deep_eager(
-      matrices, [](Quest_Complex val) { return qcomp(val); });
-  ::setKrausMap(map, std::move(mat));
+    rust::Slice<const rust::Slice<const rust::Slice<const Quest_Complex>>> matrices) {
+  auto tensor = quest_helper::slice_to_vector(matrices);
+  ::setKrausMap(map, std::move(tensor));
 }
 
-void setSuperOp(SuperOp& op, std::vector<std::vector<Quest_Complex>>& matrix) {
-  auto mat = quest_helper::transform_deep_eager(
-      matrix, [](Quest_Complex val) { return qcomp(val); });
+void setSuperOp(SuperOp& op,
+                rust::Slice<const rust::Slice<const Quest_Complex>> matrix) {
+  auto mat = quest_helper::slice_to_vector(matrix);
   ::setSuperOp(op, std::move(mat));
 }
 
 std::unique_ptr<KrausMap> createInlineKrausMap(
     int numQubits,
     int numOperators,
-    std::vector<std::vector<std::vector<Quest_Complex>>>& matrices) {
-  auto mat = quest_helper::transform_deep_eager(
-      matrices, [](Quest_Complex val) { return qcomp(val); });
+    rust::Slice<const rust::Slice<const rust::Slice<const Quest_Complex>>> matrices) {
+  auto mat = quest_helper::slice_to_vector(matrices);
   return std::make_unique<KrausMap>(
       ::createInlineKrausMap(numQubits, numOperators, std::move(mat)));
 }
 
 std::unique_ptr<SuperOp> createInlineSuperOp(
     int numQubits,
-    std::vector<std::vector<Quest_Complex>>& matrix) {
-  auto mat = quest_helper::transform_deep_eager(
-      matrix, [](Quest_Complex val) { return qcomp(val); });
+    rust::Slice<const rust::Slice<const Quest_Complex>> matrix) {
+  auto mat = quest_helper::slice_to_vector(matrix);
   return std::make_unique<SuperOp>(
       ::createInlineSuperOp(numQubits, std::move(mat)));
 }

@@ -289,7 +289,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Build the cxx bridge
     let mut builder = cxx_build::bridge("src/lib.rs");
-    builder.cpp(true)
+    builder
+        .cpp(true)
         .std("c++20")
         .include("src/bindings")
         .includes(&include_dirs);
@@ -345,9 +346,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         builder.flag_if_supported("-Wno-unknown-pragmas")
             .flag_if_supported("-Wall")
             .flag_if_supported("-Wpedantic")
-            .flag_if_supported("-Wconversion");
+            .flag_if_supported("-Wconversion")
+            .flag_if_supported("-Wextra")
+            .flag_if_supported("-Wno-dollar-in-identifier-extension");
+
     }
-    
+
     builder.compile("quest-sys-cxx");
     Ok(())
 }

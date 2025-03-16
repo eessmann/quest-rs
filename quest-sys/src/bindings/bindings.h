@@ -19,7 +19,7 @@ struct Quest_Complex {
 
   static Quest_Complex* from_qcomp_ptr(qcomp* ptr) {
     static_assert(sizeof(Quest_Complex) == sizeof(qcomp),
-                  "Incompatible types for casting");
+                 "Incompatible types for casting");
     static_assert(offsetof(Quest_Complex, re) == 0 &&
                       offsetof(Quest_Complex, im) == sizeof(double),
                   "Memory layout not as expected");
@@ -36,59 +36,57 @@ struct Quest_Complex {
   }
 };
 
+using Quest_Real = double;
+using Quest_Index = std::int64_t;
+
 // Define some wrapper functions for Rust to interact with QuEST
 namespace quest_sys {
 // Calculations
-qreal calcExpecPauliStr(const Qureg& qureg, const PauliStr& str);
+Quest_Real calcExpecPauliStr(const Qureg& qureg, const PauliStr& str);
 
-qreal calcExpecPauliStrSum(const Qureg& qureg, const PauliStrSum& sum);
+Quest_Real calcExpecPauliStrSum(const Qureg& qureg, const PauliStrSum& sum);
 
-qreal calcExpecFullStateDiagMatr(const Qureg& qureg,
-                                 const FullStateDiagMatr& matr);
+Quest_Real calcExpecFullStateDiagMatr(const Qureg& qureg,
+                                      const FullStateDiagMatr& matr);
 
-qreal calcExpecFullStateDiagMatrPower(const Qureg& qureg,
-                                      const FullStateDiagMatr& matr,
-                                      Quest_Complex exponent);
+Quest_Real calcExpecFullStateDiagMatrPower(const Qureg& qureg,
+                                           const FullStateDiagMatr& matr,
+                                           Quest_Complex exponent);
 
-qreal calcTotalProb(const Qureg& qureg);
+Quest_Real calcTotalProb(const Qureg& qureg);
 
-qreal calcProbOfBasisState(const Qureg& qureg, qindex index);
+Quest_Real calcProbOfBasisState(const Qureg& qureg, Quest_Index index);
 
-qreal calcProbOfQubitOutcome(const Qureg& qureg, int qubit, int outcome);
+Quest_Real calcProbOfQubitOutcome(const Qureg& qureg, int qubit, int outcome);
 
-qreal calcProbOfMultiQubitOutcome(const Qureg& qureg,
-                                  rust::Slice<int> qubits,
-                                  rust::Slice<int> outcomes,
-                                  int numQubits);
+Quest_Real calcProbOfMultiQubitOutcome(const Qureg& qureg,
+                                       rust::Slice<const int> qubits,
+                                       rust::Slice<const int> outcomes);
 
-void calcProbsOfAllMultiQubitOutcomes(rust::Slice<qreal> outcomeProbs,
+void calcProbsOfAllMultiQubitOutcomes(rust::Slice<Quest_Real> outcomeProbs,
                                       const Qureg& qureg,
-                                      rust::Slice<int> qubits,
-                                      int numQubits);
+                                      rust::Slice<const int> qubits);
 
-qreal calcPurity(const Qureg& qureg);
+Quest_Real calcPurity(const Qureg& qureg);
 
-qreal calcFidelity(const Qureg& qureg, const Qureg& other);
+Quest_Real calcFidelity(const Qureg& qureg, const Qureg& other);
 
-qreal calcDistance(const Qureg& qureg1, const Qureg& qureg2);
+Quest_Real calcDistance(const Qureg& qureg1, const Qureg& qureg2);
 
 std::unique_ptr<Qureg> calcPartialTrace(const Qureg& qureg,
-                                        rust::Slice<int> traceOutQubits,
-                                        int numTraceQubits);
+                                        rust::Slice<const int> traceOutQubits);
 
-std::unique_ptr<Qureg> calcReducedDensityMatrix(const Qureg& qureg,
-                                                rust::Slice<int> retainQubits,
-                                                int numRetainQubits);
+std::unique_ptr<Qureg> calcReducedDensityMatrix(
+    const Qureg& qureg,
+    rust::Slice<const int> retainQubits);
 
 void setQuregToPartialTrace(Qureg& out,
                             const Qureg& in,
-                            rust::Slice<int> traceOutQubits,
-                            int numTraceQubits);
+                            rust::Slice<const int> traceOutQubits);
 
 void setQuregToReducedDensityMatrix(Qureg& out,
                                     const Qureg& in,
-                                    rust::Slice<int> retainQubits,
-                                    int numRetainQubits);
+                                    rust::Slice<const int> retainQubits);
 
 Quest_Complex calcInnerProduct(const Qureg& qureg1, const Qureg& qureg2);
 
@@ -123,25 +121,26 @@ void reportSuperOp(const SuperOp& op);
 
 void setKrausMap(
     KrausMap& map,
-    std::vector<std::vector<std::vector<Quest_Complex>>>& matrices);
+    rust::Slice<const rust::Slice<const rust::Slice<const Quest_Complex>>> matrices);
 
-void setSuperOp(SuperOp& op, std::vector<std::vector<Quest_Complex>>& matrix);
+void setSuperOp(SuperOp& op,
+                rust::Slice<const rust::Slice<const Quest_Complex>> matrix);
 
 std::unique_ptr<KrausMap> createInlineKrausMap(
     int numQubits,
     int numOperators,
-    std::vector<std::vector<std::vector<Quest_Complex>>>& matrices);
+    rust::Slice<const rust::Slice<const rust::Slice<const Quest_Complex>>> matrices);
 
 std::unique_ptr<SuperOp> createInlineSuperOp(
     int numQubits,
-    std::vector<std::vector<Quest_Complex>>& matrix);
+    rust::Slice<const rust::Slice<const Quest_Complex>> matrix);
 
 // Debug
-void setSeeds(rust::Slice<const unsigned> seeds, int numSeeds);
+void setSeeds(rust::Slice<const unsigned> seeds);
 
 void setSeedsToDefault();
 
-std::vector<unsigned> getSeeds();
+rust::Vec<unsigned> getSeeds();
 
 void invalidQuESTInputError(rust::String msg, rust::String func);
 
@@ -151,34 +150,44 @@ void setValidationOff();
 
 void setValidationEpsilonToDefault();
 
-void setValidationEpsilon(qreal eps);
+void setValidationEpsilon(Quest_Real eps);
 
-qreal getValidationEpsilon();
+Quest_Real getValidationEpsilon();
 
-void setMaxNumReportedItems(qindex numRows, qindex numCols);
+void setMaxNumReportedItems(Quest_Index numRows, Quest_Index numCols);
 
 void setMaxNumReportedSigFigs(int numSigFigs);
 
-qindex getGpuCacheSize();
+Quest_Index getGpuCacheSize();
 
 void clearGpuCache();
 
 rust::String getEnvironmentString();
 
 //  Decoherence
-void mixDephasing(Qureg& qureg, int qubit, qreal prob);
+void mixDephasing(Qureg& qureg, int qubit, Quest_Real prob);
 
-void mixTwoQubitDephasing(Qureg& qureg, int qubit1, int qubit2, qreal prob);
+void mixTwoQubitDephasing(Qureg& qureg,
+                          int qubit1,
+                          int qubit2,
+                          Quest_Real prob);
 
-void mixDepolarising(Qureg& qureg, int qubit, qreal prob);
+void mixDepolarising(Qureg& qureg, int qubit, Quest_Real prob);
 
-void mixTwoQubitDepolarising(Qureg& qureg, int qubit1, int qubit2, qreal prob);
+void mixTwoQubitDepolarising(Qureg& qureg,
+                             int qubit1,
+                             int qubit2,
+                             Quest_Real prob);
 
-void mixDamping(Qureg& qureg, int qubit, qreal prob);
+void mixDamping(Qureg& qureg, int qubit, Quest_Real prob);
 
-void mixPaulis(Qureg& qureg, int qubit, qreal probX, qreal probY, qreal probZ);
+void mixPaulis(Qureg& qureg,
+               int qubit,
+               Quest_Real probX,
+               Quest_Real probY,
+               Quest_Real probZ);
 
-void mixQureg(Qureg& qureg, Qureg& other, qreal prob);
+void mixQureg(Qureg& qureg, Qureg& other, Quest_Real prob);
 
 void mixKrausMap(Qureg& qureg,
                  rust::Slice<const int> qubits,
@@ -187,7 +196,7 @@ void mixKrausMap(Qureg& qureg,
 // Environment management
 void initQuESTEnv();
 
-void initCustomQuESTEnv(int useDistrib, int useGpuAccel, int useMultithread);
+void initCustomQuESTEnv(bool useDistrib, bool useGpuAccel, bool useMultithread);
 
 void finalizeQuESTEnv();
 
@@ -208,7 +217,7 @@ void initPlusState(Qureg& qureg);
 
 void initPureState(Qureg& qureg, Qureg& pure);
 
-void initClassicalState(Qureg& qureg, qindex stateInd);
+void initClassicalState(Qureg& qureg, Quest_Index stateInd);
 
 void initDebugState(Qureg& qureg);
 
@@ -217,20 +226,20 @@ void initArbitraryPureState(Qureg& qureg,
 
 void initRandomPureState(Qureg& qureg);
 
-void initRandomMixedState(Qureg& qureg, qindex numPureStates);
+void initRandomMixedState(Qureg& qureg, Quest_Index numPureStates);
 
 void setQuregAmps(Qureg& qureg,
-                  qindex startInd,
+                  Quest_Index startInd,
                   rust::Slice<const Quest_Complex> amps);
 
 void setDensityQuregAmps(
     Qureg& qureg,
-    qindex startRow,
-    qindex startCol,
+    Quest_Index startRow,
+    Quest_Index startCol,
     rust::Slice<const rust::Slice<const Quest_Complex>> amps);
 
 void setDensityQuregFlatAmps(Qureg& qureg,
-                             qindex startInd,
+                             Quest_Index startInd,
                              rust::Slice<const Quest_Complex> amps);
 
 void setQuregToClone(Qureg& targetQureg, const Qureg& copyQureg);
@@ -239,10 +248,10 @@ void setQuregToSuperposition(Quest_Complex facOut,
                              Qureg& out,
                              Quest_Complex fac1,
                              const Qureg& qureg1,
-                             qcomp fac2,
+                             Quest_Complex fac2,
                              const Qureg& qureg2);
 
-qreal setQuregToRenormalized(Qureg& qureg);
+Quest_Real setQuregToRenormalized(Qureg& qureg);
 
 void setQuregToPauliStrSum(Qureg& qureg, const PauliStrSum& sum);
 
@@ -284,7 +293,7 @@ void setCompMatr(CompMatr& out,
 void setDiagMatr(DiagMatr& out, rust::Slice<const Quest_Complex> in);
 
 void setFullStateDiagMatr(FullStateDiagMatr& out,
-                          qindex startInd,
+                          Quest_Index startInd,
                           rust::Slice<const Quest_Complex> in);
 
 std::unique_ptr<FullStateDiagMatr> createFullStateDiagMatrFromPauliStrSum(
@@ -292,13 +301,6 @@ std::unique_ptr<FullStateDiagMatr> createFullStateDiagMatrFromPauliStrSum(
 
 void setFullStateDiagMatrFromPauliStrSum(FullStateDiagMatr& out,
                                          const PauliStrSum& in);
-
-void setFullStateDiagMatrFromMultiVarFunc(
-    FullStateDiagMatr& out,
-    rust::Fn<Quest_Complex(rust::Slice<const qindex>)> func,
-    rust::Slice<const int> numQubitsPerVar,
-    int numVars,
-    int areSigned);
 
 void reportCompMatr1(const CompMatr1& matrix);
 
@@ -518,13 +520,11 @@ void applyControlledS(Qureg& qureg, int control, int target);
 
 void applyMultiControlledS(Qureg& qureg,
                            rust::Slice<const int> controls,
-                           int numControls,
                            int target);
 
 void applyMultiStateControlledS(Qureg& qureg,
                                 rust::Slice<const int> controls,
                                 rust::Slice<const int> states,
-                                int numControls,
                                 int target);
 
 /// T gate
@@ -534,13 +534,11 @@ void applyControlledT(Qureg& qureg, int control, int target);
 
 void applyMultiControlledT(Qureg& qureg,
                            rust::Slice<const int> controls,
-                           int numControls,
                            int target);
 
 void applyMultiStateControlledT(Qureg& qureg,
                                 rust::Slice<const int> controls,
                                 rust::Slice<const int> states,
-                                int numControls,
                                 int target);
 
 /// Hadamard
@@ -550,13 +548,11 @@ void applyControlledHadamard(Qureg& qureg, int control, int target);
 
 void applyMultiControlledHadamard(Qureg& qureg,
                                   rust::Slice<const int> controls,
-                                  int numControls,
                                   int target);
 
 void applyMultiStateControlledHadamard(Qureg& qureg,
                                        rust::Slice<const int> controls,
                                        rust::Slice<const int> states,
-                                       int numControls,
                                        int target);
 
 /// swaps
@@ -568,14 +564,12 @@ void applyControlledSwap(Qureg& qureg, int control, int qubit1, int qubit2);
 
 void applyMultiControlledSwap(Qureg& qureg,
                               rust::Slice<const int> controls,
-                              int numControls,
                               int qubit1,
                               int qubit2);
 
 void applyMultiStateControlledSwap(Qureg& qureg,
                                    rust::Slice<const int> controls,
                                    rust::Slice<const int> states,
-                                   int numControls,
                                    int qubit1,
                                    int qubit2);
 
@@ -586,14 +580,12 @@ void applyControlledSqrtSwap(Qureg& qureg, int control, int qubit1, int qubit2);
 
 void applyMultiControlledSqrtSwap(Qureg& qureg,
                                   rust::Slice<const int> controls,
-                                  int numControls,
                                   int qubit1,
                                   int qubit2);
 
 void applyMultiStateControlledSqrtSwap(Qureg& qureg,
                                        rust::Slice<const int> controls,
                                        rust::Slice<const int> states,
-                                       int numControls,
                                        int qubit1,
                                        int qubit2);
 
@@ -634,16 +626,16 @@ void applyMultiStateControlledPauliZ(Qureg& qureg,
                                      int target);
 
 /// Pauli strings
-void multiplyPauliStr(Qureg& qureg, PauliStr str);
+void multiplyPauliStr(Qureg& qureg, const PauliStr& str);
 
-void applyPauliStr(Qureg& qureg, PauliStr str);
+void applyPauliStr(Qureg& qureg, const PauliStr& str);
 
-void applyControlledPauliStr(Qureg& qureg, int control, PauliStr str);
+void applyControlledPauliStr(Qureg& qureg, int control, const PauliStr& str);
 
 void applyMultiControlledPauliStr(Qureg& qureg,
                                   rust::Slice<const int> controls,
                                   int numControls,
-                                  PauliStr str);
+                                  const PauliStr& str);
 
 void applyMultiStateControlledPauliStr(Qureg& qureg,
                                        rust::Slice<const int> controls,
@@ -651,150 +643,157 @@ void applyMultiStateControlledPauliStr(Qureg& qureg,
                                        const PauliStr& str);
 
 /// Pauli string sums
-void multiplyPauliStrSum(Qureg& qureg, PauliStrSum sum, Qureg& workspace);
+void multiplyPauliStrSum(Qureg& qureg, const PauliStrSum& sum, Qureg& workspace);
 
 void applyTrotterizedPauliStrSumGadget(Qureg& qureg,
-                                       PauliStrSum sum,
-                                       qreal angle,
+                                       const PauliStrSum& sum,
+                                       Quest_Real angle,
                                        int order,
                                        int reps);
 
 /// individual axis rotations
-void applyRotateX(Qureg& qureg, int target, qreal angle);
-void applyRotateY(Qureg& qureg, int target, qreal angle);
-void applyRotateZ(Qureg& qureg, int target, qreal angle);
+void applyRotateX(Qureg& qureg, int target, Quest_Real angle);
+void applyRotateY(Qureg& qureg, int target, Quest_Real angle);
+void applyRotateZ(Qureg& qureg, int target, Quest_Real angle);
 
-void applyControlledRotateX(Qureg& qureg, int control, int target, qreal angle);
-void applyControlledRotateY(Qureg& qureg, int control, int target, qreal angle);
-void applyControlledRotateZ(Qureg& qureg, int control, int target, qreal angle);
+void applyControlledRotateX(Qureg& qureg,
+                            int control,
+                            int target,
+                            Quest_Real angle);
+void applyControlledRotateY(Qureg& qureg,
+                            int control,
+                            int target,
+                            Quest_Real angle);
+void applyControlledRotateZ(Qureg& qureg,
+                            int control,
+                            int target,
+                            Quest_Real angle);
 
 void applyMultiControlledRotateX(Qureg& qureg,
                                  rust::Slice<const int> controls,
                                  int target,
-                                 qreal angle);
+                                 Quest_Real angle);
 void applyMultiControlledRotateY(Qureg& qureg,
                                  rust::Slice<const int> controls,
                                  int target,
-                                 qreal angle);
+                                 Quest_Real angle);
 void applyMultiControlledRotateZ(Qureg& qureg,
                                  rust::Slice<const int> controls,
                                  int target,
-                                 qreal angle);
+                                 Quest_Real angle);
 
 void applyMultiStateControlledRotateX(Qureg& qureg,
                                       rust::Slice<const int> controls,
                                       rust::Slice<const int> states,
                                       int target,
-                                      qreal angle);
+                                      Quest_Real angle);
 void applyMultiStateControlledRotateY(Qureg& qureg,
                                       rust::Slice<const int> controls,
                                       rust::Slice<const int> states,
                                       int target,
-                                      qreal angle);
+                                      Quest_Real angle);
 void applyMultiStateControlledRotateZ(Qureg& qureg,
                                       rust::Slice<const int> controls,
                                       rust::Slice<const int> states,
                                       int target,
-                                      qreal angle);
+                                      Quest_Real angle);
 
 /// arbitrary axis rotation
 void applyRotateAroundAxis(Qureg& qureg,
                            int targ,
-                           qreal angle,
-                           qreal axisX,
-                           qreal axisY,
-                           qreal axisZ);
+                           Quest_Real angle,
+                           Quest_Real axisX,
+                           Quest_Real axisY,
+                           Quest_Real axisZ);
 
 void applyControlledRotateAroundAxis(Qureg& qureg,
                                      int ctrl,
                                      int targ,
-                                     qreal angle,
-                                     qreal axisX,
-                                     qreal axisY,
-                                     qreal axisZ);
+                                     Quest_Real angle,
+                                     Quest_Real axisX,
+                                     Quest_Real axisY,
+                                     Quest_Real axisZ);
 
 void applyMultiControlledRotateAroundAxis(Qureg& qureg,
                                           rust::Slice<const int> ctrls,
                                           int targ,
-                                          qreal angle,
-                                          qreal axisX,
-                                          qreal axisY,
-                                          qreal axisZ);
+                                          Quest_Real angle,
+                                          Quest_Real axisX,
+                                          Quest_Real axisY,
+                                          Quest_Real axisZ);
 
 void applyMultiStateControlledRotateAroundAxis(Qureg& qureg,
                                                rust::Slice<const int> ctrls,
                                                rust::Slice<const int> states,
-                                               int numCtrls,
                                                int targ,
-                                               qreal angle,
-                                               qreal axisX,
-                                               qreal axisY,
-                                               qreal axisZ);
+                                               Quest_Real angle,
+                                               Quest_Real axisX,
+                                               Quest_Real axisY,
+                                               Quest_Real axisZ);
 
 /// Pauli gadgets
-void multiplyPauliGadget(Qureg& qureg, PauliStr str, qreal angle);
+void multiplyPauliGadget(Qureg& qureg, const PauliStr& str, Quest_Real angle);
 
-void applyPauliGadget(Qureg& qureg, PauliStr str, qreal angle);
+void applyPauliGadget(Qureg& qureg, const PauliStr& str, Quest_Real angle);
 
 void applyControlledPauliGadget(Qureg& qureg,
                                 int control,
-                                PauliStr str,
-                                qreal angle);
+                                const PauliStr& str,
+                                Quest_Real angle);
 
 void applyMultiControlledPauliGadget(Qureg& qureg,
                                      rust::Slice<const int> controls,
-                                     PauliStr str,
-                                     qreal angle);
+                                     const PauliStr& str,
+                                     Quest_Real angle);
 
 void applyMultiStateControlledPauliGadget(Qureg& qureg,
                                           rust::Slice<const int> controls,
                                           rust::Slice<const int> states,
-                                          int numControls,
-                                          PauliStr str,
-                                          qreal angle);
+                                          const PauliStr& str,
+                                          Quest_Real angle);
 
 /// phase gadgets
 void multiplyPhaseGadget(Qureg& qureg,
                          rust::Slice<const int> targets,
-                         qreal angle);
+                         Quest_Real angle);
 
 void applyPhaseGadget(Qureg& qureg,
                       rust::Slice<const int> targets,
-                      qreal angle);
+                      Quest_Real angle);
 
 void applyControlledPhaseGadget(Qureg& qureg,
                                 int control,
                                 rust::Slice<const int> targets,
-                                qreal angle);
+                                Quest_Real angle);
 
 void applyMultiControlledPhaseGadget(Qureg& qureg,
                                      rust::Slice<const int> controls,
                                      rust::Slice<const int> targets,
-                                     qreal angle);
+                                     Quest_Real angle);
 
 void applyMultiStateControlledPhaseGadget(Qureg& qureg,
                                           rust::Slice<const int> controls,
                                           rust::Slice<const int> states,
                                           rust::Slice<const int> targets,
-                                          qreal angle);
+                                          Quest_Real angle);
 
 /// phase shifts and flips
 void applyPhaseFlip(Qureg& qureg, int target);
 
-void applyPhaseShift(Qureg& qureg, int target, qreal angle);
+void applyPhaseShift(Qureg& qureg, int target, Quest_Real angle);
 
 void applyTwoQubitPhaseFlip(Qureg& qureg, int target1, int target2);
 
 void applyTwoQubitPhaseShift(Qureg& qureg,
                              int target1,
                              int target2,
-                             qreal angle);
+                             Quest_Real angle);
 
 void applyMultiQubitPhaseFlip(Qureg& qureg, rust::Slice<const int> targets);
 
 void applyMultiQubitPhaseShift(Qureg& qureg,
                                rust::Slice<const int> targets,
-                               qreal angle);
+                               Quest_Real angle);
 
 /// many-qubit CNOTs (aliases for X)
 void multiplyMultiQubitNot(Qureg& qureg, rust::Slice<const int> targets);
@@ -825,30 +824,26 @@ int applyQubitMeasurement(Qureg& qureg, int target);
 
 int applyQubitMeasurementAndGetProb(Qureg& qureg,
                                     int target,
-                                    qreal* probability);
+                                    Quest_Real* probability);
 
-qreal applyForcedQubitMeasurement(Qureg& qureg, int target, int outcome);
+Quest_Real applyForcedQubitMeasurement(Qureg& qureg, int target, int outcome);
 
 void applyQubitProjector(Qureg& qureg, int target, int outcome);
 
-qindex applyMultiQubitMeasurement(Qureg& qureg,
-                                  rust::Slice<const int> qubits,
-                                  int numQubits);
+Quest_Index applyMultiQubitMeasurement(Qureg& qureg,
+                                       rust::Slice<const int> qubits);
 
-qindex applyMultiQubitMeasurementAndGetProb(Qureg& qureg,
+Quest_Index applyMultiQubitMeasurementAndGetProb(Qureg& qureg,
+                                                 rust::Slice<const int> qubits,
+                                                 Quest_Real* probability);
+
+Quest_Real applyForcedMultiQubitMeasurement(Qureg& qureg,
                                             rust::Slice<const int> qubits,
-                                            int numQubits,
-                                            qreal* probability);
-
-qreal applyForcedMultiQubitMeasurement(Qureg& qureg,
-                                       rust::Slice<const int> qubits,
-                                       rust::Slice<const int> outcomes,
-                                       int numQubits);
+                                            rust::Slice<const int> outcomes);
 
 void applyMultiQubitProjector(Qureg& qureg,
                               rust::Slice<const int> qubits,
-                              rust::Slice<const int> outcomes,
-                              int numQubits);
+                              rust::Slice<const int> outcomes);
 
 /// QFT
 void applyQuantumFourierTransform(Qureg& qureg,
@@ -861,9 +856,6 @@ void applyFullQuantumFourierTransform(Qureg& qureg);
 std::unique_ptr<PauliStr> getPauliStr(rust::String paulis,
                                       rust::Slice<const int> indices);
 
-std::unique_ptr<PauliStrSum> createPauliStrSum(
-    std::vector<PauliStr>& strings,
-    const std::vector<Quest_Complex>& coeffs);
 
 std::unique_ptr<PauliStrSum> createInlinePauliStrSum(rust::String str);
 
@@ -887,10 +879,10 @@ std::unique_ptr<Qureg> createForcedQureg(int numQubits);
 std::unique_ptr<Qureg> createForcedDensityQureg(int numQubits);
 
 std::unique_ptr<Qureg> createCustomQureg(int numQubits,
-                        int isDensMatr,
-                        int useDistrib,
-                        int useGpuAccel,
-                        int useMultithread);
+                                         int isDensMatr,
+                                         int useDistrib,
+                                         int useGpuAccel,
+                                         int useMultithread);
 
 std::unique_ptr<Qureg> createCloneQureg(const Qureg& qureg);
 
@@ -904,24 +896,28 @@ void syncQuregToGpu(Qureg& qureg);
 
 void syncQuregFromGpu(Qureg& qureg);
 
-void syncSubQuregToGpu(Qureg &qureg, qindex localStartInd, qindex numLocalAmps);
+void syncSubQuregToGpu(Qureg& qureg,
+                       Quest_Index localStartInd,
+                       Quest_Index numLocalAmps);
 
 void syncSubQuregFromGpu(Qureg& qureg,
-                         qindex localStartInd,
-                         qindex numLocalAmps);
+                         Quest_Index localStartInd,
+                         Quest_Index numLocalAmps);
 
 rust::Vec<Quest_Complex> getQuregAmps(Qureg& qureg,
-                  qindex startInd,
-                  qindex numAmps);
+                                      Quest_Index startInd,
+                                      Quest_Index numAmps);
 
-rust::Vec<rust::Vec<Quest_Complex>> getDensityQuregAmps(Qureg& qureg,
-                         qindex startRow,
-                         qindex startCol,
-                         qindex numRows,
-                         qindex numCols);
+rust::Vec<Quest_Complex> getDensityQuregAmps_flatten(Qureg& qureg,
+                                                        Quest_Index startRow,
+                                                        Quest_Index startCol,
+                                                        Quest_Index numRows,
+                                                        Quest_Index numCols);
 
-Quest_Complex getQuregAmp(Qureg& qureg, qindex index);
+Quest_Complex getQuregAmp(Qureg& qureg, Quest_Index index);
 
-Quest_Complex getDensityQuregAmp(Qureg& qureg, qindex row, qindex column);
+Quest_Complex getDensityQuregAmp(Qureg& qureg,
+                                 Quest_Index row,
+                                 Quest_Index column);
 
 }  // namespace quest_sys

@@ -5,21 +5,26 @@
 #include "helper.h"
 
 namespace quest_sys {
-void setSeeds(rust::Slice<const unsigned> seeds, int numSeeds) {
-  ::setSeeds(quest_helper::slice_to_ptr(seeds), numSeeds);
+void setSeeds(rust::Slice<const unsigned> seeds) {
+  ::setSeeds(quest_helper::slice_to_ptr(seeds),
+             static_cast<int>(seeds.length()));
 }
 
 void setSeedsToDefault() {
   ::setSeedsToDefault();
 }
 
-std::vector<unsigned> getSeeds() {
-  unsigned* seed_ptr;
+rust::Vec<unsigned> getSeeds() {
+  unsigned* seed_ptr{};
   ::getSeeds(seed_ptr);
+  rust::Vec<unsigned> out{};
   if (seed_ptr) {
-    return {seed_ptr, seed_ptr + ::getNumSeeds()};
+    for(int i = 0; i < ::getNumSeeds(); ++i) {
+        out.emplace_back(seed_ptr[0]);
+    }
+    return out;
   } else {
-    return {};
+    return out;
   }
 }
 
@@ -39,15 +44,15 @@ void setValidationEpsilonToDefault() {
   ::setValidationEpsilonToDefault();
 }
 
-void setValidationEpsilon(qreal eps) {
+void setValidationEpsilon(Quest_Real eps) {
   ::setValidationEpsilon(eps);
 }
 
-qreal getValidationEpsilon() {
+Quest_Real getValidationEpsilon() {
   return ::getValidationEpsilon();
 }
 
-void setMaxNumReportedItems(qindex numRows, qindex numCols) {
+void setMaxNumReportedItems(Quest_Index numRows, Quest_Index numCols) {
   ::setMaxNumReportedItems(numRows, numCols);
 }
 
@@ -55,7 +60,7 @@ void setMaxNumReportedSigFigs(int numSigFigs) {
   ::setMaxNumReportedSigFigs(numSigFigs);
 }
 
-qindex getGpuCacheSize() {
+Quest_Index getGpuCacheSize() {
   return ::getGpuCacheSize();
 }
 

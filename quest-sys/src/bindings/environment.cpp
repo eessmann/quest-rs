@@ -8,7 +8,7 @@ void initQuESTEnv() {
   ::initQuESTEnv();
 }
 
-void initCustomQuESTEnv(int useDistrib, int useGpuAccel, int useMultithread) {
+void initCustomQuESTEnv(bool useDistrib, bool useGpuAccel, bool useMultithread) {
   ::initCustomQuESTEnv(useDistrib, useGpuAccel, useMultithread);
 }
 

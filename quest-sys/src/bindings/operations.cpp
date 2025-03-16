@@ -1,9 +1,7 @@
 //
 // Created by Erich Essmann on 14/03/2025.
 //
-//
-// Created by Erich Essmann on 12/03/2025.
-//
+
 #include "bindings.h"
 #include "helper.h"
 
@@ -145,20 +143,18 @@ void applyControlledS(Qureg& qureg, int control, int target) {
 
 void applyMultiControlledS(Qureg& qureg,
                            rust::Slice<const int> controls,
-                           int numControls,
                            int target) {
   ::applyMultiControlledS(qureg, quest_helper::slice_to_ptr(controls),
-                          numControls, target);
+                          static_cast<int>(controls.length()), target);
 }
 
 void applyMultiStateControlledS(Qureg& qureg,
                                 rust::Slice<const int> controls,
                                 rust::Slice<const int> states,
-                                int numControls,
                                 int target) {
   ::applyMultiStateControlledS(qureg, quest_helper::slice_to_ptr(controls),
-                               quest_helper::slice_to_ptr(states), numControls,
-                               target);
+                               quest_helper::slice_to_ptr(states),
+                               static_cast<int>(controls.length()), target);
 }
 
 // T gate operations
@@ -172,20 +168,18 @@ void applyControlledT(Qureg& qureg, int control, int target) {
 
 void applyMultiControlledT(Qureg& qureg,
                            rust::Slice<const int> controls,
-                           int numControls,
                            int target) {
   ::applyMultiControlledT(qureg, quest_helper::slice_to_ptr(controls),
-                          numControls, target);
+                          static_cast<int>(controls.length()), target);
 }
 
 void applyMultiStateControlledT(Qureg& qureg,
                                 rust::Slice<const int> controls,
                                 rust::Slice<const int> states,
-                                int numControls,
                                 int target) {
   ::applyMultiStateControlledT(qureg, quest_helper::slice_to_ptr(controls),
-                               quest_helper::slice_to_ptr(states), numControls,
-                               target);
+                               quest_helper::slice_to_ptr(states),
+                               static_cast<int>(controls.length()), target);
 }
 
 // Hadamard operations
@@ -199,20 +193,19 @@ void applyControlledHadamard(Qureg& qureg, int control, int target) {
 
 void applyMultiControlledHadamard(Qureg& qureg,
                                   rust::Slice<const int> controls,
-                                  int numControls,
                                   int target) {
   ::applyMultiControlledHadamard(qureg, quest_helper::slice_to_ptr(controls),
-                                 numControls, target);
+                                 static_cast<int>(controls.length()), target);
 }
 
 void applyMultiStateControlledHadamard(Qureg& qureg,
                                        rust::Slice<const int> controls,
                                        rust::Slice<const int> states,
-                                       int numControls,
                                        int target) {
   ::applyMultiStateControlledHadamard(
       qureg, quest_helper::slice_to_ptr(controls),
-      quest_helper::slice_to_ptr(states), numControls, target);
+      quest_helper::slice_to_ptr(states), static_cast<int>(controls.length()),
+      target);
 }
 
 // Swap operations
@@ -230,22 +223,22 @@ void applyControlledSwap(Qureg& qureg, int control, int qubit1, int qubit2) {
 
 void applyMultiControlledSwap(Qureg& qureg,
                               rust::Slice<const int> controls,
-                              int numControls,
                               int qubit1,
                               int qubit2) {
   ::applyMultiControlledSwap(qureg, quest_helper::slice_to_ptr(controls),
-                             numControls, qubit1, qubit2);
+                             static_cast<int>(controls.length()), qubit1,
+                             qubit2);
 }
 
 void applyMultiStateControlledSwap(Qureg& qureg,
                                    rust::Slice<const int> controls,
                                    rust::Slice<const int> states,
-                                   int numControls,
                                    int qubit1,
                                    int qubit2) {
   ::applyMultiStateControlledSwap(qureg, quest_helper::slice_to_ptr(controls),
                                   quest_helper::slice_to_ptr(states),
-                                  numControls, qubit1, qubit2);
+                                  static_cast<int>(controls.length()), qubit1,
+                                  qubit2);
 }
 
 // Sqrt-swap operations
@@ -262,22 +255,22 @@ void applyControlledSqrtSwap(Qureg& qureg,
 
 void applyMultiControlledSqrtSwap(Qureg& qureg,
                                   rust::Slice<const int> controls,
-                                  int numControls,
                                   int qubit1,
                                   int qubit2) {
   ::applyMultiControlledSqrtSwap(qureg, quest_helper::slice_to_ptr(controls),
-                                 numControls, qubit1, qubit2);
+                                 static_cast<int>(controls.length()), qubit1,
+                                 qubit2);
 }
 
 void applyMultiStateControlledSqrtSwap(Qureg& qureg,
                                        rust::Slice<const int> controls,
                                        rust::Slice<const int> states,
-                                       int numControls,
                                        int qubit1,
                                        int qubit2) {
   ::applyMultiStateControlledSqrtSwap(
       qureg, quest_helper::slice_to_ptr(controls),
-      quest_helper::slice_to_ptr(states), numControls, qubit1, qubit2);
+      quest_helper::slice_to_ptr(states), static_cast<int>(controls.length()),
+      qubit1, qubit2);
 }
 
 // Individual Pauli operations
@@ -367,43 +360,43 @@ void applyMultiStateControlledPauliZ(Qureg& qureg,
 }
 
 // Rotation operations
-void applyRotateX(Qureg& qureg, int target, qreal angle) {
+void applyRotateX(Qureg& qureg, int target, Quest_Real angle) {
   ::applyRotateX(qureg, target, angle);
 }
 
-void applyRotateY(Qureg& qureg, int target, qreal angle) {
+void applyRotateY(Qureg& qureg, int target, Quest_Real angle) {
   ::applyRotateY(qureg, target, angle);
 }
 
-void applyRotateZ(Qureg& qureg, int target, qreal angle) {
+void applyRotateZ(Qureg& qureg, int target, Quest_Real angle) {
   ::applyRotateZ(qureg, target, angle);
 }
 
 void applyControlledRotateX(Qureg& qureg,
                             int control,
                             int target,
-                            qreal angle) {
+                            Quest_Real angle) {
   ::applyControlledRotateX(qureg, control, target, angle);
 }
 
 void applyControlledRotateY(Qureg& qureg,
                             int control,
                             int target,
-                            qreal angle) {
+                            Quest_Real angle) {
   ::applyControlledRotateY(qureg, control, target, angle);
 }
 
 void applyControlledRotateZ(Qureg& qureg,
                             int control,
                             int target,
-                            qreal angle) {
+                            Quest_Real angle) {
   ::applyControlledRotateZ(qureg, control, target, angle);
 }
 
 void applyMultiControlledRotateX(Qureg& qureg,
                                  rust::Slice<const int> controls,
                                  int target,
-                                 qreal angle) {
+                                 Quest_Real angle) {
   ::applyMultiControlledRotateX(qureg, quest_helper::slice_to_ptr(controls),
                                 static_cast<int>(controls.length()), target,
                                 angle);
@@ -412,7 +405,7 @@ void applyMultiControlledRotateX(Qureg& qureg,
 void applyMultiControlledRotateY(Qureg& qureg,
                                  rust::Slice<const int> controls,
                                  int target,
-                                 qreal angle) {
+                                 Quest_Real angle) {
   ::applyMultiControlledRotateY(qureg, quest_helper::slice_to_ptr(controls),
                                 static_cast<int>(controls.length()), target,
                                 angle);
@@ -421,7 +414,7 @@ void applyMultiControlledRotateY(Qureg& qureg,
 void applyMultiControlledRotateZ(Qureg& qureg,
                                  rust::Slice<const int> controls,
                                  int target,
-                                 qreal angle) {
+                                 Quest_Real angle) {
   ::applyMultiControlledRotateZ(qureg, quest_helper::slice_to_ptr(controls),
                                 static_cast<int>(controls.length()), target,
                                 angle);
@@ -431,7 +424,7 @@ void applyMultiStateControlledRotateX(Qureg& qureg,
                                       rust::Slice<const int> controls,
                                       rust::Slice<const int> states,
                                       int target,
-                                      qreal angle) {
+                                      Quest_Real angle) {
   ::applyMultiStateControlledRotateX(
       qureg, quest_helper::slice_to_ptr(controls),
       quest_helper::slice_to_ptr(states), static_cast<int>(controls.length()),
@@ -441,7 +434,7 @@ void applyMultiStateControlledRotateY(Qureg& qureg,
                                       rust::Slice<const int> controls,
                                       rust::Slice<const int> states,
                                       int target,
-                                      qreal angle) {
+                                      Quest_Real angle) {
   ::applyMultiStateControlledRotateY(
       qureg, quest_helper::slice_to_ptr(controls),
       quest_helper::slice_to_ptr(states), static_cast<int>(controls.length()),
@@ -451,7 +444,7 @@ void applyMultiStateControlledRotateZ(Qureg& qureg,
                                       rust::Slice<const int> controls,
                                       rust::Slice<const int> states,
                                       int target,
-                                      qreal angle) {
+                                      Quest_Real angle) {
   ::applyMultiStateControlledRotateZ(
       qureg, quest_helper::slice_to_ptr(controls),
       quest_helper::slice_to_ptr(states), static_cast<int>(controls.length()),
@@ -461,20 +454,20 @@ void applyMultiStateControlledRotateZ(Qureg& qureg,
 // Arbitrary axis rotation
 void applyRotateAroundAxis(Qureg& qureg,
                            int targ,
-                           qreal angle,
-                           qreal axisX,
-                           qreal axisY,
-                           qreal axisZ) {
+                           Quest_Real angle,
+                           Quest_Real axisX,
+                           Quest_Real axisY,
+                           Quest_Real axisZ) {
   ::applyRotateAroundAxis(qureg, targ, angle, axisX, axisY, axisZ);
 }
 
 void applyControlledRotateAroundAxis(Qureg& qureg,
                                      int ctrl,
                                      int targ,
-                                     qreal angle,
-                                     qreal axisX,
-                                     qreal axisY,
-                                     qreal axisZ) {
+                                     Quest_Real angle,
+                                     Quest_Real axisX,
+                                     Quest_Real axisY,
+                                     Quest_Real axisZ) {
   ::applyControlledRotateAroundAxis(qureg, ctrl, targ, angle, axisX, axisY,
                                     axisZ);
 }
@@ -482,10 +475,10 @@ void applyControlledRotateAroundAxis(Qureg& qureg,
 void applyMultiControlledRotateAroundAxis(Qureg& qureg,
                                           rust::Slice<const int> ctrls,
                                           int targ,
-                                          qreal angle,
-                                          qreal axisX,
-                                          qreal axisY,
-                                          qreal axisZ) {
+                                          Quest_Real angle,
+                                          Quest_Real axisX,
+                                          Quest_Real axisY,
+                                          Quest_Real axisZ) {
   ::applyMultiControlledRotateAroundAxis(
       qureg, quest_helper::slice_to_ptr(ctrls),
       static_cast<int>(ctrls.length()), targ, angle, axisX, axisY, axisZ);
@@ -495,10 +488,10 @@ void applyMultiStateControlledRotateAroundAxis(Qureg& qureg,
                                                rust::Slice<const int> ctrls,
                                                rust::Slice<const int> states,
                                                int targ,
-                                               qreal angle,
-                                               qreal axisX,
-                                               qreal axisY,
-                                               qreal axisZ) {
+                                               Quest_Real angle,
+                                               Quest_Real axisX,
+                                               Quest_Real axisY,
+                                               Quest_Real axisZ) {
   ::applyMultiStateControlledRotateAroundAxis(
       qureg, quest_helper::slice_to_ptr(ctrls),
       quest_helper::slice_to_ptr(states), static_cast<int>(ctrls.length()),
@@ -510,7 +503,7 @@ void applyPhaseFlip(Qureg& qureg, int target) {
   ::applyPhaseFlip(qureg, target);
 }
 
-void applyPhaseShift(Qureg& qureg, int target, qreal angle) {
+void applyPhaseShift(Qureg& qureg, int target, Quest_Real angle) {
   ::applyPhaseShift(qureg, target, angle);
 }
 
@@ -521,7 +514,7 @@ void applyTwoQubitPhaseFlip(Qureg& qureg, int target1, int target2) {
 void applyTwoQubitPhaseShift(Qureg& qureg,
                              int target1,
                              int target2,
-                             qreal angle) {
+                             Quest_Real angle) {
   ::applyTwoQubitPhaseShift(qureg, target1, target2, angle);
 }
 
@@ -532,7 +525,7 @@ void applyMultiQubitPhaseFlip(Qureg& qureg, rust::Slice<const int> targets) {
 
 void applyMultiQubitPhaseShift(Qureg& qureg,
                                rust::Slice<const int> targets,
-                               qreal angle) {
+                               Quest_Real angle) {
   ::applyMultiQubitPhaseShift(qureg, quest_helper::slice_to_ptr(targets),
                               static_cast<int>(targets.length()), angle);
 }
@@ -590,11 +583,11 @@ int applyQubitMeasurement(Qureg& qureg, int target) {
 
 int applyQubitMeasurementAndGetProb(Qureg& qureg,
                                     int target,
-                                    qreal* probability) {
+                                    Quest_Real* probability) {
   return ::applyQubitMeasurementAndGetProb(qureg, target, probability);
 }
 
-qreal applyForcedQubitMeasurement(Qureg& qureg, int target, int outcome) {
+Quest_Real applyForcedQubitMeasurement(Qureg& qureg, int target, int outcome) {
   return ::applyForcedQubitMeasurement(qureg, target, outcome);
 }
 
@@ -602,36 +595,34 @@ void applyQubitProjector(Qureg& qureg, int target, int outcome) {
   ::applyQubitProjector(qureg, target, outcome);
 }
 
-qindex applyMultiQubitMeasurement(Qureg& qureg,
-                                  rust::Slice<const int> qubits,
-                                  int numQubits) {
+Quest_Index applyMultiQubitMeasurement(Qureg& qureg,
+                                       rust::Slice<const int> qubits) {
   return ::applyMultiQubitMeasurement(qureg, quest_helper::slice_to_ptr(qubits),
-                                      numQubits);
+                                      static_cast<int>(qubits.length()));
 }
 
-qindex applyMultiQubitMeasurementAndGetProb(Qureg& qureg,
-                                            rust::Slice<const int> qubits,
-                                            int numQubits,
-                                            qreal* probability) {
+Quest_Index applyMultiQubitMeasurementAndGetProb(Qureg& qureg,
+                                                 rust::Slice<const int> qubits,
+                                                 Quest_Real* probability) {
   return ::applyMultiQubitMeasurementAndGetProb(
-      qureg, quest_helper::slice_to_ptr(qubits), numQubits, probability);
+      qureg, quest_helper::slice_to_ptr(qubits),
+      static_cast<int>(qubits.length()), probability);
 }
 
-qreal applyForcedMultiQubitMeasurement(Qureg& qureg,
-                                       rust::Slice<const int> qubits,
-                                       rust::Slice<const int> outcomes,
-                                       int numQubits) {
+Quest_Real applyForcedMultiQubitMeasurement(Qureg& qureg,
+                                            rust::Slice<const int> qubits,
+                                            rust::Slice<const int> outcomes) {
   return ::applyForcedMultiQubitMeasurement(
       qureg, quest_helper::slice_to_ptr(qubits),
-      quest_helper::slice_to_ptr(outcomes), numQubits);
+      quest_helper::slice_to_ptr(outcomes), static_cast<int>(qubits.length()));
 }
 
 void applyMultiQubitProjector(Qureg& qureg,
                               rust::Slice<const int> qubits,
-                              rust::Slice<const int> outcomes,
-                              int numQubits) {
+                              rust::Slice<const int> outcomes) {
   ::applyMultiQubitProjector(qureg, quest_helper::slice_to_ptr(qubits),
-                             quest_helper::slice_to_ptr(outcomes), numQubits);
+                             quest_helper::slice_to_ptr(outcomes),
+                             static_cast<int>(qubits.length()));
 }
 
 // QFT operations
@@ -647,22 +638,22 @@ void applyFullQuantumFourierTransform(Qureg& qureg) {
 }
 
 // Pauli string operations
-void multiplyPauliStr(Qureg& qureg, PauliStr str) {
+void multiplyPauliStr(Qureg& qureg, const PauliStr& str) {
   ::multiplyPauliStr(qureg, str);
 }
 
-void applyPauliStr(Qureg& qureg, PauliStr str) {
+void applyPauliStr(Qureg& qureg, const PauliStr& str) {
   ::applyPauliStr(qureg, str);
 }
 
-void applyControlledPauliStr(Qureg& qureg, int control, PauliStr str) {
+void applyControlledPauliStr(Qureg& qureg, int control, const PauliStr& str) {
   ::applyControlledPauliStr(qureg, control, str);
 }
 
 void applyMultiControlledPauliStr(Qureg& qureg,
                                   rust::Slice<const int> controls,
                                   int numControls,
-                                  PauliStr str) {
+                                  const PauliStr& str) {
   ::applyMultiControlledPauliStr(qureg, quest_helper::slice_to_ptr(controls),
                                  numControls, str);
 }
@@ -678,41 +669,52 @@ void applyMultiStateControlledPauliStr(Qureg& qureg,
 }
 
 // Pauli gadget operations
-void multiplyPauliGadget(Qureg& qureg, PauliStr str, qreal angle) {
+void multiplyPauliGadget(Qureg& qureg, const PauliStr& str, Quest_Real angle) {
   ::multiplyPauliGadget(qureg, str, angle);
 }
 
-void applyPauliGadget(Qureg& qureg, PauliStr str, qreal angle) {
+void applyPauliGadget(Qureg& qureg, const PauliStr& str, Quest_Real angle) {
   ::applyPauliGadget(qureg, str, angle);
 }
 
 void applyControlledPauliGadget(Qureg& qureg,
                                 int control,
-                                PauliStr str,
-                                qreal angle) {
+                                const PauliStr& str,
+                                Quest_Real angle) {
   ::applyControlledPauliGadget(qureg, control, str, angle);
 }
 
 void applyMultiControlledPauliGadget(Qureg& qureg,
                                      rust::Slice<const int> controls,
-                                     PauliStr str,
-                                     qreal angle) {
+                                     const PauliStr& str,
+                                     Quest_Real angle) {
   ::applyMultiControlledPauliGadget(qureg, quest_helper::slice_to_ptr(controls),
                                     static_cast<int>(controls.length()), str,
                                     angle);
 }
 
+void applyMultiStateControlledPauliGadget(Qureg& qureg,
+                                          rust::Slice<const int> controls,
+                                          rust::Slice<const int> states,
+                                          const PauliStr& str,
+                                          Quest_Real angle) {
+  ::applyMultiStateControlledPauliGadget(
+      qureg, quest_helper::slice_to_ptr(controls),
+      quest_helper::slice_to_ptr(states), static_cast<int>(controls.length()),
+      str, angle);
+}
+
 // Phase gadget operations
 void multiplyPhaseGadget(Qureg& qureg,
                          rust::Slice<const int> targets,
-                         qreal angle) {
+                         Quest_Real angle) {
   ::multiplyPhaseGadget(qureg, quest_helper::slice_to_ptr(targets),
                         static_cast<int>(targets.length()), angle);
 }
 
 void applyPhaseGadget(Qureg& qureg,
                       rust::Slice<const int> targets,
-                      qreal angle) {
+                      Quest_Real angle) {
   ::applyPhaseGadget(qureg, quest_helper::slice_to_ptr(targets),
                      static_cast<int>(targets.length()), angle);
 }
@@ -720,7 +722,7 @@ void applyPhaseGadget(Qureg& qureg,
 void applyControlledPhaseGadget(Qureg& qureg,
                                 int control,
                                 rust::Slice<const int> targets,
-                                qreal angle) {
+                                Quest_Real angle) {
   ::applyControlledPhaseGadget(qureg, control,
                                quest_helper::slice_to_ptr(targets),
                                static_cast<int>(targets.length()), angle);
@@ -729,7 +731,7 @@ void applyControlledPhaseGadget(Qureg& qureg,
 void applyMultiControlledPhaseGadget(Qureg& qureg,
                                      rust::Slice<const int> controls,
                                      rust::Slice<const int> targets,
-                                     qreal angle) {
+                                     Quest_Real angle) {
   ::applyMultiControlledPhaseGadget(qureg, quest_helper::slice_to_ptr(controls),
                                     static_cast<int>(controls.length()),
                                     quest_helper::slice_to_ptr(targets),
@@ -740,7 +742,7 @@ void applyMultiStateControlledPhaseGadget(Qureg& qureg,
                                           rust::Slice<const int> controls,
                                           rust::Slice<const int> states,
                                           rust::Slice<const int> targets,
-                                          qreal angle) {
+                                          Quest_Real angle) {
   ::applyMultiStateControlledPhaseGadget(
       qureg, quest_helper::slice_to_ptr(controls),
       quest_helper::slice_to_ptr(states), static_cast<int>(controls.length()),
@@ -749,13 +751,13 @@ void applyMultiStateControlledPhaseGadget(Qureg& qureg,
 }
 
 // Pauli sum operations
-void multiplyPauliStrSum(Qureg& qureg, PauliStrSum sum, Qureg& workspace) {
+void multiplyPauliStrSum(Qureg& qureg, const PauliStrSum& sum, Qureg& workspace) {
   ::multiplyPauliStrSum(qureg, sum, workspace);
 }
 
 void applyTrotterizedPauliStrSumGadget(Qureg& qureg,
-                                       PauliStrSum sum,
-                                       qreal angle,
+                                       const PauliStrSum& sum,
+                                       Quest_Real angle,
                                        int order,
                                        int reps) {
   ::applyTrotterizedPauliStrSumGadget(qureg, sum, angle, order, reps);
@@ -767,20 +769,6 @@ std::unique_ptr<PauliStr> getPauliStr(rust::String paulis,
   return std::make_unique<PauliStr>(
       ::getPauliStr(paulis.c_str(), quest_helper::slice_to_ptr(indices),
                     static_cast<int>(indices.length())));
-}
-
-std::unique_ptr<PauliStrSum> createPauliStrSum(
-    std::vector<PauliStr>& strings,
-    const std::vector<Quest_Complex>& coeffs) {
-  std::vector<qcomp> qcoeffs;
-  qcoeffs.reserve(coeffs.size());
-
-  for (const auto& c : coeffs) {
-    qcoeffs.push_back(c);
-  }
-
-  return std::make_unique<PauliStrSum>(
-      ::createPauliStrSum(strings.data(), qcoeffs.data(), strings.size()));
 }
 
 std::unique_ptr<PauliStrSum> createInlinePauliStrSum(rust::String str) {

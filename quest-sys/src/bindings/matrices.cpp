@@ -1,6 +1,4 @@
-//
-// Created by Erich Essmann on 12/03/2025.
-//
+
 #include "bindings.h"
 #include "helper.h"
 
@@ -91,7 +89,7 @@ void setDiagMatr(DiagMatr& out, rust::Slice<const Quest_Complex> in) {
 }
 
 void setFullStateDiagMatr(FullStateDiagMatr& out,
-                          qindex startInd,
+                          Quest_Index startInd,
                           rust::Slice<const Quest_Complex> in) {
   ::setFullStateDiagMatr(
       out, startInd,
