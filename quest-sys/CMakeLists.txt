@@ -105,4 +105,4 @@ else()
     message(WARNING "quest_dummy target will be created but may fail to build due to missing QuEST")
 endif()
 
-#add_subdirectory(src/bindings)
+#add_subdirectory(src/cxx_bindings)

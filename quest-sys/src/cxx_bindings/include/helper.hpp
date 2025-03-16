@@ -13,43 +13,43 @@
 #include "rust/cxx.h"
 
 namespace detail {
-    // Type trait to check if T is rust::Slice (including const-qualified elements)
-    template <typename T>
-    struct is_rust_slice : std::false_type {};
+// Type trait to check if T is rust::Slice (including const-qualified elements)
+template <typename T>
+struct is_rust_slice : std::false_type {};
 
-    template <typename T>
-    struct is_rust_slice<rust::Slice<T>> : std::true_type {};
-    
-    template <typename T>
-    struct is_rust_slice<rust::Slice<const T>> : std::true_type {};
+template <typename T>
+struct is_rust_slice<rust::Slice<T>> : std::true_type {};
 
-    // Type trait to get the element type of rust::Slice, removing const
-    template <typename T>
-    struct element_type {
-        using type = void;
-    };
+template <typename T>
+struct is_rust_slice<rust::Slice<const T>> : std::true_type {};
 
-    template <typename T>
-    struct element_type<rust::Slice<T>> {
-        using type = T;
-    };
+// Type trait to get the element type of rust::Slice, removing const
+template <typename T>
+struct element_type {
+  using type = void;
+};
 
-    template <typename T>
-    struct element_type<rust::Slice<const T>> {
-        using type = T;  // Remove the const qualifier
-    };
+template <typename T>
+struct element_type<rust::Slice<T>> {
+  using type = T;
+};
 
-    template <typename T>
-    using element_type_t = typename element_type<T>::type;
-    
-    // Helper to remove const qualifier from a type
-    template <typename T>
-    struct remove_const_wrapper {
-        using type = std::remove_const_t<T>;
-    };
-    
-    template <typename T>
-    using remove_const_t = typename remove_const_wrapper<T>::type;
+template <typename T>
+struct element_type<rust::Slice<const T>> {
+  using type = T;  // Remove the const qualifier
+};
+
+template <typename T>
+using element_type_t = typename element_type<T>::type;
+
+// Helper to remove const qualifier from a type
+template <typename T>
+struct remove_const_wrapper {
+  using type = std::remove_const_t<T>;
+};
+
+template <typename T>
+using remove_const_t = typename remove_const_wrapper<T>::type;
 
 // Trait to detect if a type is a specialization of std::vector
 template <typename T>
@@ -159,40 +159,40 @@ auto transform_deep_eager(T&& container, Func&& func) {
 
 template <typename SliceType>
 auto slice_to_vector(const SliceType& slice) {
-    static_assert(detail::is_rust_slice<SliceType>::value, 
-                 "Input must be a rust::Slice");
-    
-    using RawElementType = detail::element_type_t<SliceType>;
-    using ElementType = detail::remove_const_t<RawElementType>;
-    
-    if constexpr (std::is_same_v<ElementType, Quest_Complex>) {
-        // Base case: rust::Slice<const Quest_Complex> -> std::vector<qcomp>
-        std::vector<qcomp> result;
-        result.reserve(slice.size());
-        for (const auto& item : slice) {
-            result.push_back(static_cast<qcomp>(item));
-        }
-        return result;
-    } else if constexpr (detail::is_rust_slice<ElementType>::value || 
-                         detail::is_rust_slice<const ElementType>::value) {
-        // Recursive case: rust::Slice<rust::Slice<...>> -> std::vector<std::vector<...>>
-        std::vector<decltype(slice_to_vector(std::declval<ElementType>()))> result;
-        result.reserve(slice.size());
-        for (const auto& item : slice) {
-            result.push_back(slice_to_vector(item));
-        }
-        return result;
-    } else {
-        // Invalid input type - will generate a helpful compile error
-        static_assert(
-            std::is_same_v<ElementType, Quest_Complex> || 
+  static_assert(detail::is_rust_slice<SliceType>::value,
+                "Input must be a rust::Slice");
+
+  using RawElementType = detail::element_type_t<SliceType>;
+  using ElementType = detail::remove_const_t<RawElementType>;
+
+  if constexpr (std::is_same_v<ElementType, Quest_Complex>) {
+    // Base case: rust::Slice<const Quest_Complex> -> std::vector<qcomp>
+    std::vector<qcomp> result;
+    result.reserve(slice.size());
+    for (const auto& item : slice) {
+      result.push_back(static_cast<qcomp>(item));
+    }
+    return result;
+  } else if constexpr (detail::is_rust_slice<ElementType>::value ||
+                       detail::is_rust_slice<const ElementType>::value) {
+    // Recursive case: rust::Slice<rust::Slice<...>> ->
+    // std::vector<std::vector<...>>
+    std::vector<decltype(slice_to_vector(std::declval<ElementType>()))> result;
+    result.reserve(slice.size());
+    for (const auto& item : slice) {
+      result.push_back(slice_to_vector(item));
+    }
+    return result;
+  } else {
+    // Invalid input type - will generate a helpful compile error
+    static_assert(
+        std::is_same_v<ElementType, Quest_Complex> ||
             detail::is_rust_slice<ElementType>::value ||
             detail::is_rust_slice<const ElementType>::value,
-            "Slice must contain either Quest_Complex or nested rust::Slice"
-        );
-        // This return is never reached but needed for compilation
-        return std::vector<int>();
-    }
+        "Slice must contain either Quest_Complex or nested rust::Slice");
+    // This return is never reached but needed for compilation
+    return std::vector<int>();
+  }
 }
 
 }  // namespace quest_helper

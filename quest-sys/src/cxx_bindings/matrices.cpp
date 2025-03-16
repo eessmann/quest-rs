@@ -1,6 +1,6 @@
 
-#include "bindings.h"
-#include "helper.h"
+#include "matrices.hpp"
+#include "helper.hpp"
 
 namespace quest_sys {
 std::unique_ptr<CompMatr1> getCompMatr1(

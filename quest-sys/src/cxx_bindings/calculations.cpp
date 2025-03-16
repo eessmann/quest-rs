@@ -1,5 +1,5 @@
-#include "bindings.h"
-#include "helper.h"
+#include "calculations.hpp"
+#include "helper.hpp"
 
 namespace quest_sys {
 // Calculations

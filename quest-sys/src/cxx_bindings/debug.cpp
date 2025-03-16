@@ -1,8 +1,8 @@
 //
 // Created by Erich Essmann on 12/03/2025.
 //
-#include "bindings.h"
-#include "helper.h"
+#include "debug.hpp"
+#include "helper.hpp"
 
 namespace quest_sys {
 void setSeeds(rust::Slice<const unsigned> seeds) {
@@ -19,8 +19,8 @@ rust::Vec<unsigned> getSeeds() {
   ::getSeeds(seed_ptr);
   rust::Vec<unsigned> out{};
   if (seed_ptr) {
-    for(int i = 0; i < ::getNumSeeds(); ++i) {
-        out.emplace_back(seed_ptr[0]);
+    for (int i = 0; i < ::getNumSeeds(); ++i) {
+      out.emplace_back(seed_ptr[0]);
     }
     return out;
   } else {

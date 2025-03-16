@@ -1,8 +1,8 @@
 //
 // Created by Erich Essmann on 12/03/2025.
 //
-#include "bindings.h"
-#include "helper.h"
+#include "channels.hpp"
+#include "helper.hpp"
 
 namespace quest_sys {
 std::unique_ptr<KrausMap> createKrausMap(int numQubits, int numOperators) {
@@ -39,7 +39,8 @@ void reportSuperOp(const SuperOp& op) {
 
 void setKrausMap(
     KrausMap& map,
-    rust::Slice<const rust::Slice<const rust::Slice<const Quest_Complex>>> matrices) {
+    rust::Slice<const rust::Slice<const rust::Slice<const Quest_Complex>>>
+        matrices) {
   auto tensor = quest_helper::slice_to_vector(matrices);
   ::setKrausMap(map, std::move(tensor));
 }
@@ -53,7 +54,8 @@ void setSuperOp(SuperOp& op,
 std::unique_ptr<KrausMap> createInlineKrausMap(
     int numQubits,
     int numOperators,
-    rust::Slice<const rust::Slice<const rust::Slice<const Quest_Complex>>> matrices) {
+    rust::Slice<const rust::Slice<const rust::Slice<const Quest_Complex>>>
+        matrices) {
   auto mat = quest_helper::slice_to_vector(matrices);
   return std::make_unique<KrausMap>(
       ::createInlineKrausMap(numQubits, numOperators, std::move(mat)));

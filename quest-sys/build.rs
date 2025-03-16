@@ -1,8 +1,8 @@
+use serde_json::Value;
+use std::collections::{HashMap, HashSet};
 use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};
-use std::collections::{HashMap, HashSet};
-use serde_json::Value;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("cargo:rerun-if-env-changed=QUEST_DIR");
@@ -58,11 +58,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // Set CMAKE_PREFIX_PATH if QUEST_DIR or QUEST_ROOT is specified
-    let quest_dir = env::var("QUEST_DIR").or_else(|_| env::var("QUEST_ROOT")).ok();
+    let quest_dir = env::var("QUEST_DIR")
+        .or_else(|_| env::var("QUEST_ROOT"))
+        .ok();
     if let Some(ref quest_dir) = quest_dir {
         let path = Path::new(quest_dir);
         if !path.exists() {
-            eprintln!("Warning: QUEST_DIR/QUEST_ROOT points to non-existent path: {}", quest_dir);
+            eprintln!(
+                "Warning: QUEST_DIR/QUEST_ROOT points to non-existent path: {}",
+                quest_dir
+            );
         }
         config.define("CMAKE_PREFIX_PATH", quest_dir);
 
@@ -95,7 +100,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Process the CMake file-api reply
     let reply_dir = file_api_dir.join("reply");
     if !reply_dir.exists() {
-        panic!("CMake file-api reply directory not found. CMake might have failed to run properly.");
+        panic!(
+            "CMake file-api reply directory not found. CMake might have failed to run properly."
+        );
     }
 
     // Find the codemodel file which has a name pattern like "codemodel-v2-xxxxx.json"
@@ -156,11 +163,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                        .collect::<Vec<_>>())
         });
 
-    println!("cargo:warning=Reading codemodel file: {}", codemodel_file.display());
+    println!(
+        "cargo:warning=Reading codemodel file: {}",
+        codemodel_file.display()
+    );
     let codemodel_content = match fs::read_to_string(&codemodel_file) {
         Ok(content) => content,
         Err(e) => {
-            println!("cargo:warning=Failed to read codemodel file: {} (error: {})", codemodel_file.display(), e);
+            println!(
+                "cargo:warning=Failed to read codemodel file: {} (error: {})",
+                codemodel_file.display(),
+                e
+            );
             println!("cargo:warning=File exists: {}", codemodel_file.exists());
 
             // Try to read the first few bytes as a fallback to see if it's a binary file
@@ -200,11 +214,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut found_quest = false;
 
     if let Some(target) = target_info {
-        found_quest = process_quest_target(&target, &mut include_dirs, &mut define_map, &mut library_paths, is_windows);
+        found_quest = process_quest_target(
+            &target,
+            &mut include_dirs,
+            &mut define_map,
+            &mut library_paths,
+            is_windows,
+        );
     }
 
     if !found_quest {
-        println!("cargo:warning=Failed to find quest_dummy target information via CMake. Trying pkg-config fallback...");
+        println!(
+            "cargo:warning=Failed to find quest_dummy target information via CMake. Trying pkg-config fallback..."
+        );
 
         // Fallback to pkg-config
         if let Ok(quest_lib) = pkg_config::Config::new().probe("QuEST") {
@@ -236,7 +258,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     Some(val) => {
                         println!("cargo:rustc-cfg=quest_def=\"{}={}\"", name, val);
                         define_map.insert(name, val);
-                    },
+                    }
                     None => {
                         println!("cargo:rustc-cfg=quest_def=\"{}\"", name);
                         define_map.insert(name, "1".to_string());
@@ -255,21 +277,26 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "macos" => {
                 println!("cargo:warning=Adding rpath for macOS: {}", path);
                 println!("cargo:rustc-link-arg=-Wl,-rpath,{}", path);
-            },
+            }
             "linux" => {
                 println!("cargo:warning=Adding rpath for Linux: {}", path);
                 println!("cargo:rustc-link-arg=-Wl,-rpath={}", path);
-            },
+            }
             "windows" => {
                 // Windows doesn't use rpath
-                println!("cargo:warning=Windows doesn't use rpath, already added search path: {}", path);
-            },
+                println!(
+                    "cargo:warning=Windows doesn't use rpath, already added search path: {}",
+                    path
+                );
+            }
             _ => {
-                println!("cargo:warning=Unknown OS: {}, not adding rpath for: {}", host_os, path);
+                println!(
+                    "cargo:warning=Unknown OS: {}, not adding rpath for: {}",
+                    host_os, path
+                );
             }
         }
     }
-
 
     if !found_quest {
         println!("cargo:warning=");
@@ -288,11 +315,26 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // Build the cxx bridge
-    let mut builder = cxx_build::bridge("src/lib.rs");
+    let rs_files: Vec<PathBuf> = vec![
+        "src/types.rs",
+        "src/calculations.rs",
+        "src/channel.rs",
+        "src/debug.rs",
+        "src/decoherence.rs",
+        "src/environment.rs",
+        "src/initialisation.rs",
+        "src/matrices.rs",
+        "src/operations.rs",
+        "src/qureg.rs",
+    ]
+    .iter()
+    .map(|&s| s.into())
+    .collect();
+    let mut builder = cxx_build::bridges(rs_files);
     builder
         .cpp(true)
         .std("c++20")
-        .include("src/bindings")
+        .include("src/cxx_bindings/include")
         .includes(&include_dirs);
 
     // Add the required QuEST definitions from CMake to the cxx build
@@ -304,7 +346,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         ("COMPILE_OPENMP", "0"),
         ("COMPILE_CUDA", "0"),
         ("COMPILE_CUQUANTUM", "0"),
-        ("FLOAT_PRECISION", "2")
+        ("FLOAT_PRECISION", "2"),
     ];
 
     for (key, default_value) in required_defines {
@@ -316,22 +358,27 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Also add any other defines we found
     for (key, value) in &define_map {
-        if !["COMPILE_MPI", "COMPILE_OPENMP", "COMPILE_CUDA", "COMPILE_CUQUANTUM", "FLOAT_PRECISION"]
-            .contains(&key.as_str()) {
+        if ![
+            "COMPILE_MPI",
+            "COMPILE_OPENMP",
+            "COMPILE_CUDA",
+            "COMPILE_CUQUANTUM",
+            "FLOAT_PRECISION",
+        ]
+        .contains(&key.as_str())
+        {
             println!("cargo:warning=  {}={}", key, value);
             builder.define(key.as_str(), Some(value.as_str()));
         }
     }
 
     // Add the wrapper implementation
-    let cpp_files: Vec<_> = fs::read_dir("src/bindings")
+    let cpp_files: Vec<_> = fs::read_dir("src/cxx_bindings")
         .expect("Failed to read cpp directory")
         .filter_map(Result::ok)
         .map(|entry| entry.path())
         .filter(|path| path.is_file())
-        .filter(|path| path
-            .extension()
-            .map_or(false, |ext| ext == "cpp"))
+        .filter(|path| path.extension().map_or(false, |ext| ext == "cpp"))
         .collect();
 
     builder
@@ -340,16 +387,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Additional flags for different platforms
     if is_windows {
-        builder.flag_if_supported("/EHsc")
-            .flag_if_supported("/W4");
+        builder.flag_if_supported("/EHsc").flag_if_supported("/W4");
     } else {
-        builder.flag_if_supported("-Wno-unknown-pragmas")
+        builder
+            .flag_if_supported("-Wno-unknown-pragmas")
             .flag_if_supported("-Wall")
             .flag_if_supported("-Wpedantic")
             .flag_if_supported("-Wconversion")
             .flag_if_supported("-Wextra")
             .flag_if_supported("-Wno-dollar-in-identifier-extension");
-
     }
 
     builder.compile("quest-sys-cxx");
@@ -366,7 +412,10 @@ fn find_quest_dummy_target(codemodel: &Value, reply_dir: &Path) -> Option<Value>
         let target_file_path = reply_dir.join(target_file_name);
 
         // Debug output to help diagnose issues
-        println!("cargo:warning=Examining target file: {}", target_file_path.display());
+        println!(
+            "cargo:warning=Examining target file: {}",
+            target_file_path.display()
+        );
 
         // Read the target file
         if let Ok(target_content) = fs::read_to_string(&target_file_path) {
@@ -379,10 +428,16 @@ fn find_quest_dummy_target(codemodel: &Value, reply_dir: &Path) -> Option<Value>
                     }
                 }
             } else {
-                println!("cargo:warning=Failed to parse target file JSON: {}", target_file_path.display());
+                println!(
+                    "cargo:warning=Failed to parse target file JSON: {}",
+                    target_file_path.display()
+                );
             }
         } else {
-            println!("cargo:warning=Failed to read target file: {}", target_file_path.display());
+            println!(
+                "cargo:warning=Failed to read target file: {}",
+                target_file_path.display()
+            );
         }
     }
 
@@ -398,7 +453,10 @@ fn process_quest_target(
 ) -> bool {
     let mut found_quest = false;
 
-    println!("cargo:warning=Processing target: {}", target["name"].as_str().unwrap_or("unknown"));
+    println!(
+        "cargo:warning=Processing target: {}",
+        target["name"].as_str().unwrap_or("unknown")
+    );
 
     // Extract include directories
     if let Some(compile_groups) = target["compileGroups"].as_array() {
@@ -465,19 +523,28 @@ fn process_quest_target(
     if let Some(link) = target["link"].as_object() {
         // In newer CMake, libraries are in commandFragments with role="libraries"
         if let Some(command_fragments) = link.get("commandFragments").and_then(|v| v.as_array()) {
-            println!("cargo:warning=Found {} command fragments in link section", command_fragments.len());
+            println!(
+                "cargo:warning=Found {} command fragments in link section",
+                command_fragments.len()
+            );
 
             for fragment in command_fragments {
                 if let (Some(role), Some(frag_str)) = (
                     fragment.get("role").and_then(|v| v.as_str()),
                     fragment.get("fragment").and_then(|v| v.as_str()),
                 ) {
-                    println!("cargo:warning=Found fragment with role '{}': {}", role, frag_str);
+                    println!(
+                        "cargo:warning=Found fragment with role '{}': {}",
+                        role, frag_str
+                    );
 
                     if role == "libraries" {
                         // This is a library or rpath
                         if frag_str.contains("libQuEST") || frag_str.contains("quest") {
-                            println!("cargo:warning=Found QuEST library in fragment: {}", frag_str);
+                            println!(
+                                "cargo:warning=Found QuEST library in fragment: {}",
+                                frag_str
+                            );
                             found_quest = true;
                         }
 
@@ -487,11 +554,11 @@ fn process_quest_target(
                             println!("cargo:warning=Found rpath: {}", rpath);
                             println!("cargo:rustc-link-search=native={}", rpath);
                             library_paths.insert(rpath.to_string());
-                        } else if frag_str.ends_with(".dylib") ||
-                            frag_str.ends_with(".so") ||
-                            frag_str.ends_with(".dll") ||
-                            frag_str.ends_with(".a") ||
-                            frag_str.ends_with(".lib")
+                        } else if frag_str.ends_with(".dylib")
+                            || frag_str.ends_with(".so")
+                            || frag_str.ends_with(".dll")
+                            || frag_str.ends_with(".a")
+                            || frag_str.ends_with(".lib")
                         {
                             // This is a direct path to a library file
                             process_library_name(frag_str, is_windows, library_paths);
@@ -505,7 +572,10 @@ fn process_quest_target(
         } else {
             // Old-style libraries array
             if let Some(libraries) = link.get("libraries").and_then(|v| v.as_array()) {
-                println!("cargo:warning=Found {} libraries in link section", libraries.len());
+                println!(
+                    "cargo:warning=Found {} libraries in link section",
+                    libraries.len()
+                );
                 for lib in libraries {
                     if let Some(lib_name) = lib.get("name").and_then(|v| v.as_str()) {
                         println!("cargo:warning=Processing library: {}", lib_name);
@@ -527,7 +597,10 @@ fn process_quest_target(
 
         // Process library search directories
         if let Some(sysroot_link) = link.get("sysroot").and_then(|v| v.as_object()) {
-            if let Some(lib_paths) = sysroot_link.get("libraryDirectories").and_then(|v| v.as_array()) {
+            if let Some(lib_paths) = sysroot_link
+                .get("libraryDirectories")
+                .and_then(|v| v.as_array())
+            {
                 for path in lib_paths {
                     if let Some(path_str) = path.get("path").and_then(|v| v.as_str()) {
                         println!("cargo:warning=Adding library search path: {}", path_str);
@@ -554,7 +627,10 @@ fn process_quest_target(
                     if let Some(parent) = Path::new(artifact_path).parent() {
                         if parent.as_os_str().len() > 0 {
                             let path_str = parent.to_string_lossy().to_string();
-                            println!("cargo:warning=Adding artifact directory to search path: {}", parent.display());
+                            println!(
+                                "cargo:warning=Adding artifact directory to search path: {}",
+                                parent.display()
+                            );
                             println!("cargo:rustc-link-search=native={}", parent.display());
                             library_paths.insert(path_str);
                         }
@@ -628,7 +704,9 @@ fn process_library_name(lib_name: &str, is_windows: bool, library_paths: &mut Ha
             println!("cargo:warning=Extracted library name: {}", lib_name);
 
             // Determine if it's a static or dynamic library
-            let extension = path.extension().map(|ext| ext.to_string_lossy().to_lowercase());
+            let extension = path
+                .extension()
+                .map(|ext| ext.to_string_lossy().to_lowercase());
 
             if extension.as_deref() == Some("a") || extension.as_deref() == Some("lib") {
                 println!("cargo:warning=Adding static library: {}", lib_name);
@@ -642,10 +720,13 @@ fn process_library_name(lib_name: &str, is_windows: bool, library_paths: &mut Ha
             println!("cargo:warning=Could not extract filename, using full path");
             println!("cargo:rustc-link-lib={}", lib_name);
         }
-    } else if lib_name.contains('.') && (
-        lib_name.contains(".lib") || lib_name.contains(".a") ||
-            lib_name.contains(".so") || lib_name.contains(".dylib") ||
-            lib_name.contains(".dll")) {
+    } else if lib_name.contains('.')
+        && (lib_name.contains(".lib")
+            || lib_name.contains(".a")
+            || lib_name.contains(".so")
+            || lib_name.contains(".dylib")
+            || lib_name.contains(".dll"))
+    {
         // This is a library name with extension but no path
         let name = if lib_name.ends_with(".lib") || lib_name.ends_with(".a") {
             let base_name = lib_name.rsplit('.').next().unwrap_or(lib_name);

@@ -1,8 +1,8 @@
 //
 // Created by Erich Essmann on 14/03/2025.
 //
-#include "bindings.h"
-#include "helper.h"
+#include "qureg.hpp"
+#include "helper.hpp"
 
 namespace quest_sys {
 // Qureg
@@ -82,10 +82,10 @@ rust::Vec<Quest_Complex> getQuregAmps(Qureg& qureg,
 }
 
 rust::Vec<Quest_Complex> getDensityQuregAmps(Qureg& qureg,
-                                                        Quest_Index startRow,
-                                                        Quest_Index startCol,
-                                                        Quest_Index numRows,
-                                                        Quest_Index numCols) {
+                                             Quest_Index startRow,
+                                             Quest_Index startCol,
+                                             Quest_Index numRows,
+                                             Quest_Index numCols) {
   std::vector<std::vector<qcomp>> amps(numRows);
   for (auto& row : amps) {
     row.reserve(numCols);
@@ -97,7 +97,7 @@ rust::Vec<Quest_Complex> getDensityQuregAmps(Qureg& qureg,
   auto convert_amps = quest_helper::apply_deep(
       amps, [](qcomp val) { return Quest_Complex(val); });
 
- rust::Vec<Quest_Complex> out;
+  rust::Vec<Quest_Complex> out;
   for (auto row : convert_amps) {
     for (auto val : row) {
       out.emplace_back(val);

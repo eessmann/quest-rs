@@ -1,14 +1,16 @@
 //
 // Created by Erich Essmann on 12/03/2025.
 //
-#include "bindings.h"
+#include "environment.hpp"
 
 namespace quest_sys {
 void initQuESTEnv() {
   ::initQuESTEnv();
 }
 
-void initCustomQuESTEnv(bool useDistrib, bool useGpuAccel, bool useMultithread) {
+void initCustomQuESTEnv(bool useDistrib,
+                        bool useGpuAccel,
+                        bool useMultithread) {
   ::initCustomQuESTEnv(useDistrib, useGpuAccel, useMultithread);
 }
 

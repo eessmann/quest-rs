@@ -2,8 +2,8 @@
 // Created by Erich Essmann on 14/03/2025.
 //
 
-#include "bindings.h"
-#include "helper.h"
+#include "operations.hpp"
+#include "helper.hpp"
 
 namespace quest_sys {
 // CompMatr1 operations
@@ -751,7 +751,9 @@ void applyMultiStateControlledPhaseGadget(Qureg& qureg,
 }
 
 // Pauli sum operations
-void multiplyPauliStrSum(Qureg& qureg, const PauliStrSum& sum, Qureg& workspace) {
+void multiplyPauliStrSum(Qureg& qureg,
+                         const PauliStrSum& sum,
+                         Qureg& workspace) {
   ::multiplyPauliStrSum(qureg, sum, workspace);
 }
 

@@ -1,8 +1,8 @@
 //
 // Created by Erich Essmann on 12/03/2025.
 //
-#include "bindings.h"
-#include "helper.h"
+#include "decoherence.hpp"
+#include "helper.hpp"
 
 namespace quest_sys {
 void mixDephasing(Qureg& qureg, int qubit, Quest_Real prob) {

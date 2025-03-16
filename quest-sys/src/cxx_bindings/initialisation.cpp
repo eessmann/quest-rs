@@ -1,8 +1,8 @@
 //
 // Created by Erich Essmann on 12/03/2025.
 //
-#include "bindings.h"
-#include "helper.h"
+#include "initialisation.hpp"
+#include "helper.hpp"
 
 namespace quest_sys {
 void initBlankState(Qureg& qureg) {
