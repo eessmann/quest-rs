@@ -4,7 +4,7 @@
 
 namespace quest_sys {
 std::unique_ptr<CompMatr1> getCompMatr1(
-    rust::Slice<const rust::Slice<const Quest_Complex>> in) {
+    rust::cxxbridge1::Slice<const rust::cxxbridge1::Slice<const Quest_Complex>> in) {
   std::vector<qcomp*> tmp{};
   std::ranges::transform(in, std::back_inserter(tmp), [](auto val) {
     return Quest_Complex::to_qcomp_ptr(quest_helper::slice_to_ptr(val));
@@ -13,7 +13,7 @@ std::unique_ptr<CompMatr1> getCompMatr1(
 }
 
 std::unique_ptr<CompMatr2> getCompMatr2(
-    rust::Slice<const rust::Slice<const Quest_Complex>> in) {
+    rust::cxxbridge1::Slice<const rust::cxxbridge1::Slice<const Quest_Complex>> in) {
   std::vector<qcomp*> tmp{};
   std::ranges::transform(in, std::back_inserter(tmp), [](auto val) {
     return Quest_Complex::to_qcomp_ptr(quest_helper::slice_to_ptr(val));
@@ -21,12 +21,12 @@ std::unique_ptr<CompMatr2> getCompMatr2(
   return std::make_unique<CompMatr2>(::getCompMatr2(tmp.data()));
 }
 
-std::unique_ptr<DiagMatr1> getDiagMatr1(rust::Slice<const Quest_Complex> in) {
+std::unique_ptr<DiagMatr1> getDiagMatr1(rust::cxxbridge1::Slice<const Quest_Complex> in) {
   return std::make_unique<DiagMatr1>(::getDiagMatr1(
       Quest_Complex::to_qcomp_ptr(quest_helper::slice_to_ptr(in))));
 }
 
-std::unique_ptr<DiagMatr2> getDiagMatr2(rust::Slice<const Quest_Complex> in) {
+std::unique_ptr<DiagMatr2> getDiagMatr2(rust::cxxbridge1::Slice<const Quest_Complex> in) {
   return std::make_unique<DiagMatr2>(::getDiagMatr2(
       Quest_Complex::to_qcomp_ptr(quest_helper::slice_to_ptr(in))));
 }
@@ -45,9 +45,9 @@ std::unique_ptr<FullStateDiagMatr> createFullStateDiagMatr(int numQubits) {
 }
 
 std::unique_ptr<FullStateDiagMatr>
-createCustomFullStateDiagMatr(int numQubits, int useDistrib, int useGpuAccel) {
+createCustomFullStateDiagMatr(int numQubits, int useDistrib, int useGpuAccel, int useMultithread) {
   return std::make_unique<FullStateDiagMatr>(
-      ::createCustomFullStateDiagMatr(numQubits, useDistrib, useGpuAccel));
+      ::createCustomFullStateDiagMatr(numQubits, useDistrib, useGpuAccel, useMultithread));
 }
 
 void destroyCompMatr(CompMatr& matrix) {
@@ -75,7 +75,7 @@ void syncFullStateDiagMatr(FullStateDiagMatr& matr) {
 }
 
 void setCompMatr(CompMatr& out,
-                 rust::Slice<const rust::Slice<const Quest_Complex>> in) {
+                 rust::cxxbridge1::Slice<const rust::cxxbridge1::Slice<const Quest_Complex>> in) {
   std::vector<qcomp*> tmp{};
   std::ranges::transform(in, std::back_inserter(tmp), [](auto val) {
     return Quest_Complex::to_qcomp_ptr(quest_helper::slice_to_ptr(val));
@@ -83,14 +83,14 @@ void setCompMatr(CompMatr& out,
   ::setCompMatr(out, tmp.data());
 }
 
-void setDiagMatr(DiagMatr& out, rust::Slice<const Quest_Complex> in) {
+void setDiagMatr(DiagMatr& out, rust::cxxbridge1::Slice<const Quest_Complex> in) {
   ::setDiagMatr(
       out, Quest_Complex::to_qcomp_ptr(const_cast<Quest_Complex*>(in.data())));
 }
 
 void setFullStateDiagMatr(FullStateDiagMatr& out,
-                          Quest_Index startInd,
-                          rust::Slice<const Quest_Complex> in) {
+                          std::int64_t startInd,
+                          rust::cxxbridge1::Slice<const Quest_Complex> in) {
   ::setFullStateDiagMatr(
       out, startInd,
       Quest_Complex::to_qcomp_ptr(const_cast<Quest_Complex*>(in.data())),

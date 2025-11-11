@@ -4,69 +4,46 @@
 #pragma once
 
 #include <quest.h>
-#include <rust/cxx.h>
+
 #include <memory>
 #include "types.hpp"
+#include "helper.hpp"
 
 namespace quest_sys {
-// Calculations
-Quest_Real calcExpecPauliStr(const Qureg& qureg, const PauliStr& str);
+double calcExpecPauliStr(Qureg const& qureg, PauliStr const& str);
 
-Quest_Real calcExpecPauliStrSum(const Qureg& qureg, const PauliStrSum& sum);
+double calcExpecPauliStrSum(Qureg const& qureg, PauliStrSum const& sum);
 
-Quest_Real calcExpecFullStateDiagMatr(const Qureg& qureg,
-                                      const FullStateDiagMatr& matr);
+double calcExpecFullStateDiagMatr(Qureg const& qureg, FullStateDiagMatr const& matr);
 
-Quest_Real calcExpecFullStateDiagMatrPower(const Qureg& qureg,
-                                           const FullStateDiagMatr& matr,
-                                           Quest_Complex exponent);
+double calcExpecFullStateDiagMatrPower(Qureg const& qureg, FullStateDiagMatr const& matr, double exponent);
 
-Quest_Real calcTotalProb(const Qureg& qureg);
+double calcProbOfBasisState(Qureg const& qureg, std::int64_t index);
 
-Quest_Real calcProbOfBasisState(const Qureg& qureg, Quest_Index index);
+double calcProbOfQubitOutcome(Qureg const& qureg, int qubit, int outcome);
 
-Quest_Real calcProbOfQubitOutcome(const Qureg& qureg, int qubit, int outcome);
+double calcProbOfMultiQubitOutcome(Qureg const& qureg, rust::Slice<const int> qubits, rust::Slice<const int> outcomes);
 
-Quest_Real calcProbOfMultiQubitOutcome(const Qureg& qureg,
-                                       rust::Slice<const int> qubits,
-                                       rust::Slice<const int> outcomes);
+rust::Vec<qreal> calcProbsOfAllMultiQubitOutcomes(Qureg const& qureg, rust::Slice<const int> qubits);
 
-void calcProbsOfAllMultiQubitOutcomes(rust::Slice<Quest_Real> outcomeProbs,
-                                      const Qureg& qureg,
-                                      rust::Slice<const int> qubits);
+double calcTotalProb(Qureg const& qureg);
 
-Quest_Real calcPurity(const Qureg& qureg);
+double calcPurity(Qureg const& qureg);
 
-Quest_Real calcFidelity(const Qureg& qureg, const Qureg& other);
+double calcFidelity(Qureg const& qureg, Qureg const& other);
 
-Quest_Real calcDistance(const Qureg& qureg1, const Qureg& qureg2);
+double calcDistance(Qureg const& qureg1, Qureg const& qureg2);
 
-std::unique_ptr<Qureg> calcPartialTrace(const Qureg& qureg,
-                                        rust::Slice<const int> traceOutQubits);
+std::unique_ptr<Qureg> calcPartialTrace(Qureg const& qureg, rust::Slice<const int> traceOutQubits);
 
-std::unique_ptr<Qureg> calcReducedDensityMatrix(
-    const Qureg& qureg,
-    rust::Slice<const int> retainQubits);
+std::unique_ptr<Qureg> calcReducedDensityMatrix(Qureg const& qureg, rust::Slice<const int> retainQubits);
 
-void setQuregToPartialTrace(Qureg& out,
-                            const Qureg& in,
-                            rust::Slice<const int> traceOutQubits);
+QuestComplex calcInnerProduct(Qureg const& qureg1, Qureg const& qureg2);
 
-void setQuregToReducedDensityMatrix(Qureg& out,
-                                    const Qureg& in,
-                                    rust::Slice<const int> retainQubits);
+QuestComplex calcExpecNonHermitianPauliStrSum(Qureg const& qureg, PauliStrSum const& sum);
 
-Quest_Complex calcInnerProduct(const Qureg& qureg1, const Qureg& qureg2);
+QuestComplex calcExpecNonHermitianFullStateDiagMatr(Qureg const& qureg, FullStateDiagMatr const& matr);
 
-Quest_Complex calcExpecNonHermitianPauliStrSum(const Qureg& qureg,
-                                               const PauliStrSum& sum);
+QuestComplex calcExpecNonHermitianFullStateDiagMatrPower(Qureg const& qureg, FullStateDiagMatr const& matrix, QuestComplex exponent);
 
-Quest_Complex calcExpecNonHermitianFullStateDiagMatr(
-    const Qureg& qureg,
-    const FullStateDiagMatr& matr);
-
-Quest_Complex calcExpecNonHermitianFullStateDiagMatrPower(
-    const Qureg& qureg,
-    const FullStateDiagMatr& matrix,
-    Quest_Complex exponent);
-}  // namespace quest_sys
+}

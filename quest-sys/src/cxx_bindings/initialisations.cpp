@@ -21,7 +21,7 @@ void initPureState(Qureg& qureg, Qureg& pure) {
   ::initPureState(qureg, pure);
 }
 
-void initClassicalState(Qureg& qureg, Quest_Index stateInd) {
+void initClassicalState(Qureg& qureg, std::int64_t stateInd) {
   ::initClassicalState(qureg, stateInd);
 }
 
@@ -30,7 +30,7 @@ void initDebugState(Qureg& qureg) {
 }
 
 void initArbitraryPureState(Qureg& qureg,
-                            rust::Slice<const Quest_Complex> amps) {
+                            rust::cxxbridge1::Slice<const Quest_Complex> amps) {
   ::initArbitraryPureState(
       qureg, Quest_Complex::to_qcomp_ptr(quest_helper::slice_to_ptr(amps)));
 }
@@ -39,13 +39,13 @@ void initRandomPureState(Qureg& qureg) {
   ::initRandomPureState(qureg);
 }
 
-void initRandomMixedState(Qureg& qureg, Quest_Index numPureStates) {
+void initRandomMixedState(Qureg& qureg, std::int64_t numPureStates) {
   ::initRandomMixedState(qureg, numPureStates);
 }
 
 void setQuregAmps(Qureg& qureg,
-                  Quest_Index startInd,
-                  rust::Slice<const Quest_Complex> amps) {
+                  std::int64_t startInd,
+                  rust::cxxbridge1::Slice<const Quest_Complex> amps) {
   ::setQuregAmps(qureg, startInd,
                  Quest_Complex::to_qcomp_ptr(quest_helper::slice_to_ptr(amps)),
                  static_cast<int>(amps.length()));
@@ -53,9 +53,9 @@ void setQuregAmps(Qureg& qureg,
 
 void setDensityQuregAmps(
     Qureg& qureg,
-    Quest_Index startRow,
-    Quest_Index startCol,
-    rust::Slice<const rust::Slice<const Quest_Complex>> amps) {
+    std::int64_t startRow,
+    std::int64_t startCol,
+    rust::cxxbridge1::Slice<const rust::cxxbridge1::Slice<const Quest_Complex>> amps) {
   int rows = static_cast<int>(amps.length());
   int cols = static_cast<int>(amps[0].length());
 
@@ -67,8 +67,8 @@ void setDensityQuregAmps(
 }
 
 void setDensityQuregFlatAmps(Qureg& qureg,
-                             Quest_Index startInd,
-                             rust::Slice<const Quest_Complex> amps) {
+                             std::int64_t startInd,
+                             rust::cxxbridge1::Slice<const Quest_Complex> amps) {
   ::setDensityQuregFlatAmps(
       qureg, startInd,
       Quest_Complex::to_qcomp_ptr(quest_helper::slice_to_ptr(amps)),
@@ -79,16 +79,8 @@ void setQuregToClone(Qureg& targetQureg, const Qureg& copyQureg) {
   ::setQuregToClone(targetQureg, copyQureg);
 }
 
-void setQuregToSuperposition(Quest_Complex facOut,
-                             Qureg& out,
-                             Quest_Complex fac1,
-                             const Qureg& qureg1,
-                             Quest_Complex fac2,
-                             const Qureg& qureg2) {
-  ::setQuregToSuperposition(facOut, out, fac1, qureg1, fac2, qureg2);
-}
 
-Quest_Real setQuregToRenormalized(Qureg& qureg) {
+double setQuregToRenormalized(Qureg& qureg) {
   return ::setQuregToRenormalized(qureg);
 }
 

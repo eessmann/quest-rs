@@ -3,9 +3,8 @@
 //
 #pragma once
 #include <quest.h>
-#include <rust/cxx.h>
 #include <memory>
-
+#include "helper.hpp"
 #include "types.hpp"
 
 namespace quest_sys {
@@ -28,19 +27,19 @@ void reportSuperOp(const SuperOp& op);
 
 void setKrausMap(
     KrausMap& map,
-    rust::Slice<const rust::Slice<const rust::Slice<const Quest_Complex>>>
+    rust::Slice<const rust::Slice<const rust::Slice<const QuestComplex>>>
         matrices);
 
 void setSuperOp(SuperOp& op,
-                rust::Slice<const rust::Slice<const Quest_Complex>> matrix);
+                rust::Slice<const rust::Slice<const QuestComplex>> matrix);
 
 std::unique_ptr<KrausMap> createInlineKrausMap(
     int numQubits,
     int numOperators,
-    rust::Slice<const rust::Slice<const rust::Slice<const Quest_Complex>>>
+    rust::Slice<const rust::Slice<const rust::Slice<const QuestComplex>>>
         matrices);
 
 std::unique_ptr<SuperOp> createInlineSuperOp(
     int numQubits,
-    rust::Slice<const rust::Slice<const Quest_Complex>> matrix);
+    rust::Slice<const rust::Slice<const QuestComplex>> matrix);
 }  // namespace quest_sys

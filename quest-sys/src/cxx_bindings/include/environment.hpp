@@ -4,6 +4,7 @@
 #pragma once
 #include <quest.h>
 #include <memory>
+#include <quest-sys/src/lib.rs.h>
 
 namespace quest_sys {
 void initQuESTEnv();

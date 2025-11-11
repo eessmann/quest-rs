@@ -10,19 +10,24 @@ keywords = ["quantum", "simulation"]
 categories = ["science", "simulation"]
 
 [workspace]
-resolver = "3"
+resolver = "2"
 members = ["quest-sys"]
 
 [workspace.dependencies]
-cxx = { version = "1.0.148", features = ["std", "alloc", "c++20"] }
-serde = { version = "1.0.219", features = ["derive"] }
-serde_json = { version = "1.0.140"}
+cmake-package = {version = "0.1"}
+cxx = { version = "1.0", features = ["std", "alloc", "c++20"] }
+cxx-build = {version = "1.0", features = ["parallel"]}
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0"}
+miette = {version = "7.6.0", features = ["fancy"]}
+ndarray = { version = "0.17", features = ["default", "approx", "blas"] }
+num = "0.4"
+thiserror = "2.0"
 
 
 [dependencies]
-quest-sys = { path = "./quest-sys", version = "0.1.0" }
-ndarray = { version = "0.16", features = ["default", "approx", "blas"] }
-num-complex = "0.4"
-thiserror = "2.0"
+quest-sys = { path = "./quest-sys", version = "0.2" }
+ndarray.workspace = true
+num.workspace = true
 cxx.workspace = true
 

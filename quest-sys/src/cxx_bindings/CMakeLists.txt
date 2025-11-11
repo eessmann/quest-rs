@@ -13,7 +13,7 @@ target_sources(
         include/decoherence.hpp
         include/environment.hpp
         include/helper.hpp
-        include/initialisation.hpp
+        include/initialisations.hpp
         include/matrices.hpp
         include/operations.hpp
         include/qureg.hpp
@@ -28,7 +28,7 @@ target_sources(
         debug.cpp
         decoherence.cpp
         environment.cpp
-        initialisation.cpp
+        initialisations.cpp
         matrices.cpp
         operations.cpp
         qureg.cpp

@@ -3,9 +3,8 @@
 //
 #pragma once
 #include <quest.h>
-#include <rust/cxx.h>
-
 #include "types.hpp"
+#include <quest-sys/src/lib.rs.h>
 
 namespace quest_sys {
 // Debug
@@ -15,23 +14,25 @@ void setSeedsToDefault();
 
 rust::Vec<unsigned> getSeeds();
 
-void invalidQuESTInputError(rust::String msg, rust::String func);
-
 void setValidationOn();
 
 void setValidationOff();
 
 void setValidationEpsilonToDefault();
 
-void setValidationEpsilon(Quest_Real eps);
+void setValidationEpsilon(double eps);
 
-Quest_Real getValidationEpsilon();
+double getValidationEpsilon();
 
-void setMaxNumReportedItems(Quest_Index numRows, Quest_Index numCols);
+void setMaxNumReportedItems(std::int64_t numRows, std::int64_t numCols);
 
 void setMaxNumReportedSigFigs(int numSigFigs);
 
-Quest_Index getGpuCacheSize();
+void setNumReportedNewlines(int numNewlines);
+
+void setReportedPauliChars(rust::Str paulis);
+
+std::int64_t getGpuCacheSize();
 
 void clearGpuCache();
 

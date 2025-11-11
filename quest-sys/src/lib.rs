@@ -1,8 +1,8 @@
 #[cxx::bridge]
 pub mod ffi {
     // Share these types across all bridges
-    #[derive(Debug, Clone, Copy)]
-    pub struct Quest_Complex {
+    #[derive(Debug, Clone, Copy, Eq, PartialEq)]
+    pub struct QuestComplex {
         pub re: f64,
         pub im: f64,
     }
@@ -24,9 +24,6 @@ pub mod ffi {
         type KrausMap;
         type SuperOp;
         type QuESTEnv;
-
-        // Common type
-        type Quest_Complex;
     }
 
     // Calculations
@@ -37,14 +34,14 @@ pub mod ffi {
         fn calcExpecPauliStr(qureg: &Qureg, str: &PauliStr) -> f64;
         fn calcExpecPauliStrSum(qureg: &Qureg, sum: &PauliStrSum) -> f64;
         fn calcExpecFullStateDiagMatr(qureg: &Qureg, matr: &FullStateDiagMatr) -> f64;
-        fn calcExpecFullStateDiagMatrPower(qureg: &Qureg, matr: &FullStateDiagMatr, exponent: Quest_Complex) -> f64;
+        fn calcExpecFullStateDiagMatrPower(qureg: &Qureg, matr: &FullStateDiagMatr, exponent: f64) -> f64;
 
         // Probability calculations
         fn calcTotalProb(qureg: &Qureg) -> f64;
         fn calcProbOfBasisState(qureg: &Qureg, index: i64) -> f64;
         fn calcProbOfQubitOutcome(qureg: &Qureg, qubit: i32, outcome: i32) -> f64;
         fn calcProbOfMultiQubitOutcome(qureg: &Qureg, qubits: &[i32], outcomes: &[i32]) -> f64;
-        fn calcProbsOfAllMultiQubitOutcomes(outcomeProbs: &mut [f64], qureg: &Qureg, qubits: &[i32]);
+        fn calcProbsOfAllMultiQubitOutcomes(qureg: &Qureg, qubits: &[i32]) -> Vec<f64>;
 
         // Purity and fidelity
         fn calcPurity(qureg: &Qureg) -> f64;
@@ -54,14 +51,12 @@ pub mod ffi {
         // Partial trace operations
         fn calcPartialTrace(qureg: &Qureg, traceOutQubits: &[i32]) -> UniquePtr<Qureg>;
         fn calcReducedDensityMatrix(qureg: &Qureg, retainQubits: &[i32]) -> UniquePtr<Qureg>;
-        fn setQuregToPartialTrace(out: Pin<&mut Qureg>, in_: &Qureg, traceOutQubits: &[i32]);
-        fn setQuregToReducedDensityMatrix(out: Pin<&mut Qureg>, in_: &Qureg, retainQubits: &[i32]);
 
         // Non-Hermitian expectation values
-        fn calcInnerProduct(qureg1: &Qureg, qureg2: &Qureg) -> Quest_Complex;
-        fn calcExpecNonHermitianPauliStrSum(qureg: &Qureg, sum: &PauliStrSum) -> Quest_Complex;
-        fn calcExpecNonHermitianFullStateDiagMatr(qureg: &Qureg, matr: &FullStateDiagMatr) -> Quest_Complex;
-        fn calcExpecNonHermitianFullStateDiagMatrPower(qureg: &Qureg, matrix: &FullStateDiagMatr, exponent: Quest_Complex) -> Quest_Complex;
+        fn calcInnerProduct(qureg1: &Qureg, qureg2: &Qureg) -> QuestComplex;
+        fn calcExpecNonHermitianPauliStrSum(qureg: &Qureg, sum: &PauliStrSum) -> QuestComplex;
+        fn calcExpecNonHermitianFullStateDiagMatr(qureg: &Qureg, matr: &FullStateDiagMatr) -> QuestComplex;
+        fn calcExpecNonHermitianFullStateDiagMatrPower(qureg: &Qureg, matrix: &FullStateDiagMatr, exponent: QuestComplex) -> QuestComplex;
     }
 
     // Channels
@@ -78,10 +73,10 @@ pub mod ffi {
         fn destroySuperOp(map: Pin<&mut SuperOp>);
         fn reportSuperOp(map: &SuperOp);
 
-        fn setKrausMap(map: Pin<&mut KrausMap>, matrices: &[&[&[Quest_Complex]]]);
-        fn setSuperOp(map: Pin<&mut SuperOp>, matrix: &[&[Quest_Complex]]);
-        fn createInlineKrausMap(numQubits: i32, numOperators: i32, matrices: &[&[&[Quest_Complex]]]) -> UniquePtr<KrausMap>;
-        fn createInlineSuperOp(numQubits: i32, matrix: &[&[Quest_Complex]]) -> UniquePtr<SuperOp>;
+        fn setKrausMap(map: Pin<&mut KrausMap>, matrices: &[&[&[QuestComplex]]]);
+        fn setSuperOp(map: Pin<&mut SuperOp>, matrix: &[&[QuestComplex]]);
+        fn createInlineKrausMap(numQubits: i32, numOperators: i32, matrices: &[&[&[QuestComplex]]]) -> UniquePtr<KrausMap>;
+        fn createInlineSuperOp(numQubits: i32, matrix: &[&[QuestComplex]]) -> UniquePtr<SuperOp>;
     }
 
     // Debug
@@ -94,7 +89,6 @@ pub mod ffi {
         fn getSeeds() -> Vec<u32>;
 
         // Validation
-        fn invalidQuESTInputError(msg: String, func: String);
         fn setValidationOn();
         fn setValidationOff();
         fn setValidationEpsilonToDefault();
@@ -152,18 +146,17 @@ pub mod ffi {
         fn initPureState(qureg: Pin<&mut Qureg>, pure: Pin<&mut Qureg>);
         fn initClassicalState(qureg: Pin<&mut Qureg>, stateInd: i64);
         fn initDebugState(qureg: Pin<&mut Qureg>);
-        fn initArbitraryPureState(qureg: Pin<&mut Qureg>, amps: &[Quest_Complex]);
+        fn initArbitraryPureState(qureg: Pin<&mut Qureg>, amps: &[QuestComplex]);
         fn initRandomPureState(qureg: Pin<&mut Qureg>);
         fn initRandomMixedState(qureg: Pin<&mut Qureg>, numPureStates: i64);
 
         // Setting amplitudes
-        fn setQuregAmps(qureg: Pin<&mut Qureg>, startInd: i64, amps: &[Quest_Complex]);
-        fn setDensityQuregAmps(qureg: Pin<&mut Qureg>, startRow: i64, startCol: i64, amps: &[&[Quest_Complex]]);
-        fn setDensityQuregFlatAmps(qureg: Pin<&mut Qureg>, startInd: i64, amps: &[Quest_Complex]);
+        fn setQuregAmps(qureg: Pin<&mut Qureg>, startInd: i64, amps: &[QuestComplex]);
+        fn setDensityQuregAmps(qureg: Pin<&mut Qureg>, startRow: i64, startCol: i64, amps: &[&[QuestComplex]]);
+        fn setDensityQuregFlatAmps(qureg: Pin<&mut Qureg>, startInd: i64, amps: &[QuestComplex]);
 
         // Qureg manipulation
         fn setQuregToClone(targetQureg: Pin<&mut Qureg>, copyQureg: &Qureg);
-        fn setQuregToSuperposition(facOut: Quest_Complex, out: Pin<&mut Qureg>, fac1: Quest_Complex, qureg1: &Qureg, fac2: Quest_Complex, qureg2: &Qureg);
         fn setQuregToRenormalized(qureg: Pin<&mut Qureg>) -> f64;
         fn setQuregToPauliStrSum(qureg: Pin<&mut Qureg>, sum: &PauliStrSum);
     }
@@ -173,15 +166,15 @@ pub mod ffi {
     unsafe extern "C++" {
         include!("matrices.hpp");
         // Matrix creation and destruction
-        fn getCompMatr1(in_: &[&[Quest_Complex]]) -> UniquePtr<CompMatr1>;
-        fn getCompMatr2(in_: &[&[Quest_Complex]]) -> UniquePtr<CompMatr2>;
-        fn getDiagMatr1(in_: &[Quest_Complex]) -> UniquePtr<DiagMatr1>;
-        fn getDiagMatr2(in_: &[Quest_Complex]) -> UniquePtr<DiagMatr2>;
+        fn getCompMatr1(in_: &[&[QuestComplex]]) -> UniquePtr<CompMatr1>;
+        fn getCompMatr2(in_: &[&[QuestComplex]]) -> UniquePtr<CompMatr2>;
+        fn getDiagMatr1(in_: &[QuestComplex]) -> UniquePtr<DiagMatr1>;
+        fn getDiagMatr2(in_: &[QuestComplex]) -> UniquePtr<DiagMatr2>;
 
         fn createCompMatr(numQubits: i32) -> UniquePtr<CompMatr>;
         fn createDiagMatr(numQubits: i32) -> UniquePtr<DiagMatr>;
         fn createFullStateDiagMatr(numQubits: i32) -> UniquePtr<FullStateDiagMatr>;
-        fn createCustomFullStateDiagMatr(numQubits: i32, useDistrib: i32, useGpuAccel: i32) -> UniquePtr<FullStateDiagMatr>;
+        fn createCustomFullStateDiagMatr(numQubits: i32, useDistrib: i32, useGpuAccel: i32, useMultithread: i32) -> UniquePtr<FullStateDiagMatr>;
 
         fn destroyCompMatr(matrix: Pin<&mut CompMatr>);
         fn destroyDiagMatr(matrix: Pin<&mut DiagMatr>);
@@ -193,9 +186,9 @@ pub mod ffi {
         fn syncFullStateDiagMatr(matr: Pin<&mut FullStateDiagMatr>);
 
         // Setting matrix values
-        fn setCompMatr(out: Pin<&mut CompMatr>, in_: &[&[Quest_Complex]]);
-        fn setDiagMatr(out: Pin<&mut DiagMatr>, in_: &[Quest_Complex]);
-        fn setFullStateDiagMatr(out: Pin<&mut FullStateDiagMatr>, startInd: i64, in_: &[Quest_Complex]);
+        fn setCompMatr(out: Pin<&mut CompMatr>, in_: &[&[QuestComplex]]);
+        fn setDiagMatr(out: Pin<&mut DiagMatr>, in_: &[QuestComplex]);
+        fn setFullStateDiagMatr(out: Pin<&mut FullStateDiagMatr>, startInd: i64, in_: &[QuestComplex]);
 
         // Special matrix creation
         fn createFullStateDiagMatrFromPauliStrSum(in_: &PauliStrSum) -> UniquePtr<FullStateDiagMatr>;
@@ -258,17 +251,17 @@ pub mod ffi {
         fn applyMultiStateControlledDiagMatr(qureg: Pin<&mut Qureg>, controls: &[i32], states: &[i32], targets: &[i32], matrix: &DiagMatr);
 
         // DiagMatrPower operations
-        fn multiplyDiagMatrPower(qureg: Pin<&mut Qureg>, targets: &[i32], matrix: &DiagMatr, exponent: Quest_Complex);
-        fn applyDiagMatrPower(qureg: Pin<&mut Qureg>, targets: &[i32], matrix: &DiagMatr, exponent: Quest_Complex);
-        fn applyControlledDiagMatrPower(qureg: Pin<&mut Qureg>, control: i32, targets: &[i32], matrix: &DiagMatr, exponent: Quest_Complex);
-        fn applyMultiControlledDiagMatrPower(qureg: Pin<&mut Qureg>, controls: &[i32], targets: &[i32], matrix: &DiagMatr, exponent: Quest_Complex);
-        fn applyMultiStateControlledDiagMatrPower(qureg: Pin<&mut Qureg>, controls: &[i32], states: &[i32], targets: &[i32], matrix: &DiagMatr, exponent: Quest_Complex);
+        fn multiplyDiagMatrPower(qureg: Pin<&mut Qureg>, targets: &[i32], matrix: &DiagMatr, exponent: QuestComplex);
+        fn applyDiagMatrPower(qureg: Pin<&mut Qureg>, targets: &[i32], matrix: &DiagMatr, exponent: QuestComplex);
+        fn applyControlledDiagMatrPower(qureg: Pin<&mut Qureg>, control: i32, targets: &[i32], matrix: &DiagMatr, exponent: QuestComplex);
+        fn applyMultiControlledDiagMatrPower(qureg: Pin<&mut Qureg>, controls: &[i32], targets: &[i32], matrix: &DiagMatr, exponent: QuestComplex);
+        fn applyMultiStateControlledDiagMatrPower(qureg: Pin<&mut Qureg>, controls: &[i32], states: &[i32], targets: &[i32], matrix: &DiagMatr, exponent: QuestComplex);
 
         // FullStateDiagMatr operations
         fn multiplyFullStateDiagMatr(qureg: Pin<&mut Qureg>, matrix: &FullStateDiagMatr);
-        fn multiplyFullStateDiagMatrPower(qureg: Pin<&mut Qureg>, matrix: &FullStateDiagMatr, exponent: Quest_Complex);
+        fn multiplyFullStateDiagMatrPower(qureg: Pin<&mut Qureg>, matrix: &FullStateDiagMatr, exponent: QuestComplex);
         fn applyFullStateDiagMatr(qureg: Pin<&mut Qureg>, matrix: &FullStateDiagMatr);
-        fn applyFullStateDiagMatrPower(qureg: Pin<&mut Qureg>, matrix: &FullStateDiagMatr, exponent: Quest_Complex);
+        fn applyFullStateDiagMatrPower(qureg: Pin<&mut Qureg>, matrix: &FullStateDiagMatr, exponent: QuestComplex);
 
         // S gate operations
         fn applyS(qureg: Pin<&mut Qureg>, target: i32);
@@ -385,9 +378,6 @@ pub mod ffi {
         fn applyMultiControlledMultiQubitNot(qureg: Pin<&mut Qureg>, controls: &[i32], numControls: i32, targets: &[i32]);
         fn applyMultiStateControlledMultiQubitNot(qureg: Pin<&mut Qureg>, controls: &[i32], states: &[i32], targets: &[i32]);
 
-        // Superoperator
-        fn applySuperOp(qureg: Pin<&mut Qureg>, targets: &[i32], superop: &SuperOp);
-
         // Measurement operations
         fn applyQubitMeasurement(qureg: Pin<&mut Qureg>, target: i32) -> i32;
         unsafe fn applyQubitMeasurementAndGetProb(qureg: Pin<&mut Qureg>, target: i32, probability: *mut f64) -> i32;
@@ -437,10 +427,10 @@ pub mod ffi {
         fn syncSubQuregFromGpu(qureg: Pin<&mut Qureg>, localStartInd: i64, numLocalAmps: i64);
 
         // Qureg amplitude access
-        fn getQuregAmps(qureg: Pin<&mut Qureg>, startInd: i64, numAmps: i64) -> Vec<Quest_Complex>;
-        fn getDensityQuregAmps_flatten(qureg: Pin<&mut Qureg>, startRow: i64, startCol: i64, numRows: i64, numCols: i64) -> Vec<Quest_Complex>;
-        fn getQuregAmp(qureg: Pin<&mut Qureg>, index: i64) -> Quest_Complex;
-        fn getDensityQuregAmp(qureg: Pin<&mut Qureg>, row: i64, column: i64) -> Quest_Complex;
+        fn getQuregAmps(qureg: Pin<&mut Qureg>, startInd: i64, numAmps: i64) -> Vec<QuestComplex>;
+        fn getDensityQuregAmps_flatten(qureg: Pin<&mut Qureg>, startRow: i64, startCol: i64, numRows: i64, numCols: i64) -> Vec<QuestComplex>;
+        fn getQuregAmp(qureg: Pin<&mut Qureg>, index: i64) -> QuestComplex;
+        fn getDensityQuregAmp(qureg: Pin<&mut Qureg>, row: i64, column: i64) -> QuestComplex;
     }
 }
 
@@ -448,8 +438,8 @@ pub use ffi::*;
 
 
 /// Convenience function to create a quest_complex
-pub fn complex(re: f64, im: f64) -> Quest_Complex {
-    Quest_Complex { re, im }
+pub fn complex(re: f64, im: f64) -> QuestComplex {
+    QuestComplex { re, im }
 }
 
 

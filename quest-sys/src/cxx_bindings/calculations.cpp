@@ -3,67 +3,72 @@
 
 namespace quest_sys {
 // Calculations
-Quest_Real calcExpecPauliStr(const Qureg& qureg, const PauliStr& str) {
+double calcExpecPauliStr(const Qureg& qureg, const PauliStr& str) {
   return ::calcExpecPauliStr(qureg, str);
 }
 
-Quest_Real calcExpecPauliStrSum(const Qureg& qureg, const PauliStrSum& sum) {
+double calcExpecPauliStrSum(const Qureg& qureg, const PauliStrSum& sum) {
   return ::calcExpecPauliStrSum(qureg, sum);
 }
 
-Quest_Real calcExpecFullStateDiagMatr(const Qureg& qureg,
+double calcExpecFullStateDiagMatr(const Qureg& qureg,
                                       const FullStateDiagMatr& matr) {
   return ::calcExpecFullStateDiagMatr(qureg, matr);
 }
 
-Quest_Real calcExpecFullStateDiagMatrPower(const Qureg& qureg,
+double calcExpecFullStateDiagMatrPower(const Qureg& qureg,
                                            const FullStateDiagMatr& matr,
-                                           Quest_Complex exponent) {
+                                           double exponent) {
   return ::calcExpecFullStateDiagMatrPower(qureg, matr, exponent);
 }
 
-Quest_Real calcTotalProb(const Qureg& qureg) {
+double calcTotalProb(const Qureg& qureg) {
   return ::calcTotalProb(qureg);
 }
 
-Quest_Real calcProbOfBasisState(const Qureg& qureg, Quest_Index index) {
+double calcProbOfBasisState(const Qureg& qureg, std::int64_t index) {
   return ::calcProbOfBasisState(qureg, index);
 }
 
-Quest_Real calcProbOfQubitOutcome(const Qureg& qureg, int qubit, int outcome) {
+double calcProbOfQubitOutcome(const Qureg& qureg, int qubit, int outcome) {
   return ::calcProbOfQubitOutcome(qureg, qubit, outcome);
 }
 
-Quest_Real calcProbOfMultiQubitOutcome(const Qureg& qureg,
-                                       rust::Slice<const int> qubits,
-                                       rust::Slice<const int> outcomes) {
-  return ::calcProbOfMultiQubitOutcome(
-      qureg, quest_helper::slice_to_ptr(qubits),
-      quest_helper::slice_to_ptr(outcomes), static_cast<int>(qubits.length()));
+double calcProbOfMultiQubitOutcome(const Qureg& qureg,
+                                       rust::cxxbridge1::Slice<const int> qubits,
+                                       rust::cxxbridge1::Slice<const int> outcomes) {
+
+  auto qubit_vec = quest_helper::to_vector(qubits);
+  auto outcome_vec = quest_helper::to_vector(outcomes);
+  return ::calcProbOfMultiQubitOutcome(qureg, qubit_vec, outcome_vec);
+
 }
 
-void calcProbsOfAllMultiQubitOutcomes(rust::Slice<Quest_Real> outcomeProbs,
-                                      const Qureg& qureg,
-                                      rust::Slice<const int> qubits) {
-  return ::calcProbsOfAllMultiQubitOutcomes(outcomeProbs.data(), qureg,
-                                            quest_helper::slice_to_ptr(qubits),
-                                            static_cast<int>(qubits.length()));
+rust::cxxbridge1::Vec<double> calcProbsOfAllMultiQubitOutcomes(const Qureg& qureg, rust::cxxbridge1::Slice<const int> qubits) {
+  auto qubit_vec = quest_helper::to_vector(qubits);
+  auto res_vec = ::calcProbsOfAllMultiQubitOutcomes(qureg, qubit_vec);
+  rust::cxxbridge1::Vec<double> res;
+  res.reserve(res_vec.size());
+  for (auto val : res_vec) {
+    res.emplace_back(val);
+  }
+  return res;
 }
 
-Quest_Real calcPurity(const Qureg& qureg) {
+double calcPurity(const Qureg& qureg) {
   return ::calcPurity(qureg);
 }
 
-Quest_Real calcFidelity(const Qureg& qureg, const Qureg& other) {
+double calcFidelity(const Qureg& qureg, const Qureg& other) {
   return ::calcFidelity(qureg, other);
 }
 
-Quest_Real calcDistance(const Qureg& qureg1, const Qureg& qureg2) {
+double calcDistance(const Qureg& qureg1, const Qureg& qureg2) {
   return ::calcDistance(qureg1, qureg2);
 }
 
 std::unique_ptr<Qureg> calcPartialTrace(const Qureg& qureg,
-                                        rust::Slice<const int> traceOutQubits) {
+                                        rust::cxxbridge1::Slice<const int> traceOutQubits) {
   return std::make_unique<Qureg>(
       ::calcPartialTrace(qureg, quest_helper::slice_to_ptr(traceOutQubits),
                          static_cast<int>(traceOutQubits.length())));
@@ -71,26 +76,12 @@ std::unique_ptr<Qureg> calcPartialTrace(const Qureg& qureg,
 
 std::unique_ptr<Qureg> calcReducedDensityMatrix(
     const Qureg& qureg,
-    rust::Slice<const int> retainQubits) {
+    rust::cxxbridge1::Slice<const int> retainQubits) {
   return std::make_unique<Qureg>(::calcReducedDensityMatrix(
       qureg, quest_helper::slice_to_ptr(retainQubits),
       static_cast<int>(retainQubits.length())));
 }
 
-void setQuregToPartialTrace(Qureg& out,
-                            const Qureg& in,
-                            rust::Slice<const int> traceOutQubits) {
-  ::setQuregToPartialTrace(out, in, quest_helper::slice_to_ptr(traceOutQubits),
-                           static_cast<int>(traceOutQubits.length()));
-}
-
-void setQuregToReducedDensityMatrix(Qureg& out,
-                                    const Qureg& in,
-                                    rust::Slice<const int> retainQubits) {
-  ::setQuregToReducedDensityMatrix(out, in,
-                                   quest_helper::slice_to_ptr(retainQubits),
-                                   static_cast<int>(retainQubits.length()));
-}
 
 Quest_Complex calcInnerProduct(const Qureg& qureg1, const Qureg& qureg2) {
   return ::calcInnerProduct(qureg1, qureg2);

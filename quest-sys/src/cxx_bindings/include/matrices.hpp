@@ -3,22 +3,22 @@
 //
 #pragma once
 #include <quest.h>
-#include <rust/cxx.h>
 #include <memory>
 
 #include "types.hpp"
+#include <quest-sys/src/lib.rs.h>
 
 namespace quest_sys {
 // Matrices
 std::unique_ptr<CompMatr1> getCompMatr1(
-    rust::Slice<const rust::Slice<const Quest_Complex>> in);
+    rust::cxxbridge1::Slice<const rust::cxxbridge1::Slice<const Quest_Complex>> in);
 
 std::unique_ptr<CompMatr2> getCompMatr2(
-    rust::Slice<const rust::Slice<const Quest_Complex>> in);
+    rust::cxxbridge1::Slice<const rust::cxxbridge1::Slice<const Quest_Complex>> in);
 
-std::unique_ptr<DiagMatr1> getDiagMatr1(rust::Slice<const Quest_Complex> in);
+std::unique_ptr<DiagMatr1> getDiagMatr1(rust::cxxbridge1::Slice<const Quest_Complex> in);
 
-std::unique_ptr<DiagMatr2> getDiagMatr2(rust::Slice<const Quest_Complex> in);
+std::unique_ptr<DiagMatr2> getDiagMatr2(rust::cxxbridge1::Slice<const Quest_Complex> in);
 
 std::unique_ptr<CompMatr> createCompMatr(int numQubits);
 
@@ -27,7 +27,7 @@ std::unique_ptr<DiagMatr> createDiagMatr(int numQubits);
 std::unique_ptr<FullStateDiagMatr> createFullStateDiagMatr(int numQubits);
 
 std::unique_ptr<FullStateDiagMatr>
-createCustomFullStateDiagMatr(int numQubits, int useDistrib, int useGpuAccel);
+createCustomFullStateDiagMatr(int numQubits, int useDistrib, int useGpuAccel, int useMultithread);
 
 void destroyCompMatr(CompMatr& matrix);
 
@@ -42,13 +42,13 @@ void syncDiagMatr(DiagMatr& matr);
 void syncFullStateDiagMatr(FullStateDiagMatr& matr);
 
 void setCompMatr(CompMatr& out,
-                 rust::Slice<const rust::Slice<const Quest_Complex>> in);
+                 rust::cxxbridge1::Slice<const rust::cxxbridge1::Slice<const Quest_Complex>> in);
 
-void setDiagMatr(DiagMatr& out, rust::Slice<const Quest_Complex> in);
+void setDiagMatr(DiagMatr& out, rust::cxxbridge1::Slice<const Quest_Complex> in);
 
 void setFullStateDiagMatr(FullStateDiagMatr& out,
-                          Quest_Index startInd,
-                          rust::Slice<const Quest_Complex> in);
+                          std::int64_t startInd,
+                          rust::cxxbridge1::Slice<const Quest_Complex> in);
 
 std::unique_ptr<FullStateDiagMatr> createFullStateDiagMatrFromPauliStrSum(
     const PauliStrSum& in);

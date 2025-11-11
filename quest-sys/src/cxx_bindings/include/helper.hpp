@@ -10,10 +10,11 @@
 #include <type_traits>
 #include <vector>
 
-#include "rust/cxx.h"
+#include "types.hpp"
+#include "quest-sys/src/lib.rs.h"
 
 namespace detail {
-// Type trait to check if T is rust::Slice (including const-qualified elements)
+// Type trait to check if T is rust::cxxbridge1::Slice (including const-qualified elements)
 template <typename T>
 struct is_rust_slice : std::false_type {};
 
@@ -23,7 +24,7 @@ struct is_rust_slice<rust::Slice<T>> : std::true_type {};
 template <typename T>
 struct is_rust_slice<rust::Slice<const T>> : std::true_type {};
 
-// Type trait to get the element type of rust::Slice, removing const
+// Type trait to get the element type of rust::cxxbridge1::Slice, removing const
 template <typename T>
 struct element_type {
   using type = void;
@@ -160,13 +161,13 @@ auto transform_deep_eager(T&& container, Func&& func) {
 template <typename SliceType>
 auto slice_to_vector(const SliceType& slice) {
   static_assert(detail::is_rust_slice<SliceType>::value,
-                "Input must be a rust::Slice");
+                "Input must be a rust::cxxbridge1::Slice");
 
   using RawElementType = detail::element_type_t<SliceType>;
   using ElementType = detail::remove_const_t<RawElementType>;
 
-  if constexpr (std::is_same_v<ElementType, Quest_Complex>) {
-    // Base case: rust::Slice<const Quest_Complex> -> std::vector<qcomp>
+  if constexpr (std::is_same_v<ElementType, QuestComplex>) {
+    // Base case: rust::cxxbridge1::Slice<const Quest_Complex> -> std::vector<qcomp>
     std::vector<qcomp> result;
     result.reserve(slice.size());
     for (const auto& item : slice) {
@@ -175,7 +176,7 @@ auto slice_to_vector(const SliceType& slice) {
     return result;
   } else if constexpr (detail::is_rust_slice<ElementType>::value ||
                        detail::is_rust_slice<const ElementType>::value) {
-    // Recursive case: rust::Slice<rust::Slice<...>> ->
+    // Recursive case: rust::cxxbridge1::Slice<rust::cxxbridge1::Slice<...>> ->
     // std::vector<std::vector<...>>
     std::vector<decltype(slice_to_vector(std::declval<ElementType>()))> result;
     result.reserve(slice.size());
@@ -186,10 +187,10 @@ auto slice_to_vector(const SliceType& slice) {
   } else {
     // Invalid input type - will generate a helpful compile error
     static_assert(
-        std::is_same_v<ElementType, Quest_Complex> ||
+        std::is_same_v<ElementType, QuestComplex> ||
             detail::is_rust_slice<ElementType>::value ||
             detail::is_rust_slice<const ElementType>::value,
-        "Slice must contain either Quest_Complex or nested rust::Slice");
+        "Slice must contain either Quest_Complex or nested rust::cxxbridge1::Slice");
     // This return is never reached but needed for compilation
     return std::vector<int>();
   }
