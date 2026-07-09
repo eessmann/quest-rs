@@ -5,7 +5,8 @@ fn main() -> quest_sys::QuestResult<()> {
     println!("{report}");
 
     let mut qureg = quest_sys::create_qureg(20)?;
-    quest_sys::init_plus_state(qureg.pin_mut())?;
+    quest_sys::init_random_pure_state(qureg.pin_mut())?;
+    quest_sys::report_qureg(&qureg)?;
 
     let prob = quest_sys::calc_total_prob(&qureg)?;
     println!("Total probability: {prob}");
