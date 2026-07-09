@@ -25,6 +25,7 @@ miette = {version = "7.6.0", features = ["fancy"]}
 ndarray = { version = "0.17", features = ["default", "approx", "blas"] }
 num = "0.4"
 thiserror = "2.0"
+googletest = "0.14.3"
 
 
 [dependencies]
@@ -36,3 +37,6 @@ cxx.workspace = true
 [build-dependencies]
 cmake-package.workspace = true
 miette.workspace = true
+
+[dev-dependencies]
+googletest.workspace = true

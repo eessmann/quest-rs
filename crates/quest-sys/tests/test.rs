@@ -1,11 +1,12 @@
 use std::sync::Once;
 
-use approx::{assert_abs_diff_eq, assert_relative_eq};
-use quest_sys::{self, QuestComplex, QuestError, QuestResult};
+use googletest::prelude::*;
+use quest_sys::{self, QuestComplex, QuestError};
 
 static INIT: Once = Once::new();
+const EPSILON: f64 = 1e-12;
 
-fn ensure_quest_env() {
+fn ensure_quest_env() -> googletest::Result<()> {
     INIT.call_once(|| {
         quest_sys::init_quest_env().expect("QuEST environment should initialise");
         unsafe {
@@ -13,7 +14,7 @@ fn ensure_quest_env() {
         }
     });
 
-    assert!(quest_sys::is_quest_env_init());
+    verify_that!(quest_sys::is_quest_env_init(), eq(true))
 }
 
 extern "C" fn finalize_quest_env_at_exit() {
@@ -24,19 +25,23 @@ fn complex(re: f64, im: f64) -> QuestComplex {
     QuestComplex { re, im }
 }
 
-#[test]
-fn environment_api_uses_results_and_snake_case() -> QuestResult<()> {
-    ensure_quest_env();
+fn expect_complex_near(actual: QuestComplex, re: f64, im: f64) {
+    expect_that!(actual.re, near(re, EPSILON));
+    expect_that!(actual.im, near(im, EPSILON));
+}
+
+#[gtest]
+fn environment_api_uses_results_and_snake_case() -> googletest::Result<()> {
+    ensure_quest_env()?;
 
     let report = quest_sys::get_environment_string()?;
 
-    assert!(!report.is_empty());
-    Ok(())
+    verify_that!(report.as_str(), not(eq("")))
 }
 
-#[test]
-fn qureg_lifecycle_is_raii() -> QuestResult<()> {
-    ensure_quest_env();
+#[gtest]
+fn qureg_lifecycle_is_raii() -> googletest::Result<()> {
+    ensure_quest_env()?;
 
     let mut qureg = quest_sys::create_qureg(2)?;
     quest_sys::init_zero_state(qureg.pin_mut())?;
@@ -44,45 +49,44 @@ fn qureg_lifecycle_is_raii() -> QuestResult<()> {
     let amp0 = quest_sys::get_qureg_amp(&qureg, 0)?;
     let amp1 = quest_sys::get_qureg_amp(&qureg, 1)?;
 
-    assert_relative_eq!(amp0.re, 1.0);
-    assert_relative_eq!(amp0.im, 0.0);
-    assert_abs_diff_eq!(amp1.re, 0.0, epsilon = 1e-12);
-    assert_abs_diff_eq!(amp1.im, 0.0, epsilon = 1e-12);
+    expect_complex_near(amp0, 1.0, 0.0);
+    expect_complex_near(amp1, 0.0, 0.0);
 
     drop(qureg);
     Ok(())
 }
 
-#[test]
-fn finalize_fails_while_raii_handles_are_live() -> QuestResult<()> {
-    ensure_quest_env();
+#[gtest]
+fn finalize_fails_while_raii_handles_are_live() -> googletest::Result<()> {
+    ensure_quest_env()?;
 
     let qureg = quest_sys::create_qureg(1)?;
-    let err = quest_sys::finalize_quest_env().expect_err("live handles should block finalize");
+    let Err(err) = quest_sys::finalize_quest_env() else {
+        return fail!("live handles should block finalize");
+    };
 
-    assert!(quest_sys::is_quest_env_init());
-    assert!(matches!(err, QuestError::Lifecycle(_)));
-    assert!(err.to_string().contains("Qureg="));
+    expect_that!(quest_sys::is_quest_env_init(), eq(true));
+    verify_that!(&err, pat!(QuestError::Lifecycle(_)))?;
+    verify_that!(err.to_string(), contains_substring("Qureg="))?;
 
     drop(qureg);
     Ok(())
 }
 
-#[test]
-fn invalid_inputs_return_quest_errors() {
-    ensure_quest_env();
+#[gtest]
+fn invalid_inputs_return_quest_errors() -> googletest::Result<()> {
+    ensure_quest_env()?;
 
-    let err = match quest_sys::create_qureg(0) {
-        Ok(_) => panic!("zero-qubit registers are invalid"),
-        Err(err) => err,
+    let Err(err) = quest_sys::create_qureg(0) else {
+        return fail!("zero-qubit registers are invalid");
     };
 
-    assert!(!err.to_string().is_empty());
+    verify_that!(err.to_string().as_str(), not(eq("")))
 }
 
-#[test]
-fn arbitrary_pure_state_accepts_complex_slices() -> QuestResult<()> {
-    ensure_quest_env();
+#[gtest]
+fn arbitrary_pure_state_accepts_complex_slices() -> googletest::Result<()> {
+    ensure_quest_env()?;
 
     let mut qureg = quest_sys::create_qureg(2)?;
     let inv_sqrt_2 = 1.0 / 2.0_f64.sqrt();
@@ -98,33 +102,31 @@ fn arbitrary_pure_state_accepts_complex_slices() -> QuestResult<()> {
     let amp0 = quest_sys::get_qureg_amp(&qureg, 0)?;
     let amp3 = quest_sys::get_qureg_amp(&qureg, 3)?;
 
-    assert_relative_eq!(amp0.re, inv_sqrt_2, epsilon = 1e-12);
-    assert_abs_diff_eq!(amp0.im, 0.0, epsilon = 1e-12);
-    assert_abs_diff_eq!(amp3.re, 0.0, epsilon = 1e-12);
-    assert_relative_eq!(amp3.im, inv_sqrt_2, epsilon = 1e-12);
-    assert_relative_eq!(quest_sys::calc_total_prob(&qureg)?, 1.0, epsilon = 1e-12);
+    expect_complex_near(amp0, inv_sqrt_2, 0.0);
+    expect_complex_near(amp3, 0.0, inv_sqrt_2);
+    expect_that!(quest_sys::calc_total_prob(&qureg)?, near(1.0, EPSILON));
 
     Ok(())
 }
 
-#[test]
-fn measurement_with_probability_returns_a_struct() -> QuestResult<()> {
-    ensure_quest_env();
+#[gtest]
+fn measurement_with_probability_returns_a_struct() -> googletest::Result<()> {
+    ensure_quest_env()?;
 
     let mut qureg = quest_sys::create_qureg(1)?;
     quest_sys::init_plus_state(qureg.pin_mut())?;
 
     let measurement = quest_sys::apply_qubit_measurement_and_get_prob(qureg.pin_mut(), 0)?;
 
-    assert!(measurement.outcome == 0 || measurement.outcome == 1);
-    assert_relative_eq!(measurement.probability, 0.5, epsilon = 1e-12);
+    expect_that!(measurement.outcome, any!(eq(0), eq(1)));
+    expect_that!(measurement.probability, near(0.5, EPSILON));
 
     Ok(())
 }
 
-#[test]
-fn nested_complex_matrix_inputs_are_flattened_safely() -> QuestResult<()> {
-    ensure_quest_env();
+#[gtest]
+fn nested_complex_matrix_inputs_are_flattened_safely() -> googletest::Result<()> {
+    ensure_quest_env()?;
 
     let mut qureg = quest_sys::create_qureg(1)?;
     quest_sys::init_zero_state(qureg.pin_mut())?;
@@ -142,17 +144,15 @@ fn nested_complex_matrix_inputs_are_flattened_safely() -> QuestResult<()> {
     let amp0 = quest_sys::get_qureg_amp(&qureg, 0)?;
     let amp1 = quest_sys::get_qureg_amp(&qureg, 1)?;
 
-    assert_abs_diff_eq!(amp0.re, 0.0, epsilon = 1e-12);
-    assert_abs_diff_eq!(amp0.im, 0.0, epsilon = 1e-12);
-    assert_relative_eq!(amp1.re, 1.0, epsilon = 1e-12);
-    assert_abs_diff_eq!(amp1.im, 0.0, epsilon = 1e-12);
+    expect_complex_near(amp0, 0.0, 0.0);
+    expect_complex_near(amp1, 1.0, 0.0);
 
     Ok(())
 }
 
-#[test]
-fn primitive_operations_are_result_wrapped() -> QuestResult<()> {
-    ensure_quest_env();
+#[gtest]
+fn primitive_operations_are_result_wrapped() -> googletest::Result<()> {
+    ensure_quest_env()?;
 
     let mut qureg = quest_sys::create_qureg(1)?;
     quest_sys::init_zero_state(qureg.pin_mut())?;
@@ -161,43 +161,39 @@ fn primitive_operations_are_result_wrapped() -> QuestResult<()> {
     let amp0 = quest_sys::get_qureg_amp(&qureg, 0)?;
     let amp1 = quest_sys::get_qureg_amp(&qureg, 1)?;
 
-    assert_abs_diff_eq!(amp0.re, 0.0, epsilon = 1e-12);
-    assert_abs_diff_eq!(amp0.im, 0.0, epsilon = 1e-12);
-    assert_relative_eq!(amp1.re, 1.0, epsilon = 1e-12);
-    assert_abs_diff_eq!(amp1.im, 0.0, epsilon = 1e-12);
+    expect_complex_near(amp0, 0.0, 0.0);
+    expect_complex_near(amp1, 1.0, 0.0);
 
     Ok(())
 }
 
-#[test]
-fn generated_initialisation_and_probability_apis_work() -> QuestResult<()> {
-    ensure_quest_env();
+#[gtest]
+fn generated_initialisation_and_probability_apis_work() -> googletest::Result<()> {
+    ensure_quest_env()?;
 
     let mut qureg = quest_sys::create_qureg(2)?;
     quest_sys::init_classical_state(qureg.pin_mut(), 2)?;
 
-    assert_relative_eq!(
+    expect_that!(
         quest_sys::calc_prob_of_basis_state(&qureg, 2)?,
-        1.0,
-        epsilon = 1e-12
+        near(1.0, EPSILON)
     );
-    assert_relative_eq!(
+    expect_that!(
         quest_sys::calc_prob_of_qubit_outcome(&qureg, 1, 1)?,
-        1.0,
-        epsilon = 1e-12
+        near(1.0, EPSILON)
     );
 
     let probs = quest_sys::calc_probs_of_all_multi_qubit_outcomes(&qureg, &[1])?;
-    assert_eq!(probs.len(), 2);
-    assert_relative_eq!(probs[0], 0.0, epsilon = 1e-12);
-    assert_relative_eq!(probs[1], 1.0, epsilon = 1e-12);
+    verify_that!(probs.len(), eq(2))?;
+    expect_that!(probs[0], near(0.0, EPSILON));
+    expect_that!(probs[1], near(1.0, EPSILON));
 
     Ok(())
 }
 
-#[test]
-fn generated_overloads_have_distinct_safe_adapters() -> QuestResult<()> {
-    ensure_quest_env();
+#[gtest]
+fn generated_overloads_have_distinct_safe_adapters() -> googletest::Result<()> {
+    ensure_quest_env()?;
 
     let pauli_without_indices = quest_sys::get_pauli_str_from_string("Z")?;
     let pauli_with_indices = quest_sys::get_pauli_str("Z", &[0])?;
@@ -210,9 +206,9 @@ fn generated_overloads_have_distinct_safe_adapters() -> QuestResult<()> {
     Ok(())
 }
 
-#[test]
-fn generated_diag_matrix_handles_are_raii_owned() -> QuestResult<()> {
-    ensure_quest_env();
+#[gtest]
+fn generated_diag_matrix_handles_are_raii_owned() -> googletest::Result<()> {
+    ensure_quest_env()?;
 
     let mut qureg = quest_sys::create_qureg(1)?;
     quest_sys::init_plus_state(qureg.pin_mut())?;
@@ -225,18 +221,16 @@ fn generated_diag_matrix_handles_are_raii_owned() -> QuestResult<()> {
     let amp0 = quest_sys::get_qureg_amp(&qureg, 0)?;
     let amp1 = quest_sys::get_qureg_amp(&qureg, 1)?;
 
-    assert_relative_eq!(amp0.re, inv_sqrt_2, epsilon = 1e-12);
-    assert_abs_diff_eq!(amp0.im, 0.0, epsilon = 1e-12);
-    assert_relative_eq!(amp1.re, -inv_sqrt_2, epsilon = 1e-12);
-    assert_abs_diff_eq!(amp1.im, 0.0, epsilon = 1e-12);
+    expect_complex_near(amp0, inv_sqrt_2, 0.0);
+    expect_complex_near(amp1, -inv_sqrt_2, 0.0);
 
     drop(diag);
     Ok(())
 }
 
-#[test]
-fn multiplication_api_uses_safe_matrix_wrappers() -> QuestResult<()> {
-    ensure_quest_env();
+#[gtest]
+fn multiplication_api_uses_safe_matrix_wrappers() -> googletest::Result<()> {
+    ensure_quest_env()?;
 
     let mut qureg = quest_sys::create_qureg(1)?;
     quest_sys::init_zero_state(qureg.pin_mut())?;
@@ -252,15 +246,14 @@ fn multiplication_api_uses_safe_matrix_wrappers() -> QuestResult<()> {
     quest_sys::leftapply_comp_matr(qureg.pin_mut(), &[0], &comp_matr)?;
 
     let amp1 = quest_sys::get_qureg_amp(&qureg, 1)?;
-    assert_relative_eq!(amp1.re, 1.0, epsilon = 1e-12);
-    assert_abs_diff_eq!(amp1.im, 0.0, epsilon = 1e-12);
+    expect_complex_near(amp1, 1.0, 0.0);
 
     Ok(())
 }
 
-#[test]
-fn channel_handles_are_raii_owned() -> QuestResult<()> {
-    ensure_quest_env();
+#[gtest]
+fn channel_handles_are_raii_owned() -> googletest::Result<()> {
+    ensure_quest_env()?;
 
     let super_op = quest_sys::create_super_op(1)?;
     let kraus_map = quest_sys::create_kraus_map(1, 1)?;
@@ -270,21 +263,21 @@ fn channel_handles_are_raii_owned() -> QuestResult<()> {
     Ok(())
 }
 
-#[test]
-fn decoherence_api_returns_results() -> QuestResult<()> {
-    ensure_quest_env();
+#[gtest]
+fn decoherence_api_returns_results() -> googletest::Result<()> {
+    ensure_quest_env()?;
 
     let mut density = quest_sys::create_density_qureg(1)?;
     quest_sys::init_plus_state(density.pin_mut())?;
     quest_sys::mix_dephasing(density.pin_mut(), 0, 0.1)?;
 
-    assert_relative_eq!(quest_sys::calc_total_prob(&density)?, 1.0, epsilon = 1e-12);
+    verify_that!(quest_sys::calc_total_prob(&density)?, near(1.0, EPSILON))?;
     Ok(())
 }
 
-#[test]
-fn trotterisation_accepts_raii_pauli_sums() -> QuestResult<()> {
-    ensure_quest_env();
+#[gtest]
+fn trotterisation_accepts_raii_pauli_sums() -> googletest::Result<()> {
+    ensure_quest_env()?;
 
     let mut qureg = quest_sys::create_qureg(1)?;
     quest_sys::init_zero_state(qureg.pin_mut())?;
@@ -300,8 +293,7 @@ fn trotterisation_accepts_raii_pauli_sums() -> QuestResult<()> {
     )?;
 
     let amp0 = quest_sys::get_qureg_amp(&qureg, 0)?;
-    assert_relative_eq!(amp0.re, 1.0, epsilon = 1e-12);
-    assert_abs_diff_eq!(amp0.im, 0.0, epsilon = 1e-12);
+    expect_complex_near(amp0, 1.0, 0.0);
 
     Ok(())
 }

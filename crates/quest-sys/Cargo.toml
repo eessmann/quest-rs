@@ -21,7 +21,7 @@ cmake-package.workspace = true
 miette.workspace = true
 
 [dev-dependencies]
-approx = "0.5"
+googletest.workspace = true
 libc = "0.2"
 
 [[example]]

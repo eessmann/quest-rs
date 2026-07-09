@@ -1,0 +1,14 @@
+nextest-version = { required = "0.9.55" }
+
+[profile.default]
+fail-fast = true
+
+[profile.ci]
+fail-fast = false
+
+[test-groups]
+quest-sys-runtime = { max-threads = 1 }
+
+[[profile.default.overrides]]
+filter = 'package(quest-sys)'
+test-group = 'quest-sys-runtime'

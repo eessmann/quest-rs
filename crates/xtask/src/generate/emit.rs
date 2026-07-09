@@ -203,23 +203,27 @@ fn render_coverage_manifest(quest_root: &QuestRoot, items: &[ApiItem]) -> Result
 #[cfg(test)]
 mod tests {
     use super::*;
+    use googletest::prelude::*;
 
-    #[test]
-    fn check_generated_file_detects_stale_contents() {
-        let dir = tempfile::tempdir().expect("tempdir");
+    #[gtest]
+    fn check_generated_file_detects_stale_contents() -> googletest::Result<()> {
+        let dir = tempfile::tempdir().or_fail()?;
         let path = dir.path().join("artifact.rs");
-        fs::write(&path, "old").expect("write fixture");
+        fs::write(&path, "old").or_fail()?;
 
-        let error = write_or_check(true, &path, "artifact.rs", "new".to_owned())
-            .expect_err("stale artifact should fail")
-            .to_string();
+        let Err(error) = write_or_check(true, &path, "artifact.rs", "new".to_owned()) else {
+            return fail!("stale artifact should fail");
+        };
 
-        assert!(error.contains("artifact.rs is stale"));
+        verify_that!(
+            error.to_string(),
+            contains_substring("artifact.rs is stale")
+        )
     }
 
-    #[test]
-    fn generated_source_artifacts_are_stale_checked() {
-        let dir = tempfile::tempdir().expect("tempdir");
+    #[gtest]
+    fn generated_source_artifacts_are_stale_checked() -> googletest::Result<()> {
+        let dir = tempfile::tempdir().or_fail()?;
 
         for label in [
             GENERATED_RUST_PATH,
@@ -227,24 +231,26 @@ mod tests {
             GENERATED_CPP_PATH,
         ] {
             let path = dir.path().join(label);
-            fs::create_dir_all(path.parent().expect("parent")).expect("create fixture parent");
-            fs::write(&path, "stale").expect("write fixture");
+            fs::create_dir_all(path.parent().or_fail()?).or_fail()?;
+            fs::write(&path, "stale").or_fail()?;
 
-            let error = write_or_check(true, &path, label, "fresh".to_owned())
-                .expect_err("stale source artifact should fail")
-                .to_string();
+            let Err(error) = write_or_check(true, &path, label, "fresh".to_owned()) else {
+                return fail!("stale source artifact should fail");
+            };
 
-            assert!(error.contains(label));
-            assert!(error.contains("is stale"));
+            expect_that!(error.to_string(), contains_substring(label));
+            expect_that!(error.to_string(), contains_substring("is stale"));
         }
+
+        Ok(())
     }
 
-    #[test]
-    fn checked_in_generator_files_do_not_contain_machine_paths() {
+    #[gtest]
+    fn checked_in_generator_files_do_not_contain_machine_paths() -> googletest::Result<()> {
         let workspace = Path::new(env!("CARGO_MANIFEST_DIR"))
             .parent()
             .and_then(Path::parent)
-            .expect("workspace root");
+            .or_fail()?;
         let files = [
             "build.rs",
             "crates/quest-sys/build.rs",
@@ -266,13 +272,12 @@ mod tests {
         ];
 
         for file in files {
-            let contents = fs::read_to_string(workspace.join(file)).expect("read checked-in file");
+            let contents = fs::read_to_string(workspace.join(file)).or_fail()?;
             for pattern in &forbidden {
-                assert!(
-                    !contents.contains(pattern),
-                    "{file} contains forbidden machine-specific fragment {pattern}"
-                );
+                expect_that!(contents.as_str(), not(contains_substring(pattern.as_str())));
             }
         }
+
+        Ok(())
     }
 }

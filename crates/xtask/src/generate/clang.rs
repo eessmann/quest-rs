@@ -417,45 +417,51 @@ pub(crate) fn canonicalize_existing(path: &Path) -> Result<PathBuf, DynError> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use googletest::prelude::*;
 
     fn fixture_root() -> Option<QuestRoot> {
         find_quest_root().ok()
     }
 
-    #[test]
-    fn libclang_error_mentions_expected_lookup_paths() {
+    #[gtest]
+    fn libclang_error_mentions_expected_lookup_paths() -> googletest::Result<()> {
         let message = format_libclang_error("not found");
 
-        assert!(message.contains("LIBCLANG_PATH"));
-        assert!(message.contains("llvm-config"));
+        verify_that!(
+            message,
+            all!(
+                contains_substring("LIBCLANG_PATH"),
+                contains_substring("llvm-config")
+            )
+        )
     }
 
-    #[test]
-    fn libclang_extracts_representative_overloads() {
+    #[gtest]
+    fn libclang_extracts_representative_overloads() -> googletest::Result<()> {
         let Some(root) = fixture_root() else {
             eprintln!("skipping test because no QuEST root was provided by environment");
-            return;
+            return Ok(());
         };
 
-        let items = collect_quest_api(root.path()).expect("libclang should parse QuEST headers");
+        let items = collect_quest_api(root.path()).or_fail()?;
         let overloads = items
             .iter()
             .filter(|item| item.name == "applyCompMatr")
             .collect::<Vec<_>>();
 
-        assert!(
+        expect_that!(
             overloads.iter().any(|item| item
                 .arguments
                 .iter()
                 .any(|arg| arg.ty.contains("std::vector<int>"))),
-            "expected C++ std::vector overload"
+            eq(true)
         );
-        assert!(
+        expect_that!(
             overloads
                 .iter()
                 .any(|item| item.arguments.iter().any(|arg| arg.ty.contains('*'))),
-            "expected C pointer overload"
+            eq(true)
         );
-        assert!(overloads.iter().all(|item| item.line > 0));
+        verify_that!(overloads.iter().all(|item| item.line > 0), eq(true))
     }
 }

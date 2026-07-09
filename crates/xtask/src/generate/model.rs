@@ -220,6 +220,7 @@ pub fn rust_name(quest_name: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use googletest::prelude::*;
 
     fn generated_entry(overload_key: &str, adapter_name: &str, rust_name: &str) -> AdapterEntry {
         AdapterEntry {
@@ -231,9 +232,9 @@ mod tests {
         }
     }
 
-    #[test]
-    fn generated_adapter_names_must_identify_one_overload() {
-        let error = AdapterRegistry::new(vec![
+    #[gtest]
+    fn generated_adapter_names_must_identify_one_overload() -> googletest::Result<()> {
+        let Err(error) = AdapterRegistry::new(vec![
             generated_entry(
                 "getPauliStr(std::string) -> PauliStr",
                 "get_pauli_str",
@@ -244,22 +245,32 @@ mod tests {
                 "get_pauli_str",
                 "get_pauli_str",
             ),
-        ])
-        .expect_err("duplicate generated adapter names must be rejected");
+        ]) else {
+            return fail!("duplicate generated adapter names must be rejected");
+        };
 
-        assert!(error.contains("duplicate generated adapter name"));
+        verify_that!(
+            error,
+            contains_substring("duplicate generated adapter name")
+        )
     }
 
-    #[test]
-    fn generated_adapter_name_must_match_rust_bridge_symbol() {
-        let error = AdapterRegistry::new(vec![generated_entry(
+    #[gtest]
+    fn generated_adapter_name_must_match_rust_bridge_symbol() -> googletest::Result<()> {
+        let Err(error) = AdapterRegistry::new(vec![generated_entry(
             "applyCompMatr1(Qureg, int, CompMatr1) -> void",
             "applyCompMatr1",
             "apply_comp_matr1",
-        )])
-        .expect_err("generated adapter names must be bridge symbols");
+        )]) else {
+            return fail!("generated adapter names must be bridge symbols");
+        };
 
-        assert!(error.contains("generated adapter name"));
-        assert!(error.contains("does not match rust name"));
+        verify_that!(
+            error,
+            all!(
+                contains_substring("generated adapter name"),
+                contains_substring("does not match rust name")
+            )
+        )
     }
 }

@@ -96,6 +96,7 @@ mod tests {
     use crate::generate::emit::load_adapter_registry;
     use crate::generate::find_workspace_root;
     use crate::generate::model::{AdapterEntry, AdapterRegistry, AdapterSourceKind, ApiArgument};
+    use googletest::prelude::*;
 
     fn fake_apply_comp_matr_item(overload_key: &str) -> ApiItem {
         ApiItem {
@@ -130,20 +131,19 @@ mod tests {
         }
     }
 
-    #[test]
-    fn generated_classification_requires_exact_overload_key() {
+    #[gtest]
+    fn generated_classification_requires_exact_overload_key() -> googletest::Result<()> {
         let mut items = vec![fake_apply_comp_matr_item(
             "applyCompMatr(Qureg, int, CompMatr) -> void",
         )];
 
-        classify_items(&mut items, &AdapterRegistry::empty())
-            .expect("classification should be exhaustive");
+        classify_items(&mut items, &AdapterRegistry::empty()).or_fail()?;
 
-        assert_eq!(items[0].status, "gated-manual-adapter-needed");
+        verify_that!(items[0].status.as_str(), eq("gated-manual-adapter-needed"))
     }
 
-    #[test]
-    fn exact_adapter_entry_marks_only_that_overload_generated() {
+    #[gtest]
+    fn exact_adapter_entry_marks_only_that_overload_generated() -> googletest::Result<()> {
         let registry = AdapterRegistry::new(vec![AdapterEntry {
             overload_key: "applyCompMatr(Qureg, std::vector<int>, CompMatr) -> void".to_owned(),
             quest_name: "applyCompMatr".to_owned(),
@@ -151,30 +151,29 @@ mod tests {
             rust_name: "apply_comp_matr".to_owned(),
             source_kind: AdapterSourceKind::Core,
         }])
-        .expect("registry");
+        .or_fail()?;
         let mut items = vec![
             fake_apply_comp_matr_item("applyCompMatr(Qureg, int, CompMatr) -> void"),
             fake_apply_comp_matr_item("applyCompMatr(Qureg, std::vector<int>, CompMatr) -> void"),
         ];
 
-        classify_items(&mut items, &registry).expect("classification should be exhaustive");
+        classify_items(&mut items, &registry).or_fail()?;
 
-        assert_eq!(items[0].status, "gated-manual-adapter-needed");
-        assert_eq!(items[1].status, "generated");
+        expect_that!(items[0].status.as_str(), eq("gated-manual-adapter-needed"));
+        verify_that!(items[1].status.as_str(), eq("generated"))
     }
 
-    #[test]
-    fn classification_distinguishes_overloads_by_signature_shape() {
+    #[gtest]
+    fn classification_distinguishes_overloads_by_signature_shape() -> googletest::Result<()> {
         let Ok(root) = find_quest_root() else {
             eprintln!("skipping test because no QuEST root was provided by environment");
-            return;
+            return Ok(());
         };
 
-        let workspace = find_workspace_root().expect("workspace");
-        let registry = load_adapter_registry(&workspace, false).expect("adapter registry");
-        let mut items =
-            collect_quest_api(root.path()).expect("libclang should parse QuEST headers");
-        classify_items(&mut items, &registry).expect("classification should be exhaustive");
+        let workspace = find_workspace_root().or_fail()?;
+        let registry = load_adapter_registry(&workspace, false).or_fail()?;
+        let mut items = collect_quest_api(root.path()).or_fail()?;
+        classify_items(&mut items, &registry).or_fail()?;
 
         let vector = items
             .iter()
@@ -185,17 +184,20 @@ mod tests {
                         .iter()
                         .any(|arg| arg.ty.contains("std::vector<int>"))
             })
-            .expect("vector overload");
+            .or_fail()?;
         let pointer = items
             .iter()
             .find(|item| {
                 item.name == "applyCompMatr"
                     && item.arguments.iter().any(|arg| arg.ty.contains('*'))
             })
-            .expect("pointer overload");
+            .or_fail()?;
 
-        assert_ne!(vector.overload_key, pointer.overload_key);
-        assert_eq!(vector.status, "generated");
-        assert_eq!(pointer.status, "unsupported-c-api");
+        expect_that!(
+            vector.overload_key.as_str(),
+            not(eq(pointer.overload_key.as_str()))
+        );
+        expect_that!(vector.status.as_str(), eq("generated"));
+        verify_that!(pointer.status.as_str(), eq("unsupported-c-api"))
     }
 }
