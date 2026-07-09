@@ -1,2 +1,2 @@
-mod environment;
-mod register;
+pub mod environment;
+pub mod register;

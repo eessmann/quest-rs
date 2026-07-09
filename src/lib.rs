@@ -1,4 +1,6 @@
-mod core;
+pub mod core;
+pub use core::environment::QuESTEnvironment;
+pub use core::register::QuantumRegister;
 
 pub fn add(left: u64, right: u64) -> u64 {
     left + right

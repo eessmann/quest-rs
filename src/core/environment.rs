@@ -1,23 +1,35 @@
-use quest_sys::QuESTEnv;
-use cxx::UniquePtr;
+use quest_sys::{QuestEnvironment, QuestResult};
+
 pub struct QuESTEnvironment {
-    env: UniquePtr<QuESTEnv>,
+    env: QuestEnvironment,
 }
 
 impl QuESTEnvironment {
-    pub fn new() -> Self {
-        quest_sys::initQuESTEnv();
-        Self { env: quest_sys::getQuESTEnv() }
+    pub fn new() -> QuestResult<Self> {
+        quest_sys::init_quest_env()?;
+        Ok(Self {
+            env: quest_sys::get_quest_env()?,
+        })
     }
 
-    pub fn with_custom_config(use_distribution: bool, use_gpu: bool, use_multithreading: bool) -> Self {
-        quest_sys::initCustomQuESTEnv(use_distribution, use_gpu, use_multithreading);
-        Self { env: quest_sys::getQuESTEnv() }
+    pub fn with_custom_config(
+        use_distribution: bool,
+        use_gpu: bool,
+        use_multithreading: bool,
+    ) -> QuestResult<Self> {
+        quest_sys::init_custom_quest_env(use_distribution, use_gpu, use_multithreading)?;
+        Ok(Self {
+            env: quest_sys::get_quest_env()?,
+        })
+    }
+
+    pub fn env(&self) -> &QuestEnvironment {
+        &self.env
     }
 }
 
 impl Drop for QuESTEnvironment {
     fn drop(&mut self) {
-        quest_sys::finalizeQuESTEnv();
+        let _ = quest_sys::finalize_quest_env();
     }
 }

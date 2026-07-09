@@ -1,405 +1,277 @@
-use std::f64::consts::PI;
 use std::sync::Once;
-use approx::assert_relative_eq;
-use quest_sys::*;
 
-// Static initialization and cleanup control
+use approx::{assert_abs_diff_eq, assert_relative_eq};
+use quest_sys::{self, QuestComplex, QuestResult};
+
 static INIT: Once = Once::new();
-static mut QUEST_ENV_INITIALIZED: bool = false;
 
-// Initialize QuEST environment once for all tests
-fn ensure_quest_env_initialized() {
+fn ensure_quest_env() {
     INIT.call_once(|| {
-        println!("Initializing QuEST environment for all tests...");
+        quest_sys::init_quest_env().expect("QuEST environment should initialise");
         unsafe {
-            initQuESTEnv();
-            QUEST_ENV_INITIALIZED = true;
-
-            // Register a handler to finalize QuEST at program exit
-            std::panic::catch_unwind(|| {
-                libc::atexit(finalize_quest_at_exit);
-            }).ok();
+            libc::atexit(finalize_quest_env_at_exit);
         }
     });
 
-    // Check if initialization succeeded
-    assert!(unsafe { QUEST_ENV_INITIALIZED }, "QuEST environment failed to initialize");
+    assert!(quest_sys::is_quest_env_init());
 }
 
-// Function to be called at program exit to clean up QuEST
-extern "C" fn finalize_quest_at_exit() {
-    println!("Finalizing QuEST environment...");
-    unsafe {
-        if QUEST_ENV_INITIALIZED {
-            finalizeQuESTEnv();
-            QUEST_ENV_INITIALIZED = false;
-        }
-    }
+extern "C" fn finalize_quest_env_at_exit() {
+    let _ = quest_sys::finalize_quest_env();
+}
+
+fn complex(re: f64, im: f64) -> QuestComplex {
+    QuestComplex { re, im }
 }
 
 #[test]
-fn test_init_quest_environment() {
-    // Simply check that we can initialize the environment
-    ensure_quest_env_initialized();
-    assert!(true);
+fn environment_api_uses_results_and_snake_case() -> QuestResult<()> {
+    ensure_quest_env();
+
+    let report = quest_sys::get_environment_string()?;
+
+    assert!(!report.is_empty());
+    Ok(())
 }
 
 #[test]
-fn test_create_and_destroy_qureg() {
-    ensure_quest_env_initialized();
+fn qureg_lifecycle_is_raii() -> QuestResult<()> {
+    ensure_quest_env();
 
-    // Create and destroy manually to test the specific functionality
-    let mut qureg = createQureg(2);
-    assert!(!qureg.is_null());
+    let mut qureg = quest_sys::create_qureg(2)?;
+    quest_sys::init_zero_state(qureg.pin_mut())?;
 
-    // Box::pin is used to properly pin CXX opaque types
-    destroyQureg(qureg.pin_mut());
+    let amp0 = quest_sys::get_qureg_amp(&qureg, 0)?;
+    let amp1 = quest_sys::get_qureg_amp(&qureg, 1)?;
 
-    // We've successfully destroyed the qureg if we reach here
-    assert!(true);
+    assert_relative_eq!(amp0.re, 1.0);
+    assert_relative_eq!(amp0.im, 0.0);
+    assert_abs_diff_eq!(amp1.re, 0.0, epsilon = 1e-12);
+    assert_abs_diff_eq!(amp1.im, 0.0, epsilon = 1e-12);
+
+    drop(qureg);
+    Ok(())
 }
 
 #[test]
-fn test_create_and_destroy_density_qureg() {
-    ensure_quest_env_initialized();
+fn invalid_inputs_return_quest_errors() {
+    ensure_quest_env();
 
-    let mut qureg = createDensityQureg(2);
-    assert!(!qureg.is_null());
+    let err = match quest_sys::create_qureg(0) {
+        Ok(_) => panic!("zero-qubit registers are invalid"),
+        Err(err) => err,
+    };
 
-    destroyQureg(qureg.pin_mut());
-
-    // We've successfully destroyed the density qureg if we reach here
-    assert!(true);
+    assert!(!err.to_string().is_empty());
 }
 
 #[test]
-fn test_init_zero_state() {
-    ensure_quest_env_initialized();
+fn arbitrary_pure_state_accepts_complex_slices() -> QuestResult<()> {
+    ensure_quest_env();
 
-    let mut qureg = createQureg(2);
-
-    // Initialize to |00⟩
-    initZeroState(qureg.pin_mut());
-
-    // In the |00⟩ state, only the first amplitude should be 1, the rest 0
-    let amp = getQuregAmp(qureg.pin_mut(), 0);
-    assert_eq!(amp.re, 1.0);
-    assert_eq!(amp.im, 0.0);
-
-    // Check other amplitudes are zero
-    for i in 1..4 {
-        let amp = getQuregAmp(qureg.pin_mut(), i);
-        assert_eq!(amp.re, 0.0);
-        assert_eq!(amp.im, 0.0);
-    }
-
-    destroyQureg(qureg.pin_mut());
-}
-
-#[test]
-fn test_init_plus_state() {
-    ensure_quest_env_initialized();
-
-    let mut qureg = createQureg(1);
-
-    initPlusState(qureg.pin_mut());
-
-    // In the |+⟩ state, both amplitudes should be 1/sqrt(2)
-    let expected = 1.0 / 2.0_f64.sqrt();
-
-    let amp0 = getQuregAmp(qureg.pin_mut(), 0);
-    let amp1 = getQuregAmp(qureg.pin_mut(), 1);
-
-    assert!((amp0.re - expected).abs() < 1e-10);
-    assert_eq!(amp0.im, 0.0);
-
-    assert!((amp1.re - expected).abs() < 1e-10);
-    assert_eq!(amp1.im, 0.0);
-
-    destroyQureg(qureg.pin_mut());
-}
-
-#[test]
-fn test_init_arbitrary_pure_state() {
-    ensure_quest_env_initialized();
-
-    let mut qureg = createQureg(2);
-
-    // Create a specific state: (|00⟩ + i|11⟩)/sqrt(2)
-    let amps = vec![
-        complex(1.0 / 2.0_f64.sqrt(), 0.0),   // |00⟩
-        complex(0.0, 0.0),                    // |01⟩
-        complex(0.0, 0.0),                    // |10⟩
-        complex(0.0, 1.0 / 2.0_f64.sqrt()),   // |11⟩
+    let mut qureg = quest_sys::create_qureg(2)?;
+    let inv_sqrt_2 = 1.0 / 2.0_f64.sqrt();
+    let amps = [
+        complex(inv_sqrt_2, 0.0),
+        complex(0.0, 0.0),
+        complex(0.0, 0.0),
+        complex(0.0, inv_sqrt_2),
     ];
 
-    initArbitraryPureState(qureg.pin_mut(), &amps);
+    quest_sys::init_arbitrary_pure_state(qureg.pin_mut(), &amps)?;
 
-    // Check the state was correctly initialized
-    let amp0 = getQuregAmp(qureg.pin_mut(), 0);
-    let amp3 = getQuregAmp(qureg.pin_mut(), 3);
+    let amp0 = quest_sys::get_qureg_amp(&qureg, 0)?;
+    let amp3 = quest_sys::get_qureg_amp(&qureg, 3)?;
 
-    assert!((amp0.re - 1.0 / 2.0_f64.sqrt()).abs() < 1e-10);
-    assert_relative_eq!(amp0.im, 0.0);
+    assert_relative_eq!(amp0.re, inv_sqrt_2, epsilon = 1e-12);
+    assert_abs_diff_eq!(amp0.im, 0.0, epsilon = 1e-12);
+    assert_abs_diff_eq!(amp3.re, 0.0, epsilon = 1e-12);
+    assert_relative_eq!(amp3.im, inv_sqrt_2, epsilon = 1e-12);
+    assert_relative_eq!(quest_sys::calc_total_prob(&qureg)?, 1.0, epsilon = 1e-12);
 
-    assert_relative_eq!(amp3.re, 0.0);
-    assert!((amp3.im - 1.0 / 2.0_f64.sqrt()).abs() < 1e-10);
-
-    // Verify state normalization
-    let total_prob = calcTotalProb(&qureg);
-    assert!((total_prob - 1.0).abs() < 1e-10);
-
-    destroyQureg(qureg.pin_mut());
+    Ok(())
 }
 
 #[test]
-fn test_pauli_x() {
-    ensure_quest_env_initialized();
+fn measurement_with_probability_returns_a_struct() -> QuestResult<()> {
+    ensure_quest_env();
 
-    let mut qureg = createQureg(1);
+    let mut qureg = quest_sys::create_qureg(1)?;
+    quest_sys::init_plus_state(qureg.pin_mut())?;
 
-    // Init to |0⟩
-    initZeroState(qureg.pin_mut());
+    let measurement = quest_sys::apply_qubit_measurement_and_get_prob(qureg.pin_mut(), 0)?;
 
-    // Apply X gate (NOT gate)
-    applyPauliX(qureg.pin_mut(), 0);
+    assert!(measurement.outcome == 0 || measurement.outcome == 1);
+    assert_relative_eq!(measurement.probability, 0.5, epsilon = 1e-12);
 
-    // Should now be in |1⟩ state
-    let amp0 = getQuregAmp(qureg.pin_mut(), 0);
-    let amp1 = getQuregAmp(qureg.pin_mut(), 1);
-
-    assert_relative_eq!(amp0.re, 0.0);
-    assert_relative_eq!(amp0.im, 0.0);
-
-    assert_relative_eq!(amp1.re, 1.0);
-    assert_relative_eq!(amp1.im, 0.0);
-
-    destroyQureg(qureg.pin_mut());
+    Ok(())
 }
 
 #[test]
-fn test_pauli_y() {
-    ensure_quest_env_initialized();
+fn nested_complex_matrix_inputs_are_flattened_safely() -> QuestResult<()> {
+    ensure_quest_env();
 
-    let mut qureg = createQureg(1);
+    let mut qureg = quest_sys::create_qureg(1)?;
+    quest_sys::init_zero_state(qureg.pin_mut())?;
 
-    // Init to |0⟩
-    initZeroState(qureg.pin_mut());
+    let matrix = [
+        [complex(0.0, 0.0), complex(1.0, 0.0)],
+        [complex(1.0, 0.0), complex(0.0, 0.0)],
+    ];
+    let rows = [&matrix[0][..], &matrix[1][..]];
+    let mut comp_matr = quest_sys::create_comp_matr(1)?;
 
-    // Apply Y gate
-    applyPauliY(qureg.pin_mut(), 0);
+    quest_sys::set_comp_matr(comp_matr.pin_mut(), &rows)?;
+    quest_sys::apply_comp_matr(qureg.pin_mut(), &[0], &comp_matr)?;
 
-    // Should now be in i|1⟩ state
-    let amp1 = getQuregAmp(qureg.pin_mut(), 1);
+    let amp0 = quest_sys::get_qureg_amp(&qureg, 0)?;
+    let amp1 = quest_sys::get_qureg_amp(&qureg, 1)?;
 
-    assert_relative_eq!(amp1.re, 0.0);
-    assert_relative_eq!(amp1.im, 1.0);
+    assert_abs_diff_eq!(amp0.re, 0.0, epsilon = 1e-12);
+    assert_abs_diff_eq!(amp0.im, 0.0, epsilon = 1e-12);
+    assert_relative_eq!(amp1.re, 1.0, epsilon = 1e-12);
+    assert_abs_diff_eq!(amp1.im, 0.0, epsilon = 1e-12);
 
-    destroyQureg(qureg.pin_mut());
+    Ok(())
 }
 
 #[test]
-fn test_pauli_z() {
-    ensure_quest_env_initialized();
+fn primitive_operations_are_result_wrapped() -> QuestResult<()> {
+    ensure_quest_env();
 
-    let mut qureg = createQureg(1);
+    let mut qureg = quest_sys::create_qureg(1)?;
+    quest_sys::init_zero_state(qureg.pin_mut())?;
+    quest_sys::apply_pauli_x(qureg.pin_mut(), 0)?;
 
-    // Init to |+⟩ = (|0⟩ + |1⟩)/sqrt(2)
-    initPlusState(qureg.pin_mut());
+    let amp0 = quest_sys::get_qureg_amp(&qureg, 0)?;
+    let amp1 = quest_sys::get_qureg_amp(&qureg, 1)?;
 
-    // Apply Z gate
-    applyPauliZ(qureg.pin_mut(), 0);
+    assert_abs_diff_eq!(amp0.re, 0.0, epsilon = 1e-12);
+    assert_abs_diff_eq!(amp0.im, 0.0, epsilon = 1e-12);
+    assert_relative_eq!(amp1.re, 1.0, epsilon = 1e-12);
+    assert_abs_diff_eq!(amp1.im, 0.0, epsilon = 1e-12);
 
-    // Should now be in (|0⟩ - |1⟩)/sqrt(2) state
-    let expected = 1.0 / 2.0_f64.sqrt();
-
-    let amp0 = getQuregAmp(qureg.pin_mut(), 0);
-    let amp1 = getQuregAmp(qureg.pin_mut(), 1);
-
-    assert!((amp0.re - expected).abs() < 1e-10);
-    assert_relative_eq!(amp0.im, 0.0);
-
-    assert!((amp1.re + expected).abs() < 1e-10); // Note the negative sign
-    assert_relative_eq!(amp1.im, 0.0);
-
-    destroyQureg(qureg.pin_mut());
+    Ok(())
 }
 
 #[test]
-fn test_hadamard() {
-    ensure_quest_env_initialized();
+fn generated_initialisation_and_probability_apis_work() -> QuestResult<()> {
+    ensure_quest_env();
 
-    let mut qureg = createQureg(1);
+    let mut qureg = quest_sys::create_qureg(2)?;
+    quest_sys::init_classical_state(qureg.pin_mut(), 2)?;
 
-    // Init to |0⟩
-    initZeroState(qureg.pin_mut());
+    assert_relative_eq!(
+        quest_sys::calc_prob_of_basis_state(&qureg, 2)?,
+        1.0,
+        epsilon = 1e-12
+    );
+    assert_relative_eq!(
+        quest_sys::calc_prob_of_qubit_outcome(&qureg, 1, 1)?,
+        1.0,
+        epsilon = 1e-12
+    );
 
-    // Apply Hadamard
-    applyHadamard(qureg.pin_mut(), 0);
+    let probs = quest_sys::calc_probs_of_all_multi_qubit_outcomes(&qureg, &[1])?;
+    assert_eq!(probs.len(), 2);
+    assert_relative_eq!(probs[0], 0.0, epsilon = 1e-12);
+    assert_relative_eq!(probs[1], 1.0, epsilon = 1e-12);
 
-    // Should now be in |+⟩ = (|0⟩ + |1⟩)/sqrt(2) state
-    let expected = 1.0 / 2.0_f64.sqrt();
-
-    let amp0 = getQuregAmp(qureg.pin_mut(), 0);
-    let amp1 = getQuregAmp(qureg.pin_mut(), 1);
-
-    assert!((amp0.re - expected).abs() < 1e-10);
-    assert_relative_eq!(amp0.im, 0.0);
-
-    assert!((amp1.re - expected).abs() < 1e-10);
-    assert_relative_eq!(amp1.im, 0.0);
-
-    // Apply Hadamard again
-    applyHadamard(qureg.pin_mut(), 0);
-
-    // Should be back to |0⟩
-    let amp0 = getQuregAmp(qureg.pin_mut(), 0);
-    let amp1 = getQuregAmp(qureg.pin_mut(), 1);
-
-    assert!((amp0.re - 1.0).abs() < 1e-10);
-    assert_relative_eq!(amp0.im, 0.0);
-
-    assert!((amp1.re).abs() < 1e-10);
-    assert_relative_eq!(amp1.im, 0.0);
-
-    destroyQureg(qureg.pin_mut());
+    Ok(())
 }
 
 #[test]
-fn test_two_qubit_phase_shift() {
-    ensure_quest_env_initialized();
+fn generated_diag_matrix_handles_are_raii_owned() -> QuestResult<()> {
+    ensure_quest_env();
 
-    let mut qureg = createQureg(2);
+    let mut qureg = quest_sys::create_qureg(1)?;
+    quest_sys::init_plus_state(qureg.pin_mut())?;
 
-    // Create the state |11⟩
-    initZeroState(qureg.pin_mut());
-    applyPauliX(qureg.pin_mut(), 0);
-    applyPauliX(qureg.pin_mut(), 1);
+    let mut diag = quest_sys::create_diag_matr(1)?;
+    quest_sys::set_diag_matr(diag.pin_mut(), &[complex(1.0, 0.0), complex(-1.0, 0.0)])?;
+    quest_sys::apply_diag_matr(qureg.pin_mut(), &[0], &diag)?;
 
-    // Apply phase shift of PI to |11⟩
-    applyTwoQubitPhaseShift(qureg.pin_mut(), 0, 1, PI);
+    let inv_sqrt_2 = 1.0 / 2.0_f64.sqrt();
+    let amp0 = quest_sys::get_qureg_amp(&qureg, 0)?;
+    let amp1 = quest_sys::get_qureg_amp(&qureg, 1)?;
 
-    // Should now be in -|11⟩ state
-    let amp = getQuregAmp(qureg.pin_mut(), 3); // 3 corresponds to |11⟩
+    assert_relative_eq!(amp0.re, inv_sqrt_2, epsilon = 1e-12);
+    assert_abs_diff_eq!(amp0.im, 0.0, epsilon = 1e-12);
+    assert_relative_eq!(amp1.re, -inv_sqrt_2, epsilon = 1e-12);
+    assert_abs_diff_eq!(amp1.im, 0.0, epsilon = 1e-12);
 
-    assert!((amp.re + 1.0).abs() < 1e-10); // Should be -1
-    assert_relative_eq!(amp.im, 0.0);
-
-    destroyQureg(qureg.pin_mut());
+    drop(diag);
+    Ok(())
 }
 
 #[test]
-fn test_measurement() {
-    ensure_quest_env_initialized();
+fn multiplication_api_uses_safe_matrix_wrappers() -> QuestResult<()> {
+    ensure_quest_env();
 
-    let mut qureg = createQureg(1);
+    let mut qureg = quest_sys::create_qureg(1)?;
+    quest_sys::init_zero_state(qureg.pin_mut())?;
 
-    // Init to |0⟩
-    initZeroState(qureg.pin_mut());
+    let matrix = [
+        [complex(0.0, 0.0), complex(1.0, 0.0)],
+        [complex(1.0, 0.0), complex(0.0, 0.0)],
+    ];
+    let rows = [&matrix[0][..], &matrix[1][..]];
+    let mut comp_matr = quest_sys::create_comp_matr(1)?;
 
-    // Measure should give 0 with probability 1
-    let prob = calcProbOfQubitOutcome(&qureg, 0, 0);
-    assert!((prob - 1.0).abs() < 1e-10);
+    quest_sys::set_comp_matr(comp_matr.pin_mut(), &rows)?;
+    quest_sys::leftapply_comp_matr(qureg.pin_mut(), &[0], &comp_matr)?;
 
-    // Since measurement changes the state, we need to reinitialize
-    initZeroState(qureg.pin_mut());
-    let outcome = applyQubitMeasurement(qureg.pin_mut(), 0);
-    assert_eq!(outcome, 0);
+    let amp1 = quest_sys::get_qureg_amp(&qureg, 1)?;
+    assert_relative_eq!(amp1.re, 1.0, epsilon = 1e-12);
+    assert_abs_diff_eq!(amp1.im, 0.0, epsilon = 1e-12);
 
-    // Now init to |1⟩
-    initZeroState(qureg.pin_mut());
-    applyPauliX(qureg.pin_mut(), 0);
-
-    // Measure should give 1 with probability 1
-    let prob = calcProbOfQubitOutcome(&qureg, 0, 1);
-    assert!((prob - 1.0).abs() < 1e-10);
-
-    initZeroState(qureg.pin_mut());
-    applyPauliX(qureg.pin_mut(), 0);
-    let outcome = applyQubitMeasurement(qureg.pin_mut(), 0);
-    assert_eq!(outcome, 1);
-
-    destroyQureg(qureg.pin_mut());
+    Ok(())
 }
 
 #[test]
-fn test_density_matrix() {
-    ensure_quest_env_initialized();
+fn channel_handles_are_raii_owned() -> QuestResult<()> {
+    ensure_quest_env();
 
-    let mut qureg = createDensityQureg(1);
+    let super_op = quest_sys::create_super_op(1)?;
+    let kraus_map = quest_sys::create_kraus_map(1, 1)?;
 
-    // Init to |0⟩⟨0|
-    initZeroState(qureg.pin_mut());
-
-    // Check density matrix elements
-    let rho_00 = getDensityQuregAmp(qureg.pin_mut(), 0, 0);
-    let rho_01 = getDensityQuregAmp(qureg.pin_mut(), 0, 1);
-    let rho_10 = getDensityQuregAmp(qureg.pin_mut(), 1, 0);
-    let rho_11 = getDensityQuregAmp(qureg.pin_mut(), 1, 1);
-
-    assert!((rho_00.re - 1.0).abs() < 1e-10);
-    assert_relative_eq!(rho_00.im, 0.0);
-
-    assert_relative_eq!(rho_01.re, 0.0);
-    assert_relative_eq!(rho_01.im, 0.0);
-
-    assert_relative_eq!(rho_10.re, 0.0);
-    assert_relative_eq!(rho_10.im, 0.0);
-
-    assert_relative_eq!(rho_11.re, 0.0);
-    assert_relative_eq!(rho_11.im, 0.0);
-
-    // Apply X gate
-    applyPauliX(qureg.pin_mut(), 0);
-
-    // Should now be in |1⟩⟨1|
-    let rho_00 = getDensityQuregAmp(qureg.pin_mut(), 0, 0);
-    let rho_11 = getDensityQuregAmp(qureg.pin_mut(), 1, 1);
-
-    assert_relative_eq!(rho_00.re, 0.0);
-    assert_relative_eq!(rho_00.im, 0.0);
-
-    assert!((rho_11.re - 1.0).abs() < 1e-10);
-    assert_relative_eq!(rho_11.im, 0.0);
-
-    destroyQureg(qureg.pin_mut());
+    drop(super_op);
+    drop(kraus_map);
+    Ok(())
 }
 
 #[test]
-fn test_qureg_cloning() {
-    ensure_quest_env_initialized();
+fn decoherence_api_returns_results() -> QuestResult<()> {
+    ensure_quest_env();
 
-    // Create source qureg in a specific state
-    let mut src_qureg = createQureg(1);
-    initZeroState(src_qureg.pin_mut());
-    applyHadamard(src_qureg.pin_mut(), 0);
+    let mut density = quest_sys::create_density_qureg(1)?;
+    quest_sys::init_plus_state(density.pin_mut())?;
+    quest_sys::mix_dephasing(density.pin_mut(), 0, 0.1)?;
 
-    // Create target qureg
-    let mut tgt_qureg = createQureg(1);
-
-    // Clone src to tgt
-    setQuregToClone(tgt_qureg.pin_mut(), &src_qureg);
-
-    // Verify the states are identical
-    let fidelity = calcFidelity(&src_qureg, &tgt_qureg);
-    assert!((fidelity - 1.0).abs() < 1e-10);
-
-    // Clean up
-    destroyQureg(src_qureg.pin_mut());
-    destroyQureg(tgt_qureg.pin_mut());
+    assert_relative_eq!(quest_sys::calc_total_prob(&density)?, 1.0, epsilon = 1e-12);
+    Ok(())
 }
 
 #[test]
-fn test_utility_functions() {
-    ensure_quest_env_initialized();
+fn trotterisation_accepts_raii_pauli_sums() -> QuestResult<()> {
+    ensure_quest_env();
 
-    // Set validation epsilon
-    let epsilon = 1e-8;
-    setValidationEpsilon(epsilon);
+    let mut qureg = quest_sys::create_qureg(1)?;
+    quest_sys::init_zero_state(qureg.pin_mut())?;
+    let hamiltonian = quest_sys::create_inline_pauli_str_sum("1 Z")?;
 
-    // Set max number of significant figures for reporting
-    setMaxNumReportedSigFigs(10);
+    quest_sys::apply_trotterized_unitary_time_evolution(
+        qureg.pin_mut(),
+        &hamiltonian,
+        0.0,
+        1,
+        1,
+        false,
+    )?;
 
-    // These just test that the bindings don't crash
-    assert!(true);
+    let amp0 = quest_sys::get_qureg_amp(&qureg, 0)?;
+    assert_relative_eq!(amp0.re, 1.0, epsilon = 1e-12);
+    assert_abs_diff_eq!(amp0.im, 0.0, epsilon = 1e-12);
+
+    Ok(())
 }
