@@ -684,6 +684,7 @@ mod ffi {
         fn get_density_qureg_amp(qureg: &Qureg, row: i64, column: i64) -> Result<GeneratedComplex>;
         fn get_diag_matr1(in_arg: &[GeneratedComplex]) -> Result<UniquePtr<DiagMatr1>>;
         fn get_diag_matr2(in_arg: &[GeneratedComplex]) -> Result<UniquePtr<DiagMatr2>>;
+        fn get_pauli_str_from_string(paulis: &str) -> Result<UniquePtr<PauliStr>>;
         fn get_pauli_str(paulis: &str, indices: &[i32]) -> Result<UniquePtr<PauliStr>>;
         fn get_qu_est_gpu_cache_size() -> Result<i64>;
         fn get_qu_est_num_gpu_threads_per_block() -> Result<i32>;
@@ -804,6 +805,7 @@ mod ffi {
         fn report_pauli_str_sum(str_arg: &PauliStrSum) -> Result<()>;
         fn report_qureg(qureg: &Qureg) -> Result<()>;
         fn report_qureg_params(qureg: &Qureg) -> Result<()>;
+        fn report_scalar_real(label: &str, num: f64) -> Result<()>;
         fn report_scalar(label: &str, num: GeneratedComplex) -> Result<()>;
         fn report_str(str_arg: &str) -> Result<()>;
         fn report_super_op(op: &SuperOp) -> Result<()>;
@@ -2308,6 +2310,10 @@ pub fn get_diag_matr2(in_arg: &[QuestComplex]) -> QuestResult<UniquePtr<DiagMatr
     map_quest_result(ffi::get_diag_matr2(&in_arg_ffi))
 }
 
+pub fn get_pauli_str_from_string(paulis: &str) -> QuestResult<UniquePtr<PauliStr>> {
+    map_quest_result(ffi::get_pauli_str_from_string(paulis))
+}
+
 pub fn get_pauli_str(paulis: &str, indices: &[i32]) -> QuestResult<UniquePtr<PauliStr>> {
     map_quest_result(ffi::get_pauli_str(paulis, indices))
 }
@@ -2591,6 +2597,10 @@ pub fn report_qureg(qureg: &Qureg) -> QuestResult<()> {
 
 pub fn report_qureg_params(qureg: &Qureg) -> QuestResult<()> {
     map_quest_result(ffi::report_qureg_params(qureg))
+}
+
+pub fn report_scalar_real(label: &str, num: f64) -> QuestResult<()> {
+    map_quest_result(ffi::report_scalar_real(label, num))
 }
 
 pub fn report_scalar(label: &str, num: QuestComplex) -> QuestResult<()> {

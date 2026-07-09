@@ -648,6 +648,10 @@ std::unique_ptr<DiagMatr2> get_diag_matr2(rust::Slice<const GeneratedComplex> in
     return std::make_unique<DiagMatr2>(::getDiagMatr2(to_qcomp_vec(in_arg)));
 }
 
+std::unique_ptr<PauliStr> get_pauli_str_from_string(rust::Str paulis) {
+    return std::make_unique<PauliStr>(::getPauliStr(std::string(paulis.data(), paulis.size())));
+}
+
 std::unique_ptr<PauliStr> get_pauli_str(rust::Str paulis, rust::Slice<const std::int32_t> indices) {
     return std::make_unique<PauliStr>(::getPauliStr(std::string(paulis.data(), paulis.size()), to_int_vec(indices)));
 }
@@ -846,6 +850,10 @@ void report_qureg(const Qureg& qureg) {
 
 void report_qureg_params(const Qureg& qureg) {
     ::reportQuregParams(qureg.raw());
+}
+
+void report_scalar_real(rust::Str label, double num) {
+    ::reportScalar(std::string(label.data(), label.size()), static_cast<qreal>(num));
 }
 
 void report_scalar(rust::Str label, GeneratedComplex num) {

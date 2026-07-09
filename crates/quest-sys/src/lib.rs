@@ -158,11 +158,19 @@ pub enum QuestError {
     Validation(String),
     #[error("{0}")]
     InvalidInput(String),
+    #[error("{0}")]
+    Lifecycle(String),
 }
 
 impl From<cxx::Exception> for QuestError {
     fn from(error: cxx::Exception) -> Self {
-        Self::Validation(error.what().to_owned())
+        const LIFECYCLE_PREFIX: &str = "quest-sys lifecycle: ";
+        let message = error.what();
+        if let Some(message) = message.strip_prefix(LIFECYCLE_PREFIX) {
+            Self::Lifecycle(message.to_owned())
+        } else {
+            Self::Validation(message.to_owned())
+        }
     }
 }
 

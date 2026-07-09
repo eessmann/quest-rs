@@ -12,9 +12,10 @@ build = "build.rs"
 
 [workspace]
 resolver = "2"
-members = ["quest-sys", "xtask"]
+members = ["crates/quest-sys", "crates/xtask"]
 
 [workspace.dependencies]
+clang = { version = "2.0.0", features = ["runtime"] }
 cmake-package = {version = "0.2"}
 cxx = { version = "1.0", features = ["std", "alloc", "c++20"] }
 cxx-build = {version = "1.0", features = ["parallel"]}
@@ -27,7 +28,7 @@ thiserror = "2.0"
 
 
 [dependencies]
-quest-sys = { path = "./quest-sys", version = "0.2" }
+quest-sys = { path = "crates/quest-sys", version = "0.2" }
 ndarray.workspace = true
 num.workspace = true
 cxx.workspace = true

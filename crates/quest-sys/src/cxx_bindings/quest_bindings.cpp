@@ -4,7 +4,9 @@
 
 #include <algorithm>
 #include <array>
+#include <atomic>
 #include <complex>
+#include <exception>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -12,6 +14,79 @@
 
 namespace quest_sys {
 namespace {
+
+enum class ResourceKind : std::size_t {
+    Qureg = 0,
+    CompMatr,
+    DiagMatr,
+    FullStateDiagMatr,
+    SuperOp,
+    KrausMap,
+    PauliStrSum,
+    Count,
+};
+
+constexpr auto RESOURCE_KIND_COUNT = static_cast<std::size_t>(ResourceKind::Count);
+
+std::array<std::atomic<std::int64_t>, RESOURCE_KIND_COUNT> live_resources{};
+constexpr std::array<const char*, RESOURCE_KIND_COUNT> resource_names = {
+    "Qureg",
+    "CompMatr",
+    "DiagMatr",
+    "FullStateDiagMatr",
+    "SuperOp",
+    "KrausMap",
+    "PauliStrSum",
+};
+
+std::size_t resource_index(ResourceKind kind) noexcept {
+    return static_cast<std::size_t>(kind);
+}
+
+void register_resource(ResourceKind kind) noexcept {
+    live_resources[resource_index(kind)].fetch_add(1, std::memory_order_relaxed);
+}
+
+void unregister_resource(ResourceKind kind) noexcept {
+    const auto previous =
+        live_resources[resource_index(kind)].fetch_sub(1, std::memory_order_relaxed);
+    if (previous <= 0) {
+        std::terminate();
+    }
+}
+
+std::int64_t live_resource_count() noexcept {
+    std::int64_t total = 0;
+    for (const auto& count : live_resources) {
+        total += count.load(std::memory_order_relaxed);
+    }
+    return total;
+}
+
+std::string live_resource_summary() {
+    std::string summary;
+    for (std::size_t index = 0; index < live_resources.size(); ++index) {
+        const auto count = live_resources[index].load(std::memory_order_relaxed);
+        if (count == 0) {
+            continue;
+        }
+        if (!summary.empty()) {
+            summary += ", ";
+        }
+        summary += resource_names[index];
+        summary += "=";
+        summary += std::to_string(count);
+    }
+    return summary.empty() ? "none" : summary;
+}
+
+void ensure_no_live_resources_before_finalize() {
+    if (live_resource_count() != 0) {
+        throw std::runtime_error(
+            "quest-sys lifecycle: cannot finalize QuEST environment while RAII resources are live (" +
+            live_resource_summary() + ")");
+    }
+}
 
 void throw_quest_input_error(const char* func, const char* msg) {
     std::string message = func != nullptr ? func : "QuEST";
@@ -55,7 +130,9 @@ std::vector<int> to_int_vec(rust::Slice<const std::int32_t> values) {
 
 } // namespace
 
-Qureg::Qureg(::Qureg qureg) noexcept : qureg_(qureg), owns_(true) {}
+Qureg::Qureg(::Qureg qureg) noexcept : qureg_(qureg), owns_(true) {
+    register_resource(ResourceKind::Qureg);
+}
 
 Qureg::~Qureg() noexcept {
     reset();
@@ -82,14 +159,16 @@ void Qureg::reset() noexcept {
         return;
     }
 
-    owns_ = false;
     if (!::isQuESTEnvInit()) {
-        return;
+        std::terminate();
     }
 
     try {
         ::destroyQureg(qureg_);
+        owns_ = false;
+        unregister_resource(ResourceKind::Qureg);
     } catch (...) {
+        std::terminate();
     }
 }
 
@@ -105,7 +184,9 @@ CompMatr2::CompMatr2(::CompMatr2 matrix) noexcept : matrix_(matrix) {}
     return matrix_;
 }
 
-CompMatr::CompMatr(::CompMatr matrix) noexcept : matrix_(matrix), owns_(true) {}
+CompMatr::CompMatr(::CompMatr matrix) noexcept : matrix_(matrix), owns_(true) {
+    register_resource(ResourceKind::CompMatr);
+}
 
 CompMatr::~CompMatr() noexcept {
     reset();
@@ -136,10 +217,12 @@ void CompMatr::reset() noexcept {
         return;
     }
 
-    owns_ = false;
     try {
         ::destroyCompMatr(matrix_);
+        owns_ = false;
+        unregister_resource(ResourceKind::CompMatr);
     } catch (...) {
+        std::terminate();
     }
 }
 
@@ -155,7 +238,9 @@ DiagMatr2::DiagMatr2(::DiagMatr2 matrix) noexcept : matrix_(matrix) {}
     return matrix_;
 }
 
-DiagMatr::DiagMatr(::DiagMatr matrix) noexcept : matrix_(matrix), owns_(true) {}
+DiagMatr::DiagMatr(::DiagMatr matrix) noexcept : matrix_(matrix), owns_(true) {
+    register_resource(ResourceKind::DiagMatr);
+}
 
 DiagMatr::~DiagMatr() noexcept {
     reset();
@@ -186,14 +271,18 @@ void DiagMatr::reset() noexcept {
         return;
     }
 
-    owns_ = false;
     try {
         ::destroyDiagMatr(matrix_);
+        owns_ = false;
+        unregister_resource(ResourceKind::DiagMatr);
     } catch (...) {
+        std::terminate();
     }
 }
 
-FullStateDiagMatr::FullStateDiagMatr(::FullStateDiagMatr matrix) noexcept : matrix_(matrix), owns_(true) {}
+FullStateDiagMatr::FullStateDiagMatr(::FullStateDiagMatr matrix) noexcept : matrix_(matrix), owns_(true) {
+    register_resource(ResourceKind::FullStateDiagMatr);
+}
 
 FullStateDiagMatr::~FullStateDiagMatr() noexcept {
     reset();
@@ -224,14 +313,18 @@ void FullStateDiagMatr::reset() noexcept {
         return;
     }
 
-    owns_ = false;
     try {
         ::destroyFullStateDiagMatr(matrix_);
+        owns_ = false;
+        unregister_resource(ResourceKind::FullStateDiagMatr);
     } catch (...) {
+        std::terminate();
     }
 }
 
-SuperOp::SuperOp(::SuperOp op) noexcept : op_(op), owns_(true) {}
+SuperOp::SuperOp(::SuperOp op) noexcept : op_(op), owns_(true) {
+    register_resource(ResourceKind::SuperOp);
+}
 
 SuperOp::~SuperOp() noexcept {
     reset();
@@ -258,14 +351,18 @@ void SuperOp::reset() noexcept {
         return;
     }
 
-    owns_ = false;
     try {
         ::destroySuperOp(op_);
+        owns_ = false;
+        unregister_resource(ResourceKind::SuperOp);
     } catch (...) {
+        std::terminate();
     }
 }
 
-KrausMap::KrausMap(::KrausMap map) noexcept : map_(map), owns_(true) {}
+KrausMap::KrausMap(::KrausMap map) noexcept : map_(map), owns_(true) {
+    register_resource(ResourceKind::KrausMap);
+}
 
 KrausMap::~KrausMap() noexcept {
     reset();
@@ -292,10 +389,12 @@ void KrausMap::reset() noexcept {
         return;
     }
 
-    owns_ = false;
     try {
         ::destroyKrausMap(map_);
+        owns_ = false;
+        unregister_resource(ResourceKind::KrausMap);
     } catch (...) {
+        std::terminate();
     }
 }
 
@@ -305,7 +404,9 @@ PauliStr::PauliStr(::PauliStr str) noexcept : str_(str) {}
     return str_;
 }
 
-PauliStrSum::PauliStrSum(::PauliStrSum sum) noexcept : sum_(sum), owns_(true) {}
+PauliStrSum::PauliStrSum(::PauliStrSum sum) noexcept : sum_(sum), owns_(true) {
+    register_resource(ResourceKind::PauliStrSum);
+}
 
 PauliStrSum::~PauliStrSum() noexcept {
     reset();
@@ -332,10 +433,12 @@ void PauliStrSum::reset() noexcept {
         return;
     }
 
-    owns_ = false;
     try {
         ::destroyPauliStrSum(sum_);
+        owns_ = false;
+        unregister_resource(ResourceKind::PauliStrSum);
     } catch (...) {
+        std::terminate();
     }
 }
 
@@ -353,6 +456,7 @@ void init_custom_quest_env(bool use_distrib, bool use_gpu_accel, bool use_multit
 }
 
 void finalize_quest_env() {
+    ensure_no_live_resources_before_finalize();
     if (::isQuESTEnvInit()) {
         ::finalizeQuESTEnv();
     }

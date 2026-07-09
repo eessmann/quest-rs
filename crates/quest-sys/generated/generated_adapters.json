@@ -1,0 +1,1958 @@
+{
+  "generator": "xtask generate-quest-bindings",
+  "entries": [
+    {
+      "overload_key": "applyCompMatr(Qureg, std::vector<int>, CompMatr) -> void",
+      "quest_name": "applyCompMatr",
+      "adapter_name": "applyCompMatr",
+      "rust_name": "apply_comp_matr",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "applyCompMatr1(Qureg, int, CompMatr1) -> void",
+      "quest_name": "applyCompMatr1",
+      "adapter_name": "apply_comp_matr1",
+      "rust_name": "apply_comp_matr1",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyCompMatr2(Qureg, int, int, CompMatr2) -> void",
+      "quest_name": "applyCompMatr2",
+      "adapter_name": "apply_comp_matr2",
+      "rust_name": "apply_comp_matr2",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyControlledCompMatr(Qureg, int, std::vector<int>, CompMatr) -> void",
+      "quest_name": "applyControlledCompMatr",
+      "adapter_name": "apply_controlled_comp_matr",
+      "rust_name": "apply_controlled_comp_matr",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyControlledCompMatr1(Qureg, int, int, CompMatr1) -> void",
+      "quest_name": "applyControlledCompMatr1",
+      "adapter_name": "apply_controlled_comp_matr1",
+      "rust_name": "apply_controlled_comp_matr1",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyControlledCompMatr2(Qureg, int, int, int, CompMatr2) -> void",
+      "quest_name": "applyControlledCompMatr2",
+      "adapter_name": "apply_controlled_comp_matr2",
+      "rust_name": "apply_controlled_comp_matr2",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyControlledDiagMatr(Qureg, int, std::vector<int>, DiagMatr) -> void",
+      "quest_name": "applyControlledDiagMatr",
+      "adapter_name": "apply_controlled_diag_matr",
+      "rust_name": "apply_controlled_diag_matr",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyControlledDiagMatr1(Qureg, int, int, DiagMatr1) -> void",
+      "quest_name": "applyControlledDiagMatr1",
+      "adapter_name": "apply_controlled_diag_matr1",
+      "rust_name": "apply_controlled_diag_matr1",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyControlledDiagMatr2(Qureg, int, int, int, DiagMatr2) -> void",
+      "quest_name": "applyControlledDiagMatr2",
+      "adapter_name": "apply_controlled_diag_matr2",
+      "rust_name": "apply_controlled_diag_matr2",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyControlledDiagMatrPower(Qureg, int, std::vector<int>, DiagMatr, std::complex<double>) -> void",
+      "quest_name": "applyControlledDiagMatrPower",
+      "adapter_name": "apply_controlled_diag_matr_power",
+      "rust_name": "apply_controlled_diag_matr_power",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyControlledHadamard(Qureg, int, int) -> void",
+      "quest_name": "applyControlledHadamard",
+      "adapter_name": "apply_controlled_hadamard",
+      "rust_name": "apply_controlled_hadamard",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyControlledMultiQubitNot(Qureg, int, std::vector<int>) -> void",
+      "quest_name": "applyControlledMultiQubitNot",
+      "adapter_name": "apply_controlled_multi_qubit_not",
+      "rust_name": "apply_controlled_multi_qubit_not",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyControlledPauliGadget(Qureg, int, PauliStr, double) -> void",
+      "quest_name": "applyControlledPauliGadget",
+      "adapter_name": "apply_controlled_pauli_gadget",
+      "rust_name": "apply_controlled_pauli_gadget",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyControlledPauliStr(Qureg, int, PauliStr) -> void",
+      "quest_name": "applyControlledPauliStr",
+      "adapter_name": "apply_controlled_pauli_str",
+      "rust_name": "apply_controlled_pauli_str",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyControlledPauliX(Qureg, int, int) -> void",
+      "quest_name": "applyControlledPauliX",
+      "adapter_name": "apply_controlled_pauli_x",
+      "rust_name": "apply_controlled_pauli_x",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyControlledPauliY(Qureg, int, int) -> void",
+      "quest_name": "applyControlledPauliY",
+      "adapter_name": "apply_controlled_pauli_y",
+      "rust_name": "apply_controlled_pauli_y",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyControlledPauliZ(Qureg, int, int) -> void",
+      "quest_name": "applyControlledPauliZ",
+      "adapter_name": "apply_controlled_pauli_z",
+      "rust_name": "apply_controlled_pauli_z",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyControlledPhaseGadget(Qureg, int, std::vector<int>, double) -> void",
+      "quest_name": "applyControlledPhaseGadget",
+      "adapter_name": "apply_controlled_phase_gadget",
+      "rust_name": "apply_controlled_phase_gadget",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyControlledRotateAroundAxis(Qureg, int, int, double, double, double, double) -> void",
+      "quest_name": "applyControlledRotateAroundAxis",
+      "adapter_name": "apply_controlled_rotate_around_axis",
+      "rust_name": "apply_controlled_rotate_around_axis",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyControlledRotateX(Qureg, int, int, double) -> void",
+      "quest_name": "applyControlledRotateX",
+      "adapter_name": "apply_controlled_rotate_x",
+      "rust_name": "apply_controlled_rotate_x",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyControlledRotateY(Qureg, int, int, double) -> void",
+      "quest_name": "applyControlledRotateY",
+      "adapter_name": "apply_controlled_rotate_y",
+      "rust_name": "apply_controlled_rotate_y",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyControlledRotateZ(Qureg, int, int, double) -> void",
+      "quest_name": "applyControlledRotateZ",
+      "adapter_name": "apply_controlled_rotate_z",
+      "rust_name": "apply_controlled_rotate_z",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyControlledS(Qureg, int, int) -> void",
+      "quest_name": "applyControlledS",
+      "adapter_name": "apply_controlled_s",
+      "rust_name": "apply_controlled_s",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyControlledSqrtSwap(Qureg, int, int, int) -> void",
+      "quest_name": "applyControlledSqrtSwap",
+      "adapter_name": "apply_controlled_sqrt_swap",
+      "rust_name": "apply_controlled_sqrt_swap",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyControlledSwap(Qureg, int, int, int) -> void",
+      "quest_name": "applyControlledSwap",
+      "adapter_name": "apply_controlled_swap",
+      "rust_name": "apply_controlled_swap",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyControlledT(Qureg, int, int) -> void",
+      "quest_name": "applyControlledT",
+      "adapter_name": "apply_controlled_t",
+      "rust_name": "apply_controlled_t",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyDiagMatr(Qureg, std::vector<int>, DiagMatr) -> void",
+      "quest_name": "applyDiagMatr",
+      "adapter_name": "apply_diag_matr",
+      "rust_name": "apply_diag_matr",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyDiagMatr1(Qureg, int, DiagMatr1) -> void",
+      "quest_name": "applyDiagMatr1",
+      "adapter_name": "apply_diag_matr1",
+      "rust_name": "apply_diag_matr1",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyDiagMatr2(Qureg, int, int, DiagMatr2) -> void",
+      "quest_name": "applyDiagMatr2",
+      "adapter_name": "apply_diag_matr2",
+      "rust_name": "apply_diag_matr2",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyDiagMatrPower(Qureg, std::vector<int>, DiagMatr, std::complex<double>) -> void",
+      "quest_name": "applyDiagMatrPower",
+      "adapter_name": "apply_diag_matr_power",
+      "rust_name": "apply_diag_matr_power",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyForcedMultiQubitMeasurement(Qureg, std::vector<int>, std::vector<int>) -> double",
+      "quest_name": "applyForcedMultiQubitMeasurement",
+      "adapter_name": "apply_forced_multi_qubit_measurement",
+      "rust_name": "apply_forced_multi_qubit_measurement",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyForcedQubitMeasurement(Qureg, int, int) -> double",
+      "quest_name": "applyForcedQubitMeasurement",
+      "adapter_name": "apply_forced_qubit_measurement",
+      "rust_name": "apply_forced_qubit_measurement",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyFullQuantumFourierTransform(Qureg, bool) -> void",
+      "quest_name": "applyFullQuantumFourierTransform",
+      "adapter_name": "apply_full_quantum_fourier_transform",
+      "rust_name": "apply_full_quantum_fourier_transform",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyFullStateDiagMatr(Qureg, FullStateDiagMatr) -> void",
+      "quest_name": "applyFullStateDiagMatr",
+      "adapter_name": "apply_full_state_diag_matr",
+      "rust_name": "apply_full_state_diag_matr",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyFullStateDiagMatrPower(Qureg, FullStateDiagMatr, std::complex<double>) -> void",
+      "quest_name": "applyFullStateDiagMatrPower",
+      "adapter_name": "apply_full_state_diag_matr_power",
+      "rust_name": "apply_full_state_diag_matr_power",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyHadamard(Qureg, int) -> void",
+      "quest_name": "applyHadamard",
+      "adapter_name": "applyHadamard",
+      "rust_name": "apply_hadamard",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "applyMultiControlledCompMatr(Qureg, std::vector<int>, std::vector<int>, CompMatr) -> void",
+      "quest_name": "applyMultiControlledCompMatr",
+      "adapter_name": "apply_multi_controlled_comp_matr",
+      "rust_name": "apply_multi_controlled_comp_matr",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiControlledCompMatr1(Qureg, std::vector<int>, int, CompMatr1) -> void",
+      "quest_name": "applyMultiControlledCompMatr1",
+      "adapter_name": "apply_multi_controlled_comp_matr1",
+      "rust_name": "apply_multi_controlled_comp_matr1",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiControlledCompMatr2(Qureg, std::vector<int>, int, int, CompMatr2) -> void",
+      "quest_name": "applyMultiControlledCompMatr2",
+      "adapter_name": "apply_multi_controlled_comp_matr2",
+      "rust_name": "apply_multi_controlled_comp_matr2",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiControlledDiagMatr(Qureg, std::vector<int>, std::vector<int>, DiagMatr) -> void",
+      "quest_name": "applyMultiControlledDiagMatr",
+      "adapter_name": "apply_multi_controlled_diag_matr",
+      "rust_name": "apply_multi_controlled_diag_matr",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiControlledDiagMatr1(Qureg, std::vector<int>, int, DiagMatr1) -> void",
+      "quest_name": "applyMultiControlledDiagMatr1",
+      "adapter_name": "apply_multi_controlled_diag_matr1",
+      "rust_name": "apply_multi_controlled_diag_matr1",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiControlledDiagMatr2(Qureg, std::vector<int>, int, int, DiagMatr2) -> void",
+      "quest_name": "applyMultiControlledDiagMatr2",
+      "adapter_name": "apply_multi_controlled_diag_matr2",
+      "rust_name": "apply_multi_controlled_diag_matr2",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiControlledDiagMatrPower(Qureg, std::vector<int>, std::vector<int>, DiagMatr, std::complex<double>) -> void",
+      "quest_name": "applyMultiControlledDiagMatrPower",
+      "adapter_name": "apply_multi_controlled_diag_matr_power",
+      "rust_name": "apply_multi_controlled_diag_matr_power",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiControlledHadamard(Qureg, std::vector<int>, int) -> void",
+      "quest_name": "applyMultiControlledHadamard",
+      "adapter_name": "apply_multi_controlled_hadamard",
+      "rust_name": "apply_multi_controlled_hadamard",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiControlledMultiQubitNot(Qureg, std::vector<int>, std::vector<int>) -> void",
+      "quest_name": "applyMultiControlledMultiQubitNot",
+      "adapter_name": "apply_multi_controlled_multi_qubit_not",
+      "rust_name": "apply_multi_controlled_multi_qubit_not",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiControlledPauliGadget(Qureg, std::vector<int>, PauliStr, double) -> void",
+      "quest_name": "applyMultiControlledPauliGadget",
+      "adapter_name": "apply_multi_controlled_pauli_gadget",
+      "rust_name": "apply_multi_controlled_pauli_gadget",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiControlledPauliStr(Qureg, std::vector<int>, PauliStr) -> void",
+      "quest_name": "applyMultiControlledPauliStr",
+      "adapter_name": "apply_multi_controlled_pauli_str",
+      "rust_name": "apply_multi_controlled_pauli_str",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiControlledPauliX(Qureg, std::vector<int>, int) -> void",
+      "quest_name": "applyMultiControlledPauliX",
+      "adapter_name": "apply_multi_controlled_pauli_x",
+      "rust_name": "apply_multi_controlled_pauli_x",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiControlledPauliY(Qureg, std::vector<int>, int) -> void",
+      "quest_name": "applyMultiControlledPauliY",
+      "adapter_name": "apply_multi_controlled_pauli_y",
+      "rust_name": "apply_multi_controlled_pauli_y",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiControlledPauliZ(Qureg, std::vector<int>, int) -> void",
+      "quest_name": "applyMultiControlledPauliZ",
+      "adapter_name": "apply_multi_controlled_pauli_z",
+      "rust_name": "apply_multi_controlled_pauli_z",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiControlledPhaseGadget(Qureg, std::vector<int>, std::vector<int>, double) -> void",
+      "quest_name": "applyMultiControlledPhaseGadget",
+      "adapter_name": "apply_multi_controlled_phase_gadget",
+      "rust_name": "apply_multi_controlled_phase_gadget",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiControlledRotateAroundAxis(Qureg, std::vector<int>, int, double, double, double, double) -> void",
+      "quest_name": "applyMultiControlledRotateAroundAxis",
+      "adapter_name": "apply_multi_controlled_rotate_around_axis",
+      "rust_name": "apply_multi_controlled_rotate_around_axis",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiControlledRotateX(Qureg, std::vector<int>, int, double) -> void",
+      "quest_name": "applyMultiControlledRotateX",
+      "adapter_name": "apply_multi_controlled_rotate_x",
+      "rust_name": "apply_multi_controlled_rotate_x",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiControlledRotateY(Qureg, std::vector<int>, int, double) -> void",
+      "quest_name": "applyMultiControlledRotateY",
+      "adapter_name": "apply_multi_controlled_rotate_y",
+      "rust_name": "apply_multi_controlled_rotate_y",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiControlledRotateZ(Qureg, std::vector<int>, int, double) -> void",
+      "quest_name": "applyMultiControlledRotateZ",
+      "adapter_name": "apply_multi_controlled_rotate_z",
+      "rust_name": "apply_multi_controlled_rotate_z",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiControlledS(Qureg, std::vector<int>, int) -> void",
+      "quest_name": "applyMultiControlledS",
+      "adapter_name": "apply_multi_controlled_s",
+      "rust_name": "apply_multi_controlled_s",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiControlledSqrtSwap(Qureg, std::vector<int>, int, int) -> void",
+      "quest_name": "applyMultiControlledSqrtSwap",
+      "adapter_name": "apply_multi_controlled_sqrt_swap",
+      "rust_name": "apply_multi_controlled_sqrt_swap",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiControlledSwap(Qureg, std::vector<int>, int, int) -> void",
+      "quest_name": "applyMultiControlledSwap",
+      "adapter_name": "apply_multi_controlled_swap",
+      "rust_name": "apply_multi_controlled_swap",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiControlledT(Qureg, std::vector<int>, int) -> void",
+      "quest_name": "applyMultiControlledT",
+      "adapter_name": "apply_multi_controlled_t",
+      "rust_name": "apply_multi_controlled_t",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiQubitMeasurement(Qureg, std::vector<int>) -> long long",
+      "quest_name": "applyMultiQubitMeasurement",
+      "adapter_name": "apply_multi_qubit_measurement",
+      "rust_name": "apply_multi_qubit_measurement",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiQubitNot(Qureg, std::vector<int>) -> void",
+      "quest_name": "applyMultiQubitNot",
+      "adapter_name": "apply_multi_qubit_not",
+      "rust_name": "apply_multi_qubit_not",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiQubitPhaseFlip(Qureg, std::vector<int>) -> void",
+      "quest_name": "applyMultiQubitPhaseFlip",
+      "adapter_name": "apply_multi_qubit_phase_flip",
+      "rust_name": "apply_multi_qubit_phase_flip",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiQubitPhaseShift(Qureg, std::vector<int>, double) -> void",
+      "quest_name": "applyMultiQubitPhaseShift",
+      "adapter_name": "apply_multi_qubit_phase_shift",
+      "rust_name": "apply_multi_qubit_phase_shift",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiQubitProjector(Qureg, std::vector<int>, std::vector<int>) -> void",
+      "quest_name": "applyMultiQubitProjector",
+      "adapter_name": "apply_multi_qubit_projector",
+      "rust_name": "apply_multi_qubit_projector",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiStateControlledCompMatr(Qureg, std::vector<int>, std::vector<int>, std::vector<int>, CompMatr) -> void",
+      "quest_name": "applyMultiStateControlledCompMatr",
+      "adapter_name": "apply_multi_state_controlled_comp_matr",
+      "rust_name": "apply_multi_state_controlled_comp_matr",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiStateControlledCompMatr1(Qureg, std::vector<int>, std::vector<int>, int, CompMatr1) -> void",
+      "quest_name": "applyMultiStateControlledCompMatr1",
+      "adapter_name": "apply_multi_state_controlled_comp_matr1",
+      "rust_name": "apply_multi_state_controlled_comp_matr1",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiStateControlledCompMatr2(Qureg, std::vector<int>, std::vector<int>, int, int, CompMatr2) -> void",
+      "quest_name": "applyMultiStateControlledCompMatr2",
+      "adapter_name": "apply_multi_state_controlled_comp_matr2",
+      "rust_name": "apply_multi_state_controlled_comp_matr2",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiStateControlledDiagMatr(Qureg, std::vector<int>, std::vector<int>, std::vector<int>, DiagMatr) -> void",
+      "quest_name": "applyMultiStateControlledDiagMatr",
+      "adapter_name": "apply_multi_state_controlled_diag_matr",
+      "rust_name": "apply_multi_state_controlled_diag_matr",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiStateControlledDiagMatr1(Qureg, std::vector<int>, std::vector<int>, int, DiagMatr1) -> void",
+      "quest_name": "applyMultiStateControlledDiagMatr1",
+      "adapter_name": "apply_multi_state_controlled_diag_matr1",
+      "rust_name": "apply_multi_state_controlled_diag_matr1",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiStateControlledDiagMatr2(Qureg, std::vector<int>, std::vector<int>, int, int, DiagMatr2) -> void",
+      "quest_name": "applyMultiStateControlledDiagMatr2",
+      "adapter_name": "apply_multi_state_controlled_diag_matr2",
+      "rust_name": "apply_multi_state_controlled_diag_matr2",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiStateControlledDiagMatrPower(Qureg, std::vector<int>, std::vector<int>, std::vector<int>, DiagMatr, std::complex<double>) -> void",
+      "quest_name": "applyMultiStateControlledDiagMatrPower",
+      "adapter_name": "apply_multi_state_controlled_diag_matr_power",
+      "rust_name": "apply_multi_state_controlled_diag_matr_power",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiStateControlledHadamard(Qureg, std::vector<int>, std::vector<int>, int) -> void",
+      "quest_name": "applyMultiStateControlledHadamard",
+      "adapter_name": "apply_multi_state_controlled_hadamard",
+      "rust_name": "apply_multi_state_controlled_hadamard",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiStateControlledMultiQubitNot(Qureg, std::vector<int>, std::vector<int>, std::vector<int>) -> void",
+      "quest_name": "applyMultiStateControlledMultiQubitNot",
+      "adapter_name": "apply_multi_state_controlled_multi_qubit_not",
+      "rust_name": "apply_multi_state_controlled_multi_qubit_not",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiStateControlledPauliGadget(Qureg, std::vector<int>, std::vector<int>, PauliStr, double) -> void",
+      "quest_name": "applyMultiStateControlledPauliGadget",
+      "adapter_name": "apply_multi_state_controlled_pauli_gadget",
+      "rust_name": "apply_multi_state_controlled_pauli_gadget",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiStateControlledPauliStr(Qureg, std::vector<int>, std::vector<int>, PauliStr) -> void",
+      "quest_name": "applyMultiStateControlledPauliStr",
+      "adapter_name": "apply_multi_state_controlled_pauli_str",
+      "rust_name": "apply_multi_state_controlled_pauli_str",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiStateControlledPauliX(Qureg, std::vector<int>, std::vector<int>, int) -> void",
+      "quest_name": "applyMultiStateControlledPauliX",
+      "adapter_name": "apply_multi_state_controlled_pauli_x",
+      "rust_name": "apply_multi_state_controlled_pauli_x",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiStateControlledPauliY(Qureg, std::vector<int>, std::vector<int>, int) -> void",
+      "quest_name": "applyMultiStateControlledPauliY",
+      "adapter_name": "apply_multi_state_controlled_pauli_y",
+      "rust_name": "apply_multi_state_controlled_pauli_y",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiStateControlledPauliZ(Qureg, std::vector<int>, std::vector<int>, int) -> void",
+      "quest_name": "applyMultiStateControlledPauliZ",
+      "adapter_name": "apply_multi_state_controlled_pauli_z",
+      "rust_name": "apply_multi_state_controlled_pauli_z",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiStateControlledPhaseGadget(Qureg, std::vector<int>, std::vector<int>, std::vector<int>, double) -> void",
+      "quest_name": "applyMultiStateControlledPhaseGadget",
+      "adapter_name": "apply_multi_state_controlled_phase_gadget",
+      "rust_name": "apply_multi_state_controlled_phase_gadget",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiStateControlledRotateAroundAxis(Qureg, std::vector<int>, std::vector<int>, int, double, double, double, double) -> void",
+      "quest_name": "applyMultiStateControlledRotateAroundAxis",
+      "adapter_name": "apply_multi_state_controlled_rotate_around_axis",
+      "rust_name": "apply_multi_state_controlled_rotate_around_axis",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiStateControlledRotateX(Qureg, std::vector<int>, std::vector<int>, int, double) -> void",
+      "quest_name": "applyMultiStateControlledRotateX",
+      "adapter_name": "apply_multi_state_controlled_rotate_x",
+      "rust_name": "apply_multi_state_controlled_rotate_x",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiStateControlledRotateY(Qureg, std::vector<int>, std::vector<int>, int, double) -> void",
+      "quest_name": "applyMultiStateControlledRotateY",
+      "adapter_name": "apply_multi_state_controlled_rotate_y",
+      "rust_name": "apply_multi_state_controlled_rotate_y",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiStateControlledRotateZ(Qureg, std::vector<int>, std::vector<int>, int, double) -> void",
+      "quest_name": "applyMultiStateControlledRotateZ",
+      "adapter_name": "apply_multi_state_controlled_rotate_z",
+      "rust_name": "apply_multi_state_controlled_rotate_z",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiStateControlledS(Qureg, std::vector<int>, std::vector<int>, int) -> void",
+      "quest_name": "applyMultiStateControlledS",
+      "adapter_name": "apply_multi_state_controlled_s",
+      "rust_name": "apply_multi_state_controlled_s",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiStateControlledSqrtSwap(Qureg, std::vector<int>, std::vector<int>, int, int) -> void",
+      "quest_name": "applyMultiStateControlledSqrtSwap",
+      "adapter_name": "apply_multi_state_controlled_sqrt_swap",
+      "rust_name": "apply_multi_state_controlled_sqrt_swap",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiStateControlledSwap(Qureg, std::vector<int>, std::vector<int>, int, int) -> void",
+      "quest_name": "applyMultiStateControlledSwap",
+      "adapter_name": "apply_multi_state_controlled_swap",
+      "rust_name": "apply_multi_state_controlled_swap",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyMultiStateControlledT(Qureg, std::vector<int>, std::vector<int>, int) -> void",
+      "quest_name": "applyMultiStateControlledT",
+      "adapter_name": "apply_multi_state_controlled_t",
+      "rust_name": "apply_multi_state_controlled_t",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyNonUnitaryPauliGadget(Qureg, PauliStr, std::complex<double>) -> void",
+      "quest_name": "applyNonUnitaryPauliGadget",
+      "adapter_name": "apply_non_unitary_pauli_gadget",
+      "rust_name": "apply_non_unitary_pauli_gadget",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyPauliGadget(Qureg, PauliStr, double) -> void",
+      "quest_name": "applyPauliGadget",
+      "adapter_name": "apply_pauli_gadget",
+      "rust_name": "apply_pauli_gadget",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyPauliStr(Qureg, PauliStr) -> void",
+      "quest_name": "applyPauliStr",
+      "adapter_name": "apply_pauli_str",
+      "rust_name": "apply_pauli_str",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyPauliX(Qureg, int) -> void",
+      "quest_name": "applyPauliX",
+      "adapter_name": "applyPauliX",
+      "rust_name": "apply_pauli_x",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "applyPauliY(Qureg, int) -> void",
+      "quest_name": "applyPauliY",
+      "adapter_name": "applyPauliY",
+      "rust_name": "apply_pauli_y",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "applyPauliZ(Qureg, int) -> void",
+      "quest_name": "applyPauliZ",
+      "adapter_name": "applyPauliZ",
+      "rust_name": "apply_pauli_z",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "applyPhaseFlip(Qureg, int) -> void",
+      "quest_name": "applyPhaseFlip",
+      "adapter_name": "apply_phase_flip",
+      "rust_name": "apply_phase_flip",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyPhaseGadget(Qureg, std::vector<int>, double) -> void",
+      "quest_name": "applyPhaseGadget",
+      "adapter_name": "apply_phase_gadget",
+      "rust_name": "apply_phase_gadget",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyPhaseShift(Qureg, int, double) -> void",
+      "quest_name": "applyPhaseShift",
+      "adapter_name": "apply_phase_shift",
+      "rust_name": "apply_phase_shift",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyQuantumFourierTransform(Qureg, std::vector<int>, bool) -> void",
+      "quest_name": "applyQuantumFourierTransform",
+      "adapter_name": "apply_quantum_fourier_transform",
+      "rust_name": "apply_quantum_fourier_transform",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyQubitMeasurement(Qureg, int) -> int",
+      "quest_name": "applyQubitMeasurement",
+      "adapter_name": "applyQubitMeasurement",
+      "rust_name": "apply_qubit_measurement",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "applyQubitMeasurementAndGetProb(Qureg, int, double *) -> int",
+      "quest_name": "applyQubitMeasurementAndGetProb",
+      "adapter_name": "applyQubitMeasurementAndGetProb",
+      "rust_name": "apply_qubit_measurement_and_get_prob",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "applyQubitProjector(Qureg, int, int) -> void",
+      "quest_name": "applyQubitProjector",
+      "adapter_name": "apply_qubit_projector",
+      "rust_name": "apply_qubit_projector",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyRotateAroundAxis(Qureg, int, double, double, double, double) -> void",
+      "quest_name": "applyRotateAroundAxis",
+      "adapter_name": "apply_rotate_around_axis",
+      "rust_name": "apply_rotate_around_axis",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyRotateX(Qureg, int, double) -> void",
+      "quest_name": "applyRotateX",
+      "adapter_name": "apply_rotate_x",
+      "rust_name": "apply_rotate_x",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyRotateY(Qureg, int, double) -> void",
+      "quest_name": "applyRotateY",
+      "adapter_name": "apply_rotate_y",
+      "rust_name": "apply_rotate_y",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyRotateZ(Qureg, int, double) -> void",
+      "quest_name": "applyRotateZ",
+      "adapter_name": "apply_rotate_z",
+      "rust_name": "apply_rotate_z",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyS(Qureg, int) -> void",
+      "quest_name": "applyS",
+      "adapter_name": "apply_s",
+      "rust_name": "apply_s",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applySqrtSwap(Qureg, int, int) -> void",
+      "quest_name": "applySqrtSwap",
+      "adapter_name": "apply_sqrt_swap",
+      "rust_name": "apply_sqrt_swap",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applySwap(Qureg, int, int) -> void",
+      "quest_name": "applySwap",
+      "adapter_name": "apply_swap",
+      "rust_name": "apply_swap",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyT(Qureg, int) -> void",
+      "quest_name": "applyT",
+      "adapter_name": "apply_t",
+      "rust_name": "apply_t",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyTrotterizedControlledPauliStrSumGadget(Qureg, int, PauliStrSum, double, int, int, bool) -> void",
+      "quest_name": "applyTrotterizedControlledPauliStrSumGadget",
+      "adapter_name": "apply_trotterized_controlled_pauli_str_sum_gadget",
+      "rust_name": "apply_trotterized_controlled_pauli_str_sum_gadget",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyTrotterizedImaginaryTimeEvolution(Qureg, PauliStrSum, double, int, int, bool) -> void",
+      "quest_name": "applyTrotterizedImaginaryTimeEvolution",
+      "adapter_name": "apply_trotterized_imaginary_time_evolution",
+      "rust_name": "apply_trotterized_imaginary_time_evolution",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyTrotterizedMultiControlledPauliStrSumGadget(Qureg, std::vector<int>, PauliStrSum, double, int, int, bool) -> void",
+      "quest_name": "applyTrotterizedMultiControlledPauliStrSumGadget",
+      "adapter_name": "apply_trotterized_multi_controlled_pauli_str_sum_gadget",
+      "rust_name": "apply_trotterized_multi_controlled_pauli_str_sum_gadget",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyTrotterizedMultiStateControlledPauliStrSumGadget(Qureg, std::vector<int>, std::vector<int>, PauliStrSum, double, int, int, bool) -> void",
+      "quest_name": "applyTrotterizedMultiStateControlledPauliStrSumGadget",
+      "adapter_name": "apply_trotterized_multi_state_controlled_pauli_str_sum_gadget",
+      "rust_name": "apply_trotterized_multi_state_controlled_pauli_str_sum_gadget",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyTrotterizedNonUnitaryPauliStrSumGadget(Qureg, PauliStrSum, std::complex<double>, int, int, bool) -> void",
+      "quest_name": "applyTrotterizedNonUnitaryPauliStrSumGadget",
+      "adapter_name": "apply_trotterized_non_unitary_pauli_str_sum_gadget",
+      "rust_name": "apply_trotterized_non_unitary_pauli_str_sum_gadget",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyTrotterizedPauliStrSumGadget(Qureg, PauliStrSum, double, int, int, bool) -> void",
+      "quest_name": "applyTrotterizedPauliStrSumGadget",
+      "adapter_name": "apply_trotterized_pauli_str_sum_gadget",
+      "rust_name": "apply_trotterized_pauli_str_sum_gadget",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyTrotterizedUnitaryTimeEvolution(Qureg, PauliStrSum, double, int, int, bool) -> void",
+      "quest_name": "applyTrotterizedUnitaryTimeEvolution",
+      "adapter_name": "applyTrotterizedUnitaryTimeEvolution",
+      "rust_name": "apply_trotterized_unitary_time_evolution",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "applyTwoQubitPhaseFlip(Qureg, int, int) -> void",
+      "quest_name": "applyTwoQubitPhaseFlip",
+      "adapter_name": "apply_two_qubit_phase_flip",
+      "rust_name": "apply_two_qubit_phase_flip",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "applyTwoQubitPhaseShift(Qureg, int, int, double) -> void",
+      "quest_name": "applyTwoQubitPhaseShift",
+      "adapter_name": "apply_two_qubit_phase_shift",
+      "rust_name": "apply_two_qubit_phase_shift",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "calcExpecFullStateDiagMatr(Qureg, FullStateDiagMatr) -> double",
+      "quest_name": "calcExpecFullStateDiagMatr",
+      "adapter_name": "calc_expec_full_state_diag_matr",
+      "rust_name": "calc_expec_full_state_diag_matr",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "calcExpecFullStateDiagMatrPower(Qureg, FullStateDiagMatr, double) -> double",
+      "quest_name": "calcExpecFullStateDiagMatrPower",
+      "adapter_name": "calc_expec_full_state_diag_matr_power",
+      "rust_name": "calc_expec_full_state_diag_matr_power",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "calcExpecNonHermitianFullStateDiagMatr(Qureg, FullStateDiagMatr) -> std::complex<double>",
+      "quest_name": "calcExpecNonHermitianFullStateDiagMatr",
+      "adapter_name": "calc_expec_non_hermitian_full_state_diag_matr",
+      "rust_name": "calc_expec_non_hermitian_full_state_diag_matr",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "calcExpecNonHermitianFullStateDiagMatrPower(Qureg, FullStateDiagMatr, std::complex<double>) -> std::complex<double>",
+      "quest_name": "calcExpecNonHermitianFullStateDiagMatrPower",
+      "adapter_name": "calc_expec_non_hermitian_full_state_diag_matr_power",
+      "rust_name": "calc_expec_non_hermitian_full_state_diag_matr_power",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "calcExpecNonHermitianPauliStrSum(Qureg, PauliStrSum) -> std::complex<double>",
+      "quest_name": "calcExpecNonHermitianPauliStrSum",
+      "adapter_name": "calc_expec_non_hermitian_pauli_str_sum",
+      "rust_name": "calc_expec_non_hermitian_pauli_str_sum",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "calcExpecPauliStr(Qureg, PauliStr) -> double",
+      "quest_name": "calcExpecPauliStr",
+      "adapter_name": "calc_expec_pauli_str",
+      "rust_name": "calc_expec_pauli_str",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "calcExpecPauliStrSum(Qureg, PauliStrSum) -> double",
+      "quest_name": "calcExpecPauliStrSum",
+      "adapter_name": "calc_expec_pauli_str_sum",
+      "rust_name": "calc_expec_pauli_str_sum",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "calcFidelity(Qureg, Qureg) -> double",
+      "quest_name": "calcFidelity",
+      "adapter_name": "calc_fidelity",
+      "rust_name": "calc_fidelity",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "calcInnerProduct(Qureg, Qureg) -> std::complex<double>",
+      "quest_name": "calcInnerProduct",
+      "adapter_name": "calc_inner_product",
+      "rust_name": "calc_inner_product",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "calcPartialTrace(Qureg, std::vector<int>) -> Qureg",
+      "quest_name": "calcPartialTrace",
+      "adapter_name": "calc_partial_trace",
+      "rust_name": "calc_partial_trace",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "calcProbOfBasisState(Qureg, long long) -> double",
+      "quest_name": "calcProbOfBasisState",
+      "adapter_name": "calc_prob_of_basis_state",
+      "rust_name": "calc_prob_of_basis_state",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "calcProbOfMultiQubitOutcome(Qureg, std::vector<int>, std::vector<int>) -> double",
+      "quest_name": "calcProbOfMultiQubitOutcome",
+      "adapter_name": "calc_prob_of_multi_qubit_outcome",
+      "rust_name": "calc_prob_of_multi_qubit_outcome",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "calcProbOfQubitOutcome(Qureg, int, int) -> double",
+      "quest_name": "calcProbOfQubitOutcome",
+      "adapter_name": "calc_prob_of_qubit_outcome",
+      "rust_name": "calc_prob_of_qubit_outcome",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "calcProbsOfAllMultiQubitOutcomes(Qureg, std::vector<int>) -> std::vector<double>",
+      "quest_name": "calcProbsOfAllMultiQubitOutcomes",
+      "adapter_name": "calc_probs_of_all_multi_qubit_outcomes",
+      "rust_name": "calc_probs_of_all_multi_qubit_outcomes",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "calcPurity(Qureg) -> double",
+      "quest_name": "calcPurity",
+      "adapter_name": "calc_purity",
+      "rust_name": "calc_purity",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "calcReducedDensityMatrix(Qureg, std::vector<int>) -> Qureg",
+      "quest_name": "calcReducedDensityMatrix",
+      "adapter_name": "calc_reduced_density_matrix",
+      "rust_name": "calc_reduced_density_matrix",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "calcTotalProb(Qureg) -> double",
+      "quest_name": "calcTotalProb",
+      "adapter_name": "calcTotalProb",
+      "rust_name": "calc_total_prob",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "clearQuESTGpuCache() -> void",
+      "quest_name": "clearQuESTGpuCache",
+      "adapter_name": "clear_qu_estgpu_cache",
+      "rust_name": "clear_qu_estgpu_cache",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "createCloneQureg(Qureg) -> Qureg",
+      "quest_name": "createCloneQureg",
+      "adapter_name": "create_clone_qureg",
+      "rust_name": "create_clone_qureg",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "createCompMatr(int) -> CompMatr",
+      "quest_name": "createCompMatr",
+      "adapter_name": "createCompMatr",
+      "rust_name": "create_comp_matr",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "createCustomFullStateDiagMatr(int, int, int, int) -> FullStateDiagMatr",
+      "quest_name": "createCustomFullStateDiagMatr",
+      "adapter_name": "create_custom_full_state_diag_matr",
+      "rust_name": "create_custom_full_state_diag_matr",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "createCustomQureg(int, int, int, int, int) -> Qureg",
+      "quest_name": "createCustomQureg",
+      "adapter_name": "create_custom_qureg",
+      "rust_name": "create_custom_qureg",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "createDensityQureg(int) -> Qureg",
+      "quest_name": "createDensityQureg",
+      "adapter_name": "createDensityQureg",
+      "rust_name": "create_density_qureg",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "createDiagMatr(int) -> DiagMatr",
+      "quest_name": "createDiagMatr",
+      "adapter_name": "create_diag_matr",
+      "rust_name": "create_diag_matr",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "createForcedDensityQureg(int) -> Qureg",
+      "quest_name": "createForcedDensityQureg",
+      "adapter_name": "create_forced_density_qureg",
+      "rust_name": "create_forced_density_qureg",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "createForcedQureg(int) -> Qureg",
+      "quest_name": "createForcedQureg",
+      "adapter_name": "create_forced_qureg",
+      "rust_name": "create_forced_qureg",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "createFullStateDiagMatr(int) -> FullStateDiagMatr",
+      "quest_name": "createFullStateDiagMatr",
+      "adapter_name": "create_full_state_diag_matr",
+      "rust_name": "create_full_state_diag_matr",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "createFullStateDiagMatrFromPauliStrSum(PauliStrSum) -> FullStateDiagMatr",
+      "quest_name": "createFullStateDiagMatrFromPauliStrSum",
+      "adapter_name": "create_full_state_diag_matr_from_pauli_str_sum",
+      "rust_name": "create_full_state_diag_matr_from_pauli_str_sum",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "createInlineDiagMatr(int, std::vector<std::complex<double>>) -> DiagMatr",
+      "quest_name": "createInlineDiagMatr",
+      "adapter_name": "create_inline_diag_matr",
+      "rust_name": "create_inline_diag_matr",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "createInlinePauliStrSum(std::string) -> PauliStrSum",
+      "quest_name": "createInlinePauliStrSum",
+      "adapter_name": "createInlinePauliStrSum",
+      "rust_name": "create_inline_pauli_str_sum",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "createKrausMap(int, int) -> KrausMap",
+      "quest_name": "createKrausMap",
+      "adapter_name": "createKrausMap",
+      "rust_name": "create_kraus_map",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "createPauliStrSumFromFile(std::string) -> PauliStrSum",
+      "quest_name": "createPauliStrSumFromFile",
+      "adapter_name": "create_pauli_str_sum_from_file",
+      "rust_name": "create_pauli_str_sum_from_file",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "createPauliStrSumFromReversedFile(std::string) -> PauliStrSum",
+      "quest_name": "createPauliStrSumFromReversedFile",
+      "adapter_name": "create_pauli_str_sum_from_reversed_file",
+      "rust_name": "create_pauli_str_sum_from_reversed_file",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "createQureg(int) -> Qureg",
+      "quest_name": "createQureg",
+      "adapter_name": "createQureg",
+      "rust_name": "create_qureg",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "createQuregFromFile(std::string) -> Qureg",
+      "quest_name": "createQuregFromFile",
+      "adapter_name": "create_qureg_from_file",
+      "rust_name": "create_qureg_from_file",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "createSuperOp(int) -> SuperOp",
+      "quest_name": "createSuperOp",
+      "adapter_name": "createSuperOp",
+      "rust_name": "create_super_op",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "finalizeQuESTEnv() -> void",
+      "quest_name": "finalizeQuESTEnv",
+      "adapter_name": "finalizeQuESTEnv",
+      "rust_name": "finalize_qu_estenv",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "getDensityQuregAmp(Qureg, long long, long long) -> std::complex<double>",
+      "quest_name": "getDensityQuregAmp",
+      "adapter_name": "get_density_qureg_amp",
+      "rust_name": "get_density_qureg_amp",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "getDiagMatr1(std::vector<std::complex<double>>) -> DiagMatr1",
+      "quest_name": "getDiagMatr1",
+      "adapter_name": "get_diag_matr1",
+      "rust_name": "get_diag_matr1",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "getDiagMatr2(std::vector<std::complex<double>>) -> DiagMatr2",
+      "quest_name": "getDiagMatr2",
+      "adapter_name": "get_diag_matr2",
+      "rust_name": "get_diag_matr2",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "getPauliStr(std::string) -> PauliStr",
+      "quest_name": "getPauliStr",
+      "adapter_name": "get_pauli_str_from_string",
+      "rust_name": "get_pauli_str_from_string",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "getPauliStr(std::string, std::vector<int>) -> PauliStr",
+      "quest_name": "getPauliStr",
+      "adapter_name": "get_pauli_str",
+      "rust_name": "get_pauli_str",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "getQuESTEnv() -> QuESTEnv",
+      "quest_name": "getQuESTEnv",
+      "adapter_name": "getQuESTEnv",
+      "rust_name": "get_qu_estenv",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "getQuESTEnvironmentString(char[200]) -> void",
+      "quest_name": "getQuESTEnvironmentString",
+      "adapter_name": "getQuESTEnvironmentString",
+      "rust_name": "get_qu_estenvironment_string",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "getQuESTGpuCacheSize() -> long long",
+      "quest_name": "getQuESTGpuCacheSize",
+      "adapter_name": "get_qu_estgpu_cache_size",
+      "rust_name": "get_qu_estgpu_cache_size",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "getQuESTNumGpuThreadsPerBlock() -> int",
+      "quest_name": "getQuESTNumGpuThreadsPerBlock",
+      "adapter_name": "get_qu_estnum_gpu_threads_per_block",
+      "rust_name": "get_qu_estnum_gpu_threads_per_block",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "getQuESTNumSeeds() -> int",
+      "quest_name": "getQuESTNumSeeds",
+      "adapter_name": "get_qu_estnum_seeds",
+      "rust_name": "get_qu_estnum_seeds",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "getQuESTValidationEpsilon() -> double",
+      "quest_name": "getQuESTValidationEpsilon",
+      "adapter_name": "get_qu_estvalidation_epsilon",
+      "rust_name": "get_qu_estvalidation_epsilon",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "getQuregAmp(Qureg, long long) -> std::complex<double>",
+      "quest_name": "getQuregAmp",
+      "adapter_name": "getQuregAmp",
+      "rust_name": "get_qureg_amp",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "getQuregAmps(Qureg, long long, long long) -> std::vector<std::complex<double>>",
+      "quest_name": "getQuregAmps",
+      "adapter_name": "getQuregAmps",
+      "rust_name": "get_qureg_amps",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "initBlankState(Qureg) -> void",
+      "quest_name": "initBlankState",
+      "adapter_name": "init_blank_state",
+      "rust_name": "init_blank_state",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "initClassicalState(Qureg, long long) -> void",
+      "quest_name": "initClassicalState",
+      "adapter_name": "init_classical_state",
+      "rust_name": "init_classical_state",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "initCustomQuESTEnv(int, int, int) -> void",
+      "quest_name": "initCustomQuESTEnv",
+      "adapter_name": "initCustomQuESTEnv",
+      "rust_name": "init_custom_qu_estenv",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "initDebugState(Qureg) -> void",
+      "quest_name": "initDebugState",
+      "adapter_name": "init_debug_state",
+      "rust_name": "init_debug_state",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "initPlusState(Qureg) -> void",
+      "quest_name": "initPlusState",
+      "adapter_name": "initPlusState",
+      "rust_name": "init_plus_state",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "initPureState(Qureg, Qureg) -> void",
+      "quest_name": "initPureState",
+      "adapter_name": "init_pure_state",
+      "rust_name": "init_pure_state",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "initQuESTEnv() -> void",
+      "quest_name": "initQuESTEnv",
+      "adapter_name": "initQuESTEnv",
+      "rust_name": "init_qu_estenv",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "initRandomMixedState(Qureg, long long) -> void",
+      "quest_name": "initRandomMixedState",
+      "adapter_name": "init_random_mixed_state",
+      "rust_name": "init_random_mixed_state",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "initRandomPureState(Qureg) -> void",
+      "quest_name": "initRandomPureState",
+      "adapter_name": "init_random_pure_state",
+      "rust_name": "init_random_pure_state",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "initZeroState(Qureg) -> void",
+      "quest_name": "initZeroState",
+      "adapter_name": "initZeroState",
+      "rust_name": "init_zero_state",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "isQuESTEnvInit() -> int",
+      "quest_name": "isQuESTEnvInit",
+      "adapter_name": "isQuESTEnvInit",
+      "rust_name": "is_qu_estenv_init",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "leftapplyCompMatr(Qureg, std::vector<int>, CompMatr) -> void",
+      "quest_name": "leftapplyCompMatr",
+      "adapter_name": "leftapplyCompMatr",
+      "rust_name": "leftapply_comp_matr",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "leftapplyCompMatr1(Qureg, int, CompMatr1) -> void",
+      "quest_name": "leftapplyCompMatr1",
+      "adapter_name": "leftapply_comp_matr1",
+      "rust_name": "leftapply_comp_matr1",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "leftapplyCompMatr2(Qureg, int, int, CompMatr2) -> void",
+      "quest_name": "leftapplyCompMatr2",
+      "adapter_name": "leftapply_comp_matr2",
+      "rust_name": "leftapply_comp_matr2",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "leftapplyDiagMatr(Qureg, std::vector<int>, DiagMatr) -> void",
+      "quest_name": "leftapplyDiagMatr",
+      "adapter_name": "leftapply_diag_matr",
+      "rust_name": "leftapply_diag_matr",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "leftapplyDiagMatr1(Qureg, int, DiagMatr1) -> void",
+      "quest_name": "leftapplyDiagMatr1",
+      "adapter_name": "leftapply_diag_matr1",
+      "rust_name": "leftapply_diag_matr1",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "leftapplyDiagMatr2(Qureg, int, int, DiagMatr2) -> void",
+      "quest_name": "leftapplyDiagMatr2",
+      "adapter_name": "leftapply_diag_matr2",
+      "rust_name": "leftapply_diag_matr2",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "leftapplyDiagMatrPower(Qureg, std::vector<int>, DiagMatr, std::complex<double>) -> void",
+      "quest_name": "leftapplyDiagMatrPower",
+      "adapter_name": "leftapply_diag_matr_power",
+      "rust_name": "leftapply_diag_matr_power",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "leftapplyFullStateDiagMatr(Qureg, FullStateDiagMatr) -> void",
+      "quest_name": "leftapplyFullStateDiagMatr",
+      "adapter_name": "leftapply_full_state_diag_matr",
+      "rust_name": "leftapply_full_state_diag_matr",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "leftapplyFullStateDiagMatrPower(Qureg, FullStateDiagMatr, std::complex<double>) -> void",
+      "quest_name": "leftapplyFullStateDiagMatrPower",
+      "adapter_name": "leftapply_full_state_diag_matr_power",
+      "rust_name": "leftapply_full_state_diag_matr_power",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "leftapplyMultiQubitNot(Qureg, std::vector<int>) -> void",
+      "quest_name": "leftapplyMultiQubitNot",
+      "adapter_name": "leftapply_multi_qubit_not",
+      "rust_name": "leftapply_multi_qubit_not",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "leftapplyMultiQubitProjector(Qureg, std::vector<int>, std::vector<int>) -> void",
+      "quest_name": "leftapplyMultiQubitProjector",
+      "adapter_name": "leftapply_multi_qubit_projector",
+      "rust_name": "leftapply_multi_qubit_projector",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "leftapplyPauliGadget(Qureg, PauliStr, double) -> void",
+      "quest_name": "leftapplyPauliGadget",
+      "adapter_name": "leftapply_pauli_gadget",
+      "rust_name": "leftapply_pauli_gadget",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "leftapplyPauliStr(Qureg, PauliStr) -> void",
+      "quest_name": "leftapplyPauliStr",
+      "adapter_name": "leftapply_pauli_str",
+      "rust_name": "leftapply_pauli_str",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "leftapplyPauliStrSum(Qureg, PauliStrSum, Qureg) -> void",
+      "quest_name": "leftapplyPauliStrSum",
+      "adapter_name": "leftapply_pauli_str_sum",
+      "rust_name": "leftapply_pauli_str_sum",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "leftapplyPauliX(Qureg, int) -> void",
+      "quest_name": "leftapplyPauliX",
+      "adapter_name": "leftapply_pauli_x",
+      "rust_name": "leftapply_pauli_x",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "leftapplyPauliY(Qureg, int) -> void",
+      "quest_name": "leftapplyPauliY",
+      "adapter_name": "leftapply_pauli_y",
+      "rust_name": "leftapply_pauli_y",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "leftapplyPauliZ(Qureg, int) -> void",
+      "quest_name": "leftapplyPauliZ",
+      "adapter_name": "leftapply_pauli_z",
+      "rust_name": "leftapply_pauli_z",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "leftapplyPhaseGadget(Qureg, std::vector<int>, double) -> void",
+      "quest_name": "leftapplyPhaseGadget",
+      "adapter_name": "leftapply_phase_gadget",
+      "rust_name": "leftapply_phase_gadget",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "leftapplyQubitProjector(Qureg, int, int) -> void",
+      "quest_name": "leftapplyQubitProjector",
+      "adapter_name": "leftapply_qubit_projector",
+      "rust_name": "leftapply_qubit_projector",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "leftapplySwap(Qureg, int, int) -> void",
+      "quest_name": "leftapplySwap",
+      "adapter_name": "leftapply_swap",
+      "rust_name": "leftapply_swap",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "mixDamping(Qureg, int, double) -> void",
+      "quest_name": "mixDamping",
+      "adapter_name": "mix_damping",
+      "rust_name": "mix_damping",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "mixDephasing(Qureg, int, double) -> void",
+      "quest_name": "mixDephasing",
+      "adapter_name": "mixDephasing",
+      "rust_name": "mix_dephasing",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "mixDepolarising(Qureg, int, double) -> void",
+      "quest_name": "mixDepolarising",
+      "adapter_name": "mix_depolarising",
+      "rust_name": "mix_depolarising",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "mixKrausMap(Qureg, std::vector<int>, KrausMap) -> void",
+      "quest_name": "mixKrausMap",
+      "adapter_name": "mix_kraus_map",
+      "rust_name": "mix_kraus_map",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "mixPaulis(Qureg, int, double, double, double) -> void",
+      "quest_name": "mixPaulis",
+      "adapter_name": "mix_paulis",
+      "rust_name": "mix_paulis",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "mixQureg(Qureg, Qureg, double) -> void",
+      "quest_name": "mixQureg",
+      "adapter_name": "mix_qureg",
+      "rust_name": "mix_qureg",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "mixSuperOp(Qureg, std::vector<int>, SuperOp) -> void",
+      "quest_name": "mixSuperOp",
+      "adapter_name": "mix_super_op",
+      "rust_name": "mix_super_op",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "mixTwoQubitDephasing(Qureg, int, int, double) -> void",
+      "quest_name": "mixTwoQubitDephasing",
+      "adapter_name": "mix_two_qubit_dephasing",
+      "rust_name": "mix_two_qubit_dephasing",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "mixTwoQubitDepolarising(Qureg, int, int, double) -> void",
+      "quest_name": "mixTwoQubitDepolarising",
+      "adapter_name": "mix_two_qubit_depolarising",
+      "rust_name": "mix_two_qubit_depolarising",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "reportCompMatr(CompMatr) -> void",
+      "quest_name": "reportCompMatr",
+      "adapter_name": "report_comp_matr",
+      "rust_name": "report_comp_matr",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "reportCompMatr1(CompMatr1) -> void",
+      "quest_name": "reportCompMatr1",
+      "adapter_name": "report_comp_matr1",
+      "rust_name": "report_comp_matr1",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "reportCompMatr2(CompMatr2) -> void",
+      "quest_name": "reportCompMatr2",
+      "adapter_name": "report_comp_matr2",
+      "rust_name": "report_comp_matr2",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "reportDiagMatr(DiagMatr) -> void",
+      "quest_name": "reportDiagMatr",
+      "adapter_name": "report_diag_matr",
+      "rust_name": "report_diag_matr",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "reportDiagMatr1(DiagMatr1) -> void",
+      "quest_name": "reportDiagMatr1",
+      "adapter_name": "report_diag_matr1",
+      "rust_name": "report_diag_matr1",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "reportDiagMatr2(DiagMatr2) -> void",
+      "quest_name": "reportDiagMatr2",
+      "adapter_name": "report_diag_matr2",
+      "rust_name": "report_diag_matr2",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "reportFullStateDiagMatr(FullStateDiagMatr) -> void",
+      "quest_name": "reportFullStateDiagMatr",
+      "adapter_name": "report_full_state_diag_matr",
+      "rust_name": "report_full_state_diag_matr",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "reportKrausMap(KrausMap) -> void",
+      "quest_name": "reportKrausMap",
+      "adapter_name": "report_kraus_map",
+      "rust_name": "report_kraus_map",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "reportPauliStr(PauliStr) -> void",
+      "quest_name": "reportPauliStr",
+      "adapter_name": "report_pauli_str",
+      "rust_name": "report_pauli_str",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "reportPauliStrSum(PauliStrSum) -> void",
+      "quest_name": "reportPauliStrSum",
+      "adapter_name": "report_pauli_str_sum",
+      "rust_name": "report_pauli_str_sum",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "reportQureg(Qureg) -> void",
+      "quest_name": "reportQureg",
+      "adapter_name": "report_qureg",
+      "rust_name": "report_qureg",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "reportQuregParams(Qureg) -> void",
+      "quest_name": "reportQuregParams",
+      "adapter_name": "report_qureg_params",
+      "rust_name": "report_qureg_params",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "reportScalar(std::string, double) -> void",
+      "quest_name": "reportScalar",
+      "adapter_name": "report_scalar_real",
+      "rust_name": "report_scalar_real",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "reportScalar(std::string, std::complex<double>) -> void",
+      "quest_name": "reportScalar",
+      "adapter_name": "report_scalar",
+      "rust_name": "report_scalar",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "reportStr(std::string) -> void",
+      "quest_name": "reportStr",
+      "adapter_name": "report_str",
+      "rust_name": "report_str",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "reportSuperOp(SuperOp) -> void",
+      "quest_name": "reportSuperOp",
+      "adapter_name": "report_super_op",
+      "rust_name": "report_super_op",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "rightapplyCompMatr(Qureg, std::vector<int>, CompMatr) -> void",
+      "quest_name": "rightapplyCompMatr",
+      "adapter_name": "rightapplyCompMatr",
+      "rust_name": "rightapply_comp_matr",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "rightapplyCompMatr1(Qureg, int, CompMatr1) -> void",
+      "quest_name": "rightapplyCompMatr1",
+      "adapter_name": "rightapply_comp_matr1",
+      "rust_name": "rightapply_comp_matr1",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "rightapplyCompMatr2(Qureg, int, int, CompMatr2) -> void",
+      "quest_name": "rightapplyCompMatr2",
+      "adapter_name": "rightapply_comp_matr2",
+      "rust_name": "rightapply_comp_matr2",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "rightapplyDiagMatr(Qureg, std::vector<int>, DiagMatr) -> void",
+      "quest_name": "rightapplyDiagMatr",
+      "adapter_name": "rightapply_diag_matr",
+      "rust_name": "rightapply_diag_matr",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "rightapplyDiagMatr1(Qureg, int, DiagMatr1) -> void",
+      "quest_name": "rightapplyDiagMatr1",
+      "adapter_name": "rightapply_diag_matr1",
+      "rust_name": "rightapply_diag_matr1",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "rightapplyDiagMatr2(Qureg, int, int, DiagMatr2) -> void",
+      "quest_name": "rightapplyDiagMatr2",
+      "adapter_name": "rightapply_diag_matr2",
+      "rust_name": "rightapply_diag_matr2",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "rightapplyDiagMatrPower(Qureg, std::vector<int>, DiagMatr, std::complex<double>) -> void",
+      "quest_name": "rightapplyDiagMatrPower",
+      "adapter_name": "rightapply_diag_matr_power",
+      "rust_name": "rightapply_diag_matr_power",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "rightapplyFullStateDiagMatr(Qureg, FullStateDiagMatr) -> void",
+      "quest_name": "rightapplyFullStateDiagMatr",
+      "adapter_name": "rightapply_full_state_diag_matr",
+      "rust_name": "rightapply_full_state_diag_matr",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "rightapplyFullStateDiagMatrPower(Qureg, FullStateDiagMatr, std::complex<double>) -> void",
+      "quest_name": "rightapplyFullStateDiagMatrPower",
+      "adapter_name": "rightapply_full_state_diag_matr_power",
+      "rust_name": "rightapply_full_state_diag_matr_power",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "rightapplyMultiQubitNot(Qureg, std::vector<int>) -> void",
+      "quest_name": "rightapplyMultiQubitNot",
+      "adapter_name": "rightapply_multi_qubit_not",
+      "rust_name": "rightapply_multi_qubit_not",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "rightapplyMultiQubitProjector(Qureg, std::vector<int>, std::vector<int>) -> void",
+      "quest_name": "rightapplyMultiQubitProjector",
+      "adapter_name": "rightapply_multi_qubit_projector",
+      "rust_name": "rightapply_multi_qubit_projector",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "rightapplyPauliGadget(Qureg, PauliStr, double) -> void",
+      "quest_name": "rightapplyPauliGadget",
+      "adapter_name": "rightapply_pauli_gadget",
+      "rust_name": "rightapply_pauli_gadget",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "rightapplyPauliStr(Qureg, PauliStr) -> void",
+      "quest_name": "rightapplyPauliStr",
+      "adapter_name": "rightapply_pauli_str",
+      "rust_name": "rightapply_pauli_str",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "rightapplyPauliStrSum(Qureg, PauliStrSum, Qureg) -> void",
+      "quest_name": "rightapplyPauliStrSum",
+      "adapter_name": "rightapply_pauli_str_sum",
+      "rust_name": "rightapply_pauli_str_sum",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "rightapplyPauliX(Qureg, int) -> void",
+      "quest_name": "rightapplyPauliX",
+      "adapter_name": "rightapply_pauli_x",
+      "rust_name": "rightapply_pauli_x",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "rightapplyPauliY(Qureg, int) -> void",
+      "quest_name": "rightapplyPauliY",
+      "adapter_name": "rightapply_pauli_y",
+      "rust_name": "rightapply_pauli_y",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "rightapplyPauliZ(Qureg, int) -> void",
+      "quest_name": "rightapplyPauliZ",
+      "adapter_name": "rightapply_pauli_z",
+      "rust_name": "rightapply_pauli_z",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "rightapplyPhaseGadget(Qureg, std::vector<int>, double) -> void",
+      "quest_name": "rightapplyPhaseGadget",
+      "adapter_name": "rightapply_phase_gadget",
+      "rust_name": "rightapply_phase_gadget",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "rightapplyQubitProjector(Qureg, int, int) -> void",
+      "quest_name": "rightapplyQubitProjector",
+      "adapter_name": "rightapply_qubit_projector",
+      "rust_name": "rightapply_qubit_projector",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "rightapplySwap(Qureg, int, int) -> void",
+      "quest_name": "rightapplySwap",
+      "adapter_name": "rightapply_swap",
+      "rust_name": "rightapply_swap",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "saveQuregToFile(Qureg, std::string) -> void",
+      "quest_name": "saveQuregToFile",
+      "adapter_name": "save_qureg_to_file",
+      "rust_name": "save_qureg_to_file",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "setCompMatr(CompMatr, std::vector<std::vector<std::complex<double>>>) -> void",
+      "quest_name": "setCompMatr",
+      "adapter_name": "setCompMatr",
+      "rust_name": "set_comp_matr",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "setDensityQuregFlatAmps(Qureg, long long, std::vector<std::complex<double>>) -> void",
+      "quest_name": "setDensityQuregFlatAmps",
+      "adapter_name": "set_density_qureg_flat_amps",
+      "rust_name": "set_density_qureg_flat_amps",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "setDiagMatr(DiagMatr, std::vector<std::complex<double>>) -> void",
+      "quest_name": "setDiagMatr",
+      "adapter_name": "set_diag_matr",
+      "rust_name": "set_diag_matr",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "setFullStateDiagMatr(FullStateDiagMatr, long long, std::vector<std::complex<double>>) -> void",
+      "quest_name": "setFullStateDiagMatr",
+      "adapter_name": "set_full_state_diag_matr",
+      "rust_name": "set_full_state_diag_matr",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "setFullStateDiagMatrFromPauliStrSum(FullStateDiagMatr, PauliStrSum) -> void",
+      "quest_name": "setFullStateDiagMatrFromPauliStrSum",
+      "adapter_name": "set_full_state_diag_matr_from_pauli_str_sum",
+      "rust_name": "set_full_state_diag_matr_from_pauli_str_sum",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "setInlineDiagMatr(DiagMatr, int, std::vector<std::complex<double>>) -> void",
+      "quest_name": "setInlineDiagMatr",
+      "adapter_name": "set_inline_diag_matr",
+      "rust_name": "set_inline_diag_matr",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "setInlineFullStateDiagMatr(FullStateDiagMatr, long long, long long, std::vector<std::complex<double>>) -> void",
+      "quest_name": "setInlineFullStateDiagMatr",
+      "adapter_name": "set_inline_full_state_diag_matr",
+      "rust_name": "set_inline_full_state_diag_matr",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "setQuESTMaxNumReportedItems(long long, long long) -> void",
+      "quest_name": "setQuESTMaxNumReportedItems",
+      "adapter_name": "set_qu_estmax_num_reported_items",
+      "rust_name": "set_qu_estmax_num_reported_items",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "setQuESTMaxNumReportedSigFigs(int) -> void",
+      "quest_name": "setQuESTMaxNumReportedSigFigs",
+      "adapter_name": "set_qu_estmax_num_reported_sig_figs",
+      "rust_name": "set_qu_estmax_num_reported_sig_figs",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "setQuESTNumGpuThreadsPerBlock(int) -> void",
+      "quest_name": "setQuESTNumGpuThreadsPerBlock",
+      "adapter_name": "set_qu_estnum_gpu_threads_per_block",
+      "rust_name": "set_qu_estnum_gpu_threads_per_block",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "setQuESTNumReportedNewlines(int) -> void",
+      "quest_name": "setQuESTNumReportedNewlines",
+      "adapter_name": "set_qu_estnum_reported_newlines",
+      "rust_name": "set_qu_estnum_reported_newlines",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "setQuESTReportedPauliStrStyle(int) -> void",
+      "quest_name": "setQuESTReportedPauliStrStyle",
+      "adapter_name": "set_qu_estreported_pauli_str_style",
+      "rust_name": "set_qu_estreported_pauli_str_style",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "setQuESTSeedsToDefault() -> void",
+      "quest_name": "setQuESTSeedsToDefault",
+      "adapter_name": "set_qu_estseeds_to_default",
+      "rust_name": "set_qu_estseeds_to_default",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "setQuESTValidationEpsilon(double) -> void",
+      "quest_name": "setQuESTValidationEpsilon",
+      "adapter_name": "set_qu_estvalidation_epsilon",
+      "rust_name": "set_qu_estvalidation_epsilon",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "setQuESTValidationEpsilonToDefault() -> void",
+      "quest_name": "setQuESTValidationEpsilonToDefault",
+      "adapter_name": "set_qu_estvalidation_epsilon_to_default",
+      "rust_name": "set_qu_estvalidation_epsilon_to_default",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "setQuESTValidationOff() -> void",
+      "quest_name": "setQuESTValidationOff",
+      "adapter_name": "set_qu_estvalidation_off",
+      "rust_name": "set_qu_estvalidation_off",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "setQuESTValidationOn() -> void",
+      "quest_name": "setQuESTValidationOn",
+      "adapter_name": "set_qu_estvalidation_on",
+      "rust_name": "set_qu_estvalidation_on",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "setQuregAmps(Qureg, long long, std::vector<std::complex<double>>) -> void",
+      "quest_name": "setQuregAmps",
+      "adapter_name": "set_qureg_amps",
+      "rust_name": "set_qureg_amps",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "setQuregToClone(Qureg, Qureg) -> void",
+      "quest_name": "setQuregToClone",
+      "adapter_name": "set_qureg_to_clone",
+      "rust_name": "set_qureg_to_clone",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "setQuregToPartialTrace(Qureg, Qureg, std::vector<int>) -> void",
+      "quest_name": "setQuregToPartialTrace",
+      "adapter_name": "set_qureg_to_partial_trace",
+      "rust_name": "set_qureg_to_partial_trace",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "setQuregToPauliStrSum(Qureg, PauliStrSum) -> void",
+      "quest_name": "setQuregToPauliStrSum",
+      "adapter_name": "set_qureg_to_pauli_str_sum",
+      "rust_name": "set_qureg_to_pauli_str_sum",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "setQuregToReducedDensityMatrix(Qureg, Qureg, std::vector<int>) -> void",
+      "quest_name": "setQuregToReducedDensityMatrix",
+      "adapter_name": "set_qureg_to_reduced_density_matrix",
+      "rust_name": "set_qureg_to_reduced_density_matrix",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "setQuregToRenormalized(Qureg) -> double",
+      "quest_name": "setQuregToRenormalized",
+      "adapter_name": "set_qureg_to_renormalized",
+      "rust_name": "set_qureg_to_renormalized",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "sortPauliStrSumLexicographic(PauliStrSum) -> void",
+      "quest_name": "sortPauliStrSumLexicographic",
+      "adapter_name": "sort_pauli_str_sum_lexicographic",
+      "rust_name": "sort_pauli_str_sum_lexicographic",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "sortPauliStrSumMagnitude(PauliStrSum) -> void",
+      "quest_name": "sortPauliStrSumMagnitude",
+      "adapter_name": "sort_pauli_str_sum_magnitude",
+      "rust_name": "sort_pauli_str_sum_magnitude",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "syncCompMatr(CompMatr) -> void",
+      "quest_name": "syncCompMatr",
+      "adapter_name": "sync_comp_matr",
+      "rust_name": "sync_comp_matr",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "syncDiagMatr(DiagMatr) -> void",
+      "quest_name": "syncDiagMatr",
+      "adapter_name": "sync_diag_matr",
+      "rust_name": "sync_diag_matr",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "syncFullStateDiagMatr(FullStateDiagMatr) -> void",
+      "quest_name": "syncFullStateDiagMatr",
+      "adapter_name": "sync_full_state_diag_matr",
+      "rust_name": "sync_full_state_diag_matr",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "syncKrausMap(KrausMap) -> void",
+      "quest_name": "syncKrausMap",
+      "adapter_name": "sync_kraus_map",
+      "rust_name": "sync_kraus_map",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "syncQuESTEnv() -> void",
+      "quest_name": "syncQuESTEnv",
+      "adapter_name": "syncQuESTEnv",
+      "rust_name": "sync_qu_estenv",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "syncQuregFromGpu(Qureg) -> void",
+      "quest_name": "syncQuregFromGpu",
+      "adapter_name": "sync_qureg_from_gpu",
+      "rust_name": "sync_qureg_from_gpu",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "syncQuregToGpu(Qureg) -> void",
+      "quest_name": "syncQuregToGpu",
+      "adapter_name": "sync_qureg_to_gpu",
+      "rust_name": "sync_qureg_to_gpu",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "syncSubQuregFromGpu(Qureg, long long, long long) -> void",
+      "quest_name": "syncSubQuregFromGpu",
+      "adapter_name": "sync_sub_qureg_from_gpu",
+      "rust_name": "sync_sub_qureg_from_gpu",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "syncSubQuregToGpu(Qureg, long long, long long) -> void",
+      "quest_name": "syncSubQuregToGpu",
+      "adapter_name": "sync_sub_qureg_to_gpu",
+      "rust_name": "sync_sub_qureg_to_gpu",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "syncSuperOp(SuperOp) -> void",
+      "quest_name": "syncSuperOp",
+      "adapter_name": "sync_super_op",
+      "rust_name": "sync_super_op",
+      "source_kind": "generated"
+    }
+  ]
+}

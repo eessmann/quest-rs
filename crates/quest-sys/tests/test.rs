@@ -1,7 +1,7 @@
 use std::sync::Once;
 
 use approx::{assert_abs_diff_eq, assert_relative_eq};
-use quest_sys::{self, QuestComplex, QuestResult};
+use quest_sys::{self, QuestComplex, QuestError, QuestResult};
 
 static INIT: Once = Once::new();
 
@@ -48,6 +48,21 @@ fn qureg_lifecycle_is_raii() -> QuestResult<()> {
     assert_relative_eq!(amp0.im, 0.0);
     assert_abs_diff_eq!(amp1.re, 0.0, epsilon = 1e-12);
     assert_abs_diff_eq!(amp1.im, 0.0, epsilon = 1e-12);
+
+    drop(qureg);
+    Ok(())
+}
+
+#[test]
+fn finalize_fails_while_raii_handles_are_live() -> QuestResult<()> {
+    ensure_quest_env();
+
+    let qureg = quest_sys::create_qureg(1)?;
+    let err = quest_sys::finalize_quest_env().expect_err("live handles should block finalize");
+
+    assert!(quest_sys::is_quest_env_init());
+    assert!(matches!(err, QuestError::Lifecycle(_)));
+    assert!(err.to_string().contains("Qureg="));
 
     drop(qureg);
     Ok(())
@@ -176,6 +191,21 @@ fn generated_initialisation_and_probability_apis_work() -> QuestResult<()> {
     assert_eq!(probs.len(), 2);
     assert_relative_eq!(probs[0], 0.0, epsilon = 1e-12);
     assert_relative_eq!(probs[1], 1.0, epsilon = 1e-12);
+
+    Ok(())
+}
+
+#[test]
+fn generated_overloads_have_distinct_safe_adapters() -> QuestResult<()> {
+    ensure_quest_env();
+
+    let pauli_without_indices = quest_sys::get_pauli_str_from_string("Z")?;
+    let pauli_with_indices = quest_sys::get_pauli_str("Z", &[0])?;
+
+    quest_sys::report_pauli_str(&pauli_without_indices)?;
+    quest_sys::report_pauli_str(&pauli_with_indices)?;
+    quest_sys::report_scalar_real("real scalar", 1.0)?;
+    quest_sys::report_scalar("complex scalar", complex(1.0, -0.5))?;
 
     Ok(())
 }
