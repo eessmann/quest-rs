@@ -3,6 +3,23 @@ use ndarray::Array1;
 use num::complex::Complex64;
 use quest_sys::{QuestResult, Qureg};
 
+use std::fmt;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RegisterKind {
+    StateVector,
+    DensityMatrix,
+}
+
+impl fmt::Display for RegisterKind {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::StateVector => formatter.write_str("a state-vector"),
+            Self::DensityMatrix => formatter.write_str("a density-matrix"),
+        }
+    }
+}
+
 pub struct QuantumRegister {
     qureg: UniquePtr<Qureg>,
     num_qubits: usize,

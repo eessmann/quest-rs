@@ -33,6 +33,8 @@ quest-sys = { path = "crates/quest-sys", version = "0.2" }
 ndarray.workspace = true
 num.workspace = true
 cxx.workspace = true
+miette.workspace = true
+thiserror.workspace = true
 
 [build-dependencies]
 cmake-package.workspace = true
@@ -40,3 +42,7 @@ miette.workspace = true
 
 [dev-dependencies]
 googletest.workspace = true
+
+[[example]]
+name = "minimal"
+path = "examples/minimal.rs"
