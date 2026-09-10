@@ -186,3 +186,47 @@ changed as part of the Rust merge.
 
 Merge-time logs are `/tmp/quest-main-merge-nextest-cpu.log`,
 `/tmp/quest-main-merge-doctests-cpu.log` and `/tmp/quest-main-merge-nextest.log`.
+
+## Repaired GPU installation revalidation
+
+The merge-time loader failure above is **resolved**. After the user repaired the
+native installation, the merged Rust source at `fcdcf0c` was revalidated against
+`QUEST_ROOT=/var/home/erich/Projects`. The native repository was at `adfd00d6`;
+its build cache records `CMAKE_INSTALL_RPATH_USE_LINK_PATH=ON`. Installed headers
+report QuEST 4.3.0, binary64, deprecated APIs disabled, and CUDA, cuQuantum, MPI,
+OpenMP, subcommunicators and BMI2 enabled. The installed NUMA flag remains off.
+
+The installed library now records `$ORIGIN/`, the actual CUDA target library,
+cuQuantum and MPICH directories in `DT_RUNPATH`. With `LD_LIBRARY_PATH`,
+`LD_PRELOAD`, `LD_AUDIT` and `LIBRARY_PATH` unset, all dependencies resolve,
+including cuStateVec, cuBLAS/cuBLASLt and MPI. No CUDA stub directories or legacy
+`DT_RPATH` are present.
+
+Fresh checks against this repaired installation passed:
+
+| Check | Result |
+| --- | --- |
+| Workspace all-features build, `--locked --offline` | Passed. |
+| Workspace all-features Nextest, `--locked --offline` | **333 passed, zero skipped**. |
+| Workspace all-features doctests, `--locked --offline` | **13 passed**, one intentional ignore. |
+| Workspace all-targets/all-features Clippy, `--locked --offline -- -D warnings` | Passed. |
+| Binding generator `--check` | Passed with the installed MPI header context. |
+| Rust independent-consumer harness | Direct `quest-sys`, facade, wrapped and renamed consumers all passed ELF, dependency-resolution and numerical checks outside Cargo. |
+| Fresh target-only CMake consumer | Configured, built and executed through `QuEST::QuEST`; CPU Bell norm `0.99999999999999978`, with equal approximately 0.5 probabilities for 00 and 11 and zero for 01 and 10. |
+| GPU execution smoke check | The `quest-sys` example ran outside Cargo using a **20-qubit GPU-backed state vector**; total probability was **1**. |
+
+The target-only consumer used GCC 15.3.1; Rust bridge discovery and compilation
+used the same selected `/usr/bin/c++` compiler as their final Rust consumers.
+The CMake consumer's RUNPATH contains only QuEST/MPI directories: its indirect
+CUDA/cuQuantum dependencies resolve through the installed library. Both the
+independent consumers and the GPU example ran with the loader variables above
+unset. The GPU example reported `CUDA=1 OpenMP=1 MPI=1`, one MPI rank and
+`cuQuantum=1`. This remains a GPU smoke check, not a full GPU or distributed
+simulation validation suite.
+
+The preserved Rust consumer fixture is `/tmp/quest gpu retry consumers`; the
+native consumer fixture is `/tmp/quest-gpu-retry-cmake-Rsr5wA`. Detailed logs use
+the `/tmp/quest-gpu-retry-` prefix, including `nextest.log`, `doctests.log`,
+`clippy.log`, `generator.log`, `consumers.log`, `example-run.log` and
+`cmake-run.log`. No Rust implementation changes or native configuration changes
+were needed during this revalidation.
