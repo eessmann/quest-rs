@@ -12,10 +12,10 @@ path = "src/main.rs"
 
 [dependencies]
 quest-build = { workspace = true }
-anyhow = { workspace = true }
 clang = { workspace = true, features = ["runtime"] }
 serde = { workspace = true, features = ["derive", "std"] }
 serde_json.workspace = true
+color-eyre = { workspace = true, features = ["track-caller"] }
 
 [dev-dependencies]
 googletest.workspace = true

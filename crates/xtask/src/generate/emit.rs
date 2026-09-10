@@ -182,7 +182,10 @@ fn render_coverage_manifest(quest_root: &QuestRoot, items: &[ApiItem]) -> Result
 
     let mut counts = BTreeMap::<String, usize>::new();
     for item in items {
-        *counts.entry(item.status.clone()).or_default() += 1;
+        let count = counts.entry(item.status.clone()).or_default();
+        *count = count
+            .checked_add(1)
+            .ok_or("coverage manifest item count overflow")?;
     }
 
     let manifest = CoverageManifest {

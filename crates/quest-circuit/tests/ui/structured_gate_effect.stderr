@@ -1,0 +1,5 @@
+error: nonunitary effect in gate declaration
+ --> tests/ui/structured_gate_effect.rs:3:37
+  |
+3 |     let _ = circuit! { gate bad q { reset q; } qubit q; bad q; };
+  |                                     ^^^^^

@@ -1,6 +1,6 @@
-# QuEST for Rust
+# `QuEST` for Rust
 
-A Rust workspace for QuEST 4.3: environment-bound simulation resources, a pure
+A Rust workspace for `QuEST` 4.3: environment-bound simulation resources, a pure
 circuit DAG and compiler, and an OpenQASM-style circuit macro. The facade package
 is **`quest-rs`**, with Rust library name **`quest`**.
 
@@ -15,10 +15,10 @@ is **`quest-rs`**, with Rust library name **`quest`**.
 
 ## Build
 
-The workspace pins `nightly-2026-09-06` with rustfmt and Clippy. Install QuEST
-**4.3.x**, binary64 precision, deprecated APIs disabled, plus CMake and a C++20
+The workspace pins `nightly-2026-09-06` with rustfmt and Clippy. Install `QuEST`
+**4.3.x**, binary64 precision, deprecated APIs disabled, plus `CMake` and a C++20
 compiler. The tested native build recipe currently supports Linux GNU targets.
-Pure circuit and macro builds need neither QuEST nor libclang nor external BLAS.
+Pure circuit and macro builds need neither `QuEST` nor libclang nor external BLAS.
 
 ```sh
 export QUEST_ROOT=/path/to/installed/quest
@@ -39,7 +39,7 @@ overrides are rejected; regenerate using a supported compiler configuration.
 Regenerate the record when its inputs change. The record is specific
 to the installation and belongs outside version control.
 
-The Linux development recipe emits **absolute DT_RPATH**, including indirect
+The Linux development recipe emits **absolute `DT_RPATH`**, including indirect
 native dependency directories. This is not a relocatable bundle. The build does
 not modify the installed native libraries. Cross compilation, macOS, Windows and
 relocatable packaging need separate verified loader recipes.
@@ -95,33 +95,35 @@ that accounting when returned and belong to the caller.
 ## OpenQASM-style Rust macro
 
 ```rust,no_run
-use quest::{Environment, Shots, circuit};
+use quest::{Environment, QubitCount, RunInputs, circuit};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let bell = circuit! {
         qubit[2] q;
-        bit[2] c;
+        output bit[2] c;
         h q[0];
         cx q[0], q[1];
         c[0] = measure q[0];
         c[1] = measure q[1];
     }?;
     let env = Environment::builder().build()?;
-    let mut prepared = env.prepare(bell)?;
-    let samples = prepared.sample_zeroed(Shots::new(1024)?, &[2026, 9, 10])?;
-    println!("{:?}", samples.counts);
-    drop(prepared);
+    let mut prepared = env.prepare_structured(bell)?;
+    let mut state = env.state_vector(QubitCount::new(2)?)?;
+    let result = prepared.run(&mut state, &RunInputs::default())?;
+    println!("{:?}", result.outputs);
+    drop((prepared, state));
     env.close()?;
     Ok(())
 }
 ```
 
-Gate semantics follow the documented OpenQASM 3.1.0 subset. The macro parses Rust
-tokens, with explicit array indices, `pi` angles, `${rust_expression}` interpolation,
-`ctrl`/`negctrl`/`inv @` modifiers, measurement, reset and barriers. Interpolations
-execute once in construction order. This is a Rust DSL, not an OpenQASM text
-parser. Pure consumers use `quest-circuit`; its default `macros` feature reexports
-`circuit!`, and optional `codespan-reporting` renders owned source diagnostics.
+The primary macro shares the documented `OpenQASM` 3.1 simulator profile with the
+text frontend in `quest::qasm`. It supports typed classical control, user gates,
+nonrecursive subroutines, signed controls, integer powers and once-evaluated
+`${rust_expression}` captures. Pure consumers use `quest-circuit`; its default
+`macros` feature reexports `circuit!`. Optional `codespan-reporting` and `serde`
+render or serialize shared owned diagnostics. `legacy_circuit!` retains the
+earlier ideal-angle static frontend.
 See [the circuit profile](https://github.com/eessmann/quest-rs/blob/main/crates/quest-circuit/README.md) for supported syntax.
 
 ## Circuit semantics
@@ -154,11 +156,19 @@ rectangular view adapters preserve logical values, including conjugation.
 Preparation builds native caches transactionally. `run` can partially modify a
 register on failure and reports its completed prefix. It checks ambient rounding,
 underflow and native numerical policy before mutation. Sampling uses explicit
-1–16 seeds for QuEST's process-wide RNG and initializes a fresh zero state on every
+1–16 seeds for `QuEST`'s process-wide RNG and initializes a fresh zero state on every
 shot. The first batch retains a 4096-byte native RNG allowance in the environment
 budget; transient seed copies are charged separately. Direct `quest-sys` calls
 are outside facade memory accounting. Channels require density registers; reset uses trajectories on statevectors
 and a complete channel on density matrices.
+
+Every facade `Error` produces an owned shared diagnostic through `Error::report()`.
+Structured runtime reports retain the typed program/block/instruction occurrence,
+interpreter call frames, completed quantum prefix, and immutable source snapshots
+after the prepared plan and environment are dropped. Inline macro code without a
+text snapshot uses its compiler file, line, and column as a location note. Enable
+`codespan-reporting` to render validated text labels and `serde` to serialize the
+same diagnostic data.
 
 ## Validation and generation
 
@@ -180,5 +190,5 @@ use subprocesses where ordinary Cargo's in-process test harness needs isolation.
 The [architecture](https://github.com/eessmann/quest-rs/blob/main/docs/superpowers/specs/2026-09-10-quest-rust-design.md),
 [dated bridge audit](https://github.com/eessmann/quest-rs/blob/main/docs/superpowers/specs/2026-09-10-quest-bridge-audit.md), and
 [compiler research](https://github.com/eessmann/quest-rs/blob/main/docs/superpowers/specs/2026-09-10-quest-circuit-research.md)
-explain the invariants and later work. OpenQASM text import/export, structured
+explain the invariants and later work. `OpenQASM` text import/export, structured
 runtime loops and advanced synthesis, routing and ZX passes are later milestones.

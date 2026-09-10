@@ -1,0 +1,22 @@
+[package]
+name = "quest-qasm"
+version = "0.1.0"
+description = "OpenQASM 3.1 simulator-profile import and canonical export"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+quest-language.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+googletest.workspace = true
+sha2.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+serde = ["quest-language/serde"]
+codespan-reporting = ["quest-language/codespan-reporting"]

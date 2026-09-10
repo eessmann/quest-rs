@@ -1,5 +1,6 @@
 use std::collections::BTreeMap;
 use std::env;
+use std::fmt::Write as _;
 use std::fs::{self, File};
 use std::io::Read;
 use std::path::{Path, PathBuf};
@@ -8,6 +9,15 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
 use crate::{Result, explicit_prefix, invalid, io, requested_runtime_dirs, runtime_link_args};
+
+fn encode_sha256(bytes: &[u8]) -> Result<String> {
+    let mut encoded = String::new();
+    for byte in bytes {
+        write!(&mut encoded, "{byte:02x}")
+            .map_err(|_| invalid("could not encode SHA-256 digest"))?;
+    }
+    Ok(encoded)
+}
 
 /// Exact bytes of one canonical native input, streamed without loading it all.
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -20,6 +30,12 @@ pub struct FileIdentity {
 }
 
 impl FileIdentity {
+    /// Read and hash a native input while retaining its canonical identity.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error when the path cannot be made absolute, opened, read, or
+    /// canonicalized.
     pub fn read(path: &Path) -> Result<Self> {
         let path = crate::absolute(path)?;
         let canonical_path = fs::canonicalize(&path).map_err(|e| io(&path, e))?;
@@ -31,15 +47,22 @@ impl FileIdentity {
             if size == 0 {
                 break;
             }
-            digest.update(&buffer[..size]);
+            let (bytes_read, _) = buffer.split_at(size);
+            digest.update(bytes_read);
         }
         Ok(Self {
             path,
             canonical_path,
-            sha256: format!("{:x}", digest.finalize()),
+            sha256: encode_sha256(&digest.finalize())?,
         })
     }
 
+    /// Validate that this input still names the same file with the same bytes.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error when the input cannot be read or its identity differs
+    /// from the recorded identity.
     pub fn validate(&self) -> Result<()> {
         let current = Self::read(&self.path)?;
         if current.canonical_path != self.canonical_path || current.sha256 != self.sha256 {
@@ -66,7 +89,7 @@ pub struct NativeConfig {
     pub compiler_id: String,
     pub compiler_version: String,
     pub include_dirs: Vec<PathBuf>,
-    /// Subset of include_dirs searched after ordinary include directories.
+    /// Subset of `include_dirs` searched after ordinary include directories.
     pub system_include_dirs: Vec<PathBuf>,
     pub compile_definitions: Vec<String>,
     pub compile_options: Vec<String>,
@@ -80,6 +103,13 @@ pub struct NativeConfig {
 }
 
 impl NativeConfig {
+    /// Load and validate a recorded native configuration for `target`.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error when the record cannot be read, decoded, or validated
+    /// against its target, compiler environment, native inputs, or `QuEST`
+    /// installation.
     pub fn load(path: &Path, target: &str) -> Result<Self> {
         let bytes = fs::read(path).map_err(|e| io(path, e))?;
         let config: Self = serde_json::from_slice(&bytes)?;
@@ -133,6 +163,11 @@ impl NativeConfig {
         Ok(config)
     }
 
+    /// Write this native configuration as canonical, newline-terminated JSON.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error when serialization or writing fails.
     pub fn write(&self, path: &Path) -> Result<()> {
         let mut bytes = serde_json::to_vec_pretty(self)?;
         bytes.push(b'\n');
@@ -141,6 +176,11 @@ impl NativeConfig {
 
     /// Emit dependencies after compiling the CXX bridge, so static library
     /// dependencies retain their required order in Cargo's native-link metadata.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error when recorded runtime paths cannot be encoded or do not
+    /// satisfy the supported loader policy.
     pub fn emit_cargo_link_metadata(&self) -> Result<()> {
         for directory in &self.link_search_dirs {
             println!("cargo:rustc-link-search=native={}", directory.display());
@@ -160,6 +200,12 @@ impl NativeConfig {
         self.emit_runtime_paths()
     }
 
+    /// Emit final-target runtime linker arguments for the recorded directories.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error when a runtime path cannot be represented by the
+    /// supported loader policy.
     pub fn emit_runtime_paths(&self) -> Result<()> {
         for option in &self.link_options {
             println!("cargo:rustc-link-arg={option}");

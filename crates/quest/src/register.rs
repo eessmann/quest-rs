@@ -64,16 +64,23 @@ impl<'env, K: RegisterKind> Register<'env, K> {
             kind: PhantomData,
         })
     }
-    pub fn num_qubits(&self) -> QubitCount {
+    #[must_use]
+    pub const fn num_qubits(&self) -> QubitCount {
         self.count
     }
-    pub fn dimension(&self) -> usize {
+    #[must_use]
+    pub const fn dimension(&self) -> usize {
         self.count.dimension()
     }
-    pub fn environment(&self) -> &'env Environment {
+    #[must_use]
+    pub const fn environment(&self) -> &'env Environment {
         self.reservation.environment
     }
-    pub(crate) fn is_density(&self) -> bool {
+    #[expect(
+        clippy::unused_self,
+        reason = "The receiver infers the sealed register kind at execution call sites"
+    )]
+    pub(crate) const fn is_density(&self) -> bool {
         K::DENSITY
     }
     pub(crate) fn pin(&mut self) -> Pin<&mut quest_sys::Qureg> {
@@ -86,15 +93,21 @@ impl<'env, K: RegisterKind> Register<'env, K> {
                 bound: self.count.get(),
             })
         } else {
-            Ok(qubit as i32)
+            i32::try_from(qubit).map_err(|_| Error::Overflow)
         }
     }
+    /// # Errors
+    /// Propagates native initialization failure.
     pub fn init_zero(&mut self) -> Result<()> {
         quest_sys::init_zero_state(self.pin()).context("initializing zero state")
     }
+    /// # Errors
+    /// Propagates native initialization failure.
     pub fn init_plus(&mut self) -> Result<()> {
         quest_sys::init_plus_state(self.pin()).context("initializing plus state")
     }
+    /// # Errors
+    /// Rejects incorrect amplitude counts, nonfinite entries, resource limits, or native initialization failure.
     pub fn init_pure(&mut self, amplitudes: &[Complex64]) -> Result<()> {
         if amplitudes.len() != self.dimension() {
             return Err(Error::Value("pure-state amplitude count must be 2^qubits"));
@@ -105,22 +118,32 @@ impl<'env, K: RegisterKind> Register<'env, K> {
         let buffer = pack(amplitudes.iter().copied(), amplitudes.len())?;
         quest_sys::init_arbitrary_pure_state(self.pin(), &buffer).context("initializing pure state")
     }
+    /// # Errors
+    /// Rejects an out-of-range qubit or native gate failure.
     pub fn h(&mut self, qubit: usize) -> Result<()> {
         let q = self.check_qubit(qubit)?;
         quest_sys::apply_hadamard(self.pin(), q).context("applying H")
     }
+    /// # Errors
+    /// Rejects an out-of-range qubit or native gate failure.
     pub fn x(&mut self, qubit: usize) -> Result<()> {
         let q = self.check_qubit(qubit)?;
         quest_sys::apply_pauli_x(self.pin(), q).context("applying X")
     }
+    /// # Errors
+    /// Rejects an out-of-range qubit or native gate failure.
     pub fn y(&mut self, qubit: usize) -> Result<()> {
         let q = self.check_qubit(qubit)?;
         quest_sys::apply_pauli_y(self.pin(), q).context("applying Y")
     }
+    /// # Errors
+    /// Rejects an out-of-range qubit or native gate failure.
     pub fn z(&mut self, qubit: usize) -> Result<()> {
         let q = self.check_qubit(qubit)?;
         quest_sys::apply_pauli_z(self.pin(), q).context("applying Z")
     }
+    /// # Errors
+    /// Rejects out-of-range or overlapping qubits and native gate failure.
     pub fn cx(&mut self, control: usize, target: usize) -> Result<()> {
         let c = self.check_qubit(control)?;
         let t = self.check_qubit(target)?;
@@ -129,6 +152,8 @@ impl<'env, K: RegisterKind> Register<'env, K> {
         }
         quest_sys::apply_controlled_pauli_x(self.pin(), c, t).context("applying CX")
     }
+    /// # Errors
+    /// Rejects out-of-range qubits, invalid native outcomes, or native measurement failure.
     pub fn measure(&mut self, qubit: usize) -> Result<Outcome> {
         let q = self.check_qubit(qubit)?;
         match quest_sys::apply_qubit_measurement(self.pin(), q).context("measuring qubit")? {
@@ -137,6 +162,8 @@ impl<'env, K: RegisterKind> Register<'env, K> {
             _ => Err(Error::Value("backend returned an invalid outcome")),
         }
     }
+    /// # Errors
+    /// Rejects out-of-range qubits, invalid probabilities, or native calculation failure.
     pub fn probability(&self, qubit: usize, outcome: Outcome) -> Result<Probability> {
         let q = self.check_qubit(qubit)?;
         Probability::new(
@@ -144,9 +171,13 @@ impl<'env, K: RegisterKind> Register<'env, K> {
                 .context("calculating outcome probability")?,
         )
     }
+    /// # Errors
+    /// Propagates native probability calculation failure.
     pub fn total_probability(&self) -> Result<f64> {
         quest_sys::calc_total_prob(&self.native).context("calculating total probability")
     }
+    /// # Errors
+    /// Rejects allocation overflow, memory budget exhaustion, or native clone failure.
     pub fn try_clone(&self) -> Result<Self> {
         let entries = if K::DENSITY {
             self.dimension()
@@ -173,6 +204,8 @@ impl<'env, K: RegisterKind> Register<'env, K> {
     }
 }
 impl<'env> Register<'env, StateVector> {
+    /// # Errors
+    /// Rejects out-of-range indices or native read failure.
     pub fn amplitude(&self, index: usize) -> Result<Complex64> {
         if index >= self.dimension() {
             return Err(Error::Index {
@@ -180,10 +213,15 @@ impl<'env> Register<'env, StateVector> {
                 bound: self.dimension(),
             });
         }
-        let value =
-            quest_sys::get_qureg_amp(&self.native, index as i64).context("reading amplitude")?;
+        let value = quest_sys::get_qureg_amp(
+            &self.native,
+            i64::try_from(index).map_err(|_| Error::Overflow)?,
+        )
+        .context("reading amplitude")?;
         Ok(Complex64::new(value.re, value.im))
     }
+    /// # Errors
+    /// Rejects out-of-range intervals, allocation limits, or native read failure.
     pub fn amplitudes(&self, start: usize, count: usize) -> Result<Vec<Complex64>> {
         if start.checked_add(count).ok_or(Error::Overflow)? > self.dimension() {
             return Err(Error::Index {
@@ -192,12 +230,18 @@ impl<'env> Register<'env, StateVector> {
             });
         }
         let _scratch = self.environment().reserve(bytes_for(count, 3)?)?;
-        let native = quest_sys::get_qureg_amps(&self.native, start as i64, count as i64)
-            .context("reading amplitudes")?;
+        let native = quest_sys::get_qureg_amps(
+            &self.native,
+            i64::try_from(start).map_err(|_| Error::Overflow)?,
+            i64::try_from(count).map_err(|_| Error::Overflow)?,
+        )
+        .context("reading amplitudes")?;
         let mut out = reserve_vec(count)?;
         out.extend(native.into_iter().map(|v| Complex64::new(v.re, v.im)));
         Ok(out)
     }
+    /// # Errors
+    /// Rejects allocation overflow, memory budget exhaustion, or native read failure.
     pub fn snapshot(&self) -> Result<Mat<Complex64>> {
         let _scratch = self.environment().reserve(bytes_for(
             self.dimension().checked_add(4).ok_or(Error::Overflow)?,
@@ -205,15 +249,26 @@ impl<'env> Register<'env, StateVector> {
         )?)?;
         let mut out = matrix(self.dimension(), 1)?;
         for offset in (0..self.dimension()).step_by(4096) {
-            let count = (self.dimension() - offset).min(4096);
-            let native = quest_sys::get_qureg_amps(&self.native, offset as i64, count as i64)
-                .context("exporting state snapshot")?;
+            let count = self
+                .dimension()
+                .checked_sub(offset)
+                .ok_or(Error::Overflow)?
+                .min(4096);
+            let native = quest_sys::get_qureg_amps(
+                &self.native,
+                i64::try_from(offset).map_err(|_| Error::Overflow)?,
+                i64::try_from(count).map_err(|_| Error::Overflow)?,
+            )
+            .context("exporting state snapshot")?;
             for (i, value) in native.into_iter().enumerate() {
-                out[(offset + i, 0)] = Complex64::new(value.re, value.im);
+                out[(offset.checked_add(i).ok_or(Error::Overflow)?, 0)] =
+                    Complex64::new(value.re, value.im);
             }
         }
         Ok(out)
     }
+    /// # Errors
+    /// Rejects resource limits or native state transfer failure.
     pub fn to_density(&self) -> Result<Register<'env, DensityMatrix>> {
         let mut density = self.environment().density_matrix(self.count)?;
         let values = self.amplitudes(0, self.dimension())?;
@@ -221,6 +276,8 @@ impl<'env> Register<'env, StateVector> {
         Ok(density)
     }
     #[cfg(feature = "ndarray")]
+    /// # Errors
+    /// Rejects resource limits or native state read failure.
     pub fn to_ndarray(&self) -> Result<ndarray::Array1<Complex64>> {
         Ok(ndarray::Array1::from_vec(
             self.amplitudes(0, self.dimension())?,
@@ -228,6 +285,8 @@ impl<'env> Register<'env, StateVector> {
     }
 }
 impl Register<'_, DensityMatrix> {
+    /// # Errors
+    /// Rejects out-of-range matrix coordinates or native read failure.
     pub fn entry(&self, row: usize, col: usize) -> Result<Complex64> {
         if row >= self.dimension() || col >= self.dimension() {
             return Err(Error::Index {
@@ -235,12 +294,18 @@ impl Register<'_, DensityMatrix> {
                 bound: self.dimension(),
             });
         }
-        let value = quest_sys::get_density_qureg_amp(&self.native, row as i64, col as i64)
-            .context("reading density entry")?;
+        let value = quest_sys::get_density_qureg_amp(
+            &self.native,
+            i64::try_from(row).map_err(|_| Error::Overflow)?,
+            i64::try_from(col).map_err(|_| Error::Overflow)?,
+        )
+        .context("reading density entry")?;
         Ok(Complex64::new(value.re, value.im))
     }
     /// Write a logical rectangular matrix view without changing its orientation.
     /// This is a raw state edit; positive semidefiniteness is the caller's model choice.
+    /// # Errors
+    /// Rejects out-of-range blocks, nonfinite entries, resource limits, or native write failure.
     pub fn write_block<T: Conjugate<Canonical = Complex64>>(
         &mut self,
         row: usize,
@@ -269,14 +334,16 @@ impl Register<'_, DensityMatrix> {
         }
         quest_sys::set_density_qureg_amps(
             self.pin(),
-            row as i64,
-            col as i64,
+            i64::try_from(row).map_err(|_| Error::Overflow)?,
+            i64::try_from(col).map_err(|_| Error::Overflow)?,
             &values,
-            view.nrows() as i64,
-            view.ncols() as i64,
+            i64::try_from(view.nrows()).map_err(|_| Error::Overflow)?,
+            i64::try_from(view.ncols()).map_err(|_| Error::Overflow)?,
         )
         .context("writing density block")
     }
+    /// # Errors
+    /// Rejects allocation overflow, memory budget exhaustion, or native read failure.
     pub fn snapshot(&self) -> Result<Mat<Complex64>> {
         let entries = self
             .dimension()
@@ -288,29 +355,35 @@ impl Register<'_, DensityMatrix> {
         // Bounded column blocks avoid the native rectangular getter's transpose scratch growing with the full density matrix.
         for c in 0..self.dimension() {
             for r in (0..self.dimension()).step_by(4096) {
-                let rows = (self.dimension() - r).min(4096);
+                let rows = self
+                    .dimension()
+                    .checked_sub(r)
+                    .ok_or(Error::Overflow)?
+                    .min(4096);
                 let buffer = quest_sys::get_density_qureg_amps(
                     &self.native,
-                    r as i64,
-                    c as i64,
-                    rows as i64,
+                    i64::try_from(r).map_err(|_| Error::Overflow)?,
+                    i64::try_from(c).map_err(|_| Error::Overflow)?,
+                    i64::try_from(rows).map_err(|_| Error::Overflow)?,
                     1,
                 )
                 .context("exporting density snapshot")?;
                 for (i, v) in buffer.into_iter().enumerate() {
-                    out[(r + i, c)] = Complex64::new(v.re, v.im);
+                    out[(r.checked_add(i).ok_or(Error::Overflow)?, c)] = Complex64::new(v.re, v.im);
                 }
             }
         }
         Ok(out)
     }
+    /// # Errors
+    /// Rejects an out-of-range qubit or native channel failure.
     pub fn dephase(&mut self, qubit: usize, probability: Probability) -> Result<()> {
         let q = self.check_qubit(qubit)?;
         quest_sys::mix_dephasing(self.pin(), q, probability.get()).context("applying dephasing")
     }
 }
 
-pub(crate) fn logical<T: Conjugate<Canonical = Complex64>>(
+pub fn logical<T: Conjugate<Canonical = Complex64>>(
     view: MatRef<'_, T>,
     row: usize,
     col: usize,
@@ -318,13 +391,13 @@ pub(crate) fn logical<T: Conjugate<Canonical = Complex64>>(
     let value = view.canonical()[(row, col)];
     if T::IS_CANONICAL { value } else { value.conj() }
 }
-pub(crate) fn matrix(rows: usize, cols: usize) -> Result<Mat<Complex64>> {
+pub fn matrix(rows: usize, cols: usize) -> Result<Mat<Complex64>> {
     let mut out = Mat::new();
     out.try_reserve(rows, cols).map_err(|_| Error::Allocation)?;
     out.resize_with(rows, cols, |_, _| Complex64::new(0., 0.));
     Ok(out)
 }
-pub(crate) fn pack(
+pub fn pack(
     values: impl Iterator<Item = Complex64>,
     count: usize,
 ) -> Result<Vec<quest_sys::QuestComplex>> {

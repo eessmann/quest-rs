@@ -1,17 +1,26 @@
 # QuEST for Rust
 
-A Rust workspace for QuEST 4.3: environment-bound simulation resources, a pure
-circuit DAG and compiler, and an OpenQASM-style circuit macro. The facade package
-is **`quest-rs`**, with Rust library name **`quest`**.
+Structured OpenQASM 3.1 simulator programs, exact ideal circuit graphs, and
+native QuEST 4.3 execution. The facade package is **`quest-rs`**; its Rust library
+name is **`quest`**.
+
+Read the [guide](docs/book/src/index.md) for the
+[interface matrix](docs/book/src/interfaces.md), language semantics, executable
+Bell/teleportation/feedback tutorials, include/export workflows, verified SSA,
+and optimization certificates. The runnable source is
+[examples/tutorials.rs](crates/quest/examples/tutorials.rs).
 
 | Crate | Purpose |
 | --- | --- |
-| `crates/quest` | Typed runtime, faer snapshots, native preparation and execution |
-| `crates/quest-sys` | Audited CXX bridge and native RAII resources |
-| `crates/quest-circuit` | Pure circuit construction, exact angles, dependency DAG, compiler stages and transformations |
-| `crates/quest-macros` | Rust token-tree frontend, without native dependencies |
-| `crates/quest-build` | Shared installed-native configuration and final-executable runtime paths |
-| `crates/xtask` | Binding generation and native setup |
+| `quest` (`quest-rs`) | Environment-bound registers, native preparation and execution |
+| `quest-language` | Owned sources/diagnostics, gate semantics, typed language, SSA and interpreter |
+| `quest-qasm` | Explicit include resolution and canonical structured text export |
+| `quest-circuit` | Structured pipeline, ideal DAG, exact transformations and bounded fusion |
+| `quest-macros` | Structured `circuit!` / `circuit_file!`, plus migration `legacy_circuit!` |
+| `quest-math` | Exact algebra and independently checked synthesis certificates |
+| `quest-optimizer-client` / `quest-optimizer-worker` | Optional bounded external engine boundary |
+| `quest-sys` | Audited CXX bridge and native RAII resources |
+| `quest-build` / `xtask` | Native configuration, runtime paths and binding generation |
 
 ## Build
 
@@ -60,125 +69,113 @@ fn main() -> Result<(), quest_build::BuildError> {
 }
 ```
 
-## Runtime
+## Structured programs
 
-```rust,no_run
-use quest::{Environment, QubitCount};
+`circuit!` now constructs a `StructuredProgram`: typed classical expressions,
+scoped declarations, nonrecursive gates and subroutines, arrays and references,
+runtime branches/loops, measurement, reset and feedback. Rust `${ ... }`
+captures evaluate once during construction. `circuit_file!` admits text from
+compiler-tracked files. `quest-qasm` provides pure in-memory text import with an
+explicit include resolver and owned source snapshots.
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let env = Environment::builder().build()?;
-    let mut register = env.state_vector(QubitCount::new(2)?)?;
-    register.h(0)?;
-    register.cx(0, 1)?;
-    let snapshot = register.snapshot()?; // owned faer::Mat<Complex64>
-    drop(register);
-    env.close()?;
-    println!("{:?}", snapshot); // independent of the environment lifetime
-    Ok(())
-}
+Use `Environment::prepare_structured`, then run against an existing register
+with `RunInputs`. The tutorials execute the same functions tested by the
+process-isolated integration test:
+
+```sh
+cargo run -p quest-rs --example tutorials --locked
+cargo test -p quest-rs --test tutorials --locked
+cargo test -p quest-circuit --test tutorials --locked
 ```
 
-An environment is unique per process and restricted to its creating thread.
-Registers and prepared programs borrow it and cannot cross threads. Native calls
-use the same bridge lifecycle and owner-thread admission even through direct
-`quest-sys` use. Safe code cannot disable native validation. `close()` reports a
-failed shutdown while retaining its owner; `Drop` is non-panicking. Leaking a
-native owner still prevents finalization.
+Structured compilation consumes checked stages:
 
-The default environment explicitly selects CPU execution without native
-multithreading. GPU and native multithreading are explicit builder choices.
-Distributed execution is not admitted by the facade's initial resource policy.
-`MemoryBudget` bounds admission using conservative host, device and scratch
-estimates; allocator or native failures remain possible. Exported snapshots leave
-that accounting when returned and belong to the caller.
-
-## OpenQASM-style Rust macro
-
-```rust,no_run
-use quest::{Environment, Shots, circuit};
-
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let bell = circuit! {
-        qubit[2] q;
-        bit[2] c;
-        h q[0];
-        cx q[0], q[1];
-        c[0] = measure q[0];
-        c[1] = measure q[1];
-    }?;
-    let env = Environment::builder().build()?;
-    let mut prepared = env.prepare(bell)?;
-    let samples = prepared.sample_zeroed(Shots::new(1024)?, &[2026, 9, 10])?;
-    println!("{:?}", samples.counts);
-    drop(prepared);
-    env.close()?;
-    Ok(())
-}
+```text
+source / circuit! / typed Builder -> TypedModule -> verified SSA
+    -> lower -> plan -> PreparedStructuredProgram<'env> -> bounded run
 ```
 
-Gate semantics follow the documented OpenQASM 3.1.0 subset. The macro parses Rust
-tokens, with explicit array indices, `pi` angles, `${rust_expression}` interpolation,
-`ctrl`/`negctrl`/`inv @` modifiers, measurement, reset and barriers. Interpolations
-execute once in construction order. This is a Rust DSL, not an OpenQASM text
-parser. Pure consumers use `quest-circuit`; its default `macros` feature reexports
-`circuit!`, and optional `codespan-reporting` renders owned source diagnostics.
-See [the circuit profile](crates/quest-circuit/README.md) for supported syntax.
+Scalar joins and loop-carried values use SSA block arguments. Memory tokens and
+alias sets preserve effects. An independent verifier checks ownership, dominance,
+types, interfaces, predecessor sealing and resource bounds. Classical and static-window quantum SSA
+optimization are explicit and reverified; frozen structured syntax remains the
+authority for canonical export. Quantum windows admit guarded inverse
+cancellation and CNOT/Clifford+T parity resynthesis without crossing effects or
+control-flow edges.
 
-## Circuit semantics
+This is a bounded OpenQASM 3.1 simulator profile, not pulse/timed hardware
+execution. Numeric widths are 1–64 bits and floats are binary32/binary64. `pi` is
+a floating constant; integer `1/2` is zero. Stored `angle` values wrap modulo a
+turn. The U gate follows OpenQASM 3.1's scalar phase convention. See
+[the language chapter](docs/book/src/language.md) before migrating old programs.
 
-`ProgramBuilder` allocates program-owned logical qubits and classical bits.
-Operations preserve caller target order: target zero is the least-significant
-local matrix bit. The private DAG orders shared quantum wires, classical hazards,
-barriers and stochastic effects; public occurrence IDs are independent of graph
-storage slots. Scheduling is deterministic and native execution is serial.
+## Ideal circuits and optimization
 
-Compilation consumes owners:
+`ProgramBuilder` constructs finite ideal circuits with program-owned qubit/bit
+identities, explicit gate occurrences and a dependency DAG. It retains exact
+rational multiples of π and symbolic parameters before binding. The old static
+macro frontend is available as `legacy_circuit!`; it has different semantics
+from primary `circuit!`.
 
 ```text
 ProgramBuilder -> ValidatedProgram -> BoundProgram -> LoweredProgram
-               -> ExecutablePlan -> PreparedProgram<'env>
+    -> ExecutablePlan -> PreparedProgram<'env>
 ```
 
-Exact rational multiples of pi and declared parameters are distinct from finite
-floating angles. `UnitaryCircuit` provides coherent control and adjoint only for
-exact symbolic operations. Global phase is explicit; controlling a phase makes
-it relative, and `Rz(2*pi)` remains `-I`.
+Explicit passes provide phase-correct local rewrites, bounded CNOT synthesis,
+exact affine parity folding, and numerical fusion after binding. Optional
+`workers` APIs call pinned synthesis/QuiZX engines through a bounded protocol;
+parent-side checks verify candidates and retain certificates. Local rotation
+error bounds, exact operator equality, and numerical fusion rounding changes
+remain distinct claims. See [optimization](docs/book/src/optimization.md).
 
-Numerical operators own immutable faer matrices. Their semantics are `A|psi>` or
-`A rho A†`; approximate unitarity evidence does not grant an exact inverse.
-Products and residuals request `Par::Seq`. Numerical fusion may change rounding;
-no cross-platform bitwise or certified approximation guarantee is implied.
-Gate buffers are packed row-major; density state storage is column-major;
-rectangular view adapters preserve logical values, including conjugation.
+Target order is semantic: target zero is the least significant local matrix bit.
+Global phase is explicit, so controlled `Rz(2*pi)` cannot be erased as identity.
+Numerical operators own immutable faer matrices with `A|psi>` / `A rho A†`
+semantics. Approximate unitarity evidence grants no exact inverse. Products use
+sequential faer evaluation; fusion may change rounding.
 
-Preparation builds native caches transactionally. `run` can partially modify a
-register on failure and reports its completed prefix. It checks ambient rounding,
-underflow and native numerical policy before mutation. Sampling uses explicit
-1–16 seeds for QuEST's process-wide RNG and initializes a fresh zero state on every
-shot. The first batch retains a 4096-byte native RNG allowance in the environment
-budget; transient seed copies are charged separately. Direct `quest-sys` calls
-are outside facade memory accounting. Channels require density registers; reset uses trajectories on statevectors
-and a complete channel on density matrices.
+## Native ownership and effects
 
-## Validation and generation
+An environment is unique per process and confined to its creating thread.
+Registers and prepared programs borrow it. Drop them before explicit closure;
+failed `close()` retains its owner, and `Drop` is non-panicking. Safe low-level
+bridge use retains lifecycle and native validation checks too.
+
+CPU execution without native multithreading is the default. GPU and threading
+are explicit choices. `MemoryBudget` bounds admission with conservative host,
+device and scratch estimates. Returned snapshots belong to the caller and leave
+facade accounting. Direct `quest-sys` calls are outside facade memory accounting.
+
+Preparation builds caches transactionally. Execution can partially modify a
+register before failure and reports completed work; it checks numerical policy
+before mutation. Channels require density registers. Reset uses trajectories on
+state vectors and a complete channel on density matrices. Ideal sampling APIs
+use explicit seeds and fresh zero initialization for each shot. See
+[runtime limits and ownership](docs/book/src/runtime.md).
+
+## Validation and documentation
 
 ```sh
 cargo nextest run --workspace --locked
 cargo test --doc --workspace --locked
 cargo fmt --all -- --check
-cargo clippy --workspace --all-targets --locked
+cargo clippy --workspace --all-targets --locked -- -D warnings
 cargo run --locked -p xtask -- generate-quest-bindings --check
-cargo test --locked -p quest-circuit --no-default-features
+mdbook build docs/book
 ```
 
-Binding generation additionally requires libclang. Set `LIBCLANG_PATH` if needed;
-the generator obtains a coherent compiler include search rather than mixing C++
-standard libraries. Edit its templates and adapter registry, then regenerate the
-artifacts together. Native tests are serialized in Nextest; lifecycle regressions
-use subprocesses where ordinary Cargo's in-process test harness needs isolation.
+The book is validated with mdBook 0.5.4 and includes code directly from tested
+Rust sources. Pure language/QASM/circuit tests do not need QuEST. Native lifecycle
+tests use the serialized Nextest group or explicit process isolation. Optional
+worker tutorials require a supplied worker executable path.
 
-The [architecture](docs/superpowers/specs/2026-09-10-quest-rust-design.md),
-[dated bridge audit](docs/superpowers/specs/2026-09-10-quest-bridge-audit.md), and
+Binding generation also needs libclang (`LIBCLANG_PATH` when necessary). Edit
+generator templates and the adapter registry, then regenerate artifacts together.
+The [approved compiler plan](docs/superpowers/plans/2026-09-10-openqasm-ssa-implementation.md)
+tracks current implementation and evidence. The
+[dated bridge audit](docs/superpowers/specs/2026-09-10-quest-bridge-audit.md) and
 [compiler research](docs/superpowers/specs/2026-09-10-quest-circuit-research.md)
-explain the invariants and later work. OpenQASM text import/export, structured
-runtime loops and advanced synthesis, routing and ZX passes are later milestones.
+preserve historical findings; they are not current feature checklists.
+
+Local implementation evidence and platform limits are recorded in [the M6–M11 verification record](docs/verification/2026-09-10-m6-m11.md).

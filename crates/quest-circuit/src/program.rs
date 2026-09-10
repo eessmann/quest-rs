@@ -1,6 +1,7 @@
 use crate::{
+    Angle, BitId, Control, Error, Gate, GateDefinitionId, Instruction, MatrixPolicy,
+    NumericalOperator, OccurrenceId, Operation, ParameterId, QubitId, Result, SourceSpan,
     model::{Occurrence, SemanticOperation},
-    *,
 };
 use petgraph::{
     Direction,
@@ -47,9 +48,13 @@ pub struct ProgramBuilder {
     matrix_bytes: usize,
 }
 impl ProgramBuilder {
+    /// # Errors
+    /// Rejects dimensions or ranges outside their supported bounds.
     pub fn new(num_qubits: usize, num_bits: usize) -> Result<Self> {
         Self::with_limits(num_qubits, num_bits, ProgramLimits::default())
     }
+    /// # Errors
+    /// Rejects dimensions that exceed the supplied program limits.
     pub fn with_limits(num_qubits: usize, num_bits: usize, limits: ProgramLimits) -> Result<Self> {
         if num_qubits == 0 || num_qubits > limits.max_qubits {
             return Err(Error::Budget("qubit count"));
@@ -73,13 +78,17 @@ impl ProgramBuilder {
             matrix_bytes: 0,
         })
     }
+    #[must_use]
     pub const fn num_qubits(&self) -> usize {
         self.num_qubits
     }
+    #[must_use]
     pub const fn num_bits(&self) -> usize {
         self.num_bits
     }
-    pub fn qubit(&self, index: usize) -> Result<QubitId> {
+    /// # Errors
+    /// Rejects an index outside this program's qubit range.
+    pub const fn qubit(&self, index: usize) -> Result<QubitId> {
         if index >= self.num_qubits {
             Err(Error::InvalidId)
         } else {
@@ -89,7 +98,9 @@ impl ProgramBuilder {
             })
         }
     }
-    pub fn bit(&self, index: usize) -> Result<BitId> {
+    /// # Errors
+    /// Rejects an index outside this program's classical bit range.
+    pub const fn bit(&self, index: usize) -> Result<BitId> {
         if index >= self.num_bits {
             Err(Error::InvalidId)
         } else {
@@ -99,6 +110,8 @@ impl ProgramBuilder {
             })
         }
     }
+    /// # Errors
+    /// Rejects empty or duplicate names and exhausted parameter limits.
     pub fn parameter(&mut self, name: impl Into<String>) -> Result<ParameterId> {
         let name = name.into();
         if name.is_empty() || self.parameters.contains(&name) {
@@ -119,6 +132,8 @@ impl ProgramBuilder {
     }
     /// Definitions contain complete immutable unitary programs. Forward or
     /// recursive references cannot be constructed; calls expand transactionally.
+    /// # Errors
+    /// Rejects duplicate names or a definition exceeding the program limits.
     pub fn define(
         &mut self,
         name: impl Into<String>,
@@ -143,6 +158,12 @@ impl ProgramBuilder {
         self.definitions.push((name, body));
         Ok(id)
     }
+    /// # Errors
+    /// Rejects invalid identifiers, arity or parameter mismatches, overlapping operands, and exhausted expansion limits.
+    #[expect(
+        clippy::too_many_lines,
+        reason = "Definition expansion validates and stages a single transactional append"
+    )]
     pub fn call(
         &mut self,
         definition: GateDefinitionId,
@@ -189,11 +210,16 @@ impl ProgramBuilder {
         let mut expanded = Vec::with_capacity(body.occurrences.len());
         for id in body.schedule() {
             let o = ordered.get(id).ok_or(Error::InvalidId)?;
-            let map_controls = |inner: &[Control]| -> Vec<Control> {
+            let map_controls = |inner: &[Control]| -> Result<Vec<Control>> {
                 inner
                     .iter()
-                    .map(|c| Control::new(arguments[c.qubit().index], c.state()))
-                    .chain(controls.iter().copied())
+                    .map(|c| {
+                        Ok(Control::new(
+                            *arguments.get(c.qubit().index).ok_or(Error::InvalidId)?,
+                            c.state(),
+                        ))
+                    })
+                    .chain(controls.iter().copied().map(Ok))
                     .collect()
             };
             let operation = match &o.operation {
@@ -205,23 +231,23 @@ impl ProgramBuilder {
                     gate.substitute(&bindings)?,
                     &targets
                         .iter()
-                        .map(|q| arguments[q.index])
-                        .collect::<Vec<_>>(),
-                    &map_controls(inner),
+                        .map(|q| arguments.get(q.index).copied().ok_or(Error::InvalidId))
+                        .collect::<Result<Vec<_>>>()?,
+                    &map_controls(inner)?,
                 )?,
                 SemanticOperation::GlobalPhase {
                     angle,
                     controls: inner,
                 } => SemanticOperation::GlobalPhase {
                     angle: angle.substitute(&bindings)?,
-                    controls: self.operands(&[], &map_controls(inner))?,
+                    controls: self.operands(&[], &map_controls(inner)?)?,
                 },
                 SemanticOperation::Barrier { qubits } => SemanticOperation::Barrier {
                     qubits: qubits
                         .iter()
-                        .map(|q| arguments[q.index])
-                        .chain(controls.iter().map(|c| c.qubit()))
-                        .collect(),
+                        .map(|q| arguments.get(q.index).copied().ok_or(Error::InvalidId))
+                        .chain(controls.iter().map(|c| Ok(c.qubit())))
+                        .collect::<Result<Vec<_>>>()?,
                 },
                 _ => return Err(Error::NotUnitary),
             };
@@ -232,15 +258,19 @@ impl ProgramBuilder {
             .iter()
             .enumerate()
             .map(|(offset, id)| {
-                (
+                Ok((
                     *id,
                     OccurrenceId {
                         owner: self.owner,
-                        index: self.occurrences.len() + offset,
+                        index: self
+                            .occurrences
+                            .len()
+                            .checked_add(offset)
+                            .ok_or(Error::Budget("definition expansion"))?,
                     },
-                )
+                ))
             })
-            .collect();
+            .collect::<Result<BTreeMap<_, _>>>()?;
         let explicit_edges = body
             .explicit_edges
             .iter()
@@ -268,18 +298,20 @@ impl ProgramBuilder {
         self.explicit_edges.extend(explicit_edges);
         Ok(ids)
     }
-    fn check_qubit(&self, q: QubitId) -> Result<()> {
-        if q.owner != self.owner || q.index >= self.num_qubits {
-            Err(Error::InvalidId)
-        } else {
+    const fn check_qubit(&self, q: QubitId) -> Result<()> {
+        let in_bounds = q.index < self.num_qubits;
+        if in_bounds && q.owner == self.owner {
             Ok(())
+        } else {
+            Err(Error::InvalidId)
         }
     }
-    fn check_bit(&self, b: BitId) -> Result<()> {
-        if b.owner != self.owner || b.index >= self.num_bits {
-            Err(Error::InvalidId)
-        } else {
+    const fn check_bit(&self, b: BitId) -> Result<()> {
+        let in_bounds = b.index < self.num_bits;
+        if in_bounds && b.owner == self.owner {
             Ok(())
+        } else {
+            Err(Error::InvalidId)
         }
     }
     fn check_angle(&self, a: &Angle) -> Result<()> {
@@ -348,6 +380,8 @@ impl ProgramBuilder {
         });
         Ok(id)
     }
+    /// # Errors
+    /// Rejects invalid identifiers, gate arity, angles, overlapping operands, or exhausted operation limits.
     pub fn gate(
         &mut self,
         gate: Gate,
@@ -357,6 +391,8 @@ impl ProgramBuilder {
         let operation = self.gate_operation(gate, targets, controls)?;
         self.push(operation)
     }
+    /// # Errors
+    /// Rejects invalid condition or gate operands, angles, arity, or exhausted operation limits.
     pub fn gate_if(
         &mut self,
         bit: BitId,
@@ -373,21 +409,29 @@ impl ProgramBuilder {
             operation,
         })
     }
+    /// # Errors
+    /// Rejects invalid angles, control identifiers, duplicate controls, or exhausted operation limits.
     pub fn global_phase(&mut self, angle: Angle, controls: &[Control]) -> Result<OccurrenceId> {
         self.check_angle(&angle)?;
         let controls = self.operands(&[], controls)?;
         self.push(SemanticOperation::GlobalPhase { angle, controls })
     }
+    /// # Errors
+    /// Rejects invalid qubit or bit identifiers and exhausted operation limits.
     pub fn measure(&mut self, qubit: QubitId, bit: BitId) -> Result<OccurrenceId> {
         self.check_qubit(qubit)?;
         self.check_bit(bit)?;
         self.push(SemanticOperation::Measure { qubit, bit })
     }
+    /// # Errors
+    /// Rejects an invalid qubit identifier or exhausted operation limits.
     pub fn reset(&mut self, qubit: QubitId) -> Result<OccurrenceId> {
         self.check_qubit(qubit)?;
         self.push(SemanticOperation::Reset { qubit })
     }
     /// An empty scope is a whole-register barrier.
+    /// # Errors
+    /// Rejects invalid or duplicate qubits and exhausted operation limits.
     pub fn barrier(&mut self, qubits: &[QubitId]) -> Result<OccurrenceId> {
         let qubits = if qubits.is_empty() {
             (0..self.num_qubits)
@@ -399,6 +443,8 @@ impl ProgramBuilder {
         self.operands(&qubits, &[])?;
         self.push(SemanticOperation::Barrier { qubits })
     }
+    /// # Errors
+    /// Rejects operand or matrix dimensions, invalid identifiers, and exhausted resource limits.
     pub fn numerical(
         &mut self,
         matrix: NumericalOperator,
@@ -427,6 +473,8 @@ impl ProgramBuilder {
         self.matrix_bytes = bytes;
         Ok(id)
     }
+    /// # Errors
+    /// Rejects invalid operands, Kraus dimensions, completeness tolerance, or exhausted resource limits.
     pub fn channel(
         &mut self,
         kraus: Vec<NumericalOperator>,
@@ -466,6 +514,8 @@ impl ProgramBuilder {
         Ok(id)
     }
     /// Adds an explicit order constraint. Acyclicity is established at finish.
+    /// # Errors
+    /// Rejects occurrence identifiers that do not belong to this program.
     pub fn depend(&mut self, before: OccurrenceId, after: OccurrenceId) -> Result<()> {
         for id in [before, after] {
             if id.owner != self.owner || id.index >= self.occurrences.len() {
@@ -475,6 +525,8 @@ impl ProgramBuilder {
         self.explicit_edges.push((before, after));
         Ok(())
     }
+    /// # Errors
+    /// Rejects cyclic dependencies or invalid retained identifiers.
     pub fn finish(self) -> Result<ValidatedProgram> {
         ValidatedProgram::from_parts(
             self.owner,
@@ -580,7 +632,7 @@ impl ValidatedProgram {
             for edge in graph.edges_directed(node, Direction::Outgoing) {
                 let target = edge.target();
                 let degree = degrees.get_mut(&target).ok_or(Error::Cycle)?;
-                *degree -= 1;
+                *degree = degree.checked_sub(1).ok_or(Error::Cycle)?;
                 if *degree == 0 {
                     ready.push(Reverse((graph[target], target)));
                 }
@@ -602,13 +654,17 @@ impl ValidatedProgram {
             schedule,
         })
     }
+    #[must_use]
     pub const fn num_qubits(&self) -> usize {
         self.num_qubits
     }
+    #[must_use]
     pub const fn num_bits(&self) -> usize {
         self.num_bits
     }
-    pub fn qubit(&self, index: usize) -> Result<QubitId> {
+    /// # Errors
+    /// Rejects an index outside this program's qubit range.
+    pub const fn qubit(&self, index: usize) -> Result<QubitId> {
         if index >= self.num_qubits {
             Err(Error::InvalidId)
         } else {
@@ -618,7 +674,9 @@ impl ValidatedProgram {
             })
         }
     }
-    pub fn bit(&self, index: usize) -> Result<BitId> {
+    /// # Errors
+    /// Rejects an index outside this program's classical bit range.
+    pub const fn bit(&self, index: usize) -> Result<BitId> {
         if index >= self.num_bits {
             Err(Error::InvalidId)
         } else {
@@ -639,31 +697,40 @@ impl ValidatedProgram {
             )
         })
     }
+    #[must_use]
     pub fn schedule(&self) -> &[OccurrenceId] {
         &self.schedule
     }
     /// Longest dependency path, counting each operation (including barriers
     /// and effects) as one layer. Explicit ordering constraints are included.
+    #[must_use]
     pub fn dependency_depth(&self) -> usize {
         let mut depths = BTreeMap::new();
         for id in &self.schedule {
-            let node = self.nodes[id];
+            // Every scheduled ID and predecessor is admitted by build().
             let depth = self
-                .graph
-                .edges_directed(node, Direction::Incoming)
-                .map(|edge| depths[&self.graph[edge.source()]])
+                .nodes
+                .get(id)
+                .into_iter()
+                .flat_map(|node| self.graph.edges_directed(*node, Direction::Incoming))
+                .filter_map(|edge| self.graph.node_weight(edge.source()))
+                .filter_map(|predecessor| depths.get(predecessor).copied())
                 .max()
-                .unwrap_or(0)
-                + 1;
+                .unwrap_or(0usize)
+                .saturating_add(1);
             depths.insert(*id, depth);
         }
         depths.values().copied().max().unwrap_or(0)
     }
+    /// # Errors
+    /// Rejects occurrence identifiers that do not belong to this program.
     pub fn has_dependency(&self, before: OccurrenceId, after: OccurrenceId) -> Result<bool> {
         let a = *self.nodes.get(&before).ok_or(Error::InvalidId)?;
         let b = *self.nodes.get(&after).ok_or(Error::InvalidId)?;
         Ok(petgraph::algo::has_path_connecting(&self.graph, a, b, None))
     }
+    /// # Errors
+    /// Rejects effects and numerical operators without exact unitary semantics.
     pub fn into_unitary(self) -> Result<UnitaryCircuit> {
         if self.occurrences.iter().all(|o| o.operation.exact_unitary()) {
             Ok(UnitaryCircuit(self))
@@ -671,6 +738,8 @@ impl ValidatedProgram {
             Err(Error::NotUnitary)
         }
     }
+    /// # Errors
+    /// Rejects missing, duplicate, foreign, or nonfinite bindings and nonfinite angle evaluation.
     pub fn bind(self, bindings: &[(ParameterId, f64)]) -> Result<BoundProgram> {
         let mut values = BTreeMap::new();
         for (id, value) in bindings {
@@ -709,10 +778,13 @@ impl ValidatedProgram {
                 .graph
                 .edge_indices()
                 .map(|edge| {
-                    let (a, b) = self.graph.edge_endpoints(edge).expect("live graph edge");
-                    (self.graph[a], self.graph[b])
+                    let (a, b) = self.graph.edge_endpoints(edge).ok_or(Error::InvalidId)?;
+                    Ok((
+                        *self.graph.node_weight(a).ok_or(Error::InvalidId)?,
+                        *self.graph.node_weight(b).ok_or(Error::InvalidId)?,
+                    ))
                 })
-                .collect(),
+                .collect::<Result<Vec<_>>>()?,
         })
     }
 }
@@ -720,12 +792,16 @@ impl ValidatedProgram {
 #[derive(Debug, Clone)]
 pub struct UnitaryCircuit(ValidatedProgram);
 impl UnitaryCircuit {
+    #[must_use]
     pub fn into_program(self) -> ValidatedProgram {
         self.0
     }
-    pub fn program(&self) -> &ValidatedProgram {
+    #[must_use]
+    pub const fn program(&self) -> &ValidatedProgram {
         &self.0
     }
+    /// # Errors
+    /// Rejects invalid retained identifiers or cyclic dependencies when rebuilding the adjoint.
     pub fn adjoint(self) -> Result<Self> {
         let mut p = self.0;
         p.occurrences.reverse();
@@ -755,6 +831,8 @@ impl UnitaryCircuit {
     }
     /// Coherently controls the complete circuit, including its global phase.
     /// Control qubits must belong to this program and be untouched by its body.
+    /// # Errors
+    /// Rejects invalid or overlapping controls, unsupported operations, and invalid rebuilt dependencies.
     pub fn controlled(self, controls: &[Control]) -> Result<Self> {
         let mut p = self.0;
         let mut unique = BTreeSet::new();
@@ -814,16 +892,20 @@ pub struct BoundProgram {
     pub(crate) dependencies: Vec<(OccurrenceId, OccurrenceId)>,
 }
 impl BoundProgram {
+    #[must_use]
     pub const fn num_qubits(&self) -> usize {
         self.num_qubits
     }
+    #[must_use]
     pub const fn num_bits(&self) -> usize {
         self.num_bits
     }
+    #[must_use]
     pub fn instructions(&self) -> &[Instruction] {
         &self.instructions
     }
     /// Longest retained dependency path, with every operation costing one.
+    #[must_use]
     pub fn dependency_depth(&self) -> usize {
         let mut incoming: BTreeMap<_, Vec<_>> = BTreeMap::new();
         for (a, b) in &self.dependencies {
@@ -835,14 +917,17 @@ impl BoundProgram {
                 .get(&instruction.id)
                 .into_iter()
                 .flatten()
-                .map(|a| depths[a])
+                .filter_map(|a| depths.get(a).copied())
                 .max()
-                .unwrap_or(0)
-                + 1;
+                // The path length is bounded by the admitted instruction count.
+                .unwrap_or(0usize)
+                .saturating_add(1);
             depths.insert(instruction.id, depth);
         }
         depths.values().copied().max().unwrap_or(0)
     }
+    /// # Errors
+    /// Rejects wire counts that cannot be represented by native indices.
     pub fn lower(self) -> Result<LoweredProgram> {
         i32::try_from(self.num_qubits).map_err(|_| Error::NativeIndex)?;
         i32::try_from(self.num_bits).map_err(|_| Error::NativeIndex)?;
@@ -852,6 +937,8 @@ impl BoundProgram {
 #[derive(Debug, Clone)]
 pub struct LoweredProgram(BoundProgram);
 impl LoweredProgram {
+    /// # Errors
+    /// Currently infallible after successful lowering.
     pub fn plan(self) -> Result<ExecutablePlan> {
         Ok(ExecutablePlan(self.0))
     }
@@ -860,30 +947,38 @@ impl LoweredProgram {
 #[derive(Debug, Clone)]
 pub struct ExecutablePlan(BoundProgram);
 impl ExecutablePlan {
+    #[must_use]
     pub fn dependency_depth(&self) -> usize {
         self.0.dependency_depth()
     }
+    #[must_use]
     pub const fn num_qubits(&self) -> usize {
         self.0.num_qubits
     }
+    #[must_use]
     pub const fn num_bits(&self) -> usize {
         self.0.num_bits
     }
+    #[must_use]
     pub fn instructions(&self) -> &[Instruction] {
         &self.0.instructions
     }
-    pub fn bindings(&self) -> &BTreeMap<ParameterId, f64> {
+    #[must_use]
+    pub const fn bindings(&self) -> &BTreeMap<ParameterId, f64> {
         &self.0.bindings
     }
-    pub fn limits(&self) -> ProgramLimits {
+    #[must_use]
+    pub const fn limits(&self) -> ProgramLimits {
         self.0.limits
     }
+    #[must_use]
     pub fn requires_density_matrix(&self) -> bool {
         self.0
             .instructions
             .iter()
             .any(|i| matches!(i.operation, Operation::Channel { .. }))
     }
+    #[must_use]
     pub fn stochastic_order(&self) -> Vec<OccurrenceId> {
         self.0
             .instructions

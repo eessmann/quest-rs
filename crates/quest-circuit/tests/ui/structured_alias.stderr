@@ -1,0 +1,5 @@
+error: overlapping mutable call references
+ --> tests/ui/structured_alias.rs:4:34
+  |
+4 |         array[int,2] data={0,1}; change(data,data); };
+  |                                  ^^^^^^

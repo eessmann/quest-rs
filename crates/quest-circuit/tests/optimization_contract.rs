@@ -3,6 +3,39 @@ use googletest::prelude::*;
 use quest_circuit::*;
 
 #[gtest]
+fn dependency_cancellation_crosses_proven_commuting_gates_only() -> Result<()> {
+    let mut b = ProgramBuilder::new(3, 1)?;
+    let q = b.qubit(0)?;
+    let r = b.qubit(1)?;
+    let c = b.qubit(2)?;
+    b.gate(Gate::T, &[q], &[])?;
+    b.gate(
+        Gate::Rz(Angle::pi(1, 7)?),
+        &[q],
+        &[Control::new(c, ControlState::Zero)],
+    )?;
+    b.gate(Gate::H, &[r], &[])?;
+    b.gate(Gate::Tdg, &[q], &[])?;
+    let (optimized, report) = b.finish()?.optimize_exact()?;
+    expect_eq!(optimized.schedule().len(), 2);
+    expect_eq!(report.removed.len(), 2);
+    for effect in [false, true] {
+        let mut b = ProgramBuilder::new(2, 1)?;
+        let q = b.qubit(0)?;
+        let r = b.qubit(1)?;
+        b.gate(Gate::H, &[q], &[])?;
+        if effect {
+            b.measure(r, b.bit(0)?)?;
+        } else {
+            b.gate(Gate::X, &[q], &[])?;
+        }
+        b.gate(Gate::H, &[q], &[])?;
+        expect_eq!(b.finish()?.optimize_exact()?.0.schedule().len(), 3);
+    }
+    Ok(())
+}
+
+#[gtest]
 fn exact_rotation_merging_is_phase_correct_and_idempotent() -> Result<()> {
     let mut b = ProgramBuilder::new(1, 0)?;
     let q = b.qubit(0)?;
@@ -108,7 +141,7 @@ fn fusion_skips_blocks_when_retained_matrices_exhaust_program_budget() -> Result
 
 #[gtest]
 fn rational_merging_preserves_finite_lowering() -> Result<()> {
-    let angle = Angle::rational_pi(num_rational::BigRational::from_integer(
+    let angle = Angle::rational_pi(quest_circuit::BigRational::from_integer(
         num_bigint::BigInt::from(10).pow(307),
     ))?;
     let mut b = ProgramBuilder::new(1, 0)?;
@@ -143,9 +176,9 @@ fn reports_dependency_depth_before_and_after_exact_rewrites_and_fusion() -> Resu
     b.depend(first, last)?;
     let (p, report) = b.finish()?.bind(&[])?.fuse(FusionOptions::default())?;
     expect_eq!(report.before_depth, 2);
-    expect_eq!(report.after_depth, 2);
-    expect_eq!(p.dependency_depth(), 2);
-    expect_eq!(report.peak_matrix_bytes, 384);
-    expect_eq!(report.matrix_bytes, 128);
+    expect_eq!(report.after_depth, 1);
+    expect_eq!(p.dependency_depth(), 1);
+    expect_eq!(report.peak_matrix_bytes, 1152);
+    expect_eq!(report.matrix_bytes, 256);
     Ok(())
 }

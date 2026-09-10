@@ -19,7 +19,7 @@ note: required because it appears within the type `quest_sys::ffi::Qureg`
   |         type Qureg;
   |              ^^^^^
   = note: required for `cxx::unique_ptr::UniquePtr<quest_sys::ffi::Qureg>` to implement `Send`
-note: required because it appears within the type `Register<'_, StateVector>`
+note: required because it appears within the type `Register<'_, quest::StateVector>`
  --> src/register.rs
   |
   | pub struct Register<'env, K: RegisterKind> {
@@ -31,3 +31,9 @@ note: required because it's used within this closure
   |                     ^^^^^^^
 note: required by a bound in `Scope::<'scope, 'env>::spawn`
  --> $RUST/std/src/thread/scoped.rs
+  |
+  |     pub fn spawn<F, T>(&'scope self, f: F) -> ScopedJoinHandle<'scope, T>
+  |            ----- required by a bound in this associated function
+  |     where
+  |         F: FnOnce() -> T + Send + 'scope,
+  |                            ^^^^ required by this bound in `Scope::<'scope, 'env>::spawn`

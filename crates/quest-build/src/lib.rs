@@ -51,9 +51,16 @@ pub type Result<T> = std::result::Result<T, BuildError>;
 
 pub(crate) const QUEST_ENV_VARS: &[&str] = &["QUEST_DIR", "QUEST_ROOT", "QuEST_DIR", "QuEST_ROOT"];
 
-/// Load and validate `QUEST_NATIVE_CONFIG`, or discover an installation for the
-/// current Cargo target. The latter is convenient but is not a shared attestation
-/// across different build scripts; use a recorded configuration for consumers.
+/// Load and validate `QUEST_NATIVE_CONFIG`, or discover an installation.
+///
+/// Discovery uses the current Cargo target. It is convenient but is not a shared
+/// attestation across different build scripts; use a recorded configuration for
+/// consumers.
+///
+/// # Errors
+///
+/// Returns an error when Cargo's target context is missing or unsupported, or
+/// when the recorded or discovered native configuration is invalid.
 pub fn discover_from_env() -> Result<NativeConfig> {
     watch_environment();
     let host = env::var("HOST")
@@ -70,17 +77,31 @@ pub fn discover_from_env() -> Result<NativeConfig> {
     probe::discover(&PathBuf::from(out), &host, &target)
 }
 
-/// Emit the recorded native loader paths in a **final executable's** build.rs.
+/// Emit recorded native loader paths in a final executable's build script.
+///
 /// Add `quest-build` as a build dependency there, even when `quest` is reached
 /// through another library. No host build of `quest-sys` is involved.
+///
+/// # Errors
+///
+/// Returns an error when native configuration discovery or runtime-path
+/// validation fails.
 pub fn emit_final_target_runtime_paths() -> Result<()> {
     let configuration = discover_from_env()?;
     configuration.emit_runtime_paths()
 }
 
-/// Discover, execute a harmless native-link probe, and write a shared record.
-/// `target` defaults to the active rustc host. Cross-target discovery fails before
-/// probing, instead of accidentally recording a host installation.
+/// Discover and verify an installation, then write a shared native record.
+///
+/// The optional `target` defaults to the active rustc host. Cross-target
+/// discovery fails before probing, instead of accidentally recording a host
+/// installation.
+///
+/// # Errors
+///
+/// Returns an error when the Rust host cannot be identified, the target is
+/// unsupported, native discovery or its probe fails, or the record cannot be
+/// written.
 pub fn configure_native(
     output_path: impl AsRef<Path>,
     target: Option<&str>,
@@ -265,6 +286,11 @@ pub(crate) fn parse_header_configuration(header: &str) -> Result<HeaderConfigura
 }
 
 /// Link arguments for the supported absolute-path development loader policy.
+///
+/// # Errors
+///
+/// Returns an error for unsupported targets, relative or non-UTF-8 paths, or
+/// paths containing characters that cannot be represented safely.
 pub fn runtime_link_args(target_os: &str, directories: &[PathBuf]) -> Result<Vec<String>> {
     if target_os != "linux" {
         return Err(invalid(format!(
@@ -484,6 +510,10 @@ mod tests {
         let file = directory.path().join("native-library");
         fs::write(&file, b"native version one").or_fail()?;
         let identity = FileIdentity::read(&file).or_fail()?;
+        expect_eq!(
+            identity.sha256,
+            "f94fcfd9a0df90089a64afbd3f743c9b4f04a1164e9ae5c883eb3f88526e9820"
+        );
         identity.validate().or_fail()?;
         fs::write(&file, b"native version two").or_fail()?;
         verify_that!(identity.validate().is_err(), eq(true))

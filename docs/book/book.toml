@@ -1,0 +1,11 @@
+[book]
+title = "QuEST Rust: structured programs and exact circuits"
+authors = ["quest-rs contributors"]
+language = "en"
+src = "src"
+
+[build]
+build-dir = "../../target/book"
+
+[output.html]
+smart-punctuation = true

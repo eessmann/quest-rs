@@ -1,8 +1,8 @@
 use std::{collections::BTreeMap, sync::Arc};
 
+use crate::BigRational;
 use num_bigint::BigInt;
-use num_rational::BigRational;
-use num_traits::{ToPrimitive, Zero};
+use num_traits::Zero;
 
 use crate::{Error, NumericalOperator, Result};
 
@@ -31,21 +31,27 @@ owned_id!(GateDefinitionId);
 pub struct Angle(pub(crate) AngleExpr);
 
 #[derive(Debug, Clone, PartialEq)]
+#[expect(
+    clippy::redundant_pub_crate,
+    reason = "Keep internal state out of the crate wildcard public re-export"
+)]
 pub(crate) enum AngleExpr {
     Pi(BigRational),
     Parameter(ParameterId),
     Opaque(f64),
-    Negative(Arc<AngleExpr>),
+    Negative(Arc<Self>),
 }
 
 impl Angle {
-    pub(crate) fn substitute(&self, bindings: &BTreeMap<ParameterId, Angle>) -> Result<Self> {
+    pub(crate) fn substitute(&self, bindings: &BTreeMap<ParameterId, Self>) -> Result<Self> {
         Ok(match &self.0 {
             AngleExpr::Parameter(p) => bindings.get(p).ok_or(Error::Binding)?.clone(),
             AngleExpr::Negative(a) => Self((**a).clone()).substitute(bindings)?.negated(),
             _ => self.clone(),
         })
     }
+    /// # Errors
+    /// Rejects a zero denominator.
     pub fn pi(numerator: i64, denominator: i64) -> Result<Self> {
         if denominator == 0 {
             return Err(Error::ZeroDenominator);
@@ -58,6 +64,12 @@ impl Angle {
     /// Admit an arbitrary rational multiple of pi. Ratios made with
     /// `BigRational::new_raw` are validated and normalized here. Conversion to
     /// finite machine radians remains a fallible step during binding.
+    #[expect(
+        clippy::needless_pass_by_value,
+        reason = "Admission takes ownership consistently with all angle constructors"
+    )]
+    /// # Errors
+    /// Rejects a zero denominator, including one supplied through a raw rational.
     pub fn rational_pi(value: BigRational) -> Result<Self> {
         if value.denom().is_zero() {
             return Err(Error::ZeroDenominator);
@@ -67,18 +79,22 @@ impl Angle {
             value.denom().clone(),
         ))))
     }
-    pub fn radians(value: f64) -> Result<Self> {
+    /// # Errors
+    /// Rejects nonfinite angle values.
+    pub const fn radians(value: f64) -> Result<Self> {
         if !value.is_finite() {
             return Err(Error::NonFinite);
         }
         Ok(Self(AngleExpr::Opaque(value)))
     }
-    pub fn parameter(id: ParameterId) -> Self {
+    #[must_use]
+    pub const fn parameter(id: ParameterId) -> Self {
         Self(AngleExpr::Parameter(id))
     }
+    #[must_use]
     pub fn negated(&self) -> Self {
         match &self.0 {
-            AngleExpr::Pi(x) => Self(AngleExpr::Pi(-x)),
+            AngleExpr::Pi(x) => Self(AngleExpr::Pi(std::ops::Neg::neg(x))),
             AngleExpr::Negative(x) => Self((**x).clone()),
             x => Self(AngleExpr::Negative(Arc::new(x.clone()))),
         }
@@ -99,7 +115,7 @@ impl Angle {
         }
         match (&self.0, &other.0) {
             (AngleExpr::Pi(a), AngleExpr::Pi(b)) => {
-                let sum = Self(AngleExpr::Pi(a + b));
+                let sum = Self(AngleExpr::Pi(std::ops::Add::add(a, b)));
                 // Preserve the finite binding domain. In particular, two
                 // individually finite rotations must not merge into overflow.
                 sum.evaluate(&BTreeMap::new()).ok()?;
@@ -127,7 +143,12 @@ impl Angle {
     pub(crate) fn evaluate(&self, bindings: &BTreeMap<ParameterId, f64>) -> Result<f64> {
         fn eval(x: &AngleExpr, bindings: &BTreeMap<ParameterId, f64>) -> Result<f64> {
             let value = match x {
-                AngleExpr::Pi(x) => x.to_f64().ok_or(Error::NonFinite)? * std::f64::consts::PI,
+                AngleExpr::Pi(x) => crate::rational::to_pi_f64(x).map_err(|error| match error {
+                    crate::rational::PiConversionError::NonFinite => Error::NonFinite,
+                    crate::rational::PiConversionError::Precision => {
+                        Error::Budget("rational pi precision")
+                    }
+                })?,
                 AngleExpr::Parameter(p) => *bindings.get(p).ok_or(Error::Binding)?,
                 AngleExpr::Opaque(x) => *x,
                 AngleExpr::Negative(x) => -eval(x, bindings)?,
@@ -162,18 +183,21 @@ pub struct Control {
     state: ControlState,
 }
 impl Control {
+    #[must_use]
     pub const fn new(qubit: QubitId, state: ControlState) -> Self {
         Self { qubit, state }
     }
+    #[must_use]
     pub const fn qubit(self) -> QubitId {
         self.qubit
     }
+    #[must_use]
     pub const fn state(self) -> ControlState {
         self.state
     }
 }
 
-/// Built-in gates use the OpenQASM 3.1 phase convention.
+/// Built-in gates use the `OpenQASM` 3.1 phase convention.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Gate {
     Id,
@@ -214,9 +238,34 @@ impl Gate {
             x => x.clone(),
         })
     }
+    #[must_use]
     pub const fn arity(&self) -> usize {
-        if matches!(self, Self::Swap) { 2 } else { 1 }
+        self.kind().definition().target_count
     }
+    /// Shared semantic registry identity for this circuit adapter.
+    #[must_use]
+    pub const fn kind(&self) -> quest_language::GateKind {
+        match self {
+            Self::Id => quest_language::GateKind::Id,
+            Self::X => quest_language::GateKind::X,
+            Self::Y => quest_language::GateKind::Y,
+            Self::Z => quest_language::GateKind::Z,
+            Self::H => quest_language::GateKind::H,
+            Self::S => quest_language::GateKind::S,
+            Self::Sdg => quest_language::GateKind::Sdg,
+            Self::T => quest_language::GateKind::T,
+            Self::Tdg => quest_language::GateKind::Tdg,
+            Self::Sx => quest_language::GateKind::Sx,
+            Self::Sxdg => quest_language::GateKind::Sxdg,
+            Self::Swap => quest_language::GateKind::Swap,
+            Self::Rx(..) => quest_language::GateKind::Rx,
+            Self::Ry(..) => quest_language::GateKind::Ry,
+            Self::Rz(..) => quest_language::GateKind::Rz,
+            Self::Phase(..) => quest_language::GateKind::Phase,
+            Self::U { .. } => quest_language::GateKind::U,
+        }
+    }
+    #[must_use]
     pub fn adjoint(&self) -> Self {
         match self {
             Self::S => Self::Sdg,
@@ -294,6 +343,7 @@ pub enum BoundGate {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 /// A source identifier and half-open byte range into frontend-owned text.
+///
 /// Macro operations use the compiler's display filename (including any path
 /// remapping) and the original operation-keyword span. No file contents or
 /// expansion stack are stored. Rendering checks the supplied text's boundaries.
@@ -303,6 +353,8 @@ pub struct SourceSpan {
     end: usize,
 }
 impl SourceSpan {
+    /// # Errors
+    /// Rejects an end offset preceding the start offset.
     pub fn new(source: impl Into<Arc<str>>, start: usize, end: usize) -> Result<Self> {
         if end < start {
             return Err(Error::SourceRange);
@@ -314,15 +366,21 @@ impl SourceSpan {
         })
     }
     /// Source identifier; text is supplied by the frontend's source resolver.
+    #[must_use]
     pub fn source(&self) -> &str {
         &self.source
     }
-    pub fn range(&self) -> std::ops::Range<usize> {
+    #[must_use]
+    pub const fn range(&self) -> std::ops::Range<usize> {
         self.start..self.end
     }
 }
 
 #[derive(Debug, Clone)]
+#[expect(
+    clippy::redundant_pub_crate,
+    reason = "Keep internal state out of the crate wildcard public re-export"
+)]
 pub(crate) enum SemanticOperation {
     Gate {
         gate: Gate,
@@ -355,7 +413,7 @@ pub(crate) enum SemanticOperation {
     Conditional {
         bit: BitId,
         expected: bool,
-        operation: Box<SemanticOperation>,
+        operation: Box<Self>,
     },
 }
 
@@ -392,7 +450,7 @@ pub enum Operation {
     Conditional {
         bit: BitId,
         expected: bool,
-        operation: Box<Operation>,
+        operation: Box<Self>,
     },
 }
 
@@ -416,13 +474,13 @@ impl SemanticOperation {
             Self::Conditional { operation, .. } => operation.qubits(),
         }
     }
-    pub(crate) fn stochastic(&self) -> bool {
+    pub(crate) const fn stochastic(&self) -> bool {
         matches!(
             self,
             Self::Measure { .. } | Self::Reset { .. } | Self::Channel { .. }
         )
     }
-    pub(crate) fn exact_unitary(&self) -> bool {
+    pub(crate) const fn exact_unitary(&self) -> bool {
         matches!(
             self,
             Self::Gate { .. } | Self::GlobalPhase { .. } | Self::Barrier { .. }
@@ -478,6 +536,10 @@ impl SemanticOperation {
 }
 
 #[derive(Debug, Clone)]
+#[expect(
+    clippy::redundant_pub_crate,
+    reason = "Keep internal state out of the crate wildcard public re-export"
+)]
 pub(crate) struct Occurrence {
     pub(crate) id: OccurrenceId,
     pub(crate) provenance: Vec<OccurrenceId>,
@@ -493,16 +555,41 @@ pub struct Instruction {
     pub(crate) operation: Operation,
 }
 impl Instruction {
+    #[must_use]
     pub const fn id(&self) -> OccurrenceId {
         self.id
     }
+    #[must_use]
     pub fn provenance(&self) -> &[OccurrenceId] {
         &self.provenance
     }
-    pub fn source(&self) -> Option<&SourceSpan> {
+    #[must_use]
+    pub const fn source(&self) -> Option<&SourceSpan> {
         self.source.as_ref()
     }
-    pub fn operation(&self) -> &Operation {
+    #[must_use]
+    pub const fn operation(&self) -> &Operation {
         &self.operation
+    }
+}
+
+#[cfg(test)]
+mod rational_pi_binding_tests {
+    use super::{Angle, BigInt, BigRational};
+    use googletest::prelude::*;
+    #[gtest]
+    fn rational_pi_binding_rounds_only_after_multiplying_by_pi() -> googletest::Result<()> {
+        let tiny = BigRational::new(
+            BigInt::from(1),
+            std::ops::Shl::shl(BigInt::from(1), 1075usize),
+        );
+        let angle = Angle::rational_pi(tiny)?;
+        expect_eq!(
+            angle
+                .evaluate(&std::collections::BTreeMap::new())?
+                .to_bits(),
+            2
+        );
+        Ok(())
     }
 }

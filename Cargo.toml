@@ -1,6 +1,7 @@
 [workspace]
 resolver = "3"
-members = ["crates/quest", "crates/quest-sys", "crates/quest-build", "crates/quest-circuit", "crates/quest-macros", "crates/xtask"]
+members = ["crates/quest", "crates/quest-sys", "crates/quest-build", "crates/quest-circuit", "crates/quest-macros", "crates/xtask", "crates/quest-language", "crates/quest-qasm", "crates/quest-math", "crates/quest-optimizer-protocol", "crates/quest-optimizer-worker", "crates/quest-optimizer-client"]
+exclude = ["crates/vendor/rsgridsynth"]
 default-members = ["crates/quest"]
 
 [workspace.package]
@@ -9,6 +10,15 @@ license = "MIT"
 repository = "https://github.com/eessmann/quest-rs"
 
 [workspace.dependencies]
+criterion = { version = "0.8.2", default-features = false }
+quizx = "=0.3.0"
+rustix = { version = "1", default-features = false }
+quest-optimizer-client = { path = "crates/quest-optimizer-client", version = "0.1" }
+quest-optimizer-protocol = { path = "crates/quest-optimizer-protocol", version = "0.1" }
+quest-math = { path = "crates/quest-math", version = "0.1" }
+quest-qasm = { path = "crates/quest-qasm", version = "0.1" }
+quest-language = { path = "crates/quest-language", version = "0.1" }
+color-eyre = { version = "0.6.5", default-features = false }
 quest-sys = { path = "crates/quest-sys", version = "0.2" }
 quest-build = { path = "crates/quest-build", version = "0.1" }
 quest-circuit = { path = "crates/quest-circuit", version = "0.1" }
@@ -23,8 +33,8 @@ googletest = "0.14"
 
 faer = { version = "0.24.4", default-features = false }
 num-complex = "0.4"
-num-rational = "0.4"
-num-bigint = "0.4"
+num-rational = { version = "0.4", default-features = false }
+num-bigint = "0.5"
 num-traits = "0.2"
 ndarray = { version = "0.17", default-features = false }
 codespan-reporting = "0.13"
@@ -34,12 +44,11 @@ quote = "1"
 proc-macro2 = "1"
 proc-macro-crate = "3"
 cmake-file-api = "0.1.2"
-sha2 = "0.10"
-shlex = "1"
+sha2 = "0.11"
+shlex = "2"
 tempfile = "3"
 trybuild = "1"
 proptest = "1.11"
-anyhow = "1"
 libc = "0.2"
 
 [workspace.lints.rust]

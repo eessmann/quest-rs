@@ -1,0 +1,16 @@
+[package]
+name = "quest-optimizer-protocol"
+version = "0.1.0"
+description = "Bounded versioned messages for optional QuEST optimizer workers"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+quest-math = { workspace = true, features = ["serde"] }
+serde = { workspace = true, features = ["std", "derive"] }
+serde_json.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true

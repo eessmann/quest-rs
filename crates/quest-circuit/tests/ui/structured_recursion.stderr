@@ -1,0 +1,7 @@
+error: recursive calls are unsupported
+ --> tests/ui/structured_recursion.rs:3:13
+  |
+3 |     let _ = circuit! { def recurse(int value) -> int { return recurse(value); } int result=recurse(1); };
+  |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: this error originates in the macro `circuit` (in Nightly builds, run with -Z macro-backtrace for more info)

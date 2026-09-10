@@ -1,0 +1,23 @@
+[package]
+name = "quest-optimizer-client"
+version = "0.1.0"
+description = "Resource-bounded optional worker execution and independent candidate admission"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+quest-optimizer-protocol.workspace = true
+quest-math = { workspace = true, features = ["serde"] }
+serde_json.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+googletest.workspace = true
+tempfile.workspace = true
+
+[lints]
+workspace = true
+
+[target.'cfg(target_os = "linux")'.dependencies]
+rustix = { workspace = true, features = ["std", "process"] }

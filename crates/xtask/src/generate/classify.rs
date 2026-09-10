@@ -15,7 +15,7 @@ const COVERED_BY_RAII: &[(&str, &str)] = &[
 pub fn classify_items(items: &mut [ApiItem], registry: &AdapterRegistry) -> Result<(), DynError> {
     for item in items.iter_mut() {
         let (status, reason) = classify_item(item, registry);
-        item.status = status.as_str().to_owned();
+        status.as_str().clone_into(&mut item.status);
         item.reason = reason;
     }
 

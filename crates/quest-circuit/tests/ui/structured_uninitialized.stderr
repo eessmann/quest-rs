@@ -1,0 +1,5 @@
+error: storage read before definite assignment on every path
+ --> tests/ui/structured_uninitialized.rs:3:90
+  |
+3 |     let _ = circuit! { input bool choose; int value; if (choose) { value=1; } int result=value; };
+  |                                                                                          ^^^^^

@@ -1,0 +1,23 @@
+[package]
+name = "quest-math"
+version = "0.1.0"
+description = "Bounded exact arithmetic and independent quantum circuit certificates"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+num-bigint.workspace = true
+num-rational = { workspace = true, features = ["std"] }
+num-traits.workspace = true
+thiserror.workspace = true
+serde = { workspace = true, optional = true, features = ["std", "derive"] }
+
+[features]
+serde = ["dep:serde", "num-bigint/serde", "num-rational/serde"]
+
+[dev-dependencies]
+googletest.workspace = true
+
+[lints]
+workspace = true

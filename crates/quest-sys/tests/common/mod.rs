@@ -26,7 +26,10 @@ pub fn isolated(
 
 // Shared by the legacy adapter suite; other binaries initialize explicitly to
 // exercise initialization/finalization failures and thread ownership.
-#[allow(dead_code)]
+#[allow(
+    dead_code,
+    reason = "each integration-test binary compiles this shared helper independently"
+)]
 pub fn isolated_with_environment(
     name: &str,
     body: impl FnOnce() -> googletest::Result<()>,

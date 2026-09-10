@@ -75,7 +75,7 @@ fn exact_cancellation_stops_at_measurement() -> Result<()> {
 
 #[gtest]
 fn arbitrary_rational_angles_validate_and_normalize_raw_ratios() -> Result<()> {
-    use num_rational::BigRational;
+    use quest_circuit::BigRational;
     for numerator in [0, 1] {
         expect_true!(matches!(
             Angle::rational_pi(BigRational::new_raw(numerator.into(), 0.into())),
@@ -109,5 +109,27 @@ fn channel_admission_counts_existing_payloads_and_residual_scratch() -> Result<(
         Err(Error::Budget(_))
     ));
     expect_eq!(b.gate(Gate::X, &[q], &[])?.index(), 1);
+    Ok(())
+}
+
+#[gtest]
+fn upgraded_bigint_rationals_keep_large_ratio_and_subnormal_conversion() -> Result<()> {
+    use num_bigint::BigInt;
+    use quest_circuit::BigRational;
+    let denominator = std::ops::Shl::shl(BigInt::from(1), 1200usize);
+    let numerator = std::ops::Add::add(&denominator, BigInt::from(1));
+    let angle = Angle::rational_pi(BigRational::new(numerator, denominator))?;
+    let mut builder = ProgramBuilder::new(1, 0)?;
+    builder.gate(Gate::Rz(angle), &[builder.qubit(0)?], &[])?;
+    let bound = builder.finish()?.bind(&[])?;
+    if let Operation::Gate {
+        gate: BoundGate::Rz(value),
+        ..
+    } = bound.instructions()[0].operation()
+    {
+        expect_eq!(*value, std::f64::consts::PI);
+    } else {
+        fail!("expected Rz")?;
+    }
     Ok(())
 }

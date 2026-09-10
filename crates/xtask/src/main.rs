@@ -1,9 +1,13 @@
 use std::env;
 
+use color_eyre::config::HookBuilder;
+use color_eyre::eyre::{Result, eyre};
+
 mod generate;
 
-fn main() -> anyhow::Result<()> {
-    run().map_err(anyhow::Error::from_boxed)
+fn main() -> Result<()> {
+    HookBuilder::default().install()?;
+    run().map_err(|error| eyre!(error))
 }
 
 fn run() -> Result<(), generate::DynError> {

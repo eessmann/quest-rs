@@ -1,0 +1,29 @@
+[package]
+name = "quest-optimizer-worker"
+version = "0.1.0"
+publish = false
+description = "Isolated optional quantum optimization candidate engines"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+quest-optimizer-protocol.workspace = true
+quest-math = { workspace = true, features = ["serde"] }
+serde_json.workspace = true
+color-eyre = { workspace = true, features = ["track-caller"] }
+rsgridsynth = { package = "quest-rsgridsynth", version = "=0.2.2-quest.1", path = "../vendor/rsgridsynth", optional = true }
+quizx = { workspace = true, optional = true }
+
+[features]
+default = []
+synthesis = ["dep:rsgridsynth"]
+zx = ["dep:quizx"]
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+googletest.workspace = true
+quest-circuit = { workspace = true, features = ["workers"] }
+quest-optimizer-client.workspace = true

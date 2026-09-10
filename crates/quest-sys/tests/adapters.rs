@@ -4,7 +4,7 @@ use common::isolated;
 use googletest::prelude::*;
 use quest_sys::QuestComplex;
 
-fn c(re: f64, im: f64) -> QuestComplex {
+const fn c(re: f64, im: f64) -> QuestComplex {
     QuestComplex { re, im }
 }
 
@@ -196,23 +196,33 @@ fn global_phase_changes_statevector_and_preserves_density() -> googletest::Resul
 #[gtest]
 fn numerical_fingerprint_detects_ambient_simd_changes() -> googletest::Result<()> {
     isolated("numerical_fingerprint_detects_ambient_simd_changes", || {
+        struct Restore(u32);
+        impl Drop for Restore {
+            fn drop(&mut self) {
+                #[allow(
+                    deprecated,
+                    reason = "the x86 MXCSR intrinsic is required to test ambient FP controls"
+                )]
+                // SAFETY: this word was read from this same thread before the
+                // temporary change; reserved bits are preserved.
+                unsafe {
+                    std::arch::x86_64::_mm_setcsr(self.0);
+                }
+            }
+        }
+
         quest_sys::init_custom_quest_env(false, false, false)?;
         let before = quest_sys::get_numerical_fingerprint()?;
         // Restore the calling thread's control word even if an assertion fails.
+        #[allow(
+            deprecated,
+            reason = "the x86 MXCSR intrinsics are required to test ambient FP controls"
+        )]
         // SAFETY: MXCSR belongs to this test thread; only defined FTZ/DAZ
         // bits change, and Restore reinstates the original word on every exit.
-        #[allow(deprecated)]
         unsafe {
             use std::arch::x86_64::{_mm_getcsr, _mm_setcsr};
             let original = _mm_getcsr();
-            struct Restore(u32);
-            impl Drop for Restore {
-                fn drop(&mut self) {
-                    // SAFETY: this word was read from this same thread before
-                    // the temporary change; reserved bits are preserved.
-                    unsafe { _mm_setcsr(self.0) };
-                }
-            }
             let _restore = Restore(original);
             _mm_setcsr(original | (1 << 15) | (1 << 6));
             let changed = quest_sys::get_numerical_fingerprint()?;

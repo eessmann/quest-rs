@@ -4,7 +4,7 @@ use quest_circuit::*;
 
 #[gtest]
 fn bell_macro_uses_the_same_builder_semantics() -> Result<()> {
-    let p = circuit! {qubit[2] q; bit[2] c; h q[0]; cx q[0],q[1]; c[0] = measure q[0]; c[1] = measure q[1];}?;
+    let p = legacy_circuit! {qubit[2] q; bit[2] c; h q[0]; cx q[0],q[1]; c[0] = measure q[0]; c[1] = measure q[1];}?;
     let plan = p.bind(&[])?.lower()?.plan()?;
     expect_eq!(plan.num_qubits(), 2);
     expect_eq!(plan.num_bits(), 2);
@@ -25,7 +25,7 @@ fn bell_macro_uses_the_same_builder_semantics() -> Result<()> {
 fn interpolation_evaluates_once_in_source_order_and_modifiers_keep_phase() -> Result<()> {
     let mut visits = vec![];
     let __quest_builder = 0.125;
-    let p = circuit! {
+    let p = legacy_circuit! {
         qubit[3] q;
         rx(${ { visits.push(1); __quest_builder } }) q[0];
         ry(${ { visits.push(2); 0.25 } }) q[1];
@@ -42,13 +42,13 @@ fn interpolation_evaluates_once_in_source_order_and_modifiers_keep_phase() -> Re
 
 #[gtest]
 fn nonfinite_interpolation_is_rejected_at_shared_admission() {
-    let p = circuit! {qubit q; rx(${f64::NAN}) q;};
+    let p = legacy_circuit! {qubit q; rx(${f64::NAN}) q;};
     expect_true!(p.is_err());
 }
 
 #[gtest]
 fn full_macro_gate_inventory_matches_builder() -> Result<()> {
-    let macro_program = circuit! {
+    let macro_program = legacy_circuit! {
         qubit[3] q;
         id q[0]; x q[0]; y q[0]; z q[0]; h q[0];
         s q[0]; sdg q[0]; t q[0]; tdg q[0]; sx q[0]; inv @ sx q[0];
@@ -144,7 +144,7 @@ fn full_macro_gate_inventory_matches_builder() -> Result<()> {
 #[gtest]
 fn macro_operations_retain_original_file_and_keyword_byte_ranges() -> Result<()> {
     let mut visits = vec![];
-    let program = circuit! {
+    let program = legacy_circuit! {
         qubit q;
         bit c;
         rx(${ { visits.push(1); 0.125 } }) q;

@@ -8,41 +8,49 @@ use quest_circuit::*;
 
 // Independent scalar oracle. The tested faer realization/product code is never
 // used for the original gate path; basis wiring and amplitudes are explicit.
-fn scalar_gate(gate: &BoundGate) -> Vec<Vec<C>> {
-    let z = C::new(0.0, 0.0);
+#[expect(
+    clippy::arithmetic_side_effects,
+    reason = "Independent floating point fixtures and bounded test indices cannot overflow integers"
+)]
+fn scalar_gate(gate: &BoundGate) -> quest_circuit::Result<Vec<Vec<C>>> {
+    let zero = C::new(0.0, 0.0);
     let one = C::new(1.0, 0.0);
-    let i = C::new(0.0, 1.0);
-    match gate {
-        BoundGate::X => vec![vec![z, one], vec![one, z]],
-        BoundGate::Y => vec![vec![z, -i], vec![i, z]],
-        BoundGate::Z => vec![vec![one, z], vec![z, -one]],
+    let imaginary = C::new(0.0, 1.0);
+    Ok(match gate {
+        BoundGate::X => vec![vec![zero, one], vec![one, zero]],
+        BoundGate::Y => vec![vec![zero, -imaginary], vec![imaginary, zero]],
+        BoundGate::Z => vec![vec![one, zero], vec![zero, -one]],
         BoundGate::H => {
             let h = one / 2.0f64.sqrt();
             vec![vec![h, h], vec![h, -h]]
         }
-        BoundGate::S => vec![vec![one, z], vec![z, i]],
-        BoundGate::Sdg => vec![vec![one, z], vec![z, -i]],
+        BoundGate::S => vec![vec![one, zero], vec![zero, imaginary]],
+        BoundGate::Sdg => vec![vec![one, zero], vec![zero, -imaginary]],
         BoundGate::Rx(a) => {
-            let c = C::new((a / 2.0).cos(), 0.0);
-            let s = -i * (a / 2.0).sin();
-            vec![vec![c, s], vec![s, c]]
+            let cosine = C::new((a / 2.0).cos(), 0.0);
+            let sine = -imaginary * (a / 2.0).sin();
+            vec![vec![cosine, sine], vec![sine, cosine]]
         }
         BoundGate::Rz(a) => vec![
-            vec![(-i * (a / 2.0)).exp(), z],
-            vec![z, (i * (a / 2.0)).exp()],
+            vec![(-imaginary * (a / 2.0)).exp(), zero],
+            vec![zero, (imaginary * (a / 2.0)).exp()],
         ],
-        BoundGate::Phase(a) => vec![vec![one, z], vec![z, (i * a).exp()]],
-        other => panic!("fixture does not support {other:?}"),
-    }
+        BoundGate::Phase(a) => vec![vec![one, zero], vec![zero, (imaginary * a).exp()]],
+        _ => return Err(Error::NotUnitary),
+    })
 }
-fn scalar_run(plan: &ExecutablePlan, mut state: Vec<C>) -> Vec<C> {
+#[expect(
+    clippy::arithmetic_side_effects,
+    reason = "Independent floating point fixtures and bounded test indices cannot overflow integers"
+)]
+fn scalar_run(plan: &ExecutablePlan, mut state: Vec<C>) -> quest_circuit::Result<Vec<C>> {
     for instruction in plan.instructions() {
         let (targets, controls, matrix) = match instruction.operation() {
             Operation::Gate {
                 gate,
                 targets,
                 controls,
-            } => (targets, controls, scalar_gate(gate)),
+            } => (targets, controls, scalar_gate(gate)?),
             Operation::Numerical {
                 matrix,
                 targets,
@@ -70,7 +78,7 @@ fn scalar_run(plan: &ExecutablePlan, mut state: Vec<C>) -> Vec<C> {
                 continue;
             }
             Operation::Barrier { .. } => continue,
-            _ => panic!("effect in unitary fixture"),
+            _ => return Err(Error::NotUnitary),
         };
         let mask = targets.iter().fold(0usize, |m, q| m | (1 << q.index()));
         for base in 0..state.len() {
@@ -90,17 +98,31 @@ fn scalar_run(plan: &ExecutablePlan, mut state: Vec<C>) -> Vec<C> {
                 .collect::<Vec<_>>();
             let input = indices
                 .iter()
-                .map(|&index| state[index])
-                .collect::<Vec<_>>();
+                .map(|&index| state.get(index).copied().ok_or(Error::InvalidId))
+                .collect::<quest_circuit::Result<Vec<_>>>()?;
             for (row, &index) in indices.iter().enumerate() {
-                state[index] = matrix[row].iter().zip(&input).map(|(m, x)| m * x).sum();
+                *state.get_mut(index).ok_or(Error::InvalidId)? = matrix
+                    .get(row)
+                    .ok_or(Error::InvalidId)?
+                    .iter()
+                    .zip(&input)
+                    .map(|(m, x)| m * x)
+                    .sum();
             }
         }
     }
-    state
+    Ok(state)
 }
 
 #[gtest]
+#[expect(
+    clippy::unnecessary_wraps,
+    reason = "The googletest harness requires a Result return"
+)]
+#[expect(
+    clippy::arithmetic_side_effects,
+    reason = "Independent floating point fixtures and bounded test indices cannot overflow integers"
+)]
 fn randomized_exact_pass_and_fusion_preserve_complex_state_including_phase() -> Result<()> {
     let mut runner = TestRunner::new_with_rng(
         Config {
@@ -159,10 +181,10 @@ fn randomized_exact_pass_and_fusion_preserve_complex_state_including_phase() -> 
             .plan()
             .unwrap();
         let state = (0..8)
-            .map(|i| C::new((i + 1) as f64 / 11.0, (3 * i + 1) as f64 / 19.0))
+            .map(|i| C::new(f64::from(i + 1) / 11.0, f64::from(3 * i + 1) / 19.0))
             .collect::<Vec<_>>();
-        let a = scalar_run(&original, state.clone());
-        let b = scalar_run(&optimized, state);
+        let a = scalar_run(&original, state.clone()).unwrap();
+        let b = scalar_run(&optimized, state).unwrap();
         for (a, b) in a.iter().zip(&b) {
             prop_assert!((*a - *b).norm() < 2e-12, "{a:?} != {b:?}");
         }
@@ -173,6 +195,10 @@ fn randomized_exact_pass_and_fusion_preserve_complex_state_including_phase() -> 
 }
 
 #[gtest]
+#[expect(
+    clippy::arithmetic_side_effects,
+    reason = "Independent floating point fixtures and bounded test indices cannot overflow integers"
+)]
 fn controlling_a_global_phase_changes_only_the_active_branch() -> Result<()> {
     let mut builder = ProgramBuilder::new(2, 0)?;
     let control = builder.qubit(1)?;
@@ -186,7 +212,7 @@ fn controlling_a_global_phase_changes_only_the_active_branch() -> Result<()> {
         .lower()?
         .plan()?;
     let state = vec![C::new(1.0, 0.0); 4];
-    let result = scalar_run(&plan, state);
+    let result = scalar_run(&plan, state)?;
     expect_eq!(result[0], C::new(1.0, 0.0));
     expect_eq!(result[1], C::new(1.0, 0.0));
     expect_lt!((result[2] - C::new(0.0, 1.0)).norm(), 1e-15);
@@ -227,5 +253,43 @@ fn channels_are_effectful_and_completeness_is_checked() -> Result<()> {
     let (bound, _) = p.bind(&[])?.fuse(FusionOptions::default())?;
     expect_eq!(bound.instructions().len(), 3);
     expect_true!(bound.lower()?.plan()?.requires_density_matrix());
+    Ok(())
+}
+
+#[gtest]
+#[expect(
+    clippy::arithmetic_side_effects,
+    reason = "Independent bounded scalar fixture arithmetic"
+)]
+fn union_fusion_preserves_ordered_operands_and_signed_controls() -> Result<()> {
+    let mut builder = ProgramBuilder::new(4, 0)?;
+    let q0 = builder.qubit(0)?;
+    let q1 = builder.qubit(1)?;
+    let q2 = builder.qubit(2)?;
+    let q3 = builder.qubit(3)?;
+    builder.gate(Gate::H, &[q3], &[])?;
+    builder.gate(Gate::Y, &[q1], &[Control::new(q3, ControlState::Zero)])?;
+    builder.gate(Gate::Phase(Angle::radians(0.37)?), &[q2], &[])?;
+    builder.gate(Gate::X, &[q0], &[Control::new(q1, ControlState::One)])?;
+    let original = builder.finish()?.bind(&[])?;
+    let (fused, report) = original.clone().fuse(FusionOptions::default())?;
+    expect_eq!(report.after_operations, 1);
+    if let Operation::Numerical {
+        targets, controls, ..
+    } = fused.instructions()[0].operation()
+    {
+        expect_eq!(targets, &[q3, q1, q2, q0]);
+        expect_true!(controls.is_empty());
+    } else {
+        fail!("expected union matrix")?;
+    }
+    let state = (0..16)
+        .map(|i| C::new(f64::from(i) / 17.0, f64::from(7 - i) / 23.0))
+        .collect::<Vec<_>>();
+    let left = scalar_run(&original.lower()?.plan()?, state.clone())?;
+    let right = scalar_run(&fused.lower()?.plan()?, state)?;
+    for (a, b) in left.iter().zip(right) {
+        expect_lt!((*a - b).norm(), 1e-13);
+    }
     Ok(())
 }

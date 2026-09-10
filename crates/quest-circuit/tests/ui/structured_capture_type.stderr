@@ -1,0 +1,8 @@
+error[E0308]: mismatched types
+ --> tests/ui/structured_capture_type.rs:3:38
+  |
+3 |     let _ = circuit! { qubit q; rx(${true}) q; };
+  |             -------------------------^^^^-------
+  |             |                        |
+  |             |                        expected `f64`, found `bool`
+  |             expected due to this

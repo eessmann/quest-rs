@@ -30,7 +30,7 @@ pub fn run(check: bool) -> Result<(), DynError> {
     Ok(())
 }
 
-pub(crate) fn find_workspace_root() -> Result<PathBuf, DynError> {
+fn find_workspace_root() -> Result<PathBuf, DynError> {
     if let Ok(value) = env::var("CARGO_MANIFEST_DIR")
         && let Some(root) = workspace_root_from(Path::new(&value))
     {

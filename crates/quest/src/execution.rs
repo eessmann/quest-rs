@@ -11,15 +11,21 @@ use quest_circuit::{
 };
 use std::collections::BTreeMap;
 
-struct NativeMatrix {
-    forward: UniquePtr<quest_sys::CompMatr>,
-    adjoint: UniquePtr<quest_sys::CompMatr>,
+enum NativeMatrix {
+    Dense {
+        forward: UniquePtr<quest_sys::CompMatr>,
+        adjoint: UniquePtr<quest_sys::CompMatr>,
+    },
+    Diagonal {
+        forward: UniquePtr<quest_sys::DiagMatr>,
+        adjoint: UniquePtr<quest_sys::DiagMatr>,
+    },
 }
-struct NativeControls {
-    wires: Vec<i32>,
-    states: Vec<i32>,
-    zeros: Vec<usize>,
-    phase_targets: Vec<i32>,
+pub struct NativeControls {
+    pub(crate) wires: Vec<i32>,
+    pub(crate) states: Vec<i32>,
+    pub(crate) zeros: Vec<usize>,
+    pub(crate) phase_targets: Vec<i32>,
 }
 impl NativeControls {
     fn new(controls: &[Control], target: Option<i32>) -> Result<Self> {
@@ -34,9 +40,9 @@ impl NativeControls {
         )?;
         for control in controls {
             let qubit = control.qubit().index();
-            wires.push(qubit as i32);
+            wires.push(i32::try_from(qubit).map_err(|_| Error::Overflow)?);
             states.push(i32::from(control.state() == ControlState::One));
-            phase_targets.push(qubit as i32);
+            phase_targets.push(i32::try_from(qubit).map_err(|_| Error::Overflow)?);
             if control.state() == ControlState::Zero {
                 zeros.push(qubit);
             }
@@ -110,9 +116,13 @@ pub struct SampleResult {
 
 impl Environment {
     /// Convenience path for programs with no unbound symbolic parameters.
+    /// # Errors
+    /// Rejects invalid bindings, unsupported numerical configuration, resource limits, or native preparation failure.
     pub fn prepare(&self, program: ValidatedProgram) -> Result<PreparedProgram<'_>> {
         self.prepare_plan(program.bind(&[])?.lower()?.plan()?)
     }
+    /// # Errors
+    /// Rejects unsupported numerical configuration, resource limits, or native preparation failure.
     pub fn prepare_plan(&self, plan: ExecutablePlan) -> Result<PreparedProgram<'_>> {
         QubitCount::new(plan.num_qubits())?;
         let fingerprint =
@@ -122,10 +132,12 @@ impl Environment {
             .instructions()
             .len()
             .checked_mul(
-                std::mem::size_of::<quest_circuit::Instruction>()
-                    + std::mem::size_of::<PreparedOp>()
-                    + std::mem::size_of::<NativeMatrix>()
-                    + std::mem::size_of::<UniquePtr<quest_sys::KrausMap>>(),
+                const {
+                    std::mem::size_of::<quest_circuit::Instruction>()
+                        + std::mem::size_of::<PreparedOp>()
+                        + std::mem::size_of::<NativeMatrix>()
+                        + std::mem::size_of::<UniquePtr<quest_sys::KrausMap>>()
+                },
             )
             .ok_or(Error::Overflow)?;
         required = required
@@ -175,9 +187,12 @@ impl Environment {
     }
 }
 impl PreparedProgram<'_> {
-    pub fn plan(&self) -> &ExecutablePlan {
+    #[must_use]
+    pub const fn plan(&self) -> &ExecutablePlan {
         &self.plan
     }
+    /// # Errors
+    /// Rejects register or configuration mismatch and reports the completed instruction prefix on execution failure.
     pub fn run<K: RegisterKind>(&mut self, register: &mut Register<'_, K>) -> Result<RunResult> {
         if !std::ptr::eq(register.environment(), self.reservation.environment)
             || register.num_qubits().get() != self.plan.num_qubits()
@@ -213,9 +228,11 @@ impl PreparedProgram<'_> {
             completed_instructions: self.operations.len(),
         })
     }
-    /// Seeds QuEST's process RNG once per batch and restores |0...0> for every shot.
+    /// Seeds `QuEST`'s process RNG once per batch and restores |0...0> for every shot.
     /// Supply 1–16 seeds; native RNG storage retains a 4096-byte budget allowance.
     /// Density channels use exact density evolution; state vectors use reset trajectories.
+    /// # Errors
+    /// Rejects invalid seed counts, changed numerical configuration, resource limits, or native execution failure.
     pub fn sample_zeroed(&mut self, shots: Shots, seeds: &[u32]) -> Result<SampleResult> {
         if seeds.is_empty() || seeds.len() > 16 {
             return Err(Error::Value(
@@ -230,7 +247,7 @@ impl PreparedProgram<'_> {
         }
         let seed_bytes = seeds
             .len()
-            .checked_mul(std::mem::size_of::<u32>() * 8)
+            .checked_mul(const { std::mem::size_of::<u32>() * 8 })
             .ok_or(Error::Overflow)?;
         let sample_bytes = self
             .plan
@@ -243,19 +260,21 @@ impl PreparedProgram<'_> {
         let _results = environment.reserve(sample_bytes)?;
         environment.admit_seed_storage()?;
         quest_sys::set_qu_est_seeds(seeds).context("seeding sample batch")?;
-        let mut counts = BTreeMap::new();
+        let mut counts = BTreeMap::<Vec<bool>, usize>::new();
         let count = QubitCount::new(self.plan.num_qubits())?;
         if self.operations.iter().any(requires_density) {
             let mut register = environment.density_matrix(count)?;
             for _ in 0..shots.get() {
                 register.init_zero()?;
-                *counts.entry(self.run(&mut register)?.bits).or_insert(0) += 1;
+                let count = counts.entry(self.run(&mut register)?.bits).or_default();
+                *count = count.checked_add(1).ok_or(Error::Overflow)?;
             }
         } else {
             let mut register = environment.state_vector(count)?;
             for _ in 0..shots.get() {
                 register.init_zero()?;
-                *counts.entry(self.run(&mut register)?.bits).or_insert(0) += 1;
+                let count = counts.entry(self.run(&mut register)?.bits).or_default();
+                *count = count.checked_add(1).ok_or(Error::Overflow)?;
             }
         }
         let mut recorded_seeds = reserve_vec(seeds.len())?;
@@ -267,7 +286,7 @@ impl PreparedProgram<'_> {
         })
     }
 }
-fn admit_fingerprint(fp: &quest_sys::NumericalFingerprint) -> Result<()> {
+pub const fn admit_fingerprint(fp: &quest_sys::NumericalFingerprint) -> Result<()> {
     if !fp.underflow_control_supported
         || !fp.round_to_nearest
         || fp.flush_to_zero
@@ -290,15 +309,17 @@ fn estimate(op: &Operation, gpu: bool) -> Result<usize> {
     let control_bytes = |count: usize| {
         count
             .checked_mul(
-                std::mem::size_of::<Control>()
-                    + 3 * std::mem::size_of::<i32>()
-                    + std::mem::size_of::<usize>(),
+                const {
+                    std::mem::size_of::<Control>()
+                        + 3 * std::mem::size_of::<i32>()
+                        + std::mem::size_of::<usize>()
+                },
             )
             .ok_or(Error::Overflow)
     };
     let targets_bytes = |count: usize| {
         count
-            .checked_mul(std::mem::size_of::<quest_circuit::QubitId>() + std::mem::size_of::<i32>())
+            .checked_mul(const { std::mem::size_of::<quest_circuit::QubitId>() + std::mem::size_of::<i32>() })
             .ok_or(Error::Overflow)
     };
     match op {
@@ -320,13 +341,23 @@ fn estimate(op: &Operation, gpu: bool) -> Result<usize> {
             let dimension = 1usize
                 .checked_shl(u32::try_from(width.max(1)).map_err(|_| Error::Overflow)?)
                 .ok_or(Error::Overflow)?;
-            let entries = dimension.checked_mul(dimension).ok_or(Error::Overflow)?;
+            let entries = if matrix.is_diagonal() {
+                dimension
+            } else {
+                dimension.checked_mul(dimension).ok_or(Error::Overflow)?
+            };
             bytes_for(entries, if gpu { 16 } else { 12 })?
+                .checked_add(matrix.bytes())
+                .ok_or(Error::Overflow)?
                 .checked_add(targets_bytes(width)?)
                 .ok_or(Error::Overflow)
         }
         Operation::Channel { kraus, .. } => {
-            let d = kraus[0].dimension().max(2);
+            let d = kraus
+                .first()
+                .ok_or(Error::Value("empty Kraus channel"))?
+                .dimension()
+                .max(2);
             let d2 = d.checked_mul(d).ok_or(Error::Overflow)?;
             let elements = d2
                 .checked_mul(d2)
@@ -343,9 +374,13 @@ fn estimate(op: &Operation, gpu: bool) -> Result<usize> {
         Operation::Conditional { operation, .. } => estimate(operation, gpu)?
             .checked_add(std::mem::size_of::<PreparedOp>())
             .ok_or(Error::Overflow),
-        _ => Ok(0),
+        Operation::Measure { .. } => Ok(0),
     }
 }
+#[expect(
+    clippy::too_many_lines,
+    reason = "Preparation owns the transactional native allocation and cache publication for every operation"
+)]
 fn prepare_operation(
     op: &Operation,
     matrices: &mut Vec<NativeMatrix>,
@@ -359,51 +394,29 @@ fn prepare_operation(
             controls,
         } => {
             let key = (
-                numerical.view().as_ptr() as usize,
+                numerical.view().as_ptr().addr(),
                 controls
                     .iter()
                     .map(|c| c.state() == ControlState::One)
                     .collect::<Vec<_>>(),
             );
-            let mut native_targets: Vec<i32> = targets.iter().map(|q| q.index() as i32).collect();
-            native_targets.extend(controls.iter().map(|c| c.qubit().index() as i32));
+            let mut native_targets: Vec<i32> = targets
+                .iter()
+                .map(|q| i32::try_from(q.index()).map_err(|_| Error::Overflow))
+                .collect::<Result<_>>()?;
+            for control in controls {
+                native_targets
+                    .push(i32::try_from(control.qubit().index()).map_err(|_| Error::Overflow)?);
+            }
             if native_targets.is_empty() {
                 native_targets.push(0);
             }
             let index = if let Some(&index) = cache.get(&key) {
                 index
             } else {
-                let dim = numerical
-                    .dimension()
-                    .checked_shl(controls.len() as u32)
-                    .ok_or(Error::Overflow)?
-                    .max(2);
-                let mut extended = matrix(dim, dim)?;
-                let active = controls.iter().enumerate().fold(0usize, |mask, (i, c)| {
-                    mask | ((c.state() == ControlState::One) as usize) << i
-                });
-                let local_dim = numerical.dimension();
-                for row in 0..dim {
-                    for col in 0..dim {
-                        extended[(row, col)] = if local_dim == 1 && controls.is_empty() {
-                            if row == col {
-                                numerical.view()[(0, 0)]
-                            } else {
-                                Complex64::new(0., 0.)
-                            }
-                        } else if row / local_dim == active && col / local_dim == active {
-                            numerical.view()[(row % local_dim, col % local_dim)]
-                        } else if row == col {
-                            Complex64::new(1., 0.)
-                        } else {
-                            Complex64::new(0., 0.)
-                        };
-                    }
-                }
-                let forward = native_matrix(extended.as_ref())?;
-                let adjoint = native_matrix(extended.as_ref().adjoint())?;
+                let native = prepare_numerical(numerical, controls)?;
                 let index = matrices.len();
-                matrices.push(NativeMatrix { forward, adjoint });
+                matrices.push(native);
                 cache.insert(key, index);
                 index
             };
@@ -413,7 +426,11 @@ fn prepare_operation(
             })
         }
         Operation::Channel { kraus, targets } => {
-            let dim = kraus[0].dimension().max(2);
+            let dim = kraus
+                .first()
+                .ok_or(Error::Value("empty Kraus channel"))?
+                .dimension()
+                .max(2);
             let mut values = reserve_vec(
                 dim.checked_mul(dim)
                     .and_then(|n| n.checked_mul(kraus.len()))
@@ -436,12 +453,17 @@ fn prepare_operation(
                 }
             }
             let mut map = quest_sys::create_kraus_map(
-                dim.ilog2() as i32,
+                i32::try_from(dim.ilog2()).map_err(|_| Error::Overflow)?,
                 i32::try_from(kraus.len()).map_err(|_| Error::Overflow)?,
             )
             .context("allocating Kraus channel")?;
-            quest_sys::set_kraus_map_flat(map.pin_mut(), &values, kraus.len() as i32, dim as i64)
-                .context("transferring Kraus channel")?;
+            quest_sys::set_kraus_map_flat(
+                map.pin_mut(),
+                &values,
+                i32::try_from(kraus.len()).map_err(|_| Error::Overflow)?,
+                i64::try_from(dim).map_err(|_| Error::Overflow)?,
+            )
+            .context("transferring Kraus channel")?;
             let index = channels.len();
             channels.push(map);
             Ok(PreparedOp::Channel {
@@ -449,7 +471,10 @@ fn prepare_operation(
                 targets: if targets.is_empty() {
                     vec![0]
                 } else {
-                    targets.iter().map(|q| q.index() as i32).collect()
+                    targets
+                        .iter()
+                        .map(|q| i32::try_from(q.index()).map_err(|_| Error::Overflow))
+                        .collect::<Result<_>>()?
                 },
             })
         }
@@ -486,7 +511,10 @@ fn prepare_operation(
             targets,
             controls,
         } => {
-            let targets = targets.iter().map(|q| q.index() as i32).collect::<Vec<_>>();
+            let targets = targets
+                .iter()
+                .map(|q| i32::try_from(q.index()).map_err(|_| Error::Overflow))
+                .collect::<Result<Vec<_>>>()?;
             let controls = NativeControls::new(controls, targets.first().copied())?;
             Ok(PreparedOp::Gate {
                 gate: gate.clone(),
@@ -505,6 +533,92 @@ fn prepare_operation(
         Operation::Barrier { .. } => Ok(PreparedOp::Barrier),
     }
 }
+fn prepare_numerical(
+    numerical: &quest_circuit::NumericalOperator,
+    controls: &[Control],
+) -> Result<NativeMatrix> {
+    let dim = numerical
+        .dimension()
+        .checked_shl(u32::try_from(controls.len()).map_err(|_| Error::Overflow)?)
+        .ok_or(Error::Overflow)?
+        .max(2);
+    let active = controls.iter().enumerate().fold(0usize, |mask, (i, c)| {
+        mask | usize::from(c.state() == ControlState::One) << i
+    });
+    let local_dim = numerical.dimension();
+    let divisor =
+        std::num::NonZeroUsize::new(local_dim).ok_or(Error::Value("empty numerical matrix"))?;
+    let value = |row, col| {
+        if local_dim == 1 && controls.is_empty() {
+            if row == col {
+                numerical.view()[(0, 0)]
+            } else {
+                Complex64::new(0.0, 0.0)
+            }
+        } else if row / divisor == active && col / divisor == active {
+            numerical.view()[(row % divisor, col % divisor)]
+        } else if row == col {
+            Complex64::new(1.0, 0.0)
+        } else {
+            Complex64::new(0.0, 0.0)
+        }
+    };
+    if numerical.is_diagonal() {
+        let mut values = reserve_vec(dim)?;
+        for row in 0..dim {
+            let v = value(row, row);
+            values.push(quest_sys::QuestComplex { re: v.re, im: v.im });
+        }
+        let width = i32::try_from(dim.ilog2()).map_err(|_| Error::Overflow)?;
+        let mut forward =
+            quest_sys::create_diag_matr(width).context("allocating native diagonal")?;
+        quest_sys::set_diag_matr(forward.pin_mut(), &values)
+            .context("transferring native diagonal")?;
+        for value in &mut values {
+            value.im = -value.im;
+        }
+        let mut adjoint =
+            quest_sys::create_diag_matr(width).context("allocating diagonal adjoint")?;
+        quest_sys::set_diag_matr(adjoint.pin_mut(), &values)
+            .context("transferring diagonal adjoint")?;
+        return Ok(NativeMatrix::Diagonal { forward, adjoint });
+    }
+    let mut extended = matrix(dim, dim)?;
+    for row in 0..dim {
+        for col in 0..dim {
+            extended[(row, col)] = value(row, col);
+        }
+    }
+    Ok(NativeMatrix::Dense {
+        forward: native_matrix(extended.as_ref())?,
+        adjoint: native_matrix(extended.as_ref().adjoint())?,
+    })
+}
+fn execute_matrix<K: RegisterKind>(
+    matrix: &NativeMatrix,
+    register: &mut Register<'_, K>,
+    targets: &[i32],
+) -> Result<()> {
+    match matrix {
+        NativeMatrix::Dense { forward, adjoint } => {
+            quest_sys::leftapply_comp_matr(register.pin(), targets, forward)
+                .context("applying numerical operator")?;
+            if register.is_density() {
+                quest_sys::rightapply_comp_matr(register.pin(), targets, adjoint)
+                    .context("applying numerical adjoint to density")?;
+            }
+        }
+        NativeMatrix::Diagonal { forward, adjoint } => {
+            quest_sys::leftapply_diag_matr(register.pin(), targets, forward)
+                .context("applying diagonal operator")?;
+            if register.is_density() {
+                quest_sys::rightapply_diag_matr(register.pin(), targets, adjoint)
+                    .context("applying diagonal adjoint to density")?;
+            }
+        }
+    }
+    Ok(())
+}
 fn native_matrix<T: faer::traits::Conjugate<Canonical = Complex64>>(
     view: faer::MatRef<'_, T>,
 ) -> Result<UniquePtr<quest_sys::CompMatr>> {
@@ -519,10 +633,16 @@ fn native_matrix<T: faer::traits::Conjugate<Canonical = Complex64>>(
             values.push(quest_sys::QuestComplex { re: v.re, im: v.im });
         }
     }
-    let mut native = quest_sys::create_comp_matr(view.nrows().ilog2() as i32)
-        .context("allocating native matrix")?;
-    quest_sys::set_comp_matr_flat(native.pin_mut(), &values, view.nrows() as i64)
-        .context("transferring row-major matrix")?;
+    let mut native = quest_sys::create_comp_matr(
+        i32::try_from(view.nrows().ilog2()).map_err(|_| Error::Overflow)?,
+    )
+    .context("allocating native matrix")?;
+    quest_sys::set_comp_matr_flat(
+        native.pin_mut(),
+        &values,
+        i64::try_from(view.nrows()).map_err(|_| Error::Overflow)?,
+    )
+    .context("transferring row-major matrix")?;
     Ok(native)
 }
 fn execute<K: RegisterKind>(
@@ -533,23 +653,31 @@ fn execute<K: RegisterKind>(
     channels: &[UniquePtr<quest_sys::KrausMap>],
 ) -> Result<()> {
     match op {
-        PreparedOp::Numerical { cache, targets } => {
-            quest_sys::leftapply_comp_matr(register.pin(), targets, &matrices[*cache].forward)
-                .context("applying numerical operator")?;
-            if register.is_density() {
-                quest_sys::rightapply_comp_matr(register.pin(), targets, &matrices[*cache].adjoint)
-                    .context("applying numerical adjoint to density")?;
-            }
-            Ok(())
-        }
-        PreparedOp::Channel { cache, targets } => {
-            quest_sys::mix_kraus_map(register.pin(), targets, &channels[*cache])
-                .context("applying density channel")
-        }
+        PreparedOp::Numerical { cache, targets } => execute_matrix(
+            matrices
+                .get(*cache)
+                .ok_or(Error::Value("invalid prepared matrix cache"))?,
+            register,
+            targets,
+        ),
+        PreparedOp::Channel { cache, targets } => quest_sys::mix_kraus_map(
+            register.pin(),
+            targets,
+            channels
+                .get(*cache)
+                .ok_or(Error::Value("invalid prepared channel cache"))?,
+        )
+        .context("applying density channel"),
         PreparedOp::Reset { target, cache } => {
             if register.is_density() {
-                quest_sys::mix_kraus_map(register.pin(), &[*target as i32], &channels[*cache])
-                    .context("resetting density qubit")
+                quest_sys::mix_kraus_map(
+                    register.pin(),
+                    &[i32::try_from(*target).map_err(|_| Error::Overflow)?],
+                    channels
+                        .get(*cache)
+                        .ok_or(Error::Value("invalid prepared channel cache"))?,
+                )
+                .context("resetting density qubit")
             } else {
                 if register.measure(*target)? == Outcome::One {
                     register.x(*target)?;
@@ -562,7 +690,7 @@ fn execute<K: RegisterKind>(
             expected,
             operation,
         } => {
-            if bits[*bit] == *expected {
+            if *bits.get(*bit).ok_or(Error::Value("invalid prepared bit"))? == *expected {
                 execute(operation, register, bits, matrices, channels)?;
             }
             Ok(())
@@ -574,14 +702,16 @@ fn execute<K: RegisterKind>(
         } => apply_gate(register, gate, targets, controls),
         PreparedOp::GlobalPhase { radians, controls } => phase(register, *radians, controls),
         PreparedOp::Measure { qubit, bit } => {
-            bits[*bit] = register.measure(*qubit)?.as_bool();
+            *bits
+                .get_mut(*bit)
+                .ok_or(Error::Value("invalid prepared bit"))? = register.measure(*qubit)?.as_bool();
             Ok(())
         }
         PreparedOp::Barrier => Ok(()),
     }
 }
 
-fn phase<K: RegisterKind>(
+pub fn phase<K: RegisterKind>(
     register: &mut Register<'_, K>,
     angle: f64,
     controls: &NativeControls,
@@ -600,7 +730,11 @@ fn phase<K: RegisterKind>(
     }
     Ok(())
 }
-fn apply_gate<K: RegisterKind>(
+#[expect(
+    clippy::too_many_lines,
+    reason = "Exhaustive native gate dispatch keeps each controlled and uncontrolled mapping adjacent"
+)]
+pub fn apply_gate<K: RegisterKind>(
     register: &mut Register<'_, K>,
     gate: &BoundGate,
     targets: &[i32],
@@ -608,7 +742,7 @@ fn apply_gate<K: RegisterKind>(
 ) -> Result<()> {
     let qs = &controls.wires;
     let states = &controls.states;
-    let t = targets[0];
+    let t = *targets.first().ok_or(Error::Value("missing gate target"))?;
     let result = match gate {
         BoundGate::Id => return Ok(()),
         BoundGate::H if controls.wires.is_empty() => quest_sys::apply_hadamard(register.pin(), t),
@@ -645,22 +779,46 @@ fn apply_gate<K: RegisterKind>(
         BoundGate::Rz(a) => {
             quest_sys::apply_multi_state_controlled_rotate_z(register.pin(), qs, states, t, *a)
         }
-        BoundGate::S | BoundGate::Sdg | BoundGate::T | BoundGate::Tdg | BoundGate::Phase(_) => {
-            let angle = match gate {
-                BoundGate::S => std::f64::consts::FRAC_PI_2,
-                BoundGate::Sdg => -std::f64::consts::FRAC_PI_2,
-                BoundGate::T => std::f64::consts::FRAC_PI_4,
-                BoundGate::Tdg => -std::f64::consts::FRAC_PI_4,
-                BoundGate::Phase(a) => *a,
-                _ => unreachable!(),
-            };
+        BoundGate::S => {
+            return apply_gate(
+                register,
+                &BoundGate::Phase(std::f64::consts::FRAC_PI_2),
+                targets,
+                controls,
+            );
+        }
+        BoundGate::Sdg => {
+            return apply_gate(
+                register,
+                &BoundGate::Phase(-std::f64::consts::FRAC_PI_2),
+                targets,
+                controls,
+            );
+        }
+        BoundGate::T => {
+            return apply_gate(
+                register,
+                &BoundGate::Phase(std::f64::consts::FRAC_PI_4),
+                targets,
+                controls,
+            );
+        }
+        BoundGate::Tdg => {
+            return apply_gate(
+                register,
+                &BoundGate::Phase(-std::f64::consts::FRAC_PI_4),
+                targets,
+                controls,
+            );
+        }
+        BoundGate::Phase(angle) => {
             for &control in &controls.zeros {
                 register.x(control)?;
             }
             quest_sys::apply_multi_qubit_phase_shift(
                 register.pin(),
                 &controls.phase_targets,
-                angle,
+                *angle,
             )
             .context("applying phase gate")?;
             for &control in controls.zeros.iter().rev() {
@@ -668,12 +826,18 @@ fn apply_gate<K: RegisterKind>(
             }
             return Ok(());
         }
-        BoundGate::Swap if controls.wires.is_empty() => {
-            quest_sys::apply_swap(register.pin(), t, targets[1])
-        }
-        BoundGate::Swap => {
-            quest_sys::apply_multi_state_controlled_swap(register.pin(), qs, states, t, targets[1])
-        }
+        BoundGate::Swap if controls.wires.is_empty() => quest_sys::apply_swap(
+            register.pin(),
+            t,
+            *targets.get(1).ok_or(Error::Value("missing swap target"))?,
+        ),
+        BoundGate::Swap => quest_sys::apply_multi_state_controlled_swap(
+            register.pin(),
+            qs,
+            states,
+            t,
+            *targets.get(1).ok_or(Error::Value("missing swap target"))?,
+        ),
         BoundGate::Sxdg => {
             apply_gate(
                 register,
@@ -695,7 +859,8 @@ fn apply_gate<K: RegisterKind>(
         BoundGate::U { theta, phi, lambda } => {
             apply_gate(register, &BoundGate::Phase(*lambda), targets, controls)?;
             apply_gate(register, &BoundGate::Ry(*theta), targets, controls)?;
-            return apply_gate(register, &BoundGate::Phase(*phi), targets, controls);
+            apply_gate(register, &BoundGate::Phase(*phi), targets, controls)?;
+            return phase(register, theta / 2.0, controls);
         }
     };
     result.context("applying standard gate")

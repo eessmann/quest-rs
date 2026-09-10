@@ -1,13 +1,18 @@
-//! Safe cxx bridge bindings for QuEST 4.3.x, binary64, deprecated APIs disabled.
+#![allow(
+    clippy::missing_errors_doc,
+    reason = "one-to-one safe CXX wrappers uniformly forward lifecycle and native validation errors"
+)]
+
+//! Safe `cxx` bridge bindings for `QuEST` 4.3.x, binary64, deprecated APIs disabled.
 //!
-//! QuEST only permits installing a custom input-error handler after the
+//! `QuEST` only permits installing a custom input-error handler after the
 //! environment has been initialized. As a result, validation failures during
-//! `init_quest_env` and `init_custom_quest_env` can still follow QuEST's
+//! `init_quest_env` and `init_custom_quest_env` can still follow `QuEST`'s
 //! default behavior; validation failures after successful initialization are
 //! converted into [`QuestError`].
 //!
-//! QuEST-owned resources exposed as opaque handles are destroyed by RAII. Drop
-//! those handles before finalizing the QuEST environment.
+//! `QuEST`-owned resources exposed as opaque handles are destroyed by RAII. Drop
+//! those handles before finalizing the `QuEST` environment.
 //! Initialization may be attempted once per process. Every native operation
 //! must run on that initializing thread. Calls before initialization, after
 //! finalization, or from another thread return [`QuestError::Lifecycle`].
@@ -26,7 +31,10 @@ use thiserror::Error;
 mod generated_api;
 pub use generated_api::*;
 
-#[allow(dead_code)]
+#[allow(
+    dead_code,
+    reason = "CXX requires marker declarations for opaque native handle ownership"
+)]
 #[cxx::bridge(namespace = "quest_sys")]
 mod ffi {
     #[derive(Debug, Clone, Copy, PartialEq)]
@@ -217,11 +225,10 @@ impl From<cxx::Exception> for QuestError {
     fn from(error: cxx::Exception) -> Self {
         const LIFECYCLE_PREFIX: &str = "quest-sys lifecycle: ";
         let message = error.what();
-        if let Some(message) = message.strip_prefix(LIFECYCLE_PREFIX) {
-            Self::Lifecycle(message.to_owned())
-        } else {
-            Self::Validation(message.to_owned())
-        }
+        message.strip_prefix(LIFECYCLE_PREFIX).map_or_else(
+            || Self::Validation(message.to_owned()),
+            |message| Self::Lifecycle(message.to_owned()),
+        )
     }
 }
 
@@ -267,6 +274,7 @@ pub fn sync_quest_env() -> QuestResult<()> {
     map_quest_result(ffi::sync_quest_env())
 }
 
+#[must_use]
 pub fn is_quest_env_init() -> bool {
     ffi::is_quest_env_init()
 }
@@ -280,14 +288,15 @@ pub fn get_environment_string() -> QuestResult<String> {
 }
 
 /// Snapshot safety-relevant numerical configuration on the owner thread.
-/// SIMD exception status flags are excluded, so arithmetic alone does not
+///
+/// `SIMD` exception status flags are excluded, so arithmetic alone does not
 /// invalidate a snapshot. Unsupported architectures report unavailable
 /// underflow controls instead of assuming a default policy.
 pub fn get_numerical_fingerprint() -> QuestResult<NumericalFingerprint> {
     map_quest_result(ffi::get_numerical_fingerprint())
 }
 
-/// Replace QuEST's process-wide RNG seed sequence.
+/// Replace `QuEST`'s process-wide RNG seed sequence.
 pub fn set_qu_est_seeds(seeds: &[u32]) -> QuestResult<()> {
     map_quest_result(ffi::set_qu_est_seeds(seeds))
 }
@@ -333,7 +342,7 @@ pub fn calc_total_prob(qureg: &Qureg) -> QuestResult<f64> {
 }
 
 /// Copy a rectangular row-major buffer into a density register.
-/// This differs from QuEST's column-major *flat density* storage convention.
+/// This differs from `QuEST`'s column-major *flat density* storage convention.
 pub fn set_density_qureg_amps(
     qureg: Pin<&mut Qureg>,
     start_row: i64,
@@ -360,7 +369,7 @@ pub fn get_density_qureg_amps(
     ))
 }
 
-/// Multiply a statevector by exp(i angle); a density matrix is unchanged.
+/// Multiply a statevector by `exp(i angle)`; a density matrix is unchanged.
 pub fn apply_global_phase(qureg: Pin<&mut Qureg>, angle: f64) -> QuestResult<()> {
     map_quest_result(ffi::apply_global_phase(qureg, angle))
 }

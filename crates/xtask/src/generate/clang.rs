@@ -23,7 +23,7 @@ impl QuestRoot {
         &self.path
     }
 
-    pub fn source_label(&self) -> &'static str {
+    pub const fn source_label(&self) -> &'static str {
         self.source
     }
 }
@@ -284,8 +284,7 @@ fn clang_command() -> String {
         llvm_config_path("--bindir")
             .map(|bindir| bindir.join("clang"))
             .filter(|path| path.is_file())
-            .map(|path| path.display().to_string())
-            .unwrap_or_else(|| "clang".to_owned())
+            .map_or_else(|| "clang".to_owned(), |path| path.display().to_string())
     })
 }
 
@@ -374,8 +373,7 @@ fn api_item_from_entity(entity: Entity<'_>, include_root: &Path) -> Option<ApiIt
         line,
         linkage: entity
             .get_linkage()
-            .map(|linkage| format!("{linkage:?}"))
-            .unwrap_or_else(|| "none".to_owned()),
+            .map_or_else(|| "none".to_owned(), |linkage| format!("{linkage:?}")),
         availability: format!("{:?}", entity.get_availability()),
         result_type: result_type_name,
         result_canonical_type,
@@ -386,7 +384,7 @@ fn api_item_from_entity(entity: Entity<'_>, include_root: &Path) -> Option<ApiIt
     })
 }
 
-pub(crate) fn canonicalize_existing(path: &Path) -> Result<PathBuf, DynError> {
+fn canonicalize_existing(path: &Path) -> Result<PathBuf, DynError> {
     path.canonicalize()
         .map_err(|error| format!("failed to canonicalize {}: {error}", path.display()).into())
 }

@@ -6,7 +6,7 @@ use quest_sys::{self, QuestComplex, QuestError};
 
 const EPSILON: f64 = 1e-12;
 
-fn complex(re: f64, im: f64) -> QuestComplex {
+const fn complex(re: f64, im: f64) -> QuestComplex {
     QuestComplex { re, im }
 }
 

@@ -4,7 +4,7 @@ use common::isolated;
 use googletest::prelude::*;
 use quest_sys::{QuestComplex, QuestError};
 
-fn complex(re: f64, im: f64) -> QuestComplex {
+const fn complex(re: f64, im: f64) -> QuestComplex {
     QuestComplex { re, im }
 }
 
@@ -142,29 +142,36 @@ fn validation_tolerance_cannot_disable_numerical_checks() -> googletest::Result<
 fn concurrent_initializers_admit_exactly_one_owner() -> googletest::Result<()> {
     isolated("concurrent_initializers_admit_exactly_one_owner", || {
         let barrier = std::sync::Arc::new(std::sync::Barrier::new(4));
-        let threads: Vec<_> = (0..4)
-            .map(|_| {
-                let barrier = barrier.clone();
-                std::thread::spawn(move || {
-                    barrier.wait();
-                    match quest_sys::init_custom_quest_env(false, false, false) {
-                        Ok(()) => {
-                            let register = quest_sys::create_qureg(1)
-                                .expect("winning thread owns environment");
-                            drop(register);
-                            quest_sys::finalize_quest_env().expect("winning thread can finalize");
-                            true
-                        }
-                        Err(QuestError::Lifecycle(_)) => false,
-                        Err(error) => panic!("unexpected initialization failure: {error}"),
+        let mut threads = Vec::with_capacity(4);
+        for _ in 0..4 {
+            let barrier = barrier.clone();
+            threads.push(std::thread::spawn(move || {
+                barrier.wait();
+                match quest_sys::init_custom_quest_env(false, false, false) {
+                    Ok(()) => {
+                        let register = quest_sys::create_qureg(1)
+                            .map_err(|error| format!("winning thread cannot create: {error}"))?;
+                        drop(register);
+                        quest_sys::finalize_quest_env()
+                            .map_err(|error| format!("winning thread cannot finalize: {error}"))?;
+                        Ok(true)
                     }
-                })
-            })
-            .collect();
-        let owners = threads
-            .into_iter()
-            .map(|t| usize::from(t.join().expect("worker should not panic")))
-            .sum::<usize>();
+                    Err(QuestError::Lifecycle(_)) => Ok(false),
+                    Err(error) => Err(format!("unexpected initialization failure: {error}")),
+                }
+            }));
+        }
+        let mut owners = 0_usize;
+        for thread in threads {
+            let owns_environment = thread
+                .join()
+                .map_err(|_| "worker should not panic")
+                .or_fail()?
+                .or_fail()?;
+            owners = owners
+                .checked_add(usize::from(owns_environment))
+                .or_fail()?;
+        }
         verify_that!(owners, eq(1))?;
         verify_that!(quest_sys::is_quest_env_init(), eq(false))
     })

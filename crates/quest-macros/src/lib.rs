@@ -1,7 +1,8 @@
 #![forbid(unsafe_code)]
-#![feature(proc_macro_span)]
+#![feature(proc_macro_span, proc_macro_expand)]
 //! Token-tree frontend for the documented OpenQASM-style Rust circuit profile.
 
+use num_traits::ToPrimitive;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span, TokenStream as Tokens};
 use quote::{quote, quote_spanned};
@@ -14,6 +15,22 @@ use syn::{
 
 #[proc_macro]
 pub fn circuit(input: TokenStream) -> TokenStream {
+    frontend::expand(input.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/// Compile a compiler-tracked `OpenQASM` source file.
+#[proc_macro]
+pub fn circuit_file(input: TokenStream) -> TokenStream {
+    frontend::file(input.into())
+        .unwrap_or_else(syn::Error::into_compile_error)
+        .into()
+}
+
+/// Previous static builder DSL, retaining its ideal rational-pi expressions.
+#[proc_macro]
+pub fn legacy_circuit(input: TokenStream) -> TokenStream {
     match syn::parse::<Circuit>(input).and_then(Circuit::expand) {
         Ok(tokens) => tokens.into(),
         Err(error) => error.to_compile_error().into(),
@@ -118,61 +135,7 @@ impl Parse for Circuit {
             let name = input.parse::<Ident>()?;
             let keyword = name.to_string();
             if keyword == "qubit" || keyword == "bit" {
-                if !circuit.statements.is_empty() {
-                    return Err(syn::Error::new(
-                        name.span(),
-                        "wire declarations must precede circuit operations",
-                    ));
-                }
-                let array = input.peek(syn::token::Bracket);
-                let length = if array {
-                    let content;
-                    bracketed!(content in input);
-                    let n = content.parse::<LitInt>()?.base10_parse::<usize>()?;
-                    if !content.is_empty() {
-                        return Err(content.error("wire array size must be an integer literal"));
-                    }
-                    n
-                } else {
-                    1
-                };
-                if length == 0 {
-                    return Err(syn::Error::new(name.span(), "wire arrays must be nonempty"));
-                }
-                let wire_name = input.parse::<Ident>()?;
-                input.parse::<Token![;]>()?;
-                let kind = if keyword == "qubit" {
-                    WireKind::Qubit
-                } else {
-                    WireKind::Bit
-                };
-                let total = if kind == WireKind::Qubit {
-                    &mut circuit.qubits
-                } else {
-                    &mut circuit.bits
-                };
-                let offset = *total;
-                *total = total.checked_add(length).ok_or_else(|| {
-                    syn::Error::new(wire_name.span(), "wire count overflows usize")
-                })?;
-                if circuit
-                    .wires
-                    .insert(
-                        wire_name.to_string(),
-                        Wire {
-                            kind,
-                            offset,
-                            length,
-                            array,
-                        },
-                    )
-                    .is_some()
-                {
-                    return Err(syn::Error::new(
-                        wire_name.span(),
-                        "wire name is already declared",
-                    ));
-                }
+                circuit.parse_declaration(input, &name, &keyword)?;
                 continue;
             }
             if keyword == "reset" {
@@ -241,69 +204,138 @@ impl Parse for Circuit {
                 });
                 continue;
             }
-            let mut gate_name = name;
-            let mut controls = vec![];
-            let mut inverse = false;
-            loop {
-                match gate_name.to_string().as_str() {
-                    "inv" => {
-                        inverse = !inverse;
-                        input.parse::<Token![@]>()?;
-                        gate_name = input.parse()?;
-                    }
-                    "ctrl" | "negctrl" => {
-                        let state = gate_name == "ctrl";
-                        let count = if input.peek(syn::token::Paren) {
-                            let content;
-                            parenthesized!(content in input);
-                            let count = content.parse::<LitInt>()?.base10_parse::<usize>()?;
-                            if !content.is_empty() {
-                                return Err(
-                                    content.error("control count must be an integer literal")
-                                );
-                            }
-                            count
-                        } else {
-                            1
-                        };
-                        if count == 0 || count > 1024 {
-                            return Err(syn::Error::new(
-                                gate_name.span(),
-                                "control count must be in 1..=1024",
-                            ));
-                        }
-                        controls.extend(std::iter::repeat_n(state, count));
-                        input.parse::<Token![@]>()?;
-                        gate_name = input.parse()?;
-                    }
-                    _ => break,
-                }
-            }
-            let mut angles = vec![];
-            if input.peek(syn::token::Paren) {
-                let content;
-                parenthesized!(content in input);
-                while !content.is_empty() {
-                    angles.push(parse_angle(&content)?);
-                    if content.is_empty() {
-                        break;
-                    }
-                    content.parse::<Token![,]>()?;
-                }
-            }
-            circuit.statements.push(Statement::Gate {
-                name: gate_name,
-                angles,
-                operands: operands(input)?,
-                controls,
-                inverse,
-            });
+            circuit.statements.push(parse_gate(input, name)?);
         }
         if circuit.qubits == 0 {
             return Err(input.error("a circuit requires at least one qubit declaration"));
         }
         Ok(circuit)
     }
+}
+
+impl Circuit {
+    fn parse_declaration(
+        &mut self,
+        input: ParseStream,
+        name: &Ident,
+        keyword: &str,
+    ) -> syn::Result<()> {
+        if !self.statements.is_empty() {
+            return Err(syn::Error::new(
+                name.span(),
+                "wire declarations must precede circuit operations",
+            ));
+        }
+        let array = input.peek(syn::token::Bracket);
+        let length = if array {
+            let content;
+            bracketed!(content in input);
+            let n = content.parse::<LitInt>()?.base10_parse::<usize>()?;
+            if !content.is_empty() {
+                return Err(content.error("wire array size must be an integer literal"));
+            }
+            n
+        } else {
+            1
+        };
+        if length == 0 {
+            return Err(syn::Error::new(name.span(), "wire arrays must be nonempty"));
+        }
+        let wire_name = input.parse::<Ident>()?;
+        input.parse::<Token![;]>()?;
+        let kind = if keyword == "qubit" {
+            WireKind::Qubit
+        } else {
+            WireKind::Bit
+        };
+        let total = if kind == WireKind::Qubit {
+            &mut self.qubits
+        } else {
+            &mut self.bits
+        };
+        let offset = *total;
+        *total = total
+            .checked_add(length)
+            .ok_or_else(|| syn::Error::new(wire_name.span(), "wire count overflows usize"))?;
+        if self
+            .wires
+            .insert(
+                wire_name.to_string(),
+                Wire {
+                    kind,
+                    offset,
+                    length,
+                    array,
+                },
+            )
+            .is_some()
+        {
+            return Err(syn::Error::new(
+                wire_name.span(),
+                "wire name is already declared",
+            ));
+        }
+
+        Ok(())
+    }
+}
+
+fn parse_gate(input: ParseStream, name: Ident) -> syn::Result<Statement> {
+    let mut gate_name = name;
+    let mut controls = vec![];
+    let mut inverse = false;
+    loop {
+        match gate_name.to_string().as_str() {
+            "inv" => {
+                inverse = !inverse;
+                input.parse::<Token![@]>()?;
+                gate_name = input.parse()?;
+            }
+            "ctrl" | "negctrl" => {
+                let state = gate_name == "ctrl";
+                let count = if input.peek(syn::token::Paren) {
+                    let content;
+                    parenthesized!(content in input);
+                    let count = content.parse::<LitInt>()?.base10_parse::<usize>()?;
+                    if !content.is_empty() {
+                        return Err(content.error("control count must be an integer literal"));
+                    }
+                    count
+                } else {
+                    1
+                };
+                if count == 0 || count > 1024 {
+                    return Err(syn::Error::new(
+                        gate_name.span(),
+                        "control count must be in 1..=1024",
+                    ));
+                }
+                controls.extend(std::iter::repeat_n(state, count));
+                input.parse::<Token![@]>()?;
+                gate_name = input.parse()?;
+            }
+            _ => break,
+        }
+    }
+    let mut angles = vec![];
+    if input.peek(syn::token::Paren) {
+        let content;
+        parenthesized!(content in input);
+        while !content.is_empty() {
+            angles.push(parse_angle(&content)?);
+            if content.is_empty() {
+                break;
+            }
+            content.parse::<Token![,]>()?;
+        }
+    }
+    Ok(Statement::Gate {
+        name: gate_name,
+        angles,
+        operands: operands(input)?,
+        controls,
+        inverse,
+    })
 }
 
 fn parse_angle(input: ParseStream) -> syn::Result<AngleValue> {
@@ -330,7 +362,14 @@ fn parse_angle(input: ParseStream) -> syn::Result<AngleValue> {
     }
     let (numerator, denominator, power) = exact(&expression)?;
     if power == 0 {
-        return Ok(AngleValue::Radians(numerator as f64 / denominator as f64));
+        return Ok(AngleValue::Radians(
+            numerator
+                .to_f64()
+                .ok_or_else(|| input.error("numerator is not representable"))?
+                / denominator
+                    .to_f64()
+                    .ok_or_else(|| input.error("denominator is not representable"))?,
+        ));
     }
     if power != 1 {
         return Err(syn::Error::new(
@@ -381,15 +420,21 @@ fn exact(expression: &Expr) -> syn::Result<(i128, i128, i8)> {
         let mut a = n.checked_abs().ok_or_else(overflow)?;
         let mut b = d.checked_abs().ok_or_else(overflow)?;
         while b != 0 {
-            let next = a % b;
+            let next = a.checked_rem(b).ok_or_else(overflow)?;
             a = b;
             b = next;
         }
         let gcd = a.max(1);
         let sign = if d < 0 { -1 } else { 1 };
         Ok((
-            (n / gcd).checked_mul(sign).ok_or_else(overflow)?,
-            (d / gcd).checked_mul(sign).ok_or_else(overflow)?,
+            n.checked_div(gcd)
+                .ok_or_else(overflow)?
+                .checked_mul(sign)
+                .ok_or_else(overflow)?,
+            d.checked_div(gcd)
+                .ok_or_else(overflow)?
+                .checked_mul(sign)
+                .ok_or_else(overflow)?,
             p,
         ))
     };
@@ -408,30 +453,48 @@ fn exact(expression: &Expr) -> syn::Result<(i128, i128, i8)> {
             let (n, d, p) = exact(&x.expr)?;
             Ok((n.checked_neg().ok_or_else(overflow)?, d, p))
         }
-        Expr::Binary(x) => {
-            let (a, b, p) = exact(&x.left)?;
-            let (c, d, q) = exact(&x.right)?;
-            match x.op {
+        Expr::Binary(binary) => {
+            let (left_numerator, left_denominator, left_power) = exact(&binary.left)?;
+            let (right_numerator, right_denominator, right_power) = exact(&binary.right)?;
+            match binary.op {
                 syn::BinOp::Mul(_) => normalized(
-                    a.checked_mul(c).ok_or_else(overflow)?,
-                    b.checked_mul(d).ok_or_else(overflow)?,
-                    p.checked_add(q).ok_or_else(overflow)?,
+                    left_numerator
+                        .checked_mul(right_numerator)
+                        .ok_or_else(overflow)?,
+                    left_denominator
+                        .checked_mul(right_denominator)
+                        .ok_or_else(overflow)?,
+                    left_power.checked_add(right_power).ok_or_else(overflow)?,
                 ),
                 syn::BinOp::Div(_) => normalized(
-                    a.checked_mul(d).ok_or_else(overflow)?,
-                    b.checked_mul(c).ok_or_else(overflow)?,
-                    p.checked_sub(q).ok_or_else(overflow)?,
+                    left_numerator
+                        .checked_mul(right_denominator)
+                        .ok_or_else(overflow)?,
+                    left_denominator
+                        .checked_mul(right_numerator)
+                        .ok_or_else(overflow)?,
+                    left_power.checked_sub(right_power).ok_or_else(overflow)?,
                 ),
-                syn::BinOp::Add(_) | syn::BinOp::Sub(_) if p == q => {
-                    let left = a.checked_mul(d).ok_or_else(overflow)?;
-                    let right = c.checked_mul(b).ok_or_else(overflow)?;
-                    let n = if matches!(x.op, syn::BinOp::Add(_)) {
+                syn::BinOp::Add(_) | syn::BinOp::Sub(_) if left_power == right_power => {
+                    let left = left_numerator
+                        .checked_mul(right_denominator)
+                        .ok_or_else(overflow)?;
+                    let right = right_numerator
+                        .checked_mul(left_denominator)
+                        .ok_or_else(overflow)?;
+                    let numerator = if matches!(binary.op, syn::BinOp::Add(_)) {
                         left.checked_add(right)
                     } else {
                         left.checked_sub(right)
                     }
                     .ok_or_else(overflow)?;
-                    normalized(n, b.checked_mul(d).ok_or_else(overflow)?, p)
+                    normalized(
+                        numerator,
+                        left_denominator
+                            .checked_mul(right_denominator)
+                            .ok_or_else(overflow)?,
+                        left_power,
+                    )
                 }
                 _ => Err(error()),
             }
@@ -486,7 +549,9 @@ impl Circuit {
                 "circuit wire index is out of range",
             ));
         }
-        Ok(wire.offset + operand.index)
+        wire.offset
+            .checked_add(operand.index)
+            .ok_or_else(|| syn::Error::new(operand.name.span(), "wire offset overflows usize"))
     }
     fn expand(self) -> syn::Result<Tokens> {
         let root = root_path()?;
@@ -499,9 +564,7 @@ impl Circuit {
                 | Statement::Reset { span, .. }
                 | Statement::Barrier { span, .. } => *span,
             };
-            // The compiler owns these source coordinates. No source files or
-            // reconstructed token text are read to recover locations. This is
-            // only called during an actual procedural macro invocation.
+            // Only the compiler provides source locations; no source file is read.
             let compiler_span = span.unwrap();
             let file = compiler_span.file();
             let range = compiler_span.byte_range();
@@ -530,130 +593,169 @@ impl Circuit {
                         .collect::<syn::Result<Vec<_>>>()?;
                     emitted.push(quote!(#builder.barrier(&[#(#builder.qubit(#qs)?),*])?;));
                 }
-                Statement::Gate {
-                    name,
-                    angles,
-                    operands,
-                    controls,
-                    inverse,
-                } => {
-                    let (variant, arity, angle_count, intrinsic) = gate_spec(name)?;
-                    let expected = arity + controls.len() + intrinsic;
-                    if operands.len() != expected {
-                        return Err(syn::Error::new(
-                            name.span(),
-                            format!(
-                                "{} expects {expected} qubit operands with these modifiers, received {}",
-                                name,
-                                operands.len()
-                            ),
-                        ));
-                    }
-                    if angles.len() != angle_count {
-                        return Err(syn::Error::new(
-                            name.span(),
-                            format!(
-                                "{} expects {angle_count} angle arguments, received {}",
-                                name,
-                                angles.len()
-                            ),
-                        ));
-                    }
-                    let indices = operands
-                        .iter()
-                        .map(|q| self.resolve(q, WireKind::Qubit))
-                        .collect::<syn::Result<Vec<_>>>()?;
-                    let mut unique = std::collections::BTreeSet::new();
-                    for (operand, index) in operands.iter().zip(&indices) {
-                        if !unique.insert(index) {
-                            return Err(syn::Error::new(
-                                operand.name.span(),
-                                "duplicate target/control operand",
-                            ));
-                        }
-                    }
-                    let mut states = controls.clone();
-                    states.extend(std::iter::repeat_n(true, intrinsic));
-                    let control_tokens=states.iter().zip(&indices).map(|(state,index)|{let state=if *state{quote!(One)}else{quote!(Zero)};quote!(#root::Control::new(#builder.qubit(#index)?,#root::ControlState::#state))}).collect::<Vec<_>>();
-                    let targets = &indices[states.len()..];
-                    let angle_tokens = angles
-                        .iter()
-                        .map(|a| match a {
-                            AngleValue::Exact {
-                                numerator,
-                                denominator,
-                            } => quote!(#root::Angle::pi(#numerator,#denominator)?),
-                            AngleValue::Radians(x) => quote!(#root::Angle::radians(#x)?),
-                            AngleValue::Runtime(x) => quote!(#root::Angle::radians((#x) as f64)?),
-                        })
-                        .collect::<Vec<_>>();
-                    if variant == "GlobalPhase" {
-                        let a = &angle_tokens[0];
-                        let a = if *inverse {
-                            quote!((#a).negated())
-                        } else {
-                            quote!(#a)
-                        };
-                        emitted.push(quote_spanned!(name.span()=>#builder.global_phase(#a,&[#(#control_tokens),*])?;));
-                    } else {
-                        let variant = Ident::new(variant, name.span());
-                        let gate = if variant == "U" {
-                            let t = &angle_tokens[0];
-                            let p = &angle_tokens[1];
-                            let l = &angle_tokens[2];
-                            quote!(#root::Gate::U{theta:#t,phi:#p,lambda:#l})
-                        } else if angle_count == 1 {
-                            let a = &angle_tokens[0];
-                            quote!(#root::Gate::#variant(#a))
-                        } else {
-                            quote!(#root::Gate::#variant)
-                        };
-                        let gate = if *inverse {
-                            quote!((#gate).adjoint())
-                        } else {
-                            gate
-                        };
-                        emitted.push(quote_spanned!(name.span()=>#builder.gate(#gate,&[#(#builder.qubit(#targets)?),*],&[#(#control_tokens),*])?;));
-                    }
+                Statement::Gate { .. } => {
+                    emitted.push(self.expand_gate(&root, &builder, statement)?);
                 }
             }
         }
         let qubits = self.qubits;
         let bits = self.bits;
         Ok(
-            quote!((|| -> ::core::result::Result<#root::ValidatedProgram,#root::CircuitError> {let mut #builder=#root::ProgramBuilder::new(#qubits,#bits)?;#(#emitted)*#builder.finish()})()),
+            quote!((|| -> ::core::result::Result<#root::ValidatedProgram,#root::CircuitError> {
+            let mut #builder=#root::ProgramBuilder::new(#qubits,#bits)?;
+            #(#emitted)*#builder.finish()
+        })()),
         )
     }
 }
 
-fn gate_spec(name: &Ident) -> syn::Result<(&'static str, usize, usize, usize)> {
-    Ok(match name.to_string().as_str() {
-        "id" => ("Id", 1, 0, 0),
-        "x" => ("X", 1, 0, 0),
-        "y" => ("Y", 1, 0, 0),
-        "z" => ("Z", 1, 0, 0),
-        "h" => ("H", 1, 0, 0),
-        "s" => ("S", 1, 0, 0),
-        "sdg" => ("Sdg", 1, 0, 0),
-        "t" => ("T", 1, 0, 0),
-        "tdg" => ("Tdg", 1, 0, 0),
-        "sx" => ("Sx", 1, 0, 0),
-        "rx" => ("Rx", 1, 1, 0),
-        "ry" => ("Ry", 1, 1, 0),
-        "rz" => ("Rz", 1, 1, 0),
-        "p" => ("Phase", 1, 1, 0),
-        "cx" => ("X", 1, 0, 1),
-        "cy" => ("Y", 1, 0, 1),
-        "cz" => ("Z", 1, 0, 1),
-        "ccx" => ("X", 1, 0, 2),
-        "swap" => ("Swap", 2, 0, 0),
-        "U" | "u" => ("U", 1, 3, 0),
-        "gphase" => ("GlobalPhase", 0, 1, 0),
-        _ => {
+impl Circuit {
+    fn expand_gate(
+        &self,
+        root: &Tokens,
+        builder: &Ident,
+        statement: &Statement,
+    ) -> syn::Result<Tokens> {
+        let Statement::Gate {
+            name,
+            angles,
+            operands,
+            controls,
+            inverse,
+        } = statement
+        else {
             return Err(syn::Error::new(
-                name.span(),
-                "unsupported circuit construct or gate in the initial DSL profile",
+                Span::call_site(),
+                "internal gate emission mismatch",
             ));
+        };
+
+        let (variant, angle_count, intrinsic) =
+            check_signature(name, angles.len(), operands.len(), controls.len())?;
+        let indices = operands
+            .iter()
+            .map(|q| self.resolve(q, WireKind::Qubit))
+            .collect::<syn::Result<Vec<_>>>()?;
+        let mut unique = std::collections::BTreeSet::new();
+        for (operand, index) in operands.iter().zip(&indices) {
+            if !unique.insert(index) {
+                return Err(syn::Error::new(
+                    operand.name.span(),
+                    "duplicate target/control operand",
+                ));
+            }
         }
-    })
+        let mut states = controls.clone();
+        states.extend(std::iter::repeat_n(true, intrinsic));
+        let control_tokens = states
+            .iter()
+            .zip(&indices)
+            .map(|(state, index)| {
+                let state = if *state { quote!(One) } else { quote!(Zero) };
+                quote!(#root::Control::new(#builder.qubit(#index)?,#root::ControlState::#state))
+            })
+            .collect::<Vec<_>>();
+        let targets = indices
+            .get(states.len()..)
+            .ok_or_else(|| syn::Error::new(name.span(), "control arity exceeds operands"))?;
+        let angle_tokens = angles
+            .iter()
+            .map(|a| match a {
+                AngleValue::Exact {
+                    numerator,
+                    denominator,
+                } => quote!(#root::Angle::pi(#numerator,#denominator)?),
+                AngleValue::Radians(x) => quote!(#root::Angle::radians(#x)?),
+                AngleValue::Runtime(x) => quote!(#root::Angle::radians((#x) as f64)?),
+            })
+            .collect::<Vec<_>>();
+        if variant == "GlobalPhase" {
+            let a = angle_tokens
+                .first()
+                .ok_or_else(|| syn::Error::new(name.span(), "missing gate angle"))?;
+            let a = if *inverse {
+                quote!((#a).negated())
+            } else {
+                quote!(#a)
+            };
+            Ok(quote_spanned!(name.span()=>#builder.global_phase(#a,&[#(#control_tokens),*])?;))
+        } else {
+            let variant = Ident::new(variant, name.span());
+            let gate = if variant == "U" {
+                let t = angle_tokens
+                    .first()
+                    .ok_or_else(|| syn::Error::new(name.span(), "missing gate angle"))?;
+                let p = angle_tokens
+                    .get(1)
+                    .ok_or_else(|| syn::Error::new(name.span(), "missing gate angle"))?;
+                let l = angle_tokens
+                    .get(2)
+                    .ok_or_else(|| syn::Error::new(name.span(), "missing gate angle"))?;
+                quote!(#root::Gate::U{theta:#t,phi:#p,lambda:#l})
+            } else if angle_count == 1 {
+                let a = angle_tokens
+                    .first()
+                    .ok_or_else(|| syn::Error::new(name.span(), "missing gate angle"))?;
+                quote!(#root::Gate::#variant(#a))
+            } else {
+                quote!(#root::Gate::#variant)
+            };
+            let gate = if *inverse {
+                quote!((#gate).adjoint())
+            } else {
+                gate
+            };
+            Ok(
+                quote_spanned!(name.span()=>#builder.gate(#gate,&[#(#builder.qubit(#targets)?),*],&[#(#control_tokens),*])?;),
+            )
+        }
+    }
 }
+
+fn gate_spec(name: &Ident) -> syn::Result<(&'static str, usize, usize, usize)> {
+    let kind = quest_language::GateKind::lookup(&name.to_string()).ok_or_else(|| {
+        syn::Error::new(
+            name.span(),
+            "unsupported circuit construct or gate in the initial DSL profile",
+        )
+    })?;
+    let gate = kind.definition();
+    Ok((
+        gate.rust_variant,
+        gate.target_count,
+        gate.parameter_count,
+        gate.intrinsic_controls,
+    ))
+}
+
+fn check_signature(
+    name: &Ident,
+    actual_angles: usize,
+    operand_count: usize,
+    control_count: usize,
+) -> syn::Result<(&'static str, usize, usize)> {
+    let (variant, arity, angle_count, intrinsic) = gate_spec(name)?;
+    let expected = arity
+        .checked_add(control_count)
+        .and_then(|count| count.checked_add(intrinsic))
+        .ok_or_else(|| syn::Error::new(name.span(), "gate arity overflows usize"))?;
+    if operand_count != expected {
+        return Err(syn::Error::new(
+            name.span(),
+            format!(
+                "{name} expects {expected} qubit operands with these modifiers, received {operand_count}"
+            ),
+        ));
+    }
+    if actual_angles != angle_count {
+        return Err(syn::Error::new(
+            name.span(),
+            format!("{name} expects {angle_count} angle arguments, received {actual_angles}"),
+        ));
+    }
+
+    Ok((variant, angle_count, intrinsic))
+}
+
+mod adapter;
+mod frontend;

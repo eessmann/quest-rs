@@ -22,6 +22,7 @@ faer = { workspace = true, features = ["std", "linalg"] }
 ndarray = { workspace = true, features = ["std"], optional = true }
 
 [dev-dependencies]
+criterion.workspace = true
 googletest.workspace = true
 trybuild = { workspace = true }
 
@@ -29,7 +30,14 @@ trybuild = { workspace = true }
 workspace = true
 
 [features]
+serde = ["quest-circuit/serde"]
+codespan-reporting = ["quest-circuit/codespan-reporting"]
+workers = ["quest-circuit/workers"]
 ndarray = ["dep:ndarray"]
 
 [build-dependencies]
 quest-build = { workspace = true }
+
+[[bench]]
+name = "runtime"
+harness = false

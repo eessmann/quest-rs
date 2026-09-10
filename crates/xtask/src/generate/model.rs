@@ -59,7 +59,7 @@ pub enum AdapterSourceKind {
 }
 
 impl AdapterSourceKind {
-    pub fn reason(self) -> &'static str {
+    pub const fn reason(self) -> &'static str {
         match self {
             Self::Core => "emitted in hand-written core cxx bridge",
             Self::Generated => "emitted in checked-in generated cxx bridge",
@@ -118,7 +118,7 @@ impl AdapterRegistry {
     }
 
     #[cfg(test)]
-    pub fn empty() -> Self {
+    pub const fn empty() -> Self {
         Self {
             entries: Vec::new(),
             by_overload_key: BTreeMap::new(),
@@ -163,7 +163,7 @@ pub enum CoverageStatus {
 }
 
 impl CoverageStatus {
-    pub fn as_str(self) -> &'static str {
+    pub const fn as_str(self) -> &'static str {
         match self {
             Self::Generated => "generated",
             Self::Manual => "manual",

@@ -1,4 +1,10 @@
-#![allow(clippy::too_many_arguments)]
+// This file mirrors upstream CXX signatures one-to-one. Per-wrapper argument
+// counts and identical native-validation error docs add no Rust-side contract.
+#![allow(
+    clippy::missing_errors_doc,
+    clippy::too_many_arguments,
+    reason = "generated wrappers preserve upstream CXX signatures and share one error contract"
+)]
 
 use crate::{
     CompMatr, CompMatr1, CompMatr2, DiagMatr, DiagMatr1, DiagMatr2, FullStateDiagMatr, KrausMap,

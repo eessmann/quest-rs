@@ -10,6 +10,10 @@ pub enum ExecutionMode {
     Disabled,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[expect(
+    clippy::struct_excessive_bools,
+    reason = "Independent native feature flags are a capability snapshot, not mutually exclusive states"
+)]
 pub struct Capabilities {
     pub gpu: bool,
     pub multithreaded: bool,
@@ -34,22 +38,28 @@ impl Default for EnvironmentBuilder {
     }
 }
 impl EnvironmentBuilder {
-    pub fn gpu(mut self, mode: ExecutionMode) -> Self {
+    #[must_use]
+    pub const fn gpu(mut self, mode: ExecutionMode) -> Self {
         self.gpu = mode;
         self
     }
-    pub fn multithreading(mut self, mode: ExecutionMode) -> Self {
+    #[must_use]
+    pub const fn multithreading(mut self, mode: ExecutionMode) -> Self {
         self.threads = mode;
         self
     }
-    pub fn distribution(mut self, mode: ExecutionMode) -> Self {
+    #[must_use]
+    pub const fn distribution(mut self, mode: ExecutionMode) -> Self {
         self.distribution = mode;
         self
     }
-    pub fn memory_budget(mut self, budget: MemoryBudget) -> Self {
+    #[must_use]
+    pub const fn memory_budget(mut self, budget: MemoryBudget) -> Self {
         self.budget = budget;
         self
     }
+    /// # Errors
+    /// Rejects unsupported distribution, unavailable native modes, or native environment initialization failures.
     pub fn build(self) -> Result<Environment> {
         // The initial runtime has no collective allocation/error protocol.
         if self.distribution != ExecutionMode::Disabled {
@@ -96,24 +106,31 @@ pub struct Environment {
     thread: PhantomData<Rc<()>>,
 }
 impl Environment {
+    #[must_use]
     pub fn builder() -> EnvironmentBuilder {
         EnvironmentBuilder::default()
     }
-    pub fn capabilities(&self) -> Capabilities {
+    pub const fn capabilities(&self) -> Capabilities {
         self.capabilities
     }
-    pub fn memory_budget(&self) -> MemoryBudget {
+    pub const fn memory_budget(&self) -> MemoryBudget {
         self.budget
     }
-    pub fn allocated_bytes(&self) -> usize {
+    pub const fn allocated_bytes(&self) -> usize {
         self.allocated.get()
     }
+    /// # Errors
+    /// Rejects allocation overflow, insufficient memory budget, or native allocation failure.
     pub fn state_vector(&self, count: QubitCount) -> Result<Register<'_, StateVector>> {
         Register::allocate(self, count)
     }
+    /// # Errors
+    /// Rejects allocation overflow, insufficient memory budget, or native allocation failure.
     pub fn density_matrix(&self, count: QubitCount) -> Result<Register<'_, DensityMatrix>> {
         Register::allocate(self, count)
     }
+    /// # Errors
+    /// Returns the environment and native shutdown error if live resources prevent finalization.
     pub fn close(mut self) -> std::result::Result<(), CloseError> {
         match quest_sys::finalize_quest_env().context("finalizing environment") {
             Ok(()) => {
@@ -126,13 +143,13 @@ impl Environment {
             }),
         }
     }
-    /// Retain a conservative fixed allowance for QuEST's process RNG seed
+    /// Retain a conservative fixed allowance for `QuEST`'s process RNG seed
     /// storage after the first high-level batch. It remains charged until close.
     pub(crate) fn admit_seed_storage(&self) -> Result<()> {
+        const BYTES: usize = 4096;
         if self.seed_storage.get() {
             return Ok(());
         }
-        const BYTES: usize = 4096;
         let available = self.budget.bytes().saturating_sub(self.allocated.get());
         if available < BYTES {
             return Err(Error::Budget {
@@ -203,14 +220,15 @@ impl std::error::Error for CloseError {
     }
 }
 
-pub(crate) struct Reservation<'a> {
+pub struct Reservation<'a> {
     pub(crate) environment: &'a Environment,
     bytes: usize,
 }
+// Each reservation releases exactly the bytes charged at construction.
 impl Drop for Reservation<'_> {
     fn drop(&mut self) {
-        self.environment
-            .allocated
-            .set(self.environment.allocated.get() - self.bytes);
+        if let Some(remaining) = self.environment.allocated.get().checked_sub(self.bytes) {
+            self.environment.allocated.set(remaining);
+        }
     }
 }
