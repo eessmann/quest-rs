@@ -12,8 +12,8 @@ struct QuestComplex;
 struct QuestEnvironment;
 struct QubitMeasurement;
 
-static_assert(QUEST_VERSION_MAJOR == 4 && QUEST_VERSION_MINOR == 2 && QUEST_VERSION_PATCH == 0,
-              "quest-sys generated bindings target QuEST 4.2.0");
+static_assert(QUEST_VERSION_MAJOR == 4 && QUEST_VERSION_MINOR >= 2 && QUEST_VERSION_PATCH == 0,
+              "quest-sys generated bindings target QuEST 4.2.0+");
 static_assert(QUEST_INCLUDE_DEPRECATED_FUNCTIONS == 0,
               "quest-sys generated bindings exclude deprecated QuEST APIs");
 static_assert(QUEST_FLOAT_PRECISION == 2,

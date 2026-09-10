@@ -11,15 +11,21 @@ prebuilt binaries if it is not already available:
 curl -LsSf https://get.nexte.st/latest/mac | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
 ```
 
-The low-level `quest-sys` tests need a local QuEST install. For the standard
-local setup, run:
+The low-level `quest-sys` tests need a local QuEST install. Point either
+`QUEST_ROOT`/`QUEST_DIR` or `CMAKE_PREFIX_PATH` at its installation prefix:
 
 ```sh
-CMAKE_PREFIX_PATH=/Users/erich/Projects/opt/quest cargo nextest run --workspace
+QUEST_ROOT=/path/to/quest cargo nextest run --workspace
 ```
 
 Nextest does not run doctests, so run them separately:
 
 ```sh
-CMAKE_PREFIX_PATH=/Users/erich/Projects/opt/quest cargo test --doc --workspace
+QUEST_ROOT=/path/to/quest cargo test --doc --workspace
 ```
+
+When QuEST is shared, workspace test and example executables embed the
+resolved QuEST library directory as an rpath on Linux and macOS. Static QuEST
+builds are linked without adding a QuEST runtime path; static archives must be
+built with `CMAKE_POSITION_INDEPENDENT_CODE=ON` for position-independent Rust
+executables.

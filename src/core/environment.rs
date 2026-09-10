@@ -3,7 +3,7 @@ use std::sync::OnceLock;
 
 static ENVIRONMENT_CLAIMED: OnceLock<()> = OnceLock::new();
 
-fn claim_environment() -> quest_sys::QuestResult<()> {
+pub fn claim_environment() -> quest_sys::QuestResult<()> {
     ENVIRONMENT_CLAIMED.set(()).map_err(|()| {
         quest_sys::QuestError::Lifecycle(
             "the QuEST environment has already been initialized or finalized; \

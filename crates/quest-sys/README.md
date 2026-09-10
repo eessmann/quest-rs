@@ -28,17 +28,17 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-quest-rs-sys = "0.1.0"
+quest-sys = "0.2"
 ```
 
 ### Finding the QuEST Installation
 
-The build system will try to find QuEST in the following order:
+The build system asks CMake for the installed `QuEST::QuEST` target, using
+prefixes in the following order:
 
-1. Using `QUEST_DIR` or `QUEST_ROOT` environment variables
-2. Using `CMAKE_PREFIX_PATH` environment variable
-3. Using pkg-config
-4. In standard system directories
+1. `QUEST_DIR`, `QUEST_ROOT`, `QuEST_DIR`, or `QuEST_ROOT`
+2. Entries from `CMAKE_PREFIX_PATH`
+3. Standard CMake package locations
 
 If QuEST cannot be found, the build will fail with an error message.
 
@@ -48,6 +48,13 @@ Example with environment variables:
 export QUEST_DIR=/path/to/quest/installation
 cargo build
 ```
+
+Both `lib` and `lib64` installation layouts are supported. On Linux and
+macOS, shared QuEST libraries discovered through the CMake target are added to
+the rpath of this package's tests and examples. Static QuEST archives need no
+QuEST runtime path and remain statically linked. Build static archives with
+`CMAKE_POSITION_INDEPENDENT_CODE=ON` so they can link into position-independent
+Rust executables.
 
 ### Feature Flags
 
