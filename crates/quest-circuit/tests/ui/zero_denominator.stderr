@@ -1,0 +1,5 @@
+error: angle denominator must be nonzero
+ --> tests/ui/zero_denominator.rs:2:38
+  |
+2 | fn main(){let _=circuit!{qubit q; rz(pi/0) q;};}
+  |                                      ^^^^

@@ -942,8 +942,8 @@
     {
       "overload_key": "clearQuESTGpuCache() -> void",
       "quest_name": "clearQuESTGpuCache",
-      "adapter_name": "clear_qu_estgpu_cache",
-      "rust_name": "clear_qu_estgpu_cache",
+      "adapter_name": "clear_qu_est_gpu_cache",
+      "rust_name": "clear_qu_est_gpu_cache",
       "source_kind": "generated"
     },
     {
@@ -1087,6 +1087,13 @@
       "source_kind": "generated"
     },
     {
+      "overload_key": "getDensityQuregAmps(std::complex<double> **, Qureg, long long, long long, long long, long long) -> void",
+      "quest_name": "getDensityQuregAmps",
+      "adapter_name": "get_density_qureg_amps",
+      "rust_name": "get_density_qureg_amps",
+      "source_kind": "core"
+    },
+    {
       "overload_key": "getDiagMatr1(std::vector<std::complex<double>>) -> DiagMatr1",
       "quest_name": "getDiagMatr1",
       "adapter_name": "get_diag_matr1",
@@ -1131,29 +1138,36 @@
     {
       "overload_key": "getQuESTGpuCacheSize() -> long long",
       "quest_name": "getQuESTGpuCacheSize",
-      "adapter_name": "get_qu_estgpu_cache_size",
-      "rust_name": "get_qu_estgpu_cache_size",
+      "adapter_name": "get_qu_est_gpu_cache_size",
+      "rust_name": "get_qu_est_gpu_cache_size",
       "source_kind": "generated"
     },
     {
       "overload_key": "getQuESTNumGpuThreadsPerBlock() -> int",
       "quest_name": "getQuESTNumGpuThreadsPerBlock",
-      "adapter_name": "get_qu_estnum_gpu_threads_per_block",
-      "rust_name": "get_qu_estnum_gpu_threads_per_block",
+      "adapter_name": "get_qu_est_num_gpu_threads_per_block",
+      "rust_name": "get_qu_est_num_gpu_threads_per_block",
       "source_kind": "generated"
     },
     {
       "overload_key": "getQuESTNumSeeds() -> int",
       "quest_name": "getQuESTNumSeeds",
-      "adapter_name": "get_qu_estnum_seeds",
-      "rust_name": "get_qu_estnum_seeds",
+      "adapter_name": "get_qu_est_num_seeds",
+      "rust_name": "get_qu_est_num_seeds",
       "source_kind": "generated"
+    },
+    {
+      "overload_key": "getQuESTSeeds() -> std::vector<unsigned int>",
+      "quest_name": "getQuESTSeeds",
+      "adapter_name": "get_qu_est_seeds",
+      "rust_name": "get_qu_est_seeds",
+      "source_kind": "core"
     },
     {
       "overload_key": "getQuESTValidationEpsilon() -> double",
       "quest_name": "getQuESTValidationEpsilon",
-      "adapter_name": "get_qu_estvalidation_epsilon",
-      "rust_name": "get_qu_estvalidation_epsilon",
+      "adapter_name": "get_qu_est_validation_epsilon",
+      "rust_name": "get_qu_est_validation_epsilon",
       "source_kind": "generated"
     },
     {
@@ -1168,6 +1182,13 @@
       "quest_name": "getQuregAmps",
       "adapter_name": "getQuregAmps",
       "rust_name": "get_qureg_amps",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "initArbitraryPureState(Qureg, std::complex<double> *) -> void",
+      "quest_name": "initArbitraryPureState",
+      "adapter_name": "init_arbitrary_pure_state",
+      "rust_name": "init_arbitrary_pure_state",
       "source_kind": "core"
     },
     {
@@ -1187,8 +1208,8 @@
     {
       "overload_key": "initCustomQuESTEnv(int, int, int) -> void",
       "quest_name": "initCustomQuESTEnv",
-      "adapter_name": "initCustomQuESTEnv",
-      "rust_name": "init_custom_qu_estenv",
+      "adapter_name": "init_custom_quest_env_modes",
+      "rust_name": "init_custom_quest_env_modes",
       "source_kind": "core"
     },
     {
@@ -1710,10 +1731,17 @@
       "source_kind": "generated"
     },
     {
-      "overload_key": "setCompMatr(CompMatr, std::vector<std::vector<std::complex<double>>>) -> void",
+      "overload_key": "setCompMatr(CompMatr, std::complex<double> **) -> void",
       "quest_name": "setCompMatr",
-      "adapter_name": "setCompMatr",
-      "rust_name": "set_comp_matr",
+      "adapter_name": "set_comp_matr_flat",
+      "rust_name": "set_comp_matr_flat",
+      "source_kind": "core"
+    },
+    {
+      "overload_key": "setDensityQuregAmps(Qureg, long long, long long, std::complex<double> **, long long, long long) -> void",
+      "quest_name": "setDensityQuregAmps",
+      "adapter_name": "set_density_qureg_amps",
+      "rust_name": "set_density_qureg_amps",
       "source_kind": "core"
     },
     {
@@ -1759,73 +1787,87 @@
       "source_kind": "generated"
     },
     {
+      "overload_key": "setKrausMap(KrausMap, std::complex<double> ***) -> void",
+      "quest_name": "setKrausMap",
+      "adapter_name": "set_kraus_map_flat",
+      "rust_name": "set_kraus_map_flat",
+      "source_kind": "core"
+    },
+    {
       "overload_key": "setQuESTMaxNumReportedItems(long long, long long) -> void",
       "quest_name": "setQuESTMaxNumReportedItems",
-      "adapter_name": "set_qu_estmax_num_reported_items",
-      "rust_name": "set_qu_estmax_num_reported_items",
+      "adapter_name": "set_qu_est_max_num_reported_items",
+      "rust_name": "set_qu_est_max_num_reported_items",
       "source_kind": "generated"
     },
     {
       "overload_key": "setQuESTMaxNumReportedSigFigs(int) -> void",
       "quest_name": "setQuESTMaxNumReportedSigFigs",
-      "adapter_name": "set_qu_estmax_num_reported_sig_figs",
-      "rust_name": "set_qu_estmax_num_reported_sig_figs",
+      "adapter_name": "set_qu_est_max_num_reported_sig_figs",
+      "rust_name": "set_qu_est_max_num_reported_sig_figs",
       "source_kind": "generated"
     },
     {
       "overload_key": "setQuESTNumGpuThreadsPerBlock(int) -> void",
       "quest_name": "setQuESTNumGpuThreadsPerBlock",
-      "adapter_name": "set_qu_estnum_gpu_threads_per_block",
-      "rust_name": "set_qu_estnum_gpu_threads_per_block",
+      "adapter_name": "set_qu_est_num_gpu_threads_per_block",
+      "rust_name": "set_qu_est_num_gpu_threads_per_block",
       "source_kind": "generated"
     },
     {
       "overload_key": "setQuESTNumReportedNewlines(int) -> void",
       "quest_name": "setQuESTNumReportedNewlines",
-      "adapter_name": "set_qu_estnum_reported_newlines",
-      "rust_name": "set_qu_estnum_reported_newlines",
+      "adapter_name": "set_qu_est_num_reported_newlines",
+      "rust_name": "set_qu_est_num_reported_newlines",
+      "source_kind": "generated"
+    },
+    {
+      "overload_key": "setQuESTReportedPauliChars(const char *) -> void",
+      "quest_name": "setQuESTReportedPauliChars",
+      "adapter_name": "set_qu_est_reported_pauli_chars",
+      "rust_name": "set_qu_est_reported_pauli_chars",
       "source_kind": "generated"
     },
     {
       "overload_key": "setQuESTReportedPauliStrStyle(int) -> void",
       "quest_name": "setQuESTReportedPauliStrStyle",
-      "adapter_name": "set_qu_estreported_pauli_str_style",
-      "rust_name": "set_qu_estreported_pauli_str_style",
+      "adapter_name": "set_qu_est_reported_pauli_str_style",
+      "rust_name": "set_qu_est_reported_pauli_str_style",
       "source_kind": "generated"
+    },
+    {
+      "overload_key": "setQuESTSeeds(unsigned int *, int) -> void",
+      "quest_name": "setQuESTSeeds",
+      "adapter_name": "set_qu_est_seeds",
+      "rust_name": "set_qu_est_seeds",
+      "source_kind": "core"
     },
     {
       "overload_key": "setQuESTSeedsToDefault() -> void",
       "quest_name": "setQuESTSeedsToDefault",
-      "adapter_name": "set_qu_estseeds_to_default",
-      "rust_name": "set_qu_estseeds_to_default",
+      "adapter_name": "set_qu_est_seeds_to_default",
+      "rust_name": "set_qu_est_seeds_to_default",
       "source_kind": "generated"
     },
     {
       "overload_key": "setQuESTValidationEpsilon(double) -> void",
       "quest_name": "setQuESTValidationEpsilon",
-      "adapter_name": "set_qu_estvalidation_epsilon",
-      "rust_name": "set_qu_estvalidation_epsilon",
+      "adapter_name": "set_qu_est_validation_epsilon",
+      "rust_name": "set_qu_est_validation_epsilon",
       "source_kind": "generated"
     },
     {
       "overload_key": "setQuESTValidationEpsilonToDefault() -> void",
       "quest_name": "setQuESTValidationEpsilonToDefault",
-      "adapter_name": "set_qu_estvalidation_epsilon_to_default",
-      "rust_name": "set_qu_estvalidation_epsilon_to_default",
-      "source_kind": "generated"
-    },
-    {
-      "overload_key": "setQuESTValidationOff() -> void",
-      "quest_name": "setQuESTValidationOff",
-      "adapter_name": "set_qu_estvalidation_off",
-      "rust_name": "set_qu_estvalidation_off",
+      "adapter_name": "set_qu_est_validation_epsilon_to_default",
+      "rust_name": "set_qu_est_validation_epsilon_to_default",
       "source_kind": "generated"
     },
     {
       "overload_key": "setQuESTValidationOn() -> void",
       "quest_name": "setQuESTValidationOn",
-      "adapter_name": "set_qu_estvalidation_on",
-      "rust_name": "set_qu_estvalidation_on",
+      "adapter_name": "set_qu_est_validation_on",
+      "rust_name": "set_qu_est_validation_on",
       "source_kind": "generated"
     },
     {

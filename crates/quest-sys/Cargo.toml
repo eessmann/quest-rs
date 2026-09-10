@@ -1,29 +1,30 @@
 [package]
 name = "quest-sys"
 version = "0.2.0"
-edition = "2024"
+edition.workspace = true
 links = "QuEST"
 description = "Low-level Rust bindings to the QuEST C++ quantum simulation toolkit"
-license = "MIT"
-repository = "https://github.com/eessmann/quest-rs"
-readme = "README.md"
+license.workspace = true
+repository.workspace = true
 keywords = ["quantum", "simulation", "ffi", "bindings"]
 categories = ["external-ffi-bindings", "science"]
 build = "build.rs"
 
 [dependencies]
-cxx.workspace = true
+cxx = { workspace = true, features = ["std", "c++20"] }
 thiserror.workspace = true
 
 [build-dependencies]
-cxx-build.workspace = true
-cmake-package.workspace = true
-miette.workspace = true
+cxx-build = { workspace = true, features = ["parallel"] }
+quest-build.workspace = true
 
 [dev-dependencies]
 googletest.workspace = true
-libc = "0.2"
+libc = { workspace = true }
 
 [[example]]
 name = "min_example"
 path = "examples/min_example.rs"
+
+[lints]
+workspace = true

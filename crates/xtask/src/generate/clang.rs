@@ -1,6 +1,5 @@
 use std::collections::BTreeSet;
 use std::env;
-use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::sync::{Mutex, OnceLock};
@@ -64,11 +63,11 @@ pub fn collect_quest_api(quest_root: &Path) -> Result<Vec<ApiItem>, DynError> {
     let _guard = clang_lock()
         .lock()
         .map_err(|_| "libclang mutex was poisoned")?;
-    configure_libclang_path();
-
+    // clang-sys already searches llvm-config's prefix and explicit LIBCLANG_PATH.
+    // Do not mutate the process environment while other test threads may read it.
     let clang = Clang::new().map_err(|error| format_libclang_error(&error))?;
     let index = Index::new(&clang, false, false);
-    let args = clang_arguments(&include_root);
+    let args = clang_arguments(&include_root)?;
     let mut parser = index.parser(&quest_h);
     parser.arguments(&args);
 
@@ -113,21 +112,6 @@ fn clang_lock() -> &'static Mutex<()> {
     LOCK.get_or_init(|| Mutex::new(()))
 }
 
-fn configure_libclang_path() {
-    if env::var_os("LIBCLANG_PATH").is_some() {
-        return;
-    }
-
-    if let Some(libdir) = llvm_config_path("--libdir").filter(|path| contains_libclang(path)) {
-        // The xtask is single-threaded at runtime. Tests serialize libclang access
-        // through `clang_lock`, so setting this process variable happens before
-        // clang-sys attempts to load libclang.
-        unsafe {
-            env::set_var("LIBCLANG_PATH", libdir);
-        }
-    }
-}
-
 pub fn format_libclang_error(error: &str) -> String {
     format!(
         "could not load libclang: {error}\n\
@@ -136,7 +120,22 @@ pub fn format_libclang_error(error: &str) -> String {
     )
 }
 
-fn clang_arguments(include_root: &Path) -> Vec<String> {
+fn clang_arguments(include_root: &Path) -> Result<Vec<String>, DynError> {
+    // A libclang resource directory is compiler-specific. Refuse to silently
+    // combine an explicitly selected libclang with a different driver version.
+    let driver = clang_command();
+    let driver_output = Command::new(&driver)
+        .arg("--version")
+        .output()
+        .map_err(|error| format!("could not inspect parser driver {driver}: {error}"))?;
+    let driver_version = String::from_utf8_lossy(&driver_output.stdout);
+    let library_version = clang::get_version();
+    if !driver_output.status.success()
+        || clang_major_version(&driver_version).is_none()
+        || clang_major_version(&driver_version) != clang_major_version(&library_version)
+    {
+        return Err(format!("libclang and parser driver must come from the same LLVM major version; libclang={library_version}; driver={driver_version}. Select matching LIBCLANG_PATH and CLANG.").into());
+    }
     let mut args = vec![
         "-x".to_owned(),
         "c++".to_owned(),
@@ -148,11 +147,6 @@ fn clang_arguments(include_root: &Path) -> Vec<String> {
     if let Some(resource_dir) = clang_resource_dir() {
         args.push("-resource-dir".to_owned());
         args.push(resource_dir.display().to_string());
-        let resource_include = resource_dir.join("include");
-        if resource_include.is_dir() {
-            args.push("-isystem".to_owned());
-            args.push(resource_include.display().to_string());
-        }
     }
 
     for include in discovered_include_dirs() {
@@ -179,7 +173,17 @@ fn clang_arguments(include_root: &Path) -> Vec<String> {
         }
     }
 
-    args
+    Ok(args)
+}
+
+fn clang_major_version(version: &str) -> Option<u32> {
+    version
+        .split_once("version ")?
+        .1
+        .split('.')
+        .next()?
+        .parse()
+        .ok()
 }
 
 fn clang_target() -> Option<String> {
@@ -233,22 +237,6 @@ fn quest_root_error() -> String {
     "could not locate QuEST headers; set QUEST_ROOT, QUEST_DIR, QuEST_ROOT, QuEST_DIR, or CMAKE_PREFIX_PATH to a QuEST install containing include/quest.h".to_owned()
 }
 
-fn contains_libclang(path: &Path) -> bool {
-    fs::read_dir(path)
-        .ok()
-        .into_iter()
-        .flatten()
-        .filter_map(Result::ok)
-        .any(|entry| {
-            let name = entry.file_name();
-            let name = name.to_string_lossy();
-            name == "libclang.dylib"
-                || name == "libclang.so"
-                || name.starts_with("libclang.so.")
-                || name == "libclang.dll"
-        })
-}
-
 fn llvm_config_path(arg: &str) -> Option<PathBuf> {
     let output = Command::new("llvm-config").arg(arg).output().ok()?;
     if !output.status.success() {
@@ -261,25 +249,20 @@ fn llvm_config_path(arg: &str) -> Option<PathBuf> {
 fn discovered_include_dirs() -> Vec<PathBuf> {
     let mut dirs = Vec::new();
 
-    if let Some(includedir) = llvm_config_path("--includedir").filter(|path| path.is_dir()) {
-        dirs.push(includedir);
-    }
-
-    if let Some(prefix) = llvm_config_path("--prefix") {
-        let libcxx = prefix.join("include").join("c++").join("v1");
-        if libcxx.is_dir() {
-            dirs.push(libcxx);
-        }
-    }
+    // Let the selected Clang driver choose its platform standard library.
+    // Merely finding LLVM does not select libc++: injecting LLVM's c++/v1
+    // headers here mixes libc++ with the driver's libstdc++ include chain.
 
     for var in ["CPATH", "C_INCLUDE_PATH", "CPLUS_INCLUDE_PATH"] {
         if let Some(value) = env::var_os(var) {
-            dirs.extend(env::split_paths(&value).filter(|path| path.is_dir()));
+            for path in env::split_paths(&value).filter(|path| path.is_dir()) {
+                if !dirs.contains(&path) {
+                    dirs.push(path);
+                }
+            }
         }
     }
 
-    dirs.sort();
-    dirs.dedup();
     dirs
 }
 
@@ -307,13 +290,7 @@ fn clang_command() -> String {
 }
 
 fn cxx_command() -> String {
-    env::var("CXX").unwrap_or_else(|_| {
-        llvm_config_path("--bindir")
-            .map(|bindir| bindir.join("clang++"))
-            .filter(|path| path.is_file())
-            .map(|path| path.display().to_string())
-            .unwrap_or_else(|| "clang++".to_owned())
-    })
+    env::var("CXX").unwrap_or_else(|_| clang_command())
 }
 
 fn collect_function_decls(

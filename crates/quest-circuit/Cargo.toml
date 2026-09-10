@@ -1,0 +1,31 @@
+[package]
+name = "quest-circuit"
+version = "0.1.0"
+description = "Native-independent quantum circuits, exact algebra, and bounded numerical fusion"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+codespan-reporting = { workspace = true, optional = true }
+faer = { workspace = true, features = ["std", "linalg"] }
+num-bigint = { workspace = true }
+num-complex = { workspace = true }
+num-rational = { workspace = true }
+num-traits = { workspace = true }
+petgraph = { workspace = true, features = ["std", "stable_graph"] }
+quest-macros = { workspace = true, optional = true }
+thiserror = { workspace = true }
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+googletest = { workspace = true }
+proptest = { workspace = true }
+trybuild = { workspace = true }
+
+[features]
+default = ["macros"]
+macros = ["dep:quest-macros"]
+codespan-reporting = ["dep:codespan-reporting"]

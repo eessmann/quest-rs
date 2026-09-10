@@ -1,0 +1,5 @@
+error[E0599]: no method named `inverse` found for struct `NumericalOperator` in the current scope
+ --> tests/ui/numerical_operator_has_no_inverse.rs:5:14
+  |
+5 |     operator.inverse();
+  |              ^^^^^^^ method not found in `NumericalOperator`

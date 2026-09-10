@@ -918,7 +918,6 @@ mod ffi {
         fn set_qu_est_seeds_to_default() -> Result<()>;
         fn set_qu_est_validation_epsilon(eps: f64) -> Result<()>;
         fn set_qu_est_validation_epsilon_to_default() -> Result<()>;
-        fn set_qu_est_validation_off() -> Result<()>;
         fn set_qu_est_validation_on() -> Result<()>;
         fn set_qureg_amps(
             qureg: Pin<&mut Qureg>,
@@ -2881,10 +2880,6 @@ pub fn set_qu_est_validation_epsilon(eps: f64) -> QuestResult<()> {
 
 pub fn set_qu_est_validation_epsilon_to_default() -> QuestResult<()> {
     map_quest_result(ffi::set_qu_est_validation_epsilon_to_default())
-}
-
-pub fn set_qu_est_validation_off() -> QuestResult<()> {
-    map_quest_result(ffi::set_qu_est_validation_off())
 }
 
 pub fn set_qu_est_validation_on() -> QuestResult<()> {

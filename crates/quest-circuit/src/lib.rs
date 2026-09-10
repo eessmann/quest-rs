@@ -1,0 +1,105 @@
+#![forbid(unsafe_code)]
+//! Native-independent circuits with owned identifiers and consuming compiler stages.
+//!
+//! Matrix target zero is the least-significant local basis bit. Targets retain
+//! their supplied order; controls never become matrix target bits. Exact algebra
+//! preserves ideal global phase, but does not promise bit-identical simulation.
+//!
+//! ```
+//! use quest_circuit::{Angle, Gate, ProgramBuilder};
+//! let mut builder = ProgramBuilder::new(1, 0)?;
+//! let theta = builder.parameter("theta")?;
+//! builder.gate(Gate::Rx(Angle::parameter(theta)), &[builder.qubit(0)?], &[])?;
+//! let plan = builder.finish()?.bind(&[(theta, 0.25)])?.lower()?.plan()?;
+//! assert_eq!(plan.instructions().len(), 1);
+//! # Ok::<(), quest_circuit::Error>(())
+//! ```
+
+mod matrix;
+mod model;
+mod optimize;
+mod program;
+
+pub use matrix::*;
+pub use model::*;
+pub use optimize::*;
+pub use program::*;
+
+extern crate self as quest_circuit;
+#[cfg(feature = "macros")]
+pub use quest_macros::circuit;
+/// Unambiguous error name for macro expansion through a runtime facade.
+pub type CircuitError = Error;
+
+pub type Result<T> = std::result::Result<T, Error>;
+
+#[derive(Debug, thiserror::Error)]
+#[non_exhaustive]
+pub enum Error {
+    #[error("identifier does not belong to this program, or is out of bounds")]
+    InvalidId,
+    #[error("duplicate operand or overlapping control and target")]
+    DuplicateOperand,
+    #[error("operation expects {expected} targets, received {actual}")]
+    Arity { expected: usize, actual: usize },
+    #[error("invalid finite numerical value")]
+    NonFinite,
+    #[error("rational angle denominator must be nonzero")]
+    ZeroDenominator,
+    #[error("resource budget exceeded: {0}")]
+    Budget(&'static str),
+    #[error("matrix must be a nonempty square with power-of-two dimension")]
+    MatrixShape,
+    #[error("matrix dimension mismatch")]
+    MatrixDimension,
+    #[error("unitarity residual {residual} exceeds tolerance {tolerance}")]
+    Unitarity { residual: f64, tolerance: f64 },
+    #[error("channel completeness residual {residual} exceeds tolerance {tolerance}")]
+    ChannelCompleteness { residual: f64, tolerance: f64 },
+    #[error("parameter name is empty or already declared")]
+    ParameterName,
+    #[error("parameter bindings must be complete, unique, finite, and program-owned")]
+    Binding,
+    #[error("dependency graph contains a cycle")]
+    Cycle,
+    #[error("program contains an effect or numerical operator without exact unitary semantics")]
+    NotUnitary,
+    #[error("native index is not representable")]
+    NativeIndex,
+    #[error("source range end precedes its start")]
+    SourceRange,
+}
+
+#[cfg(feature = "codespan-reporting")]
+impl Error {
+    /// Render this structured error at a frontend-owned source range. Rendering
+    /// borrows the original text; invalid byte offsets and UTF-8 boundaries are
+    /// rejected before invoking the optional presentation layer.
+    pub fn render_source(
+        &self,
+        span: &SourceSpan,
+        text: &str,
+    ) -> std::result::Result<String, codespan_reporting::files::Error> {
+        use codespan_reporting::{
+            diagnostic::{Diagnostic, Label},
+            files, term,
+        };
+        let range = span.range();
+        for index in [range.start, range.end] {
+            if index > text.len() {
+                return Err(files::Error::IndexTooLarge {
+                    given: index,
+                    max: text.len(),
+                });
+            }
+            if !text.is_char_boundary(index) {
+                return Err(files::Error::InvalidCharBoundary { given: index });
+            }
+        }
+        let file = files::SimpleFile::new(span.source(), text);
+        let diagnostic = Diagnostic::error()
+            .with_message(self.to_string())
+            .with_labels(vec![Label::primary((), range)]);
+        term::emit_into_string(&term::Config::default(), &file, &diagnostic)
+    }
+}

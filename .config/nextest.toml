@@ -10,5 +10,5 @@ fail-fast = false
 quest-sys-runtime = { max-threads = 1 }
 
 [[profile.default.overrides]]
-filter = 'package(quest-sys)'
+filter = 'package(quest-sys) | package(quest-rs)'
 test-group = 'quest-sys-runtime'

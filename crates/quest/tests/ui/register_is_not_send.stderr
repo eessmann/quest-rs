@@ -1,0 +1,33 @@
+error[E0277]: `*const cxx::void` cannot be sent between threads safely
+ --> tests/ui/register_is_not_send.rs:6:21
+  |
+6 |         scope.spawn(move || register.h(0).unwrap());
+  |               ----- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `*const cxx::void` cannot be sent between threads safely
+  |               |
+  |               required by a bound introduced by this call
+  |
+  = help: within `quest_sys::ffi::Qureg`, the trait `Send` is not implemented for `*const cxx::void`
+  = note: required because it appears within the type `[*const cxx::void; 0]`
+note: required because it appears within the type `cxx::opaque::Opaque`
+ --> $CARGO/cxx-$VERSION/src/opaque.rs
+  |
+  | pub struct Opaque {
+  |            ^^^^^^
+note: required because it appears within the type `quest_sys::ffi::Qureg`
+ --> $WORKSPACE/crates/quest-sys/src/lib.rs
+  |
+  |         type Qureg;
+  |              ^^^^^
+  = note: required for `cxx::unique_ptr::UniquePtr<quest_sys::ffi::Qureg>` to implement `Send`
+note: required because it appears within the type `Register<'_, StateVector>`
+ --> src/register.rs
+  |
+  | pub struct Register<'env, K: RegisterKind> {
+  |            ^^^^^^^^
+note: required because it's used within this closure
+ --> tests/ui/register_is_not_send.rs:6:21
+  |
+6 |         scope.spawn(move || register.h(0).unwrap());
+  |                     ^^^^^^^
+note: required by a bound in `Scope::<'scope, 'env>::spawn`
+ --> $RUST/std/src/thread/scoped.rs

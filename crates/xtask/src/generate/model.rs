@@ -152,6 +152,8 @@ fn reject_duplicate_generated_identifier(
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CoverageStatus {
     Generated,
+    Manual,
+    IntentionallyExcluded,
     CoveredByRaii,
     UnsupportedCApi,
     GatedMpi,
@@ -164,6 +166,8 @@ impl CoverageStatus {
     pub fn as_str(self) -> &'static str {
         match self {
             Self::Generated => "generated",
+            Self::Manual => "manual",
+            Self::IntentionallyExcluded => "intentionally-excluded",
             Self::CoveredByRaii => "covered-by-raii",
             Self::UnsupportedCApi => "unsupported-c-api",
             Self::GatedMpi => "gated-mpi",
@@ -184,7 +188,12 @@ pub fn overload_key(name: &str, result_type: &str, arguments: &[ApiArgument]) ->
 }
 
 pub fn normalize_type_key(ty: &str) -> String {
-    ty.split_whitespace().collect::<Vec<_>>().join(" ")
+    // Some libclang/standard-library combinations expand the std::string alias
+    // in canonical types while others retain it. They denote the same overload.
+    ty.split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ")
+        .replace("std::basic_string<char>", "std::string")
 }
 
 pub fn macro_value(config: &str, name: &str) -> Option<String> {
@@ -221,6 +230,14 @@ pub fn rust_name(quest_name: &str) -> String {
 mod tests {
     use super::*;
     use googletest::prelude::*;
+
+    #[gtest]
+    fn std_string_canonical_spelling_preserves_adapter_identity() -> googletest::Result<()> {
+        verify_that!(
+            normalize_type_key("std::basic_string<char>"),
+            eq("std::string")
+        )
+    }
 
     fn generated_entry(overload_key: &str, adapter_name: &str, rust_name: &str) -> AdapterEntry {
         AdapterEntry {

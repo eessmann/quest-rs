@@ -1,4 +1,4 @@
-//! Safe cxx bridge bindings for QuEST 4.2.0.
+//! Safe cxx bridge bindings for QuEST 4.3.x, binary64, deprecated APIs disabled.
 //!
 //! QuEST only permits installing a custom input-error handler after the
 //! environment has been initialized. As a result, validation failures during
@@ -8,6 +8,15 @@
 //!
 //! QuEST-owned resources exposed as opaque handles are destroyed by RAII. Drop
 //! those handles before finalizing the QuEST environment.
+//! Initialization may be attempted once per process. Every native operation
+//! must run on that initializing thread. Calls before initialization, after
+//! finalization, or from another thread return [`QuestError::Lifecycle`].
+//! [`is_quest_env_init`] reads synchronized bridge state and is thread-independent.
+//!
+//! Safe bridge users cannot disable native validation:
+//! ```compile_fail
+//! quest_sys::set_qu_est_validation_off().unwrap();
+//! ```
 
 use std::pin::Pin;
 
@@ -30,6 +39,17 @@ mod ffi {
     pub struct QubitMeasurement {
         pub outcome: i32,
         pub probability: f64,
+    }
+
+    #[derive(Debug, Clone, Copy, PartialEq)]
+    pub struct NumericalFingerprint {
+        pub rounding_mode: i32,
+        pub simd_control: u64,
+        pub round_to_nearest: bool,
+        pub flush_to_zero: bool,
+        pub denormals_are_zero: bool,
+        pub underflow_control_supported: bool,
+        pub validation_epsilon: f64,
     }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -67,11 +87,19 @@ mod ffi {
             use_gpu_accel: bool,
             use_multithread: bool,
         ) -> Result<()>;
+        fn init_custom_quest_env_modes(
+            use_distrib: i32,
+            use_gpu_accel: i32,
+            use_multithread: i32,
+        ) -> Result<()>;
         fn finalize_quest_env() -> Result<()>;
         fn sync_quest_env() -> Result<()>;
         fn is_quest_env_init() -> bool;
         fn get_quest_env() -> Result<QuestEnvironment>;
         fn get_environment_string() -> Result<String>;
+        fn get_numerical_fingerprint() -> Result<NumericalFingerprint>;
+        fn set_qu_est_seeds(seeds: &[u32]) -> Result<()>;
+        fn get_qu_est_seeds() -> Result<Vec<u32>>;
 
         fn create_qureg(num_qubits: i32) -> Result<UniquePtr<Qureg>>;
         fn create_density_qureg(num_qubits: i32) -> Result<UniquePtr<Qureg>>;
@@ -94,6 +122,22 @@ mod ffi {
             num_amps: i64,
         ) -> Result<Vec<QuestComplex>>;
         fn calc_total_prob(qureg: &Qureg) -> Result<f64>;
+        fn set_density_qureg_amps(
+            qureg: Pin<&mut Qureg>,
+            start_row: i64,
+            start_col: i64,
+            values: &[QuestComplex],
+            num_rows: i64,
+            num_cols: i64,
+        ) -> Result<()>;
+        fn get_density_qureg_amps(
+            qureg: &Qureg,
+            start_row: i64,
+            start_col: i64,
+            num_rows: i64,
+            num_cols: i64,
+        ) -> Result<Vec<QuestComplex>>;
+        fn apply_global_phase(qureg: Pin<&mut Qureg>, angle: f64) -> Result<()>;
 
         fn apply_qubit_measurement(qureg: Pin<&mut Qureg>, target: i32) -> Result<i32>;
         fn apply_qubit_measurement_and_get_prob(
@@ -132,6 +176,12 @@ mod ffi {
 
         fn create_super_op(num_qubits: i32) -> Result<UniquePtr<SuperOp>>;
         fn create_kraus_map(num_qubits: i32, num_operators: i32) -> Result<UniquePtr<KrausMap>>;
+        fn set_kraus_map_flat(
+            map: Pin<&mut KrausMap>,
+            values: &[QuestComplex],
+            num_operators: i32,
+            num_rows: i64,
+        ) -> Result<()>;
 
         fn create_inline_pauli_str_sum(spec: &str) -> Result<UniquePtr<PauliStrSum>>;
         fn apply_trotterized_unitary_time_evolution(
@@ -147,7 +197,8 @@ mod ffi {
 
 pub use ffi::{
     CompMatr, CompMatr1, CompMatr2, DiagMatr, DiagMatr1, DiagMatr2, FullStateDiagMatr, KrausMap,
-    PauliStr, PauliStrSum, QubitMeasurement, QuestComplex, QuestEnvironment, Qureg, SuperOp,
+    NumericalFingerprint, PauliStr, PauliStrSum, QubitMeasurement, QuestComplex, QuestEnvironment,
+    Qureg, SuperOp,
 };
 
 pub type QuestResult<T> = Result<T, QuestError>;
@@ -198,6 +249,20 @@ pub fn finalize_quest_env() -> QuestResult<()> {
     map_quest_result(ffi::finalize_quest_env())
 }
 
+/// Select native deployment modes: -1 for automatic, 0 disabled, 1 enabled.
+/// Invalid flags are rejected before consuming the native initialization attempt.
+pub fn init_custom_quest_env_modes(
+    use_distrib: i32,
+    use_gpu_accel: i32,
+    use_multithread: i32,
+) -> QuestResult<()> {
+    map_quest_result(ffi::init_custom_quest_env_modes(
+        use_distrib,
+        use_gpu_accel,
+        use_multithread,
+    ))
+}
+
 pub fn sync_quest_env() -> QuestResult<()> {
     map_quest_result(ffi::sync_quest_env())
 }
@@ -212,6 +277,23 @@ pub fn get_quest_env() -> QuestResult<QuestEnvironment> {
 
 pub fn get_environment_string() -> QuestResult<String> {
     map_quest_result(ffi::get_environment_string())
+}
+
+/// Snapshot safety-relevant numerical configuration on the owner thread.
+/// SIMD exception status flags are excluded, so arithmetic alone does not
+/// invalidate a snapshot. Unsupported architectures report unavailable
+/// underflow controls instead of assuming a default policy.
+pub fn get_numerical_fingerprint() -> QuestResult<NumericalFingerprint> {
+    map_quest_result(ffi::get_numerical_fingerprint())
+}
+
+/// Replace QuEST's process-wide RNG seed sequence.
+pub fn set_qu_est_seeds(seeds: &[u32]) -> QuestResult<()> {
+    map_quest_result(ffi::set_qu_est_seeds(seeds))
+}
+
+pub fn get_qu_est_seeds() -> QuestResult<Vec<u32>> {
+    map_quest_result(ffi::get_qu_est_seeds())
 }
 
 pub fn create_qureg(num_qubits: i32) -> QuestResult<UniquePtr<Qureg>> {
@@ -250,6 +332,39 @@ pub fn calc_total_prob(qureg: &Qureg) -> QuestResult<f64> {
     map_quest_result(ffi::calc_total_prob(qureg))
 }
 
+/// Copy a rectangular row-major buffer into a density register.
+/// This differs from QuEST's column-major *flat density* storage convention.
+pub fn set_density_qureg_amps(
+    qureg: Pin<&mut Qureg>,
+    start_row: i64,
+    start_col: i64,
+    values: &[QuestComplex],
+    num_rows: i64,
+    num_cols: i64,
+) -> QuestResult<()> {
+    map_quest_result(ffi::set_density_qureg_amps(
+        qureg, start_row, start_col, values, num_rows, num_cols,
+    ))
+}
+
+/// Copy a rectangular density block into owned row-major values.
+pub fn get_density_qureg_amps(
+    qureg: &Qureg,
+    start_row: i64,
+    start_col: i64,
+    num_rows: i64,
+    num_cols: i64,
+) -> QuestResult<Vec<QuestComplex>> {
+    map_quest_result(ffi::get_density_qureg_amps(
+        qureg, start_row, start_col, num_rows, num_cols,
+    ))
+}
+
+/// Multiply a statevector by exp(i angle); a density matrix is unchanged.
+pub fn apply_global_phase(qureg: Pin<&mut Qureg>, angle: f64) -> QuestResult<()> {
+    map_quest_result(ffi::apply_global_phase(qureg, angle))
+}
+
 pub fn apply_qubit_measurement(qureg: Pin<&mut Qureg>, target: i32) -> QuestResult<i32> {
     map_quest_result(ffi::apply_qubit_measurement(qureg, target))
 }
@@ -263,6 +378,15 @@ pub fn apply_qubit_measurement_and_get_prob(
 
 pub fn create_comp_matr(num_qubits: i32) -> QuestResult<UniquePtr<CompMatr>> {
     map_quest_result(ffi::create_comp_matr(num_qubits))
+}
+
+/// Copy a square row-major complex buffer into an existing native matrix.
+pub fn set_comp_matr_flat(
+    matrix: Pin<&mut CompMatr>,
+    values: &[QuestComplex],
+    num_rows: i64,
+) -> QuestResult<()> {
+    map_quest_result(ffi::set_comp_matr_flat(matrix, values, num_rows))
 }
 
 pub fn set_comp_matr(matrix: Pin<&mut CompMatr>, rows: &[&[QuestComplex]]) -> QuestResult<()> {
@@ -284,12 +408,17 @@ pub fn set_comp_matr(matrix: Pin<&mut CompMatr>, rows: &[&[QuestComplex]]) -> Qu
         ));
     }
 
-    let values = rows
-        .iter()
-        .flat_map(|row| row.iter().copied())
-        .collect::<Vec<_>>();
-
-    map_quest_result(ffi::set_comp_matr_flat(matrix, &values, rows.len() as i64))
+    let num_rows = i64::try_from(rows.len())
+        .map_err(|_| QuestError::InvalidInput("matrix row count exceeds i64".to_owned()))?;
+    let count = width.checked_mul(rows.len()).ok_or_else(|| {
+        QuestError::InvalidInput("matrix element count overflows usize".to_owned())
+    })?;
+    let mut values = Vec::new();
+    values.try_reserve_exact(count).map_err(|error| {
+        QuestError::InvalidInput(format!("cannot allocate matrix staging buffer: {error}"))
+    })?;
+    values.extend(rows.iter().flat_map(|row| row.iter().copied()));
+    set_comp_matr_flat(matrix, &values, num_rows)
 }
 
 pub fn apply_comp_matr(
@@ -342,6 +471,21 @@ pub fn create_super_op(num_qubits: i32) -> QuestResult<UniquePtr<SuperOp>> {
 
 pub fn create_kraus_map(num_qubits: i32, num_operators: i32) -> QuestResult<UniquePtr<KrausMap>> {
     map_quest_result(ffi::create_kraus_map(num_qubits, num_operators))
+}
+
+/// Copy operators in operator-major, then row-major order into a Kraus map.
+pub fn set_kraus_map_flat(
+    map: Pin<&mut KrausMap>,
+    values: &[QuestComplex],
+    num_operators: i32,
+    num_rows: i64,
+) -> QuestResult<()> {
+    map_quest_result(ffi::set_kraus_map_flat(
+        map,
+        values,
+        num_operators,
+        num_rows,
+    ))
 }
 
 pub fn create_inline_pauli_str_sum(spec: &str) -> QuestResult<UniquePtr<PauliStrSum>> {

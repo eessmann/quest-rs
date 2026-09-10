@@ -1,0 +1,5 @@
+error[E0599]: no method named `adjoint` found for struct `ValidatedProgram` in the current scope
+ --> tests/ui/program_adjoint.rs:2:89
+  |
+2 | fn main(){let program=ProgramBuilder::new(1,0).unwrap().finish().unwrap();let _=program.adjoint();}
+  |                                                                                         ^^^^^^^ method not found in `ValidatedProgram`

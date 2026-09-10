@@ -1,0 +1,5 @@
+error: duplicate target/control operand
+ --> tests/ui/duplicate.rs:2:52
+  |
+2 | fn main(){let _=circuit!{qubit[2] q; ctrl @ x q[0],q[0];};}
+  |                                                    ^

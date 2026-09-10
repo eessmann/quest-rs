@@ -1,7 +1,9 @@
 [package]
 name = "xtask"
 version = "0.1.0"
-edition = "2024"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
 publish = false
 
 [[bin]]
@@ -9,10 +11,15 @@ name = "xtask"
 path = "src/main.rs"
 
 [dependencies]
-clang.workspace = true
-serde.workspace = true
+quest-build = { workspace = true }
+anyhow = { workspace = true }
+clang = { workspace = true, features = ["runtime"] }
+serde = { workspace = true, features = ["derive", "std"] }
 serde_json.workspace = true
 
 [dev-dependencies]
 googletest.workspace = true
-tempfile = "3"
+tempfile = { workspace = true }
+
+[lints]
+workspace = true

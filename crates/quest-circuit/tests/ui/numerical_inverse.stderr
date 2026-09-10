@@ -1,0 +1,5 @@
+error[E0599]: no method named `inverse` found for struct `NumericalOperator` in the current scope
+ --> tests/ui/numerical_inverse.rs:2:55
+  |
+2 | fn inverse(operator:NumericalOperator){let _=operator.inverse();}
+  |                                                       ^^^^^^^ method not found in `NumericalOperator`

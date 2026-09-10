@@ -1,124 +1,56 @@
-# quest-rs-sys
+# quest-sys
 
-Low-level Rust bindings to the [QuEST](https://github.com/QuEST-Kit/QuEST) (Quantum Exact Simulation Toolkit) C++ library.
+CXX bindings to **QuEST 4.3.x**, with double precision and deprecated APIs disabled.
+Native discovery lives in the shared `quest-build` crate. The tested installed
+build recipe is Linux GNU with CMake and a C++20 compiler.
 
-These bindings are intended to be a thin wrapper around the C++ API, with minimal abstractions. For a more idiomatic Rust interface, see the `quest-rs` crate.
+Set `QUEST_ROOT` to the installation prefix, or use the canonical
+`QUEST_NATIVE_CONFIG` record created by the workspace's `xtask configure-native`.
+When needed, `QUEST_RUNTIME_LIBRARY_PATH` supplies explicit indirect native
+library directories. See `quest-build` for the final-executable build script and
+absolute DT_RPATH development recipe. A library's Cargo linker arguments do not
+propagate across arbitrary downstream dependencies. This crate does not modify
+or bundle native installation files.
 
-## Prerequisites
-
-This crate requires a prebuilt QuEST installation. You must install QuEST on your system before using this crate.
-
-### Installing QuEST
-
-1. Clone and build the QuEST repository:
-
-```bash
-git clone https://github.com/QuEST-Kit/QuEST.git
-cd QuEST
-mkdir build && cd build
-cmake -DCMAKE_INSTALL_PREFIX=/path/to/install/quest ..
-cmake --build . --target install
-```
-
-For more details, see the [QuEST documentation](https://github.com/QuEST-Kit/QuEST#readme).
-
-## Usage
-
-Add this to your `Cargo.toml`:
-
-```toml
-[dependencies]
-quest-sys = "0.2"
-```
-
-### Finding the QuEST Installation
-
-The build system asks CMake for the installed `QuEST::QuEST` target, using
-prefixes in the following order:
-
-1. `QUEST_DIR`, `QUEST_ROOT`, `QuEST_DIR`, or `QuEST_ROOT`
-2. Entries from `CMAKE_PREFIX_PATH`
-3. Standard CMake package locations
-
-If QuEST cannot be found, the build will fail with an error message.
-
-Example with environment variables:
-
-```bash
-export QUEST_DIR=/path/to/quest/installation
-cargo build
-```
-
-Both `lib` and `lib64` installation layouts are supported. On Linux and
-macOS, shared QuEST libraries discovered through the CMake target are added to
-the rpath of this package's tests and examples. Static QuEST archives need no
-QuEST runtime path and remain statically linked. Build static archives with
-`CMAKE_POSITION_INDEPENDENT_CODE=ON` so they can link into position-independent
-Rust executables.
-
-### Feature Flags
-
-- `openmp` - Enable OpenMP multithreading
-- `mpi` - Enable MPI distributed computing
-- `cuda` - Enable CUDA GPU acceleration
-- `cuquantum` - Enable NVIDIA cuQuantum library (requires `cuda`)
-- `hip` - Enable AMD HIP GPU acceleration
-- `build-from-source` - Build QuEST from source (not recommended; prefer system installation)
-
-## Example
-
-```rust
-use quest_rs_sys::safe::{self, create_qureg, init_zero_state, apply_hadamard, measure_qubit};
-use std::pin::Pin;
-
-fn main() {
-    // Initialize QuEST environment
-    safe::init_quest_env();
-    
-    // Create a 2-qubit register
-    let mut qureg = create_qureg(2);
-    let qureg_pin = Pin::new(qureg.as_mut().unwrap());
-    
-    // Initialize to |00⟩
-    init_zero_state(qureg_pin);
-    
-    // Apply Hadamard to first qubit to get (|00⟩ + |10⟩)/√2
-    apply_hadamard(qureg_pin, 0);
-    
-    // Measure first qubit (should get 0 or 1 with 50% probability)
-    let result = measure_qubit(qureg_pin, 0);
-    println!("Measurement result: {}", result);
-    
-    // Clean up
-    safe::finalize_quest_env();
+```rust,no_run
+fn main() -> quest_sys::QuestResult<()> {
+    quest_sys::init_custom_quest_env(false, false, false)?;
+    let mut register = quest_sys::create_qureg(2)?;
+    quest_sys::apply_hadamard(register.pin_mut(), 0)?;
+    quest_sys::apply_controlled_pauli_x(register.pin_mut(), 0, 1)?;
+    let amplitude = quest_sys::get_qureg_amp(&register, 3)?;
+    println!("{} + {}i", amplitude.re, amplitude.im);
+    drop(register);
+    quest_sys::finalize_quest_env()
 }
 ```
 
-## Build Requirements
+Initialization may be attempted only once per process. Every native wrapper
+uses serialized owner-thread admission; resources must be destroyed on that
+thread before finalization. Opaque owned handles use RAII. Leaking a handle does
+not bypass live-resource checks. Destructors cannot throw across FFI and fail
+closed when native destruction cannot safely proceed. Native initialization
+failures can still invoke QuEST's default error handler before the replacement
+handler can be installed.
 
-- A C++20 compatible compiler
-- CMake 3.15+
-- Preinstalled QuEST library
+Safe bindings keep validation enabled; the validation-disable API is absent.
+The tolerance setter admits positive finite values only. Native input errors
+become structured `QuestError` values after initialization.
 
-Additional requirements based on features:
-- OpenMP development libraries for the `openmp` feature
-- MPI development libraries for the `mpi` feature
-- CUDA toolkit for the `cuda` feature
-- cuQuantum for the `cuquantum` feature
-- AMD ROCm for the `hip` feature
+Matrices are copied through checked buffers, with no faer dependency:
 
-## Troubleshooting
+- `set_comp_matr_flat`: row-major square matrix values.
+- `set_density_qureg_amps` / `get_density_qureg_amps`: independent rectangular
+  row/column dimensions with row-major interchange buffers.
+- `set_density_qureg_flat_amps`: QuEST's column-major flattened density storage.
+- `set_kraus_map_flat`: operator-major, then row-major values.
 
-If you encounter build errors:
+The facade handles faer view conversion and stronger environment lifetimes.
+Manual adapters additionally expose explicit seeds, global phase and a numerical
+configuration fingerprint. The generated API inventory and unsupported reasons
+are in `generated/api_coverage.json`; generated counts are not a promise that
+every native feature is supported by the facade.
 
-1. Make sure QuEST is properly installed
-2. Set `QUEST_DIR` or `QUEST_ROOT` to point to your QuEST installation
-3. For additional debug information, set the environment variable `QUEST_DEBUG=1`
-
-## License
-
-This crate is licensed under the MIT License. Note that QuEST itself has its own license.
-
-## Acknowledgements
-
-This crate is a thin wrapper around the QuEST library, which is developed by the [QuEST team](https://github.com/QuEST-Kit/QuEST).
+Edit the adapter registry and generator templates together, then regenerate with
+`cargo run -p xtask -- generate-quest-bindings`. `--check` verifies freshness.
+Generation requires libclang; consuming this crate does not.

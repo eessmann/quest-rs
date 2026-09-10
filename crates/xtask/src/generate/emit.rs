@@ -252,7 +252,7 @@ mod tests {
             .and_then(Path::parent)
             .or_fail()?;
         let files = [
-            "build.rs",
+            "crates/quest/build.rs",
             "crates/quest-sys/build.rs",
             "crates/quest-sys/generated/api_coverage.json",
             "crates/quest-sys/generated/generated_adapters.json",

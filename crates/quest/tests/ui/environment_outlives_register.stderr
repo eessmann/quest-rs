@@ -1,0 +1,11 @@
+error[E0505]: cannot move out of `environment` because it is borrowed
+ --> tests/ui/environment_outlives_register.rs:5:10
+  |
+3 |     let environment = Environment::builder().build().unwrap();
+  |         ----------- binding `environment` declared here
+4 |     let mut register = environment.state_vector(QubitCount::new(1).unwrap()).unwrap();
+  |                        ----------- borrow of `environment` occurs here
+5 |     drop(environment);
+  |          ^^^^^^^^^^^ move out of `environment` occurs here
+6 |     register.h(0).unwrap();
+  |     -------- borrow later used here

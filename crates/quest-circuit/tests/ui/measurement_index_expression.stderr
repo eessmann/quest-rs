@@ -1,0 +1,5 @@
+error: circuit wire indices must be integer literals
+ --> tests/ui/measurement_index_expression.rs:2:48
+  |
+2 | fn main(){let _=circuit!{qubit q; bit[2] c; c[0+1]=measure q;};}
+  |                                                ^

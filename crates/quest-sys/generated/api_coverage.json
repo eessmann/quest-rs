@@ -1,7 +1,7 @@
 {
   "generator": "xtask generate-quest-bindings",
   "parser": "clang crate libclang semantic AST",
-  "quest_version": "4.2.0",
+  "quest_version": "4.3.0",
   "quest_root": "QUEST_ROOT",
   "deprecated_apis_included": "0",
   "counts": {
@@ -9,8 +9,10 @@
     "gated-callback": 3,
     "gated-manual-adapter-needed": 337,
     "gated-opaque-pointer": 2,
-    "generated": 279,
-    "unsupported-c-api": 119
+    "generated": 249,
+    "intentionally-excluded": 1,
+    "manual": 36,
+    "unsupported-c-api": 112
   },
   "items": [
     {
@@ -75,7 +77,7 @@
         }
       ],
       "signature": "void applyCompMatr(Qureg, std::vector<int>, CompMatr)",
-      "status": "generated",
+      "status": "manual",
       "reason": "emitted in hand-written core cxx bridge"
     },
     {
@@ -1540,7 +1542,7 @@
         }
       ],
       "signature": "void applyHadamard(Qureg, int)",
-      "status": "generated",
+      "status": "manual",
       "reason": "emitted in hand-written core cxx bridge"
     },
     {
@@ -5700,7 +5702,7 @@
         }
       ],
       "signature": "void applyPauliX(Qureg, int)",
-      "status": "generated",
+      "status": "manual",
       "reason": "emitted in hand-written core cxx bridge"
     },
     {
@@ -5725,7 +5727,7 @@
         }
       ],
       "signature": "void applyPauliY(Qureg, int)",
-      "status": "generated",
+      "status": "manual",
       "reason": "emitted in hand-written core cxx bridge"
     },
     {
@@ -5750,7 +5752,7 @@
         }
       ],
       "signature": "void applyPauliZ(Qureg, int)",
-      "status": "generated",
+      "status": "manual",
       "reason": "emitted in hand-written core cxx bridge"
     },
     {
@@ -5960,7 +5962,7 @@
         }
       ],
       "signature": "int applyQubitMeasurement(Qureg, int)",
-      "status": "generated",
+      "status": "manual",
       "reason": "emitted in hand-written core cxx bridge"
     },
     {
@@ -5990,7 +5992,7 @@
         }
       ],
       "signature": "int applyQubitMeasurementAndGetProb(Qureg, int, qreal *)",
-      "status": "generated",
+      "status": "manual",
       "reason": "emitted in hand-written core cxx bridge"
     },
     {
@@ -6775,7 +6777,7 @@
         }
       ],
       "signature": "void applyTrotterizedUnitaryTimeEvolution(Qureg, PauliStrSum, qreal, int, int, bool)",
-      "status": "generated",
+      "status": "manual",
       "reason": "emitted in hand-written core cxx bridge"
     },
     {
@@ -7430,7 +7432,7 @@
         }
       ],
       "signature": "qreal calcTotalProb(Qureg)",
-      "status": "generated",
+      "status": "manual",
       "reason": "emitted in hand-written core cxx bridge"
     },
     {
@@ -7484,7 +7486,7 @@
         }
       ],
       "signature": "CompMatr createCompMatr(int)",
-      "status": "generated",
+      "status": "manual",
       "reason": "emitted in hand-written core cxx bridge"
     },
     {
@@ -7579,7 +7581,7 @@
         }
       ],
       "signature": "Qureg createDensityQureg(int)",
-      "status": "generated",
+      "status": "manual",
       "reason": "emitted in hand-written core cxx bridge"
     },
     {
@@ -7795,11 +7797,11 @@
         {
           "name": "str",
           "ty": "std::string",
-          "canonical_type": "std::string"
+          "canonical_type": "std::basic_string<char>"
         }
       ],
       "signature": "PauliStrSum createInlinePauliStrSum(std::string)",
-      "status": "generated",
+      "status": "manual",
       "reason": "emitted in hand-written core cxx bridge"
     },
     {
@@ -7849,7 +7851,7 @@
         }
       ],
       "signature": "KrausMap createKrausMap(int, int)",
-      "status": "generated",
+      "status": "manual",
       "reason": "emitted in hand-written core cxx bridge"
     },
     {
@@ -7940,7 +7942,7 @@
         {
           "name": "fn",
           "ty": "std::string",
-          "canonical_type": "std::string"
+          "canonical_type": "std::basic_string<char>"
         }
       ],
       "signature": "PauliStrSum createPauliStrSumFromFile(std::string)",
@@ -7980,7 +7982,7 @@
         {
           "name": "fn",
           "ty": "std::string",
-          "canonical_type": "std::string"
+          "canonical_type": "std::basic_string<char>"
         }
       ],
       "signature": "PauliStrSum createPauliStrSumFromReversedFile(std::string)",
@@ -8004,7 +8006,7 @@
         }
       ],
       "signature": "Qureg createQureg(int)",
-      "status": "generated",
+      "status": "manual",
       "reason": "emitted in hand-written core cxx bridge"
     },
     {
@@ -8040,7 +8042,7 @@
         {
           "name": "fn",
           "ty": "std::string",
-          "canonical_type": "std::string"
+          "canonical_type": "std::basic_string<char>"
         }
       ],
       "signature": "Qureg createQuregFromFile(std::string)",
@@ -8064,7 +8066,7 @@
         }
       ],
       "signature": "SuperOp createSuperOp(int)",
-      "status": "generated",
+      "status": "manual",
       "reason": "emitted in hand-written core cxx bridge"
     },
     {
@@ -8218,7 +8220,7 @@
       "result_canonical_type": "void",
       "arguments": [],
       "signature": "void finalizeQuESTEnv()",
-      "status": "generated",
+      "status": "manual",
       "reason": "emitted in hand-written core cxx bridge"
     },
     {
@@ -8453,8 +8455,8 @@
         }
       ],
       "signature": "void getDensityQuregAmps(qcomp **, Qureg, qindex, qindex, qindex, qindex)",
-      "status": "unsupported-c-api",
-      "reason": "C pointer signature is not exposed; target the C++ overload or a safe manual adapter"
+      "status": "manual",
+      "reason": "emitted in hand-written core cxx bridge"
     },
     {
       "name": "getDiagMatr1",
@@ -8609,7 +8611,7 @@
         {
           "name": "paulis",
           "ty": "std::string",
-          "canonical_type": "std::string"
+          "canonical_type": "std::basic_string<char>"
         }
       ],
       "signature": "PauliStr getPauliStr(std::string)",
@@ -8629,7 +8631,7 @@
         {
           "name": "paulis",
           "ty": "std::string",
-          "canonical_type": "std::string"
+          "canonical_type": "std::basic_string<char>"
         },
         {
           "name": "indices",
@@ -8659,7 +8661,7 @@
         {
           "name": "paulis",
           "ty": "std::string",
-          "canonical_type": "std::string"
+          "canonical_type": "std::basic_string<char>"
         },
         {
           "name": "indices",
@@ -8707,7 +8709,7 @@
       "result_canonical_type": "QuESTEnv",
       "arguments": [],
       "signature": "QuESTEnv getQuESTEnv()",
-      "status": "generated",
+      "status": "manual",
       "reason": "emitted in hand-written core cxx bridge"
     },
     {
@@ -8727,7 +8729,7 @@
         }
       ],
       "signature": "void getQuESTEnvironmentString(char *)",
-      "status": "generated",
+      "status": "manual",
       "reason": "emitted in hand-written core cxx bridge"
     },
     {
@@ -8783,8 +8785,8 @@
       "result_canonical_type": "std::vector<unsigned int>",
       "arguments": [],
       "signature": "std::vector<unsigned int> getQuESTSeeds()",
-      "status": "gated-manual-adapter-needed",
-      "reason": "requires a dedicated cxx-safe wrapper before exposing through quest-sys"
+      "status": "manual",
+      "reason": "emitted in hand-written core cxx bridge"
     },
     {
       "name": "getQuESTSeeds",
@@ -8842,7 +8844,7 @@
         }
       ],
       "signature": "qcomp getQuregAmp(Qureg, qindex)",
-      "status": "generated",
+      "status": "manual",
       "reason": "emitted in hand-written core cxx bridge"
     },
     {
@@ -8872,7 +8874,7 @@
         }
       ],
       "signature": "std::vector<qcomp> getQuregAmps(Qureg, qindex, qindex)",
-      "status": "generated",
+      "status": "manual",
       "reason": "emitted in hand-written core cxx bridge"
     },
     {
@@ -8932,8 +8934,8 @@
         }
       ],
       "signature": "void initArbitraryPureState(Qureg, qcomp *)",
-      "status": "unsupported-c-api",
-      "reason": "C pointer signature is not exposed; target the C++ overload or a safe manual adapter"
+      "status": "manual",
+      "reason": "emitted in hand-written core cxx bridge"
     },
     {
       "name": "initBlankState",
@@ -9042,7 +9044,7 @@
         }
       ],
       "signature": "void initCustomQuESTEnv(int, int, int)",
-      "status": "generated",
+      "status": "manual",
       "reason": "emitted in hand-written core cxx bridge"
     },
     {
@@ -9082,7 +9084,7 @@
         }
       ],
       "signature": "void initPlusState(Qureg)",
-      "status": "generated",
+      "status": "manual",
       "reason": "emitted in hand-written core cxx bridge"
     },
     {
@@ -9121,7 +9123,7 @@
       "result_canonical_type": "void",
       "arguments": [],
       "signature": "void initQuESTEnv()",
-      "status": "generated",
+      "status": "manual",
       "reason": "emitted in hand-written core cxx bridge"
     },
     {
@@ -9186,7 +9188,7 @@
         }
       ],
       "signature": "void initZeroState(Qureg)",
-      "status": "generated",
+      "status": "manual",
       "reason": "emitted in hand-written core cxx bridge"
     },
     {
@@ -9200,7 +9202,7 @@
       "result_canonical_type": "int",
       "arguments": [],
       "signature": "int isQuESTEnvInit()",
-      "status": "generated",
+      "status": "manual",
       "reason": "emitted in hand-written core cxx bridge"
     },
     {
@@ -9265,7 +9267,7 @@
         }
       ],
       "signature": "void leftapplyCompMatr(Qureg, std::vector<int>, CompMatr)",
-      "status": "generated",
+      "status": "manual",
       "reason": "emitted in hand-written core cxx bridge"
     },
     {
@@ -10055,7 +10057,7 @@
         }
       ],
       "signature": "void mixDephasing(Qureg, int, qreal)",
-      "status": "generated",
+      "status": "manual",
       "reason": "emitted in hand-written core cxx bridge"
     },
     {
@@ -18515,7 +18517,7 @@
         {
           "name": "label",
           "ty": "std::string",
-          "canonical_type": "std::string"
+          "canonical_type": "std::basic_string<char>"
         },
         {
           "name": "num",
@@ -18540,7 +18542,7 @@
         {
           "name": "label",
           "ty": "std::string",
-          "canonical_type": "std::string"
+          "canonical_type": "std::basic_string<char>"
         },
         {
           "name": "num",
@@ -18585,7 +18587,7 @@
         {
           "name": "str",
           "ty": "std::string",
-          "canonical_type": "std::string"
+          "canonical_type": "std::basic_string<char>"
         }
       ],
       "signature": "void reportStr(std::string)",
@@ -18674,7 +18676,7 @@
         }
       ],
       "signature": "void rightapplyCompMatr(Qureg, std::vector<int>, CompMatr)",
-      "status": "generated",
+      "status": "manual",
       "reason": "emitted in hand-written core cxx bridge"
     },
     {
@@ -19450,7 +19452,7 @@
         {
           "name": "arg1",
           "ty": "std::string",
-          "canonical_type": "std::string"
+          "canonical_type": "std::basic_string<char>"
         }
       ],
       "signature": "void saveQuregToFile(Qureg, std::string)",
@@ -19479,8 +19481,8 @@
         }
       ],
       "signature": "void setCompMatr(CompMatr, qcomp **)",
-      "status": "unsupported-c-api",
-      "reason": "C pointer signature is not exposed; target the C++ overload or a safe manual adapter"
+      "status": "manual",
+      "reason": "emitted in hand-written core cxx bridge"
     },
     {
       "name": "setCompMatr",
@@ -19504,8 +19506,8 @@
         }
       ],
       "signature": "void setCompMatr(CompMatr, std::vector<std::vector<qcomp>>)",
-      "status": "generated",
-      "reason": "emitted in hand-written core cxx bridge"
+      "status": "gated-manual-adapter-needed",
+      "reason": "requires a dedicated cxx-safe wrapper before exposing through quest-sys"
     },
     {
       "name": "setDensityQuregAmps",
@@ -19549,8 +19551,8 @@
         }
       ],
       "signature": "void setDensityQuregAmps(Qureg, qindex, qindex, qcomp **, qindex, qindex)",
-      "status": "unsupported-c-api",
-      "reason": "C pointer signature is not exposed; target the C++ overload or a safe manual adapter"
+      "status": "manual",
+      "reason": "emitted in hand-written core cxx bridge"
     },
     {
       "name": "setDensityQuregAmps",
@@ -20124,8 +20126,8 @@
         }
       ],
       "signature": "void setKrausMap(KrausMap, qcomp ***)",
-      "status": "unsupported-c-api",
-      "reason": "C pointer signature is not exposed; target the C++ overload or a safe manual adapter"
+      "status": "manual",
+      "reason": "emitted in hand-written core cxx bridge"
     },
     {
       "name": "setKrausMap",
@@ -20274,8 +20276,8 @@
         }
       ],
       "signature": "void setQuESTReportedPauliChars(const char *)",
-      "status": "unsupported-c-api",
-      "reason": "C pointer signature is not exposed; target the C++ overload or a safe manual adapter"
+      "status": "generated",
+      "reason": "emitted in checked-in generated cxx bridge"
     },
     {
       "name": "setQuESTReportedPauliStrStyle",
@@ -20339,8 +20341,8 @@
         }
       ],
       "signature": "void setQuESTSeeds(unsigned int *, int)",
-      "status": "unsupported-c-api",
-      "reason": "C pointer signature is not exposed; target the C++ overload or a safe manual adapter"
+      "status": "manual",
+      "reason": "emitted in hand-written core cxx bridge"
     },
     {
       "name": "setQuESTSeedsToDefault",
@@ -20401,8 +20403,8 @@
       "result_canonical_type": "void",
       "arguments": [],
       "signature": "void setQuESTValidationOff()",
-      "status": "generated",
-      "reason": "emitted in checked-in generated cxx bridge"
+      "status": "intentionally-excluded",
+      "reason": "disabling native validation invalidates the safe bridge contract"
     },
     {
       "name": "setQuESTValidationOn",
@@ -20994,7 +20996,7 @@
       "result_canonical_type": "void",
       "arguments": [],
       "signature": "void syncQuESTEnv()",
-      "status": "generated",
+      "status": "manual",
       "reason": "emitted in hand-written core cxx bridge"
     },
     {

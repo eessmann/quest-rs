@@ -1,5 +1,5 @@
 use super::DynError;
-use super::model::{AdapterRegistry, ApiItem, CoverageStatus};
+use super::model::{AdapterRegistry, AdapterSourceKind, ApiItem, CoverageStatus};
 use super::type_rules::{has_callback_signature, has_opaque_pointer, has_raw_pointer, type_text};
 
 const COVERED_BY_RAII: &[(&str, &str)] = &[
@@ -35,6 +35,12 @@ pub fn classify_items(items: &mut [ApiItem], registry: &AdapterRegistry) -> Resu
 }
 
 fn classify_item(item: &ApiItem, registry: &AdapterRegistry) -> (CoverageStatus, String) {
+    if item.name == "setQuESTValidationOff" {
+        return (
+            CoverageStatus::IntentionallyExcluded,
+            "disabling native validation invalidates the safe bridge contract".to_owned(),
+        );
+    }
     if let Some((_, owner)) = COVERED_BY_RAII
         .iter()
         .find(|(name, _)| *name == item.name.as_str())
@@ -70,7 +76,10 @@ fn classify_item(item: &ApiItem, registry: &AdapterRegistry) -> (CoverageStatus,
 
     if let Some(adapter) = registry.get(&item.overload_key) {
         return (
-            CoverageStatus::Generated,
+            match adapter.source_kind {
+                AdapterSourceKind::Core => CoverageStatus::Manual,
+                AdapterSourceKind::Generated => CoverageStatus::Generated,
+            },
             adapter.source_kind.reason().to_owned(),
         );
     }
@@ -97,6 +106,31 @@ mod tests {
     use crate::generate::find_workspace_root;
     use crate::generate::model::{AdapterEntry, AdapterRegistry, AdapterSourceKind, ApiArgument};
     use googletest::prelude::*;
+
+    #[gtest]
+    fn disabling_validation_is_intentionally_excluded() -> googletest::Result<()> {
+        let mut item = fake_apply_comp_matr_item("setQuESTValidationOff() -> void");
+        item.name = "setQuESTValidationOff".to_owned();
+        item.arguments.clear();
+        let registry = AdapterRegistry::new(vec![]).or_fail()?;
+        let (status, _) = classify_item(&item, &registry);
+        verify_that!(status.as_str(), eq("intentionally-excluded"))
+    }
+
+    #[gtest]
+    fn manual_adapters_are_distinct_from_generated_ones() -> googletest::Result<()> {
+        let item = fake_apply_comp_matr_item("applyCompMatr(Qureg, int, CompMatr) -> void");
+        let registry = AdapterRegistry::new(vec![AdapterEntry {
+            overload_key: item.overload_key.clone(),
+            quest_name: item.name.clone(),
+            adapter_name: "apply_comp_matr".to_owned(),
+            rust_name: "apply_comp_matr".to_owned(),
+            source_kind: AdapterSourceKind::Core,
+        }])
+        .or_fail()?;
+        let (status, _) = classify_item(&item, &registry);
+        verify_that!(status.as_str(), eq("manual"))
+    }
 
     fn fake_apply_comp_matr_item(overload_key: &str) -> ApiItem {
         ApiItem {
@@ -143,7 +177,7 @@ mod tests {
     }
 
     #[gtest]
-    fn exact_adapter_entry_marks_only_that_overload_generated() -> googletest::Result<()> {
+    fn exact_adapter_entry_marks_only_that_overload_manual() -> googletest::Result<()> {
         let registry = AdapterRegistry::new(vec![AdapterEntry {
             overload_key: "applyCompMatr(Qureg, std::vector<int>, CompMatr) -> void".to_owned(),
             quest_name: "applyCompMatr".to_owned(),
@@ -160,7 +194,7 @@ mod tests {
         classify_items(&mut items, &registry).or_fail()?;
 
         expect_that!(items[0].status.as_str(), eq("gated-manual-adapter-needed"));
-        verify_that!(items[1].status.as_str(), eq("generated"))
+        verify_that!(items[1].status.as_str(), eq("manual"))
     }
 
     #[gtest]
@@ -197,7 +231,7 @@ mod tests {
             vector.overload_key.as_str(),
             not(eq(pointer.overload_key.as_str()))
         );
-        expect_that!(vector.status.as_str(), eq("generated"));
+        expect_that!(vector.status.as_str(), eq("manual"));
         verify_that!(pointer.status.as_str(), eq("unsupported-c-api"))
     }
 }

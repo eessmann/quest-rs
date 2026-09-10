@@ -1,0 +1,7 @@
+error[E0599]: no method named `amplitude` found for struct `Register<'_, DensityMatrix>` in the current scope
+ --> tests/ui/density_has_no_amplitude.rs:5:14
+  |
+5 |     register.amplitude(0).unwrap();
+  |              ^^^^^^^^^ method not found in `Register<'_, DensityMatrix>`
+  |
+  = note: the method was found for `Register<'env, StateVector>`

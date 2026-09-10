@@ -7,7 +7,7 @@ pub mod emit;
 pub mod model;
 pub mod type_rules;
 
-pub type DynError = Box<dyn std::error::Error>;
+pub type DynError = Box<dyn std::error::Error + Send + Sync>;
 
 pub fn run(check: bool) -> Result<(), DynError> {
     let workspace = find_workspace_root()?;

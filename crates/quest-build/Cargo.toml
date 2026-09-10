@@ -1,0 +1,22 @@
+[package]
+name = "quest-build"
+version = "0.1.0"
+description = "Shared installed QuEST discovery and final-executable runtime configuration"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+cmake-file-api = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+sha2 = { workspace = true }
+shlex = { workspace = true }
+thiserror.workspace = true
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+googletest.workspace = true
+tempfile = { workspace = true }
