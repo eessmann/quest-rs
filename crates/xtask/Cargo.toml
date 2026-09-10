@@ -16,10 +16,10 @@ clang = { workspace = true, features = ["runtime"] }
 serde = { workspace = true, features = ["derive", "std"] }
 serde_json.workspace = true
 color-eyre = { workspace = true, features = ["track-caller"] }
+tempfile.workspace = true
 
 [dev-dependencies]
 googletest.workspace = true
-tempfile = { workspace = true }
 
 [lints]
 workspace = true

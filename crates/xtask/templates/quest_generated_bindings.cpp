@@ -62,16 +62,6 @@ namespace {
   return out;
 }
 
-[[maybe_unused]] rust::Vec<GeneratedComplex> from_qcomp_vec(
-    const std::vector<qcomp>& values) {
-  rust::Vec<GeneratedComplex> out;
-  out.reserve(values.size());
-  for (const auto value : values) {
-    out.push_back(from_qcomp(value));
-  }
-  return out;
-}
-
 [[maybe_unused]] rust::Vec<double> from_qreal_vec(
     const std::vector<qreal>& values) {
   rust::Vec<double> out;

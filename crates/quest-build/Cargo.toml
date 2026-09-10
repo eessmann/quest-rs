@@ -7,10 +7,9 @@ license.workspace = true
 repository.workspace = true
 
 [dependencies]
+cmake.workspace = true
 cmake-file-api = { workspace = true }
-serde = { workspace = true, features = ["derive"] }
-serde_json.workspace = true
-sha2 = { workspace = true }
+cmake-package.workspace = true
 shlex = { workspace = true }
 thiserror.workspace = true
 

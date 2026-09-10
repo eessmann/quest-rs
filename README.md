@@ -31,27 +31,27 @@ Pure circuit and macro builds need neither QuEST nor libclang nor external BLAS.
 
 ```sh
 export QUEST_ROOT=/path/to/installed/quest
-# If indirect GPU libraries need additional directories, configure them explicitly:
-export QUEST_RUNTIME_LIBRARY_PATH=/path/to/cuda/targets/x86_64-linux/lib
-cargo run --locked -p xtask -- configure-native target/quest-native.json
-export QUEST_NATIVE_CONFIG="$PWD/target/quest-native.json"
 cargo build --workspace --locked
 cargo run --locked --example minimal
 ```
 
-Omit `QUEST_RUNTIME_LIBRARY_PATH` when the native installation already resolves
-its dependencies. The setup probe executes with loader variables removed and
-records the native compiler, ABI, canonical library identities and dependency
-closure. This identifies observed QuEST/CMake inputs and libraries, rather than
-every transitive system header. Unrecorded C++ flag, include-search and tool
-overrides are rejected; regenerate using a supported compiler configuration.
-Regenerate the record when its inputs change. The record is specific
-to the installation and belongs outside version control.
+The installed package must export `QuEST::QuEST` and resolve its own runtime
+dependencies. CMake compiles the static CXX bridge against that target; the
+evaluated target supplies the native link requirements. Standard `QuEST_DIR`
+and `CMAKE_PREFIX_PATH` selection are also supported. See
+[`quest-build`](crates/quest-build/README.md) for selection and compiler details.
 
-The Linux development recipe emits **absolute DT_RPATH**, including indirect
-native dependency directories. This is not a relocatable bundle. The build does
-not modify the installed native libraries. Cross compilation, macOS, Windows and
-relocatable packaging need separate verified loader recipes.
+For a local QuEST installation whose CUDA/cuQuantum or MPI libraries live
+outside the system loader paths, configure **QuEST itself** with
+`-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON` before installing. The upstream RPATH
+helper must honor that standard option. Default native packaging retains
+relative `$ORIGIN` paths. Cargo builds do not repair or bundle native libraries.
+
+The Linux development helper emits absolute **DT_RUNPATH** entries for directly
+linked libraries. Cross compilation, macOS, Windows and relocatable application
+bundles need separate verified recipes. The old `QUEST_NATIVE_CONFIG` JSON
+record and `QUEST_RUNTIME_LIBRARY_PATH` workflow have been removed; unset those
+variables and select the installed package normally.
 
 Cargo does not propagate a library build script's linker arguments into an
 arbitrarily distant executable. Every final executable that uses this runtime,
@@ -63,7 +63,7 @@ quest-build = "0.1"
 ```
 
 ```rust,ignore
-// build.rs -- use the same QUEST_NATIVE_CONFIG as the native bridge
+// build.rs -- select the same installed package as the native bridge
 fn main() -> Result<(), quest_build::BuildError> {
     quest_build::emit_final_target_runtime_paths()
 }
@@ -162,6 +162,7 @@ cargo test --doc --workspace --locked
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets --locked -- -D warnings
 cargo run --locked -p xtask -- generate-quest-bindings --check
+cargo run --locked -p xtask -- check-native-consumers
 mdbook build docs/book
 ```
 
@@ -178,4 +179,6 @@ tracks current implementation and evidence. The
 [compiler research](docs/superpowers/specs/2026-09-10-quest-circuit-research.md)
 preserve historical findings; they are not current feature checklists.
 
-Local implementation evidence and platform limits are recorded in [the M6–M11 verification record](docs/verification/2026-09-10-m6-m11.md).
+Local compiler evidence is preserved in [the M6–M11 verification record](docs/verification/2026-09-10-m6-m11.md).
+The updated native build and loader checks are recorded in
+[native CMake verification](docs/verification/2026-09-10-native-cmake.md).

@@ -8,7 +8,7 @@ cargo test -p quest-language --locked
 cargo test -p quest-qasm --locked
 ```
 
-Native examples require installed QuEST 4.3.x, binary64 precision, deprecated APIs disabled, CMake, and a C++20 compiler. The repository root README describes generating `QUEST_NATIVE_CONFIG` and final-executable runtime paths. Once configured:
+Native examples require installed QuEST 4.3.x, binary64 precision, deprecated APIs disabled, CMake, and a C++20 compiler. Set `QUEST_ROOT` to an installation exporting `QuEST::QuEST` whose native runtime dependencies are resolvable. The repository root README describes standard CMake selection and the final-executable link helper; no JSON native record is required. Once configured:
 
 ```sh
 cargo run -p quest-rs --example tutorials --locked

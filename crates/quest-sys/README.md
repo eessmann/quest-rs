@@ -4,13 +4,18 @@ CXX bindings to **QuEST 4.3.x**, with double precision and deprecated APIs disab
 Native discovery lives in the shared `quest-build` crate. The tested installed
 build recipe is Linux GNU with CMake and a C++20 compiler.
 
-Set `QUEST_ROOT` to the installation prefix, or use the canonical
-`QUEST_NATIVE_CONFIG` record created by the workspace's `xtask configure-native`.
-When needed, `QUEST_RUNTIME_LIBRARY_PATH` supplies explicit indirect native
-library directories. See `quest-build` for the final-executable build script and
-absolute DT_RPATH development recipe. A library's Cargo linker arguments do not
-propagate across arbitrary downstream dependencies. This crate does not modify
-or bundle native installation files.
+Set `QUEST_ROOT` to the installation prefix, or select its package with
+`QuEST_DIR` or `CMAKE_PREFIX_PATH`. CXX generates bridge sources; CMake compiles
+the static bridge against `QuEST::QuEST`, consuming its public usage requirements.
+The installed library must resolve its own dependencies, including private GPU
+libraries. Local native installs can opt into CMake's
+`CMAKE_INSTALL_RPATH_USE_LINK_PATH` setting.
+
+See `quest-build` for the final-executable helper, which emits required linker
+options and direct-library RUNPATH entries. Cargo does not propagate those
+arguments through arbitrary Rust library dependencies. The old native JSON
+record and runtime-directory override workflow are removed. This crate does
+not modify or bundle native installation files.
 
 ```rust,no_run
 fn main() -> quest_sys::QuestResult<()> {

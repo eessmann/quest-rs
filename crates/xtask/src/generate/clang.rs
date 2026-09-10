@@ -15,43 +15,28 @@ const QUEST_ENV_VARS: &[&str] = &["QUEST_DIR", "QUEST_ROOT", "QuEST_DIR", "QuEST
 #[derive(Debug, Clone)]
 pub struct QuestRoot {
     path: PathBuf,
-    source: &'static str,
+    source: String,
 }
 
 impl QuestRoot {
+    pub fn from_package(package: &quest_build::NativePackage) -> Self {
+        Self {
+            path: package.prefix.clone(),
+            source: source_label(&package.prefix),
+        }
+    }
+
     pub fn path(&self) -> &Path {
         &self.path
     }
 
-    pub const fn source_label(&self) -> &'static str {
-        self.source
+    pub fn source_label(&self) -> &str {
+        &self.source
     }
 }
 
-pub fn find_quest_root() -> Result<QuestRoot, DynError> {
-    if let Some(root) = quest_root_from_env_vars() {
-        return Ok(root);
-    }
-
-    if let Some(root) = quest_root_from_cmake_prefix_path() {
-        return Ok(root);
-    }
-
-    Err(quest_root_error().into())
-}
-
-pub fn normalize_quest_root(candidate: &Path) -> Option<PathBuf> {
-    let mut current = candidate;
-    loop {
-        if current.join("include/quest.h").is_file() {
-            return Some(current.to_path_buf());
-        }
-        current = current.parent()?;
-    }
-}
-
-pub fn collect_quest_api(quest_root: &Path) -> Result<Vec<ApiItem>, DynError> {
-    let include_root = quest_root.join("include");
+pub fn collect_quest_api(package: &quest_build::NativePackage) -> Result<Vec<ApiItem>, DynError> {
+    let include_root = package.prefix.join("include");
     let quest_h = include_root.join("quest.h");
 
     if !quest_h.is_file() {
@@ -67,7 +52,7 @@ pub fn collect_quest_api(quest_root: &Path) -> Result<Vec<ApiItem>, DynError> {
     // Do not mutate the process environment while other test threads may read it.
     let clang = Clang::new().map_err(|error| format_libclang_error(&error))?;
     let index = Index::new(&clang, false, false);
-    let args = clang_arguments(&include_root)?;
+    let args = clang_arguments(package, &include_root)?;
     let mut parser = index.parser(&quest_h);
     parser.arguments(&args);
 
@@ -120,7 +105,10 @@ pub fn format_libclang_error(error: &str) -> String {
     )
 }
 
-fn clang_arguments(include_root: &Path) -> Result<Vec<String>, DynError> {
+fn clang_arguments(
+    package: &quest_build::NativePackage,
+    include_root: &Path,
+) -> Result<Vec<String>, DynError> {
     // A libclang resource directory is compiler-specific. Refuse to silently
     // combine an explicitly selected libclang with a different driver version.
     let driver = clang_command();
@@ -143,17 +131,14 @@ fn clang_arguments(include_root: &Path) -> Result<Vec<String>, DynError> {
         format!("-I{}", include_root.display()),
         format!("-I{}", include_root.join("quest/include").display()),
     ];
+    args.extend(header_context_arguments(&package.headers));
 
     if let Some(resource_dir) = clang_resource_dir() {
         args.push("-resource-dir".to_owned());
         args.push(resource_dir.display().to_string());
     }
 
-    for include in discovered_include_dirs() {
-        args.push(format!("-I{}", include.display()));
-    }
-
-    if let Some(target) = clang_target() {
+    if let Some(target) = clang_target(&package.compiler) {
         args.push("-target".to_owned());
         args.push(target);
     }
@@ -186,11 +171,8 @@ fn clang_major_version(version: &str) -> Option<u32> {
         .ok()
 }
 
-fn clang_target() -> Option<String> {
-    let output = Command::new(cxx_command())
-        .arg("-dumpmachine")
-        .output()
-        .ok()?;
+fn clang_target(compiler: &Path) -> Option<String> {
+    let output = Command::new(compiler).arg("-dumpmachine").output().ok()?;
     if !output.status.success() {
         return None;
     }
@@ -214,27 +196,24 @@ fn macos_sdk_path() -> Option<PathBuf> {
     path.is_dir().then_some(path)
 }
 
-fn quest_root_from_env_vars() -> Option<QuestRoot> {
-    QUEST_ENV_VARS.iter().find_map(|source| {
-        let value = env::var_os(source)?;
-        normalize_quest_root(Path::new(&value)).map(|path| QuestRoot { path, source })
-    })
-}
-
-fn quest_root_from_cmake_prefix_path() -> Option<QuestRoot> {
-    env::var_os("CMAKE_PREFIX_PATH")
+fn source_label(prefix: &Path) -> String {
+    for variable in QUEST_ENV_VARS {
+        if env::var_os(variable)
+            .and_then(|value| PathBuf::from(value).canonicalize().ok())
+            .is_some_and(|candidate| candidate == prefix || candidate.starts_with(prefix))
+        {
+            return (*variable).to_owned();
+        }
+    }
+    if env::var_os("CMAKE_PREFIX_PATH")
         .into_iter()
         .flat_map(|value| env::split_paths(&value).collect::<Vec<_>>())
-        .find_map(|path| {
-            normalize_quest_root(&path).map(|path| QuestRoot {
-                path,
-                source: "CMAKE_PREFIX_PATH",
-            })
-        })
-}
-
-fn quest_root_error() -> String {
-    "could not locate QuEST headers; set QUEST_ROOT, QUEST_DIR, QuEST_ROOT, QuEST_DIR, or CMAKE_PREFIX_PATH to a QuEST install containing include/quest.h".to_owned()
+        .filter_map(|candidate| candidate.canonicalize().ok())
+        .any(|candidate| candidate == prefix || candidate.starts_with(prefix))
+    {
+        return "CMAKE_PREFIX_PATH".to_owned();
+    }
+    "quest-build selected package".to_owned()
 }
 
 fn llvm_config_path(arg: &str) -> Option<PathBuf> {
@@ -246,24 +225,26 @@ fn llvm_config_path(arg: &str) -> Option<PathBuf> {
     (!value.is_empty()).then_some(PathBuf::from(value))
 }
 
-fn discovered_include_dirs() -> Vec<PathBuf> {
-    let mut dirs = Vec::new();
-
-    // Let the selected Clang driver choose its platform standard library.
-    // Merely finding LLVM does not select libc++: injecting LLVM's c++/v1
-    // headers here mixes libc++ with the driver's libstdc++ include chain.
-
-    for var in ["CPATH", "C_INCLUDE_PATH", "CPLUS_INCLUDE_PATH"] {
-        if let Some(value) = env::var_os(var) {
-            for path in env::split_paths(&value).filter(|path| path.is_dir()) {
-                if !dirs.contains(&path) {
-                    dirs.push(path);
-                }
-            }
+fn header_context_arguments(headers: &quest_build::HeaderContext) -> Vec<String> {
+    let mut arguments = Vec::new();
+    for include in &headers.include_dirs {
+        if !headers.system_include_dirs.contains(include) {
+            arguments.push(format!("-I{}", include.display()));
         }
     }
-
-    dirs
+    for include in &headers.system_include_dirs {
+        arguments.push("-isystem".to_owned());
+        arguments.push(include.display().to_string());
+    }
+    for definition in &headers.definitions {
+        if definition.starts_with("-D") {
+            arguments.push(definition.clone());
+        } else {
+            arguments.push(format!("-D{definition}"));
+        }
+    }
+    arguments.extend(headers.frontend_flags.iter().cloned());
+    arguments
 }
 
 fn clang_resource_dir() -> Option<PathBuf> {
@@ -286,10 +267,6 @@ fn clang_command() -> String {
             .filter(|path| path.is_file())
             .map_or_else(|| "clang".to_owned(), |path| path.display().to_string())
     })
-}
-
-fn cxx_command() -> String {
-    env::var("CXX").unwrap_or_else(|_| clang_command())
 }
 
 fn collect_function_decls(
@@ -394,8 +371,9 @@ mod tests {
     use super::*;
     use googletest::prelude::*;
 
-    fn fixture_root() -> Option<QuestRoot> {
-        find_quest_root().ok()
+    fn fixture_package() -> Option<quest_build::NativePackage> {
+        let work = tempfile::tempdir().ok()?;
+        quest_build::discover_for_tooling(work.path(), None).ok()
     }
 
     #[gtest]
@@ -412,13 +390,34 @@ mod tests {
     }
 
     #[gtest]
+    fn evaluated_header_context_is_forwarded_without_splitting_paths() -> googletest::Result<()> {
+        let headers = quest_build::HeaderContext {
+            include_dirs: vec![PathBuf::from("/opt/QuEST install/include")],
+            system_include_dirs: vec![PathBuf::from("/opt/MPI include")],
+            definitions: vec!["QUEST_MPI=1".to_owned()],
+            frontend_flags: vec!["-pthread".to_owned()],
+        };
+
+        verify_that!(
+            header_context_arguments(&headers),
+            elements_are![
+                eq("-I/opt/QuEST install/include"),
+                eq("-isystem"),
+                eq("/opt/MPI include"),
+                eq("-DQUEST_MPI=1"),
+                eq("-pthread")
+            ]
+        )
+    }
+
+    #[gtest]
     fn libclang_extracts_representative_overloads() -> googletest::Result<()> {
-        let Some(root) = fixture_root() else {
+        let Some(package) = fixture_package() else {
             eprintln!("skipping test because no QuEST root was provided by environment");
             return Ok(());
         };
 
-        let items = collect_quest_api(root.path()).or_fail()?;
+        let items = collect_quest_api(&package).or_fail()?;
         let overloads = items
             .iter()
             .filter(|item| item.name == "applyCompMatr")

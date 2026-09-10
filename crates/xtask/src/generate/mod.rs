@@ -11,10 +11,14 @@ pub type DynError = Box<dyn std::error::Error + Send + Sync>;
 
 pub fn run(check: bool) -> Result<(), DynError> {
     let workspace = find_workspace_root()?;
-    let quest_root = clang::find_quest_root()?;
+    let package = quest_build::discover_for_tooling(
+        workspace.join("target/xtask-binding-native-discovery"),
+        None,
+    )?;
+    let quest_root = clang::QuestRoot::from_package(&package);
     let registry = emit::load_adapter_registry(&workspace, check)?;
 
-    let mut items = clang::collect_quest_api(quest_root.path())?;
+    let mut items = clang::collect_quest_api(&package)?;
     classify::classify_items(&mut items, &registry)?;
 
     let outputs = emit::render_outputs(&quest_root, &items, &registry)?;
@@ -30,7 +34,7 @@ pub fn run(check: bool) -> Result<(), DynError> {
     Ok(())
 }
 
-fn find_workspace_root() -> Result<PathBuf, DynError> {
+pub fn find_workspace_root() -> Result<PathBuf, DynError> {
     if let Ok(value) = env::var("CARGO_MANIFEST_DIR")
         && let Some(root) = workspace_root_from(Path::new(&value))
     {

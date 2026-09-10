@@ -10,8 +10,8 @@ is **`quest-rs`**, with Rust library name **`quest`**.
 | `crates/quest-sys` | Audited CXX bridge and native RAII resources |
 | `crates/quest-circuit` | Pure circuit construction, exact angles, dependency DAG, compiler stages and transformations |
 | `crates/quest-macros` | Rust token-tree frontend, without native dependencies |
-| `crates/quest-build` | Shared installed-native configuration and final-executable runtime paths |
-| `crates/xtask` | Binding generation and native setup |
+| `crates/quest-build` | Installed `CMake` target discovery, bridge compilation and final-executable linking |
+| `crates/xtask` | Binding generation and independent native consumer checks |
 
 ## Build
 
@@ -22,27 +22,22 @@ Pure circuit and macro builds need neither `QuEST` nor libclang nor external BLA
 
 ```sh
 export QUEST_ROOT=/path/to/installed/quest
-# If indirect GPU libraries need additional directories, configure them explicitly:
-export QUEST_RUNTIME_LIBRARY_PATH=/path/to/cuda/targets/x86_64-linux/lib
-cargo run --locked -p xtask -- configure-native target/quest-native.json
-export QUEST_NATIVE_CONFIG="$PWD/target/quest-native.json"
 cargo build --workspace --locked
 cargo run --locked --example minimal
 ```
 
-Omit `QUEST_RUNTIME_LIBRARY_PATH` when the native installation already resolves
-its dependencies. The setup probe executes with loader variables removed and
-records the native compiler, ABI, canonical library identities and dependency
-closure. This identifies observed QuEST/CMake inputs and libraries, rather than
-every transitive system header. Unrecorded C++ flag, include-search and tool
-overrides are rejected; regenerate using a supported compiler configuration.
-Regenerate the record when its inputs change. The record is specific
-to the installation and belongs outside version control.
+The installed package must export `QuEST::QuEST` and resolve its own runtime
+dependencies. `CMake` compiles the static CXX bridge against that target.
+`QuEST_DIR` and `CMAKE_PREFIX_PATH` selection are also supported. Local native
+installs with external CUDA/cuQuantum or MPI libraries can use `CMake`'s
+`CMAKE_INSTALL_RPATH_USE_LINK_PATH=ON` option, provided `QuEST`'s RPATH helper
+honors it. Cargo does not repair or bundle native installations.
 
-The Linux development recipe emits **absolute `DT_RPATH`**, including indirect
-native dependency directories. This is not a relocatable bundle. The build does
-not modify the installed native libraries. Cross compilation, macOS, Windows and
-relocatable packaging need separate verified loader recipes.
+The Linux development helper emits absolute `DT_RUNPATH` entries for directly
+linked libraries. Cross compilation, macOS, Windows and relocatable application
+bundles need separate verified recipes. The old `QUEST_NATIVE_CONFIG` JSON record
+and `QUEST_RUNTIME_LIBRARY_PATH` workflow are removed; unset those variables and
+select the installed package normally.
 
 Cargo does not propagate a library build script's linker arguments into an
 arbitrarily distant executable. Every final executable that uses this runtime,
@@ -54,7 +49,7 @@ quest-build = "0.1"
 ```
 
 ```rust,ignore
-// build.rs -- use the same QUEST_NATIVE_CONFIG as the native bridge
+// build.rs -- select the same installed package as the native bridge
 fn main() -> Result<(), quest_build::BuildError> {
     quest_build::emit_final_target_runtime_paths()
 }
@@ -178,6 +173,7 @@ cargo test --doc --workspace --locked
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets --locked
 cargo run --locked -p xtask -- generate-quest-bindings --check
+cargo run --locked -p xtask -- check-native-consumers
 cargo test --locked -p quest-circuit --no-default-features
 ```
 
@@ -190,5 +186,6 @@ use subprocesses where ordinary Cargo's in-process test harness needs isolation.
 The [architecture](https://github.com/eessmann/quest-rs/blob/main/docs/superpowers/specs/2026-09-10-quest-rust-design.md),
 [dated bridge audit](https://github.com/eessmann/quest-rs/blob/main/docs/superpowers/specs/2026-09-10-quest-bridge-audit.md), and
 [compiler research](https://github.com/eessmann/quest-rs/blob/main/docs/superpowers/specs/2026-09-10-quest-circuit-research.md)
-explain the invariants and later work. `OpenQASM` text import/export, structured
-runtime loops and advanced synthesis, routing and ZX passes are later milestones.
+preserve the design and dated research evidence. Text import/export, structured
+execution and optional certified synthesis/ZX workers are implemented; the guide
+documents their supported profile and validation boundaries.
