@@ -101,6 +101,7 @@ mod ffi {
             use_multithread: i32,
         ) -> Result<()>;
         fn finalize_quest_env() -> Result<()>;
+        fn finalize_quest_env_on_drop();
         fn sync_quest_env() -> Result<()>;
         fn is_quest_env_init() -> bool;
         fn get_quest_env() -> Result<QuestEnvironment>;
@@ -252,8 +253,29 @@ pub fn init_custom_quest_env(
     ))
 }
 
+/// Finalize the runtime after all native handles have been destroyed.
+///
+/// Rejection for live handles or the wrong thread leaves an active runtime
+/// available to its owner. Once native finalization begins, any failure is
+/// terminal. Successful finalization is idempotent and never permits restarting
+/// the runtime in this process.
 pub fn finalize_quest_env() -> QuestResult<()> {
     map_quest_result(ffi::finalize_quest_env())
+}
+
+/// Terminal cleanup for an environment owner's destructor or a failed
+/// publication after successful native initialization.
+///
+/// This function does not panic. It finalizes only on the owner thread with no
+/// live handles; any unsuccessful cleanup permanently rejects further native
+/// operations and initialization, preserving storage unsafe to destroy. Calling
+/// it before initialization or after successful finalization is a no-op.
+///
+/// Do not call this after a rejected initialization attempt: another caller may
+/// own the active environment.
+#[doc(hidden)]
+pub fn finalize_quest_env_on_drop() {
+    ffi::finalize_quest_env_on_drop();
 }
 
 /// Select native deployment modes: -1 for automatic, 0 disabled, 1 enabled.

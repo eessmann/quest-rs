@@ -35,16 +35,18 @@ fn facade_reports_preserve_exact_resource_usage() {
 #[gtest]
 fn bell_state_and_snapshot_survive_teardown() -> googletest::Result<()> {
     isolated("bell_state_and_snapshot_survive_teardown", || {
-        let env = Environment::builder().build().or_fail()?;
-        let mut register = env.state_vector(QubitCount::new(2).or_fail()?).or_fail()?;
-        register.h(0).or_fail()?;
-        register.cx(0, 1).or_fail()?;
-        let snapshot = register.snapshot().or_fail()?;
+        let snapshot = {
+            let env = Environment::builder().build().or_fail()?;
+            let mut register = env.state_vector(QubitCount::new(2).or_fail()?).or_fail()?;
+            register.h(0).or_fail()?;
+            register.cx(0, 1).or_fail()?;
+            register.snapshot().or_fail()?
+        };
+        expect_false!(quest_sys::is_quest_env_init());
+        quest_sys::finalize_quest_env().or_fail()?;
         expect_that!(snapshot[(0, 0)].re, near(2f64.sqrt().recip(), 1e-14));
         expect_that!(snapshot[(3, 0)].re, near(2f64.sqrt().recip(), 1e-14));
         expect_that!(snapshot[(1, 0)], eq(Complex64::new(0., 0.)));
-        drop(register);
-        env.close().map_err(|e| e.to_string()).or_fail()?;
         expect_that!(snapshot.nrows(), eq(4));
         Ok(())
     })
@@ -62,7 +64,6 @@ fn dimension_and_budget_reject_before_native_allocation() -> googletest::Result<
                 .or_fail()?;
             expect_true!(env.state_vector(QubitCount::new(10).or_fail()?).is_err());
             expect_that!(env.allocated_bytes(), eq(0));
-            env.close().map_err(|e| e.to_string()).or_fail()?;
             Ok(())
         },
     )
@@ -97,8 +98,6 @@ fn density_imaginary_entries_and_rectangular_blocks_keep_layout() -> googletest:
             let tall = faer::Mat::from_fn(3, 1, |r, _| Complex64::new(fixture_index(r), 0.25));
             density.write_block(0, 3, tall.as_ref()).or_fail()?;
             expect_that!(density.entry(2, 3).or_fail()?, eq(tall[(2, 0)]));
-            drop(density);
-            env.close().map_err(|e| e.to_string()).or_fail()?;
             Ok(())
         },
     )
@@ -119,8 +118,6 @@ fn builder_execution_samples_each_shot_from_zero() -> googletest::Result<()> {
             .sample_zeroed(Shots::new(16).or_fail()?, &[17, 23])
             .or_fail()?;
         expect_that!(samples.counts.get(&vec![true]), some(eq(&16)));
-        drop(prepared);
-        env.close().map_err(|e| e.to_string()).or_fail()?;
         Ok(())
     })
 }
@@ -172,9 +169,6 @@ fn nonsorted_numerical_targets_preserve_complex_operator_order() -> googletest::
             for (i, expect) in expected.into_iter().enumerate() {
                 expect_that!((snapshot[(i, 0)] - expect).norm(), le(1e-12));
             }
-            drop(register);
-            drop(prepared);
-            env.close().map_err(|e| e.to_string()).or_fail()?;
             Ok(())
         },
     )
@@ -237,9 +231,6 @@ fn numerical_density_evolution_uses_adjoint_and_signed_control() -> googletest::
                     );
                 }
             }
-            drop(density);
-            drop(prepared);
-            env.close().map_err(|e| e.to_string()).or_fail()?;
             Ok(())
         },
     )
@@ -298,9 +289,6 @@ fn density_channel_reset_and_classical_branch_are_effectful() -> googletest::Res
             let result = prepared.run(&mut density).or_fail()?;
             expect_false!(result.bits[0]);
             expect_that!(density.entry(1, 1).or_fail()?.re, near(1., 1e-12));
-            drop(density);
-            drop(prepared);
-            env.close().map_err(|e| e.to_string()).or_fail()?;
             Ok(())
         },
     )
@@ -350,11 +338,6 @@ fn controlled_rotation_phase_matches_fused_and_unfused_execution() -> googletest
             // Sx leaves |+> invariant; controlled Rz(2pi) changes only the control-one branch's phase.
             expect_that!(right.amplitude(0).or_fail()?.re, near(0.5, 1e-12));
             expect_that!(right.amplitude(1).or_fail()?.re, near(-0.5, 1e-12));
-            drop(left);
-            drop(right);
-            drop(direct);
-            drop(optimized);
-            env.close().map_err(|e| e.to_string()).or_fail()?;
             Ok(())
         },
     )
@@ -397,7 +380,6 @@ fn execution_failure_reports_completed_prefix_and_keeps_partial_state() -> googl
             drop(register);
             drop(prepared);
             expect_that!(env.allocated_bytes(), eq(0));
-            env.close().map_err(|e| e.to_string()).or_fail()?;
             Ok(())
         },
     )
@@ -448,7 +430,6 @@ fn scalar_numerical_operator_and_preparation_budget_have_checked_admission()
                 .or_fail()?;
             expect_true!(env.prepare(builder.finish().or_fail()?).is_err());
             expect_that!(env.allocated_bytes(), eq(0));
-            env.close().map_err(|e| e.to_string()).or_fail()?;
             Ok(())
         },
     )
@@ -484,9 +465,6 @@ fn changed_numerical_policy_is_rejected_before_mutation_or_seeding() -> googlete
                 eq(&original_seeds)
             );
             quest_sys::set_qu_est_validation_epsilon(epsilon).or_fail()?;
-            drop(register);
-            drop(prepared);
-            env.close().map_err(|e| e.to_string()).or_fail()?;
             Ok(())
         },
     )
@@ -506,8 +484,6 @@ fn density_promotion_owns_an_independent_native_state() -> googletest::Result<()
         let density = original.to_density().or_fail()?;
         drop(original);
         expect_that!(density.entry(0, 1).or_fail()?.im, near(-0.5, 1e-12));
-        drop(density);
-        env.close().map_err(|e| e.to_string()).or_fail()?;
         Ok(())
     })
 }
@@ -597,7 +573,6 @@ fn openqasm31_u_phase_survives_native_adjoint_signed_controls_and_fusion() -> go
                     }
                 }
             }
-            env.close().map_err(|error| error.to_string()).or_fail()?;
             Ok(())
         },
     )

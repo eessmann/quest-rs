@@ -14,8 +14,5 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut register = env.state_vector(QubitCount::new(2)?)?;
     let result = prepared.run(&mut register, &RunInputs::default())?;
     println!("{:?}", result.outputs);
-    drop(register);
-    drop(prepared);
-    env.close()?;
     Ok(())
 }

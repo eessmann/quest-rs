@@ -2,6 +2,10 @@
 
 Date: 2026-09-10. Read-only production audit for the [proposed design](2026-09-10-quest-rust-design.md). No production fixes were applied. The initial checkout was clean at `6f2e5d5`.
 
+Historical note added 2026-09-11: the explicit-close recommendation below is
+superseded by the approved [RAII-only lifecycle](2026-09-11-raii-environment.md).
+The audit findings and dated native configuration evidence remain unchanged.
+
 ## Installed configuration
 
 Verified installed headers, exported CMake package, and ELF library identify **QuEST 4.3.0**, shared Release, binary64, deprecated APIs disabled. OpenMP, CUDA, cuQuantum and BMI2 are enabled; MPI, subcommunicators, HIP, ADIOS2 and NUMA are disabled.

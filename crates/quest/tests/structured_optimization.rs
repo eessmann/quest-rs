@@ -102,10 +102,6 @@ fn exact_structured_optimization_preserves_native_state_density_and_observations
                 "qubit[2] q; h q[0]; h q[0]; x q[0]; output bit b=measure q[0]; if(bool(b)) { x q[1]; x q[1]; } reset q[0];",
                 1,
             )?;
-            environment
-                .close()
-                .map_err(|error| error.to_string())
-                .or_fail()?;
             Ok(())
         },
     )

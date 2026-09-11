@@ -221,19 +221,18 @@ pub fn structured_certified_loop(executable: &std::path::Path) -> TutorialResult
 
 #[cfg(not(test))]
 fn main() -> TutorialResult<()> {
-    let environment = Environment::builder().build()?;
-    println!("Bell probabilities: {:?}", bell(&environment)?);
-    println!("Teleportation fidelity: {}", teleportation(&environment)?);
-    println!("Feedback P(0): {}", feedback(&environment)?);
-    println!("Repeat result: {:?}", repeat_until_success(&environment)?);
-    println!(
-        "Captured values / iterations: {:?}",
-        captures_once(&environment)?
-    );
-    println!("Array result: {}", array_arguments(&environment)?);
-    environment
-        .close()
-        .map_err(|error| std::io::Error::other(error.to_string()))?;
+    {
+        let environment = Environment::builder().build()?;
+        println!("Bell probabilities: {:?}", bell(&environment)?);
+        println!("Teleportation fidelity: {}", teleportation(&environment)?);
+        println!("Feedback P(0): {}", feedback(&environment)?);
+        println!("Repeat result: {:?}", repeat_until_success(&environment)?);
+        println!(
+            "Captured values / iterations: {:?}",
+            captures_once(&environment)?
+        );
+        println!("Array result: {}", array_arguments(&environment)?);
+    }
     if let Some(path) = std::env::args_os().nth(1) {
         #[cfg(feature = "workers")]
         println!(

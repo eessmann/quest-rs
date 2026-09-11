@@ -25,8 +25,19 @@ namespace {
 enum class Lifecycle { Unattempted, Initializing, Active, Finalized, Failed };
 std::recursive_mutex lifecycle_mutex;
 Lifecycle lifecycle = Lifecycle::Unattempted;
+// One-way admission barrier independent of the lifecycle mutex: even failure
+// to acquire that mutex during owner destruction must retire the runtime.
+std::atomic<bool> retired{false};
 std::uint64_t owner_token = 0;
 std::uint64_t next_thread_token = 0;
+
+void ensure_not_retired() {
+  if (retired.load(std::memory_order_acquire)) {
+    throw std::runtime_error(
+        "quest-sys lifecycle: environment permanently retired after "
+        "unsuccessful cleanup");
+  }
+}
 
 // Access only under lifecycle_mutex. Unlike std::thread::id, this token cannot
 // be reused by a later thread after the initialization thread has exited.
@@ -52,6 +63,7 @@ void ensure_owner_thread() {
 template <typename Initialize>
 void initialize_environment(Initialize initialize) {
   const std::lock_guard lock(lifecycle_mutex);
+  ensure_not_retired();
   if (lifecycle != Lifecycle::Unattempted) {
     throw std::runtime_error(
         "quest-sys lifecycle: environment initialization may only be attempted "
@@ -235,6 +247,7 @@ std::vector<qcomp*> row_pointers(std::vector<qcomp>& values,
 
 std::unique_lock<std::recursive_mutex> admit_native_call() {
   std::unique_lock lock(lifecycle_mutex);
+  ensure_not_retired();
   if (lifecycle != Lifecycle::Active) {
     throw std::runtime_error(
         "quest-sys lifecycle: native calls require an active environment");
@@ -598,8 +611,11 @@ void init_custom_quest_env_modes(std::int32_t use_distrib,
 
 void finalize_quest_env() {
   const std::lock_guard lock(lifecycle_mutex);
-  if (lifecycle == Lifecycle::Finalized ||
-      lifecycle == Lifecycle::Unattempted) {
+  if (lifecycle == Lifecycle::Finalized) {
+    return;
+  }
+  ensure_not_retired();
+  if (lifecycle == Lifecycle::Unattempted) {
     return;
   }
   const auto admission = admit_native_call();
@@ -613,14 +629,38 @@ void finalize_quest_env() {
   }
 }
 
+void finalize_quest_env_on_drop() noexcept {
+  try {
+    const std::lock_guard lock(lifecycle_mutex);
+    try {
+      // Retain the ordinary finalizer's owner-thread and live-resource checks.
+      finalize_quest_env();
+    } catch (...) {
+      // The owner is disappearing: unlike an explicit low-level finalization
+      // rejection, this failure can never leave the runtime available for use.
+      // Resource destructors will preserve native storage after retirement.
+      lifecycle = Lifecycle::Failed;
+      retired.store(true, std::memory_order_release);
+    }
+  } catch (...) {
+    // Do not touch mutex-protected state without its lock. The independent
+    // latch still prevents initialization and subsequent native admission.
+    retired.store(true, std::memory_order_release);
+  }
+}
+
 void sync_quest_env() {
   const auto admission = admit_native_call();
   ::syncQuESTEnv();
 }
 
 bool is_quest_env_init() {
+  if (retired.load(std::memory_order_acquire)) {
+    return false;
+  }
   const std::lock_guard lock(lifecycle_mutex);
-  return lifecycle == Lifecycle::Active;
+  return !retired.load(std::memory_order_acquire) &&
+         lifecycle == Lifecycle::Active;
 }
 
 QuestEnvironment get_quest_env() {

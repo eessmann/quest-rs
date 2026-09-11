@@ -16,4 +16,4 @@ The return values are probabilities for basis states 0 and 3, each approximately
 
 `prepare_structured` performs the checked compilation/planning stages needed by the facade. Keep a prepared program when executing the same structure repeatedly. A new state vector starts in the zero state. Running a prepared program on an existing register acts on its current state.
 
-The pure frontend Bell example can be checked without native libraries. Native execution requires the installed QuEST configuration described in [validation](validation.md). Registers and prepared objects borrow their environment, so their handles must be dropped before explicit environment closure.
+The pure frontend Bell example can be checked without native libraries. Native execution requires the installed QuEST configuration described in [validation](validation.md). Registers and prepared objects borrow their environment; lexical scope exit destroys their handles before the environment automatically finalizes the native runtime.

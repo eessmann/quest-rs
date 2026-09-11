@@ -15,7 +15,7 @@ cargo run -p quest-rs --example tutorials --locked
 cargo test -p quest-rs --test tutorials --locked
 ```
 
-The native test runs the same functions shown in this book, inside a subprocess. It checks Bell probabilities, teleportation fidelity, deterministic feedback, bounded retry success, once-only captures, and array mutation. The subprocess owns one environment and closes it after all borrowed native resources are dropped.
+The native test runs the same functions shown in this book, inside a subprocess. It checks Bell probabilities, teleportation fidelity, deterministic feedback, bounded retry success, once-only captures, and array mutation. The subprocess owns one environment whose scope ends after all borrowing native resources have been destroyed; `Drop` then automatically finalizes the runtime.
 
 ```rust
 {{#include ../../../crates/quest/tests/tutorials.rs:native_tutorial_tests}}

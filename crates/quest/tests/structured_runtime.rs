@@ -42,13 +42,6 @@ fn structured_feedback_and_density_reset_preserve_observations() -> Result<()> {
                 .run(&mut density, &RunInputs::default())
                 .or_fail()?;
             expect_that!(density.entry(0, 0).or_fail()?.re, near(1., 1e-13));
-            drop(prepared);
-            drop(state);
-            drop(density);
-            environment
-                .close()
-                .map_err(|error| error.to_string())
-                .or_fail()?;
             Ok(())
         },
     )
@@ -66,78 +59,75 @@ fn runtime_loop_capture_once_and_step_failure_report_prefix() -> Result<()> {
                 while(count<3) { turn(${{captures.push(1); 0.25}}) q; count+=1; }
             }?;
             expect_eq!(captures, vec![1]);
-            let environment = Environment::builder().build().or_fail()?;
-            let mut prepared = environment.prepare_structured(program).or_fail()?;
-            let mut state = environment
-                .state_vector(QubitCount::new(1).or_fail()?)
-                .or_fail()?;
-            let result = prepared.run(&mut state, &RunInputs::default()).or_fail()?;
-            expect_eq!(
-                result
-                    .outputs
-                    .get("count")
-                    .and_then(|value| value.as_scalar())
-                    .map(quest::language::classical::ScalarValue::to_i128),
-                Some(Ok(3))
-            );
-            expect_that!(
-                state.amplitude(0).or_fail()?.im,
-                near(-0.375_f64.sin() / 2_f64.sqrt(), 1e-13)
-            );
-            let looping = circuit! {qubit q; while(true){x q;}}?;
-            let mut loop_plan = environment.prepare_structured(looping).or_fail()?;
-            let error = loop_plan
-                .run_with_limits(
-                    &mut state,
-                    &RunInputs::default(),
-                    InterpreterLimits {
-                        steps: 100,
-                        ..InterpreterLimits::default()
-                    },
-                )
-                .unwrap_err();
-            let quest::Error::StructuredExecution(error) = error else {
-                fail!("structured error expected")?;
-                return Ok(());
-            };
-            expect_true!(matches!(
-                error.cause,
-                quest::language::vm::RuntimeCause::StepLimit
-            ));
-            expect_gt!(error.completed_quantum, 0);
-            expect_false!(error.context.is_empty());
-            let macro_diagnostic = error.diagnostic().clone();
-            expect_true!(macro_diagnostic.labels.is_empty());
-            expect_true!(
-                macro_diagnostic
-                    .notes
-                    .iter()
-                    .any(|note| note.contains("Rust source location:"))
-            );
-            expect_true!(matches!(
-                macro_diagnostic.provenance.entity,
-                Some(quest::language::Entity::Operation(_))
-            ));
-            expect_false!(macro_diagnostic.provenance.execution.is_empty());
+            let (macro_diagnostic, source_diagnostic) = {
+                let environment = Environment::builder().build().or_fail()?;
+                let mut prepared = environment.prepare_structured(program).or_fail()?;
+                let mut state = environment
+                    .state_vector(QubitCount::new(1).or_fail()?)
+                    .or_fail()?;
+                let result = prepared.run(&mut state, &RunInputs::default()).or_fail()?;
+                expect_eq!(
+                    result
+                        .outputs
+                        .get("count")
+                        .and_then(|value| value.as_scalar())
+                        .map(quest::language::classical::ScalarValue::to_i128),
+                    Some(Ok(3))
+                );
+                expect_that!(
+                    state.amplitude(0).or_fail()?.im,
+                    near(-0.375_f64.sin() / 2_f64.sqrt(), 1e-13)
+                );
+                let looping = circuit! {qubit q; while(true){x q;}}?;
+                let mut loop_plan = environment.prepare_structured(looping).or_fail()?;
+                let error = loop_plan
+                    .run_with_limits(
+                        &mut state,
+                        &RunInputs::default(),
+                        InterpreterLimits {
+                            steps: 100,
+                            ..InterpreterLimits::default()
+                        },
+                    )
+                    .unwrap_err();
+                let quest::Error::StructuredExecution(error) = error else {
+                    fail!("structured error expected")?;
+                    return Ok(());
+                };
+                expect_true!(matches!(
+                    error.cause,
+                    quest::language::vm::RuntimeCause::StepLimit
+                ));
+                expect_gt!(error.completed_quantum, 0);
+                expect_false!(error.context.is_empty());
+                let macro_diagnostic = error.diagnostic().clone();
+                expect_true!(macro_diagnostic.labels.is_empty());
+                expect_true!(
+                    macro_diagnostic
+                        .notes
+                        .iter()
+                        .any(|note| note.contains("Rust source location:"))
+                );
+                expect_true!(matches!(
+                    macro_diagnostic.provenance.entity,
+                    Some(quest::language::Entity::Operation(_))
+                ));
+                expect_false!(macro_diagnostic.provenance.execution.is_empty());
 
-            let sourced = StructuredProgram::parse(
-                "qubit q; input int value; if (value > 0) { x q; }",
-                "runtime.qasm",
-            )?;
-            let mut source_plan = environment.prepare_structured(sourced).or_fail()?;
-            let source_error = source_plan
-                .run(&mut state, &RunInputs::default())
-                .unwrap_err();
-            let source_diagnostic = source_error.diagnostic().or_fail()?.clone();
-            expect_eq!(source_diagnostic.labels.len(), 1);
-            drop(source_plan);
-            drop(loop_plan);
-            drop(prepared);
-            drop(state);
-            environment
-                .close()
-                .map_err(|error| error.to_string())
-                .or_fail()?;
+                let sourced = StructuredProgram::parse(
+                    "qubit q; input int value; if (value > 0) { x q; }",
+                    "runtime.qasm",
+                )?;
+                let mut source_plan = environment.prepare_structured(sourced).or_fail()?;
+                let source_error = source_plan
+                    .run(&mut state, &RunInputs::default())
+                    .unwrap_err();
+                let source_diagnostic = source_error.diagnostic().or_fail()?.clone();
+                expect_eq!(source_diagnostic.labels.len(), 1);
+                (macro_diagnostic, source_diagnostic)
+            };
+            expect_false!(quest_sys::is_quest_env_init());
+            quest_sys::finalize_quest_env().or_fail()?;
             macro_diagnostic.validate_sources()?;
             source_diagnostic.validate_sources()?;
             #[cfg(feature = "codespan-reporting")]
@@ -218,12 +208,6 @@ fn standard_cu_and_cx_preserve_full_phase_on_each_basis_column() -> Result<()> {
                     );
                 }
             }
-            drop(prepared);
-            drop(state);
-            environment
-                .close()
-                .map_err(|error| error.to_string())
-                .or_fail()?;
             Ok(())
         },
     )

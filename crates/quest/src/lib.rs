@@ -13,7 +13,7 @@ mod values;
 pub use quest_circuit::language::vm::{ClassicalValue, InterpreterLimits, RunInputs, RunOutput};
 pub use structured_execution::PreparedStructuredProgram;
 
-pub use environment::{Capabilities, CloseError, Environment, EnvironmentBuilder, ExecutionMode};
+pub use environment::{Capabilities, Environment, EnvironmentBuilder, ExecutionMode};
 pub use error::{Error, Result, StructuredExecutionError};
 pub use execution::{PreparedProgram, RunResult, SampleResult};
 pub use faer;

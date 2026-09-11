@@ -296,9 +296,6 @@ fn facade_library_source(crate_name: &str) -> String {
         assert!((state[(row, 0)].re - expected_re).abs() < 1e-12);
         assert!(state[(row, 0)].im.abs() < 1e-12);
     }}
-    drop(register);
-    drop(prepared);
-    environment.close()?;
     Ok(())
 }}
 "

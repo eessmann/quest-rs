@@ -68,14 +68,5 @@ fn certified_ssa_synthesis_preserves_native_state_and_density() -> Result<()> {
             }
         }
     }
-    drop((
-        before,
-        after,
-        state_before,
-        state_after,
-        density_before,
-        density_after,
-    ));
-    environment.close().map_err(|e| e.to_string()).or_fail()?;
     Ok(())
 }

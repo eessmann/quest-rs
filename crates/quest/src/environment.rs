@@ -58,8 +58,15 @@ impl EnvironmentBuilder {
         self.budget = budget;
         self
     }
+    /// Enter native initialization at most once per process.
+    ///
+    /// Configuration checks before native entry do not consume this attempt.
+    /// Once native initialization starts, even a failure permanently prevents
+    /// another attempt. Dropping the returned owner ends this runtime forever.
+    ///
     /// # Errors
-    /// Rejects unsupported distribution, unavailable native modes, or native environment initialization failures.
+    /// Rejects unsupported distribution, unavailable native modes, previous
+    /// initialization attempts, or native environment initialization failures.
     pub fn build(self) -> Result<Environment> {
         // The initial runtime has no collective allocation/error protocol.
         if self.distribution != ExecutionMode::Disabled {
@@ -75,12 +82,13 @@ impl EnvironmentBuilder {
         let native = match quest_sys::get_quest_env().context("reading environment") {
             Ok(value) => value,
             Err(error) => {
-                let _ = quest_sys::finalize_quest_env();
+                // Initialization succeeded, so this builder owns cleanup. A
+                // rejected initialization above must never retire another owner.
+                quest_sys::finalize_quest_env_on_drop();
                 return Err(error);
             }
         };
         Ok(Environment {
-            active: true,
             capabilities: Capabilities {
                 gpu: native.is_gpu_accelerated,
                 multithreaded: native.is_multithreaded,
@@ -95,10 +103,23 @@ impl EnvironmentBuilder {
     }
 }
 
-/// Unique active native environment, restricted to its creating thread.
-/// Registers, native matrices and prepared programs borrow this owner.
+/// Unique owner of a native runtime, confined to its creating thread.
+///
+/// Registers and prepared programs (including their native matrices and
+/// channels) borrow this owner and are destroyed before it. Scope exit finalizes
+/// the runtime automatically. Initialization can only be attempted once per
+/// process: `QuEST` may own MPI, whose world model cannot restart after
+/// finalization. There is no explicit high-level shutdown operation.
+///
+/// Drop never panics. If native cleanup fails or an independently retained
+/// low-level handle prevents it, the bridge permanently retires the runtime and
+/// rejects subsequent native operations. The process can continue; allocations
+/// that cannot safely be destroyed remain until process exit.
+///
+/// Owned register snapshots and pure Rust [`crate::NumericalOperator`] payloads
+/// do not borrow this owner and remain usable after its scope ends. RAII cannot
+/// ensure cleanup on process abort, forced termination, or [`std::mem::forget`].
 pub struct Environment {
-    active: bool,
     capabilities: Capabilities,
     budget: MemoryBudget,
     allocated: Cell<usize>,
@@ -129,22 +150,8 @@ impl Environment {
     pub fn density_matrix(&self, count: QubitCount) -> Result<Register<'_, DensityMatrix>> {
         Register::allocate(self, count)
     }
-    /// # Errors
-    /// Returns the environment and native shutdown error if live resources prevent finalization.
-    pub fn close(mut self) -> std::result::Result<(), CloseError> {
-        match quest_sys::finalize_quest_env().context("finalizing environment") {
-            Ok(()) => {
-                self.active = false;
-                Ok(())
-            }
-            Err(error) => Err(CloseError {
-                environment: self,
-                error,
-            }),
-        }
-    }
     /// Retain a conservative fixed allowance for `QuEST`'s process RNG seed
-    /// storage after the first high-level batch. It remains charged until close.
+    /// storage after the first high-level batch, until this owner is destroyed.
     pub(crate) fn admit_seed_storage(&self) -> Result<()> {
         const BYTES: usize = 4096;
         if self.seed_storage.get() {
@@ -188,9 +195,7 @@ impl Environment {
 }
 impl Drop for Environment {
     fn drop(&mut self) {
-        if self.active {
-            let _ = quest_sys::finalize_quest_env();
-        }
+        quest_sys::finalize_quest_env_on_drop();
     }
 }
 impl fmt::Debug for Environment {
@@ -199,24 +204,6 @@ impl fmt::Debug for Environment {
             .field("capabilities", &self.capabilities)
             .field("allocated_bytes", &self.allocated.get())
             .finish_non_exhaustive()
-    }
-}
-
-/// Failed shutdown retains its environment, allowing outstanding leaked native
-/// resources to be recovered through low-level interoperability before retrying.
-#[derive(Debug)]
-pub struct CloseError {
-    pub environment: Environment,
-    pub error: Error,
-}
-impl fmt::Display for CloseError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        self.error.fmt(f)
-    }
-}
-impl std::error::Error for CloseError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        Some(&self.error)
     }
 }
 

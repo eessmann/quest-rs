@@ -137,10 +137,18 @@ sequential faer evaluation; fusion may change rounding.
 
 ## Native ownership and effects
 
-An environment is unique per process and confined to its creating thread.
-Registers and prepared programs borrow it. Drop them before explicit closure;
-failed `close()` retains its owner, and `Drop` is non-panicking. Safe low-level
-bridge use retains lifecycle and native validation checks too.
+`Environment` is the unique owner of a runtime initialized at most once per
+process and confined to its creating thread. Registers and prepared programs
+borrow it. Scope exit destroys those resources and automatically finalizes the
+environment; no explicit shutdown method is needed or provided. Finalization
+permanently ends QuEST use in that process, including when QuEST owns MPI, whose
+world model cannot restart after finalization.
+
+`Drop` never panics. A failed cleanup permanently retires QuEST while allowing
+the process to continue, retaining native storage that cannot safely be freed.
+Subsequent native operations and initialization are rejected. Safe low-level
+bridge use retains lifecycle and native validation checks too. Pure Rust matrix
+payloads and owned snapshots remain independent of the environment lifetime.
 
 CPU execution without native multithreading is the default. GPU and threading
 are explicit choices. `MemoryBudget` bounds admission with conservative host,

@@ -25,7 +25,39 @@ Potentially trapping classical computations are observable too. An optimizer can
 
 ## Native lifetime and numerical policy
 
-An environment is unique per process and confined to its owner thread. Registers and prepared programs borrow it. Drop these resources before calling `close`; failed explicit closure retains ownership so the caller can inspect the error. Native handle leaks still prevent finalization.
+`Environment` uniquely owns a runtime whose native initialization may be entered
+at most once per process. It is confined to its creating thread and implements
+neither `Send` nor `Sync`. Registers, `PreparedProgram`, and
+`PreparedStructuredProgram` borrow it, so their native handles are destroyed
+before its scope ends. `Drop` then finalizes the runtime automatically, including
+on an early `?` return or during Rust unwinding. The facade has no explicit
+shutdown method.
+
+The minimal example returns an owned snapshot from the environment's scope:
+
+```rust,no_run
+{{#include ../../../crates/quest/examples/minimal.rs}}
+```
+
+This is a process lifetime, not a restartable session. QuEST may own an MPI world;
+MPI cannot be initialized again after its world is finalized. Both facade and
+low-level initialization reject attempts after the environment is dropped.
+Pure configuration validation before entering native initialization does not
+consume the attempt. A rejected duplicate initialization leaves the existing
+owner usable.
+
+`Drop` never panics. If native finalization fails or an independently retained
+low-level handle prevents safe cleanup, the bridge permanently retires QuEST.
+The process continues, but subsequent native operations and initialization fail.
+Native storage that cannot safely be destroyed remains allocated until process
+exit. Retirement does not report successful finalization or return a recoverable
+environment. Deliberately forgetting the environment, aborting, or forcibly
+terminating the process can prevent RAII cleanup altogether.
+
+Native dense/diagonal matrices and channels cached in prepared programs belong
+to this runtime. Pure Rust `NumericalOperator` matrix payloads, compiled circuit
+descriptions, owned faer snapshots, and owned diagnostics have independent
+lifetimes and may outlive the environment.
 
 The default environment selects CPU execution without native multithreading. GPU execution and native threading require explicit policy choices. Preparation constructs caches transactionally; run checks native numerical admission before mutation. Direct low-level bridge calls do not enter the facade's memory accounting automatically.
 

@@ -32,9 +32,6 @@ fn executable_native_tutorials_pass_in_an_isolated_process() -> Result<()> {
     verify_that!(attempts, le(2))?;
     verify_eq!(examples::captures_once(&environment).or_fail()?, (1, 4))?;
     verify_eq!(examples::array_arguments(&environment).or_fail()?, 6)?;
-    environment
-        .close()
-        .map_err(|error| std::io::Error::other(error.to_string()))?;
     Ok(())
 }
 // ANCHOR_END: native_tutorial_tests

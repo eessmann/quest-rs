@@ -61,24 +61,37 @@ fn main() -> Result<(), quest_build::BuildError> {
 use quest::{Environment, QubitCount};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let env = Environment::builder().build()?;
-    let mut register = env.state_vector(QubitCount::new(2)?)?;
-    register.h(0)?;
-    register.cx(0, 1)?;
-    let snapshot = register.snapshot()?; // owned faer::Mat<Complex64>
-    drop(register);
-    env.close()?;
+    let snapshot = {
+        let env = Environment::builder().build()?;
+        let mut register = env.state_vector(QubitCount::new(2)?)?;
+        register.h(0)?;
+        register.cx(0, 1)?;
+        register.snapshot()? // owned faer::Mat<Complex64>
+    }; // register is destroyed, then env finalizes the native runtime
     println!("{:?}", snapshot); // independent of the environment lifetime
     Ok(())
 }
 ```
 
-An environment is unique per process and restricted to its creating thread.
-Registers and prepared programs borrow it and cannot cross threads. Native calls
-use the same bridge lifecycle and owner-thread admission even through direct
-`quest-sys` use. Safe code cannot disable native validation. `close()` reports a
-failed shutdown while retaining its owner; `Drop` is non-panicking. Leaking a
-native owner still prevents finalization.
+`Environment` uniquely owns a runtime whose native initialization may be entered
+only once per process. It is restricted to its creating thread. Registers and
+both kinds of prepared program borrow it and cannot cross threads. Scope exit,
+including an early `?` return, destroys borrowing resources before `Environment`
+automatically finalizes the native runtime. There is no high-level explicit
+shutdown method and no restart: `QuEST` may own an MPI world that cannot be
+initialized again after finalization. Configuration validation before native
+initialization does not consume the single attempt.
+
+`Drop` never panics. If safe finalization is prevented or native cleanup fails,
+`QuEST` is permanently retired while the process continues. All later native
+operations and initialization attempts are rejected, and storage that cannot
+safely be destroyed is retained until process exit. Direct `quest-sys` calls
+retain the same lifecycle and owner-thread admission checks. Abort, forced
+termination, or deliberately forgetting the environment can prevent RAII cleanup.
+
+Native matrix and channel caches inside prepared programs belong to the runtime.
+Independent Rust `NumericalOperator` payloads and owned faer snapshots do not
+borrow the environment and remain usable after its scope ends.
 
 The default environment explicitly selects CPU execution without native
 multithreading. GPU and native multithreading are explicit builder choices.
@@ -106,8 +119,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut state = env.state_vector(QubitCount::new(2)?)?;
     let result = prepared.run(&mut state, &RunInputs::default())?;
     println!("{:?}", result.outputs);
-    drop((prepared, state));
-    env.close()?;
     Ok(())
 }
 ```

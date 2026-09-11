@@ -231,6 +231,7 @@ void init_custom_quest_env_modes(std::int32_t use_distrib,
                                  std::int32_t use_gpu_accel,
                                  std::int32_t use_multithread);
 void finalize_quest_env();
+void finalize_quest_env_on_drop() noexcept;
 void sync_quest_env();
 bool is_quest_env_init();
 QuestEnvironment get_quest_env();

@@ -2,6 +2,11 @@
 
 Status: approved by the user on 2026-09-10; initial M0–M5 implementation verified for the documented Linux GNU recipe and macro profile. See the [implementation ledger](../plans/implementation-status.md) for results and precise implementation boundaries.
 
+Lifecycle update, 2026-09-11: the close/recovery design below is superseded by
+the approved [RAII-only environment lifecycle](2026-09-11-raii-environment.md).
+The facade now finalizes automatically at scope exit and permanently retires
+QuEST after a failed cleanup. Dated audit and verification evidence is preserved.
+
 Date: 2026-09-10. Baseline: `quest-rs` commit `6f2e5d5`; native QuEST installation `/var/home/erich/Projects/opt/quest`, source `/var/home/erich/Projects/QuEST`.
 
 The user selected **Rust macro first, OpenQASM text import/export later**. This proposal covers the complete direction, with separately deliverable milestones. The accompanying [audit](2026-09-10-quest-bridge-audit.md) records existing defects and validation limits; the [research notes](2026-09-10-quest-circuit-research.md) record sources and optimization assumptions.
@@ -68,7 +73,7 @@ Start optimization as modules in `quest-circuit`, not another crate. Keep CXX ty
 
 ### Environment
 
-`EnvironmentBuilder::build()` returns the sole active `Environment` guard. Existence of this guard represents successful initialization; a separate generic state parameter is unnecessary unless it changes available operations. A consuming `close()` reports shutdown failure and retains ownership in its error when finalization has not occurred. `Drop` is a non-panicking fallback. No restart after finalization is promised.
+`EnvironmentBuilder::build()` returns the sole active `Environment` guard. Existence of this guard represents successful initialization; a separate generic state parameter is unnecessary unless it changes available operations. The original consuming `close()` and recoverable shutdown error design is superseded by automatic non-panicking `Drop`. Native initialization may be entered only once per process; finalization or failed cleanup permanently ends QuEST use. See the [lifecycle update](2026-09-11-raii-environment.md) for the terminal-retirement policy.
 
 Use explicit configuration enums, such as `ExecutionMode::{Auto, Enabled, Disabled}`, in place of positional booleans. Validate requested modes against installed capabilities before invoking native initialization. Record actual capabilities separately from requested configuration.
 
@@ -98,7 +103,7 @@ Initially `UnitaryCircuit` admits built-in exact gate semantics and their symbol
 
 Preparation is transactional: native objects and scratch are built privately and dropped on failure before publishing a prepared owner. Execution is not transactional by default: an error may leave the register partially modified. Return the failing operation and completed-prefix context. Offer snapshot-based execution only as an explicit future cost, not an implied guarantee.
 
-Even safe Rust can leak owners with `mem::forget`; native live-resource checks must still reject premature finalization. Destructors must not panic or let exceptions cross FFI. If shutdown cannot safely occur, preserve native state rather than claiming successful finalization.
+Even safe Rust can leak owners with `mem::forget`; native live-resource checks must still reject premature finalization. Destructors must not panic or let exceptions cross FFI. If shutdown cannot safely occur, preserve native state rather than claiming successful finalization. Under the 2026-09-11 lifecycle update, failed environment cleanup permanently retires all native admission while the process continues.
 
 ## 4. General circuit representation
 
@@ -192,8 +197,6 @@ let bell = circuit! {
 let env = Environment::builder().build()?;
 let mut executable = env.prepare(bell)?; // convenience path through explicit stages
 let counts = executable.sample_zeroed(Shots::new(1024)?, &[2026, 9, 10])?;
-drop(executable);
-env.close()?;
 Ok(())
 }
 ```
