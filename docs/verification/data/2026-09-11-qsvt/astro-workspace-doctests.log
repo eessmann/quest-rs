@@ -1,0 +1,178 @@
+    Blocking waiting for file lock on build directory
+   Compiling bindgen v0.72.1
+   Compiling hdf5-metno-sys v0.12.3
+   Compiling quest-sys v0.2.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/qsvt-port/crates/quest-sys)
+   Compiling mpi-sys v0.2.4
+   Compiling mpi v0.8.2
+   Compiling hdf5-metno-types v0.11.1
+   Compiling hdf5-metno v0.14.1
+   Compiling quest-qsvt-io v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/qsvt-port/crates/quest-qsvt-io)
+   Compiling quest-qsvt-cli v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/qsvt-port/crates/quest-qsvt-cli)
+warning: quest-sys@0.2.0: Using QuEST 4.3.0 from /var/home/erich/Projects/opt/quest with /usr/bin/c++
+warning: quest-sys@0.2.0: Verified rsmpi MPICC /var/home/linuxbrew/.linuxbrew/Cellar/mpich/5.0.1/bin/mpicc matches QuEST MPI ABI and loaded library
+   Compiling quest-rs v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/qsvt-port/crates/quest)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 14.12s
+   Doc-tests quest_build
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests quest_circuit
+
+running 1 test
+test crates/quest-circuit/src/lib.rs - (line 8) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+all doctests ran in 0.22s; merged doctests compilation took 0.21s
+   Doc-tests quest_language
+
+running 7 tests
+test crates/quest-language/src/ssa/mod.rs - ssa::VerifiedProgram (line 498) - compile fail ... ok
+test crates/quest-language/src/semantic/mod.rs - semantic::TypedModule (line 170) - compile fail ... ok
+test crates/quest-language/src/semantic/mod.rs - semantic::TypedModule (line 179) - compile fail ... ok
+test crates/quest-language/src/ssa/mod.rs - ssa::VerifiedProgram (line 503) - compile fail ... ok
+test crates/quest-language/src/semantic/builder/mod.rs - semantic::builder (line 10) - compile fail ... ok
+test crates/quest-language/src/semantic/builder/mod.rs - semantic::builder (line 15) - compile fail ... ok
+test crates/quest-language/src/semantic/builder/mod.rs - semantic::builder (line 4) - compile fail ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+   Doc-tests quest_macros
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests quest_math
+
+running 1 test
+test crates/quest-math/src/../README.md - (line 8) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+all doctests ran in 0.12s; merged doctests compilation took 0.12s
+   Doc-tests quest_numerics
+
+running 1 test
+test crates/quest-numerics/src/observer.rs - observer (line 8) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+all doctests ran in 0.13s; merged doctests compilation took 0.12s
+   Doc-tests quest_optimizer_client
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests quest_optimizer_protocol
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests quest_polynomial
+
+running 2 tests
+test crates/quest-polynomial/src/function.rs - function::function (line 222) ... ok
+test crates/quest-polynomial/src/remez.rs - remez::RemezBuilder (line 47) ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.41s
+
+
+running 1 test
+test crates/quest-polynomial/src/remez.rs - remez::RemezBuilder (line 59) - compile fail ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+all doctests ran in 0.65s; merged doctests compilation took 0.19s
+   Doc-tests quest_qasm
+
+running 1 test
+test crates/quest-qasm/src/lib.rs - (line 8) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+all doctests ran in 0.16s; merged doctests compilation took 0.16s
+   Doc-tests quest_qsp
+
+running 2 tests
+test crates/quest-qsp/src/certification/mod.rs - certification::CertificationBuilder (line 149) ... ok
+test crates/quest-qsp/src/offline/mod.rs - offline (line 10) ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+running 2 tests
+test crates/quest-qsp/src/stages.rs - stages::SynthesisBuilder (line 84) - compile fail ... ok
+test crates/quest-qsp/src/certification/mod.rs - certification::CertificationBuilder (line 163) - compile fail ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+all doctests ran in 0.35s; merged doctests compilation took 0.28s
+   Doc-tests quest_qsvt
+
+running 9 tests
+test crates/quest-qsvt/src/analysis.rs - analysis::StandardPremises (line 214) - compile fail ... ok
+test crates/quest-qsvt/src/analysis.rs - analysis::AnalysisBuilder (line 453) - compile fail ... ok
+test crates/quest-qsvt/src/analysis.rs - analysis::EncodingBoundBuilder (line 50) - compile fail ... ok
+test crates/quest-qsvt/src/transform.rs - transform::TransformBuilder (line 198) - compile fail ... ok
+test crates/quest-qsvt/src/encoding.rs - encoding::EncodingBuilder (line 34) - compile fail ... ok
+test crates/quest-qsvt/src/transform.rs - transform::ValidatedTransform (line 46) - compile fail ... ok
+test crates/quest-qsvt/src/analysis.rs - analysis::NumericalObservations (line 363) - compile fail ... ok
+test crates/quest-qsvt/src/encoding.rs - encoding::EncodingBuilder (line 30) - compile fail ... ok
+test crates/quest-qsvt/src/dense.rs - dense::DenseEncodingBuilder (line 18) - compile fail ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+   Doc-tests quest_qsvt_cli
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests quest_qsvt_io
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests quest
+
+running 3 tests
+test crates/quest/src/lib.rs - (line 55) ... ignored
+test crates/quest/src/lib.rs - (line 109) - compile ... ok
+test crates/quest/src/lib.rs - (line 64) - compile ... ok
+
+test result: ok. 2 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 12 tests
+test crates/quest/src/qsvt/collective.rs - qsvt::collective::ExecutionResult (line 130) - compile fail ... ok
+test crates/quest/src/qsvt/mod.rs - qsvt::ExecutionResult (line 361) - compile fail ... ok
+test crates/quest/src/collective.rs - collective (line 30) - compile fail ... ok
+test crates/quest/src/collective.rs - collective (line 11) - compile fail ... ok
+test crates/quest/src/collective.rs - collective (line 20) - compile fail ... ok
+test crates/quest/src/qsvt/collective.rs - qsvt::collective::PreparedTransform (line 85) - compile fail ... ok
+test crates/quest/src/qsvt/mod.rs - qsvt::PreparedTransform (line 206) - compile fail ... ok
+test crates/quest/src/collective.rs - collective (line 42) - compile fail ... ok
+test crates/quest/src/qsvt/mod.rs - qsvt::PreparationBuilder (line 56) - compile fail ... ok
+test crates/quest/src/qsvt/mod.rs - qsvt::ExecutionResult (line 368) - compile fail ... ok
+test crates/quest/src/qsvt/mod.rs - qsvt::AdmittedTransform (line 104) - compile fail ... ok
+test crates/quest/src/qsvt/collective.rs - qsvt::collective::PreparationBuilder (line 17) - compile fail ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+all doctests ran in 0.47s; merged doctests compilation took 0.40s
+   Doc-tests quest_sys
+
+running 5 tests
+test crates/quest-sys/src/mpi.rs - mpi (line 20) - compile fail ... ok
+test crates/quest-sys/src/mpi.rs - mpi (line 28) - compile fail ... ok
+test crates/quest-sys/src/mpi.rs - mpi (line 9) - compile fail ... ok
+test crates/quest-sys/src/mpi.rs - mpi (line 14) - compile fail ... ok
+test crates/quest-sys/src/lib.rs - (line 22) - compile fail ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s

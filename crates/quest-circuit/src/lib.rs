@@ -15,6 +15,8 @@
 //! # Ok::<(), quest_circuit::Error>(())
 //! ```
 
+mod oracle;
+pub use oracle::{NeedsOracleTolerance, OracleBuilder, OracleFragment, OracleTolerance};
 mod linear;
 pub use linear::{
     Cnot, LinearOptions, LinearReport, LinearRewrite, LinearSynthesis, synthesize_cnot,
@@ -83,6 +85,8 @@ pub enum Error {
     NotUnitary,
     #[error("native index is not representable")]
     NativeIndex,
+    #[error("unsupported capability: {0}")]
+    Unsupported(&'static str),
     #[error("source range end precedes its start")]
     SourceRange,
 }

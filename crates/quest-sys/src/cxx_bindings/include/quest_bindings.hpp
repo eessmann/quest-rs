@@ -260,6 +260,8 @@ rust::Vec<QuestComplex> get_qureg_amps(const Qureg& qureg,
                                        std::int64_t start_index,
                                        std::int64_t num_amps);
 double calc_total_prob(const Qureg& qureg);
+void add_qureg(Qureg& out, const Qureg& source);
+
 void set_density_qureg_amps(Qureg& qureg,
                             std::int64_t start_row,
                             std::int64_t start_col,

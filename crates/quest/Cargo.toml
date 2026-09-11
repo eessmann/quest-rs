@@ -20,20 +20,33 @@ quest-circuit = { workspace = true }
 num-complex = { workspace = true }
 faer = { workspace = true, features = ["std", "linalg"] }
 ndarray = { workspace = true, features = ["std"], optional = true }
+quest-qsvt = { workspace = true, optional = true }
 
 [dev-dependencies]
 criterion.workspace = true
 googletest.workspace = true
+quest-qsp = { path = "../quest-qsp" }
 trybuild = { workspace = true }
 
 [lints]
 workspace = true
 
 [features]
+mpi = ["quest-sys/mpi"]
 serde = ["quest-circuit/serde"]
 codespan-reporting = ["quest-circuit/codespan-reporting"]
 workers = ["quest-circuit/workers"]
 ndarray = ["dep:ndarray"]
+qsvt = ["dep:quest-qsvt"]
+
+[[bench]]
+name = "qsvt_execution"
+harness = false
+required-features = ["qsvt"]
+
+[[example]]
+name = "qsvt"
+required-features = ["qsvt"]
 
 [build-dependencies]
 quest-build = { workspace = true }

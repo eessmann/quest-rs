@@ -396,6 +396,11 @@ pub(crate) enum SemanticOperation {
         targets: Vec<QubitId>,
         controls: Vec<Control>,
     },
+    Oracle {
+        fragment: crate::OracleFragment,
+        targets: Vec<QubitId>,
+        controls: Vec<Control>,
+    },
     Measure {
         qubit: QubitId,
         bit: BitId,
@@ -433,6 +438,11 @@ pub enum Operation {
         targets: Vec<QubitId>,
         controls: Vec<Control>,
     },
+    Oracle {
+        fragment: crate::OracleFragment,
+        targets: Vec<QubitId>,
+        controls: Vec<Control>,
+    },
     Measure {
         qubit: QubitId,
         bit: BitId,
@@ -461,6 +471,9 @@ impl SemanticOperation {
                 targets, controls, ..
             }
             | Self::Numerical {
+                targets, controls, ..
+            }
+            | Self::Oracle {
                 targets, controls, ..
             } => targets
                 .iter()
@@ -507,6 +520,15 @@ impl SemanticOperation {
                 controls,
             } => Operation::Numerical {
                 matrix: matrix.clone(),
+                targets: targets.clone(),
+                controls: controls.clone(),
+            },
+            Self::Oracle {
+                fragment,
+                targets,
+                controls,
+            } => Operation::Oracle {
+                fragment: fragment.clone(),
                 targets: targets.clone(),
                 controls: controls.clone(),
             },

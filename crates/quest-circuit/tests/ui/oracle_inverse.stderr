@@ -1,0 +1,5 @@
+error: numerical oracle requires adjoint; inverse and negative powers require exact semantics
+ --> tests/ui/oracle_inverse.rs:6:9
+  |
+6 |         inv @ block q;
+  |         ^^^

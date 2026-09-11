@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["crates/quest", "crates/quest-sys", "crates/quest-build", "crates/quest-circuit", "crates/quest-macros", "crates/xtask", "crates/quest-language", "crates/quest-qasm", "crates/quest-math", "crates/quest-optimizer-protocol", "crates/quest-optimizer-worker", "crates/quest-optimizer-client"]
+members = ["crates/quest", "crates/quest-sys", "crates/quest-build", "crates/quest-circuit", "crates/quest-macros", "crates/xtask", "crates/quest-language", "crates/quest-qasm", "crates/quest-math", "crates/quest-optimizer-protocol", "crates/quest-optimizer-worker", "crates/quest-optimizer-client", "crates/quest-numerics", "crates/quest-polynomial", "crates/quest-qsp", "crates/quest-qsvt", "crates/quest-qsvt-io", "crates/quest-qsvt-cli"]
 exclude = ["crates/vendor/rsgridsynth"]
 default-members = ["crates/quest"]
 
@@ -10,6 +10,19 @@ license = "MIT"
 repository = "https://github.com/eessmann/quest-rs"
 
 [workspace.dependencies]
+quest = { package = "quest-rs", path = "crates/quest", version = "0.1" }
+clap = { version = "4.6.6", default-features = false }
+mpi = { version = "0.8.2", default-features = false }
+rustfft = { version = "=6.4.1", default-features = false }
+maryada = { version = "=0.2.1", default-features = false }
+rayon = { version = "=1.12.0", default-features = false }
+astro-float = { version = "=0.9.6", default-features = false }
+hdf5-metno = { version = "=0.14.1", default-features = false }
+quest-numerics = { path = "crates/quest-numerics", version = "0.1" }
+quest-polynomial = { path = "crates/quest-polynomial", version = "0.1" }
+quest-qsp = { path = "crates/quest-qsp", version = "0.1" }
+quest-qsvt = { path = "crates/quest-qsvt", version = "0.1" }
+quest-qsvt-io = { path = "crates/quest-qsvt-io", version = "0.1" }
 criterion = { version = "0.8.2", default-features = false }
 quizx = "=0.3.0"
 rustix = { version = "1", default-features = false }

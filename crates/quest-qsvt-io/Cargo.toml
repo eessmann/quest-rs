@@ -1,0 +1,35 @@
+[package]
+name = "quest-qsvt-io"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "QSP and QSVT scientific interchange formats"
+
+[dependencies]
+thiserror.workspace = true
+num-complex.workspace = true
+hdf5-metno = { workspace = true, optional = true, features = ["complex"] }
+quest-qsp.workspace = true
+quest-polynomial.workspace = true
+serde_json = { workspace = true, features = ["float_roundtrip"] }
+faer = { workspace = true, default-features = false, features = ["std", "linalg"] }
+
+[dev-dependencies]
+googletest.workspace = true
+tempfile.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+hdf5 = ["dep:hdf5-metno"]
+certification = ["quest-qsp/certification"]
+offline-synthesis = ["quest-qsp/offline-synthesis"]
+
+[build-dependencies]
+quest-build.workspace = true
+
+[[example]]
+name = "generalized_catalog"
+required-features = ["certification"]

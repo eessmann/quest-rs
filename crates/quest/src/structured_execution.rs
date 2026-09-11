@@ -1,4 +1,5 @@
 //! Environment-bound preparation and native dispatch for structured SSA.
+use crate::oracle_execution::{OracleCache, OracleInventory};
 use crate::{
     Environment, Error, Outcome, QubitCount, Register, RegisterKind, Result,
     environment::Reservation,
@@ -20,6 +21,8 @@ use quest_circuit::{
 /// are admitted before publication and dropped before the owning environment.
 pub struct PreparedStructuredProgram<'env> {
     reset: Option<UniquePtr<quest_sys::KrausMap>>,
+    oracles: OracleCache,
+    oracle_ids: std::collections::BTreeMap<usize, (usize, bool)>,
     controls: NativeControls,
     targets: Vec<i32>,
     reservation: Reservation<'env>,
@@ -56,14 +59,43 @@ impl Environment {
             .flat_map(|block| &block.instructions)
             .any(|instruction| matches!(instruction.kind, InstructionKind::Reset { .. }));
         let scratch = plan.num_qubits().checked_mul(32).ok_or(Error::Overflow)?;
+        let inventory = OracleInventory::from_structured(
+            &plan,
+            self.resources
+                .memory_budget()
+                .bytes()
+                .saturating_sub(self.resources.allocated_bytes()),
+        )?;
+        let oracle_bytes = inventory
+            .estimated_bytes(plan.num_qubits(), self.resources.capabilities().gpu)?
+            .checked_add(
+                plan.oracle_captures()
+                    .len()
+                    .checked_mul(128)
+                    .ok_or(Error::Overflow)?,
+            )
+            .ok_or(Error::Overflow)?;
         let required = plan
             .resources()
             .ir_bytes
             .checked_add(plan.resources().source_bytes)
+            .and_then(|n| n.checked_add(oracle_bytes))
             .and_then(|n| n.checked_add(scratch))
             .and_then(|n| n.checked_add(if reset_needed { 4096 } else { 0 }))
             .ok_or(Error::Overflow)?;
-        let reservation = self.reserve(required)?;
+        let reservation = self.resources.reserve(required)?;
+        let oracles = OracleCache::prepare(&inventory, plan.num_qubits())?;
+        // Unreachable captures remain owned by the source plan without native resources.
+        let oracle_ids = plan
+            .oracle_captures()
+            .iter()
+            .filter_map(|(id, fragment)| {
+                inventory
+                    .index(fragment)
+                    .ok()
+                    .map(|index| (*id, (index, fragment.is_adjoint())))
+            })
+            .collect();
         let capacity = plan.num_qubits();
         let controls = NativeControls {
             wires: reserve_vec(capacity)?,
@@ -90,6 +122,8 @@ impl Environment {
         };
         Ok(PreparedStructuredProgram {
             reset,
+            oracles,
+            oracle_ids,
             controls,
             targets,
             reservation,
@@ -99,6 +133,16 @@ impl Environment {
     }
 }
 impl PreparedStructuredProgram<'_> {
+    /// Distinct shared canonical oracle bodies retained in native preparation.
+    #[must_use]
+    pub const fn prepared_oracle_bodies(&self) -> usize {
+        self.oracles.body_count()
+    }
+    /// Numerical payload/control variants; each owns a forward/adjoint pair.
+    #[must_use]
+    pub const fn prepared_oracle_matrix_variants(&self) -> usize {
+        self.oracles.matrix_count()
+    }
     #[must_use]
     pub const fn plan(&self) -> &StructuredPlan {
         &self.plan
@@ -124,7 +168,7 @@ impl PreparedStructuredProgram<'_> {
         inputs: &vm::RunInputs,
         limits: vm::InterpreterLimits,
     ) -> Result<vm::RunOutput> {
-        if !std::ptr::eq(register.environment(), self.reservation.environment)
+        if !std::ptr::eq(register.resources(), self.reservation.environment)
             || register.num_qubits().get() != self.plan.num_qubits()
         {
             return Err(Error::RegisterMismatch);
@@ -138,6 +182,8 @@ impl PreparedStructuredProgram<'_> {
         let mut backend = Backend {
             register,
             reset: self.reset.as_ref(),
+            oracles: &mut self.oracles,
+            oracle_ids: &self.oracle_ids,
             controls: &mut self.controls,
             targets: &mut self.targets,
         };
@@ -173,11 +219,28 @@ fn runtime_diagnostic(
 struct Backend<'a, 'env, K: RegisterKind> {
     register: &'a mut Register<'env, K>,
     reset: Option<&'a UniquePtr<quest_sys::KrausMap>>,
+    oracles: &'a mut OracleCache,
+    oracle_ids: &'a std::collections::BTreeMap<usize, (usize, bool)>,
     controls: &'a mut NativeControls,
     targets: &'a mut Vec<i32>,
 }
 impl<K: RegisterKind> QuantumBackend for Backend<'_, '_, K> {
     type Error = Error;
+    fn apply_oracle(&mut self, request: vm::OracleRequest<'_>) -> Option<Result<()>> {
+        Some((|| {
+            let &(body, adjoint) = self
+                .oracle_ids
+                .get(&request.capture)
+                .ok_or(Error::Value("unprepared structured oracle"))?;
+            self.oracles.run(
+                body,
+                request.targets,
+                request.controls,
+                adjoint ^ request.adjoint,
+                self.register,
+            )
+        })())
+    }
     fn apply_gate(&mut self, request: GateRequest<'_>) -> Result<()> {
         self.controls.wires.clear();
         self.controls.states.clear();

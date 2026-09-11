@@ -4,6 +4,14 @@ The workspace provides two complementary program models. A **structured program*
 
 Start with [the interface matrix](interfaces.md), then run the [Bell tutorial](bell.md). Every Rust tutorial shown here is included from a compiled example or integration test. Test fragments use `googletest` assertions and the imports in their containing source file; runnable native functions share the example module imports shown in the Bell chapter. The native example executes several algorithms inside one environment; its integration test starts a separate process to respect QuEST's process lifecycle.
 
+For polynomial quantum algorithms, follow [polynomial preparation](numerical-polynomials.md),
+[canonical and generalized QSP synthesis](qsp-synthesis.md),
+[independent certification](qsp-certification.md), and
+[QSVT encodings and transform builders](qsvt-model.md). These stages need no
+native simulator. Continue with [prepared QSVT execution](qsvt-runtime.md) and
+[applications](qsvt-applications.md) for QuEST resources, postselection, physical
+solve scaling, file interchange and optional distributed runs.
+
 The compiler pipeline keeps distinct trust boundaries:
 
 1. Parse owned source snapshots into structured syntax.

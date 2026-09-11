@@ -1,0 +1,43 @@
+[package]
+name = "quest-qsvt-cli"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "QuEST QSP and QSVT scientific applications"
+
+[dependencies]
+thiserror.workspace = true
+num-complex.workspace = true
+quest-qsvt-io.workspace = true
+quest-qsvt.workspace = true
+quest-qsp.workspace = true
+color-eyre.workspace = true
+clap = { workspace = true, default-features = false, features = ["std", "derive", "help", "usage", "error-context"] }
+serde_json.workspace = true
+quest-polynomial.workspace = true
+quest-numerics = { workspace = true, features = ["trace-json"] }
+quest-circuit.workspace = true
+faer = { workspace = true, default-features = false, features = ["std", "linalg"] }
+quest = { workspace = true, features = ["qsvt"], optional = true }
+hdf5-metno = { workspace = true, features = ["complex"], optional = true }
+rayon = { workspace = true, optional = true }
+
+[dev-dependencies]
+googletest.workspace = true
+tempfile.workspace = true
+
+[lints]
+workspace = true
+
+[build-dependencies]
+quest-build.workspace = true
+
+[features]
+default = ["native", "hdf5", "certification"]
+native = ["dep:quest", "hdf5"]
+hdf5 = ["quest-qsvt-io/hdf5", "dep:hdf5-metno"]
+certification = ["quest-qsp/certification", "quest-qsvt-io/certification"]
+offline-synthesis = ["certification", "quest-qsp/offline-synthesis", "quest-qsvt-io/offline-synthesis"]
+rayon = ["dep:rayon", "quest-qsp/rayon", "quest-numerics/rayon"]
+mpi = ["native", "quest/mpi"]

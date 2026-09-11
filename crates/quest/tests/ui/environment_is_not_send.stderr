@@ -14,6 +14,11 @@ note: required because it appears within the type `PhantomData<Rc<()>>`
   |
   | pub struct PhantomData<T: PointeeSized>;
   |            ^^^^^^^^^^^
+note: required because it appears within the type `quest::environment::RuntimeResources`
+ --> src/environment.rs
+  |
+  | pub struct RuntimeResources {
+  |            ^^^^^^^^^^^^^^^^
 note: required because it appears within the type `Environment`
  --> src/environment.rs
   |

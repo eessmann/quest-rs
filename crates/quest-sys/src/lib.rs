@@ -23,10 +23,21 @@
 //! quest_sys::set_qu_est_validation_off().unwrap();
 //! ```
 
+#![cfg_attr(
+    not(all(feature = "mpi", quest_native_mpi)),
+    doc = "The MPI API is hidden without both the optional feature and native MPI/subcommunicator support.
+```compile_fail
+use quest_sys::mpi::MpiRuntime;
+```"
+)]
+
 use std::pin::Pin;
 
 use cxx::UniquePtr;
 use thiserror::Error;
+
+#[cfg(all(feature = "mpi", quest_native_mpi))]
+pub mod mpi;
 
 mod generated_api;
 pub use generated_api::*;
@@ -139,6 +150,7 @@ mod ffi {
             num_rows: i64,
             num_cols: i64,
         ) -> Result<()>;
+        fn add_qureg(out: Pin<&mut Qureg>, source: &Qureg) -> Result<()>;
         fn get_density_qureg_amps(
             qureg: &Qureg,
             start_row: i64,
@@ -539,4 +551,10 @@ pub fn apply_trotterized_unitary_time_evolution(
         reps,
         permute_terms,
     ))
+}
+
+/// Add a second register into the output without allocating native state storage.
+/// Both registers must have identical dimensions, kind and deployment.
+pub fn add_qureg(out: Pin<&mut Qureg>, source: &Qureg) -> QuestResult<()> {
+    map_quest_result(ffi::add_qureg(out, source))
 }

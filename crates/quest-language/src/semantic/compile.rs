@@ -52,6 +52,7 @@ pub(super) fn compile(
                 parameters: Vec::new(),
                 result: Type::Void,
                 gate: false,
+                oracle: None,
             }],
             blocks: vec![ssa::Block {
                 id: entry,
@@ -404,6 +405,25 @@ impl Compiler {
     fn declarations(&mut self, statements: &[syntax::Statement]) -> Result<(), SemanticError> {
         for statement in statements {
             match &statement.kind {
+                StatementKind::Oracle {
+                    name,
+                    arity,
+                    capture,
+                } => {
+                    let count = self.positive_size(arity)?;
+                    if count > self.limits.qubits || count > self.limits.slots {
+                        return Err(SemanticError::budget("oracle arity"));
+                    }
+                    let params = (0..count)
+                        .map(|index| (format!("q{index}"), Type::Qubit(1), true, true))
+                        .collect();
+                    self.declare_function(name, params, Type::Void, true, &[])?;
+                    self.program
+                        .regions
+                        .last_mut()
+                        .ok_or_else(|| SemanticError::invalid("missing oracle region"))?
+                        .oracle = Some(ssa::OracleId::new(*capture));
+                }
                 StatementKind::GateDeclaration {
                     name,
                     parameters,
@@ -503,6 +523,7 @@ impl Compiler {
             parameters: slots,
             result,
             gate,
+            oracle: None,
         });
         self.functions.insert(
             name.into(),

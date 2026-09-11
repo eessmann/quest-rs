@@ -7,6 +7,7 @@ use color_eyre::eyre::{Result, eyre};
 
 mod generate;
 mod native_consumers;
+mod qsvt_catalog;
 
 fn main() -> Result<()> {
     HookBuilder::default().install()?;
@@ -17,6 +18,7 @@ fn run() -> Result<(), generate::DynError> {
     match parse_command(env::args_os().skip(1))? {
         CommandKind::GenerateQuestBindings { check } => generate::run(check),
         CommandKind::CheckNativeConsumers { work_dir } => native_consumers::run(work_dir),
+        CommandKind::GenerateQsvtCatalog { source, check } => qsvt_catalog::run(&source, check),
         CommandKind::Help => {
             eprintln!("{USAGE}");
             Ok(())
@@ -24,12 +26,13 @@ fn run() -> Result<(), generate::DynError> {
     }
 }
 
-const USAGE: &str = "usage: cargo run -p xtask -- generate-quest-bindings [--check]\n       cargo run -p xtask -- check-native-consumers [--work-dir PATH]";
+const USAGE: &str = "usage: cargo run -p xtask -- generate-quest-bindings [--check]\n       cargo run -p xtask -- check-native-consumers [--work-dir PATH]\n       cargo run -p xtask -- generate-qsvt-catalog --source CPP_REPOSITORY [--check]";
 
 #[derive(Debug, Eq, PartialEq)]
 enum CommandKind {
     GenerateQuestBindings { check: bool },
     CheckNativeConsumers { work_dir: Option<PathBuf> },
+    GenerateQsvtCatalog { source: PathBuf, check: bool },
     Help,
 }
 
@@ -41,6 +44,27 @@ fn parse_command(
         return Ok(CommandKind::Help);
     };
     match command.to_str() {
+        Some("generate-qsvt-catalog") => {
+            if arguments.next().as_deref() != Some(std::ffi::OsStr::new("--source")) {
+                return Err(format!(
+                    "catalog generation requires --source CPP_REPOSITORY\n{USAGE}"
+                )
+                .into());
+            }
+            let source = arguments
+                .next()
+                .map(PathBuf::from)
+                .ok_or("missing catalog source path")?;
+            let check = match arguments.next().as_deref() {
+                None => false,
+                Some(flag) if flag == "--check" => true,
+                Some(_) => return Err("unexpected catalog generation argument".into()),
+            };
+            if arguments.next().is_some() {
+                return Err("unexpected trailing catalog arguments".into());
+            }
+            Ok(CommandKind::GenerateQsvtCatalog { source, check })
+        }
         Some("generate-quest-bindings") => match arguments.next().as_deref() {
             None => Ok(CommandKind::GenerateQuestBindings { check: false }),
             Some(argument) if argument == "--check" && arguments.next().is_none() => {

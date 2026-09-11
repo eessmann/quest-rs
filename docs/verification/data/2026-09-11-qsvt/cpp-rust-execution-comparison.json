@@ -1,0 +1,48 @@
+{
+  "rust": {
+    "fixture": "complex_scalar_degree3",
+    "amplitude": [
+      -0.002352413924260943,
+      -0.0031365518990147945
+    ],
+    "mass": 1.5371809086270084e-05,
+    "overlap": [
+      -0.0023524139242612208,
+      -0.00313655189901485
+    ],
+    "overlap_mass": 0.5000076859045433
+  },
+  "cpp": {
+    "source_revision": "7fe7f740579b03c52a8cf48be6a31268b029c19f",
+    "cpu_local": true,
+    "repetitions": 1000,
+    "response_real": -0.0023524139242611097,
+    "response_imag": -0.003136551899014739,
+    "retained_mass": 1.537180908627052e-05,
+    "hadamard_real": -0.0023524139242609987,
+    "hadamard_imag": -0.003136551899014628,
+    "hadamard_total_success_probability": 0.5000076859045433,
+    "hadamard_active_probability_absolute": 7.685904543135228e-06,
+    "construction_seconds": 2.3529099999999968e-05,
+    "combined_lowering_native_prepare_seconds": 3.6791430000000004e-05,
+    "execution_with_coordinate_projections_seconds": 5.188227400000002e-05,
+    "native_condition_seconds": 1.3065480000000057e-06,
+    "hadamard_observation_seconds": 8.413201199999994e-05,
+    "run": 0
+  },
+  "absolute_differences": {
+    "response_absolute": 1.7554167342883506e-16,
+    "mass_absolute": 4.37069000783219e-19,
+    "hadamard_absolute": 3.1401849173675503e-16,
+    "hadamard_mass_absolute": 0.0
+  },
+  "tolerance": 1e-12,
+  "passed": true,
+  "cpp_five_run_medians_seconds": {
+    "construction_seconds": 2.2972174e-05,
+    "combined_lowering_native_prepare_seconds": 3.627588199999995e-05,
+    "execution_with_coordinate_projections_seconds": 5.1388929999999994e-05,
+    "native_condition_seconds": 1.300935000000004e-06,
+    "hadamard_observation_seconds": 8.362166900000012e-05
+  }
+}

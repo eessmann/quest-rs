@@ -1,0 +1,20 @@
+[
+  "cmake",
+  "-S",
+  "/var/home/erich/Projects/quest-rs/.superpowers/worktrees/qsvt-port/.superpowers/sdd/2026-09-11-qsvt-port/cpp-execution-source",
+  "-B",
+  "/var/home/erich/Projects/quest-rs/.superpowers/worktrees/qsvt-port/.superpowers/sdd/2026-09-11-qsvt-port/cpp-execution-build",
+  "-G",
+  "Ninja",
+  "-DCMAKE_BUILD_TYPE=Release",
+  "-DREFERENCE_SOURCE=/var/home/erich/Projects/quest-qsvt",
+  "-DREFERENCE_ADAPTER=/var/home/erich/Projects/quest-rs/.superpowers/worktrees/qsvt-port/benchmarks/reference/cpp_execution.cpp",
+  "-DCMAKE_CXX_COMPILER=/usr/bin/g++",
+  "-DCMAKE_C_COMPILER=/usr/bin/gcc",
+  "-DCMAKE_PREFIX_PATH=/var/home/erich/Projects/quest-qsvt/out/build/audit-gcc-release/vcpkg_installed/x64-linux;/var/home/erich/Projects/opt/hpx-qsp-node-local-release;/var/home/erich/Projects/opt/quest;/var/home/erich/Projects/vcpkg/packages/mimalloc_x64-linux",
+  "-Dautodiff_DIR=/var/home/erich/Projects/quest-qsvt/extern/autodiff/lib/cmake/autodiff",
+  "-Dh5pp_DIR=/var/home/erich/Projects/quest-qsvt/extern/h5pp/lib/cmake/h5pp",
+  "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+  "-DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON",
+  "-DHDF5_USE_STATIC_LIBRARIES=ON"
+]

@@ -134,6 +134,7 @@ pub enum CallArgument {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum GateModifier {
     Inverse,
+    Adjoint,
     Control { positive: bool, count: usize },
     Power(ValueId),
 }
@@ -448,6 +449,18 @@ pub struct Block {
     pub sealed: bool,
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OracleId(usize);
+impl OracleId {
+    #[must_use]
+    pub const fn new(capture: usize) -> Self {
+        Self(capture)
+    }
+    #[must_use]
+    pub const fn index(&self) -> usize {
+        self.0
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Region {
     pub id: RegionId,
     pub name: String,
@@ -455,6 +468,7 @@ pub struct Region {
     pub parameters: Vec<SlotId>,
     pub result: Type,
     pub gate: bool,
+    pub oracle: Option<OracleId>,
 }
 /// Mutable candidate representation. No executor should accept it directly.
 #[derive(Debug, Clone, PartialEq)]

@@ -1,0 +1,1 @@
+The degree-8,105 inverse Chebyshev fixture is copied from quest-qsvt-io/data/inverse/coeffs_kappa_1500_eps_0p001.bin so packaged QSP tests remain self-contained. It originates from the pinned C++ revision 7fe7f740579b03c52a8cf48be6a31268b029c19f. The family label is provenance; it does not establish an approximation bound. Catalog generation checks the canonical IO copy.

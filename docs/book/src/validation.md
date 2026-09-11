@@ -21,6 +21,45 @@ The native test runs the same functions shown in this book, inside a subprocess.
 {{#include ../../../crates/quest/tests/tutorials.rs:native_tutorial_tests}}
 ```
 
+## Numerical and QSP tutorials
+
+These examples need no native QuEST installation. They share the exact source
+included by the numerical/QSP chapters and their googletest integration tests:
+
+```sh
+cargo run -p quest-qsp --example qsp_tutorials --locked
+cargo test -p quest-qsp --test tutorials --locked
+cargo run -p quest-qsp --example qsp_tutorials --features offline-synthesis --locked
+cargo test -p quest-qsp --test tutorials --features offline-synthesis --locked
+```
+
+The feature-enabled run includes independent Astro Float certification and explicit
+offline synthesis/approximation. It never changes the ordinary production route.
+Compile-time stage-order failures are also exercised by the crate doctests.
+
+```sh
+cargo test -p quest-polynomial -p quest-qsp --doc --features quest-qsp/offline-synthesis --locked
+cargo test -p quest-qsvt --doc --locked
+cargo doc -p quest-qsp -p quest-qsvt --all-features --no-deps --locked
+cargo bench -p quest-qsp --bench pipeline --locked
+cargo bench -p quest-qsp --bench pipeline --features offline-synthesis --locked
+```
+
+Benchmarks separate binary64 construction, frozen response evaluation, cold
+certification and explicit offline synthesis including its final certification.
+The actual degree-8105 catalog scale run is a separately recorded verification
+fixture; the small tutorial is not a claim of exhaustive numerical coverage.
+
+The pure QSVT builder examples come from the crate README, which is also its
+crate-level rustdoc and is compiled by Cargo doctests. For native preparation,
+postselection and complex Hadamard observations, use the process-isolated
+runtime test and the same example included in the native QSVT chapter:
+
+```sh
+cargo run -p quest-rs --example qsvt --features qsvt --locked
+cargo nextest run -p quest-rs --test qsvt_runtime --features qsvt --locked
+```
+
 ## Optional real workers
 
 Build a worker explicitly, then pass its absolute path. The client does not search PATH or silently substitute an engine:

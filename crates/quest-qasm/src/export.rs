@@ -217,6 +217,9 @@ impl Writer {
     )]
     fn statement(&mut self, statement: &StatementKind) -> Result<()> {
         match statement {
+            StatementKind::Oracle { .. } => Err(unsupported(
+                "oracle capture requires an explicit portable decomposition",
+            )),
             StatementKind::Include(path) => {
                 self.push("include ")?;
                 self.quoted(path)?;
@@ -538,7 +541,7 @@ impl Writer {
     }
     fn modifier(&mut self, modifier: &Modifier) -> Result<()> {
         match modifier {
-            Modifier::Inverse => self.push("inv"),
+            Modifier::Inverse | Modifier::Adjoint => self.push("inv"),
             Modifier::Control { positive, count } => {
                 self.push(if *positive { "ctrl" } else { "negctrl" })?;
                 if let Some(count) = count {

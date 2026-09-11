@@ -169,6 +169,17 @@ impl Frontend {
     fn emit(self) -> syn::Result<TokenStream> {
         let module = syntax::parse_tokens(&self.tokens, ParseLimits::default())
             .map_err(|error| self.error(error.span, error))?;
+        let oracle_captures = module
+            .statements
+            .iter()
+            .filter_map(|statement| {
+                if let syntax::StatementKind::Oracle { capture, .. } = &statement.kind {
+                    Some(*capture)
+                } else {
+                    None
+                }
+            })
+            .collect::<std::collections::BTreeSet<_>>();
         let admitted = quest_qasm::admit_expanded(module, &self.sources, CompileLimits::default())
             .map_err(|error| {
                 self.error(
@@ -185,6 +196,7 @@ impl Frontend {
             .map_err(|error| self.error(error.span, error))?;
         let root = root_path()?;
         let __captures = proc_macro2::Ident::new("__captures", Span::mixed_site());
+        let __oracles = proc_macro2::Ident::new("__oracles", Span::mixed_site());
         let __tokens = proc_macro2::Ident::new("__tokens", Span::mixed_site());
         let __sources = proc_macro2::Ident::new("__sources", Span::mixed_site());
         let __locations = proc_macro2::Ident::new("__locations", Span::mixed_site());
@@ -192,6 +204,17 @@ impl Frontend {
 
         let tokens = self.tokens.iter().map(|token| emit_token(token, &root));
         let captures = &self.captures;
+        let capture_statements = captures.iter().enumerate().map(|(index, expression)| {
+            if oracle_captures.contains(&index) {
+                quote! {
+                    #__oracles.insert(#index, { let #__value: #root::OracleFragment = #expression; #__value });
+                    #__captures.push(#root::language::classical::ScalarValue::floating(#root::language::classical::FloatWidth::F64, 0.0)?);
+                }
+            } else {
+                quote! { #__captures.push(#root::language::classical::ScalarValue::floating(
+                    #root::language::classical::FloatWidth::F64, { let #__value: f64 = #expression; #__value })?); }
+            }
+        });
         let token_count = self.tokens.len();
         let capture_count = captures.len();
         let sources = self.sources.iter().map(|source| {
@@ -209,10 +232,10 @@ impl Frontend {
         let location_count = self.locations.len();
         Ok(quote! {
             (|| -> ::std::result::Result<#root::StructuredProgram, #root::LanguageError> {
+                let mut #__oracles = ::std::collections::BTreeMap::new();
                 let mut #__captures = ::std::vec::Vec::new();
                 #__captures.try_reserve_exact(#capture_count).map_err(|_| #root::LanguageError::Budget("captures"))?;
-                #(#__captures.push(#root::language::classical::ScalarValue::floating(
-                    #root::language::classical::FloatWidth::F64, { let #__value: f64 = #captures; #__value })?);)*
+                #(#capture_statements)*
                 let mut #__tokens = ::std::vec::Vec::new();
                 #__tokens.try_reserve_exact(#token_count).map_err(|_| #root::LanguageError::Budget("frontend tokens"))?;
                 #(#__tokens.push(#tokens);)*
@@ -221,7 +244,7 @@ impl Frontend {
                 let mut #__locations = ::std::vec::Vec::new();
                 #__locations.try_reserve_exact(#location_count).map_err(|_| #root::LanguageError::Budget("source locations"))?;
                 #(#locations)*
-                #root::StructuredProgram::from_frontend(&#__tokens, #__captures, #__sources, #__locations)
+                #root::StructuredProgram::from_frontend(&#__tokens, #__captures, #__sources, #__locations)?.with_oracles(#__oracles)
             })()
         })
     }

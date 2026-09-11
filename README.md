@@ -1,7 +1,7 @@
 # QuEST for Rust
 
-Structured OpenQASM 3.1 simulator programs, exact ideal circuit graphs, and
-native QuEST 4.3 execution. The facade package is **`quest-rs`**; its Rust library
+Structured OpenQASM 3.1 simulator programs, exact ideal circuit graphs, typed
+QSP/QSVT workflows, and native QuEST 4.3 execution. The facade package is **`quest-rs`**; its Rust library
 name is **`quest`**.
 
 Read the [guide](docs/book/src/index.md) for the
@@ -21,6 +21,12 @@ and optimization certificates. The runnable source is
 | `quest-optimizer-client` / `quest-optimizer-worker` | Optional bounded external engine boundary |
 | `quest-sys` | Audited CXX bridge and native RAII resources |
 | `quest-build` / `xtask` | Native configuration, runtime paths and binding generation |
+| [`quest-numerics`](crates/quest-numerics/README.md) | Binary64 kernels, interval arithmetic, reusable workspaces and observers |
+| [`quest-polynomial`](crates/quest-polynomial/README.md) | Typed polynomial bases, function expressions and approximation |
+| [`quest-qsp`](crates/quest-qsp/README.md) | Canonical/generalized QSP, binary64 inverse NLFT and separate certification |
+| [`quest-qsvt`](crates/quest-qsvt/README.md) | Native-independent encodings, projectors, transforms and analysis |
+| [`quest-qsvt-io`](crates/quest-qsvt-io/README.md) | JSON and optional serial HDF5 interchange |
+| [`quest-qsvt-cli`](crates/quest-qsvt-cli/README.md) | Synthesis, inverse catalogs, solve, embedded and overlap applications |
 
 ## Build
 
@@ -28,12 +34,18 @@ The workspace pins `nightly-2026-09-06` with rustfmt and Clippy. Install QuEST
 **4.3.x**, binary64 precision, deprecated APIs disabled, plus CMake and a C++20
 compiler. The tested native build recipe currently supports Linux GNU targets.
 Pure circuit and macro builds need neither QuEST nor libclang nor external BLAS.
+The full workspace also builds the QSVT application, whose default IO feature
+requires a **serial HDF5** installation; a parallel HDF5 build is rejected.
 
 ```sh
 export QUEST_ROOT=/path/to/installed/quest
+export HDF5_DIR=/path/to/installed/serial-hdf5
 cargo build --workspace --locked
 cargo run --locked --example minimal
 ```
+
+For just the facade and its default examples, use `cargo build -p quest-rs --locked`;
+that package does not require HDF5.
 
 The installed package must export `QuEST::QuEST` and resolve its own runtime
 dependencies. CMake compiles the static CXX bridge against that target; the
@@ -134,6 +146,57 @@ Global phase is explicit, so controlled `Rz(2*pi)` cannot be erased as identity.
 Numerical operators own immutable faer matrices with `A|psi>` / `A rho A†`
 semantics. Approximate unitarity evidence grants no exact inverse. Products use
 sequential faer evaluation; fusion may change rounding.
+
+## QSP and QSVT
+
+Start with [typed polynomial preparation](docs/book/src/numerical-polynomials.md),
+[QSP synthesis](docs/book/src/qsp-synthesis.md), then
+[QSVT encodings and transform builders](docs/book/src/qsvt-model.md).
+Consuming builders distinguish admitted targets, completed polynomials, frozen
+controls, validated transforms and environment-bound prepared execution.
+
+```text
+polynomial -> admission -> completion -> frozen QSP candidate
+                                      -> optional independent certification
+encoding + typed phases/controls -> QSVT transform -> admission -> preparation
+                                                   -> execution -> release/condition
+```
+
+Production synthesis and native execution use binary64. The optional
+`certification` feature checks frozen values using Astro Float; the separate
+`offline-synthesis` feature enables explicitly requested arbitrary-precision
+synthesis. Production failures never invoke it automatically. Numerical
+residuals, certified QSP error bounds and conditional QSVT theorem bounds are
+different evidence; see [certification](docs/book/src/qsp-certification.md).
+No GMP or MPFR dependency is required.
+
+```sh
+# Pure numerical tutorials: no native QuEST installation required.
+cargo run -p quest-qsp --example qsp_tutorials --locked
+cargo test -p quest-qsp -p quest-qsvt --doc --locked
+# Optional cold verification and explicit offline tutorials.
+cargo run -p quest-qsp --example qsp_tutorials --features offline-synthesis --locked
+# Native execution, postselection and complex Hadamard observations.
+cargo run -p quest-rs --example qsvt --features qsvt --locked
+```
+
+The [native tutorial](docs/book/src/qsvt-runtime.md) explains scoped preparation
+and consuming postselection. The [application guide](docs/book/src/qsvt-applications.md)
+covers serial HDF5 setup, all 21 inverse catalogs, physical solve scaling,
+caller-owned Rayon pools and optional rsmpi execution. The default application
+enables native execution, HDF5 and certification; pure library builds remain
+independent of those application dependencies. MPI requires both the Cargo
+feature and a compatible MPI/SUBCOMM-enabled QuEST installation.
+
+Generate the API references locally with:
+
+```sh
+cargo doc -p quest-qsp -p quest-qsvt --all-features --no-deps --locked
+```
+
+The [verification record](docs/verification/2026-09-11-qsvt-port.md) separates
+mathematical certificates, numerical comparisons, measured costs and unverified
+platforms. Generalized QSVT theorem-level robustness is not certified.
 
 ## Native ownership and effects
 

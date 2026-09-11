@@ -1,3 +1,4 @@
+use crate::oracle_execution::{OracleCache, OracleInventory};
 use crate::{Complex64, Environment, Error, Outcome, QubitCount, Result, Shots};
 use crate::{
     environment::Reservation,
@@ -11,7 +12,7 @@ use quest_circuit::{
 };
 use std::collections::BTreeMap;
 
-enum NativeMatrix {
+pub enum NativeMatrix {
     Dense {
         forward: UniquePtr<quest_sys::CompMatr>,
         adjoint: UniquePtr<quest_sys::CompMatr>,
@@ -59,6 +60,12 @@ impl NativeControls {
     }
 }
 enum PreparedOp {
+    Oracle {
+        body: usize,
+        targets: Vec<usize>,
+        controls: Vec<quest_circuit::language::vm::QuantumControl>,
+        adjoint: bool,
+    },
     Gate {
         gate: BoundGate,
         targets: Vec<i32>,
@@ -96,6 +103,7 @@ enum PreparedOp {
 /// before an error; errors identify the completed instruction prefix.
 pub struct PreparedProgram<'env> {
     matrices: Vec<NativeMatrix>,
+    oracles: OracleCache,
     channels: Vec<UniquePtr<quest_sys::KrausMap>>,
     reservation: Reservation<'env>,
     plan: ExecutablePlan,
@@ -124,10 +132,28 @@ impl Environment {
     /// # Errors
     /// Rejects unsupported numerical configuration, resource limits, or native preparation failure.
     pub fn prepare_plan(&self, plan: ExecutablePlan) -> Result<PreparedProgram<'_>> {
+        self.resources.prepare_plan(plan)
+    }
+}
+impl crate::environment::RuntimeResources {
+    /// # Errors
+    /// Rejects unsupported numerical configuration, resource limits, or native preparation failure.
+    pub fn prepare_plan(&self, plan: ExecutablePlan) -> Result<PreparedProgram<'_>> {
+        self.admit_plan(plan)?.materialize()
+    }
+    pub(crate) fn admit_plan(&self, plan: ExecutablePlan) -> Result<AdmittedPlan<'_>> {
         QubitCount::new(plan.num_qubits())?;
         let fingerprint =
             quest_sys::get_numerical_fingerprint().context("checking numerical environment")?;
         admit_fingerprint(&fingerprint)?;
+        let mut inventory = OracleInventory::with_budget(
+            self.memory_budget()
+                .bytes()
+                .saturating_sub(self.allocated_bytes()),
+        );
+        for instruction in plan.instructions() {
+            inventory.include_operation(instruction.operation(), plan.num_qubits())?;
+        }
         let mut required = plan
             .instructions()
             .len()
@@ -162,7 +188,44 @@ impl Environment {
                 .checked_add(estimate(instruction.operation(), self.capabilities().gpu)?)
                 .ok_or(Error::Overflow)?;
         }
+        required = required
+            .checked_add(inventory.estimated_bytes(plan.num_qubits(), self.capabilities().gpu)?)
+            .ok_or(Error::Overflow)?;
         let reservation = self.reserve(required)?;
+        Ok(AdmittedPlan {
+            plan,
+            fingerprint,
+            inventory,
+            reservation,
+        })
+    }
+}
+pub struct AdmittedPlan<'env> {
+    plan: ExecutablePlan,
+    fingerprint: quest_sys::NumericalFingerprint,
+    inventory: OracleInventory,
+    reservation: Reservation<'env>,
+}
+impl<'env> AdmittedPlan<'env> {
+    #[cfg(feature = "qsvt")]
+    pub(crate) fn dispatch_scratch(&self) -> Result<Reservation<'_>> {
+        self.reservation
+            .environment
+            .reserve(self.inventory.dispatch_scratch_bytes()?)
+    }
+    #[cfg(feature = "qsvt")]
+    pub(crate) const fn plan(&self) -> &ExecutablePlan {
+        &self.plan
+    }
+
+    pub(crate) fn materialize(self) -> Result<PreparedProgram<'env>> {
+        let Self {
+            plan,
+            fingerprint,
+            inventory,
+            reservation,
+        } = self;
+        let oracles = OracleCache::prepare(&inventory, plan.num_qubits())?;
         let mut matrices = reserve_vec(plan.instructions().len())?;
         let mut channels = reserve_vec(plan.instructions().len())?;
         let mut cache = BTreeMap::new();
@@ -173,11 +236,13 @@ impl Environment {
                 &mut matrices,
                 &mut channels,
                 &mut cache,
+                &inventory,
             )?);
         }
         // Locals release native handles on any error before the prepared owner is published.
         Ok(PreparedProgram {
             matrices,
+            oracles,
             channels,
             reservation,
             plan,
@@ -187,6 +252,16 @@ impl Environment {
     }
 }
 impl PreparedProgram<'_> {
+    /// Distinct shared canonical oracle bodies retained in native preparation.
+    #[must_use]
+    pub const fn prepared_oracle_bodies(&self) -> usize {
+        self.oracles.body_count()
+    }
+    /// Numerical payload/control variants; each owns a forward/adjoint pair.
+    #[must_use]
+    pub const fn prepared_oracle_matrix_variants(&self) -> usize {
+        self.oracles.matrix_count()
+    }
     #[must_use]
     pub const fn plan(&self) -> &ExecutablePlan {
         &self.plan
@@ -194,7 +269,14 @@ impl PreparedProgram<'_> {
     /// # Errors
     /// Rejects register or configuration mismatch and reports the completed instruction prefix on execution failure.
     pub fn run<K: RegisterKind>(&mut self, register: &mut Register<'_, K>) -> Result<RunResult> {
-        if !std::ptr::eq(register.environment(), self.reservation.environment)
+        let bits = self.admit_run(register)?;
+        self.run_admitted(register, bits)
+    }
+    pub(crate) fn admit_run<K: RegisterKind>(
+        &self,
+        register: &Register<'_, K>,
+    ) -> Result<Vec<bool>> {
+        if !std::ptr::eq(register.resources(), self.reservation.environment)
             || register.num_qubits().get() != self.plan.num_qubits()
         {
             return Err(Error::RegisterMismatch);
@@ -209,6 +291,13 @@ impl PreparedProgram<'_> {
         }
         let mut bits = reserve_vec(self.plan.num_bits())?;
         bits.resize(self.plan.num_bits(), false);
+        Ok(bits)
+    }
+    pub(crate) fn run_admitted<K: RegisterKind>(
+        &mut self,
+        register: &mut Register<'_, K>,
+        mut bits: Vec<bool>,
+    ) -> Result<RunResult> {
         for (index, operation) in self.operations.iter().enumerate() {
             execute(
                 operation,
@@ -216,6 +305,7 @@ impl PreparedProgram<'_> {
                 &mut bits,
                 &self.matrices,
                 &self.channels,
+                &mut self.oracles,
             )
             .map_err(|source| Error::Execution {
                 instruction: index,
@@ -323,6 +413,12 @@ fn estimate(op: &Operation, gpu: bool) -> Result<usize> {
             .ok_or(Error::Overflow)
     };
     match op {
+        Operation::Oracle {
+            targets, controls, ..
+        } => control_bytes(controls.len())?
+            .checked_add(targets_bytes(targets.len())?)
+            .and_then(|n| n.checked_add(targets.len().checked_mul(size_of::<usize>())?))
+            .ok_or(Error::Overflow),
         Operation::Gate {
             targets, controls, ..
         } => control_bytes(controls.len())?
@@ -386,8 +482,25 @@ fn prepare_operation(
     matrices: &mut Vec<NativeMatrix>,
     channels: &mut Vec<UniquePtr<quest_sys::KrausMap>>,
     cache: &mut BTreeMap<(usize, Vec<bool>), usize>,
+    inventory: &OracleInventory,
 ) -> Result<PreparedOp> {
     match op {
+        Operation::Oracle {
+            fragment,
+            targets,
+            controls,
+        } => Ok(PreparedOp::Oracle {
+            body: inventory.index(fragment)?,
+            targets: targets.iter().map(|target| target.index()).collect(),
+            controls: controls
+                .iter()
+                .map(|control| quest_circuit::language::vm::QuantumControl {
+                    qubit: control.qubit().index(),
+                    positive: control.state() == ControlState::One,
+                })
+                .collect(),
+            adjoint: fragment.is_adjoint(),
+        }),
         Operation::Numerical {
             matrix: numerical,
             targets,
@@ -414,7 +527,7 @@ fn prepare_operation(
             let index = if let Some(&index) = cache.get(&key) {
                 index
             } else {
-                let native = prepare_numerical(numerical, controls)?;
+                let native = prepare_numerical(numerical, &key.1)?;
                 let index = matrices.len();
                 matrices.push(native);
                 cache.insert(key, index);
@@ -504,7 +617,9 @@ fn prepare_operation(
         } => Ok(PreparedOp::Conditional {
             bit: bit.index(),
             expected: *expected,
-            operation: Box::new(prepare_operation(operation, matrices, channels, cache)?),
+            operation: Box::new(prepare_operation(
+                operation, matrices, channels, cache, inventory,
+            )?),
         }),
         Operation::Gate {
             gate,
@@ -533,18 +648,19 @@ fn prepare_operation(
         Operation::Barrier { .. } => Ok(PreparedOp::Barrier),
     }
 }
-fn prepare_numerical(
+pub fn prepare_numerical(
     numerical: &quest_circuit::NumericalOperator,
-    controls: &[Control],
+    controls: &[bool],
 ) -> Result<NativeMatrix> {
     let dim = numerical
         .dimension()
         .checked_shl(u32::try_from(controls.len()).map_err(|_| Error::Overflow)?)
         .ok_or(Error::Overflow)?
         .max(2);
-    let active = controls.iter().enumerate().fold(0usize, |mask, (i, c)| {
-        mask | usize::from(c.state() == ControlState::One) << i
-    });
+    let active = controls
+        .iter()
+        .enumerate()
+        .fold(0usize, |mask, (i, c)| mask | usize::from(*c) << i);
     let local_dim = numerical.dimension();
     let divisor =
         std::num::NonZeroUsize::new(local_dim).ok_or(Error::Value("empty numerical matrix"))?;
@@ -594,13 +710,19 @@ fn prepare_numerical(
         adjoint: native_matrix(extended.as_ref().adjoint())?,
     })
 }
-fn execute_matrix<K: RegisterKind>(
+pub fn execute_matrix<K: RegisterKind>(
     matrix: &NativeMatrix,
     register: &mut Register<'_, K>,
     targets: &[i32],
+    inverse: bool,
 ) -> Result<()> {
     match matrix {
         NativeMatrix::Dense { forward, adjoint } => {
+            let (forward, adjoint) = if inverse {
+                (adjoint, forward)
+            } else {
+                (forward, adjoint)
+            };
             quest_sys::leftapply_comp_matr(register.pin(), targets, forward)
                 .context("applying numerical operator")?;
             if register.is_density() {
@@ -609,6 +731,11 @@ fn execute_matrix<K: RegisterKind>(
             }
         }
         NativeMatrix::Diagonal { forward, adjoint } => {
+            let (forward, adjoint) = if inverse {
+                (adjoint, forward)
+            } else {
+                (forward, adjoint)
+            };
             quest_sys::leftapply_diag_matr(register.pin(), targets, forward)
                 .context("applying diagonal operator")?;
             if register.is_density() {
@@ -619,7 +746,7 @@ fn execute_matrix<K: RegisterKind>(
     }
     Ok(())
 }
-fn native_matrix<T: faer::traits::Conjugate<Canonical = Complex64>>(
+pub fn native_matrix<T: faer::traits::Conjugate<Canonical = Complex64>>(
     view: faer::MatRef<'_, T>,
 ) -> Result<UniquePtr<quest_sys::CompMatr>> {
     let mut values = reserve_vec(
@@ -651,14 +778,22 @@ fn execute<K: RegisterKind>(
     bits: &mut [bool],
     matrices: &[NativeMatrix],
     channels: &[UniquePtr<quest_sys::KrausMap>],
+    oracles: &mut OracleCache,
 ) -> Result<()> {
     match op {
+        PreparedOp::Oracle {
+            body,
+            targets,
+            controls,
+            adjoint,
+        } => oracles.run(*body, targets, controls, *adjoint, register),
         PreparedOp::Numerical { cache, targets } => execute_matrix(
             matrices
                 .get(*cache)
                 .ok_or(Error::Value("invalid prepared matrix cache"))?,
             register,
             targets,
+            false,
         ),
         PreparedOp::Channel { cache, targets } => quest_sys::mix_kraus_map(
             register.pin(),
@@ -691,7 +826,7 @@ fn execute<K: RegisterKind>(
             operation,
         } => {
             if *bits.get(*bit).ok_or(Error::Value("invalid prepared bit"))? == *expected {
-                execute(operation, register, bits, matrices, channels)?;
+                execute(operation, register, bits, matrices, channels, oracles)?;
             }
             Ok(())
         }

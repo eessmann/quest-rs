@@ -22,9 +22,13 @@ Pure circuit and macro builds need neither `QuEST` nor libclang nor external BLA
 
 ```sh
 export QUEST_ROOT=/path/to/installed/quest
-cargo build --workspace --locked
+cargo build -p quest-rs --locked
 cargo run --locked --example minimal
 ```
+
+Building the entire workspace also selects the QSVT application and its serial
+HDF5 support. Install serial HDF5, set `HDF5_DIR` to its prefix, then use
+`cargo build --workspace --locked`. The facade itself does not require HDF5.
 
 The installed package must export `QuEST::QuEST` and resolve its own runtime
 dependencies. `CMake` compiles the static CXX bridge against that target.
@@ -95,7 +99,9 @@ borrow the environment and remain usable after its scope ends.
 
 The default environment explicitly selects CPU execution without native
 multithreading. GPU and native multithreading are explicit builder choices.
-Distributed execution is not admitted by the facade's initial resource policy.
+This local `Environment` does not admit distributed execution. The optional
+`quest::collective` API owns distributed resources through a caller-owned rsmpi
+runtime and borrowed communicators; see the MPI section below.
 `MemoryBudget` bounds admission using conservative host, device and scratch
 estimates; allocator or native failures remain possible. Exported snapshots leave
 that accounting when returned and belong to the caller.
@@ -200,3 +206,78 @@ The [architecture](https://github.com/eessmann/quest-rs/blob/main/docs/superpowe
 preserve the design and dated research evidence. Text import/export, structured
 execution and optional certified synthesis/ZX workers are implemented; the guide
 documents their supported profile and validation boundaries.
+
+Shared `OracleFragment` calls remain retained in both ordinary and structured
+plans. Preparation builds each shared body once and caches numerical matrices by
+payload identity and the signed control profiles needed by reachable calls.
+Forward and adjoint native matrices belong to one cached variant. Targets and
+orientation are applied during execution using preallocated remapping buffers;
+repeated calls do not flatten or rebuild the body. The prepared owner exposes
+`prepared_oracle_bodies()` and `prepared_oracle_matrix_variants()` for inspecting
+these retained resources.
+
+Numerical controls use the existing general linear-operator path. Preparation
+embeds each required control profile once, preserving negative controls and the
+phase of controlled global phases without granting approximate matrices exact
+inverse privileges. An additional control doubles the matrix dimension (and
+quadruples dense storage); the memory forecast includes all distinct variants
+and rejects excessive widths before native allocation. Structured target indices
+may vary at execution; signed control counts and states come from the admitted
+SSA call graph. Uncalled captures require no native cache.
+
+These caches preserve the existing environment borrow, thread confinement,
+numerical configuration snapshot, and transactional native preparation. Coherent
+oracle execution supports both state vectors and density matrices. The retained
+oracle path reuses its Rust matrix and operand buffers; the general structured
+interpreter and existing C++ bridge keep their own documented allocation behavior.
+
+## Collective MPI ownership and execution
+
+The `collective` module is compiled only with Cargo feature `mpi` and an installed
+`QuEST::QuEST` target configured with both MPI and SUBCOMM. Default facade and
+pure compiler builds do not depend on rsmpi or its bindgen/libclang build chain.
+A Cargo feature selects the optional dependency; checked native configuration
+controls whether the API exists. No placeholder MPI API is emitted for other
+native configurations.
+
+Use `quest::collective::MpiRuntime::initialize()` to own rsmpi's `Universe` with
+mandatory `MPI_THREAD_MULTIPLE`, borrow a world communicator (or split a subgroup),
+then call `CollectiveEnvironment::builder(&communicator)?.build()`. The builder
+supports named GPU/multithreading opt-ins and a per-rank memory budget. Set
+`MPICC` to the absolute wrapper for the same installed MPI implementation; the
+build compares actual loaded library identity, ABI layouts and version against
+the selected `QuEST::QuEST` target before accepting that pairing. The development
+MPICH installation additionally needs `MPICH_CC=/usr/bin/gcc` because its saved
+`gcc-13` executable is absent.
+
+Every rank in one subgroup calls collective operations in matching order.
+`state_vector`, `prepare_plan`, and `CollectivePreparedProgram::run` share the
+local facade's resource accounting and execution implementation. Preparation
+compares complete canonical semantic bytes, including all complex matrix entries,
+ordered targets, signed controls, phases, nested oracle bodies and adjoints.
+Recoverable validation and budget failures are agreed before native work;
+a native failure after entry aborts the job when ordered cleanup is uncertain.
+Different subgroups can execute independent coherent schedules. Measurement,
+noise, reset, structured SSA and distributed solve are not exposed here.
+
+`CollectiveRegister::init_pure_from_root` broadcasts admitted input storage from
+one subgroup root. `probability`, `total_probability`, and the unnormalized
+`project` operation support scalar postselection accounting without a full-state
+gather. Native registers/prepared programs borrow their environment, which borrows
+the communicator, which borrows the MPI universe. Drop resources first, then the
+`QuEST` owner; application MPI remains usable until its universe is dropped.
+All owners stay on the initializing thread. Only borrowed `MpiThreadView` message
+views cross scoped threads, with rsmpi typed buffers and pure status snapshots.
+No owning rsmpi communicator can escape the universe lifetime through this API.
+
+`Register::environment()` now returns a read-only `EnvironmentView` exposing
+capabilities, memory budget and current allocation, shared by both owner kinds.
+Call allocation/preparation methods on the actual owner rather than through a
+register's accessor. There is no `Deref` conversion between collective and local
+owners and no explicit shutdown operation.
+
+Collective preparation also checks canonical cache-sharing relationships: equal
+values assembled with different sharing graphs can require different native
+allocation schedules. First-occurrence indices describe those relationships;
+raw memory addresses never cross ranks. Such a schedule mismatch is rejected
+before materialization, even when the numerical operations are otherwise equal.

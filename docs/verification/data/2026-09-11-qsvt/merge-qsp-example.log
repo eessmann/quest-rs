@@ -1,0 +1,11 @@
+   Compiling quest-qsp v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/qsvt-port/crates/quest-qsp)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.77s
+     Running `target/debug/examples/qsp_tutorials`
+polynomial value: -0.72
+exp approximation bound: 0.005528370108691228
+canonical response at 0.3: 0.18000000000000005
+generalized matrices: 2
+recorded stages: 1
+certified response bound: 0.00000000000000009835447442136023
+offline certified response bound: 0
+offline approximation bound: 0.0059403306943438105

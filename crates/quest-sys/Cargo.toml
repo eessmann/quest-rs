@@ -10,9 +10,14 @@ keywords = ["quantum", "simulation", "ffi", "bindings"]
 categories = ["external-ffi-bindings", "science"]
 build = "build.rs"
 
+[features]
+default = []
+mpi = ["dep:mpi"]
+
 [dependencies]
 cxx = { workspace = true, features = ["std", "c++20"] }
 thiserror.workspace = true
+mpi = { workspace = true, optional = true }
 
 [build-dependencies]
 cxx-build = { workspace = true, features = ["parallel"] }

@@ -1,0 +1,24 @@
+   Compiling bitflags v2.13.1
+   Compiling raw-cpuid v11.6.0
+   Compiling pulp v0.22.3
+   Compiling private-gemm-x86 v0.1.20
+   Compiling gemm-common v0.19.0
+   Compiling gemm-c64 v0.19.0
+   Compiling gemm-f32 v0.19.0
+   Compiling gemm-f64 v0.19.0
+   Compiling gemm-c32 v0.19.0
+   Compiling qd v0.8.0
+   Compiling faer-traits v0.24.0
+   Compiling gemm v0.19.0
+   Compiling faer v0.24.4
+   Compiling quest-polynomial v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/qsvt-port/crates/quest-polynomial)
+   Compiling quest-qsp v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/qsvt-port/crates/quest-qsp)
+    Finished `release` profile [optimized] target(s) in 31.53s
+     Running tests/offline.rs (target/release/build/quest-qsp/02d45ed846572988/out/offline-02d45ed846572988)
+
+running 1 test
+OFFLINE_DEGREE_8105 attempts=1 response=4.19907426849013860e-17 reconstruction=6.97491398967269712e-17
+OFFLINE_ATTEMPT OfflineAttempt { precision: 128, grid: 65536, work: 2300433696, computation: 5.494323942s, certification: 20.028651382s, completion_residual: Some(4.838763355369977639155362678130652057298e-20) }
+test offline_original_degree_8105_catalog_exports_and_certifies ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 25.53s

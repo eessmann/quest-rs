@@ -1,4 +1,5 @@
 #include "quest_bindings.hpp"
+#include "quest_mpi.hpp"
 
 #include "quest-sys/src/lib.rs.h"
 
@@ -28,6 +29,7 @@ Lifecycle lifecycle = Lifecycle::Unattempted;
 // One-way admission barrier independent of the lifecycle mutex: even failure
 // to acquire that mutex during owner destruction must retire the runtime.
 std::atomic<bool> retired{false};
+std::atomic<bool> distributed_cleanup{false};
 std::uint64_t owner_token = 0;
 std::uint64_t next_thread_token = 0;
 
@@ -291,6 +293,9 @@ void Qureg::reset() noexcept {
     owns_ = false;
     unregister_resource(ResourceKind::Qureg);
   } catch (...) {
+    if (distributed_cleanup.load(std::memory_order_acquire)) {
+      mpi_abort_job();
+    }
     // Fail closed: retain the native allocation and live count.
     // Destruction must never cross FFI with an exception.
   }
@@ -347,6 +352,9 @@ void CompMatr::reset() noexcept {
     owns_ = false;
     unregister_resource(ResourceKind::CompMatr);
   } catch (...) {
+    if (distributed_cleanup.load(std::memory_order_acquire)) {
+      mpi_abort_job();
+    }
     // Fail closed: retain the native allocation and live count.
     // Destruction must never cross FFI with an exception.
   }
@@ -403,6 +411,9 @@ void DiagMatr::reset() noexcept {
     owns_ = false;
     unregister_resource(ResourceKind::DiagMatr);
   } catch (...) {
+    if (distributed_cleanup.load(std::memory_order_acquire)) {
+      mpi_abort_job();
+    }
     // Fail closed: retain the native allocation and live count.
     // Destruction must never cross FFI with an exception.
   }
@@ -449,6 +460,9 @@ void FullStateDiagMatr::reset() noexcept {
     owns_ = false;
     unregister_resource(ResourceKind::FullStateDiagMatr);
   } catch (...) {
+    if (distributed_cleanup.load(std::memory_order_acquire)) {
+      mpi_abort_job();
+    }
     // Fail closed: retain the native allocation and live count.
     // Destruction must never cross FFI with an exception.
   }
@@ -489,6 +503,9 @@ void SuperOp::reset() noexcept {
     owns_ = false;
     unregister_resource(ResourceKind::SuperOp);
   } catch (...) {
+    if (distributed_cleanup.load(std::memory_order_acquire)) {
+      mpi_abort_job();
+    }
     // Fail closed: retain the native allocation and live count.
     // Destruction must never cross FFI with an exception.
   }
@@ -529,6 +546,9 @@ void KrausMap::reset() noexcept {
     owns_ = false;
     unregister_resource(ResourceKind::KrausMap);
   } catch (...) {
+    if (distributed_cleanup.load(std::memory_order_acquire)) {
+      mpi_abort_job();
+    }
     // Fail closed: retain the native allocation and live count.
     // Destruction must never cross FFI with an exception.
   }
@@ -575,6 +595,9 @@ void PauliStrSum::reset() noexcept {
     owns_ = false;
     unregister_resource(ResourceKind::PauliStrSum);
   } catch (...) {
+    if (distributed_cleanup.load(std::memory_order_acquire)) {
+      mpi_abort_job();
+    }
     // Fail closed: retain the native allocation and live count.
     // Destruction must never cross FFI with an exception.
   }
@@ -609,6 +632,65 @@ void init_custom_quest_env_modes(std::int32_t use_distrib,
   });
 }
 
+#if QUEST_SYS_RSMPI_ENABLED
+bool mpi_quest_can_initialize() noexcept {
+  try {
+    const std::lock_guard lock(lifecycle_mutex);
+    return !retired.load(std::memory_order_acquire) &&
+           lifecycle == Lifecycle::Unattempted;
+  } catch (...) {
+    mpi_abort_job();
+  }
+}
+
+void mpi_init_quest(std::int64_t communicator,
+                    std::int32_t rank,
+                    std::int32_t size,
+                    bool gpu,
+                    bool threads) {
+#if QUEST_SYS_MPI_ENABLED
+  if (communicator < std::numeric_limits<MPI_Fint>::min() ||
+      communicator > std::numeric_limits<MPI_Fint>::max())
+    throw std::invalid_argument(
+        "MPI Fortran communicator handle is out of range");
+  if (size <= 0 || (size & (size - 1)) != 0)
+    throw std::invalid_argument(
+        "QuEST communicator size must be a power of two");
+  initialize_environment([&] {
+    // The guard precedes even native communicator handoff. Rejected attempts
+    // cannot replace QuEST's process-global communicator or consume ownership.
+    MPI_Comm comm = MPI_Comm_f2c(static_cast<MPI_Fint>(communicator));
+    int native_rank = -1;
+    int native_size = 0;
+    if (comm == MPI_COMM_NULL ||
+        MPI_Comm_rank(comm, &native_rank) != MPI_SUCCESS ||
+        MPI_Comm_size(comm, &native_size) != MPI_SUCCESS ||
+        native_rank != rank || native_size != size)
+      mpi_abort_job();
+    distributed_cleanup.store(true, std::memory_order_release);
+    try {
+      ::initCustomMpiCommQuESTEnv(comm, gpu ? 1 : 0, threads ? 1 : 0);
+      install_quest_input_error_handler();
+    } catch (...) {
+      mpi_abort_job();
+    }
+  });
+#else
+  throw std::runtime_error("installed QuEST lacks MPI subcommunicator support");
+#endif
+}
+#endif
+
+bool mpi_quest_is_quiescent() noexcept {
+  try {
+    const std::lock_guard lock(lifecycle_mutex);
+    return !distributed_cleanup.load(std::memory_order_acquire) ||
+           lifecycle == Lifecycle::Finalized;
+  } catch (...) {
+    return false;
+  }
+}
+
 void finalize_quest_env() {
   const std::lock_guard lock(lifecycle_mutex);
   if (lifecycle == Lifecycle::Finalized) {
@@ -625,6 +707,9 @@ void finalize_quest_env() {
     lifecycle = Lifecycle::Finalized;
   } catch (...) {
     lifecycle = Lifecycle::Failed;
+    if (distributed_cleanup.load(std::memory_order_acquire)) {
+      mpi_abort_job();
+    }
     throw;
   }
 }
@@ -636,6 +721,9 @@ void finalize_quest_env_on_drop() noexcept {
       // Retain the ordinary finalizer's owner-thread and live-resource checks.
       finalize_quest_env();
     } catch (...) {
+      if (distributed_cleanup.load(std::memory_order_acquire)) {
+        mpi_abort_job();
+      }
       // The owner is disappearing: unlike an explicit low-level finalization
       // rejection, this failure can never leave the runtime available for use.
       // Resource destructors will preserve native storage after retirement.
@@ -643,6 +731,9 @@ void finalize_quest_env_on_drop() noexcept {
       retired.store(true, std::memory_order_release);
     }
   } catch (...) {
+    if (distributed_cleanup.load(std::memory_order_acquire)) {
+      mpi_abort_job();
+    }
     // Do not touch mutex-protected state without its lock. The independent
     // latch still prevents initialization and subsequent native admission.
     retired.store(true, std::memory_order_release);
@@ -831,6 +922,13 @@ rust::Vec<QuestComplex> get_qureg_amps(const Qureg& qureg,
 double calc_total_prob(const Qureg& qureg) {
   const auto admission = admit_native_call();
   return static_cast<double>(::calcTotalProb(qureg.raw()));
+}
+
+void add_qureg(Qureg& out, const Qureg& source) {
+  const auto admission = admit_native_call();
+  qcomp coefficients[] = {qcomp{1, 0}, qcomp{1, 0}};
+  ::Qureg inputs[] = {out.raw(), source.raw()};
+  ::setQuregToWeightedSum(out.raw(), coefficients, inputs, 2);
 }
 
 void set_density_qureg_amps(Qureg& qureg,

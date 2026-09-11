@@ -5,9 +5,13 @@
 //! Final executables emit direct dependency RUNPATHs. Installed native libraries
 //! remain responsible for the runtime paths of their own dependencies.
 
+mod hdf5;
 mod probe;
+pub use hdf5::emit_serial_hdf5_runtime_paths;
 
 mod package;
+mod rsmpi;
+pub use rsmpi::verify_rsmpi_compatibility;
 
 pub use package::{BridgeInputs, HeaderContext, NativePackage};
 
@@ -248,6 +252,8 @@ pub(crate) fn validate_compiler_environment(
 #[derive(Debug)]
 pub(crate) struct HeaderConfiguration {
     version: String,
+    mpi_enabled: bool,
+    subcommunicators_enabled: bool,
 }
 
 pub(crate) fn parse_header_configuration(header: &str) -> Result<HeaderConfiguration> {
@@ -285,8 +291,20 @@ pub(crate) fn parse_header_configuration(header: &str) -> Result<HeaderConfigura
     patch
         .parse::<u32>()
         .map_err(|_| invalid("invalid QUEST_VERSION_PATCH"))?;
+    let flag = |name: &str| match features.get(name).map(String::as_str) {
+        None | Some("0") => Ok(false),
+        Some("1") => Ok(true),
+        Some(_) => Err(invalid(format!("invalid native feature flag {name}"))),
+    };
+    let mpi_enabled = flag("QUEST_COMPILE_MPI")?;
+    let subcommunicators_enabled = flag("QUEST_COMPILE_SUBCOMM")?;
+    if subcommunicators_enabled && !mpi_enabled {
+        return Err(invalid("native subcommunicator support requires MPI"));
+    }
     Ok(HeaderConfiguration {
         version: format!("4.3.{patch}"),
+        mpi_enabled,
+        subcommunicators_enabled,
     })
 }
 
@@ -420,6 +438,29 @@ mod tests {
             parse_header_configuration(&header(2, 0, 4)).is_err(),
             eq(true)
         );
+        Ok(())
+    }
+
+    #[gtest]
+    fn native_mpi_api_requires_both_mpi_and_subcommunicators() -> googletest::Result<()> {
+        for (mpi, subcomm, expected) in [(0, 0, false), (1, 0, false), (1, 1, true)] {
+            let text = format!(
+                "{}#define QUEST_COMPILE_MPI {mpi}\n#define QUEST_COMPILE_SUBCOMM {subcomm}\n",
+                header(2, 0, 3)
+            );
+            let configuration = parse_header_configuration(&text).or_fail()?;
+            verify_that!(
+                configuration.mpi_enabled && configuration.subcommunicators_enabled,
+                eq(expected)
+            )?;
+        }
+        for (mpi, subcomm) in [(0, 1), (2, 0)] {
+            let text = format!(
+                "{}#define QUEST_COMPILE_MPI {mpi}\n#define QUEST_COMPILE_SUBCOMM {subcomm}\n",
+                header(2, 0, 3)
+            );
+            verify_that!(parse_header_configuration(&text).is_err(), eq(true))?;
+        }
         Ok(())
     }
 

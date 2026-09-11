@@ -33,12 +33,28 @@ pub struct GateRequest<'a> {
     pub inverse: bool,
 }
 
+/// A retained oracle request; the backend resolves only the local capture ID.
+#[derive(Debug, Clone, Copy)]
+pub struct OracleRequest<'a> {
+    pub capture: usize,
+    pub targets: &'a [usize],
+    pub controls: &'a [QuantumControl],
+    pub adjoint: bool,
+}
+
 /// Native-independent quantum operations required by the interpreter.
 pub trait QuantumBackend {
     type Error: StdError + Send + Sync + 'static;
 
     /// # Errors
     /// Returns a backend-specific error without rolling back prior requests.
+    /// Return `None` when oracle execution is unsupported. The interpreter then
+    /// reports an explicit capability failure before silently skipping any call.
+    fn apply_oracle(&mut self, _request: OracleRequest<'_>) -> Option<Result<(), Self::Error>> {
+        None
+    }
+    /// # Errors
+    /// Returns a backend error without rolling back prior requests.
     fn apply_gate(&mut self, request: GateRequest<'_>) -> Result<(), Self::Error>;
     /// # Errors
     /// Returns a backend-specific error without rolling back prior requests.
@@ -153,10 +169,14 @@ pub enum RuntimeCause<E> {
     StorageLimit,
     Allocation,
     InvalidVerifiedProgram(&'static str),
+    Unsupported(&'static str),
 }
 impl<E: fmt::Display> fmt::Display for RuntimeCause<E> {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            Self::Unsupported(capability) => {
+                write!(formatter, "unsupported capability: {capability}")
+            }
             Self::Backend(error) => write!(formatter, "quantum backend failed: {error}"),
             Self::Value(error) => error.fmt(formatter),
             Self::MissingInput(name) => write!(formatter, "missing runtime input {name}"),
@@ -216,53 +236,7 @@ impl<E: fmt::Display> RuntimeError<E> {
     #[must_use]
     pub fn diagnostic(&self, sources: &crate::SourceMap) -> crate::Diagnostic {
         let reason = self.cause.to_string();
-        let cause = match &self.cause {
-            RuntimeCause::MissingInput(name) | RuntimeCause::UnexpectedInput(name) => {
-                crate::DiagnosticCause::UnknownSymbol { name: name.clone() }
-            }
-            RuntimeCause::Assertion(message) => crate::DiagnosticCause::InvalidControlFlow {
-                reason: message.clone(),
-            },
-            RuntimeCause::StepLimit
-            | RuntimeCause::FrameLimit
-            | RuntimeCause::StorageLimit
-            | RuntimeCause::Allocation => crate::DiagnosticCause::ResourceFailure {
-                reason: reason.clone(),
-            },
-            RuntimeCause::Backend(_) => crate::DiagnosticCause::Lifecycle {
-                reason: reason.clone(),
-            },
-            RuntimeCause::Value(_) | RuntimeCause::InputType(_) => {
-                crate::DiagnosticCause::LanguageFailure {
-                    kind: if matches!(self.cause, RuntimeCause::InputType(_)) {
-                        crate::LanguageFailureKind::RuntimeInput
-                    } else {
-                        crate::LanguageFailureKind::RuntimeValue
-                    },
-                    reason: reason.clone(),
-                }
-            }
-            RuntimeCause::MissingCapture(_) | RuntimeCause::CaptureType(_) => {
-                crate::DiagnosticCause::LanguageFailure {
-                    kind: crate::LanguageFailureKind::RuntimeCapture,
-                    reason: reason.clone(),
-                }
-            }
-            RuntimeCause::Uninitialized | RuntimeCause::Alias => {
-                crate::DiagnosticCause::LanguageFailure {
-                    kind: if matches!(self.cause, RuntimeCause::Alias) {
-                        crate::LanguageFailureKind::Alias
-                    } else {
-                        crate::LanguageFailureKind::DefiniteAssignment
-                    },
-                    reason: reason.clone(),
-                }
-            }
-            RuntimeCause::InvalidVerifiedProgram(_) => crate::DiagnosticCause::LanguageFailure {
-                kind: crate::LanguageFailureKind::InvalidIr,
-                reason: reason.clone(),
-            },
-        };
+        let cause = self.cause.diagnostic_cause(&reason);
         let mut diagnostic = crate::Diagnostic::new(crate::Stage::Execution, cause, &reason);
         diagnostic.occurrence = self.span.as_deref().copied();
         diagnostic.sources = sources.clone();
@@ -394,9 +368,14 @@ struct Frame {
     values: Vec<Option<RuntimeValue>>,
 }
 
+#[derive(Clone, Copy)]
+enum QuantumKind {
+    Builtin(GateKind),
+    Oracle(usize),
+}
 #[derive(Clone)]
 struct OwnedGate {
-    gate: GateKind,
+    kind: QuantumKind,
     parameters: Vec<f64>,
     targets: Vec<usize>,
     controls: Vec<QuantumControl>,
@@ -1118,6 +1097,7 @@ impl<'a, B: QuantumBackend> Engine<'a, B> {
             .get(region.index())
             .filter(|candidate| candidate.id == region)
             .ok_or_else(|| self.fault(RuntimeCause::InvalidVerifiedProgram("missing callee")))?;
+        let oracle = callee.oracle.as_ref().map(ssa::OracleId::index);
         let parameters = callee.parameters.clone();
         let gate = callee.gate;
         if arguments.len() != parameters.len() {
@@ -1217,13 +1197,49 @@ impl<'a, B: QuantumBackend> Engine<'a, B> {
             validate_selected_aliases(&bindings, &prepared, &external, lane)
                 .map_err(|cause| self.fault(cause))?;
             let first = buffer.requests.len();
-            let result = self.execute_region(region, bindings, &mut Sink::Buffer(&mut buffer))?;
+            let result = if let Some(capture) = oracle {
+                let targets = prepared
+                    .iter()
+                    .map(|argument| {
+                        let Binding::Reference(address) = &argument.binding else {
+                            return Err(RuntimeCause::InvalidVerifiedProgram(
+                                "oracle operand is not a reference",
+                            ));
+                        };
+                        select_qubit(address, lane)
+                    })
+                    .collect::<Result<Vec<_>, _>>()
+                    .map_err(|cause| self.fault(cause))?;
+                self.dispatch(
+                    OwnedGate {
+                        kind: QuantumKind::Oracle(capture),
+                        parameters: Vec::new(),
+                        targets,
+                        controls: Vec::new(),
+                        inverse: false,
+                    },
+                    &mut Sink::Buffer(&mut buffer),
+                )?;
+                None
+            } else {
+                self.execute_region(region, bindings, &mut Sink::Buffer(&mut buffer))?
+            };
             if result.is_some() {
                 return Err(self.fault(RuntimeCause::InvalidVerifiedProgram(
                     "unitary gate returned a value",
                 )));
             }
             self.add_external_controls(&mut buffer, first, &selected_controls)?;
+        }
+        if modifier.exact_inverse
+            && buffer
+                .requests
+                .iter()
+                .any(|request| matches!(request.kind, QuantumKind::Oracle(_)))
+        {
+            return Err(self.fault(RuntimeCause::Unsupported(
+                "exact inverse or negative power of a numerical oracle",
+            )));
         }
         if modifier.inverse {
             buffer.requests.reverse();
@@ -1328,7 +1344,7 @@ impl<'a, B: QuantumBackend> Engine<'a, B> {
                 validate_gate(gate, &parameters, &targets, &controls)
                     .map_err(|cause| self.fault(cause))?;
                 let request = OwnedGate {
-                    gate,
+                    kind: QuantumKind::Builtin(gate),
                     parameters: parameters.clone(),
                     targets,
                     controls,
@@ -1346,11 +1362,16 @@ impl<'a, B: QuantumBackend> Engine<'a, B> {
         modifiers: &[GateModifier],
     ) -> VmResult<ModifierValues, B::Error> {
         let mut inverse = false;
+        let mut exact_inverse = false;
         let mut repetitions = 1i128;
         let mut controls = Vec::new();
         for modifier in modifiers {
             match modifier {
-                GateModifier::Inverse => inverse = !inverse,
+                GateModifier::Inverse => {
+                    inverse = !inverse;
+                    exact_inverse = true;
+                }
+                GateModifier::Adjoint => inverse = !inverse,
                 GateModifier::Control { positive, count } => {
                     controls.extend(std::iter::repeat_n(*positive, *count));
                 }
@@ -1358,6 +1379,7 @@ impl<'a, B: QuantumBackend> Engine<'a, B> {
                     let power = scalar_value(frame, *value)
                         .and_then(|value| value.to_i128().map_err(RuntimeCause::Value))
                         .map_err(|cause| self.fault(cause))?;
+                    exact_inverse |= power < 0;
                     repetitions = repetitions
                         .checked_mul(power)
                         .ok_or_else(|| self.fault(RuntimeCause::StepLimit))?;
@@ -1368,6 +1390,7 @@ impl<'a, B: QuantumBackend> Engine<'a, B> {
             inverse = !inverse;
         }
         Ok(ModifierValues {
+            exact_inverse,
             inverse,
             repetitions: usize::try_from(
                 repetitions
@@ -1407,12 +1430,18 @@ impl<'a, B: QuantumBackend> Engine<'a, B> {
                 .copied()
                 .chain(request.controls.iter().copied())
                 .collect::<Vec<_>>();
-            validate_gate(
-                request.gate,
-                &request.parameters,
-                &request.targets,
-                &controls,
-            )
+            match request.kind {
+                QuantumKind::Builtin(gate) => {
+                    validate_gate(gate, &request.parameters, &request.targets, &controls)
+                }
+                QuantumKind::Oracle(_) => unique_qubits(
+                    &controls
+                        .iter()
+                        .map(|control| control.qubit)
+                        .chain(request.targets.iter().copied())
+                        .collect::<Vec<_>>(),
+                ),
+            }
             .map_err(|cause| self.fault(cause))?;
         }
         for request in requests {
@@ -1459,15 +1488,27 @@ impl<'a, B: QuantumBackend> Engine<'a, B> {
     fn dispatch(&mut self, request: OwnedGate, sink: &mut Sink<'_>) -> VmResult<(), B::Error> {
         match sink {
             Sink::Backend => {
-                self.backend
-                    .apply_gate(GateRequest {
-                        gate: request.gate,
-                        parameters: &request.parameters,
-                        targets: &request.targets,
-                        controls: &request.controls,
-                        inverse: request.inverse,
-                    })
-                    .map_err(|error| self.fault(RuntimeCause::Backend(error)))?;
+                if let QuantumKind::Oracle(capture) = request.kind {
+                    self.backend
+                        .apply_oracle(OracleRequest {
+                            capture,
+                            targets: &request.targets,
+                            controls: &request.controls,
+                            adjoint: request.inverse,
+                        })
+                        .ok_or_else(|| self.fault(RuntimeCause::Unsupported("oracle execution")))?
+                        .map_err(|error| self.fault(RuntimeCause::Backend(error)))?;
+                } else if let QuantumKind::Builtin(gate) = request.kind {
+                    self.backend
+                        .apply_gate(GateRequest {
+                            gate,
+                            parameters: &request.parameters,
+                            targets: &request.targets,
+                            controls: &request.controls,
+                            inverse: request.inverse,
+                        })
+                        .map_err(|error| self.fault(RuntimeCause::Backend(error)))?;
+                }
                 self.completed_quantum = self
                     .completed_quantum
                     .checked_add(1)
@@ -1512,6 +1553,7 @@ fn gate_storage(request: &OwnedGate) -> Option<usize> {
 }
 
 struct ModifierValues {
+    exact_inverse: bool,
     inverse: bool,
     repetitions: usize,
     controls: Vec<bool>,
@@ -2087,4 +2129,54 @@ fn bit_value<E>(bits: &[bool]) -> Result<ScalarValue, RuntimeCause<E>> {
         .map(|bit| if *bit { '1' } else { '0' })
         .collect::<String>();
     ScalarValue::bitstring(&text).map_err(RuntimeCause::Value)
+}
+
+impl<E> RuntimeCause<E> {
+    fn diagnostic_cause(&self, reason: &str) -> crate::DiagnosticCause {
+        match self {
+            Self::MissingInput(name) | Self::UnexpectedInput(name) => {
+                crate::DiagnosticCause::UnknownSymbol { name: name.clone() }
+            }
+            Self::Assertion(message) => crate::DiagnosticCause::InvalidControlFlow {
+                reason: message.clone(),
+            },
+            Self::StepLimit | Self::FrameLimit | Self::StorageLimit | Self::Allocation => {
+                crate::DiagnosticCause::ResourceFailure {
+                    reason: reason.to_owned(),
+                }
+            }
+            Self::Unsupported(capability) => crate::DiagnosticCause::UnsupportedCapability {
+                capability: (*capability).into(),
+            },
+            Self::Backend(_) => crate::DiagnosticCause::Lifecycle {
+                reason: reason.to_owned(),
+            },
+            Self::Value(_) | Self::InputType(_) => crate::DiagnosticCause::LanguageFailure {
+                kind: if matches!(self, Self::InputType(_)) {
+                    crate::LanguageFailureKind::RuntimeInput
+                } else {
+                    crate::LanguageFailureKind::RuntimeValue
+                },
+                reason: reason.to_owned(),
+            },
+            Self::MissingCapture(_) | Self::CaptureType(_) => {
+                crate::DiagnosticCause::LanguageFailure {
+                    kind: crate::LanguageFailureKind::RuntimeCapture,
+                    reason: reason.to_owned(),
+                }
+            }
+            Self::Uninitialized | Self::Alias => crate::DiagnosticCause::LanguageFailure {
+                kind: if matches!(self, Self::Alias) {
+                    crate::LanguageFailureKind::Alias
+                } else {
+                    crate::LanguageFailureKind::DefiniteAssignment
+                },
+                reason: reason.to_owned(),
+            },
+            Self::InvalidVerifiedProgram(_) => crate::DiagnosticCause::LanguageFailure {
+                kind: crate::LanguageFailureKind::InvalidIr,
+                reason: reason.to_owned(),
+            },
+        }
+    }
 }

@@ -172,7 +172,7 @@ pub fn gate(item: &ssa::Instruction, context: &Context<'_>) -> Option<ResolvedGa
     let mut controls = vec![];
     for modifier in modifiers {
         match modifier {
-            M::Inverse => inverse = !inverse,
+            M::Inverse | M::Adjoint => inverse = !inverse,
             M::Control { positive, count } => {
                 controls.extend(std::iter::repeat_n(*positive, *count));
             }

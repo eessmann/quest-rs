@@ -145,6 +145,27 @@ impl Parser<'_> {
         self.require(")")?;
         Ok(result)
     }
+    fn oracle_declaration(&mut self) -> Result<StatementKind, ParseError> {
+        self.next()?;
+        let name = self.name()?;
+        self.require("[")?;
+        let arity = self.expression(0)?;
+        self.require("]")?;
+        self.require("=")?;
+        let token = self.next()?;
+        let TokenKind::Capture(capture) = token.kind else {
+            return Err(ParseError::syntax(
+                token.span,
+                "oracle requires a Rust fragment capture",
+            ));
+        };
+        self.require(";")?;
+        Ok(StatementKind::Oracle {
+            name,
+            arity,
+            capture,
+        })
+    }
     fn statement(&mut self) -> Result<Statement, ParseError> {
         let span = self.peek().and_then(|t| t.span);
         let keyword = self
@@ -178,6 +199,7 @@ impl Parser<'_> {
                 self.require(";")?;
                 StatementKind::Alias { name, value }
             }
+            "oracle" => self.oracle_declaration()?,
             "gate" => self.gate_declaration()?,
             "def" => self.subroutine()?,
             "qubit" => {
@@ -442,7 +464,10 @@ impl Parser<'_> {
     fn operation(&mut self) -> Result<StatementKind, ParseError> {
         let mut modifiers = Vec::new();
         loop {
-            if self.eat("inv") {
+            if self.eat("adjoint") {
+                modifiers.push(Modifier::Adjoint);
+                self.require("@")?;
+            } else if self.eat("inv") {
                 modifiers.push(Modifier::Inverse);
                 self.require("@")?;
             } else if self.is("ctrl") || self.is("negctrl") {

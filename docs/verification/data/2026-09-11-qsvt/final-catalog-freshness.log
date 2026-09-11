@@ -1,0 +1,3 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.04s
+     Running `target/debug/xtask generate-qsvt-catalog --source /var/home/erich/Projects/quest-qsvt --check`
+Checked 21 inverse catalog families (through degree 8105)

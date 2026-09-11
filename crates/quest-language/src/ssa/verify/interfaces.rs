@@ -100,6 +100,30 @@ fn register(
 
 fn regions(program: &Program) -> Result<(), SemanticError> {
     for region in &program.regions {
+        if region.oracle.is_some() {
+            let blocks = program
+                .blocks
+                .iter()
+                .filter(|block| block.region == region.id)
+                .collect::<Vec<_>>();
+            if !region.gate
+                || region.id == program.entry
+                || region.parameters.is_empty()
+                || blocks.len() != 1
+                || blocks.iter().any(|block| !block.instructions.is_empty())
+                || region.parameters.iter().any(|id| {
+                    program
+                        .slots
+                        .get(id.index())
+                        .is_none_or(|slot| slot.ty != Type::Qubit(1))
+                })
+            {
+                return Err(SemanticError::invalid(
+                    "oracle requires an empty coherent region with a fixed qubit signature",
+                ));
+            }
+        }
+
         if region.id == program.entry
             && (region.gate || !region.parameters.is_empty() || region.result != Type::Void)
         {

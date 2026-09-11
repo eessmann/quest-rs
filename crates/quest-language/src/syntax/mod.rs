@@ -143,6 +143,12 @@ pub struct Statement {
 #[derive(Debug, Clone, PartialEq)]
 pub enum StatementKind {
     Include(String),
+    /// Rust payload identity and checked local arity; no captured data lives here.
+    Oracle {
+        name: String,
+        arity: Expression,
+        capture: usize,
+    },
     Alias {
         name: String,
         value: Expression,
@@ -253,6 +259,7 @@ pub enum Iterable {
 #[derive(Debug, Clone, PartialEq)]
 pub enum Modifier {
     Inverse,
+    Adjoint,
     Control {
         positive: bool,
         count: Option<Expression>,

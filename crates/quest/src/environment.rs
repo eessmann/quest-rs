@@ -89,16 +89,7 @@ impl EnvironmentBuilder {
             }
         };
         Ok(Environment {
-            capabilities: Capabilities {
-                gpu: native.is_gpu_accelerated,
-                multithreaded: native.is_multithreaded,
-                distributed: native.is_distributed,
-                cu_quantum: native.is_cu_quantum_enabled,
-            },
-            budget: self.budget,
-            allocated: Cell::new(0),
-            seed_storage: Cell::new(false),
-            thread: PhantomData,
+            resources: RuntimeResources::new(native, self.budget),
         })
     }
 }
@@ -120,6 +111,10 @@ impl EnvironmentBuilder {
 /// do not borrow this owner and remain usable after its scope ends. RAII cannot
 /// ensure cleanup on process abort, forced termination, or [`std::mem::forget`].
 pub struct Environment {
+    pub(crate) resources: RuntimeResources,
+}
+
+pub struct RuntimeResources {
     capabilities: Capabilities,
     budget: MemoryBudget,
     allocated: Cell<usize>,
@@ -132,22 +127,74 @@ impl Environment {
         EnvironmentBuilder::default()
     }
     pub const fn capabilities(&self) -> Capabilities {
-        self.capabilities
+        self.resources.capabilities
     }
     pub const fn memory_budget(&self) -> MemoryBudget {
-        self.budget
+        self.resources.budget
     }
     pub const fn allocated_bytes(&self) -> usize {
-        self.allocated.get()
+        self.resources.allocated.get()
     }
     /// # Errors
     /// Rejects allocation overflow, insufficient memory budget, or native allocation failure.
     pub fn state_vector(&self, count: QubitCount) -> Result<Register<'_, StateVector>> {
-        Register::allocate(self, count)
+        Register::allocate(&self.resources, count)
     }
     /// # Errors
     /// Rejects allocation overflow, insufficient memory budget, or native allocation failure.
     pub fn density_matrix(&self, count: QubitCount) -> Result<Register<'_, DensityMatrix>> {
+        Register::allocate(&self.resources, count)
+    }
+}
+
+/// Read-only capabilities and resource accounting shared by local and collective owners.
+/// This view cannot allocate resources or extend the runtime lifetime.
+#[derive(Clone, Copy)]
+pub struct EnvironmentView<'env> {
+    pub(crate) resources: &'env RuntimeResources,
+}
+impl EnvironmentView<'_> {
+    #[must_use]
+    pub const fn capabilities(&self) -> Capabilities {
+        self.resources.capabilities
+    }
+    #[must_use]
+    pub const fn memory_budget(&self) -> MemoryBudget {
+        self.resources.budget
+    }
+    #[must_use]
+    pub const fn allocated_bytes(&self) -> usize {
+        self.resources.allocated.get()
+    }
+}
+impl RuntimeResources {
+    pub(crate) const fn new(native: quest_sys::QuestEnvironment, budget: MemoryBudget) -> Self {
+        Self {
+            capabilities: Capabilities {
+                gpu: native.is_gpu_accelerated,
+                multithreaded: native.is_multithreaded,
+                distributed: native.is_distributed,
+                cu_quantum: native.is_cu_quantum_enabled,
+            },
+            budget,
+            allocated: Cell::new(0),
+            seed_storage: Cell::new(false),
+            thread: PhantomData,
+        }
+    }
+    pub(crate) const fn capabilities(&self) -> Capabilities {
+        self.capabilities
+    }
+    pub(crate) const fn memory_budget(&self) -> MemoryBudget {
+        self.budget
+    }
+    pub(crate) const fn allocated_bytes(&self) -> usize {
+        self.allocated.get()
+    }
+    pub(crate) fn state_vector(&self, count: QubitCount) -> Result<Register<'_, StateVector>> {
+        Register::allocate(self, count)
+    }
+    pub(crate) fn density_matrix(&self, count: QubitCount) -> Result<Register<'_, DensityMatrix>> {
         Register::allocate(self, count)
     }
     /// Retain a conservative fixed allowance for `QuEST`'s process RNG seed
@@ -201,14 +248,14 @@ impl Drop for Environment {
 impl fmt::Debug for Environment {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Environment")
-            .field("capabilities", &self.capabilities)
-            .field("allocated_bytes", &self.allocated.get())
+            .field("capabilities", &self.resources.capabilities)
+            .field("allocated_bytes", &self.resources.allocated.get())
             .finish_non_exhaustive()
     }
 }
 
 pub struct Reservation<'a> {
-    pub(crate) environment: &'a Environment,
+    pub(crate) environment: &'a RuntimeResources,
     bytes: usize,
 }
 // Each reservation releases exactly the bytes charged at construction.

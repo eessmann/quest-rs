@@ -1,6 +1,6 @@
-use crate::{Complex64, Environment, Error, Outcome, Probability, QubitCount, Result};
+use crate::{Complex64, Error, Outcome, Probability, QubitCount, Result};
 use crate::{
-    environment::Reservation,
+    environment::{EnvironmentView, Reservation, RuntimeResources},
     error::BackendResult,
     values::{bytes_for, reserve_vec},
 };
@@ -37,7 +37,14 @@ pub struct Register<'env, K: RegisterKind> {
     kind: PhantomData<K>,
 }
 impl<'env, K: RegisterKind> Register<'env, K> {
-    pub(crate) fn allocate(environment: &'env Environment, count: QubitCount) -> Result<Self> {
+    pub(crate) fn allocate(environment: &'env RuntimeResources, count: QubitCount) -> Result<Self> {
+        let reservation = Self::admit_allocation(environment, count)?;
+        Self::allocate_admitted(reservation, count)
+    }
+    pub(crate) fn admit_allocation(
+        environment: &'env RuntimeResources,
+        count: QubitCount,
+    ) -> Result<Reservation<'env>> {
         let entries = if K::DENSITY {
             count
                 .dimension()
@@ -47,11 +54,25 @@ impl<'env, K: RegisterKind> Register<'env, K> {
             count.dimension()
         };
         // Include native state and workspace copies, on host and (when enabled) device.
-        let reservation = environment.reserve(bytes_for(
+        environment.reserve(bytes_for(
             entries,
             if environment.capabilities().gpu { 8 } else { 4 },
-        )?)?;
-        let native = if K::DENSITY {
+        )?)
+    }
+    pub(crate) fn allocate_admitted(
+        reservation: Reservation<'env>,
+        count: QubitCount,
+    ) -> Result<Self> {
+        let native = if reservation.environment.capabilities().distributed {
+            let caps = reservation.environment.capabilities();
+            quest_sys::create_custom_qureg(
+                count.native(),
+                i32::from(K::DENSITY),
+                1,
+                i32::from(caps.gpu),
+                i32::from(caps.multithreaded),
+            )
+        } else if K::DENSITY {
             quest_sys::create_density_qureg(count.native())
         } else {
             quest_sys::create_qureg(count.native())
@@ -73,7 +94,12 @@ impl<'env, K: RegisterKind> Register<'env, K> {
         self.count.dimension()
     }
     #[must_use]
-    pub const fn environment(&self) -> &'env Environment {
+    pub const fn environment(&self) -> EnvironmentView<'env> {
+        EnvironmentView {
+            resources: self.resources(),
+        }
+    }
+    pub(crate) const fn resources(&self) -> &'env RuntimeResources {
         self.reservation.environment
     }
     #[expect(
@@ -112,9 +138,7 @@ impl<'env, K: RegisterKind> Register<'env, K> {
         if amplitudes.len() != self.dimension() {
             return Err(Error::Value("pure-state amplitude count must be 2^qubits"));
         }
-        let _scratch = self
-            .environment()
-            .reserve(bytes_for(amplitudes.len(), 3)?)?;
+        let _scratch = self.resources().reserve(bytes_for(amplitudes.len(), 3)?)?;
         let buffer = pack(amplitudes.iter().copied(), amplitudes.len())?;
         quest_sys::init_arbitrary_pure_state(self.pin(), &buffer).context("initializing pure state")
     }
@@ -186,9 +210,9 @@ impl<'env, K: RegisterKind> Register<'env, K> {
         } else {
             self.dimension()
         };
-        let reservation = self.environment().reserve(bytes_for(
+        let reservation = self.resources().reserve(bytes_for(
             entries,
-            if self.environment().capabilities().gpu {
+            if self.resources().capabilities().gpu {
                 8
             } else {
                 4
@@ -229,7 +253,7 @@ impl<'env> Register<'env, StateVector> {
                 bound: self.dimension(),
             });
         }
-        let _scratch = self.environment().reserve(bytes_for(count, 3)?)?;
+        let _scratch = self.resources().reserve(bytes_for(count, 3)?)?;
         let native = quest_sys::get_qureg_amps(
             &self.native,
             i64::try_from(start).map_err(|_| Error::Overflow)?,
@@ -243,7 +267,7 @@ impl<'env> Register<'env, StateVector> {
     /// # Errors
     /// Rejects allocation overflow, memory budget exhaustion, or native read failure.
     pub fn snapshot(&self) -> Result<Mat<Complex64>> {
-        let _scratch = self.environment().reserve(bytes_for(
+        let _scratch = self.resources().reserve(bytes_for(
             self.dimension().checked_add(4).ok_or(Error::Overflow)?,
             3,
         )?)?;
@@ -270,7 +294,7 @@ impl<'env> Register<'env, StateVector> {
     /// # Errors
     /// Rejects resource limits or native state transfer failure.
     pub fn to_density(&self) -> Result<Register<'env, DensityMatrix>> {
-        let mut density = self.environment().density_matrix(self.count)?;
+        let mut density = self.resources().density_matrix(self.count)?;
         let values = self.amplitudes(0, self.dimension())?;
         density.init_pure(&values)?;
         Ok(density)
@@ -321,7 +345,7 @@ impl Register<'_, DensityMatrix> {
             .nrows()
             .checked_mul(view.ncols())
             .ok_or(Error::Overflow)?;
-        let _scratch = self.environment().reserve(bytes_for(count, 4)?)?;
+        let _scratch = self.resources().reserve(bytes_for(count, 4)?)?;
         let mut values = reserve_vec(count)?;
         for r in 0..view.nrows() {
             for c in 0..view.ncols() {
@@ -350,7 +374,7 @@ impl Register<'_, DensityMatrix> {
             .checked_add(4)
             .and_then(|n| n.checked_mul(self.dimension()))
             .ok_or(Error::Overflow)?;
-        let _scratch = self.environment().reserve(bytes_for(entries, 3)?)?;
+        let _scratch = self.resources().reserve(bytes_for(entries, 3)?)?;
         let mut out = matrix(self.dimension(), self.dimension())?;
         // Bounded column blocks avoid the native rectangular getter's transpose scratch growing with the full density matrix.
         for c in 0..self.dimension() {

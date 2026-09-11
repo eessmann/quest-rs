@@ -451,7 +451,7 @@ fn modifiers_check(
                     return Err(SemanticError::invalid("gate power requires int or uint"));
                 }
             }
-            ssa::GateModifier::Inverse => {}
+            ssa::GateModifier::Inverse | ssa::GateModifier::Adjoint => {}
         }
     }
     Ok(controls)

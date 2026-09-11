@@ -96,3 +96,44 @@ historical evidence; the approved implementation plan records current progress.
 stages. Errors that already carry a diagnostic retain its original stage and
 snapshots. Rust macro occurrences without text use their compiler file, line, and
 column as a location note; text-backed occurrences remain normal validated labels.
+
+## Shared numerical oracles
+
+Freeze a bound coherent body through the consuming oracle builder. Matrix
+admission is explicit and applies to each numerical operator separately; it does
+not certify the unitarity error of the composed fragment.
+
+```rust
+use quest_circuit::{Gate, OracleFragment, ProgramBuilder};
+let mut body = ProgramBuilder::new(2, 0)?;
+body.gate(Gate::H, &[body.qubit(0)?], &[])?;
+let fragment = OracleFragment::builder(body.finish()?.bind(&[])?)
+    .matrix_tolerance(1e-12)?
+    .build()?;
+let mut program = ProgramBuilder::new(3, 0)?;
+let targets = [program.qubit(2)?, program.qubit(0)?];
+program.oracle(&fragment, &targets, &[])?;
+program.oracle(&fragment.adjoint(), &targets, &[])?;
+let plan = program.finish()?.bind(&[])?.lower()?.plan()?;
+# Ok::<(), quest_circuit::Error>(())
+```
+
+Each invocation remains an ordered `Operation::Oracle` occurrence in the plan.
+Cloned fragments and adjoint views share immutable body storage. Local target
+zero remains the least-significant basis bit, including nonsorted argument lists.
+`decompose` remaps one body layer, preserving nested oracle calls and controlled
+global phase. It is intended for preparation, where the backend can cache each
+shared body; it does not flatten the retained plan during lowering.
+
+The Rust frontend accepts `oracle block[2] = ${fragment};` and invokes it using
+`block q[2], q[0];` or `adjoint @ ctrl @ block q[1], q[2], q[0];`. Captures execute
+once during construction, even when calls occur inside loops. Shared language
+SSA holds only the local capture identity and qubit signature; the circuit plan
+owns the fragment payload. A numerical oracle has an adjoint but no exact inverse
+capability. `inv` and negative powers require exact semantics and are rejected for
+numerical oracle calls, including indirectly invoked calls at execution preflight.
+
+`OracleFragment::export_qasm` exports an explicit portable built-in decomposition.
+Numerical matrices and unresolved Rust captures return a structured unsupported
+capability diagnostic. A staged QSVT transform is not an oracle fragment and
+cannot be supplied as an oracle capture implicitly.

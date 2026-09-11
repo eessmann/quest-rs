@@ -100,3 +100,11 @@ zero, and no approximate numeric identities are applied. Work, iteration, and
 storage budgets bound optimization. Every returned program passes independent
 verification; failure exposes no partially transformed candidate. The outer
 program wrapper retains frozen export syntax, source snapshots, and host captures.
+
+Oracle capture declarations in the Rust token profile carry only a local
+`OracleId` and a fixed qubit signature. Calls remain ordinary SSA `Call`
+occurrences targeting an oracle region. Captured payloads belong to the circuit
+binding layer. The interpreter emits `OracleRequest` values with ordered targets,
+signed controls and an explicit adjoint bit; backends without oracle support
+return a structured capability failure. Numerical `adjoint @` is distinct from
+exact `inv @` and negative powers.

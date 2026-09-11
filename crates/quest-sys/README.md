@@ -59,3 +59,69 @@ every native feature is supported by the facade.
 Edit the adapter registry and generator templates together, then regenerate with
 `cargo run -p xtask -- generate-quest-bindings`. `--check` verifies freshness.
 Generation requires libclang; consuming this crate does not.
+
+With the optional `mpi` feature, `quest_sys::mpi` owns an official rsmpi
+`Universe` and three rsmpi `SimpleCommunicator` contexts per communicator.
+The public module, CXX handoff and MPI tests additionally require the selected
+native package to enable MPI and subcommunicators: build scripts emit checked
+`quest_native_mpi`, and Rust uses `all(feature = "mpi", quest_native_mpi)`.
+A non-MPI native package hides the API and skips MPI compatibility witnesses.
+Cargo still resolves an explicitly enabled optional dependency before build
+scripts run, so leave `mpi` disabled for a fully MPI-free dependency graph.
+The default feature set does not add rsmpi, mpi-sys, bindgen or libclang.
+Pure circuit/language compilation stays independent of the native runtime.
+
+Set an explicit absolute `MPICC` path before building with `--features mpi`.
+The wrapper must select the MPI implementation used by the installed
+`QuEST::QuEST` target, and the package must enable MPI and subcommunicators.
+The build compiles separate MPI ABI witnesses with that target and with MPICC,
+then compares their actual loaded MPI library paths, versions, handle/status
+sizes and constants. Runtime validation checks the loaded library and generated
+rsmpi layout again before MPI initialization. Unset `MPI_PKG_CONFIG` and
+`CRAY_MPICH_DIR` for this supported recipe. Rebuild mpi-sys when changing MPICC
+or its compiler environment; upstream MPI discovery does not track every such
+change. rsmpi's mpi-sys feature build requires libclang.
+
+`MpiRuntime::initialize()` uses rsmpi's `initialize_with_threading(Multiple)`
+and requires that support on every rank. It rejects an existing runtime or a
+repeat attempt. Runtime and communicator owners remain on the initializing
+thread. The rsmpi universe finalizes MPI only when its runtime owner drops,
+after every borrowed communicator has been destroyed.
+
+A communicator owns separate QuEST, coordination and application contexts.
+`split(Some(color), key)` permits any positive group size; `split(None, key)`
+excludes a rank. `split_power_of_two(size)` creates equal consecutive groups.
+`quest_environment()` admits a power-of-two group and returns a builder
+borrowing its communicator and admitted runtime. Named
+`with_gpu_acceleration()` / `with_multithreading()` options configure native
+execution; `build()` consumes the builder to initialize QuEST. The minimal C++
+handoff converts a borrowed MPI Fortran handle and retains QuEST's one-attempt
+lifecycle guard. QuEST duplicates that context and frees its duplicate on Drop,
+leaving the rsmpi-owned universe active.
+
+`collective_lane()` lends an exclusive ordered coordination lane while the
+environment lives. `threaded()` lends a `Send + Sync` message view for scoped
+workers, with bounded byte send/receive/send-receive and portable tags
+`0..=32767`. Views cannot free communicators or finalize MPI, and application
+messages do not acquire QuEST's lifecycle mutex. Typed slice methods use
+rsmpi's `Equivalence` datatype contract and return pure source/tag/count status
+snapshots. rsmpi's `SimpleCommunicator` does not borrow its `Universe`, and even
+a shared communicator exposes duplication into untracked owned handles; these
+wrappers therefore do not expose the full upstream communicator trait or raw
+handles. Callers must maintain matching
+collective/lifecycle order and configuration across ranks.
+
+rsmpi generally ignores MPI return codes and its destructors can panic.
+Consequently all exposed contexts retain MPI's fatal handler; ordinary
+collective preflight errors are agreed before rsmpi payload operations.
+Destruction contains upstream panics and aborts the MPI job on unrecoverable
+cleanup failure. Low-level resources must drop before the distributed
+environment guard. Ordinary local QuEST Drop retains retirement-and-continue
+behavior. High-level collective preparation/execution scheduling belongs in
+the facade.
+
+MPI integration tests launch isolated one-, two- and four-process cases with
+`mpiexec -n` and `timeout` on PATH. The launcher must match the selected MPI
+implementation, with local sockets enabled. On the current MPICH installation,
+`MPICH_CC=/usr/bin/gcc` selects the available C compiler because its saved
+`gcc-13` command is absent; the ABI witnesses still verify the same MPI library.

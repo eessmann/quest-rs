@@ -112,7 +112,7 @@ impl Compiler {
                 operands,
                 modifiers,
             } => self.gate(name, arguments, operands, modifiers, span),
-            S::GateDeclaration { .. } | S::Subroutine { .. } => {
+            S::Oracle { .. } | S::GateDeclaration { .. } | S::Subroutine { .. } => {
                 if self.region != self.program.entry || self.scopes.len() != 1 {
                     Err(SemanticError::new(
                         ErrorKind::ControlFlow,
@@ -392,6 +392,22 @@ impl Compiler {
                 .ok_or_else(|| {
                     SemanticError::new(ErrorKind::UnknownSymbol, format!("unknown gate {name}"))
                 })?;
+            if region.oracle.is_some()
+                && modifiers.iter().any(|modifier| match modifier {
+                    ssa::GateModifier::Inverse => true,
+                    ssa::GateModifier::Power(value) => self
+                        .constants
+                        .get(value)
+                        .and_then(|value| value.to_i128().ok())
+                        .is_some_and(|value| value < 0),
+                    _ => false,
+                })
+            {
+                return Err(SemanticError::new(
+                    ErrorKind::Capability,
+                    "numerical oracle requires adjoint; inverse and negative powers require exact semantics",
+                ));
+            }
             if !region.gate {
                 return Err(SemanticError::new(
                     ErrorKind::Type,
@@ -433,6 +449,7 @@ impl Compiler {
             .iter()
             .map(|modifier| match modifier {
                 syntax::Modifier::Inverse => Ok(ssa::GateModifier::Inverse),
+                syntax::Modifier::Adjoint => Ok(ssa::GateModifier::Adjoint),
                 syntax::Modifier::Control { positive, count } => Ok(ssa::GateModifier::Control {
                     positive: *positive,
                     count: count

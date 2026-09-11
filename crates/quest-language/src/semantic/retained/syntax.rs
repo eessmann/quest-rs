@@ -17,6 +17,7 @@ impl Heap for S {
     fn heap(&self) -> Result<usize, SemanticError> {
         match self {
             Self::Include(name) => name.heap(),
+            Self::Oracle { name, arity, .. } => sum([name.heap()?, arity.heap()?]),
             Self::Alias { name, value } => sum([name.heap()?, value.heap()?]),
             Self::Qubit { name, size } => sum([name.heap()?, size.heap()?]),
             Self::Declare {
@@ -112,7 +113,7 @@ impl Heap for syntax::Iterable {
 impl Heap for syntax::Modifier {
     fn heap(&self) -> Result<usize, SemanticError> {
         match self {
-            Self::Inverse => Ok(0),
+            Self::Inverse | Self::Adjoint => Ok(0),
             Self::Control { count, .. } => count.heap(),
             Self::Power(value) => value.heap(),
         }

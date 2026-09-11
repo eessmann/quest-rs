@@ -1,5 +1,5 @@
 [book]
-title = "QuEST Rust: structured programs and exact circuits"
+title = "QuEST Rust: circuits, QSP and QSVT"
 authors = ["quest-rs contributors"]
 language = "en"
 src = "src"

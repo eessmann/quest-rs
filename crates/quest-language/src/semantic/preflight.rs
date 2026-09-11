@@ -97,6 +97,7 @@ impl<'a> Scan<'a> {
         depth: usize,
     ) -> Result<(), SemanticError> {
         match &statement.kind {
+            S::Oracle { arity, .. } => self.push(Node::Expression(arity), depth)?,
             S::Qubit { size, .. } => self.optional(size.as_ref(), depth)?,
             S::Declare {
                 ty, initializer, ..
@@ -127,7 +128,7 @@ impl<'a> Scan<'a> {
                         syntax::Modifier::Power(value) => {
                             self.push(Node::Expression(value), depth)?;
                         }
-                        syntax::Modifier::Inverse => {}
+                        syntax::Modifier::Inverse | syntax::Modifier::Adjoint => {}
                     }
                 }
             }

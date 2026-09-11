@@ -158,6 +158,23 @@ impl ProgramBuilder {
         self.definitions.push((name, body));
         Ok(id)
     }
+    /// Append one retained shared oracle occurrence.
+    /// # Errors
+    /// Rejects invalid operands, arity and exhausted occurrence limits.
+    pub fn oracle(
+        &mut self,
+        fragment: &crate::OracleFragment,
+        targets: &[QubitId],
+        controls: &[Control],
+    ) -> Result<OccurrenceId> {
+        fragment.check_operands(targets, controls)?;
+        let controls = self.operands(targets, controls)?;
+        self.push(SemanticOperation::Oracle {
+            fragment: fragment.clone(),
+            targets: targets.to_vec(),
+            controls,
+        })
+    }
     /// # Errors
     /// Rejects invalid identifiers, arity or parameter mismatches, overlapping operands, and exhausted expansion limits.
     #[expect(
@@ -947,6 +964,23 @@ impl LoweredProgram {
 #[derive(Debug, Clone)]
 pub struct ExecutablePlan(BoundProgram);
 impl ExecutablePlan {
+    /// Count retained oracle occurrences recursively, including each outer call.
+    /// # Errors
+    /// Rejects query-count overflow.
+    pub fn oracle_query_count(&self) -> Result<usize> {
+        self.instructions()
+            .iter()
+            .try_fold(0usize, |total, instruction| {
+                let count = match instruction.operation() {
+                    Operation::Oracle { fragment, .. } => fragment.query_count(),
+                    _ => 0,
+                };
+                total
+                    .checked_add(count)
+                    .ok_or(Error::Budget("oracle queries"))
+            })
+    }
+
     #[must_use]
     pub fn dependency_depth(&self) -> usize {
         self.0.dependency_depth()

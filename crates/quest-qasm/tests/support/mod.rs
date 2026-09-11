@@ -61,7 +61,8 @@ fn statements(body: &mut [Statement]) {
             | StatementKind::Break
             | StatementKind::Continue
             | StatementKind::End => {}
-            StatementKind::Alias { value, .. }
+            StatementKind::Oracle { arity: value, .. }
+            | StatementKind::Alias { value, .. }
             | StatementKind::Reset(value)
             | StatementKind::Expression(value) => expression(value),
             StatementKind::Qubit { size, .. } | StatementKind::Return(size) => {
@@ -93,7 +94,7 @@ fn statements(body: &mut [Statement]) {
                 expressions(operands);
                 for modifier in modifiers {
                     match modifier {
-                        Modifier::Inverse => {}
+                        Modifier::Inverse | Modifier::Adjoint => {}
                         Modifier::Power(value) => expression(value),
                         Modifier::Control { count, .. } => {
                             if let Some(value) = count {

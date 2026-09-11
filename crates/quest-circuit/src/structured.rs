@@ -123,6 +123,7 @@ fn language_failure(
 pub struct StructuredProgram {
     typed: TypedModule,
     captures: Arc<[ScalarValue]>,
+    oracles: Arc<std::collections::BTreeMap<usize, crate::OracleFragment>>,
     sources: SourceMap,
     locations: Arc<[MacroLocation]>,
 }
@@ -159,6 +160,7 @@ impl StructuredProgram {
         Ok(Self {
             typed,
             captures: Arc::from([]),
+            oracles: Arc::default(),
             sources,
             locations: Arc::from([]),
         })
@@ -196,6 +198,7 @@ impl StructuredProgram {
         Ok(Self {
             typed,
             captures: captures.into(),
+            oracles: Arc::default(),
             sources,
             locations: locations.into(),
         })
@@ -205,9 +208,28 @@ impl StructuredProgram {
         Self {
             typed,
             captures: Arc::from([]),
+            oracles: Arc::default(),
             sources,
             locations: Arc::from([]),
         }
+    }
+    /// Bind immutable oracle payloads to language-local capture identities.
+    /// # Errors
+    /// Rejects missing captures. The consuming `verify` stage checks declared arity
+    /// against the bound payload before publishing an executable program.
+    pub fn with_oracles(
+        mut self,
+        oracles: std::collections::BTreeMap<usize, crate::OracleFragment>,
+    ) -> Result<Self, LanguageError> {
+        for statement in &self.typed.syntax().statements {
+            if let syntax::StatementKind::Oracle { capture, .. } = statement.kind
+                && !oracles.contains_key(&capture)
+            {
+                return Err(LanguageError::Capture { index: capture });
+            }
+        }
+        self.oracles = Arc::new(oracles);
+        Ok(self)
     }
     #[must_use]
     pub const fn typed(&self) -> &TypedModule {
@@ -225,6 +247,7 @@ impl StructuredProgram {
         let Self {
             typed,
             captures,
+            oracles,
             sources,
             locations,
         } = self;
@@ -244,6 +267,16 @@ impl StructuredProgram {
                 error.into_diagnostic(quest_language::Stage::Verification, sources.clone()),
             ))
         })?;
+        for region in &program.program().regions {
+            if let Some(id) = &region.oracle {
+                let fragment = oracles
+                    .get(&id.index())
+                    .ok_or_else(|| LanguageError::Capture { index: id.index() })?;
+                if fragment.num_qubits() != region.parameters.len() {
+                    return Err(LanguageError::Capture { index: id.index() });
+                }
+            }
+        }
         let syntax = Arc::new(syntax);
         for instruction in program
             .blocks()
@@ -251,6 +284,9 @@ impl StructuredProgram {
             .flat_map(|block| &block.instructions)
         {
             if let ssa::InstructionKind::Capture { index, ty } = &instruction.kind {
+                if oracles.contains_key(index) {
+                    return Err(LanguageError::Capture { index: *index });
+                }
                 let capture = captures.get(*index).ok_or_else(|| {
                     let mut diagnostic = LanguageError::Capture { index: *index }
                         .into_diagnostic(quest_language::Stage::Verification, sources.clone());
@@ -273,6 +309,7 @@ impl StructuredProgram {
             program,
             syntax,
             captures,
+            oracles,
             sources,
             locations,
             retained_ir,
@@ -307,6 +344,7 @@ pub struct VerifiedStructuredProgram {
     program: ssa::VerifiedProgram,
     syntax: Arc<syntax::Module>,
     captures: Arc<[ScalarValue]>,
+    oracles: Arc<std::collections::BTreeMap<usize, crate::OracleFragment>>,
     sources: SourceMap,
     locations: Arc<[MacroLocation]>,
     retained_ir: usize,
@@ -453,17 +491,7 @@ impl LoweredStructuredProgram {
 
     fn plan_inner(self) -> Result<StructuredPlan, LanguageError> {
         let limits = CompileLimits::default();
-        let source_bytes = self
-            .verified
-            .sources
-            .iter()
-            .try_fold(0usize, |total, source| {
-                total
-                    .checked_add(source.text().len())
-                    .and_then(|n| n.checked_add(source.name().len()))
-                    .and_then(|n| n.checked_add(1024))
-                    .ok_or(LanguageError::Budget("source accounting"))
-            })?;
+        let source_bytes = source_storage(&self.verified.sources)?;
         let classical_bytes =
             self.verified
                 .program
@@ -483,6 +511,12 @@ impl LoweredStructuredProgram {
             .checked_add(std::mem::size_of_val(self.verified.captures.as_ref()))
             .and_then(|n| n.checked_add(std::mem::size_of_val(self.verified.locations.as_ref())))
             .ok_or(LanguageError::Budget("frontend storage"))?;
+        ir_bytes = ir_bytes
+            .checked_add(
+                crate::OracleFragment::shared_storage_bytes(self.verified.oracles.values())
+                    .map_err(|_| LanguageError::Budget("oracle storage"))?,
+            )
+            .ok_or(LanguageError::Budget("oracle storage"))?;
         for location in self.verified.locations.iter() {
             ir_bytes = ir_bytes
                 .checked_add(location.file.capacity())
@@ -567,6 +601,10 @@ impl StructuredPlan {
         &self.verified.syntax
     }
     #[must_use]
+    pub fn oracle_captures(&self) -> &std::collections::BTreeMap<usize, crate::OracleFragment> {
+        &self.verified.oracles
+    }
+    #[must_use]
     pub fn captures(&self) -> &[ScalarValue] {
         &self.verified.captures
     }
@@ -607,4 +645,14 @@ fn storage_size(ty: &ssa::Type) -> Result<usize, LanguageError> {
             Err(LanguageError::Unsupported("nonstorage slot type"))
         }
     }
+}
+
+fn source_storage(sources: &SourceMap) -> Result<usize, LanguageError> {
+    sources.iter().try_fold(0usize, |total, source| {
+        total
+            .checked_add(source.text().len())
+            .and_then(|n| n.checked_add(source.name().len()))
+            .and_then(|n| n.checked_add(1024))
+            .ok_or(LanguageError::Budget("source accounting"))
+    })
 }

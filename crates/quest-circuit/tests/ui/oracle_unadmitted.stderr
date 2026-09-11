@@ -1,0 +1,7 @@
+error[E0599]: no method named `build` found for struct `OracleBuilder` in the current scope
+ --> tests/ui/oracle_unadmitted.rs:3:46
+  |
+3 |     let _ = OracleFragment::builder(program).build();
+  |                                              ^^^^^ method not found in `OracleBuilder`
+  |
+  = note: the method was found for `OracleBuilder<OracleTolerance>`

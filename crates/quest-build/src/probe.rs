@@ -39,7 +39,7 @@ pub fn discover(
     let probe = read_target(&reader, &setup.profile, "quest_link_query")?;
     let compiler = read_compiler(&reader, target)?;
     validate_compiler_environment(target, Some(&compiler.path))?;
-    let (prefix, version, headers) = inspect_headers(&probe, explicit.as_deref())?;
+    let (prefix, configuration, headers) = inspect_headers(&probe, explicit.as_deref())?;
     let mut link = inspect_link(&probe, &setup.build_directory, &setup.profile)?;
     // CMake's link fragments omit the driver's implicit standard library.
     // Use the evaluated toolchain rather than assuming GCC or Clang defaults.
@@ -59,7 +59,9 @@ pub fn discover(
         .transpose()?;
     let package = NativePackage {
         prefix,
-        version,
+        version: configuration.version,
+        mpi_enabled: configuration.mpi_enabled,
+        subcommunicators_enabled: configuration.subcommunicators_enabled,
         headers,
         compiler: compiler.path,
         compiler_id: compiler.id,
@@ -71,6 +73,12 @@ pub fn discover(
         runtime_library_dirs: link.runtime_dirs,
         bridge_archive,
         exact_library_files: link.library_files_by_name,
+        build_directory: setup.build_directory.clone(),
+        mpi_probe: read_target(&reader, &setup.profile, "quest_mpi_abi")?
+            .artifacts
+            .first()
+            .map(|artifact| setup.build_directory.join(&artifact.path))
+            .ok_or_else(|| invalid("CMake omitted MPI ABI witness target"))?,
     };
     package.validate_link_search()?;
     Ok(package)
@@ -140,6 +148,7 @@ fn configure(
         ("CMakeLists.txt", include_str!("../native/CMakeLists.txt")),
         ("abi.cpp", include_str!("../native/abi.cpp")),
         ("query.cpp", include_str!("../native/query.cpp")),
+        ("mpi_abi.c", include_str!("../native/mpi_abi.c")),
     ] {
         write(&source.join(name), content)?;
     }
@@ -280,7 +289,7 @@ fn read_compiler(reader: &reply::Reader, target: &str) -> Result<CompilerConfigu
 fn inspect_headers(
     probe: &Target,
     explicit: Option<&Path>,
-) -> Result<(PathBuf, String, HeaderContext)> {
+) -> Result<(PathBuf, crate::HeaderConfiguration, HeaderContext)> {
     let mut headers = HeaderContext::default();
     for group in &probe.compile_groups {
         for include in &group.includes {
@@ -322,7 +331,7 @@ fn inspect_headers(
     let parsed = parse_header_configuration(
         &fs::read_to_string(&config_header).map_err(|error| io(&config_header, error))?,
     )?;
-    Ok((prefix, parsed.version, headers))
+    Ok((prefix, parsed, headers))
 }
 
 #[derive(Default)]
@@ -674,9 +683,9 @@ set_target_properties(QuEST::QuEST PROPERTIES
         .or_fail()?;
         let reader = reply::Reader::from_build_dir(&setup.build_directory).or_fail()?;
         let query = read_target(&reader, &setup.profile, "quest_link_query").or_fail()?;
-        let (_, version, headers) = inspect_headers(&query, Some(&prefix)).or_fail()?;
+        let (_, configuration, headers) = inspect_headers(&query, Some(&prefix)).or_fail()?;
         let link = inspect_link(&query, &setup.build_directory, &setup.profile).or_fail()?;
-        expect_eq!(version, "4.3.9");
+        expect_eq!(configuration.version, "4.3.9");
         let expected_profile =
             env::var("QUEST_BUILD_FIXTURE_PROFILE").unwrap_or_else(|_| "Release".to_owned());
         expect_eq!(&setup.profile, &expected_profile);
