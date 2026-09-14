@@ -83,7 +83,7 @@ fn main() -> Result<(), quest_build::BuildError> {
 
 ## Structured programs
 
-`circuit!` now constructs a `StructuredProgram`: typed classical expressions,
+`circuit!` constructs a `StructuredProgram`: typed classical expressions,
 scoped declarations, nonrecursive gates and subroutines, arrays and references,
 runtime branches/loops, measurement, reset and feedback. Rust `${ ... }`
 captures evaluate once during construction. `circuit_file!` admits text from
