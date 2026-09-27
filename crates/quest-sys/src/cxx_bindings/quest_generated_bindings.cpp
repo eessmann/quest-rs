@@ -2,9 +2,12 @@
 
 #include "quest-sys/src/generated_api.rs.h"
 
+#include <algorithm>
 #include <cmath>
 #include <complex>
+#include <cstddef>
 #include <cstdint>
+#include <limits>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -1197,8 +1200,38 @@ rust::Vec<double> calc_probs_of_all_multi_qubit_outcomes(
     const Qureg& qureg,
     rust::Slice<const std::int32_t> qubits) {
   const auto admission = admit_native_call();
-  return from_qreal_vec(
-      ::calcProbsOfAllMultiQubitOutcomes(qureg.raw(), to_int_vec(qubits)));
+  const auto count = qubits.size();
+  if (count == 0 || count > static_cast<std::size_t>(qureg.raw().numQubits) ||
+      count >= std::numeric_limits<std::size_t>::digits ||
+      count >= std::numeric_limits<qindex>::digits ||
+      count > static_cast<std::size_t>(std::numeric_limits<int>::max())) {
+    throw std::invalid_argument("probability target count is invalid");
+  }
+
+  std::vector<int> targets;
+  targets.reserve(count);
+  for (const auto qubit : qubits) {
+    if (qubit < 0 || qubit >= qureg.raw().numQubits) {
+      throw std::invalid_argument("probability target index is out of bounds");
+    }
+    if (std::find(targets.begin(), targets.end(), qubit) != targets.end()) {
+      throw std::invalid_argument(
+          "duplicate target qubit in probability query");
+    }
+    targets.push_back(qubit);
+  }
+
+  const auto outcome_count = std::size_t{1} << count;
+  if (outcome_count > std::vector<qreal>().max_size() ||
+      outcome_count >
+          static_cast<std::size_t>(std::numeric_limits<std::ptrdiff_t>::max()) /
+              sizeof(qreal)) {
+    throw std::length_error("probability output size is not representable");
+  }
+  std::vector<qreal> probabilities(outcome_count);
+  ::calcProbsOfAllMultiQubitOutcomes(probabilities.data(), qureg.raw(),
+                                     targets.data(), static_cast<int>(count));
+  return from_qreal_vec(probabilities);
 }
 
 double calc_purity(const Qureg& qureg) {

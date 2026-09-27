@@ -101,7 +101,7 @@ fn classify_item(item: &ApiItem, registry: &AdapterRegistry) -> (CoverageStatus,
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::generate::clang::collect_quest_api;
+    use crate::generate::clang::{collect_quest_api, fixture_package};
     use crate::generate::emit::load_adapter_registry;
     use crate::generate::find_workspace_root;
     use crate::generate::model::{AdapterEntry, AdapterRegistry, AdapterSourceKind, ApiArgument};
@@ -199,9 +199,8 @@ mod tests {
 
     #[gtest]
     fn classification_distinguishes_overloads_by_signature_shape() -> googletest::Result<()> {
-        let work = tempfile::tempdir().or_fail()?;
-        let Ok(package) = quest_build::discover_for_tooling(work.path(), None) else {
-            eprintln!("skipping test because no QuEST root was provided by environment");
+        let Some(package) = fixture_package().or_fail()? else {
+            eprintln!("skipping test because no QuEST package was discovered");
             return Ok(());
         };
 

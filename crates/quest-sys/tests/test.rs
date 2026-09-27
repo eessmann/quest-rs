@@ -177,6 +177,46 @@ fn generated_initialisation_and_probability_apis_work() -> googletest::Result<()
 }
 
 #[gtest]
+fn probability_outcomes_reject_invalid_target_counts_before_allocation() -> googletest::Result<()> {
+    isolated_with_environment(
+        "probability_outcomes_reject_invalid_target_counts_before_allocation",
+        || {
+            let qureg = quest_sys::create_qureg(2)?;
+            for targets in [&[][..], &[0, 1, 0][..], &[0; 64][..]] {
+                let Err(error) = quest_sys::calc_probs_of_all_multi_qubit_outcomes(&qureg, targets)
+                else {
+                    return fail!("invalid target count was accepted");
+                };
+                verify_that!(error.to_string(), contains_substring("target count"))?;
+            }
+            Ok(())
+        },
+    )
+}
+
+#[gtest]
+fn probability_outcomes_reject_duplicate_and_out_of_bounds_targets() -> googletest::Result<()> {
+    isolated_with_environment(
+        "probability_outcomes_reject_duplicate_and_out_of_bounds_targets",
+        || {
+            let qureg = quest_sys::create_qureg(2)?;
+            for (targets, expected) in [
+                (&[0, 0][..], "duplicate target"),
+                (&[-1][..], "target index"),
+                (&[2][..], "target index"),
+            ] {
+                let Err(error) = quest_sys::calc_probs_of_all_multi_qubit_outcomes(&qureg, targets)
+                else {
+                    return fail!("invalid target was accepted");
+                };
+                verify_that!(error.to_string(), contains_substring(expected))?;
+            }
+            Ok(())
+        },
+    )
+}
+
+#[gtest]
 fn generated_overloads_have_distinct_safe_adapters() -> googletest::Result<()> {
     isolated_with_environment("generated_overloads_have_distinct_safe_adapters", || {
         let pauli_without_indices = quest_sys::get_pauli_str_from_string("Z")?;

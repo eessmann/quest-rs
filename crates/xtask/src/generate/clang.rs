@@ -367,14 +367,23 @@ fn canonicalize_existing(path: &Path) -> Result<PathBuf, DynError> {
 }
 
 #[cfg(test)]
+pub(crate) fn fixture_package() -> Result<Option<quest_build::NativePackage>, DynError> {
+    let explicitly_selected = QUEST_ENV_VARS
+        .iter()
+        .any(|name| env::var_os(name).is_some())
+        || env::var_os("CMAKE_PREFIX_PATH").is_some_and(|value| !value.is_empty());
+    let work = tempfile::tempdir()?;
+    match quest_build::discover_for_tooling(work.path(), None) {
+        Ok(package) => Ok(Some(package)),
+        Err(_) if !explicitly_selected => Ok(None),
+        Err(error) => Err(error.into()),
+    }
+}
+
+#[cfg(test)]
 mod tests {
     use super::*;
     use googletest::prelude::*;
-
-    fn fixture_package() -> Option<quest_build::NativePackage> {
-        let work = tempfile::tempdir().ok()?;
-        quest_build::discover_for_tooling(work.path(), None).ok()
-    }
 
     #[gtest]
     fn libclang_error_mentions_expected_lookup_paths() -> googletest::Result<()> {
@@ -412,8 +421,8 @@ mod tests {
 
     #[gtest]
     fn libclang_extracts_representative_overloads() -> googletest::Result<()> {
-        let Some(package) = fixture_package() else {
-            eprintln!("skipping test because no QuEST root was provided by environment");
+        let Some(package) = fixture_package().or_fail()? else {
+            eprintln!("skipping test because no QuEST package was discovered");
             return Ok(());
         };
 
@@ -437,5 +446,44 @@ mod tests {
             eq(true)
         );
         verify_that!(overloads.iter().all(|item| item.line > 0), eq(true))
+    }
+
+    #[gtest]
+    fn explicit_broken_package_makes_generator_fixture_tests_fail() -> googletest::Result<()> {
+        let work = tempfile::tempdir().or_fail()?;
+        let missing = work.path().join("missing-quest-installation");
+        let executable = std::env::current_exe().or_fail()?;
+        for test in [
+            "generate::clang::tests::libclang_extracts_representative_overloads",
+            "generate::classify::tests::classification_distinguishes_overloads_by_signature_shape",
+        ] {
+            let output = Command::new(&executable)
+                .args(["--exact", test, "--nocapture"])
+                .env("QUEST_ROOT", &missing)
+                .env_remove("QUEST_DIR")
+                .env_remove("QuEST_ROOT")
+                .env_remove("QuEST_DIR")
+                .env_remove("CMAKE_PREFIX_PATH")
+                .output()
+                .or_fail()?;
+            if output.status.success() {
+                return fail!(
+                    "{test} skipped an explicitly selected but broken package:\n{}\n{}",
+                    String::from_utf8_lossy(&output.stdout),
+                    String::from_utf8_lossy(&output.stderr)
+                );
+            }
+            let output_text = format!(
+                "{}{}",
+                String::from_utf8_lossy(&output.stdout),
+                String::from_utf8_lossy(&output.stderr)
+            );
+            if !output_text.contains(missing.to_string_lossy().as_ref()) {
+                return fail!(
+                    "{test} failed for a reason other than the selected package: {output_text}"
+                );
+            }
+        }
+        Ok(())
     }
 }
