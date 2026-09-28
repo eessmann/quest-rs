@@ -21,7 +21,7 @@ fn numerical_oracle_calls_keep_local_certificates_without_a_global_bound() -> Re
     let _remove = Remove(path.clone());
     std::fs::write(
         &path,
-        "#!/bin/sh\ncat >/dev/null\nprintf '%s' '{\"version\":1,\"seed\":0,\"outcome\":{\"Candidate\":{\"sequence\":{\"qubits\":1,\"operations\":[]},\"engine\":\"identity-fixture\",\"precision_bits\":256}}}'\n",
+        "#!/bin/sh\ncat >/dev/null\nprintf '%s' '{\"version\":2,\"seed\":0,\"outcome\":{\"Candidate\":{\"sequence\":{\"qubits\":1,\"operations\":[]},\"engine\":\"identity-fixture\",\"precision_bits\":256}}}'\n",
     )?;
     std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700))?;
     let client = Client::new(path, WorkerLimits::default())?;

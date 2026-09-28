@@ -3,6 +3,8 @@
 use quest_optimizer_protocol::{Outcome, Request, RequestEnvelope, ResponseEnvelope, VERSION};
 use std::io::{Read, Write};
 
+#[cfg(feature = "mitm")]
+mod mitm;
 #[cfg(feature = "synthesis")]
 mod synthesis;
 #[cfg(feature = "zx")]
@@ -13,12 +15,57 @@ fn dispatch(request: Request, seed: u64) -> Outcome {
         Request::Capabilities => Outcome::Capabilities {
             synthesis: cfg!(feature = "synthesis"),
             zx: cfg!(feature = "zx"),
+            mitm: cfg!(feature = "mitm"),
         },
         Request::Synthesize {
             target,
             epsilon_bits,
         } => synthesize(&target, epsilon_bits, seed),
         Request::Zx { sequence } => optimize_zx(&sequence, seed),
+        Request::ZxBest { sequence } => optimize_zx_best(&sequence, seed),
+        Request::ZxExpanded { sequence } => optimize_zx_expanded(&sequence, seed),
+        Request::ExactMitm { target, limits } => exact_mitm(&target, limits),
+        Request::ApproxMitm {
+            target,
+            epsilon_bits,
+            limits,
+        } => approx_mitm(&target, epsilon_bits, limits),
+    }
+}
+#[cfg(feature = "mitm")]
+fn exact_mitm(
+    target: &quest_math::Sequence,
+    limits: quest_optimizer_protocol::MitmLimits,
+) -> Outcome {
+    mitm::exact::search_exact(target, limits)
+}
+#[cfg(not(feature = "mitm"))]
+fn exact_mitm(
+    _target: &quest_math::Sequence,
+    _limits: quest_optimizer_protocol::MitmLimits,
+) -> Outcome {
+    Outcome::Failure {
+        code: "capability".into(),
+        message: "MITM engine is not enabled".into(),
+    }
+}
+#[cfg(feature = "mitm")]
+fn approx_mitm(
+    target: &quest_math::Target,
+    epsilon_bits: u64,
+    limits: quest_optimizer_protocol::MitmLimits,
+) -> Outcome {
+    mitm::approx::search_approx(target, epsilon_bits, limits)
+}
+#[cfg(not(feature = "mitm"))]
+fn approx_mitm(
+    _target: &quest_math::Target,
+    _epsilon_bits: u64,
+    _limits: quest_optimizer_protocol::MitmLimits,
+) -> Outcome {
+    Outcome::Failure {
+        code: "capability".into(),
+        message: "MITM engine is not enabled".into(),
     }
 }
 #[cfg(feature = "synthesis")]
@@ -76,7 +123,7 @@ fn main() -> color_eyre::Result<()> {
 
 #[cfg(feature = "zx")]
 fn optimize_zx(sequence: &quest_math::Sequence, seed: u64) -> Outcome {
-    match zx::optimize(sequence, seed) {
+    match zx::optimize_baseline(sequence, seed) {
         Ok(sequence) => Outcome::Candidate {
             sequence,
             engine: "quizx-0.3.0".into(),
@@ -90,6 +137,48 @@ fn optimize_zx(sequence: &quest_math::Sequence, seed: u64) -> Outcome {
 }
 #[cfg(not(feature = "zx"))]
 fn optimize_zx(_sequence: &quest_math::Sequence, _seed: u64) -> Outcome {
+    Outcome::Failure {
+        code: "capability".into(),
+        message: "ZX engine is not enabled".into(),
+    }
+}
+#[cfg(feature = "zx")]
+fn optimize_zx_best(sequence: &quest_math::Sequence, seed: u64) -> Outcome {
+    match zx::optimize(sequence, seed) {
+        Ok(sequence) => Outcome::Candidate {
+            sequence,
+            engine: "quizx-0.3.0-best".into(),
+            precision_bits: 0,
+        },
+        Err(message) => Outcome::Failure {
+            code: "zx-best".into(),
+            message,
+        },
+    }
+}
+#[cfg(not(feature = "zx"))]
+fn optimize_zx_best(_sequence: &quest_math::Sequence, _seed: u64) -> Outcome {
+    Outcome::Failure {
+        code: "capability".into(),
+        message: "ZX engine is not enabled".into(),
+    }
+}
+#[cfg(feature = "zx")]
+fn optimize_zx_expanded(sequence: &quest_math::Sequence, seed: u64) -> Outcome {
+    match zx::optimize_expanded(sequence, seed) {
+        Ok(sequence) => Outcome::Candidate {
+            sequence,
+            engine: "quizx-0.3.0-expanded".into(),
+            precision_bits: 0,
+        },
+        Err(message) => Outcome::Failure {
+            code: "zx-expanded".into(),
+            message,
+        },
+    }
+}
+#[cfg(not(feature = "zx"))]
+fn optimize_zx_expanded(_sequence: &quest_math::Sequence, _seed: u64) -> Outcome {
     Outcome::Failure {
         code: "capability".into(),
         message: "ZX engine is not enabled".into(),

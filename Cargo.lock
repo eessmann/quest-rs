@@ -2451,6 +2451,7 @@ dependencies = [
 name = "quest-optimizer-protocol"
 version = "0.1.0"
 dependencies = [
+ "googletest",
  "quest-math",
  "serde",
  "serde_json",
@@ -2463,6 +2464,7 @@ version = "0.1.0"
 dependencies = [
  "color-eyre",
  "googletest",
+ "num-bigint 0.5.1",
  "quest-circuit",
  "quest-math",
  "quest-optimizer-client",
