@@ -107,12 +107,29 @@ fn admit_certificate(base: &ApproxCertificate, limits: Limits) -> Result<()> {
         .numer()
         .bits()
         .max(base.bound_squared().denom().bits());
-    if let AngleTarget::RationalPi {
-        numerator,
-        denominator,
-    } = &base.target().angle
-    {
-        bits = bits.max(numerator.bits()).max(denominator.bits());
+    match &base.target().angle {
+        AngleTarget::RationalPi {
+            numerator,
+            denominator,
+        } => {
+            bits = bits.max(numerator.bits()).max(denominator.bits());
+        }
+        AngleTarget::AffinePi {
+            radians_numerator,
+            radians_denominator,
+            pi_numerator,
+            pi_denominator,
+        } => {
+            if radians_denominator == &0.into() || pi_denominator == &0.into() {
+                return Err(Error::Invalid("zero affine-pi denominator".into()));
+            }
+            bits = bits
+                .max(radians_numerator.bits())
+                .max(radians_denominator.bits())
+                .max(pi_numerator.bits())
+                .max(pi_denominator.bits());
+        }
+        AngleTarget::DyadicRadians { .. } => {}
     }
     if bits > limits.coefficient_bits {
         return Err(crate::types::budget(

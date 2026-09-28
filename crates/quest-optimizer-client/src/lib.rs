@@ -129,6 +129,9 @@ impl Client {
                     return Err(Error::Limits);
                 }
             }
+            quest_math::AngleTarget::AffinePi { .. } => {
+                quest_math::admit_rotation_target(target, limits).map_err(|_| Error::Limits)?;
+            }
         }
         let sequence = candidate(self.request(
             Request::Synthesize {

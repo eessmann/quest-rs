@@ -8,11 +8,14 @@ mod ring;
 pub use ring::Cyclotomic;
 mod matrix;
 pub use matrix::{
-    ExactCertificate, ExactMatrix, PhaseRecovery, reconstruct, recover_eighth_root_phase,
-    verify_exact,
+    ExactCertificate, ExactMatrix, MatrixKey, PhaseRecovery, reconstruct,
+    recover_eighth_root_phase, verify_exact,
 };
 mod approx;
-pub use approx::{ApproxCertificate, certify_rotation, dyadic_from_bits};
+pub use approx::{
+    ApproxCertificate, DyadicBox8, adjoint_times_rotation_enclosure, admit_rotation_target,
+    certify_rotation, dyadic_from_bits, rotation_enclosure,
+};
 mod controlled;
 pub use controlled::{ControlledApproxCertificate, lift_controlled_rotation};
 mod interval;

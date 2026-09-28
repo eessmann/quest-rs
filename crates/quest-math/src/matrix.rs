@@ -14,6 +14,173 @@ impl ExactMatrix {
     pub fn entries(&self) -> &[Cyclotomic] {
         &self.entries
     }
+    /// Construct a checked one- or two-qubit identity.
+    /// # Errors
+    /// Rejects unsupported width or exhausted matrix resources.
+    pub fn identity(qubits: usize, limits: Limits) -> Result<Self> {
+        small_dimension(qubits, limits)?;
+        reconstruct(
+            &Sequence {
+                qubits,
+                operations: Vec::new(),
+            },
+            limits,
+        )
+    }
+    /// Construct the embedded full matrix of one admitted operation.
+    /// # Errors
+    /// Rejects unsupported width, operands or exhausted resources.
+    pub fn for_operation(qubits: usize, operation: &Operation, limits: Limits) -> Result<Self> {
+        small_dimension(qubits, limits)?;
+        reconstruct(
+            &Sequence {
+                qubits,
+                operations: vec![operation.clone()],
+            },
+            limits,
+        )
+    }
+    /// Checked full-phase left matrix product, `self * right`.
+    /// # Errors
+    /// Rejects mismatched widths or arithmetic/resource excesses.
+    pub fn multiply(&self, right: &Self, limits: Limits) -> Result<Self> {
+        let dimension = small_dimension(self.qubits, limits)?;
+        let entries_count = dimension
+            .checked_mul(dimension)
+            .ok_or_else(|| Error::Resource("MITM matrix dimension".into()))?;
+        if self.qubits != right.qubits
+            || self.entries.len() != entries_count
+            || right.entries.len() != entries_count
+        {
+            return Err(Error::Invalid("small matrix shape".into()));
+        }
+        memory(0, dimension, limits)?;
+        let mut entries = zeros(entries_count)?;
+        for row in 0..dimension {
+            for col in 0..dimension {
+                let mut value = Cyclotomic::zero();
+                for inner in 0..dimension {
+                    let product = get(&self.entries, dimension, row, inner)?
+                        .checked_mul(get(&right.entries, dimension, inner, col)?, limits)?;
+                    value = value.checked_add(&product, limits)?;
+                }
+                *get_mut(&mut entries, dimension, row, col)? = value;
+            }
+        }
+        Ok(Self {
+            qubits: self.qubits,
+            entries,
+        })
+    }
+    /// Checked conjugate transpose.
+    /// # Errors
+    /// Rejects invalid small-matrix shape or arithmetic/resource excesses.
+    pub fn adjoint(&self, limits: Limits) -> Result<Self> {
+        let dimension = small_dimension(self.qubits, limits)?;
+        let entries_count = dimension
+            .checked_mul(dimension)
+            .ok_or_else(|| Error::Resource("MITM matrix dimension".into()))?;
+        if self.entries.len() != entries_count {
+            return Err(Error::Invalid("small matrix shape".into()));
+        }
+        memory(0, dimension, limits)?;
+        let mut entries = zeros(entries_count)?;
+        for row in 0..dimension {
+            for col in 0..dimension {
+                *get_mut(&mut entries, dimension, row, col)? =
+                    get(&self.entries, dimension, col, row)?.conjugated(limits)?;
+            }
+        }
+        Ok(Self {
+            qubits: self.qubits,
+            entries,
+        })
+    }
+    /// Canonical key of every normalized entry, including global phase.
+    /// # Errors
+    /// Rejects invalid shape, coefficient limits or allocation failure.
+    pub fn full_phase_key(&self, limits: Limits) -> Result<MatrixKey> {
+        let dimension = small_dimension(self.qubits, limits)?;
+        let entries_count = dimension
+            .checked_mul(dimension)
+            .ok_or_else(|| Error::Resource("MITM matrix dimension".into()))?;
+        if self.entries.len() != entries_count {
+            return Err(Error::Invalid("small matrix shape".into()));
+        }
+        let mut entries = Vec::new();
+        entries
+            .try_reserve_exact(self.entries.len())
+            .map_err(|_| Error::Resource("matrix key allocation".into()))?;
+        for value in &self.entries {
+            if value
+                .coefficients()
+                .iter()
+                .any(|coefficient| coefficient.bits() > limits.coefficient_bits)
+                || u64::from(value.denominator_exponent()) > limits.coefficient_bits
+            {
+                return Err(crate::types::budget(
+                    "coefficient bits",
+                    limits.coefficient_bits.saturating_add(1),
+                    limits.coefficient_bits,
+                ));
+            }
+            entries.push(EntryKey {
+                denominator_exponent: value.denominator_exponent(),
+                coefficients: value.coefficients().clone(),
+            });
+        }
+        Ok(MatrixKey {
+            qubits: self.qubits,
+            entries,
+        })
+    }
+}
+
+fn small_dimension(qubits: usize, limits: Limits) -> Result<usize> {
+    if !(1..=2).contains(&qubits) || qubits > limits.qubits {
+        return Err(Error::Invalid("MITM matrix width".into()));
+    }
+    mask(qubits)
+}
+
+/// Hashable full-phase canonical matrix identity for one or two qubits.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct MatrixKey {
+    qubits: usize,
+    entries: Vec<EntryKey>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+struct EntryKey {
+    denominator_exponent: u32,
+    coefficients: [BigInt; 4],
+}
+impl MatrixKey {
+    /// Conservative owned key bytes, including independent bigint limbs.
+    /// # Errors
+    /// Rejects storage arithmetic overflow.
+    pub fn retained_bytes(&self) -> Result<usize> {
+        let mut bytes = std::mem::size_of::<Self>()
+            .checked_add(
+                self.entries
+                    .capacity()
+                    .checked_mul(std::mem::size_of::<EntryKey>())
+                    .ok_or_else(|| Error::Resource("matrix key storage".into()))?,
+            )
+            .ok_or_else(|| Error::Resource("matrix key storage".into()))?;
+        for entry in &self.entries {
+            for coefficient in &entry.coefficients {
+                let limb_bytes = usize::try_from(coefficient.bits().div_ceil(64))
+                    .map_err(|_| Error::Resource("matrix key storage".into()))?
+                    .checked_mul(16)
+                    .and_then(|n| n.checked_add(24))
+                    .ok_or_else(|| Error::Resource("matrix key storage".into()))?;
+                bytes = bytes
+                    .checked_add(limb_bytes)
+                    .ok_or_else(|| Error::Resource("matrix key storage".into()))?;
+            }
+        }
+        Ok(bytes)
+    }
 }
 /// Owned exact identities. Construction requires full matrix equality including phase.
 #[derive(Debug, Clone, PartialEq, Eq)]

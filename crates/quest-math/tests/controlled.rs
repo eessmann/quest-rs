@@ -198,3 +198,89 @@ fn existing_base_scalar_control_is_remapped_to_the_new_target() -> Result<()> {
     );
     Ok(())
 }
+
+#[gtest]
+fn controlled_lift_rechecks_affine_target_identity_budget() -> Result<()> {
+    let base = certify_rotation(
+        &Sequence {
+            qubits: 1,
+            operations: vec![],
+        },
+        &Target {
+            axis: Axis::Z,
+            angle: AngleTarget::AffinePi {
+                radians_numerator: 0.into(),
+                radians_denominator: std::ops::Shl::shl(num_bigint::BigInt::from(1), 1000usize),
+                pi_numerator: 0.into(),
+                pi_denominator: 1.into(),
+            },
+        },
+        1e-12f64.to_bits(),
+        Limits::default(),
+    )?;
+    let controls = [Control {
+        qubit: 1,
+        positive: true,
+    }];
+    expect_true!(
+        lift_controlled_rotation(
+            &base,
+            2,
+            0,
+            &controls,
+            Limits {
+                coefficient_bits: 512,
+                ..Limits::default()
+            }
+        )
+        .is_err()
+    );
+    let lifted = lift_controlled_rotation(&base, 2, 0, &controls, Limits::default())?;
+    expect_eq!(lifted.base().target(), base.target());
+    Ok(())
+}
+
+#[gtest]
+fn affine_two_pi_scalar_phase_survives_negative_control_lift() -> Result<()> {
+    let base = certify_rotation(
+        &Sequence {
+            qubits: 1,
+            operations: vec![operation(Gate::W); 4],
+        },
+        &Target {
+            axis: Axis::Z,
+            angle: AngleTarget::AffinePi {
+                radians_numerator: 0.into(),
+                radians_denominator: 1.into(),
+                pi_numerator: 2.into(),
+                pi_denominator: 1.into(),
+            },
+        },
+        1e-12f64.to_bits(),
+        Limits::default(),
+    )?;
+    let controls = [Control {
+        qubit: 1,
+        positive: false,
+    }];
+    let lifted = lift_controlled_rotation(&base, 2, 0, &controls, Limits::default())?;
+    expect_eq!(lifted.base().target(), base.target());
+    let matrix = reconstruct(lifted.sequence(), Limits::default())?;
+    for row in 0..4usize {
+        for column in 0..4usize {
+            let expected = if row != column {
+                Cyclotomic::zero()
+            } else if column < 2 {
+                Cyclotomic::omega(4)
+            } else {
+                Cyclotomic::one()
+            };
+            let offset = row
+                .checked_mul(4)
+                .and_then(|value| value.checked_add(column))
+                .ok_or_else(|| std::io::Error::other("fixture matrix offset"))?;
+            expect_eq!(matrix.entries().get(offset), Some(&expected));
+        }
+    }
+    Ok(())
+}

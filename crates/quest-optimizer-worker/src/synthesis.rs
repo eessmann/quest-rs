@@ -97,6 +97,10 @@ fn exact_theta(target: &Target, limits: Limits) -> Result<(Rational, bool), Stri
             }
             Ok((Rational::new(numerator.clone(), denominator.clone()), true))
         }
+        AngleTarget::AffinePi { .. } => Err(
+            "affine-pi target requires an engine interface accepting exact radians plus exact pi coefficient"
+                .to_string(),
+        ),
     }
 }
 
@@ -215,6 +219,20 @@ mod tests {
                 denominator: std::convert::From::from(denominator),
             },
         }
+    }
+
+    #[test]
+    fn affine_pi_requires_an_exact_two_term_engine_interface() {
+        let target = Target {
+            axis: Axis::Z,
+            angle: AngleTarget::AffinePi {
+                radians_numerator: 1.into(),
+                radians_denominator: 3.into(),
+                pi_numerator: 1.into(),
+                pi_denominator: 5.into(),
+            },
+        };
+        assert!(exact_theta(&target, Limits::default()).is_err());
     }
 
     fn independently_certify(sequence: &Sequence, target: &Target) {

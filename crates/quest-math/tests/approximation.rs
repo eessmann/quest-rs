@@ -23,6 +23,143 @@ fn sequence(gates: &[Gate]) -> Sequence {
         operations: gates.iter().copied().map(operation).collect(),
     }
 }
+fn affine(axis: Axis, r_num: i64, r_den: i64, s_num: i64, s_den: i64) -> Target {
+    Target {
+        axis,
+        angle: AngleTarget::AffinePi {
+            radians_numerator: r_num.into(),
+            radians_denominator: r_den.into(),
+            pi_numerator: s_num.into(),
+            pi_denominator: s_den.into(),
+        },
+    }
+}
+#[gtest]
+fn affine_pi_certifies_both_exact_terms_and_retains_target() -> Result<()> {
+    // 1/3 - pi/10 is about 0.01917 radians, so identity passes at 0.03
+    // and fails at 0.01. Neither rational coefficient is dyadic.
+    let target = affine(Axis::Z, 1, 3, -1, 10);
+    let candidate = sequence(&[]);
+    let proof = certify_rotation(&candidate, &target, 0.03f64.to_bits(), Limits::default())?;
+    expect_eq!(proof.target(), &target);
+    expect_true!(
+        certify_rotation(&candidate, &target, 0.01f64.to_bits(), Limits::default()).is_err()
+    );
+    Ok(())
+}
+#[gtest]
+fn affine_pi_reduction_keeps_full_four_pi_phase() -> Result<()> {
+    let identity = sequence(&[]);
+    let negative_identity = sequence(&[Gate::W, Gate::W, Gate::W, Gate::W]);
+    let two_pi = affine(Axis::Z, 0, 1, 2, 1);
+    let four_pi = affine(Axis::Z, 0, 1, 4, 1);
+    certify_rotation(
+        &negative_identity,
+        &two_pi,
+        1e-12f64.to_bits(),
+        Limits::default(),
+    )?;
+    expect_true!(
+        certify_rotation(&identity, &two_pi, 1e-12f64.to_bits(), Limits::default()).is_err()
+    );
+    certify_rotation(&identity, &four_pi, 1e-12f64.to_bits(), Limits::default())?;
+    expect_true!(
+        certify_rotation(
+            &negative_identity,
+            &four_pi,
+            1e-12f64.to_bits(),
+            Limits::default()
+        )
+        .is_err()
+    );
+    Ok(())
+}
+#[gtest]
+fn affine_pi_rejects_bad_denominators_and_input_budget() {
+    let id = sequence(&[]);
+    for target in [affine(Axis::Z, 1, 0, 0, 1), affine(Axis::Z, 0, 1, 1, 0)] {
+        expect_true!(certify_rotation(&id, &target, 0.5f64.to_bits(), Limits::default()).is_err());
+    }
+    let target = affine(Axis::Z, 17, 1, 0, 1);
+    expect_true!(
+        certify_rotation(
+            &id,
+            &target,
+            0.5f64.to_bits(),
+            Limits {
+                coefficient_bits: 4,
+                ..Limits::default()
+            }
+        )
+        .is_err()
+    );
+}
+#[gtest]
+fn large_nondyadic_affine_radians_require_refinement_and_respect_budget() -> Result<()> {
+    let huge = Target {
+        axis: Axis::X,
+        angle: AngleTarget::AffinePi {
+            radians_numerator: std::ops::Add::add(std::ops::Shl::shl(BigInt::from(1), 400usize), 1),
+            radians_denominator: 3.into(),
+            pi_numerator: 0.into(),
+            pi_denominator: 1.into(),
+        },
+    };
+    let candidate = sequence(&[]);
+    expect_true!(certify_rotation(&candidate, &huge, 3.0f64.to_bits(), Limits::default()).is_err());
+    let proof = certify_rotation(
+        &candidate,
+        &huge,
+        3.0f64.to_bits(),
+        Limits {
+            precision_bits: 1024,
+            ..Limits::default()
+        },
+    )?;
+    expect_true!(proof.precision_bits() >= 512);
+    expect_true!(
+        certify_rotation(
+            &candidate,
+            &huge,
+            3.0f64.to_bits(),
+            Limits {
+                coefficient_bits: 400,
+                ..Limits::default()
+            }
+        )
+        .is_err()
+    );
+    let negative_huge = Target {
+        axis: Axis::Y,
+        angle: AngleTarget::AffinePi {
+            radians_numerator: std::ops::Add::add(std::ops::Shl::shl(BigInt::from(1), 400usize), 1),
+            radians_denominator: (-3).into(),
+            pi_numerator: (-1).into(),
+            pi_denominator: (-10).into(),
+        },
+    };
+    expect_true!(
+        certify_rotation(
+            &candidate,
+            &negative_huge,
+            3.0f64.to_bits(),
+            Limits::default()
+        )
+        .is_err()
+    );
+    let negative_proof = certify_rotation(
+        &candidate,
+        &negative_huge,
+        3.0f64.to_bits(),
+        Limits {
+            precision_bits: 1024,
+            ..Limits::default()
+        },
+    )?;
+    expect_true!(negative_proof.precision_bits() >= 512);
+    expect_eq!(negative_proof.target(), &negative_huge);
+    Ok(())
+}
 #[gtest]
 fn mathematical_rotation_certificates_keep_phase_and_input_identity() -> Result<()> {
     let limits = Limits::default();

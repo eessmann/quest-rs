@@ -48,6 +48,9 @@ sequence plus its exact certificate only if a full matrix match succeeds.
 `certify_rotation` accepts a one-qubit candidate and `Rx`, `Ry`, or `Rz` target.
 `DyadicRadians { bits }` denotes the exact rational number encoded by finite
 binary64 bits. `RationalPi` denotes a rational multiple of mathematical π.
+`AffinePi` denotes exact rational radians `r + sπ` with separate numerator and
+denominator fields for each coefficient. The two terms remain exact through
+half-angle reduction and are independently enclosed on each precision grid.
 These identities remain distinct, even when a binary64 value happens to equal
 an ordinary approximation to π. Epsilon likewise denotes an exact, strictly
 positive finite dyadic number. Signed zero in the input DTO remains recorded.
@@ -60,6 +63,9 @@ All production interval endpoints are integers in units of `2^-p`:
    tail contributes less than one more unit. These errors are carried outward
    through the Machin combination.
 2. Rational multiples of π are reduced exactly before interval multiplication.
+   Affine half-angles use `r/2 + (s/2 - 2k)π` for an integer `k` chosen from
+   a grid enclosure. The enclosure of both terms remains outward; input and
+   intermediate coefficient growth are bounded before admission.
    General dyadic half-angles subtract an integer multiple of an interval for
    `2π`; subtraction preserves containment even when the chosen integer is only
    estimated from the midpoint. A reduced interval outside `[-4,4]` triggers

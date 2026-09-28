@@ -11,6 +11,13 @@ pub enum AngleTarget {
         numerator: BigInt,
         denominator: BigInt,
     },
+    /// Exact radians `r + s*pi`, with each coefficient represented as a rational.
+    AffinePi {
+        radians_numerator: BigInt,
+        radians_denominator: BigInt,
+        pi_numerator: BigInt,
+        pi_denominator: BigInt,
+    },
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
