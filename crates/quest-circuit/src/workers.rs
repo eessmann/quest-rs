@@ -1,4 +1,6 @@
 //! Optional candidate replacements. Certificates are owned independently of native resources.
+// These helpers are shared with sibling worker adapters but must not enter the public facade.
+#![expect(clippy::redundant_pub_crate)]
 use crate::model::{Occurrence, SemanticOperation};
 use crate::{
     Angle, BoundAngleTarget, Control, ControlState, Error, Gate, OccurrenceId, QubitId,
@@ -22,6 +24,8 @@ pub enum WorkerError {
     Mathematics(#[from] quest_math::Error),
     #[error("worker transformation resource limit: {0}")]
     Budget(&'static str),
+    #[error("certified worker output rejected after request: {0}")]
+    RejectedOutput(&'static str),
     #[error("explicit ordering constraints are not supported by this worker transformation")]
     Ordering,
 }
@@ -66,8 +70,10 @@ pub struct ZxReport {
     pub skipped: Vec<SkippedCandidate>,
     pub before_operations: usize,
     pub after_operations: usize,
+    /// Original occurrence offsets of the selected beam candidate region.
+    pub candidate_window: Option<(usize, usize)>,
 }
-fn target_angle(angle: &Angle, limits: Limits) -> Result<AngleTarget, WorkerError> {
+pub(crate) fn target_angle(angle: &Angle, limits: Limits) -> Result<AngleTarget, WorkerError> {
     let (_, target) = angle.evaluate_target(&std::collections::BTreeMap::new())?;
     let cap = limits.coefficient_bits.min(16_384);
     let check = |values: &[&num_bigint::BigInt]| {
@@ -110,7 +116,10 @@ fn target_angle(angle: &Angle, limits: Limits) -> Result<AngleTarget, WorkerErro
         }
     })
 }
-fn rotation(operation: &SemanticOperation, limits: Limits) -> Result<Option<Target>, WorkerError> {
+pub(crate) fn rotation(
+    operation: &SemanticOperation,
+    limits: Limits,
+) -> Result<Option<Target>, WorkerError> {
     if let SemanticOperation::Gate { gate, .. } = operation {
         let (axis, angle) = match gate {
             Gate::Rx(angle) => (Axis::X, angle),
@@ -139,7 +148,7 @@ fn positional_controls(controls: &[Control]) -> Result<Vec<quest_math::Control>,
         })
         .collect()
 }
-fn admit_output(count: usize, extra: usize, maximum: usize) -> Result<(), WorkerError> {
+pub(crate) fn admit_output(count: usize, extra: usize, maximum: usize) -> Result<(), WorkerError> {
     if count
         .checked_add(extra)
         .is_none_or(|count| count > maximum.min(16_384))
@@ -204,11 +213,11 @@ fn semantic(
         controls: controls.into(),
     })
 }
-struct ProvenanceBudget {
+pub(crate) struct ProvenanceBudget {
     remaining: usize,
 }
 impl ProvenanceBudget {
-    const fn new(limits: Limits) -> Self {
+    pub(crate) const fn new(limits: Limits) -> Self {
         Self {
             remaining: if limits.bytes < 64 * 1024 * 1024 {
                 limits.bytes
@@ -227,14 +236,17 @@ impl ProvenanceBudget {
             .ok_or(WorkerError::Budget("aggregate provenance bytes"))?;
         Ok(())
     }
-    fn edit(&mut self, program: &ValidatedProgram) -> Result<ProvenanceGraph, WorkerError> {
+    pub(crate) fn edit(
+        &mut self,
+        program: &ValidatedProgram,
+    ) -> Result<ProvenanceGraph, WorkerError> {
         self.remaining = self.remaining.min(program.limits.max_provenance_bytes);
         Ok(ProvenanceGraph::edit(
             Arc::clone(&program.provenance),
             self.remaining,
         )?)
     }
-    fn finish(
+    pub(crate) fn finish(
         self,
         mut graph: ProvenanceGraph,
         next: usize,
@@ -245,7 +257,7 @@ impl ProvenanceBudget {
         graph.retain_next_occurrence(next);
         Ok(Arc::new(graph))
     }
-    fn copy(&mut self, inputs: &[Occurrence]) -> Result<Vec<ProvenanceId>, WorkerError> {
+    pub(crate) fn copy(&mut self, inputs: &[Occurrence]) -> Result<Vec<ProvenanceId>, WorkerError> {
         let count = inputs.len();
         self.charge(count)?;
         let mut ids = Vec::new();
@@ -285,6 +297,45 @@ fn replacement(
                 .ok_or(WorkerError::Budget("occurrence identities"))?;
             id
         };
+        output.push(Occurrence {
+            id,
+            provenance,
+            source: first.source.clone(),
+            operation: semantic(operation, interface)?,
+        });
+    }
+    Ok((output, provenance))
+}
+pub(crate) fn candidate_replacement(
+    sequence: &Sequence,
+    interface: &[QubitId],
+    inputs: &[Occurrence],
+    next: &mut usize,
+    budget: &mut ProvenanceBudget,
+    graph: &mut ProvenanceGraph,
+) -> Result<(Vec<Occurrence>, ProvenanceId), WorkerError> {
+    let first = inputs.first().ok_or(Error::InvalidId)?;
+    budget.charge(
+        sequence
+            .operations
+            .len()
+            .checked_add(1)
+            .ok_or(WorkerError::Budget("candidate report root"))?,
+    )?;
+    let ids = budget.copy(inputs)?;
+    let provenance = graph.rewrite(&ids, budget.remaining)?;
+    let mut output = Vec::new();
+    output
+        .try_reserve_exact(sequence.operations.len())
+        .map_err(|_| WorkerError::Budget("candidate allocation"))?;
+    for operation in &sequence.operations {
+        let id = OccurrenceId {
+            owner: first.id.owner,
+            index: *next,
+        };
+        *next = next
+            .checked_add(1)
+            .ok_or(WorkerError::Budget("candidate occurrence identities"))?;
         output.push(Occurrence {
             id,
             provenance,
@@ -492,12 +543,12 @@ fn quantum_sequence(operations: &[Occurrence], interface: &[QubitId]) -> Option<
         operations: output,
     })
 }
-struct QuantumWindow {
-    end: usize,
-    interface: Vec<QubitId>,
-    sequence: Option<Sequence>,
+pub(crate) struct QuantumWindow {
+    pub(crate) end: usize,
+    pub(crate) interface: Vec<QubitId>,
+    pub(crate) sequence: Option<Sequence>,
 }
-fn quantum_window(
+pub(crate) fn quantum_window(
     occurrences: &[Occurrence],
     offset: usize,
     limits: Limits,
@@ -537,6 +588,169 @@ fn quantum_window(
     })
 }
 impl ValidatedProgram {
+    /// Produce one exact certified ZX region candidate for beam scoring.
+    /// An unsupported operation is a fence; a worker/admission error propagates.
+    /// Candidate length may grow within the supplied whole-program output cap.
+    /// # Errors
+    /// Rejects invalid ordering, exhausted budgets, worker failures, or failed certificates.
+    pub fn zx_candidate(
+        self,
+        client: &Client,
+        seed: u64,
+        limits: Limits,
+        max_requests: usize,
+        max_output_operations: usize,
+    ) -> Result<(Self, ZxReport), WorkerError> {
+        self.zx_candidate_from(0, client, seed, limits, max_requests, max_output_operations)
+    }
+    /// Generate the first independently certified region at or after `start_offset`.
+    /// Each successful call uses one worker request and records the selected span.
+    /// # Errors
+    /// Rejects an invalid offset, ordering, budget, worker error, or failed certificate.
+    pub fn zx_candidate_from(
+        self,
+        start_offset: usize,
+        client: &Client,
+        seed: u64,
+        limits: Limits,
+        max_requests: usize,
+        max_output_operations: usize,
+    ) -> Result<(Self, ZxReport), WorkerError> {
+        self.zx_candidate_from_mode(
+            start_offset,
+            client,
+            seed,
+            limits,
+            max_requests,
+            max_output_operations,
+            false,
+        )
+    }
+    /// Generate the independently certified expanded ZX candidate from the
+    /// first eligible region at or after `start_offset`. Operation growth is
+    /// allowed within `max_output_operations` for cost-based selection.
+    /// # Errors
+    /// Rejects an invalid offset, ordering, budget, worker error, or failed certificate.
+    pub fn zx_expanded_candidate_from(
+        self,
+        start_offset: usize,
+        client: &Client,
+        seed: u64,
+        limits: Limits,
+        max_requests: usize,
+        max_output_operations: usize,
+    ) -> Result<(Self, ZxReport), WorkerError> {
+        self.zx_candidate_from_mode(
+            start_offset,
+            client,
+            seed,
+            limits,
+            max_requests,
+            max_output_operations,
+            true,
+        )
+    }
+    #[expect(
+        clippy::too_many_arguments,
+        reason = "Shared baseline and expanded candidate path"
+    )]
+    fn zx_candidate_from_mode(
+        self,
+        start_offset: usize,
+        client: &Client,
+        seed: u64,
+        limits: Limits,
+        max_requests: usize,
+        max_output_operations: usize,
+        expanded: bool,
+    ) -> Result<(Self, ZxReport), WorkerError> {
+        if start_offset > self.occurrences.len() {
+            return Err(Error::InvalidId.into());
+        }
+        if !self.explicit_edges.is_empty() {
+            return Err(WorkerError::Ordering);
+        }
+        if self.occurrences.len() > 16_384 || self.occurrences.len() > max_output_operations {
+            return Err(WorkerError::Budget("candidate input/output operations"));
+        }
+        if max_requests == 0 {
+            return Err(WorkerError::Budget("ZX candidate requests"));
+        }
+        let mut report = ZxReport {
+            provenance: Arc::clone(&self.provenance),
+            before_operations: self.occurrences.len(),
+            after_operations: self.occurrences.len(),
+            ..ZxReport::default()
+        };
+        let mut budget = ProvenanceBudget::new(limits);
+        let mut graph = budget.edit(&self)?;
+        let mut next = graph.next_occurrence();
+        for offset in start_offset..self.occurrences.len() {
+            let QuantumWindow {
+                end,
+                interface,
+                sequence,
+            } = quantum_window(&self.occurrences, offset, limits)?;
+            let Some(sequence) = sequence else { continue };
+            let region = self.occurrences.get(offset..end).ok_or(Error::InvalidId)?;
+            let certificate = if expanded {
+                client.optimize_zx_expanded(&sequence, seed, limits)?
+            } else {
+                client.optimize_zx_baseline(&sequence, seed, limits)?
+            };
+            let outside = self
+                .occurrences
+                .len()
+                .checked_sub(region.len())
+                .ok_or(WorkerError::Budget("candidate output operations"))?;
+            admit_output(
+                outside,
+                certificate.candidate().operations.len(),
+                max_output_operations.min(self.limits.max_operations),
+            )?;
+            let ids = budget.copy(region)?;
+            let (replacement, provenance) = candidate_replacement(
+                certificate.candidate(),
+                &interface,
+                region,
+                &mut next,
+                &mut budget,
+                &mut graph,
+            )?;
+            let size = outside
+                .checked_add(replacement.len())
+                .ok_or(WorkerError::Budget("candidate output operations"))?;
+            let mut output = Vec::new();
+            output
+                .try_reserve_exact(size)
+                .map_err(|_| WorkerError::Budget("candidate allocation"))?;
+            output.extend_from_slice(self.occurrences.get(..offset).ok_or(Error::InvalidId)?);
+            output.extend(replacement);
+            output.extend_from_slice(self.occurrences.get(end..).ok_or(Error::InvalidId)?);
+            report.accepted.push(ExactRegionCertificate {
+                occurrences: ids,
+                provenance,
+                interface,
+                seed,
+                certificate,
+            });
+            report.after_operations = output.len();
+            report.candidate_window = Some((offset, end));
+            report.provenance = budget.finish(graph, next)?;
+            let program = Self::from_parts(
+                self.owner,
+                self.num_qubits,
+                self.num_bits,
+                self.parameters,
+                output,
+                self.explicit_edges,
+                self.limits,
+                Arc::clone(&report.provenance),
+            )?;
+            return Ok((program, report));
+        }
+        Ok((self, report))
+    }
     /// Optional bounded ZX regions. Failures and unprofitable candidates retain
     /// every original occurrence and are recorded as skipped. Each replacement
     /// requires complete exact matrix equality, including its recovered phase.
@@ -653,6 +867,13 @@ impl ValidatedProgram {
 mod review_tests {
     use super::*;
     use googletest::{Result, prelude::*};
+    #[gtest]
+    fn zx_quarter_turn_admission_retains_pi_conversion_obligation() -> Result<()> {
+        let huge = num_bigint::BigInt::from(10).pow(400);
+        let angle = Angle::rational_pi(crate::BigRational::from_integer(huge))?;
+        expect_eq!(quarter_turns(&angle), None);
+        Ok(())
+    }
     #[gtest]
     fn borrowed_negative_targets_preserve_identity_and_apply_leaf_bit_limits() -> Result<()> {
         let value = Angle::pi(3, 8)?;

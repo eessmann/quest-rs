@@ -19,10 +19,14 @@ mod oracle;
 pub use oracle::{NeedsOracleTolerance, OracleBuilder, OracleFragment, OracleTolerance};
 mod linear;
 pub use linear::{
-    Cnot, LinearOptions, LinearReport, LinearRewrite, LinearSynthesis, synthesize_cnot,
+    Cnot, LinearCandidateStrategy, LinearOptions, LinearReport, LinearRewrite, LinearSynthesis,
+    synthesize_cnot,
 };
 mod parity;
-pub use parity::{AffinePhaseOperation, ParityOptions, ParityReport, ParitySynthesis, fold_parity};
+pub use parity::{
+    AffinePhaseOperation, ParityOptions, ParityReport, ParitySynthesis, fold_parity,
+    fold_parity_candidate,
+};
 mod matrix;
 mod model;
 mod optimize;

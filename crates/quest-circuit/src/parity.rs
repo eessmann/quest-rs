@@ -28,6 +28,7 @@ use crate::{
 use num_bigint::BigInt;
 use num_traits::{Signed, Zero};
 use std::{collections::BTreeMap, sync::Arc};
+mod bound;
 
 /// Straight-line adapter shared by program windows and external block frontends.
 /// Coefficients multiply mathematical pi; these DTOs are admitted on every call.
@@ -78,6 +79,8 @@ pub struct ParityReport {
     pub after_operations: usize,
     pub considered_windows: usize,
     pub accepted_windows: usize,
+    /// Original occurrence offsets of the selected beam candidate window.
+    pub candidate_window: Option<(usize, usize)>,
     pub work: usize,
     pub rewrites: Vec<LinearRewrite>,
     pub provenance: Arc<ProvenanceGraph>,
@@ -250,39 +253,57 @@ fn candidate(
     work: &mut Work,
 ) -> Result<Option<Vec<AffinePhaseOperation>>> {
     let mut output = vec![];
-    for (&mask, coefficient) in &signature.phases {
-        if mask == 0 {
-            output.push(AffinePhaseOperation::GlobalPhase {
-                coefficient: coefficient.clone(),
-            });
-        } else {
-            let target = usize::try_from(mask.trailing_zeros())
-                .map_err(|_| Error::Budget("parity target"))?;
-            let mut compute = vec![];
-            for control in 0..signature.rows.len() {
-                work.charge(1)?;
-                if control != target && mask & linear::bit(control)? != 0 {
-                    compute.push(Cnot { control, target });
-                }
-            }
-            let count = compute
+    if let Some(coefficient) = signature.phases.get(&0) {
+        output.push(AffinePhaseOperation::GlobalPhase {
+            coefficient: coefficient.clone(),
+        });
+    }
+    for target in 0..signature.rows.len() {
+        let pivot = linear::bit(target)?;
+        let mut current = pivot;
+        for (&mask, coefficient) in signature.phases.iter().filter(|(mask, _)| {
+            **mask != 0 && usize::try_from(mask.trailing_zeros()).ok() == Some(target)
+        }) {
+            let difference = current ^ mask;
+            let count = output
                 .len()
-                .checked_mul(2)
-                .and_then(|n| n.checked_add(output.len()))
+                .checked_add(
+                    usize::try_from(difference.count_ones())
+                        .map_err(|_| Error::Budget("parity candidate"))?,
+                )
                 .and_then(|n| n.checked_add(1))
                 .ok_or(Error::Budget("parity candidate"))?;
             if count >= limit {
                 return Ok(None);
             }
-            output.extend(compute.iter().copied().map(AffinePhaseOperation::Cnot));
+            for control in 0..signature.rows.len() {
+                work.charge(1)?;
+                if difference & linear::bit(control)? != 0 {
+                    output.push(AffinePhaseOperation::Cnot(Cnot { control, target }));
+                }
+            }
             output.push(AffinePhaseOperation::Phase {
                 target,
                 coefficient: coefficient.clone(),
             });
-            output.extend(compute.into_iter().rev().map(AffinePhaseOperation::Cnot));
+            current = mask;
         }
-        if output.len() >= limit {
+        let restore = current ^ pivot;
+        let count = output
+            .len()
+            .checked_add(
+                usize::try_from(restore.count_ones())
+                    .map_err(|_| Error::Budget("parity candidate"))?,
+            )
+            .ok_or(Error::Budget("parity candidate"))?;
+        if count >= limit {
             return Ok(None);
+        }
+        for control in 0..signature.rows.len() {
+            work.charge(1)?;
+            if restore & linear::bit(control)? != 0 {
+                output.push(AffinePhaseOperation::Cnot(Cnot { control, target }));
+            }
         }
     }
     let (gaussian, pmh) = linear::synthesize_rows(&signature.rows, options.linear, work)?;
@@ -347,6 +368,45 @@ pub fn fold_parity(
             maximum: options.linear.max_work,
         },
     )
+}
+/// Generate a bounded exact parity candidate without requiring it to be shorter.
+/// The existing `fold_parity` pass still accepts only a strict shortening.
+///
+/// # Errors
+/// Rejects invalid input, exhausted work/storage bounds, or a candidate above
+/// `max_output_operations` (also capped by the configured window limit).
+pub fn fold_parity_candidate(
+    width: usize,
+    input: &[AffinePhaseOperation],
+    options: ParityOptions,
+    max_output_operations: usize,
+) -> Result<ParitySynthesis> {
+    let mut work = Work {
+        used: 0,
+        maximum: options.linear.max_work,
+    };
+    fold_candidate_with_work(width, input, options, max_output_operations, &mut work)
+}
+fn fold_candidate_with_work(
+    width: usize,
+    input: &[AffinePhaseOperation],
+    options: ParityOptions,
+    max_output_operations: usize,
+    work: &mut Work,
+) -> Result<ParitySynthesis> {
+    input_preflight(width, input, options)?;
+    let expected = signature(width, input, options, work)?;
+    let exclusive = max_output_operations
+        .min(options.linear.max_window_operations)
+        .checked_add(1)
+        .ok_or(Error::Budget("parity candidate output"))?;
+    let operations = candidate(&expected, exclusive, options, work)?
+        .ok_or(Error::Budget("parity candidate output"))?;
+    input_preflight(width, &operations, options)?;
+    if signature(width, &operations, options, work)? != expected {
+        return Err(Error::NotUnitary);
+    }
+    Ok(ParitySynthesis { operations })
 }
 fn rational_angle(angle: &Angle) -> Option<BigRational> {
     let coefficient = angle.rational_pi_identity()?;
@@ -469,6 +529,150 @@ fn operation(value: AffinePhaseOperation, owner: u64) -> Result<SemanticOperatio
     })
 }
 impl ValidatedProgram {
+    /// Produce one bounded exact affine-window candidate for beam scoring.
+    /// The window may expand; every replacement receives fresh execution IDs.
+    /// Unsupported operations delimit windows and explicit ordering is rejected.
+    /// # Errors
+    /// Rejects malformed input, ordering constraints, or exhausted work/storage/output limits.
+    pub fn resynthesize_parity_candidate(
+        self,
+        options: ParityOptions,
+        max_output_operations: usize,
+    ) -> Result<(Self, ParityReport)> {
+        self.parity_candidate_from(0, options, max_output_operations)
+    }
+    /// Beam-compatible first-window alias for exact parity candidates.
+    /// # Errors
+    /// Rejects invalid ordering, exhausted budgets, or an uncertified candidate.
+    pub fn parity_candidate(
+        self,
+        options: ParityOptions,
+        max_output_operations: usize,
+    ) -> Result<(Self, ParityReport)> {
+        self.parity_candidate_from(0, options, max_output_operations)
+    }
+    /// Generate the first eligible candidate at or after `start_offset`.
+    /// Callers can enumerate later disjoint windows even when an earlier
+    /// proposal is not selected for a beam.
+    /// # Errors
+    /// Rejects an invalid offset, ordering, budget, or exactness failure.
+    #[expect(
+        clippy::too_many_lines,
+        reason = "Keep bounded window admission, exact replay and provenance publication in one transaction"
+    )]
+    pub fn parity_candidate_from(
+        self,
+        start_offset: usize,
+        options: ParityOptions,
+        max_output_operations: usize,
+    ) -> Result<(Self, ParityReport)> {
+        input_preflight(self.num_qubits, &[], options)?;
+        if start_offset > self.occurrences.len() {
+            return Err(Error::InvalidId);
+        }
+        if !self.explicit_edges.is_empty() {
+            return Err(Error::Unsupported("parity candidate explicit ordering"));
+        }
+        if self.occurrences.len() > max_output_operations {
+            return Err(Error::Budget("parity candidate output"));
+        }
+        let mut report = ParityReport {
+            before_operations: self.occurrences.len(),
+            after_operations: self.occurrences.len(),
+            provenance: Arc::clone(&self.provenance),
+            ..ParityReport::default()
+        };
+        let options = ParityOptions {
+            linear: linear::program_preflight(&self, options.linear)?,
+            ..options
+        };
+        let mut work = linear::program_work(&self, options.linear)?;
+        let Some(offset) = self
+            .occurrences
+            .iter()
+            .enumerate()
+            .skip(start_offset)
+            .find_map(|(index, item)| admitted(&item.operation).then_some(index))
+        else {
+            report.work = work.used;
+            return Ok((self, report));
+        };
+        let count = self
+            .occurrences
+            .iter()
+            .skip(offset)
+            .take(options.linear.max_window_operations)
+            .take_while(|item| admitted(&item.operation))
+            .count();
+        if count == 0 {
+            return Err(Error::Budget("parity candidate window"));
+        }
+        work.charge(count)?;
+        allocation_preflight(self.num_qubits, count, options)?;
+        let end = offset
+            .checked_add(count)
+            .ok_or(Error::Budget("parity candidate window"))?;
+        let window = self.occurrences.get(offset..end).ok_or(Error::InvalidId)?;
+        for item in window {
+            source_coefficient_check(&item.operation, options)?;
+        }
+        let input = window
+            .iter()
+            .map(|item| adapter(&item.operation).ok_or(Error::InvalidId))
+            .collect::<Result<Vec<_>>>()?;
+        let outside = self
+            .occurrences
+            .len()
+            .checked_sub(count)
+            .ok_or(Error::Budget("parity candidate output"))?;
+        let room = max_output_operations
+            .checked_sub(outside)
+            .ok_or(Error::Budget("parity candidate output"))?;
+        let synthesized =
+            fold_candidate_with_work(self.num_qubits, &input, options, room, &mut work)?;
+        let operations = synthesized
+            .operations
+            .into_iter()
+            .map(|value| operation(value, self.owner))
+            .collect::<Result<Vec<_>>>()?;
+        let mut graph = ProvenanceGraph::edit(
+            Arc::clone(&self.provenance),
+            options
+                .linear
+                .max_bytes
+                .min(self.limits.max_provenance_bytes),
+        )?;
+        let (replacement, rewrite) =
+            linear::replacement_candidate(window, operations, room, options.linear, &mut graph)?;
+        let output_len = outside
+            .checked_add(replacement.len())
+            .ok_or(Error::Budget("parity candidate output"))?;
+        let mut output = Vec::new();
+        output
+            .try_reserve_exact(output_len)
+            .map_err(|_| Error::Budget("parity candidate allocation"))?;
+        output.extend_from_slice(self.occurrences.get(..offset).ok_or(Error::InvalidId)?);
+        output.extend(replacement);
+        output.extend_from_slice(self.occurrences.get(end..).ok_or(Error::InvalidId)?);
+        report.considered_windows = 1;
+        report.accepted_windows = 1;
+        report.candidate_window = Some((offset, end));
+        report.after_operations = output.len();
+        report.work = work.used;
+        report.rewrites.push(rewrite);
+        report.provenance = Arc::new(graph);
+        let result = Self::from_parts(
+            self.owner,
+            self.num_qubits,
+            self.num_bits,
+            self.parameters,
+            output,
+            self.explicit_edges,
+            self.limits,
+            Arc::clone(&report.provenance),
+        )?;
+        Ok((result, report))
+    }
     /// Fold bounded contiguous rational-pi affine windows. Effects, unsupported
     /// controls and opaque/symbolic angles stop a window; explicit edges disable rewriting.
     /// # Errors

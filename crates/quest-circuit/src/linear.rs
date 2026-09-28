@@ -35,6 +35,12 @@ pub struct LinearOptions {
     pub max_work: usize,
     pub max_bytes: usize,
 }
+/// Algebraic candidate choice; comparison belongs to the enclosing search.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LinearCandidateStrategy {
+    Gaussian,
+    Pmh,
+}
 impl Default for LinearOptions {
     fn default() -> Self {
         Self {
@@ -337,6 +343,67 @@ pub fn replacement(
     };
     Ok((output, rewrite))
 }
+/// Bounded expansion uses fresh execution occurrences and immediate history.
+pub fn replacement_candidate(
+    window: &[Occurrence],
+    operations: Vec<SemanticOperation>,
+    max_output_operations: usize,
+    options: LinearOptions,
+    provenance: &mut ProvenanceGraph,
+) -> Result<(Vec<Occurrence>, LinearRewrite)> {
+    if operations.len() > max_output_operations {
+        return Err(Error::Budget("candidate output operations"));
+    }
+    let payload = operations.iter().try_fold(0usize, |sum, operation| {
+        sum.checked_add(operation.retained_bytes()?)
+            .ok_or(Error::Budget("candidate payload storage"))
+    })?;
+    let bytes = operations
+        .len()
+        .checked_mul(1024)
+        .and_then(|n| {
+            window
+                .len()
+                .checked_mul(size_of::<ProvenanceId>())
+                .and_then(|m| n.checked_add(m))
+        })
+        .and_then(|n| n.checked_add(payload))
+        .ok_or(Error::Budget("candidate replacement storage"))?;
+    let graph_limit = options
+        .max_bytes
+        .checked_sub(bytes)
+        .ok_or(Error::Budget("candidate replacement storage"))?;
+    let first = window.first().ok_or(Error::InvalidId)?;
+    let inputs: Vec<_> = window.iter().map(|item| item.provenance).collect();
+    let history = provenance.rewrite(&inputs, graph_limit)?;
+    let mut output = Vec::new();
+    output
+        .try_reserve_exact(operations.len())
+        .map_err(|_| Error::Budget("candidate allocation"))?;
+    let mut next = provenance.next_occurrence();
+    for operation in operations {
+        let id = OccurrenceId {
+            owner: first.id.owner,
+            index: next,
+        };
+        next = next
+            .checked_add(1)
+            .ok_or(Error::Budget("candidate occurrence identities"))?;
+        output.push(Occurrence {
+            id,
+            provenance: history,
+            source: first.source.clone(),
+            operation,
+        });
+    }
+    provenance.retain_next_occurrence(next);
+    let rewrite = LinearRewrite {
+        inputs,
+        provenance: history,
+        outputs: output.iter().map(|item| item.id).collect(),
+    };
+    Ok((output, rewrite))
+}
 // Reserve output/report storage before cloning occurrences; history is copied only once.
 pub fn program_preflight(
     program: &ValidatedProgram,
@@ -388,6 +455,50 @@ impl ValidatedProgram {
     /// # Errors
     /// Rejects exhausted pass budgets or an invalid rebuilt dependency graph.
     pub fn optimize_linear(self, options: LinearOptions) -> Result<(Self, LinearReport)> {
+        let max_output = self.limits.max_operations;
+        self.linear_pass(options, None, max_output)
+    }
+    /// Generate a replay-verified algebraic candidate, even when it is longer.
+    /// Each positive-CNOT window is independent; mandatory edges disable rewriting.
+    /// # Errors
+    /// Rejects exhausted output, work or retained-storage limits transactionally.
+    pub fn resynthesize_linear_candidate(
+        self,
+        options: LinearOptions,
+        strategy: LinearCandidateStrategy,
+        max_output_operations: usize,
+    ) -> Result<(Self, LinearReport)> {
+        if max_output_operations > self.limits.max_operations
+            || max_output_operations < self.occurrences.len()
+        {
+            return Err(Error::Budget("linear candidate output"));
+        }
+        let output_bytes = max_output_operations
+            .checked_mul(1024)
+            .ok_or(Error::Budget("linear candidate storage"))?;
+        let max_bytes = options
+            .max_bytes
+            .checked_sub(output_bytes)
+            .ok_or(Error::Budget("linear candidate storage"))?;
+        self.linear_pass(
+            LinearOptions {
+                max_bytes,
+                ..options
+            },
+            Some(strategy),
+            max_output_operations,
+        )
+    }
+    #[expect(
+        clippy::too_many_lines,
+        reason = "Keep bounded synthesis, independent replay and transactional candidate publication together"
+    )]
+    fn linear_pass(
+        self,
+        options: LinearOptions,
+        strategy: Option<LinearCandidateStrategy>,
+        max_output: usize,
+    ) -> Result<(Self, LinearReport)> {
         preflight(self.num_qubits, 0, options)?;
         if options.max_window_operations == 0 {
             return Err(Error::Budget("linear window"));
@@ -411,6 +522,9 @@ impl ValidatedProgram {
         let mut offset = 0;
         while let Some(current) = self.occurrences.get(offset) {
             if cnot(&current.operation).is_none() {
+                if output.len() >= max_output {
+                    return Err(Error::Budget("linear candidate output"));
+                }
                 output.push(current.clone());
                 offset = offset
                     .checked_add(1)
@@ -446,21 +560,30 @@ impl ValidatedProgram {
                 .pmh_operations
                 .checked_add(pmh.len())
                 .ok_or(Error::Budget("linear report"))?;
-            let best = if pmh.len() < gaussian.len() {
-                pmh
-            } else {
-                gaussian
+            let best = match strategy {
+                Some(LinearCandidateStrategy::Pmh) => pmh,
+                None if pmh.len() < gaussian.len() => pmh,
+                Some(LinearCandidateStrategy::Gaussian) | None => gaussian,
             };
-            if best.len() < input.len() {
+            if strategy.is_some() || best.len() < input.len() {
                 work.charge(window.len())?;
-                let (replacement, rewrite) = replacement(
-                    window,
-                    best.into_iter()
-                        .map(|gate| cnot_operation(gate, self.owner))
-                        .collect(),
-                    options,
-                    &mut provenance,
-                )?;
+                let operations = best
+                    .into_iter()
+                    .map(|gate| cnot_operation(gate, self.owner))
+                    .collect();
+                let (replacement, rewrite) = if strategy.is_some() {
+                    replacement_candidate(
+                        window,
+                        operations,
+                        max_output
+                            .checked_sub(output.len())
+                            .ok_or(Error::Budget("linear candidate output"))?,
+                        options,
+                        &mut provenance,
+                    )?
+                } else {
+                    replacement(window, operations, options, &mut provenance)?
+                };
                 output.extend(replacement);
                 report.rewrites.push(rewrite);
                 report.accepted_windows = report
@@ -471,6 +594,9 @@ impl ValidatedProgram {
                 output.extend_from_slice(window);
             }
             offset = end;
+            if output.len() > max_output {
+                return Err(Error::Budget("linear candidate output"));
+            }
         }
         report.work = work.used;
         report.after_operations = output.len();

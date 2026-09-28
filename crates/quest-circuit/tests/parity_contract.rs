@@ -1,5 +1,7 @@
 use googletest::{Result, prelude::*};
-use quest_circuit::{AffinePhaseOperation as A, BigRational, Cnot, ParityOptions, fold_parity};
+use quest_circuit::{
+    AffinePhaseOperation as A, BigRational, Cnot, ParityOptions, fold_parity, fold_parity_candidate,
+};
 
 #[gtest]
 fn complemented_rz_keeps_the_exact_scalar_phase() -> Result<()> {
@@ -54,6 +56,248 @@ fn repeated_parity_phase_and_affine_x_network_fold_exactly() -> Result<()> {
         )
         .is_err()
     );
+    Ok(())
+}
+
+#[gtest]
+fn shared_pivot_reuses_symmetric_difference_and_restores_the_wire() -> Result<()> {
+    let cx10 = A::Cnot(Cnot {
+        control: 1,
+        target: 0,
+    });
+    let cx20 = A::Cnot(Cnot {
+        control: 2,
+        target: 0,
+    });
+    let phase = A::Phase {
+        target: 0,
+        coefficient: BigRational::new(1.into(), 4.into()),
+    };
+    let source = [
+        cx10.clone(),
+        phase.clone(),
+        cx10.clone(),
+        cx10.clone(),
+        cx20.clone(),
+        phase,
+        cx20,
+        cx10,
+    ];
+    let result = fold_parity(3, &source, ParityOptions::default())?;
+    expect_eq!(result.operations().len(), 6);
+    for basis in 0..8 {
+        expect_eq!(
+            evaluate(&source, basis),
+            evaluate(result.operations(), basis)
+        );
+    }
+    Ok(())
+}
+
+#[gtest]
+fn parity_candidate_can_be_longer_while_the_existing_pass_retains_input() -> Result<()> {
+    let phase = A::Phase {
+        target: 0,
+        coefficient: BigRational::new(1.into(), 4.into()),
+    };
+    let source = [
+        phase.clone(),
+        A::Cnot(Cnot {
+            control: 1,
+            target: 0,
+        }),
+        phase,
+    ];
+    let candidate = fold_parity_candidate(2, &source, ParityOptions::default(), 5)?;
+    expect_eq!(candidate.operations().len(), 5);
+    for basis in 0..4 {
+        expect_eq!(
+            evaluate(&source, basis),
+            evaluate(candidate.operations(), basis)
+        );
+    }
+    expect_true!(fold_parity_candidate(2, &source, ParityOptions::default(), 4).is_err());
+    expect_eq!(
+        fold_parity(2, &source, ParityOptions::default())?.operations(),
+        &source
+    );
+    Ok(())
+}
+
+#[gtest]
+fn program_candidate_expands_a_window_after_a_fence_with_fresh_ids() -> Result<()> {
+    use quest_circuit::{Gate, ProgramBuilder};
+    let mut builder = ProgramBuilder::new(2, 0)?;
+    let q = builder.qubit(0)?;
+    let r = builder.qubit(1)?;
+    builder.gate(Gate::H, &[q], &[])?;
+    builder.gate(Gate::T, &[q], &[])?;
+    builder.gate(
+        Gate::X,
+        &[q],
+        &[quest_circuit::Control::new(
+            r,
+            quest_circuit::ControlState::One,
+        )],
+    )?;
+    builder.gate(Gate::T, &[q], &[])?;
+    let original = builder.finish()?;
+    let (candidate, report) = original
+        .clone()
+        .resynthesize_parity_candidate(ParityOptions::default(), 6)?;
+    expect_eq!(candidate.schedule().len(), 6);
+    expect_eq!(report.accepted_windows, 1);
+    let ids = candidate
+        .schedule()
+        .iter()
+        .copied()
+        .collect::<std::collections::BTreeSet<_>>();
+    expect_eq!(ids.len(), 6);
+    candidate.bind(&[])?.plan()?;
+    let (unchanged, _) = original.optimize_parity(ParityOptions::default())?;
+    expect_eq!(unchanged.schedule().len(), 4);
+    Ok(())
+}
+
+#[gtest]
+fn program_candidate_can_start_after_an_earlier_affine_window() -> Result<()> {
+    use quest_circuit::{Gate, ProgramBuilder};
+    let mut builder = ProgramBuilder::new(2, 0)?;
+    let q = builder.qubit(0)?;
+    let r = builder.qubit(1)?;
+    builder.gate(Gate::T, &[q], &[])?;
+    builder.gate(Gate::H, &[q], &[])?;
+    builder.gate(Gate::T, &[q], &[])?;
+    builder.gate(
+        Gate::X,
+        &[q],
+        &[quest_circuit::Control::new(
+            r,
+            quest_circuit::ControlState::One,
+        )],
+    )?;
+    builder.gate(Gate::T, &[q], &[])?;
+    let original = builder.finish()?;
+    let retained = original.schedule()[0..2].to_vec();
+    let (candidate, report) = original.parity_candidate_from(2, ParityOptions::default(), 7)?;
+    expect_eq!(report.accepted_windows, 1);
+    expect_eq!(report.candidate_window, Some((2, 5)));
+    expect_eq!(candidate.schedule().len(), 7);
+    expect_eq!(&candidate.schedule()[0..2], retained.as_slice());
+    candidate.bind(&[])?.plan()?;
+    Ok(())
+}
+
+#[gtest]
+fn bound_symbolic_parity_cancels_only_after_original_binding_and_keeps_source_identity()
+-> Result<()> {
+    use quest_circuit::{Angle, Gate, ProgramBuilder};
+    let mut builder = ProgramBuilder::new(1, 0)?;
+    let p = builder.parameter("p")?;
+    let q = builder.qubit(0)?;
+    let angle = Angle::parameter(p)?;
+    builder.gate(Gate::Phase(angle.clone()), &[q], &[])?;
+    builder.gate(Gate::Phase(angle.negated()?), &[q], &[])?;
+    let ideal = builder.finish()?;
+    let bound = ideal.clone().bind(&[(p, 0.25)])?;
+    let (candidate, report) =
+        ideal.parity_bound_candidate_from(&bound, 0, ParityOptions::default(), 2)?;
+    expect_eq!(report.accepted_windows, 1);
+    expect_eq!(candidate.instructions().len(), 0);
+    expect_eq!(candidate.source_snapshot_id(), bound.source_snapshot_id());
+    candidate.plan()?;
+    Ok(())
+}
+
+#[gtest]
+fn bound_symbolic_parity_falls_back_on_new_overflow_and_rejects_foreign_bound_input() -> Result<()>
+{
+    use quest_circuit::{Angle, Gate, ProgramBuilder};
+    let mut builder = ProgramBuilder::new(1, 0)?;
+    let p = builder.parameter("p")?;
+    let q = builder.qubit(0)?;
+    let angle = Angle::parameter(p)?;
+    builder.gate(Gate::Phase(angle.clone()), &[q], &[])?;
+    builder.gate(Gate::Phase(angle), &[q], &[])?;
+    let ideal = builder.finish()?;
+    let bound = ideal.clone().bind(&[(p, f64::MAX)])?;
+    let (candidate, report) =
+        ideal.parity_bound_candidate_from(&bound, 0, ParityOptions::default(), 2)?;
+    expect_eq!(report.accepted_windows, 0);
+    expect_eq!(candidate.snapshot_id(), bound.snapshot_id());
+    let mut foreign_builder = ProgramBuilder::new(1, 0)?;
+    foreign_builder.gate(Gate::X, &[foreign_builder.qubit(0)?], &[])?;
+    let foreign = foreign_builder.finish()?.bind(&[])?;
+    expect_true!(
+        ideal
+            .parity_bound_candidate_from(&foreign, 0, ParityOptions::default(), 2)
+            .is_err()
+    );
+    Ok(())
+}
+
+#[gtest]
+fn bound_parity_keeps_rz_two_pi_scalar_and_signed_zero_source() -> Result<()> {
+    use quest_circuit::{Angle, Gate, Operation, ProgramBuilder};
+    let mut builder = ProgramBuilder::new(1, 0)?;
+    let q = builder.qubit(0)?;
+    builder.gate(Gate::Rz(Angle::pi(2, 1)?), &[q], &[])?;
+    let ideal = builder.finish()?;
+    let bound = ideal.clone().bind(&[])?;
+    let (candidate, report) =
+        ideal.parity_bound_candidate_from(&bound, 0, ParityOptions::default(), 1)?;
+    expect_eq!(report.accepted_windows, 1);
+    let [phase] = candidate.instructions() else {
+        return Err(std::io::Error::other("expected scalar phase").into());
+    };
+    expect_true!(
+        matches!(phase.operation(), Operation::GlobalPhase { radians, controls }
+        if radians.to_bits() == std::f64::consts::PI.to_bits() && controls.is_empty())
+    );
+
+    let mut builder = ProgramBuilder::new(1, 0)?;
+    let p = builder.parameter("p")?;
+    let q = builder.qubit(0)?;
+    builder.gate(Gate::Phase(Angle::parameter(p)?), &[q], &[])?;
+    let ideal = builder.finish()?;
+    let bound = ideal.clone().bind(&[(p, -0.0)])?;
+    let (candidate, report) =
+        ideal.parity_bound_candidate_from(&bound, 0, ParityOptions::default(), 1)?;
+    expect_eq!(report.accepted_windows, 0);
+    expect_eq!(candidate.snapshot_id(), bound.snapshot_id());
+    Ok(())
+}
+
+#[gtest]
+fn bound_parity_precharges_original_binding_and_independent_affine_replay() -> Result<()> {
+    use quest_circuit::{Angle, Gate, LinearOptions, ProgramBuilder};
+    let mut builder = ProgramBuilder::new(1, 0)?;
+    let p = builder.parameter("p")?;
+    let q = builder.qubit(0)?;
+    let mixed = Angle::parameter(p)?.added(&Angle::affine(
+        BigRational::new(1.into(), 8.into()),
+        BigRational::new(1.into(), 4.into()),
+    )?)?;
+    builder.gate(Gate::Phase(mixed.clone()), &[q], &[])?;
+    builder.gate(Gate::Phase(mixed.negated()?), &[q], &[])?;
+    let ideal = builder.finish()?;
+    let bound = ideal.clone().bind(&[(p, 0.5)])?;
+    let options = ParityOptions {
+        linear: LinearOptions {
+            max_work: 3,
+            ..LinearOptions::default()
+        },
+        ..ParityOptions::default()
+    };
+    expect_true!(
+        ideal
+            .parity_bound_candidate_from(&bound, 0, options, 2)
+            .is_err()
+    );
+    let (candidate, report) =
+        ideal.parity_bound_candidate_from(&bound, 0, ParityOptions::default(), 2)?;
+    expect_eq!(report.accepted_windows, 1);
+    expect_true!(candidate.instructions().is_empty());
     Ok(())
 }
 

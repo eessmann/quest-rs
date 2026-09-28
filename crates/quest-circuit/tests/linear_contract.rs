@@ -1,6 +1,72 @@
 use googletest::{Result, prelude::*};
 use quest_circuit::{Cnot, LinearOptions, synthesize_cnot};
 
+#[gtest]
+fn candidate_generation_is_independent_of_local_shortening() -> Result<()> {
+    use quest_circuit::{Control, ControlState, Gate, LinearCandidateStrategy, ProgramBuilder};
+    let input = [
+        Cnot {
+            control: 0,
+            target: 1,
+        },
+        Cnot {
+            control: 1,
+            target: 2,
+        },
+        Cnot {
+            control: 2,
+            target: 0,
+        },
+    ];
+    let mut b = ProgramBuilder::new(3, 0)?;
+    for gate in &input {
+        b.gate(
+            Gate::X,
+            &[b.qubit(gate.target)?],
+            &[Control::new(b.qubit(gate.control)?, ControlState::One)],
+        )?;
+    }
+    let p = b.finish()?;
+    let old_ids = p.schedule().to_vec();
+    let (candidate, report) = p.resynthesize_linear_candidate(
+        LinearOptions::default(),
+        LinearCandidateStrategy::Gaussian,
+        64,
+    )?;
+    expect_eq!(report.accepted_windows, 1);
+    expect_true!(candidate.schedule().iter().all(|id| !old_ids.contains(id)));
+    let sequence = candidate
+        .bind(&[])?
+        .instructions()
+        .iter()
+        .map(|i| {
+            if let quest_circuit::Operation::Gate {
+                targets, controls, ..
+            } = i.operation()
+            {
+                Ok(Cnot {
+                    control: controls
+                        .first()
+                        .ok_or(quest_circuit::Error::InvalidId)?
+                        .qubit()
+                        .index(),
+                    target: targets
+                        .first()
+                        .ok_or(quest_circuit::Error::InvalidId)?
+                        .index(),
+                })
+            } else {
+                Err(quest_circuit::Error::NotUnitary)
+            }
+        })
+        .collect::<quest_circuit::Result<Vec<_>>>()?;
+    expect_gt!(sequence.len(), input.len());
+    for basis in 0..8 {
+        expect_eq!(apply(&input, basis), apply(&sequence, basis));
+    }
+    Ok(())
+}
+
 fn apply(sequence: &[Cnot], mut input: u64) -> u64 {
     for gate in sequence {
         if (input >> gate.control) & 1 != 0 {

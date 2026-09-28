@@ -328,11 +328,9 @@ impl ProvenanceGraph {
         self.inputs.extend_from_slice(inputs);
         Ok(id)
     }
-    #[cfg(feature = "workers")]
     pub(crate) const fn next_occurrence(&self) -> usize {
         self.next_occurrence
     }
-    #[cfg(feature = "workers")]
     pub(crate) fn retain_next_occurrence(&mut self, next: usize) {
         self.next_occurrence = self.next_occurrence.max(next);
     }

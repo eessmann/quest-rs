@@ -100,3 +100,99 @@ fn unchanged_worker_output_obeys_aggregate_provenance_budget() -> Result<()> {
     expect_true!(program.optimize_zx(&client, 0, limits).is_err());
     Ok(())
 }
+
+#[gtest]
+fn zx_candidate_propagates_worker_error_after_an_effect_fence() -> Result<()> {
+    let mut builder = ProgramBuilder::new(1, 1)?;
+    let q = builder.qubit(0)?;
+    let bit = builder.bit(0)?;
+    builder.measure(q, bit)?;
+    builder.gate(Gate::H, &[q], &[])?;
+    let program = builder.finish()?;
+    let client = Client::new("/nonexistent-worker", WorkerLimits::default())?;
+    expect_true!(
+        program
+            .clone()
+            .zx_candidate(&client, 0, Limits::default(), 0, 2)
+            .is_err()
+    );
+    expect_true!(
+        program
+            .zx_candidate(&client, 0, Limits::default(), 1, 2)
+            .is_err()
+    );
+    Ok(())
+}
+
+#[cfg(target_os = "linux")]
+#[gtest]
+fn zx_candidate_accepts_a_longer_certified_region_with_fresh_identities() -> Result<()> {
+    use std::os::unix::fs::PermissionsExt;
+    struct Remove(std::path::PathBuf);
+    impl Drop for Remove {
+        fn drop(&mut self) {
+            let _ = std::fs::remove_file(&self.0);
+        }
+    }
+    let path =
+        std::env::temp_dir().join(format!("quest-zx-candidate-worker-{}", std::process::id()));
+    let _remove = Remove(path.clone());
+    std::fs::write(
+        &path,
+        "#!/bin/sh\ncat >/dev/null\nprintf '%s' '{\"version\":2,\"seed\":0,\"outcome\":{\"Candidate\":{\"sequence\":{\"qubits\":1,\"operations\":[{\"gate\":\"H\",\"targets\":[0],\"controls\":[]},{\"gate\":\"X\",\"targets\":[0],\"controls\":[]},{\"gate\":\"X\",\"targets\":[0],\"controls\":[]}]},\"engine\":\"longer-fixture\",\"precision_bits\":256}}}'\n",
+    )?;
+    std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700))?;
+    let client = Client::new(path, WorkerLimits::default())?;
+    let mut builder = ProgramBuilder::new(1, 1)?;
+    let q = builder.qubit(0)?;
+    let bit = builder.bit(0)?;
+    builder.gate(Gate::H, &[q], &[])?;
+    builder.measure(q, bit)?;
+    builder.gate(Gate::H, &[q], &[])?;
+    let original = builder.finish()?;
+    let retained = original.schedule()[0..2].to_vec();
+    expect_true!(
+        original
+            .clone()
+            .zx_candidate_from(2, &client, 0, Limits::default(), 1, 4)
+            .is_err()
+    );
+    let (candidate, report) = original.zx_candidate_from(2, &client, 0, Limits::default(), 1, 5)?;
+    expect_eq!(report.accepted.len(), 1);
+    expect_eq!(report.candidate_window, Some((2, 3)));
+    expect_eq!(candidate.schedule().len(), 5);
+    expect_eq!(&candidate.schedule()[0..2], retained.as_slice());
+    candidate.bind(&[])?.plan()?;
+    Ok(())
+}
+
+#[cfg(target_os = "linux")]
+#[gtest]
+fn zx_expanded_candidate_uses_its_distinct_request_and_keeps_growth_for_scoring() -> Result<()> {
+    use std::os::unix::fs::PermissionsExt;
+    struct Remove(std::path::PathBuf);
+    impl Drop for Remove {
+        fn drop(&mut self) {
+            let _ = std::fs::remove_file(&self.0);
+        }
+    }
+    let path =
+        std::env::temp_dir().join(format!("quest-zx-expanded-worker-{}", std::process::id()));
+    let _remove = Remove(path.clone());
+    std::fs::write(
+        &path,
+        "#!/bin/sh\ninput=$(cat); case \"$input\" in *ZxExpanded*) printf '%s' '{\"version\":2,\"seed\":0,\"outcome\":{\"Candidate\":{\"sequence\":{\"qubits\":1,\"operations\":[{\"gate\":\"H\",\"targets\":[0],\"controls\":[]},{\"gate\":\"X\",\"targets\":[0],\"controls\":[]},{\"gate\":\"X\",\"targets\":[0],\"controls\":[]}]},\"engine\":\"expanded-fixture\",\"precision_bits\":0}}}' ;; *) exit 7 ;; esac\n",
+    )?;
+    std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700))?;
+    let client = Client::new(path, WorkerLimits::default())?;
+    let mut builder = ProgramBuilder::new(1, 0)?;
+    let q = builder.qubit(0)?;
+    builder.gate(Gate::H, &[q], &[])?;
+    let original = builder.finish()?;
+    let (candidate, report) =
+        original.zx_expanded_candidate_from(0, &client, 0, Limits::default(), 1, 3)?;
+    expect_eq!(candidate.schedule().len(), 3);
+    expect_eq!(report.candidate_window, Some((0, 1)));
+    candidate.bind(&[])?.plan()?;
+    Ok(())
+}
