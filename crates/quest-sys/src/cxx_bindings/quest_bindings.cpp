@@ -304,6 +304,16 @@ Qureg& Qureg::operator=(Qureg&& other) noexcept {
   return qureg_;
 }
 
+QuestRegisterDeployment get_qureg_deployment(const Qureg& qureg) {
+  const auto admission = admit_native_call();
+  const auto native = qureg.raw();
+  return QuestRegisterDeployment{
+      native.isDensityMatrix, native.isGpuAccelerated, native.isDistributed,
+      native.isMultithreaded, native.numQubits,        native.rank,
+      native.numNodes,        native.numAmpsPerNode,
+  };
+}
+
 void Qureg::reset() noexcept {
   reset_owned(qureg_, owns_, ResourceKind::Qureg,
               [](auto value) { ::destroyQureg(value); });

@@ -33,6 +33,39 @@ fn facade_reports_preserve_exact_resource_usage() {
 }
 
 #[gtest]
+fn preparation_accounts_for_retained_exact_angle_coefficients() -> googletest::Result<()> {
+    isolated(
+        "preparation_accounts_for_retained_exact_angle_coefficients",
+        || {
+            let plan = |angle| -> quest::Result<quest::ExecutablePlan> {
+                let mut builder = quest::ProgramBuilder::new(1, 0)?;
+                builder.gate(quest::Gate::Rz(angle), &[builder.qubit(0)?], &[])?;
+                Ok(builder.finish()?.bind(&[])?.plan()?)
+            };
+            let small = plan(quest::Angle::pi(1, 1)?)?;
+            // Near-one ratio with coprime, individually large coefficients. Both
+            // plans execute the same rounded radians but retain different proofs.
+            let numerator = format!("1{}1", "0".repeat(398)).parse()?;
+            let denominator = format!("1{}", "0".repeat(399)).parse()?;
+            let large = plan(quest::Angle::rational_pi(quest::BigRational::new(
+                numerator,
+                denominator,
+            ))?)?;
+            let env = Environment::builder().build()?;
+            let prepared = env.prepare_plan(small)?;
+            let small_bytes = env.allocated_bytes();
+            drop(prepared);
+            expect_eq!(env.allocated_bytes(), 0);
+            let prepared = env.prepare_plan(large)?;
+            verify_that!(env.allocated_bytes().saturating_sub(small_bytes), gt(500))?;
+            drop(prepared);
+            expect_eq!(env.allocated_bytes(), 0);
+            Ok(())
+        },
+    )
+}
+
+#[gtest]
 fn bell_state_and_snapshot_survive_teardown() -> googletest::Result<()> {
     isolated("bell_state_and_snapshot_survive_teardown", || {
         let snapshot = {

@@ -7,7 +7,12 @@ use crate::{
     values::reserve_vec,
 };
 use quest_circuit::{
-    BoundGate, Control, ControlState, Operation, OracleFragment, language::vm::QuantumControl,
+    BoundGate, Control, ControlState, Operation, OracleFragment,
+    dispatch_recipe::{
+        OracleProfile, RecipeLimits, discover_oracle_profiles_with_limits,
+        oracle_profile_storage_bytes,
+    },
+    language::vm::QuantumControl,
 };
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -58,6 +63,75 @@ impl OracleInventory {
         Ok(())
     }
 
+    fn preflight_discovered(
+        &self,
+        discovered: &[OracleProfile],
+        max_qubits: usize,
+    ) -> Result<usize> {
+        let temporary_bytes = oracle_profile_storage_bytes(discovered)?;
+        let comparison_work = discovered
+            .len()
+            .checked_mul(
+                self.bodies
+                    .len()
+                    .checked_add(discovered.len())
+                    .ok_or(Error::Overflow)?,
+            )
+            .and_then(|n| n.checked_mul(max_qubits.checked_add(1)?))
+            .ok_or(Error::Overflow)?;
+        let work_limit = RecipeLimits::default().work();
+        if comparison_work > work_limit {
+            return Err(Error::Budget {
+                requested: comparison_work,
+                available: work_limit,
+            });
+        }
+        let mut persistent_delta = 0usize;
+        let mut new_body_count = 0usize;
+        for (position, entry) in discovered.iter().enumerate() {
+            let existing = self
+                .bodies
+                .iter()
+                .position(|body| body.shares_storage_with(entry.fragment()));
+            if existing.is_none()
+                && !discovered
+                    .get(..position)
+                    .ok_or(Error::Overflow)?
+                    .iter()
+                    .any(|prior| prior.fragment().shares_storage_with(entry.fragment()))
+            {
+                new_body_count = new_body_count.checked_add(1).ok_or(Error::Overflow)?;
+                persistent_delta = persistent_delta.checked_add(256).ok_or(Error::Overflow)?;
+            }
+            if existing
+                .and_then(|index| self.profiles.get(index))
+                .is_none_or(|profiles| !profiles.contains_key(entry.signed_controls()))
+            {
+                persistent_delta = persistent_delta
+                    .checked_add(
+                        entry
+                            .signed_controls()
+                            .len()
+                            .checked_add(128)
+                            .ok_or(Error::Overflow)?,
+                    )
+                    .ok_or(Error::Overflow)?;
+            }
+        }
+        let requested = self
+            .discovery_bytes
+            .checked_add(temporary_bytes)
+            .and_then(|n| n.checked_add(persistent_delta))
+            .ok_or(Error::Overflow)?;
+        if requested > self.budget {
+            return Err(Error::Budget {
+                requested,
+                available: self.budget,
+            });
+        }
+        Ok(new_body_count)
+    }
+
     pub(crate) fn include(
         &mut self,
         fragment: &OracleFragment,
@@ -76,61 +150,77 @@ impl OracleInventory {
                 "oracle interface exceeds register or nesting bounds",
             ));
         }
-        self.depth = self.depth.max(depth);
-        let index = if let Some(index) = self
+        if let Some(index) = self
             .bodies
             .iter()
             .position(|body| body.shares_storage_with(fragment))
+            && self
+                .profiles
+                .get(index)
+                .and_then(|profiles| profiles.get(controls))
+                .is_some_and(|previous| *previous >= depth)
         {
-            index
-        } else {
-            self.charge_discovery(256)?;
-            let index = self.bodies.len();
-            self.bodies.push(fragment.clone());
-            self.profiles.push(BTreeMap::new());
-            index
-        };
-        let previous = self
-            .profiles
-            .get(index)
-            .ok_or(Error::Value("oracle inventory index"))?
-            .get(controls)
-            .copied();
-        if previous.is_some_and(|previous| previous >= depth) {
             return Ok(index);
         }
-        if previous.is_none() {
-            self.charge_discovery(controls.len().checked_add(128).ok_or(Error::Overflow)?)?;
-        }
+        let remaining = self
+            .budget
+            .checked_sub(self.discovery_bytes)
+            .ok_or(Error::Overflow)?;
+        let discovered = discover_oracle_profiles_with_limits(
+            fragment,
+            controls,
+            depth,
+            max_qubits,
+            RecipeLimits::default().with_storage_cap(remaining),
+        )?;
+        let new_body_count = self.preflight_discovered(&discovered, max_qubits)?;
+        // Discovery remains live while persistent bodies/profiles are copied. This
+        // preflight covers their overlap, and the Vec drops after the loop.
+        self.bodies
+            .try_reserve(new_body_count)
+            .map_err(|_| Error::Allocation)?;
         self.profiles
-            .get_mut(index)
-            .ok_or(Error::Value("oracle inventory index"))?
-            .insert(controls.to_vec(), depth);
-        for operation in fragment.operations() {
-            if let Operation::Oracle {
-                fragment,
-                controls: local,
-                ..
-            } = operation
+            .try_reserve(new_body_count)
+            .map_err(|_| Error::Allocation)?;
+        for entry in discovered {
+            self.depth = self.depth.max(entry.depth());
+            let index = if let Some(index) = self
+                .bodies
+                .iter()
+                .position(|body| body.shares_storage_with(entry.fragment()))
             {
-                let nested = controls
-                    .iter()
-                    .copied()
-                    .chain(
-                        local
-                            .iter()
-                            .map(|control| control.state() == ControlState::One),
-                    )
-                    .collect::<Vec<_>>();
-                self.include(
-                    fragment,
-                    &nested,
-                    depth.checked_add(1).ok_or(Error::Overflow)?,
-                    max_qubits,
+                index
+            } else {
+                self.charge_discovery(256)?;
+                let index = self.bodies.len();
+                self.bodies.push(entry.fragment().clone());
+                self.profiles.push(BTreeMap::new());
+                index
+            };
+            let previous = self
+                .profiles
+                .get(index)
+                .ok_or(Error::Value("oracle inventory index"))?
+                .get(entry.signed_controls())
+                .copied();
+            if previous.is_some_and(|previous| previous >= entry.depth()) {
+                continue;
+            }
+            if previous.is_none() {
+                self.charge_discovery(
+                    entry
+                        .signed_controls()
+                        .len()
+                        .checked_add(128)
+                        .ok_or(Error::Overflow)?,
                 )?;
             }
+            self.profiles
+                .get_mut(index)
+                .ok_or(Error::Value("oracle inventory index"))?
+                .insert(entry.signed_controls().to_vec(), entry.depth());
         }
-        Ok(index)
+        self.index(fragment)
     }
     pub(crate) fn index(&self, fragment: &OracleFragment) -> Result<usize> {
         self.bodies
@@ -719,6 +809,25 @@ mod tests {
         Ok(OracleFragment::builder(builder.finish()?.bind(&[])?)
             .matrix_tolerance(1e-12)?
             .build()?)
+    }
+    #[gtest]
+    fn cached_oracle_profile_still_validates_depth_and_width() -> googletest::Result<()> {
+        let fragment = body()?;
+        let mut inventory = OracleInventory::with_budget(4096);
+        inventory.include(&fragment, &[], 1, 1)?;
+        expect_true!(inventory.include(&fragment, &[], 65, 1).is_err());
+        expect_true!(inventory.include(&fragment, &[], 1, 0).is_err());
+        Ok(())
+    }
+    #[gtest]
+    fn oracle_discovery_and_retained_profiles_share_one_budget() -> googletest::Result<()> {
+        let fragment = body()?;
+        let mut inventory = OracleInventory::with_budget(700);
+        inventory.include(&fragment, &[], 1, 1)?;
+        expect_true!(inventory.include(&fragment, &[true], 1, 2).is_err());
+        expect_true!(inventory.profiles[0].contains_key(&Vec::<bool>::new()));
+        expect_false!(inventory.profiles[0].contains_key(&vec![true]));
+        Ok(())
     }
     #[gtest]
     fn inventory_keeps_distinct_profiles_and_deepest_shared_path() -> googletest::Result<()> {

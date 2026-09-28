@@ -9,6 +9,7 @@ use crate::{
 use cxx::UniquePtr;
 use quest_circuit::{
     BoundGate, Control, ControlState, ExecutablePlan, Operation, ValidatedProgram,
+    dispatch_recipe::{self, DispatchStep, MatrixRecipe, PrimitiveGate},
 };
 use std::collections::BTreeMap;
 
@@ -203,6 +204,9 @@ impl crate::environment::RuntimeResources {
             .and_then(|bytes| bytes.checked_add(provenance_bytes))
             .ok_or(Error::Overflow)?;
         for instruction in plan.instructions() {
+            required = required
+                .checked_add(instruction.angle_target_storage_bytes()?)
+                .ok_or(Error::Overflow)?;
             if let Some(span) = instruction.source() {
                 required = required
                     .checked_add(span.source().len())
@@ -665,37 +669,12 @@ pub fn prepare_numerical(
     numerical: &quest_circuit::NumericalOperator,
     controls: &[bool],
 ) -> Result<NativeMatrix> {
-    let dim = numerical
-        .dimension()
-        .checked_shl(u32::try_from(controls.len()).map_err(|_| Error::Overflow)?)
-        .ok_or(Error::Overflow)?
-        .max(2);
-    let active = controls
-        .iter()
-        .enumerate()
-        .fold(0usize, |mask, (i, c)| mask | usize::from(*c) << i);
-    let local_dim = numerical.dimension();
-    let divisor =
-        std::num::NonZeroUsize::new(local_dim).ok_or(Error::Value("empty numerical matrix"))?;
-    let value = |row, col| {
-        if local_dim == 1 && controls.is_empty() {
-            if row == col {
-                numerical.view()[(0, 0)]
-            } else {
-                Complex64::new(0.0, 0.0)
-            }
-        } else if row / divisor == active && col / divisor == active {
-            numerical.view()[(row % divisor, col % divisor)]
-        } else if row == col {
-            Complex64::new(1.0, 0.0)
-        } else {
-            Complex64::new(0.0, 0.0)
-        }
-    };
-    if numerical.is_diagonal() {
+    let recipe = MatrixRecipe::new(numerical, controls)?;
+    let dim = recipe.dimension();
+    if recipe.is_diagonal() {
         let mut values = reserve_vec(dim)?;
         for row in 0..dim {
-            let v = value(row, row);
+            let v = recipe.value(row, row);
             values.push(quest_sys::QuestComplex { re: v.re, im: v.im });
         }
         let width = i32::try_from(dim.ilog2()).map_err(|_| Error::Overflow)?;
@@ -703,8 +682,12 @@ pub fn prepare_numerical(
             quest_sys::create_diag_matr(width).context("allocating native diagonal")?;
         quest_sys::set_diag_matr(forward.pin_mut(), &values)
             .context("transferring native diagonal")?;
-        for value in &mut values {
-            value.im = -value.im;
+        for (row, value) in values.iter_mut().enumerate() {
+            let adjoint = recipe.adjoint_value(row, row);
+            *value = quest_sys::QuestComplex {
+                re: adjoint.re,
+                im: adjoint.im,
+            };
         }
         let mut adjoint =
             quest_sys::create_diag_matr(width).context("allocating diagonal adjoint")?;
@@ -715,7 +698,7 @@ pub fn prepare_numerical(
     let mut extended = matrix(dim, dim)?;
     for row in 0..dim {
         for col in 0..dim {
-            extended[(row, col)] = value(row, col);
+            extended[(row, col)] = recipe.value(row, col);
         }
     }
     Ok(NativeMatrix::Dense {
@@ -867,27 +850,65 @@ pub fn phase<K: RegisterKind>(
     angle: f64,
     controls: &NativeControls,
 ) -> Result<()> {
-    if controls.wires.is_empty() {
-        return quest_sys::apply_global_phase(register.pin(), angle)
-            .context("applying global phase");
+    let recipe = dispatch_recipe::scalar_phase_recipe(angle, controls.zeros.len())?;
+    for step in recipe.steps() {
+        execute_step(register, step, &[], controls)?;
     }
+    Ok(())
+}
+
+fn signed_phase<K: RegisterKind>(
+    register: &mut Register<'_, K>,
+    angle: f64,
+    controls: &NativeControls,
+    target: bool,
+) -> Result<()> {
     for &control in &controls.zeros {
         register.x(control)?;
     }
-    quest_sys::apply_multi_qubit_phase_shift(register.pin(), &controls.wires, angle)
-        .context("applying controlled phase")?;
+    if target {
+        quest_sys::apply_multi_qubit_phase_shift(register.pin(), &controls.phase_targets, angle)
+            .context("applying phase gate")?;
+    } else if controls.wires.is_empty() {
+        quest_sys::apply_global_phase(register.pin(), angle).context("applying global phase")?;
+    } else {
+        quest_sys::apply_multi_qubit_phase_shift(register.pin(), &controls.wires, angle)
+            .context("applying controlled phase")?;
+    }
     for &control in controls.zeros.iter().rev() {
         register.x(control)?;
     }
     Ok(())
 }
-#[expect(
-    clippy::too_many_lines,
-    reason = "Exhaustive native gate dispatch keeps each controlled and uncontrolled mapping adjacent"
-)]
 pub fn apply_gate<K: RegisterKind>(
     register: &mut Register<'_, K>,
     gate: &BoundGate,
+    targets: &[i32],
+    controls: &NativeControls,
+) -> Result<()> {
+    let recipe = dispatch_recipe::gate_recipe(gate, controls.zeros.len())?;
+    for step in recipe.steps() {
+        execute_step(register, step, targets, controls)?;
+    }
+    Ok(())
+}
+
+fn execute_step<K: RegisterKind>(
+    register: &mut Register<'_, K>,
+    step: DispatchStep,
+    targets: &[i32],
+    controls: &NativeControls,
+) -> Result<()> {
+    match step {
+        DispatchStep::Native(gate) => apply_primitive(register, gate, targets, controls),
+        DispatchStep::PhaseGate(angle) => signed_phase(register, angle, controls, true),
+        DispatchStep::ScalarPhase(angle) => signed_phase(register, angle, controls, false),
+    }
+}
+
+fn apply_primitive<K: RegisterKind>(
+    register: &mut Register<'_, K>,
+    gate: PrimitiveGate,
     targets: &[i32],
     controls: &NativeControls,
 ) -> Result<()> {
@@ -895,124 +916,60 @@ pub fn apply_gate<K: RegisterKind>(
     let states = &controls.states;
     let t = *targets.first().ok_or(Error::Value("missing gate target"))?;
     let result = match gate {
-        BoundGate::Id => return Ok(()),
-        BoundGate::H if controls.wires.is_empty() => quest_sys::apply_hadamard(register.pin(), t),
-        BoundGate::H => {
+        PrimitiveGate::H if controls.wires.is_empty() => {
+            quest_sys::apply_hadamard(register.pin(), t)
+        }
+        PrimitiveGate::H => {
             quest_sys::apply_multi_state_controlled_hadamard(register.pin(), qs, states, t)
         }
-        BoundGate::X if controls.wires.is_empty() => quest_sys::apply_pauli_x(register.pin(), t),
-        BoundGate::X => {
+        PrimitiveGate::X if controls.wires.is_empty() => {
+            quest_sys::apply_pauli_x(register.pin(), t)
+        }
+        PrimitiveGate::X => {
             quest_sys::apply_multi_state_controlled_pauli_x(register.pin(), qs, states, t)
         }
-        BoundGate::Y if controls.wires.is_empty() => quest_sys::apply_pauli_y(register.pin(), t),
-        BoundGate::Y => {
+        PrimitiveGate::Y if controls.wires.is_empty() => {
+            quest_sys::apply_pauli_y(register.pin(), t)
+        }
+        PrimitiveGate::Y => {
             quest_sys::apply_multi_state_controlled_pauli_y(register.pin(), qs, states, t)
         }
-        BoundGate::Z if controls.wires.is_empty() => quest_sys::apply_pauli_z(register.pin(), t),
-        BoundGate::Z => {
+        PrimitiveGate::Z if controls.wires.is_empty() => {
+            quest_sys::apply_pauli_z(register.pin(), t)
+        }
+        PrimitiveGate::Z => {
             quest_sys::apply_multi_state_controlled_pauli_z(register.pin(), qs, states, t)
         }
-        BoundGate::Rx(a) if controls.wires.is_empty() => {
-            quest_sys::apply_rotate_x(register.pin(), t, *a)
+        PrimitiveGate::Rx(a) if controls.wires.is_empty() => {
+            quest_sys::apply_rotate_x(register.pin(), t, a)
         }
-        BoundGate::Rx(a) => {
-            quest_sys::apply_multi_state_controlled_rotate_x(register.pin(), qs, states, t, *a)
+        PrimitiveGate::Rx(a) => {
+            quest_sys::apply_multi_state_controlled_rotate_x(register.pin(), qs, states, t, a)
         }
-        BoundGate::Ry(a) if controls.wires.is_empty() => {
-            quest_sys::apply_rotate_y(register.pin(), t, *a)
+        PrimitiveGate::Ry(a) if controls.wires.is_empty() => {
+            quest_sys::apply_rotate_y(register.pin(), t, a)
         }
-        BoundGate::Ry(a) => {
-            quest_sys::apply_multi_state_controlled_rotate_y(register.pin(), qs, states, t, *a)
+        PrimitiveGate::Ry(a) => {
+            quest_sys::apply_multi_state_controlled_rotate_y(register.pin(), qs, states, t, a)
         }
-        BoundGate::Rz(a) if controls.wires.is_empty() => {
-            quest_sys::apply_rotate_z(register.pin(), t, *a)
+        PrimitiveGate::Rz(a) if controls.wires.is_empty() => {
+            quest_sys::apply_rotate_z(register.pin(), t, a)
         }
-        BoundGate::Rz(a) => {
-            quest_sys::apply_multi_state_controlled_rotate_z(register.pin(), qs, states, t, *a)
+        PrimitiveGate::Rz(a) => {
+            quest_sys::apply_multi_state_controlled_rotate_z(register.pin(), qs, states, t, a)
         }
-        BoundGate::S => {
-            return apply_gate(
-                register,
-                &BoundGate::Phase(std::f64::consts::FRAC_PI_2),
-                targets,
-                controls,
-            );
-        }
-        BoundGate::Sdg => {
-            return apply_gate(
-                register,
-                &BoundGate::Phase(-std::f64::consts::FRAC_PI_2),
-                targets,
-                controls,
-            );
-        }
-        BoundGate::T => {
-            return apply_gate(
-                register,
-                &BoundGate::Phase(std::f64::consts::FRAC_PI_4),
-                targets,
-                controls,
-            );
-        }
-        BoundGate::Tdg => {
-            return apply_gate(
-                register,
-                &BoundGate::Phase(-std::f64::consts::FRAC_PI_4),
-                targets,
-                controls,
-            );
-        }
-        BoundGate::Phase(angle) => {
-            for &control in &controls.zeros {
-                register.x(control)?;
-            }
-            quest_sys::apply_multi_qubit_phase_shift(
-                register.pin(),
-                &controls.phase_targets,
-                *angle,
-            )
-            .context("applying phase gate")?;
-            for &control in controls.zeros.iter().rev() {
-                register.x(control)?;
-            }
-            return Ok(());
-        }
-        BoundGate::Swap if controls.wires.is_empty() => quest_sys::apply_swap(
+        PrimitiveGate::Swap if controls.wires.is_empty() => quest_sys::apply_swap(
             register.pin(),
             t,
             *targets.get(1).ok_or(Error::Value("missing swap target"))?,
         ),
-        BoundGate::Swap => quest_sys::apply_multi_state_controlled_swap(
+        PrimitiveGate::Swap => quest_sys::apply_multi_state_controlled_swap(
             register.pin(),
             qs,
             states,
             t,
             *targets.get(1).ok_or(Error::Value("missing swap target"))?,
         ),
-        BoundGate::Sxdg => {
-            apply_gate(
-                register,
-                &BoundGate::Rx(-std::f64::consts::FRAC_PI_2),
-                targets,
-                controls,
-            )?;
-            return phase(register, -std::f64::consts::FRAC_PI_4, controls);
-        }
-        BoundGate::Sx => {
-            apply_gate(
-                register,
-                &BoundGate::Rx(std::f64::consts::FRAC_PI_2),
-                targets,
-                controls,
-            )?;
-            return phase(register, std::f64::consts::FRAC_PI_4, controls);
-        }
-        BoundGate::U { theta, phi, lambda } => {
-            apply_gate(register, &BoundGate::Phase(*lambda), targets, controls)?;
-            apply_gate(register, &BoundGate::Ry(*theta), targets, controls)?;
-            apply_gate(register, &BoundGate::Phase(*phi), targets, controls)?;
-            return phase(register, theta / 2.0, controls);
-        }
     };
     result.context("applying standard gate")
 }

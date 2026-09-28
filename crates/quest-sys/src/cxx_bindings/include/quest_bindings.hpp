@@ -11,6 +11,7 @@ namespace quest_sys {
 
 struct QuestComplex;
 struct QuestEnvironment;
+struct QuestRegisterDeployment;
 struct QubitMeasurement;
 struct NumericalFingerprint;
 
@@ -242,6 +243,7 @@ rust::Vec<std::uint32_t> get_qu_est_seeds();
 
 std::unique_ptr<Qureg> create_qureg(std::int32_t num_qubits);
 std::unique_ptr<Qureg> create_density_qureg(std::int32_t num_qubits);
+QuestRegisterDeployment get_qureg_deployment(const Qureg& qureg);
 std::unique_ptr<CompMatr1> unique_ptr_marker_comp_matr1();
 std::unique_ptr<CompMatr2> unique_ptr_marker_comp_matr2();
 std::unique_ptr<DiagMatr1> unique_ptr_marker_diag_matr1();

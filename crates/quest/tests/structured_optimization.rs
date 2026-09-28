@@ -106,3 +106,64 @@ fn exact_structured_optimization_preserves_native_state_density_and_observations
         },
     )
 }
+
+#[gtest]
+fn terminal_structured_fusion_preserves_full_native_state_and_density_operators() -> Result<()> {
+    isolated(
+        "terminal_structured_fusion_preserves_full_native_state_and_density_operators",
+        || {
+            use quest_circuit::{
+                ApproximationMode, BudgetLedger, CostProfile, OptimizationLimits,
+                OptimizationOptions, OptimizationTarget, TerminalOptions,
+            };
+            let environment = Environment::builder().build()?;
+            let mut a = environment.state_vector(QubitCount::new(2)?)?;
+            let mut b = environment.state_vector(QubitCount::new(2)?)?;
+            let mut da = environment.density_matrix(QubitCount::new(2)?)?;
+            let mut db = environment.density_matrix(QubitCount::new(2)?)?;
+            let source = "def mixed(qubit a, qubit b) { h a; negctrl @ x a,b; t b; } gate pair a { h a; t a; } qubit[2] q; mixed(q[1],q[0]); inv @ pair q[0]; pow(-2) @ pair q[1]; h q[0]; x q[0];";
+            let original = StructuredProgram::parse(source, "terminal-native.qasm")?.verify()?;
+            let options = OptimizationOptions::new(
+                OptimizationTarget::once(
+                    a.deployment().compiler_snapshot()?,
+                    CostProfile::NativeV1,
+                )?,
+                OptimizationLimits::default(),
+                ApproximationMode::Disabled,
+            )?;
+            let outcome = original.clone().fuse_terminal(
+                TerminalOptions::default(),
+                &options,
+                &BudgetLedger::new(OptimizationLimits::default()),
+            )?;
+            expect_ge!(outcome.report().fused_windows(), 2);
+            let mut before = environment.prepare_structured_plan(original.lower()?.plan()?)?;
+            let mut after =
+                environment.prepare_structured_plan(outcome.into_program().lower()?.plan()?)?;
+            for input in 0..5 {
+                let values = initial(2, input)?;
+                a.init_pure(&values)?;
+                b.init_pure(&values)?;
+                da.init_pure(&values)?;
+                db.init_pure(&values)?;
+                before.run(&mut a, &RunInputs::default())?;
+                after.run(&mut b, &RunInputs::default())?;
+                before.run(&mut da, &RunInputs::default())?;
+                after.run(&mut db, &RunInputs::default())?;
+                for row in 0..4 {
+                    expect_lt!(
+                        std::ops::Sub::sub(a.amplitude(row)?, b.amplitude(row)?).norm(),
+                        2e-13
+                    );
+                    for col in 0..4 {
+                        expect_lt!(
+                            std::ops::Sub::sub(da.entry(row, col)?, db.entry(row, col)?).norm(),
+                            2e-13
+                        );
+                    }
+                }
+            }
+            Ok(())
+        },
+    )
+}

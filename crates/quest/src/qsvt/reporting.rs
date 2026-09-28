@@ -1,6 +1,6 @@
 //! Counts the fixed successful state-vector dispatch schedule before execution.
 use crate::{Error, Result};
-use quest_circuit::{BoundGate, ControlState, ExecutablePlan, Operation};
+use quest_circuit::{BoundGate, ControlState, ExecutablePlan, Operation, dispatch_recipe};
 use std::collections::BTreeMap;
 
 /// Successful QSVT run calls into the native register API, per process/rank.
@@ -86,33 +86,14 @@ impl NativeDispatchReport {
 }
 
 fn phase(zeros: usize) -> Result<usize> {
-    zeros
-        .checked_mul(2)
-        .and_then(|n| n.checked_add(1))
-        .ok_or(Error::Overflow)
+    dispatch_recipe::scalar_phase_recipe(0.0, zeros)
+        .map(dispatch_recipe::GateRecipe::native_calls)
+        .map_err(|_| Error::Overflow)
 }
-// Keep exhaustive alongside execution::apply_gate: native signed controls cost
-// one dispatch, but phase operations toggle zero-controls before and after.
 fn gate(gate: &BoundGate, zeros: usize) -> Result<usize> {
-    match gate {
-        BoundGate::Id => Ok(0),
-        BoundGate::Phase(_) | BoundGate::S | BoundGate::Sdg | BoundGate::T | BoundGate::Tdg => {
-            phase(zeros)
-        }
-        BoundGate::Sx | BoundGate::Sxdg => phase(zeros)?.checked_add(1).ok_or(Error::Overflow),
-        BoundGate::U { .. } => phase(zeros)?
-            .checked_mul(3)
-            .and_then(|n| n.checked_add(1))
-            .ok_or(Error::Overflow),
-        BoundGate::H
-        | BoundGate::X
-        | BoundGate::Y
-        | BoundGate::Z
-        | BoundGate::Rx(_)
-        | BoundGate::Ry(_)
-        | BoundGate::Rz(_)
-        | BoundGate::Swap => Ok(1),
-    }
+    dispatch_recipe::gate_recipe(gate, zeros)
+        .map(dispatch_recipe::GateRecipe::native_calls)
+        .map_err(|_| Error::Overflow)
 }
 
 pub(super) fn circuit(plan: &ExecutablePlan) -> Result<usize> {

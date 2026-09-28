@@ -48,6 +48,10 @@ required-features = ["qsvt"]
 name = "qsvt"
 required-features = ["qsvt"]
 
+[[example]]
+name = "optimize_workers"
+required-features = ["workers"]
+
 [build-dependencies]
 quest-build = { workspace = true }
 

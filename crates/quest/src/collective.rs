@@ -251,6 +251,11 @@ pub struct CollectiveRegister<'env, 'comm, 'runtime> {
     pub(crate) id: u64,
 }
 impl CollectiveRegister<'_, '_, '_> {
+    /// Actual native deployment of this register on the calling rank.
+    #[must_use]
+    pub const fn deployment(&self) -> crate::RegisterDeployment {
+        self.inner.deployment()
+    }
     #[must_use]
     pub const fn environment(&self) -> EnvironmentView<'_> {
         self.environment.view()

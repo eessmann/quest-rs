@@ -35,5 +35,5 @@ pub use execution::{PreparedProgram, RunResult, SampleResult};
 pub use faer;
 pub use num_complex::Complex64;
 pub use quest_circuit::*;
-pub use register::{DensityMatrix, Register, RegisterKind, StateVector};
+pub use register::{DensityMatrix, Register, RegisterDeployment, RegisterKind, StateVector};
 pub use values::{MemoryBudget, Outcome, Probability, QubitCount, Shots};

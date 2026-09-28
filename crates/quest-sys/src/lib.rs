@@ -84,6 +84,19 @@ mod ffi {
         pub num_nodes: i32,
     }
 
+    /// Raw values sampled from one allocated native Qureg.
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub struct QuestRegisterDeployment {
+        pub is_density_matrix: i32,
+        pub is_gpu_accelerated: i32,
+        pub is_distributed: i32,
+        pub is_multithreaded: i32,
+        pub num_qubits: i32,
+        pub rank: i32,
+        pub num_nodes: i32,
+        pub num_amps_per_node: i64,
+    }
+
     unsafe extern "C++" {
         include!("quest_bindings.hpp");
 
@@ -123,6 +136,7 @@ mod ffi {
 
         fn create_qureg(num_qubits: i32) -> Result<UniquePtr<Qureg>>;
         fn create_density_qureg(num_qubits: i32) -> Result<UniquePtr<Qureg>>;
+        fn get_qureg_deployment(qureg: &Qureg) -> Result<QuestRegisterDeployment>;
         fn unique_ptr_marker_comp_matr1() -> UniquePtr<CompMatr1>;
         fn unique_ptr_marker_comp_matr2() -> UniquePtr<CompMatr2>;
         fn unique_ptr_marker_diag_matr1() -> UniquePtr<DiagMatr1>;
@@ -219,7 +233,7 @@ mod ffi {
 pub use ffi::{
     CompMatr, CompMatr1, CompMatr2, DiagMatr, DiagMatr1, DiagMatr2, FullStateDiagMatr, KrausMap,
     NumericalFingerprint, PauliStr, PauliStrSum, QubitMeasurement, QuestComplex, QuestEnvironment,
-    Qureg, SuperOp,
+    QuestRegisterDeployment, Qureg, SuperOp,
 };
 
 pub type QuestResult<T> = Result<T, QuestError>;
@@ -345,6 +359,11 @@ pub fn create_qureg(num_qubits: i32) -> QuestResult<UniquePtr<Qureg>> {
 
 pub fn create_density_qureg(num_qubits: i32) -> QuestResult<UniquePtr<Qureg>> {
     map_quest_result(ffi::create_density_qureg(num_qubits))
+}
+
+/// Read actual deployment fields from a live, allocated native register.
+pub fn get_qureg_deployment(qureg: &Qureg) -> QuestResult<QuestRegisterDeployment> {
+    map_quest_result(ffi::get_qureg_deployment(qureg))
 }
 
 pub fn init_zero_state(qureg: Pin<&mut Qureg>) -> QuestResult<()> {

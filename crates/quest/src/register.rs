@@ -28,12 +28,126 @@ impl sealed::Kind for DensityMatrix {
 impl RegisterKind for StateVector {}
 impl RegisterKind for DensityMatrix {}
 
+/// Immutable deployment of one successfully allocated native register.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[expect(
+    clippy::struct_excessive_bools,
+    reason = "Native deployment exposes four independent hardware/mode flags"
+)]
+pub struct RegisterDeployment {
+    density: bool,
+    gpu: bool,
+    distributed: bool,
+    multithreaded: bool,
+    width: usize,
+    rank: usize,
+    nodes: usize,
+    local_amplitudes: usize,
+}
+impl RegisterDeployment {
+    fn from_native(
+        raw: quest_sys::QuestRegisterDeployment,
+        density: bool,
+        width: usize,
+    ) -> Result<Self> {
+        let flag = |value| match value {
+            0 => Ok(false),
+            1 => Ok(true),
+            _ => Err(Error::Value("invalid native register deployment")),
+        };
+        let actual_density = flag(raw.is_density_matrix)?;
+        let gpu = flag(raw.is_gpu_accelerated)?;
+        let distributed = flag(raw.is_distributed)?;
+        let multithreaded = flag(raw.is_multithreaded)?;
+        let actual_width = usize::try_from(raw.num_qubits)
+            .map_err(|_| Error::Value("invalid native register width"))?;
+        let rank =
+            usize::try_from(raw.rank).map_err(|_| Error::Value("invalid native register rank"))?;
+        let nodes = usize::try_from(raw.num_nodes)
+            .map_err(|_| Error::Value("invalid native node count"))?;
+        let local_amplitudes = usize::try_from(raw.num_amps_per_node)
+            .map_err(|_| Error::Value("invalid native local amplitude count"))?;
+        if actual_density != density
+            || actual_width != width
+            || nodes == 0
+            || rank >= nodes
+            || local_amplitudes == 0
+            || (!distributed && (nodes != 1 || rank != 0))
+        {
+            return Err(Error::Value("inconsistent native register deployment"));
+        }
+        Ok(Self {
+            density,
+            gpu,
+            distributed,
+            multithreaded,
+            width,
+            rank,
+            nodes,
+            local_amplitudes,
+        })
+    }
+    #[must_use]
+    pub const fn is_density_matrix(self) -> bool {
+        self.density
+    }
+    #[must_use]
+    pub const fn is_gpu_accelerated(self) -> bool {
+        self.gpu
+    }
+    #[must_use]
+    pub const fn is_distributed(self) -> bool {
+        self.distributed
+    }
+    #[must_use]
+    pub const fn is_multithreaded(self) -> bool {
+        self.multithreaded
+    }
+    #[must_use]
+    pub const fn width(self) -> usize {
+        self.width
+    }
+    #[must_use]
+    pub const fn rank(self) -> usize {
+        self.rank
+    }
+    #[must_use]
+    pub const fn nodes(self) -> usize {
+        self.nodes
+    }
+    #[must_use]
+    pub const fn local_amplitudes(self) -> usize {
+        self.local_amplitudes
+    }
+    /// Copy this actual native deployment into the compiler's validated target.
+    /// # Errors
+    /// Rejects a local amplitude count that cannot fit the compiler DTO.
+    pub fn compiler_snapshot(self) -> Result<quest_circuit::DeploymentSnapshot> {
+        let kind = if self.density {
+            quest_circuit::DeploymentKind::DensityMatrix
+        } else {
+            quest_circuit::DeploymentKind::StateVector
+        };
+        Ok(quest_circuit::DeploymentSnapshot::new(
+            kind,
+            self.width,
+            self.gpu,
+            self.distributed,
+            self.multithreaded,
+            self.rank,
+            self.nodes,
+            u64::try_from(self.local_amplitudes).map_err(|_| Error::Overflow)?,
+        )?)
+    }
+}
+
 /// A native register tied to its active environment. Cloning is explicit and deep.
 pub struct Register<'env, K: RegisterKind> {
     // Declaration order ensures native destruction precedes releasing accounting.
     pub(crate) native: UniquePtr<quest_sys::Qureg>,
     reservation: Reservation<'env>,
     count: QubitCount,
+    deployment: RegisterDeployment,
     kind: PhantomData<K>,
 }
 impl<'env, K: RegisterKind> Register<'env, K> {
@@ -78,16 +192,26 @@ impl<'env, K: RegisterKind> Register<'env, K> {
             quest_sys::create_qureg(count.native())
         }
         .context("allocating register")?;
+        let deployment = RegisterDeployment::from_native(
+            quest_sys::get_qureg_deployment(&native).context("reading register deployment")?,
+            K::DENSITY,
+            count.get(),
+        )?;
         Ok(Self {
             native,
             reservation,
             count,
+            deployment,
             kind: PhantomData,
         })
     }
     #[must_use]
     pub const fn num_qubits(&self) -> QubitCount {
         self.count
+    }
+    #[must_use]
+    pub const fn deployment(&self) -> RegisterDeployment {
+        self.deployment
     }
     #[must_use]
     pub const fn dimension(&self) -> usize {
@@ -205,10 +329,17 @@ impl<'env, K: RegisterKind> Register<'env, K> {
     pub fn try_clone(&self) -> Result<Self> {
         let reservation = Self::admit_allocation(self.resources(), self.count)?;
         let native = quest_sys::create_clone_qureg(&self.native).context("cloning register")?;
+        let deployment = RegisterDeployment::from_native(
+            quest_sys::get_qureg_deployment(&native)
+                .context("reading cloned register deployment")?,
+            K::DENSITY,
+            self.count.get(),
+        )?;
         Ok(Self {
             native,
             reservation,
             count: self.count,
+            deployment,
             kind: PhantomData,
         })
     }

@@ -64,6 +64,13 @@ fn collective_prepared_bell_oracle_and_projection_preserve_mpi() -> googletest::
             {
                 let env = CollectiveEnvironment::builder(&comm)?.build()?;
                 let mut register = env.state_vector(QubitCount::new(2)?)?;
+                let deployment = register.deployment();
+                expect_true!(deployment.is_distributed());
+                expect_false!(deployment.is_density_matrix());
+                expect_eq!(deployment.rank(), usize::try_from(env.rank()?)?);
+                expect_eq!(deployment.nodes(), usize::try_from(env.size()?)?);
+                expect_eq!(deployment.local_amplitudes(), 2);
+                expect_eq!(deployment.compiler_snapshot()?.nodes(), 2);
                 let mut prepared = env.prepare_plan(bell()?)?;
                 register.init_zero()?;
                 prepared.run(&mut register)?;
