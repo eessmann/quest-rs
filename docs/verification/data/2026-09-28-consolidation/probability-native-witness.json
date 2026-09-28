@@ -1,0 +1,12 @@
+[
+  {
+    "target_count": 1,
+    "returncode": 0,
+    "expected": "normal exit"
+  },
+  {
+    "target_count": 64,
+    "returncode": -4,
+    "expected": "shift sanitizer trap SIGILL"
+  }
+]

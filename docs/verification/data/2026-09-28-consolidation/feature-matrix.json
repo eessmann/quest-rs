@@ -1,0 +1,106 @@
+[
+  {
+    "configuration": "pure-circuit",
+    "command": [
+      "cargo",
+      "check",
+      "-p",
+      "quest-circuit",
+      "--no-default-features",
+      "--locked"
+    ],
+    "exit_code": 0,
+    "invalid_native_paths": true
+  },
+  {
+    "configuration": "pure-cli",
+    "command": [
+      "cargo",
+      "check",
+      "-p",
+      "quest-qsvt-cli",
+      "--no-default-features",
+      "--locked"
+    ],
+    "exit_code": 0,
+    "invalid_native_paths": true
+  },
+  {
+    "configuration": "certification",
+    "command": [
+      "cargo",
+      "nextest",
+      "run",
+      "-p",
+      "quest-qsp",
+      "--no-default-features",
+      "--features",
+      "certification",
+      "--locked"
+    ],
+    "exit_code": 0,
+    "invalid_native_paths": false
+  },
+  {
+    "configuration": "worker-synthesis",
+    "command": [
+      "cargo",
+      "nextest",
+      "run",
+      "-p",
+      "quest-optimizer-worker",
+      "--features",
+      "synthesis",
+      "--locked"
+    ],
+    "exit_code": 0,
+    "invalid_native_paths": false
+  },
+  {
+    "configuration": "worker-zx",
+    "command": [
+      "cargo",
+      "nextest",
+      "run",
+      "-p",
+      "quest-optimizer-worker",
+      "--features",
+      "zx",
+      "--locked"
+    ],
+    "exit_code": 0,
+    "invalid_native_paths": false
+  },
+  {
+    "configuration": "io-hdf5",
+    "command": [
+      "cargo",
+      "nextest",
+      "run",
+      "-p",
+      "quest-qsvt-io",
+      "--no-default-features",
+      "--features",
+      "hdf5",
+      "--locked"
+    ],
+    "exit_code": 0,
+    "invalid_native_paths": false
+  },
+  {
+    "configuration": "cli-mpi",
+    "command": [
+      "cargo",
+      "nextest",
+      "run",
+      "-p",
+      "quest-qsvt-cli",
+      "--no-default-features",
+      "--features",
+      "mpi",
+      "--locked"
+    ],
+    "exit_code": 0,
+    "invalid_native_paths": false
+  }
+]

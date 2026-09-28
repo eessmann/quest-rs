@@ -1,0 +1,37 @@
+   Compiling bindgen v0.72.1
+   Compiling private-gemm-x86 v0.1.20
+   Compiling quest-sys v0.2.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-sys)
+   Compiling quest-rs v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest)
+   Compiling quest-qsvt-io v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-qsvt-io)
+   Compiling quest-qsvt-cli v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-qsvt-cli)
+   Compiling faer v0.24.4
+   Compiling mpi-sys v0.2.4
+   Compiling mpi v0.8.2
+warning: quest-sys@0.2.0: Using QuEST 4.3.0 from /var/home/erich/Projects/opt/quest with /usr/bin/c++
+warning: quest-sys@0.2.0: Verified rsmpi MPICC /var/home/linuxbrew/.linuxbrew/Cellar/mpich/5.0.1/bin/mpicc matches QuEST MPI ABI and loaded library
+   Compiling quest-polynomial v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-polynomial)
+   Compiling quest-circuit v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-circuit)
+   Compiling quest-qsp v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-qsp)
+   Compiling quest-qsvt v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-qsvt)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 12.01s
+────────────
+ Nextest run ID 0882f1c8-c512-418f-90ff-ed885ae4ddf7 with nextest profile: default
+    Starting 16 tests across 6 binaries
+        PASS [   0.005s] ( 1/16) quest-qsvt-cli distributed::wire::tests::imported_angle_wire_preserves_source_and_admitted_matrix_words
+        PASS [   0.005s] ( 2/16) quest-qsvt-cli distributed::wire::tests::frozen_wire_roundtrips_exact_words_and_rejects_truncation
+        PASS [   0.190s] ( 3/16) quest-qsvt-cli::application failed_input_admission_still_writes_a_failed_trace_without_output
+        PASS [   0.191s] ( 4/16) quest-qsvt-cli::application trace_outer_scope_is_application_dispatch_after_preflight
+        PASS [   0.191s] ( 5/16) quest-qsvt-cli::application canonical_synthesis_exports_reimportable_frozen_phases_with_stage_timings
+        PASS [   0.196s] ( 6/16) quest-qsvt-cli::application worker_selection_parses_auto_and_preserves_the_serial_default
+        PASS [   0.197s] ( 7/16) quest-qsvt-cli::application failed_trace_export_retains_primary_dispatch_error
+        PASS [   0.198s] ( 8/16) quest-qsvt-cli::application generalized_synthesis_preserves_matrix_export_and_rejects_phase_input
+        PASS [   0.207s] ( 9/16) quest-qsvt-cli::application catalog_lists_exact_twenty_one_families_and_rejects_nearby_selection
+        PASS [   0.207s] (10/16) quest-qsvt-cli::application failed_worker_preflight_produces_no_dispatch_trace
+        PASS [   0.209s] (11/16) quest-qsvt-cli::native_application solve_rejects_rank_deficiency_before_publishing_output
+        PASS [   0.209s] (12/16) quest-qsvt-cli::application catalog_check_constructs_the_selected_target_instead_of_trusting_its_label
+        PASS [   0.210s] (13/16) quest-qsvt-cli::native_application complex_solve_recovers_physical_norm_and_separately_checks_residual
+        PASS [   0.242s] (14/16) quest-qsvt-cli::distributed_application root_input_failure_is_collective_and_never_enters_native_execution
+        PASS [   0.279s] (15/16) quest-qsvt-cli::native_application native_embedded_and_overlap_preserve_complex_phase_and_mass
+        PASS [   0.644s] (16/16) quest-qsvt-cli::distributed_application mpi_two_and_four_rank_root_synthesis_preserve_embedded_and_overlap_mass
+────────────
+     Summary [   0.644s] 16 tests run: 16 passed, 0 skipped

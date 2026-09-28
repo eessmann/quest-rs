@@ -1,0 +1,14 @@
+[
+  {
+    "mode": "cpu",
+    "exit_code": 0
+  },
+  {
+    "mode": "omp",
+    "exit_code": 0
+  },
+  {
+    "mode": "gpu",
+    "exit_code": 0
+  }
+]

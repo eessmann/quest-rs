@@ -1,0 +1,99 @@
+    Checking num-integer v0.1.47
+    Checking serde v1.0.229
+    Checking serde_json v1.0.151
+    Checking googletest v0.14.3
+    Checking equator v0.2.2
+    Checking nano-gemm v0.2.2
+    Checking num-bigint v0.4.8
+    Checking faer v0.24.4
+    Checking quest-language v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-language)
+    Checking num-bigint v0.5.1
+    Checking num-rational v0.4.2
+    Checking transpose v0.2.3
+    Checking zerocopy v0.8.57
+    Checking quest-math v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-math)
+    Checking primal-check v0.3.4
+    Checking rustfft v6.4.1
+    Checking quest-qasm v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-qasm)
+    Checking clap v4.6.6
+    Checking quest-optimizer-protocol v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-optimizer-protocol)
+    Checking quest-optimizer-client v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-optimizer-client)
+   Compiling astro-float-num v0.3.7
+   Compiling thiserror v1.0.69
+   Compiling cmake-file-api v0.1.2
+    Checking quest-numerics v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-numerics)
+    Checking half v2.7.1
+   Compiling astro-float-macro v0.4.6
+    Checking ciborium-ll v0.2.2
+    Checking ciborium v0.2.2
+    Checking astro-float v0.9.6
+    Checking tinytemplate v1.2.1
+   Compiling bindgen v0.72.1
+    Checking criterion v0.8.2
+   Compiling quest-build v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-build)
+    Checking toml_datetime v1.1.1+spec-1.1.0
+    Checking toml v1.1.5+spec-1.1.0
+    Checking trybuild v1.0.121
+   Compiling quest-sys v0.2.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-sys)
+    Checking ndarray v0.17.2
+   Compiling mpi-sys v0.2.4
+    Checking ppv-lite86 v0.2.21
+   Compiling quest-rs v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest)
+    Checking rand_chacha v0.9.0
+    Checking rand v0.9.5
+    Checking proptest v1.11.0
+    Checking hdf5-metno-types v0.11.1
+   Compiling quest-qsvt-io v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-qsvt-io)
+    Checking hdf5-metno v0.14.1
+   Compiling parking_lot_core v0.9.12
+   Compiling mpi v0.8.2
+   Compiling parking_lot v0.12.5
+    Checking quest-circuit v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-circuit)
+    Checking quest-polynomial v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-polynomial)
+   Compiling string_cache v0.8.9
+    Checking quest-qsp v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-qsp)
+   Compiling lalrpop v0.19.12
+    Checking futures-util v0.3.34
+    Checking quest-qsvt v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-qsvt)
+    Checking num-iter v0.1.46
+    Checking num v0.4.3
+   Compiling quest-qsvt-cli v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-qsvt-cli)
+   Compiling rstest_macros v0.23.0
+    Checking futures-executor v0.3.34
+    Checking futures v0.3.34
+   Compiling dashu-macros v0.4.2
+    Checking rand_chacha v0.3.1
+    Checking logos v0.12.1
+    Checking rstest v0.23.0
+    Checking rand v0.8.8
+    Checking nalgebra v0.34.2
+warning: quest-sys@0.2.0: Using QuEST 4.3.0 from /var/home/erich/Projects/opt/quest with /usr/bin/c++
+warning: quest-sys@0.2.0: Verified rsmpi MPICC /var/home/linuxbrew/.linuxbrew/Cellar/mpich/5.0.1/bin/mpicc matches QuEST MPI ABI and loaded library
+    Checking derive_more v1.0.0
+    Checking dashu v0.4.4
+    Checking ndarray v0.16.1
+   Compiling openqasm v0.1.2
+    Checking quizx v0.3.0
+    Checking memchr v2.8.3
+    Checking petgraph v0.8.3
+    Checking aho-corasick v1.1.5
+    Checking quest-rsgridsynth v0.2.2-quest.1 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/vendor/rsgridsynth)
+    Checking xtask v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/xtask)
+    Checking regex-automata v0.4.18
+    Checking quest-optimizer-worker v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-optimizer-worker)
+    Checking regex v1.13.1
+    Checking quest-macros v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-macros)
+error[E0689]: can't call method `checked_mul` on ambiguous numeric type `{integer}`
+  --> crates/quest-qsp/tests/offline.rs:44:18
+   |
+44 |                 .checked_mul(size_of::<Interval>())
+   |                  ^^^^^^^^^^^
+   |
+help: you must specify a type for this binding, like `i32`
+   |
+35 |     let subdivisions: i32 = 8;
+   |                     +++++
+
+For more information about this error, try `rustc --explain E0689`.
+error: could not compile `quest-qsp` (test "offline") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

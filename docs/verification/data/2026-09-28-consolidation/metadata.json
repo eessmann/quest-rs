@@ -1,0 +1,9 @@
+{
+  "baseline_commit": "9d614fb",
+  "measurement_profile": "debug, standalone offline consumers, CARGO_BUILD_JOBS=4",
+  "toolchain": "rustc 1.100.0-nightly (f248f4038 2026-09-05)",
+  "platform": "Linux x86_64",
+  "consolidated_state": "Reviewed source snapshot identified by source-manifest.sha256; signing is separately pending",
+  "allocator_scope": "requested bytes, excludes allocator metadata and RSS",
+  "source_manifest": "source-manifest.sha256"
+}

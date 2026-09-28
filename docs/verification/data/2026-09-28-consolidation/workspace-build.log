@@ -1,0 +1,26 @@
+   Compiling quest-build v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-build)
+   Compiling aho-corasick v1.1.5
+   Compiling quest-numerics v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-numerics)
+   Compiling quest-language v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-language)
+   Compiling regex-automata v0.4.18
+   Compiling quest-sys v0.2.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-sys)
+   Compiling quest-polynomial v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-polynomial)
+   Compiling regex v1.13.1
+   Compiling hdf5-metno-sys v0.12.3
+   Compiling quest-qasm v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-qasm)
+   Compiling hdf5-metno-types v0.11.1
+   Compiling quest-qsp v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-qsp)
+   Compiling quest-macros v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-macros)
+   Compiling hdf5-metno v0.14.1
+   Compiling quest-circuit v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-circuit)
+   Compiling quest-rs v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest)
+   Compiling quest-qsvt-io v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-qsvt-io)
+   Compiling quest-qsvt-cli v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-qsvt-cli)
+   Compiling quest-math v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-math)
+   Compiling quest-optimizer-protocol v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-optimizer-protocol)
+   Compiling quest-qsvt v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-qsvt)
+   Compiling quest-optimizer-worker v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-optimizer-worker)
+   Compiling quest-optimizer-client v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-optimizer-client)
+   Compiling xtask v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/xtask)
+warning: quest-sys@0.2.0: Using QuEST 4.3.0 from /var/home/erich/Projects/opt/quest with /usr/bin/c++
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 9.17s

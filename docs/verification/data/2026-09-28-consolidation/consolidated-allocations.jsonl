@@ -1,0 +1,8 @@
+{"measurement":"requested allocator bytes, excludes allocator metadata and RSS"}
+{"case":"exact_merge_chain","scale":1024,"ok":true,"allocations":49618,"requested_bytes":2468192,"retained_bytes":206512,"peak_bytes":653880,"elapsed_ns":80546898}
+{"case":"exact_merge_chain","scale":2048,"ok":true,"allocations":99020,"requested_bytes":4931968,"retained_bytes":411216,"peak_bytes":1305504,"elapsed_ns":161560960}
+{"case":"exact_merge_chain","scale":4096,"ok":true,"allocations":198053,"requested_bytes":9866576,"retained_bytes":820816,"peak_bytes":2609800,"elapsed_ns":325526354}
+{"case":"shared_expression_construction","scale":10,"ok":true,"allocations":15,"requested_bytes":1442,"retained_bytes":1442,"peak_bytes":1442,"elapsed_ns":46120}
+{"case":"shared_expression_construction","scale":14,"ok":true,"allocations":19,"requested_bytes":1890,"retained_bytes":1890,"peak_bytes":1890,"elapsed_ns":4770}
+{"case":"branch_heavy_ssa_admission","scale":30,"ok":true,"allocations":9186,"requested_bytes":1899454,"retained_bytes":140003,"peak_bytes":554184,"elapsed_ns":4307045}
+{"case":"branch_heavy_ssa_admission","scale":150,"ok":true,"allocations":44866,"requested_bytes":9851966,"retained_bytes":669155,"peak_bytes":2755224,"elapsed_ns":21579773}

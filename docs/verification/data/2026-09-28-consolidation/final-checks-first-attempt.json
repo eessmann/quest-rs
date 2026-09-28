@@ -1,0 +1,87 @@
+[
+  {
+    "check": "workspace-build-all",
+    "command": [
+      "cargo",
+      "build",
+      "--workspace",
+      "--all-features",
+      "--locked"
+    ],
+    "exit_code": 0
+  },
+  {
+    "check": "workspace-nextest-final",
+    "command": [
+      "cargo",
+      "nextest",
+      "run",
+      "--workspace",
+      "--all-features",
+      "--locked",
+      "--no-fail-fast"
+    ],
+    "exit_code": 101
+  },
+  {
+    "check": "workspace-doctests-final",
+    "command": [
+      "cargo",
+      "test",
+      "--doc",
+      "--workspace",
+      "--all-features",
+      "--locked"
+    ],
+    "exit_code": 0
+  },
+  {
+    "check": "workspace-clippy",
+    "command": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--all-features",
+      "--locked",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit_code": 101
+  },
+  {
+    "check": "bindings-freshness",
+    "command": [
+      "cargo",
+      "run",
+      "-p",
+      "xtask",
+      "--locked",
+      "--",
+      "generate-quest-bindings",
+      "--check"
+    ],
+    "exit_code": 0
+  },
+  {
+    "check": "workspace-format",
+    "command": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "exit_code": 0
+  },
+  {
+    "check": "diff-whitespace",
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0
+  }
+]

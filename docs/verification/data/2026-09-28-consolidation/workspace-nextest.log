@@ -1,0 +1,701 @@
+   Compiling syn v2.0.119
+   Compiling num-integer v0.1.47
+   Compiling serde v1.0.229
+   Compiling serde_json v1.0.151
+   Compiling num-bigint v0.4.8
+   Compiling quest-language v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-language)
+   Compiling num-rational v0.4.2
+   Compiling num-bigint v0.5.1
+   Compiling transpose v0.2.3
+   Compiling primal-check v0.3.4
+   Compiling rustfft v6.4.1
+   Compiling quest-math v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-math)
+   Compiling quest-optimizer-protocol v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-optimizer-protocol)
+   Compiling quest-qasm v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-qasm)
+   Compiling googletest_macro v0.14.3
+   Compiling equator-macro v0.2.1
+   Compiling googletest v0.14.3
+   Compiling equator v0.2.2
+   Compiling nano-gemm v0.2.2
+   Compiling faer v0.24.4
+   Compiling thiserror-impl v1.0.69
+   Compiling quest-numerics v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-numerics)
+   Compiling thiserror v1.0.69
+   Compiling zerocopy-derive v0.8.57
+   Compiling zerocopy v0.8.57
+   Compiling clap v4.6.6
+   Compiling quest-optimizer-client v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-optimizer-client)
+   Compiling quest-macros v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-macros)
+   Compiling astro-float-num v0.3.7
+   Compiling half v2.7.1
+   Compiling ciborium-ll v0.2.2
+   Compiling ciborium v0.2.2
+   Compiling cmake-file-api v0.1.2
+   Compiling tinytemplate v1.2.1
+   Compiling astro-float-macro v0.4.6
+   Compiling criterion v0.8.2
+   Compiling astro-float v0.9.6
+   Compiling clang-sys v1.9.1
+   Compiling bindgen v0.72.1
+   Compiling quest-build v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-build)
+   Compiling itertools v0.13.0
+   Compiling cxx-build v1.0.198
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling toml v1.1.5+spec-1.1.0
+   Compiling trybuild v1.0.121
+   Compiling quest-sys v0.2.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-sys)
+   Compiling ndarray v0.17.2
+   Compiling quest-polynomial v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-polynomial)
+   Compiling quest-circuit v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-circuit)
+   Compiling quest-qsp v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-qsp)
+   Compiling mpi-sys v0.2.4
+   Compiling quest-qsvt v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-qsvt)
+   Compiling ppv-lite86 v0.2.21
+   Compiling quest-rs v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest)
+   Compiling rand_chacha v0.9.0
+   Compiling rand v0.9.5
+   Compiling hdf5-metno-sys v0.12.3
+   Compiling hdf5-metno-types v0.11.1
+   Compiling proptest v1.11.0
+   Compiling mpi v0.8.2
+   Compiling hdf5-metno v0.14.1
+   Compiling quest-qsvt-io v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-qsvt-io)
+   Compiling string_cache v0.8.9
+   Compiling futures-macro v0.3.34
+   Compiling futures-util v0.3.34
+   Compiling lalrpop v0.19.12
+warning: quest-sys@0.2.0: Using QuEST 4.3.0 from /var/home/erich/Projects/opt/quest with /usr/bin/c++
+warning: quest-sys@0.2.0: Verified rsmpi MPICC /var/home/linuxbrew/.linuxbrew/Cellar/mpich/5.0.1/bin/mpicc matches QuEST MPI ABI and loaded library
+   Compiling quest-qsvt-cli v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-qsvt-cli)
+   Compiling num-iter v0.1.46
+   Compiling logos-derive v0.12.1
+   Compiling num v0.4.3
+   Compiling futures-executor v0.3.34
+   Compiling rstest_macros v0.23.0
+   Compiling dashu-macros v0.4.2
+   Compiling futures v0.3.34
+   Compiling logos v0.12.1
+   Compiling rand_chacha v0.3.1
+   Compiling derive_more-impl v1.0.0
+   Compiling nalgebra-macros v0.3.0
+   Compiling strum_macros v0.25.3
+   Compiling nalgebra v0.34.2
+   Compiling rstest v0.23.0
+   Compiling rand v0.8.8
+   Compiling openqasm v0.1.2
+   Compiling derive_more v1.0.0
+   Compiling dashu v0.4.4
+   Compiling ndarray v0.16.1
+   Compiling quizx v0.3.0
+   Compiling quest-rsgridsynth v0.2.2-quest.1 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/vendor/rsgridsynth)
+   Compiling xtask v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/xtask)
+   Compiling quest-optimizer-worker v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-optimizer-worker)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 36.88s
+────────────
+ Nextest run ID 2c6ffea5-cffd-40ac-94c1-ed45f1a4c67d with nextest profile: default
+    Starting 603 tests across 109 binaries (3 tests skipped)
+        PASS [   0.010s] (  1/603) quest-build tests::admits_only_reviewed_version_precision_and_api_configuration
+        PASS [   0.010s] (  2/603) quest-build probe::tests::paired_mpi_paths_and_library_order_survive_cargo_translation
+        PASS [   0.010s] (  3/603) quest-build probe::tests::rejects_unevaluated_expressions_and_order_sensitive_link_state
+        PASS [   0.010s] (  4/603) quest-build tests::obsolete_overrides_fail_with_migration_guidance
+        PASS [   0.010s] (  5/603) quest-build tests::cross_target_is_rejected_before_host_discovery
+        PASS [   0.010s] (  6/603) quest-build hdf5::tests::package_paths_keep_quoted_spaces_and_reject_unpaired_flags
+        PASS [   0.010s] (  7/603) quest-build tests::rejects_compiler_flags_and_header_search_overrides
+        PASS [   0.010s] (  8/603) quest-build hdf5::tests::serial_header_admission_excludes_independent_mpi_runtime
+        PASS [   0.010s] (  9/603) quest-build probe::tests::rejects_an_unreferenced_shadow_file_in_an_earlier_search_directory
+        PASS [   0.010s] ( 10/603) quest-build package::tests::bridge_archive_directory_cannot_shadow_an_exact_native_library
+        PASS [   0.010s] ( 11/603) quest-build probe::tests::watches_library_and_header_symlink_lookups_as_well_as_targets
+        PASS [   0.010s] ( 12/603) quest-build probe::tests::bridge_paths_preserve_spaces_and_literal_cmake_variable_syntax
+        PASS [   0.010s] ( 13/603) quest-build probe::tests::explicit_shared_files_keep_exact_filename_and_direct_runtime_directory
+        PASS [   0.010s] ( 14/603) quest-build rsmpi::tests::mpi_witness_rejects_same_name_different_library_or_layout
+        PASS [   0.010s] ( 15/603) quest-build tests::linux_paths_use_direct_runpath_and_reject_unrepresentable_paths
+        PASS [   0.010s] ( 16/603) quest-build tests::native_mpi_api_requires_both_mpi_and_subcommunicators
+        PASS [   0.011s] ( 17/603) quest-build probe::tests::rejects_distinct_absolute_libraries_with_the_same_basename
+        PASS [   0.011s] ( 18/603) quest-build tests::normalizes_installed_package_roots_in_lib_and_lib64
+        PASS [   0.012s] ( 19/603) quest-circuit rational::tests::rational_conversion_rounds_ties_and_subnormals_once
+        PASS [   0.012s] ( 20/603) quest-circuit rational::tests::rational_pi_keeps_subnormals_until_the_final_rounding
+        PASS [   0.011s] ( 21/603) quest-circuit workers::review_tests::borrowed_negative_targets_preserve_identity_and_apply_leaf_bit_limits
+        PASS [   0.012s] ( 22/603) quest-circuit model::rational_pi_binding_tests::rational_pi_binding_rounds_only_after_multiplying_by_pi
+        PASS [   0.013s] ( 23/603) quest-circuit rational::tests::rational_pi_refines_around_an_independently_computed_midpoint
+        PASS [   0.017s] ( 24/603) quest-circuit structured_workers::tests::deterministic_trace_proves_loops_calls_and_rejects_observation_or_exhaustion
+        PASS [   0.008s] ( 25/603) quest-circuit::adapters_contract bound_plan_checks_native_indices_without_an_empty_intermediate_stage
+        PASS [   0.007s] ( 26/603) quest-circuit::adapters_contract checked_gate_adapter_uses_registry_arity_and_finite_parameters
+        PASS [   0.008s] ( 27/603) quest-circuit::adapters_contract bindings_share_frozen_operands_without_merging_occurrences
+        PASS [   0.020s] ( 28/603) quest-circuit structured_workers::tests::scalar_word_lowering_preserves_signed_control_phase_exactly
+        PASS [   0.011s] ( 29/603) quest-circuit::definitions_contract adjoint_reverses_explicit_edges_without_serializing_independent_gates
+        PASS [   0.011s] ( 30/603) quest-circuit::definitions_contract failed_definition_expansion_does_not_partially_append
+        PASS [   0.012s] ( 31/603) quest-circuit::core_contract arbitrary_rational_angles_validate_and_normalize_raw_ratios
+        PASS [   0.011s] ( 32/603) quest-circuit::core_contract rejects_foreign_operands_without_consuming_an_occurrence
+        PASS [   0.011s] ( 33/603) quest-circuit::core_contract exact_cancellation_stops_at_measurement
+        PASS [   0.012s] ( 34/603) quest-circuit::core_contract missing_nonfinite_and_duplicate_bindings_are_rejected
+        PASS [   0.012s] ( 35/603) quest-circuit::definitions_contract definition_expansion_preserves_explicit_body_dependencies
+        PASS [   0.011s] ( 36/603) quest-circuit::core_contract stochastic_and_classical_hazards_preserve_order
+        PASS [   0.011s] ( 37/603) quest-circuit::diagnostics source_renderer_labels_original_text_and_rejects_invalid_utf8_ranges
+        PASS [   0.012s] ( 38/603) quest-circuit::core_contract controlled_full_turn_rotation_keeps_relative_phase
+        PASS [   0.012s] ( 39/603) quest-circuit::definitions_contract shared_definitions_expand_with_fresh_occurrences_and_ordered_arguments
+        PASS [   0.012s] ( 40/603) quest-circuit::core_contract upgraded_bigint_rationals_keep_large_ratio_and_subnormal_conversion
+        PASS [   0.011s] ( 41/603) quest-circuit::linear_contract cnot_cancellations_and_preflight_bounds_are_checked
+        PASS [   0.006s] ( 42/603) quest-circuit::linear_contract program_linear_windows_preserve_barriers_and_explicit_dependencies
+        PASS [   0.007s] ( 43/603) quest-circuit::linear_contract gaussian_and_pmh_preserve_independent_basis_permutations_and_order
+        PASS [   0.006s] ( 44/603) quest-circuit::linear_contract whole_program_scan_and_output_copy_are_in_the_pass_budget
+        PASS [   0.017s] ( 45/603) quest-circuit::differential controlling_a_global_phase_changes_only_the_active_branch
+        PASS [   0.017s] ( 46/603) quest-circuit::differential numerical_approximate_unitarity_does_not_grant_exact_capability
+        PASS [   0.017s] ( 47/603) quest-circuit::differential channels_are_effectful_and_completeness_is_checked
+        PASS [   0.017s] ( 48/603) quest-circuit::differential union_fusion_preserves_ordered_operands_and_signed_controls
+        PASS [   0.021s] ( 49/603) quest-circuit::core_contract channel_admission_counts_existing_payloads_and_residual_scratch
+        PASS [   0.013s] ( 50/603) quest-circuit::macro_contract nonfinite_interpolation_is_rejected_at_shared_admission
+        PASS [   0.015s] ( 51/603) quest-circuit::macro_contract bell_macro_uses_the_same_builder_semantics
+        PASS [   0.015s] ( 52/603) quest-circuit::macro_contract interpolation_evaluates_once_in_source_order_and_modifiers_keep_phase
+        PASS [   0.014s] ( 53/603) quest-circuit::optimization_contract dependency_cancellation_crosses_proven_commuting_gates_only
+        PASS [   0.009s] ( 54/603) quest-circuit::optimization_contract opaque_float_rotations_are_not_merged
+        PASS [   0.016s] ( 55/603) quest-circuit::macro_contract macro_operations_retain_original_file_and_keyword_byte_ranges
+        PASS [   0.015s] ( 56/603) quest-circuit::optimization_contract cycles_and_classical_read_write_hazards_are_checked
+        PASS [   0.017s] ( 57/603) quest-circuit::matrix_contract matrix_admission_checks_finiteness_shape_and_budget
+        PASS [   0.020s] ( 58/603) quest-circuit::matrix_contract u_realization_keeps_finite_large_phases_without_overflowing_their_sum
+        PASS [   0.020s] ( 59/603) quest-circuit::matrix_contract registry_u_decomposition_reconstructs_the_full_specification_matrix
+        PASS [   0.020s] ( 60/603) quest-circuit::matrix_contract logical_views_are_copied_including_transpose_and_conjugation
+        PASS [   0.020s] ( 61/603) quest-circuit::matrix_contract padding_is_counted_and_noncontiguous_views_keep_logical_coordinates
+        PASS [   0.020s] ( 62/603) quest-circuit::matrix_contract openqasm31_u_has_specification_phase_and_two_pi_periodicity
+        PASS [   0.020s] ( 63/603) quest-circuit::matrix_contract faer_product_matches_independent_scalar_complex_fixture
+        PASS [   0.020s] ( 64/603) quest-circuit::matrix_contract openqasm31_u_adjoint_keeps_the_conjugated_specification_phase
+        PASS [   0.024s] ( 65/603) quest-circuit::linear_contract seeded_binary_matrices_verify_both_algorithms_through_sixty_four_wires
+        PASS [   0.007s] ( 66/603) quest-circuit::optimization_contract symbolic_merging_preserves_all_finite_bindings
+        PASS [   0.008s] ( 67/603) quest-circuit::oracle_contract adjoint_reverses_operations_and_controls_global_phase
+        PASS [   0.015s] ( 68/603) quest-circuit::optimization_contract fusion_skips_blocks_when_retained_matrices_exhaust_program_budget
+        PASS [   0.012s] ( 69/603) quest-circuit::optimization_contract reports_dependency_depth_before_and_after_exact_rewrites_and_fusion
+        PASS [   0.020s] ( 70/603) quest-circuit::optimization_contract exact_rotation_merging_is_phase_correct_and_idempotent
+        PASS [   0.016s] ( 71/603) quest-circuit::optimization_contract fusion_preserves_multiplication_order_and_provenance
+        PASS [   0.022s] ( 72/603) quest-circuit::macro_contract full_macro_gate_inventory_matches_builder
+        PASS [   0.008s] ( 73/603) quest-circuit::oracle_contract capture_arity_is_checked_before_a_verified_plan_exists
+        PASS [   0.007s] ( 74/603) quest-circuit::oracle_contract portable_oracle_export_retains_global_phase_and_target_order
+        PASS [   0.007s] ( 75/603) quest-circuit::oracle_contract nested_call_adjoint_reverses_oracle_order_and_preserves_controls
+        PASS [   0.008s] ( 76/603) quest-circuit::oracle_contract inverse_of_a_gate_containing_a_numerical_oracle_fails_before_dispatch
+        PASS [   0.007s] ( 77/603) quest-circuit::oracle_contract numerical_adjoint_is_conjugate_transpose_without_exact_admission
+        PASS [   0.009s] ( 78/603) quest-circuit::oracle_contract negative_runtime_power_of_oracle_never_dispatches
+        PASS [   0.025s] ( 79/603) quest-circuit::optimization_contract exact_merge_reports_retain_only_immediate_rewrite_inputs
+        PASS [   0.007s] ( 80/603) quest-circuit::oracle_contract retained_calls_share_storage_but_keep_distinct_occurrences
+        PASS [   0.008s] ( 81/603) quest-circuit::oracle_contract storage_accounting_deduplicates_shared_bodies_without_deduplicating_queries
+        PASS [   0.021s] ( 82/603) quest-circuit::optimization_contract rational_merging_preserves_finite_lowering
+        PASS [   0.008s] ( 83/603) quest-circuit::parity_contract repeated_parity_phase_and_affine_x_network_fold_exactly
+        PASS [   0.009s] ( 84/603) quest-circuit::parity_contract negative_controls_and_explicit_edges_guard_parity_replacements
+        PASS [   0.009s] ( 85/603) quest-circuit::parity_contract complemented_rz_keeps_the_exact_scalar_phase
+        PASS [   0.009s] ( 86/603) quest-circuit::parity_contract program_folding_retains_rz_scalar_phase_and_stops_at_effects_and_opaque_angles
+        PASS [   0.009s] ( 87/603) quest-circuit::oracle_contract structured_oracle_captures_once_and_preserves_calls
+        PASS [   0.007s] ( 88/603) quest-circuit::structured_macro captures_do_not_collide_with_macro_local_names
+        PASS [   0.011s] ( 89/603) quest-circuit::provenance_contract diverging_snapshot_edits_cannot_exchange_history_roots
+        PASS [   0.009s] ( 90/603) quest-circuit::structured_contract parsed_language_error_owns_renderable_source
+        PASS [   0.010s] ( 91/603) quest-circuit::structured_contract capture_admission_rejects_missing_values
+        PASS [   0.010s] ( 92/603) quest-circuit::structured_contract structured_stages_retain_source_and_verified_loop_arguments
+        PASS [   0.007s] ( 93/603) quest-circuit::structured_macro macro_float_pi_and_integer_division_remain_language_values
+        PASS [   0.014s] ( 94/603) quest-circuit::provenance_contract definition_history_budget_rejection_keeps_the_builder_transactional
+        PASS [   0.014s] ( 95/603) quest-circuit::provenance_contract empty_replacements_retain_distinct_rewrite_events
+        PASS [   0.014s] ( 96/603) quest-circuit::provenance_contract exact_rewrite_work_and_history_storage_budgets_reject_without_publishing
+        PASS [   0.009s] ( 97/603) quest-circuit::structured_macro macro_uses_shared_types_declarations_and_loop_ssa
+        PASS [   0.013s] ( 98/603) quest-circuit::structured_macro compiler_tracked_file_and_bundled_includes_share_admission
+        PASS [   0.016s] ( 99/603) quest-circuit::provenance_contract exact_then_fusion_preserves_history_and_current_dependency_endpoints
+        PASS [   0.015s] (100/603) quest-circuit::provenance_contract parity_outputs_share_history_and_later_fusion_deduplicates_sources
+        PASS [   0.009s] (101/603) quest-circuit::structured_optimization posttransform_compile_and_work_limits_are_enforced
+        PASS [   0.010s] (102/603) quest-circuit::structured_optimization macro_captures_and_original_export_sources_survive_quantum_replacement
+        PASS [   0.010s] (103/603) quest-circuit::structured_optimization float_parameters_only_allow_structural_inverse_and_never_ideal_pi_folding
+        PASS [   0.011s] (104/603) quest-circuit::structured_optimization dynamic_indices_reference_parameters_and_effects_guard_windows
+        PASS [   0.011s] (105/603) quest-circuit::structured_optimization classical_constants_enable_quantum_windows_without_crossing_trapping_work
+        PASS [   0.010s] (106/603) quest-circuit::structured_optimization exact_quantum_windows_cancel_across_constant_indices_and_keep_loop_cfg
+        PASS [   0.011s] (107/603) quest-circuit::structured_optimization parity_scalar_omega_is_encoded_as_a_proved_exact_clifford_word
+        PASS [   0.023s] (108/603) quest-circuit::provenance_contract composed_passes_budget_retained_history_even_with_one_surviving_operation
+        PASS [   0.007s] (109/603) quest-language::builder_contract boolean_construction_obeys_zero_storage_and_node_budgets
+        PASS [   0.007s] (110/603) quest-language semantic::builder::shared::tests::shallow_nodes_admit_retained_arc_storage_before_allocation
+        PASS [   0.006s] (111/603) quest-language::builder_contract typed_builder_rejects_foreign_handles_and_invalid_widths
+        PASS [   0.007s] (112/603) quest-language::builder_contract typed_builder_gate_parameters_do_not_bypass_explicit_cast_rules
+        PASS [   0.007s] (113/603) quest-language::builder_contract typed_builder_constructs_control_flow_through_shared_admission
+        PASS [   0.007s] (114/603) quest-language::builder_contract typed_builder_bounds_shared_expression_expansion_before_materialization
+        PASS [   0.005s] (115/603) quest-language::builder_contract typed_builder_uses_hygienic_names_and_rejects_nested_qubit_declarations
+        PASS [   0.015s] (116/603) quest-circuit::structured_optimization vm_executed_loop_windows_and_signed_controls_have_exact_full_matrix_equality
+        PASS [   0.015s] (117/603) quest-circuit::tutorials owned_diagnostic_retains_source_and_typed_cause
+        PASS [   0.015s] (118/603) quest-circuit::tutorials structured_macro_builds_bell_program
+        PASS [   0.018s] (119/603) quest-circuit::tutorials compiler_tracked_source_uses_the_same_structured_pipeline
+        PASS [   0.017s] (120/603) quest-circuit::tutorials numeric_widths_and_integer_division_are_explicit
+        PASS [   0.014s] (121/603) quest-circuit::tutorials typed_builder_keeps_classical_categories_and_loop_values
+        PASS [   0.019s] (122/603) quest-circuit::tutorials classical_optimization_reports_changes_and_retains_export_authority
+        PASS [   0.008s] (123/603) quest-language::classical_contract angle_casts_are_modular_and_ties_even
+        PASS [   0.006s] (124/603) quest-language::classical_contract casts_preserve_bits_and_reject_invalid_widths_and_nonfinite_values
+        PASS [   0.006s] (125/603) quest-language::classical_contract standard_builtins_keep_widths_and_signed_rotation_distances
+        PASS [   0.019s] (126/603) quest-circuit::tutorials ideal_builder_separates_exact_rewrites_binding_and_numerical_fusion
+        PASS [   0.007s] (127/603) quest-language::classical_contract angle_products_preserve_units_and_reject_mixed_addition
+        PASS [   0.014s] (128/603) quest-circuit::worker_contract unchanged_worker_output_obeys_aggregate_provenance_budget
+        PASS [   0.007s] (129/603) quest-language::classical_contract integer_division_and_checked_signed_overflow
+        PASS [   0.007s] (130/603) quest-language::classical_contract explicit_cast_categories_follow_the_openqasm_allowed_cast_table
+        PASS [   0.007s] (131/603) quest-language::contracts diagnostic_checks_trace_and_replacement_spans_without_labels
+        PASS [   0.007s] (132/603) quest-language::contracts controlled_gate_signature_separates_controls_from_targets
+        PASS [   0.007s] (133/603) quest-language::contracts diagnostic_keeps_typed_budget_and_cross_source_expansion_context
+        PASS [   0.015s] (134/603) quest-circuit::worker_contract explicit_synthesis_validates_epsilon_even_without_any_rotation
+        PASS [   0.017s] (135/603) quest-circuit::tutorials structured_quantum_optimization_keeps_syntax_and_reports_inverse_pairs
+        PASS [   0.006s] (136/603) quest-language::contracts exact_u_decomposition_keeps_global_phase_and_execution_order
+        PASS [   0.007s] (137/603) quest-language::contracts diagnostic_roundtrip_preserves_sources_causes_and_suggestions
+        PASS [   0.006s] (138/603) quest-language::contracts registry_adjoint_and_decomposition_references_are_well_formed
+        PASS [   0.023s] (139/603) quest-circuit::tutorials import_export_preserves_explicit_includes_and_owned_sources
+        PASS [   0.006s] (140/603) quest-language::contracts location_only_occurrences_allow_missing_text_but_validate_present_snapshots
+        PASS [   0.006s] (141/603) quest-language::contracts renderer_rejects_deserialized_spans_splitting_utf8
+        PASS [   0.006s] (142/603) quest-language::contracts serde_rejects_reversed_spans_and_duplicate_snapshot_identities
+        PASS [   0.006s] (143/603) quest-language::contracts source_errors_convert_without_inventing_structured_fields
+        PASS [   0.007s] (144/603) quest-language::contracts renderer_uses_snapshots_and_preserves_multiple_labels
+        PASS [   0.006s] (145/603) quest-language::contracts source_identity_cannot_replace_an_existing_snapshot
+        PASS [   0.006s] (146/603) quest-language::contracts source_spans_reject_reversal_bounds_and_split_utf8
+        PASS [   0.008s] (147/603) quest-language::optimization_contract loops_with_different_incoming_values_remain_dynamic
+        PASS [   0.009s] (148/603) quest-language::edit_contract allocated_ids_are_owned_unique_and_carry_no_publication_proof
+        PASS [   0.008s] (149/603) quest-language::optimization_contract cse_keeps_first_potential_trap_and_does_not_remove_unused_division
+        PASS [   0.008s] (150/603) quest-language::edit_contract verified_snapshots_reject_handles_from_other_edit_publications
+        PASS [   0.009s] (151/603) quest-language::optimization_contract constant_and_dynamic_failures_keep_the_same_completed_effect_prefix
+        PASS [   0.009s] (152/603) quest-language::optimization_contract folds_constants_and_executable_branches_without_removing_gate_occurrences
+        PASS [   0.009s] (153/603) quest-language::optimization_contract constant_gate_parameter_interpretation_folds_without_a_forbidden_source_cast
+        PASS [   0.009s] (154/603) quest-language::optimization_contract optimization_work_and_storage_limits_fail_transactionally
+        PASS [   0.007s] (155/603) quest-language::optimization_contract signed_zero_is_not_merged_across_constants_or_phi_inputs
+        PASS [   0.010s] (156/603) quest-language::optimization_contract optimization_preserves_loops_joins_outputs_and_quantum_memory_effects
+        PASS [   0.008s] (157/603) quest-language::optimization_contract removes_dead_proven_nontrapping_computation
+        PASS [   0.007s] (158/603) quest-language::ssa_contract compilation_budgets_precede_recursive_ast_traversal_and_large_storage
+        PASS [   0.008s] (159/603) quest-language::ssa_contract admits_mixed_functions_dynamic_parameters_aliases_and_typed_return
+        PASS [   0.008s] (160/603) quest-language::ssa_contract broadcasts_user_gates_but_keeps_mixed_reference_shapes_exact
+        PASS [   0.007s] (161/603) quest-language::ssa_contract creates_scalar_block_arguments_for_branch_and_loop_carried_values
+        PASS [   0.007s] (162/603) quest-language::ssa_contract constant_widths_are_available_in_forward_function_signatures
+        PASS [   0.007s] (163/603) quest-language::ssa_contract controlled_user_gate_carries_external_controls_separately
+        PASS [   0.008s] (164/603) quest-language::ssa_contract constant_control_paths_preserve_definite_assignment_and_total_returns
+        PASS [   0.007s] (165/603) quest-language::ssa_contract contextual_array_literals_obey_element_width_and_const_admission
+        PASS [   0.007s] (166/603) quest-language::ssa_contract gate_parameters_require_real_values_without_implicit_bit_interpretation
+        PASS [   0.006s] (167/603) quest-language::ssa_contract independent_verifier_rejects_foreign_region_entry_identity
+        PASS [   0.007s] (168/603) quest-language::ssa_contract independent_verifier_rejects_duplicate_named_input_output_interfaces
+        PASS [   0.007s] (169/603) quest-language::ssa_contract dynamic_explicit_casts_reject_forbidden_type_pairs_before_execution
+        PASS [   0.008s] (170/603) quest-language::ssa_contract global_quantum_allocations_hoist_without_forward_name_visibility
+        PASS [   0.007s] (171/603) quest-language::ssa_contract independent_verifier_rejects_forged_cast_between_forbidden_categories
+        PASS [   0.007s] (172/603) quest-language::ssa_contract implicit_conversions_do_not_grant_explicit_bit_or_angle_casts
+        PASS [   0.008s] (173/603) quest-language::ssa_contract gate_powers_reject_implicit_noninteger_counts_during_admission
+        PASS [   0.006s] (174/603) quest-language::ssa_contract independent_verifier_rejects_forged_immutable_reinitialization
+        PASS [   0.006s] (175/603) quest-language::ssa_contract independent_verifier_rejects_forward_value_use
+        PASS [   0.007s] (176/603) quest-language::ssa_contract independent_verifier_rejects_forged_noninteger_power_values
+        PASS [   0.007s] (177/603) quest-language::ssa_contract independent_verifier_rejects_stale_memory_wrong_results_and_missing_edge_arguments
+        PASS [   0.006s] (178/603) quest-language::ssa_contract local_nonconstant_shadow_cannot_supply_global_constant_array_extent
+        PASS [   0.007s] (179/603) quest-language::ssa_contract independently_rejects_foreign_ids_effect_tampering_and_unsealed_blocks
+        PASS [   0.006s] (180/603) quest-language::ssa_contract permits_value_parameter_mutation_but_rejects_effectful_gate_bodies
+        PASS [   0.007s] (181/603) quest-language::ssa_contract normalized_negative_indices_cannot_hide_mutable_aliases
+        PASS [   0.008s] (182/603) quest-language::ssa_contract independent_verifier_requires_a_parameterless_void_mixed_program_entry
+        PASS [   0.006s] (183/603) quest-language::ssa_contract quantum_declarations_are_restricted_to_global_scope
+        PASS [   0.009s] (184/603) quest-language::ssa_contract lowers_for_ranges_sets_arrays_and_switch_with_control_transfers
+        PASS [   0.006s] (185/603) quest-language::ssa_contract rejects_recursive_calls_and_aliased_gate_operands
+        PASS [   0.006s] (186/603) quest-language::ssa_contract rejects_nonunitary_gate_effects_even_in_constant_dead_branches
+        PASS [   0.006s] (187/603) quest-language::ssa_contract retained_bytes_include_nested_owned_capacity
+        PASS [   0.009s] (188/603) quest-language::ssa_contract proves_partial_array_and_bit_initialization_across_branches
+        PASS [   0.007s] (189/603) quest-language::ssa_contract rejects_invalid_mutability_return_width_and_control_context
+        PASS [   0.006s] (190/603) quest-language::ssa_contract rejects_reads_not_assigned_on_every_branch
+        PASS [   0.008s] (191/603) quest-language::ssa_contract quantum_dependency_graph_retains_occurrences_without_cfg_backedges
+        PASS [   0.005s] (192/603) quest-language::syntax_contract rejects_truncated_syntax_and_hardware_capabilities
+        PASS [   0.007s] (193/603) quest-language::ssa_contract switch_labels_are_distinct_after_selector_width_conversion
+        PASS [   0.007s] (194/603) quest-language::ssa_contract verifies_loop_back_edges_and_preserves_gate_occurrences
+        PASS [   0.006s] (195/603) quest-language::syntax_contract comma_indices_match_nested_indices_and_scalar_gate_modifiers_survive
+        PASS [   0.006s] (196/603) quest-language::syntax_contract preserves_integer_precedence_and_structured_control
+        PASS [   0.008s] (197/603) quest-language::syntax_contract retains_gate_and_subroutine_declarations
+        PASS [   0.006s] (198/603) quest-language::vm_contract duplicate_input_insertion_preserves_the_original_value
+        PASS [   0.007s] (199/603) quest-language::vm_contract broadcasts_user_gates_and_vector_controls_in_lane_order
+        PASS [   0.008s] (200/603) quest-language::vm_contract captures_dynamic_parameters_and_user_gate_adjoint_powers_are_exactly_ordered
+        PASS [   0.009s] (201/603) quest-language::vm_contract arrays_mutable_references_and_runtime_alias_checks_use_actual_indices
+        PASS [   0.009s] (202/603) quest-language::vm_contract backend_failures_retain_location_context_and_completed_prefix
+        PASS [   0.006s] (203/603) quest-language::vm_contract integer_gate_powers_preserve_signed_adjoint_and_runtime_unsigned_counts
+        PASS [   0.007s] (204/603) quest-language::vm_contract physically_allocates_verified_partially_initialized_arrays_and_bitstrings
+        PASS [   0.007s] (205/603) quest-language::vm_contract executes_cfg_backedges_branches_returns_and_owned_outputs
+        PASS [   0.008s] (206/603) quest-language::vm_contract intrinsic_and_explicit_controls_measurement_reset_and_barrier_are_dispatched
+        PASS [   0.008s] (207/603) quest-language::vm_contract executes_break_continue_nested_calls_and_scalar_builtins
+        PASS [   0.008s] (208/603) quest-language::vm_contract dynamic_indices_and_all_runtime_limits_fail_before_unsafe_progress
+        PASS [   0.007s] (209/603) quest-language::vm_contract shared_builder_expressions_preserve_materialized_evaluation_and_occurrences
+        PASS [   0.007s] (210/603) quest-math::approximation exact_dyadic_decoding_preserves_subnormals_and_rejects_nonfinite_payloads
+        PASS [   0.008s] (211/603) quest-math::approximation basis_conjugation_orientations_are_certified_independently
+        PASS [   0.007s] (212/603) quest-language::vm_contract user_gate_angle_arguments_use_radians_without_permitting_float_casts
+        PASS [   0.010s] (213/603) quest-language::vm_contract range_advance_handles_signed_and_unsigned_boundaries_and_zero_step_assertion
+        PASS [   0.007s] (214/603) quest-math::approximation rotation_two_pi_phase_is_not_reduced_away
+        PASS [   0.008s] (215/603) quest-math::approximation golden_frobenius_bound_for_t_minus_identity_is_two_minus_sqrt_two
+        PASS [   0.007s] (216/603) quest-math::approximation tiny_dyadic_angles_have_proved_pass_fail_tolerance_boundaries
+        PASS [   0.008s] (217/603) quest-math::approximation mathematical_rotation_certificates_keep_phase_and_input_identity
+        PASS [   0.006s] (218/603) quest-math::exact hadamard_then_t_has_independent_exact_coefficients
+        PASS [   0.007s] (219/603) quest-math::controlled existing_base_scalar_control_is_remapped_to_the_new_target
+        PASS [   0.012s] (220/603) quest-macros adapter::tests::token_punctuation_preserves_operators_and_string_literals
+        PASS [   0.008s] (221/603) quest-math::controlled controlled_lift_rejects_incomplete_overlapping_and_over_budget_interfaces
+        PASS [   0.012s] (222/603) quest-macros adapter::tests::shared_grammar_retains_control_and_capture_order
+        PASS [   0.006s] (223/603) quest-math::exact exact_matrices_preserve_product_order_and_scalar_phase
+        PASS [   0.006s] (224/603) quest-math::exact signed_controls_and_nonsorted_targets_match_independent_basis_maps
+        PASS [   0.007s] (225/603) quest-math::exact bounds_and_duplicate_operands_are_checked_before_matrix_work
+        PASS [   0.006s] (226/603) quest-math::exact sequence_and_matrix_allocations_share_one_budget
+        PASS [   0.008s] (227/603) quest-math::controlled exact_controlled_rotation_matches_signed_nonsorted_full_matrix
+        PASS [   0.008s] (228/603) quest-math::exact all_primitive_inverses_and_controlled_scalar_phases_are_exact
+        PASS [   0.006s] (229/603) quest-math::ring conjugation_and_admission_respect_exact_resource_bounds
+        PASS [   0.006s] (230/603) quest-math::ring eighth_roots_and_sqrt_two_retain_exact_phase
+        PASS [   0.007s] (231/603) quest-numerics::kernels complex_convolution_has_exact_support_and_reuses_buffers
+        PASS [   0.006s] (232/603) quest-numerics::kernels convolution_recovers_after_rejection_and_overflow
+        PASS [   0.006s] (233/603) quest-numerics::kernels fft_rejects_invalid_lengths_budgets_and_nonfinite_inputs
+        PASS [   0.008s] (234/603) quest-numerics::kernels caller_owned_parallel_policy_preserves_results_and_error_order
+        PASS [   0.009s] (235/603) quest-numerics::kernels available_simd_matches_scalar_with_explicit_tolerance
+        PASS [   0.007s] (236/603) quest-numerics::kernels intervals_enclose_arithmetic_and_check_elementary_domains
+        PASS [   0.007s] (237/603) quest-numerics::kernels interval_arithmetic_preserves_subnormals_and_rejects_overflow
+        PASS [   0.007s] (238/603) quest-numerics::kernels fft_matches_independent_four_point_dft_and_normalized_round_trip
+        PASS [   0.007s] (239/603) quest-numerics::kernels prime_length_fft_matches_direct_scalar_dft
+        PASS [   0.006s] (240/603) quest-numerics::observer backward_caller_clock_is_marked_instead_of_underflowing
+        PASS [   0.007s] (241/603) quest-numerics::kernels resource_admission_includes_convolution_buffers_and_three_transforms
+        PASS [   0.006s] (242/603) quest-numerics::observer chrome_json_contains_typed_stage_outcomes_and_trace_loss
+        PASS [   0.007s] (243/603) quest-numerics::observer compile_time_noop_observer_never_reads_the_clock
+        PASS [   0.043s] (244/603) quest-language::ssa_contract branch_heavy_region_verifies_with_linear_dominance_storage
+        PASS [   0.011s] (245/603) quest-numerics::kernels forward_normalization_and_inverse_sign_are_independent
+        PASS [   0.006s] (246/603) quest-numerics::observer nested_scopes_include_the_complete_operation_and_its_retry_loop
+        PASS [   0.006s] (247/603) quest-numerics::observer trace_outcomes_and_exhaustion_are_explicit
+        PASS [   0.008s] (248/603) quest-numerics::observer owned_trace_records_success_errors_and_early_drop
+        PASS [   0.068s] (249/603) quest-circuit::worker_contract numerical_oracle_calls_keep_local_certificates_without_a_global_bound
+        PASS [   0.010s] (250/603) quest-optimizer-client process::review_tests::exit_observation_keeps_pid_owned_until_group_cleanup_and_reap
+        PASS [   0.018s] (251/603) quest-numerics::kernels prepared_parallel_fft_pair_preserves_bits_and_left_first_input_errors
+        PASS [   0.012s] (252/603) quest-optimizer-client::process_contract bounded_valid_response_and_capability_rejection
+        PASS [   0.024s] (253/603) quest-math::oracle pinned_nonclifford_pi_over_seven_sequence_is_certified_at_one_e_minus_twelve
+        PASS [   0.020s] (254/603) quest-optimizer-client::process_contract rejects_malformed_output_and_wrong_seed
+        PASS [   0.016s] (255/603) quest-optimizer-worker::structured_contract structured_zx_preserves_a_real_extracted_nonidentity_scalar
+        PASS [   0.019s] (256/603) quest-optimizer-worker::circuit_contract zx_replacements_are_transactional_and_preserve_measurement_occurrences
+        PASS [   0.016s] (257/603) quest-optimizer-worker::structured_contract structured_zx_retains_effects_cfg_and_failed_candidates
+        PASS [   0.030s] (258/603) quest-numerics::kernels power_of_two_fft_admits_logarithmic_work_budget_and_keeps_arbitrary_length_accounting
+        PASS [   0.024s] (259/603) quest-optimizer-client::process_contract well_formed_candidates_still_need_independent_mathematical_admission
+        PASS [   0.008s] (260/603) quest-optimizer-worker::bin/quest-optimizer-worker synthesis::tests::impossible_precision_is_rejected_before_search
+        PASS [   0.042s] (261/603) quest-math::oracle independent_decimal_full_matrix_oracles_bracket_every_axis_and_angle_kind
+        PASS [   0.048s] (262/603) quest-math::approximation huge_finite_dyadic_angles_use_certified_range_reduction
+        PASS [   0.019s] (263/603) quest-optimizer-worker::zx_process real_zx_worker_certifies_negative_control_and_declines_unsupported_control
+        PASS [   0.010s] (264/603) quest-optimizer-worker::bin/quest-optimizer-worker zx::tests::exactly_supported_signed_controls_survive_extraction
+        PASS [   0.006s] (265/603) quest-optimizer-worker::bin/quest-optimizer-worker zx::tests::extracted_ancilla_and_changed_interfaces_are_not_admitted
+        PASS [   0.006s] (266/603) quest-optimizer-worker::bin/quest-optimizer-worker zx::tests::unsupported_controls_and_malformed_interfaces_return_errors
+        PASS [   0.008s] (267/603) quest-optimizer-worker::bin/quest-optimizer-worker zx::tests::extracted_scalar_phase_is_recovered_with_candidate_target_order
+        PASS [   0.008s] (268/603) quest-optimizer-worker::bin/quest-optimizer-worker zx::tests::real_engine_cancels_gates_and_preserves_idle_interface
+        PASS [   0.006s] (269/603) quest-optimizer-worker::bin/quest-optimizer-worker zx::tests::zero_qubit_scalar_and_deterministic_seed_interface_are_preserved
+        PASS [   0.031s] (270/603) quest-optimizer-worker::zx_process real_zx_worker_returns_phase_sensitive_certificate_for_original_interface
+        PASS [   0.008s] (271/603) quest-polynomial::analysis callback_functions_require_an_explicit_consistency_assumption
+        PASS [   0.010s] (272/603) quest-polynomial::analysis basis_derivatives_preserve_parameters_and_match_exact_legendre_identity
+        PASS [   0.008s] (273/603) quest-polynomial::analysis derivatives_keep_basis_families_and_intervals_enclose_original_parameters
+        PASS [   0.009s] (274/603) quest-polynomial::analysis conversions_return_enclosed_error_and_parity_is_admitted
+        PASS [   0.006s] (275/603) quest-polynomial::analysis exact_cosine_conversion_rejects_underflow_that_changes_the_polynomial
+        PASS [   0.007s] (276/603) quest-polynomial::analysis explicit_conversion_preserves_complex_response_across_parameterized_bases
+        PASS [   0.052s] (277/603) quest-numerics::warm_parallel warmed_caller_pool_fft_pairs_allocate_nothing
+        PASS [   0.006s] (278/603) quest-polynomial::analysis expression_views_preserve_the_original_single_expression
+        PASS [   0.009s] (279/603) quest-polynomial::analysis one_expression_evaluates_values_and_encloses_derivatives
+        PASS [   0.009s] (280/603) quest-polynomial::analysis remez_linear_square_matches_known_minimax_and_certifies_domain
+        PASS [   0.007s] (281/603) quest-polynomial::bases admission_rejects_bad_parameters_nonfinite_payloads_and_storage_limits
+        PASS [   0.006s] (282/603) quest-polynomial::bases complex_laurent_support_is_preserved_and_zero_poles_are_errors
+        PASS [   0.005s] (283/603) quest-polynomial::bases cosine_laurent_conversion_preserves_complex_response_and_signed_support
+        PASS [   0.062s] (284/603) quest-optimizer-client::process_contract memory_limit_is_applied_before_worker_execution
+        PASS [   0.008s] (285/603) quest-polynomial::bases named_bases_match_independent_low_degree_formulas
+        PASS [   0.010s] (286/603) quest-qasm::admission semantic_include_failure_owns_label_and_expansion_trace
+        PASS [   0.011s] (287/603) quest-qasm::admission semantic_errors_own_their_source_after_resolver_drops
+        PASS [   0.022s] (288/603) quest-polynomial::analysis root_isolation_keeps_tangent_roots_unresolved_and_rejects_budget_exhaustion
+        PASS [   0.008s] (289/603) quest-qasm::admission semantic_resource_diagnostics_preserve_exact_usage
+        PASS [   0.011s] (290/603) quest-qasm::includes conflicting_source_identity_and_nested_include_are_rejected
+        PASS [   0.007s] (291/603) quest-qasm::includes includes_preserve_order_and_own_all_source_snapshots
+        PASS [   0.008s] (292/603) quest-qasm::includes missing_cycle_and_include_budgets_return_owned_diagnostics
+        PASS [   0.007s] (293/603) quest-qasm::includes parser_budgets_keep_exact_resource_metadata
+        PASS [   0.022s] (294/603) quest-qasm::admission admitted_import_export_import_preserves_definitions_and_control
+        PASS [   0.008s] (295/603) quest-qasm::roundtrip export_budgets_report_exact_resource_usage
+        PASS [   0.007s] (296/603) quest-qasm::roundtrip export_preserves_measurement_index_precedence_and_rejects_nontextual_types
+        PASS [   0.007s] (297/603) quest-qasm::roundtrip exporter_rejects_unresolved_captures_and_lexical_injection
+        PASS [   0.007s] (298/603) quest-qasm::roundtrip gate_operands_cannot_be_reinterpreted_as_parameters
+        PASS [   0.013s] (299/603) quest-qasm::roundtrip canonical_export_preserves_every_structured_syntax_variant
+        PASS [   0.009s] (300/603) quest-qasm::stdlib pinned_sources_and_only_documented_phase_corrections_are_exact
+        PASS [   0.007s] (301/603) quest-qsp certification::interval::tests::backend_error_sentinel_is_not_erased_by_zero_or_absolute_shortcuts
+        PASS [   0.007s] (302/603) quest-qsp admission::tests::interval_fft_encloses_independent_four_point_values
+        PASS [   0.014s] (303/603) quest-qasm::stdlib only_exact_pinned_library_may_use_registry_intrinsics
+        PASS [   0.015s] (304/603) quest-qasm::stdlib shared_expanded_admission_validates_the_pinned_statement_body
+        PASS [   0.008s] (305/603) quest-qsp certification::interval::tests::zero_polynomial_does_not_hide_invalid_other_convolution_operand
+        PASS [   0.008s] (306/603) quest-qsp certification::tests::canonical_conversion_is_checked_against_original_source_independently
+        PASS [   0.044s] (307/603) quest-polynomial::warm_evaluation warmed_scalar_interval_and_derivative_evaluation_allocate_nothing
+        PASS [   0.100s] (308/603) quest-optimizer-client::process_contract timeout_and_output_limit_kill_the_process_group
+        PASS [   0.020s] (309/603) quest-qsp admission::tests::circle_bound_admits_a_contracting_target_whose_coefficient_sum_exceeds_one
+        PASS [   0.008s] (310/603) quest-qsp certification::tests::directed_interval_non_ties_and_nonfinite_endpoints_are_checked
+        PASS [   0.006s] (311/603) quest-qsp certification::tests::exact_admission_and_outward_summary_keep_the_smallest_subnormal
+        PASS [   0.013s] (312/603) quest-qsp certification::tests::canonical_large_phase_uses_the_exact_export_without_period_reduction
+        PASS [   0.006s] (313/603) quest-qsp certification::tests::interval_exact_dyadics_preserve_cancellation_and_complex_products
+        PASS [   0.099s] (314/603) quest-optimizer-worker::synthesis_process fixed_exact_phase_sequence_survives_the_bounded_process
+        PASS [   0.008s] (315/603) quest-qsp certification::tests::exact_coefficient_violation_is_distinct_from_unestablished_bound
+        PASS [   0.006s] (316/603) quest-qsp certification::tests::source_precision_memory_and_work_budgets_fail_explicitly
+        PASS [   0.009s] (317/603) quest-qsp certification::tests::multiprecision_acceptance_does_not_round_an_above_tolerance_bound_to_binary64
+        PASS [   0.007s] (318/603) quest-qsp kernel::parallel_tests::joined_tree_reports_left_budget_failure_before_right_nonfinite_input
+        PASS [   0.097s] (319/603) quest-optimizer-worker::bin/quest-optimizer-worker synthesis::tests::exact_pi_over_four_preserves_scalar_phase_at_twelve_digits
+        PASS [   0.009s] (320/603) quest-qsp kernel::parallel_tests::parallel_pointwise_failure_selects_the_first_input_index
+        PASS [   0.013s] (321/603) quest-qsp certification::tests::precision_retries_verify_same_phase_export_and_separate_insufficient_bounds
+        PASS [   0.006s] (322/603) quest-qsp offline::number::tests::exact_subnormal_components_and_zero_arithmetic_keep_configured_precision
+        PASS [   0.006s] (323/603) quest-qsp offline::number::tests::invalid_arbitrary_arithmetic_reaches_typed_boundary_errors
+        PASS [   0.008s] (324/603) quest-qsp offline::remez::tests::exported_error_enclosure_charges_the_offline_work_budget
+        PASS [   0.006s] (325/603) quest-qsp precision::tests::half_subnormal_and_midpoint_round_in_the_requested_direction
+        PASS [   0.006s] (326/603) quest-qsp::astro_conversion backend_exponent_extremes_and_signed_zero_keep_directional_semantics
+        PASS [   0.007s] (327/603) quest-qsp precision::tests::finite_binary64_import_roundtrips_exact_bits_in_every_rounding_mode
+        PASS [   0.008s] (328/603) quest-qsp offline::remez::tests::pivoted_arbitrary_qr_solves_independent_integer_reference
+        PASS [   0.005s] (329/603) quest-qsp::astro_conversion invalid_inputs_keep_backend_nonfinite_and_precision_errors_distinct
+        PASS [   0.005s] (330/603) quest-qsp::astro_conversion storage_padding_and_sticky_bits_cross_multiple_word_boundaries
+        PASS [   0.008s] (331/603) quest-qsp::astro_conversion rounding_provenance_does_not_change_the_represented_dyadic
+        PASS [   0.255s] (332/603) quest-circuit rational::tests::rational_pi_rejects_uncertainty_beyond_the_precision_cap
+        PASS [   0.034s] (333/603) quest-qsp certification::tests::interval_fft_contains_direct_rational_convolution_with_exact_support
+        PASS [   0.012s] (334/603) quest-qsp::certification canonical_certification_reconstructs_exported_phases_and_source_conversion
+        PASS [   0.006s] (335/603) quest-qsp::imported generalized_angle_import_keeps_the_final_k_matrix
+        PASS [   0.008s] (336/603) quest-qsp::certification near_contractivity_boundary_is_verified_without_normalizing_export
+        PASS [   0.006s] (337/603) quest-qsp::imported phase_convention_import_and_conversion_are_explicit
+        PASS [   0.006s] (338/603) quest-qsp::imported symmetric_phase_admission_compares_actual_rotations_at_large_arguments
+        PASS [   0.021s] (339/603) quest-qsp::certification frozen_complex_export_is_checked_independently_with_both_convolutions
+        PASS [   0.007s] (340/603) quest-qsp::offline empty_offline_generalized_laurent_preserves_zero_and_positive_offset
+        PASS [   0.149s] (341/603) quest-optimizer-worker::synthesis_process nontrivial_process_certificate_lifts_to_signed_controls_without_losing_its_bound
+        PASS [   0.028s] (342/603) quest-qsp::certification higher_degree_symmetric_phases_certify_the_canonical_wx_response
+        PASS [   0.010s] (343/603) quest-qsp::offline offline_arbitrary_remez_uses_original_expression_and_pivoted_qr
+        PASS [   0.051s] (344/603) quest-qsp::astro_conversion midpoint_neighbors_round_with_sign_parity_and_gradual_underflow
+        PASS [   0.181s] (345/603) quest-optimizer-worker::circuit_contract explicit_synthesis_retains_target_identity_control_phase_and_local_certificates
+        PASS [   0.158s] (346/603) quest-optimizer-worker::bin/quest-optimizer-worker synthesis::tests::x_and_y_basis_changes_retain_full_phase
+        PASS [   0.031s] (347/603) quest-qsp::offline explicit_offline_near_boundary_retains_original_input
+        PASS [   0.087s] (348/603) quest-qsp certification::tests::dyadic_twiddle_axes_octants_and_periodicity_use_exact_integer_reduction
+        PASS [   0.006s] (349/603) quest-qsp::offline offline_rejects_precision_that_would_be_silently_rounded_to_a_backend_word
+        PASS [   0.298s] (350/603) quest-circuit::differential randomized_exact_pass_and_fusion_preserve_complex_state_including_phase
+        PASS [   0.041s] (351/603) quest-qsp::offline explicit_offline_complex_synthesis_exports_then_independently_certifies
+        PASS [   0.005s] (352/603) quest-qsp::offline remez_policy_checks_exact_modeled_storage_boundary
+        PASS [   0.042s] (353/603) quest-qsp::offline offline_canonical_phases_keep_the_wx_convention
+        PASS [   0.006s] (354/603) quest-qsp::offline remez_policy_rejects_unbounded_subdivision_storage
+        PASS [   0.013s] (355/603) quest-qsp::offline offline_subnormal_canonical_conversion_retains_original_and_certifies_rounding
+        PASS [   0.007s] (356/603) quest-qsp::parallel caller_pools_do_not_retry_failed_work_budgets_with_another_backend
+        PASS [   0.008s] (357/603) quest-qsp::parallel canonical_pool_scope_ends_before_frozen_phase_payload_is_used
+        PASS [   0.030s] (358/603) quest-qsp::offline offline_rejects_work_budgets_and_does_not_hide_export_rounding_failure
+        PASS [   0.006s] (359/603) quest-qsp::phase_conversion ordinary_phase_shifts_keep_existing_bits_and_accumulate_diagnostics
+        PASS [   0.011s] (360/603) quest-qsp::phase_conversion huge_phase_conversion_preserves_full_matrices_without_period_reduction
+        PASS [   0.007s] (361/603) quest-qsp::precision_boundary production_kernels_and_native_execution_cannot_dispatch_to_the_cold_backend
+        PASS [   0.007s] (362/603) quest-qsp::production canonical_freezing_checks_actual_exported_phase_trigonometry
+        PASS [   0.221s] (363/603) quest-optimizer-worker::structured_contract structured_synthesis_preserves_signed_control_phase_and_source_export
+        PASS [   0.009s] (364/603) quest-qsp::production canonical_degree_one_has_the_wx_imaginary_response_convention
+        PASS [   0.007s] (365/603) quest-qsp::production completion_accounts_for_live_payload_beside_fft_plan_and_repeated_work
+        PASS [   0.006s] (366/603) quest-qsp::production generalized_constant_keeps_complex_phase_and_final_convention_factor
+        PASS [   0.008s] (367/603) quest-qsp::production empty_generalized_laurent_is_zero_at_zero_and_positive_offset
+        PASS [   0.010s] (368/603) quest-qsp::production frozen_generalized_matrix_product_matches_independent_expansion
+        PASS [   0.009s] (369/603) quest-qsp::production generalized_linear_response_matches_direct_polynomial_on_the_circle
+        PASS [   0.006s] (370/603) quest-qsp::production nonsymmetric_cancellation_heavy_target_and_support_offset_are_retained
+        PASS [   0.236s] (371/603) quest-optimizer-worker::structured_contract structured_synthesis_maps_a_middle_target_and_mixed_controls
+        PASS [   0.006s] (372/603) quest-qsp::production target_admission_rechecks_retained_storage_after_policy_changes
+        PASS [   0.010s] (373/603) quest-qsp::production target_admission_rejects_negative_support_and_noncontractivity
+        PASS [   0.071s] (374/603) quest-qsp::offline offline_interval_fft_admits_contractivity_beyond_coefficient_l1
+        PASS [   0.007s] (375/603) quest-qsp::tutorials book_caller_pool_example_runs
+        PASS [   0.009s] (376/603) quest-qsvt::analysis generalized_reports_use_physical_queries_without_standard_theorem_privileges
+        PASS [   0.010s] (377/603) quest-qsvt::analysis diagnostic_budget_covers_oracle_decomposition_metadata_before_materializing
+        PASS [   0.016s] (378/603) quest-qsp::tutorials book_independent_certification_example_runs
+        PASS [   0.010s] (379/603) quest-qsvt::analysis diagnostics_preserve_global_phase_and_repeat_seeded_observations
+        PASS [   0.008s] (380/603) quest-qsvt::analysis normalization_composition_preserves_enclosures_and_separate_oracle_errors
+        PASS [   0.007s] (381/603) quest-qsvt::analysis standard_bounds_are_conditional_outward_and_bound_to_actual_transform
+        PASS [   0.243s] (382/603) quest-optimizer-worker::bin/quest-optimizer-worker zx::tests::complete_uncontrolled_gate_set_and_exact_control_extensions_certify
+        PASS [   0.010s] (383/603) quest-qsvt::analysis svd_reference_keeps_rectangular_odd_map_and_even_right_nullspace
+        PASS [   0.014s] (384/603) quest-qsvt::analysis seeded_matrix_diagnostic_observes_spectral_error_without_claiming_an_upper_bound
+        PASS [   0.007s] (385/603) quest-qsvt::dense_encoding dense_dilation_rejects_insufficient_normalization_and_small_budget
+        PASS [   0.012s] (386/603) quest-qsvt::dense_encoding dense_dilation_preserves_rectangular_complex_block_and_normalization
+        PASS [   0.095s] (387/603) quest-qsp::offline offline_remez_rejects_domain_and_insufficient_error_budget
+        PASS [   0.013s] (388/603) quest-qsvt::encodings coordinate_spaces_keep_independent_dimensions_and_caller_order
+        PASS [   0.016s] (389/603) quest-qsvt::encodings complex_isometry_and_dense_projector_keep_conjugate_transpose
+        PASS [   0.011s] (390/603) quest-qsvt::encodings explicit_unitary_premise_keeps_large_coordinate_encodings_compact
+        PASS [   0.008s] (391/603) quest-qsvt::encodings whole_oracle_admission_does_not_reuse_individual_gate_tolerances
+        PASS [   0.014s] (392/603) quest-qsvt::encodings encoding_builder_preserves_oracle_storage_and_logical_interfaces
+        PASS [   0.007s] (393/603) quest-qsvt::materialization independent_materialization_keeps_controlled_phase_and_adjoint_order
+        PASS [   0.167s] (394/603) quest-qsp::astro_conversion seeded_imports_equal_independent_integer_dyadics_at_multiple_precisions
+        PASS [   0.012s] (395/603) quest-qsvt::matrix_transforms complex_isometry_and_dense_projector_routes_preserve_ordered_logical_bases
+        PASS [   0.273s] (396/603) quest-optimizer-worker::bin/quest-optimizer-worker synthesis::tests::seeded_pi_over_seven_is_deterministic_and_certified_at_twelve_digits
+        PASS [   0.012s] (397/603) quest-qsvt::transforms direct_route_rejects_full_oracle_nonhermiticity_and_projector_mismatch
+        PASS [   0.014s] (398/603) quest-qsvt::phase_conversion huge_imported_phases_keep_full_complex_qsvt_blocks_and_finite_diagnostics
+        PASS [   0.374s] (399/603) quest-circuit::parity_contract seeded_affine_phase_windows_preserve_every_basis_column_and_scalar_phase
+        PASS [   0.012s] (400/603) quest-qsvt::transforms explicit_idle_high_qubits_preserve_block_and_fix_every_projection_to_zero
+        PASS [   0.007s] (401/603) quest-qsvt::transforms odd_multiplication_retains_bridge_and_source_at_reduced_degree_zero
+        PASS [   0.020s] (402/603) quest-qsvt::matrix_transforms standard_degree_three_preserves_wx_conventions_on_rectangular_complex_inputs
+        PASS [   0.009s] (403/603) quest-qsvt::transforms standard_degree_zero_and_one_keep_exact_readout_and_counts
+        PASS [   0.019s] (404/603) quest-qsvt::transforms generalized_routes_preserve_complex_control_polynomials_and_query_counts
+        PASS [   0.434s] (405/603) quest-build probe::tests::missing_imported_dependency_returns_typed_failure_without_an_archive
+        PASS [   0.247s] (406/603) quest-qsp kernel::parallel_tests::joined_forward_trees_keep_work_counts_and_all_coefficient_bits
+        PASS [   0.155s] (407/603) quest-qsp::parallel caller_pools_preserve_generalized_export_bits_across_worker_counts
+        PASS [   0.281s] (408/603) quest-qsp certification::tests::all_four_matrix_entries_match_independent_analytic_sparse_product
+        PASS [   0.451s] (409/603) quest-circuit::provenance_contract long_merge_history_is_linear_and_expands_every_source_without_recursion
+        PASS [   0.111s] (410/603) quest-qsvt::matrix_transforms rectangular_complex_generalized_routes_match_independent_matrix_polynomials
+        PASS [   0.524s] (411/603) quest-build probe::tests::compiled_abi_guard_rejects_incompatible_precision_before_archiving
+        PASS [   0.492s] (412/603) quest-optimizer-client::process_contract exited_leader_with_inherited_pipes_keeps_cleanup_ownership
+        PASS [   0.200s] (413/603) quest-qsvt-cli distributed::wire::tests::imported_angle_wire_preserves_source_and_admitted_matrix_words
+        PASS [   0.201s] (414/603) quest-qsvt-cli distributed::wire::tests::frozen_wire_roundtrips_exact_words_and_rejects_truncation
+        PASS [   0.215s] (415/603) quest-qsvt-cli::application canonical_synthesis_exports_reimportable_frozen_phases_with_stage_timings
+        PASS [   0.214s] (416/603) quest-qsvt-cli::application catalog_check_constructs_the_selected_target_instead_of_trusting_its_label
+        PASS [   0.162s] (417/603) quest-qsvt-cli::application failed_input_admission_still_writes_a_failed_trace_without_output
+        PASS [   0.209s] (418/603) quest-qsvt-cli::application catalog_lists_exact_twenty_one_families_and_rejects_nearby_selection
+        PASS [   0.220s] (419/603) quest-qsvt-cli::application automatic_local_workers_report_the_resolved_pool_size
+        PASS [   0.642s] (420/603) quest-build probe::tests::cargo_discovery_evaluates_the_selected_package_once
+        PASS [   0.152s] (421/603) quest-qsvt-cli::application failed_trace_export_retains_primary_dispatch_error
+        PASS [   0.209s] (422/603) quest-qsvt-cli::application certification_is_explicit_and_reports_every_attempt
+        PASS [   0.172s] (423/603) quest-qsvt-cli::application explicit_workers_use_a_caller_owned_catalogue_pool_and_report_scope
+        PASS [   0.159s] (424/603) quest-qsvt-cli::application failed_worker_preflight_produces_no_dispatch_trace
+        PASS [   0.015s] (425/603) quest-qsvt-io::catalog all_twenty_one_families_preserve_exact_odd_support
+        PASS [   0.151s] (426/603) quest-qsvt-cli::application generalized_synthesis_preserves_matrix_export_and_rejects_phase_input
+        PASS [   0.016s] (427/603) quest-qsvt-io::cpp_reference generalized_complex_controls_match_cpp_including_every_matrix_entry_and_k_factor
+        PASS [   0.010s] (428/603) quest-qsvt-io::hdf5 dense_rectangular_preserves_h5py_and_cpp_complex_order
+        PASS [   0.017s] (429/603) quest-qsvt-io::hdf5 block_encoding_roundtrip_preserves_isometry_columns_and_metadata
+        PASS [   0.012s] (430/603) quest-qsvt-io::hdf5 sparse_one_based_duplicates_sum_in_declared_csr_and_csc_order
+        PASS [   0.019s] (431/603) quest-qsvt-io::hdf5 invalid_dtype_shape_nonfinite_and_budget_are_rejected_before_output_replacement
+        PASS [   0.023s] (432/603) quest-qsvt-io::hdf5 state_roundtrip_and_variable_string_attributes_preserve_imaginary_values
+        PASS [   0.180s] (433/603) quest-qsvt-cli::application offline_command_is_explicit_and_retains_computation_and_certification_timings
+        PASS [   0.017s] (434/603) quest-qsvt-io::interchange canonical_phase_and_polynomial_json_round_trip
+        PASS [   0.021s] (435/603) quest-qsvt-io::hdf5 unsupported_numeric_storage_nonfinite_input_and_bad_sparse_indices_fail
+        PASS [   0.013s] (436/603) quest-qsvt-io::interchange checked_angle_constructor_has_one_admitted_execution_authority
+        PASS [   0.008s] (437/603) quest-qsvt-io::interchange execution_matrix_words_preserve_subnormal_and_signed_zero_bits
+        PASS [   0.716s] (438/603) quest-build probe::tests::cmake_build_evaluates_target_requirements_and_paths_with_spaces
+        PASS [   0.012s] (439/603) quest-qsvt-io::interchange complex_frozen_control_components_round_trip_exactly
+        PASS [   0.013s] (440/603) quest-qsvt-io::interchange frozen_execution_rejects_competing_matrix_and_angle_authorities
+        PASS [   0.012s] (441/603) quest-qsvt-io::interchange frozen_execution_retains_signed_zero_source_angle_bits
+        PASS [   0.011s] (442/603) quest-qsvt-io::interchange imported_angles_keep_source_and_exact_frozen_execution_words
+        PASS [   0.012s] (443/603) quest-qsvt-io::interchange sparse_builder_budget_counts_pointer_storage
+        PASS [   0.013s] (444/603) quest-qsvt-io::interchange sparse_densification_keeps_complex_duplicates_and_one_based_csc
+        PASS [   0.009s] (445/603) quest-qsvt-io::interchange zero_entry_sparse_budget_has_exact_pointer_boundary
+        PASS [   0.016s] (446/603) quest-qsvt-io::interchange sparse_builder_rejects_retained_spare_capacity
+        PASS [   0.018s] (447/603) xtask::precision_boundary native_and_binary64_kernels_have_no_cold_backend_entrypoint
+        PASS [   0.020s] (448/603) xtask::precision_boundary packaged_high_degree_qsp_fixture_matches_the_canonical_catalog
+        PASS [   0.588s] (449/603) quest-polynomial::analysis remez_exp_converges_with_domain_enclosure_and_error_lower_bound
+        PASS [   0.007s] (450/603) xtask::bin/xtask generate::clang::tests::libclang_error_mentions_expected_lookup_paths
+        PASS [   0.021s] (451/603) xtask::bin/xtask generate::clang::tests::evaluated_header_context_is_forwarded_without_splitting_paths
+        PASS [   0.028s] (452/603) quest-rs oracle_execution::tests::inventory_keeps_distinct_profiles_and_deepest_shared_path
+        PASS [   0.007s] (453/603) xtask::bin/xtask generate::classify::tests::disabling_validation_is_intentionally_excluded
+        PASS [   0.007s] (454/603) quest-rs oracle_execution::tests::profile_discovery_obeys_the_preparation_budget
+        PASS [   0.009s] (455/603) xtask::bin/xtask generate::classify::tests::exact_adapter_entry_marks_only_that_overload_manual
+        PASS [   0.159s] (456/603) quest-qsvt-cli::application per_synthesis_pool_exports_identical_frozen_words
+        PASS [   0.011s] (457/603) xtask::bin/xtask generate::classify::tests::manual_adapters_are_distinct_from_generated_ones
+        PASS [   0.157s] (458/603) quest-qsvt-cli::application trace_outer_scope_is_application_dispatch_after_preflight
+        PASS [   0.015s] (459/603) xtask::bin/xtask generate::classify::tests::generated_classification_requires_exact_overload_key
+        PASS [   0.017s] (460/603) quest-rs oracle_execution::tests::remapping_reuses_storage_and_rejects_unadmitted_growth
+        PASS [   0.161s] (461/603) quest-qsvt-cli::application worker_selection_parses_auto_and_preserves_the_serial_default
+        PASS [   0.012s] (462/603) xtask::bin/xtask generate::emit::tests::check_generated_file_detects_stale_contents
+        PASS [   0.007s] (463/603) xtask::bin/xtask generate::emit::tests::generated_source_artifacts_are_stale_checked
+        PASS [   0.009s] (464/603) xtask::bin/xtask generate::emit::tests::generated_bridge_shares_the_public_complex_value_type
+        PASS [   0.484s] (465/603) quest-qsp::offline offline_nonpolynomial_remez_exchanges_and_proves_export_error
+        PASS [   0.012s] (466/603) xtask::bin/xtask generate::emit::tests::checked_in_generator_files_do_not_contain_machine_paths
+        PASS [   0.009s] (467/603) quest-rs qsvt::reporting::tests::nested_shared_adjoint_calls_count_decomposition_and_signed_controls
+        PASS [   0.006s] (468/603) xtask::bin/xtask generate::model::tests::generated_adapter_names_must_identify_one_overload
+        PASS [   0.007s] (469/603) xtask::bin/xtask generate::model::tests::generated_adapter_name_must_match_rust_bridge_symbol
+        PASS [   0.011s] (470/603) xtask::bin/xtask generate::emit::tests::pauli_control_families_have_generator_insertion_points
+        PASS [   0.007s] (471/603) xtask::bin/xtask generate::model::tests::std_string_canonical_spelling_preserves_adapter_identity
+        PASS [   0.008s] (472/603) xtask::bin/xtask native_consumers::tests::child_process_loader_overrides_are_removed
+        PASS [   0.008s] (473/603) quest-rs qsvt::reporting::tests::unrepresentable_dispatch_totals_fail_before_execution
+        PASS [   0.008s] (474/603) xtask::bin/xtask native_consumers::tests::explicit_nonempty_work_directory_is_rejected_without_overwriting_it
+        PASS [   0.009s] (475/603) xtask::bin/xtask native_consumers::tests::native_pin_preserves_dependency_prefix_search_paths
+        PASS [   0.008s] (476/603) xtask::bin/xtask qsvt_catalog::tests::parses_counted_decimal_values_without_changing_bits
+        PASS [   0.005s] (477/603) xtask::bin/xtask tests::check_native_consumers_accepts_an_optional_work_directory
+        PASS [   0.518s] (478/603) quest-qsp::offline offline_divide_inverse_handles_dense_complex_degree_sixteen
+        PASS [   0.005s] (479/603) xtask::bin/xtask tests::removed_and_trailing_arguments_are_rejected
+        PASS [   0.075s] (480/603) xtask::bin/xtask generate::clang::tests::explicit_broken_package_makes_generator_fixture_tests_fail
+        PASS [   0.026s] (481/603) xtask::bin/xtask generate::emit::tests::pauli_family_descriptors_cover_the_registry_and_generated_sources
+        PASS [   0.169s] (482/603) quest-qsvt-cli::native_application solve_rejects_rank_deficiency_before_publishing_output
+        PASS [   0.178s] (483/603) quest-qsvt-cli::native_application complex_solve_recovers_physical_norm_and_separately_checks_residual
+        PASS [   0.031s] (484/603) xtask::bin/xtask native_consumers::tests::fixture_is_a_separate_workspace_with_all_consumer_shapes
+        PASS [   0.587s] (485/603) quest-qsp::certification dense_complex_product_tree_overlaps_direct_all_four_coefficients
+        PASS [   0.434s] (486/603) quest-qsvt-cli distributed::tests::mpi_admission_precedes_root_worker_spawns
+        PASS [   0.491s] (487/603) quest-qsp::tutorials book_explicit_offline_examples_run
+        PASS [   0.214s] (488/603) quest-qsvt-cli::distributed_application root_input_failure_is_collective_and_never_enters_native_execution
+        PASS [   0.231s] (489/603) quest-qsvt-cli::distributed_application nonroot_missing_files_are_not_read_or_synthesized
+        PASS [   0.760s] (490/603) quest-optimizer-worker::structured_contract structured_synthesis_bounds_exclusive_paths_and_proves_finite_loop_counts
+        PASS [   0.263s] (491/603) quest-qsvt-cli::no_multiprecision production_failure_and_native_execution_are_independent_of_cold_verification
+        PASS [   0.555s] (492/603) quest-qsp::tutorials book_binary64_polynomial_function_and_synthesis_examples_run
+        PASS [   0.288s] (493/603) quest-qsvt-cli::native_application native_embedded_and_overlap_preserve_complex_phase_and_mass
+        PASS [   0.662s] (494/603) quest-qsp::offline offline_insufficient_precision_preserves_original_function_and_attempt_count
+        PASS [   0.238s] (495/603) quest-rs::collective_runtime collective_budget_failure_on_one_rank_precedes_native_allocation
+        PASS [   1.174s] (496/603) quest-build probe::tests::cargo_profiles_and_explicit_cxx_remain_coherent_in_child_processes
+        PASS [   1.108s] (497/603) quest-optimizer-worker::synthesis_process seeded_targets_are_reproducible_and_independently_certified
+        PASS [   0.212s] (498/603) quest-rs::collective_runtime collective_compares_full_semantics_and_prepared_identity
+        PASS [   0.947s] (499/603) quest-qsp::offline offline_remez_restarts_original_expression_at_higher_precision
+        PASS [   0.672s] (500/603) quest-qsvt-cli::distributed_application mpi_two_and_four_rank_root_synthesis_preserve_embedded_and_overlap_mass
+        PASS [   0.203s] (501/603) quest-rs::collective_runtime collective_mismatched_payload_and_preflight_recover_together
+        PASS [   1.452s] (502/603) quest-build probe::tests::reconfiguration_uses_current_prefix_after_explicit_selection_is_removed
+        PASS [   0.184s] (503/603) quest-rs::collective_runtime collective_prepared_bell_oracle_and_projection_preserve_mpi
+        PASS [   0.192s] (504/603) quest-rs::collective_runtime collective_rejects_different_cache_sharing_before_materialization
+        PASS [   1.959s] (505/603) quest-circuit::compile_fail invalid_dsl_and_semantic_capabilities_are_rejected
+        PASS [   0.193s] (506/603) quest-rs::collective_runtime collective_subgroups_execute_independent_schedules
+        PASS [   2.530s] (507/603) quest-qsvt-io::cpp_reference canonical_full_phase_matches_pinned_cpp_through_degree_8105
+        PASS [   2.449s] (508/603) xtask::bin/xtask generate::clang::tests::libclang_extracts_representative_overloads
+        PASS [   2.456s] (509/603) xtask::bin/xtask generate::classify::tests::classification_distinguishes_overloads_by_signature_shape
+        PASS [   3.215s] (510/603) quest-qsvt-cli synthesis::tests::catalogue_pool_preserves_family_order_and_failure_order
+        PASS [   3.519s] (511/603) quest-qsp::certification cancellation_heavy_complex_degree64_direct_and_fft_enclosures_overlap
+        PASS [  27.869s] (512/603) quest-rs::compile_fail runtime_ownership_and_kind_contracts
+        PASS [   0.131s] (513/603) quest-rs::diagonal_contract diagonal_cache_preserves_order_signed_controls_and_density_adjoint
+        PASS [   0.136s] (514/603) quest-rs::environment_lifecycle all_native_preparation_kinds_drop_before_environment
+        PASS [   0.132s] (515/603) quest-rs::environment_lifecycle configuration_rejection_does_not_consume_native_attempt
+        PASS [   0.130s] (516/603) quest-rs::environment_lifecycle duplicate_initialization_leaves_existing_owner_usable
+        PASS [   0.132s] (517/603) quest-rs::environment_lifecycle early_error_return_finalizes_borrowing_resources
+        PASS [   0.129s] (518/603) quest-rs::environment_lifecycle orphaned_native_handle_retires_runtime_without_panicking
+        PASS [   0.129s] (519/603) quest-rs::environment_lifecycle retirement_during_unwinding_preserves_the_original_panic
+        PASS [   0.131s] (520/603) quest-rs::environment_lifecycle scope_exit_finalizes_and_owned_snapshot_survives
+        PASS [   0.128s] (521/603) quest-rs::environment_lifecycle unwinding_destroys_resources_without_a_second_panic
+        PASS [   0.139s] (522/603) quest-rs::oracle_runtime nested_shared_fragment_orientation_uses_one_native_matrix_pair
+        PASS [   0.136s] (523/603) quest-rs::oracle_runtime oracle_control_variants_respect_transactional_preparation_budget
+        PASS [   0.132s] (524/603) quest-rs::oracle_runtime oracle_snapshot_outlives_cached_native_resources
+        PASS [   0.132s] (525/603) quest-rs::oracle_runtime retained_oracles_match_expanded_phase_target_and_density_semantics
+        PASS [   0.132s] (526/603) quest-rs::oracle_runtime structured_oracle_profiles_and_nested_adjoint_reuse_prepared_bodies
+        PASS [   0.135s] (527/603) quest-rs::oracle_runtime unused_oracle_capture_needs_no_native_cache
+        PASS [   0.188s] (528/603) quest-rs::qsvt_collective collective_qsvt_checks_projector_representation_and_dense_complex_projection
+        PASS [   0.180s] (529/603) quest-rs::qsvt_collective collective_qsvt_mass_conditioning_and_complex_hadamard
+        PASS [   0.179s] (530/603) quest-rs::qsvt_collective collective_qsvt_rejects_transform_vector_and_budget_disagreement
+        PASS [   0.191s] (531/603) quest-rs::qsvt_collective collective_qsvt_subgroups_run_independent_transforms
+        PASS [   0.087s] (532/603) quest-rs::qsvt_native_dispatches successful_run_counts_native_decompositions_and_hadamard_readout
+        PASS [   0.138s] (533/603) quest-rs::qsvt_runtime complex_isometry_projection_matches_canonical_projector_and_adjoint_decode
+        PASS [   0.143s] (534/603) quest-rs::qsvt_runtime hadamard_overlap_retains_complex_phase_and_probability_ledger
+        PASS [   0.132s] (535/603) quest-rs::qsvt_runtime prepared_transform_preserves_phase_mass_and_reuses_resources
+        PASS [   0.174s] (536/603) quest-rs::qsvt_runtime rectangular_generalized_routes_match_full_subnormalized_references
+        PASS [   0.129s] (537/603) quest-rs::qsvt_runtime zero_success_and_preparation_failure_release_borrows_and_storage
+        PASS [   0.137s] (538/603) quest-rs::runtime bell_state_and_snapshot_survive_teardown
+        PASS [   0.130s] (539/603) quest-rs::runtime builder_execution_samples_each_shot_from_zero
+        PASS [   0.133s] (540/603) quest-rs::runtime changed_numerical_policy_is_rejected_before_mutation_or_seeding
+        PASS [   0.135s] (541/603) quest-rs::runtime controlled_rotation_phase_matches_fused_and_unfused_execution
+        PASS [   0.125s] (542/603) quest-rs::runtime density_channel_reset_and_classical_branch_are_effectful
+        PASS [   0.128s] (543/603) quest-rs::runtime density_imaginary_entries_and_rectangular_blocks_keep_layout
+        PASS [   0.130s] (544/603) quest-rs::runtime density_promotion_owns_an_independent_native_state
+        PASS [   0.128s] (545/603) quest-rs::runtime diagonal_preparation_retains_structure_under_a_small_native_budget
+        PASS [   0.130s] (546/603) quest-rs::runtime dimension_and_budget_reject_before_native_allocation
+        PASS [   0.129s] (547/603) quest-rs::runtime execution_failure_reports_completed_prefix_and_keeps_partial_state
+        PASS [   0.070s] (548/603) quest-rs::runtime facade_reports_preserve_exact_resource_usage
+        PASS [   0.128s] (549/603) quest-rs::runtime nonsorted_numerical_targets_preserve_complex_operator_order
+        PASS [   0.131s] (550/603) quest-rs::runtime numerical_density_evolution_uses_adjoint_and_signed_control
+        PASS [   0.130s] (551/603) quest-rs::runtime openqasm31_u_phase_survives_native_adjoint_signed_controls_and_fusion
+        PASS [   0.131s] (552/603) quest-rs::runtime scalar_numerical_operator_and_preparation_budget_have_checked_admission
+        PASS [   0.146s] (553/603) quest-rs::structured_optimization exact_structured_optimization_preserves_native_state_density_and_observations
+        PASS [   0.130s] (554/603) quest-rs::structured_runtime runtime_loop_capture_once_and_step_failure_report_prefix
+        PASS [   0.131s] (555/603) quest-rs::structured_runtime standard_cu_and_cx_preserve_full_phase_on_each_basis_column
+        PASS [   0.130s] (556/603) quest-rs::structured_runtime structured_feedback_and_density_reset_preserve_observations
+        PASS [   0.279s] (557/603) quest-rs::structured_workers certified_ssa_synthesis_preserves_native_state_and_density
+        PASS [   0.141s] (558/603) quest-rs::tutorials executable_native_tutorials_pass_in_an_isolated_process
+        PASS [   0.233s] (559/603) quest-rs::tutorials optional_synthesis_tutorial_uses_an_explicit_worker_path
+        PASS [   0.129s] (560/603) quest-sys::adapters explicit_seeds_replay_measurement_sequences
+        PASS [   0.130s] (561/603) quest-sys::adapters flat_matrix_preserves_complex_row_order_and_rejects_bad_dimensions
+        PASS [   0.130s] (562/603) quest-sys::adapters global_phase_changes_statevector_and_preserves_density
+        PASS [   0.132s] (563/603) quest-sys::adapters kraus_flat_matrices_apply_amplitude_damping
+        PASS [   0.128s] (564/603) quest-sys::adapters numerical_fingerprint_detects_ambient_simd_changes
+        PASS [   0.129s] (565/603) quest-sys::adapters rectangular_density_transfers_preserve_rows_and_columns
+        PASS [   0.127s] (566/603) quest-sys::drop_cleanup drop_cleanup_before_initialization_does_not_consume_attempt
+        PASS [   0.130s] (567/603) quest-sys::drop_cleanup drop_cleanup_finalizes_and_remains_idempotent
+        PASS [   0.128s] (568/603) quest-sys::drop_cleanup drop_cleanup_from_another_thread_retires_without_native_finalization
+        PASS [   0.127s] (569/603) quest-sys::drop_cleanup drop_cleanup_with_live_handle_permanently_retires_runtime
+        PASS [   0.305s] (570/603) quest-sys::finalize finalize_succeeds_after_raii_handles_drop
+        PASS [   0.172s] (571/603) quest-sys::mpi mpi_collective_preflight_rejects_mismatch_on_every_rank
+        PASS [   0.155s] (572/603) quest-sys::mpi mpi_distributed_drop_with_live_resource_aborts_job
+        PASS [   0.180s] (573/603) quest-sys::mpi mpi_subgroups_and_excluded_ranks_preserve_contexts
+        PASS [   0.162s] (574/603) quest-sys::mpi mpi_survives_quest_drop_and_reinitialization_is_rejected
+        PASS [   0.149s] (575/603) quest-sys::mpi mpi_threaded_views_exchange_and_collectives_agree
+        PASS [   0.130s] (576/603) quest-sys::safety another_thread_cannot_finalize_an_active_environment
+        PASS [   0.128s] (577/603) quest-sys::safety calls_before_initialization_return_lifecycle_errors
+        PASS [   0.115s] (578/603) quest-sys::safety concurrent_initializers_admit_exactly_one_owner
+        PASS [   0.290s] (579/603) quest-sys::safety custom_modes_accept_auto_and_reject_invalid_flags_before_native_init
+        PASS [   0.133s] (580/603) quest-sys::safety density_pure_initialization_uses_statevector_dimension
+        PASS [   0.130s] (581/603) quest-sys::safety duplicate_initialization_and_restart_are_lifecycle_errors
+        PASS [   0.128s] (582/603) quest-sys::safety generated_global_calls_reject_another_thread
+        PASS [   0.129s] (583/603) quest-sys::safety owner_identity_is_not_reused_after_its_thread_exits
+        PASS [   0.125s] (584/603) quest-sys::safety validation_tolerance_cannot_disable_numerical_checks
+        PASS [   0.285s] (585/603) quest-sys::test arbitrary_pure_state_accepts_complex_slices
+        PASS [   0.291s] (586/603) quest-sys::test channel_handles_are_raii_owned
+        PASS [   0.286s] (587/603) quest-sys::test decoherence_api_returns_results
+        PASS [   0.286s] (588/603) quest-sys::test environment_api_uses_results_and_snake_case
+        PASS [   0.300s] (589/603) quest-sys::test finalize_accounts_for_every_owned_native_resource_kind
+        PASS [   0.287s] (590/603) quest-sys::test finalize_fails_while_raii_handles_are_live
+        PASS [   0.283s] (591/603) quest-sys::test generated_diag_matrix_handles_are_raii_owned
+        PASS [   0.288s] (592/603) quest-sys::test generated_initialisation_and_probability_apis_work
+        PASS [   0.295s] (593/603) quest-sys::test generated_overloads_have_distinct_safe_adapters
+        PASS [   0.293s] (594/603) quest-sys::test generated_pauli_control_families_preserve_axes_and_control_states
+        PASS [   0.285s] (595/603) quest-sys::test invalid_inputs_return_quest_errors
+        PASS [   0.285s] (596/603) quest-sys::test measurement_with_probability_returns_a_struct
+        PASS [   0.289s] (597/603) quest-sys::test multiplication_api_uses_safe_matrix_wrappers
+        PASS [   0.294s] (598/603) quest-sys::test nested_complex_matrix_inputs_are_flattened_safely
+        PASS [   0.285s] (599/603) quest-sys::test primitive_operations_are_result_wrapped
+        PASS [   0.284s] (600/603) quest-sys::test probability_outcomes_reject_duplicate_and_out_of_bounds_targets
+        PASS [   0.284s] (601/603) quest-sys::test probability_outcomes_reject_invalid_target_counts_before_allocation
+        PASS [   0.286s] (602/603) quest-sys::test qureg_lifecycle_is_raii
+        PASS [   0.290s] (603/603) quest-sys::test trotterisation_accepts_raii_pauli_sums
+────────────
+     Summary [  45.700s] 603 tests run: 603 passed, 3 skipped

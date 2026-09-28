@@ -1,0 +1,40 @@
+   Compiling serde_core v1.0.229
+   Compiling serde v1.0.229
+   Compiling bindgen v0.72.1
+   Compiling quest-macros v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-macros)
+   Compiling quest-sys v0.2.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-sys)
+   Compiling logos-derive v0.12.1
+   Compiling serde_json v1.0.151
+   Compiling num-rational v0.4.2
+   Compiling num-bigint v0.5.1
+   Compiling quest-numerics v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-numerics)
+   Compiling quest-math v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-math)
+   Compiling mpi-sys v0.2.4
+   Compiling quest-optimizer-protocol v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-optimizer-protocol)
+   Compiling quest-polynomial v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-polynomial)
+   Compiling quest-language v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-language)
+   Compiling quest-qsp v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-qsp)
+   Compiling mpi v0.8.2
+   Compiling quest-optimizer-client v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-optimizer-client)
+   Compiling quest-qasm v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-qasm)
+   Compiling quest-circuit v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-circuit)
+   Compiling num v0.4.3
+   Compiling rstest_macros v0.23.0
+   Compiling hdf5-metno v0.14.1
+warning: quest-sys@0.2.0: Using QuEST 4.3.0 from /var/home/erich/Projects/opt/quest with /usr/bin/c++
+warning: quest-sys@0.2.0: Verified rsmpi MPICC /var/home/linuxbrew/.linuxbrew/Cellar/mpich/5.0.1/bin/mpicc matches QuEST MPI ABI and loaded library
+   Compiling quest-rs v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest)
+   Compiling quest-qsvt v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-qsvt)
+   Compiling logos v0.12.1
+   Compiling rstest v0.23.0
+   Compiling openqasm v0.1.2
+   Compiling nalgebra v0.34.2
+   Compiling quest-qsvt-cli v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-qsvt-cli)
+   Compiling quest-qsvt-io v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-qsvt-io)
+   Compiling cmake-file-api v0.1.2
+   Compiling quizx v0.3.0
+   Compiling quest-build v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-build)
+   Compiling quest-rsgridsynth v0.2.2-quest.1 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/vendor/rsgridsynth)
+   Compiling xtask v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/xtask)
+   Compiling quest-optimizer-worker v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/correctness-consolidation/crates/quest-optimizer-worker)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 12.33s

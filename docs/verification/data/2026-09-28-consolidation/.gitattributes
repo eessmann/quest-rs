@@ -1,0 +1,2 @@
+# Preserve raw tool output, including native reports' trailing blank lines.
+*.log -whitespace

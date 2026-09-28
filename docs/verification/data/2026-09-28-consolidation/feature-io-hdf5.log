@@ -1,0 +1,26 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s
+────────────
+ Nextest run ID 9e499434-1fd8-4847-be53-5e5d322fec9c with nextest profile: default
+    Starting 20 tests across 5 binaries
+        PASS [   0.004s] ( 1/20) quest-qsvt-io::interchange sparse_densification_keeps_complex_duplicates_and_one_based_csc
+        PASS [   0.004s] ( 2/20) quest-qsvt-io::interchange checked_angle_constructor_has_one_admitted_execution_authority
+        PASS [   0.004s] ( 3/20) quest-qsvt-io::interchange sparse_builder_budget_counts_pointer_storage
+        PASS [   0.005s] ( 4/20) quest-qsvt-io::catalog all_twenty_one_families_preserve_exact_odd_support
+        PASS [   0.006s] ( 5/20) quest-qsvt-io::cpp_reference generalized_complex_controls_match_cpp_including_every_matrix_entry_and_k_factor
+        PASS [   0.006s] ( 6/20) quest-qsvt-io::hdf5 dense_rectangular_preserves_h5py_and_cpp_complex_order
+        PASS [   0.006s] ( 7/20) quest-qsvt-io::hdf5 invalid_dtype_shape_nonfinite_and_budget_are_rejected_before_output_replacement
+        PASS [   0.006s] ( 8/20) quest-qsvt-io::hdf5 block_encoding_roundtrip_preserves_isometry_columns_and_metadata
+        PASS [   0.006s] ( 9/20) quest-qsvt-io::hdf5 sparse_one_based_duplicates_sum_in_declared_csr_and_csc_order
+        PASS [   0.006s] (10/20) quest-qsvt-io::hdf5 unsupported_numeric_storage_nonfinite_input_and_bad_sparse_indices_fail
+        PASS [   0.015s] (11/20) quest-qsvt-io::interchange sparse_builder_rejects_retained_spare_capacity
+        PASS [   0.015s] (12/20) quest-qsvt-io::interchange complex_frozen_control_components_round_trip_exactly
+        PASS [   0.016s] (13/20) quest-qsvt-io::interchange zero_entry_sparse_budget_has_exact_pointer_boundary
+        PASS [   0.016s] (14/20) quest-qsvt-io::interchange frozen_execution_retains_signed_zero_source_angle_bits
+        PASS [   0.016s] (15/20) quest-qsvt-io::interchange execution_matrix_words_preserve_subnormal_and_signed_zero_bits
+        PASS [   0.016s] (16/20) quest-qsvt-io::interchange imported_angles_keep_source_and_exact_frozen_execution_words
+        PASS [   0.016s] (17/20) quest-qsvt-io::interchange canonical_phase_and_polynomial_json_round_trip
+        PASS [   0.016s] (18/20) quest-qsvt-io::interchange frozen_execution_rejects_competing_matrix_and_angle_authorities
+        PASS [   0.018s] (19/20) quest-qsvt-io::hdf5 state_roundtrip_and_variable_string_attributes_preserve_imaginary_values
+        PASS [   2.328s] (20/20) quest-qsvt-io::cpp_reference canonical_full_phase_matches_pinned_cpp_through_degree_8105
+────────────
+     Summary [   2.328s] 20 tests run: 20 passed, 0 skipped
