@@ -88,6 +88,33 @@ fn signed(value: i128) -> Result<ClassicalValue> {
     )?))
 }
 
+#[gtest]
+fn shared_builder_expressions_preserve_materialized_evaluation_and_occurrences() -> Result<()> {
+    let mut builder = quest_language::semantic::builder::Builder::new()?;
+    let q = builder.qubit("q", 1)?;
+    let mut angle = builder.floating::<64>(0.125)?;
+    for _ in 0..3 {
+        angle = angle.add(&angle)?;
+    }
+    for _ in 0..2 {
+        builder.gate(
+            GateKind::Rx,
+            std::slice::from_ref(&angle),
+            std::slice::from_ref(&q),
+        )?;
+    }
+    let program = builder.finish(CompileLimits::default())?.into_ssa()?;
+    let mut backend = RecordingBackend::default();
+    Interpreter::default().run(&program, &mut backend, &RunInputs::default(), &[])?;
+    expect_eq!(backend.gates.len(), 2);
+    for gate in &backend.gates {
+        expect_eq!(gate.gate, GateKind::Rx);
+        expect_eq!(&gate.parameters, &vec![1.0f64.to_bits()]);
+        expect_eq!(&gate.targets, &vec![0]);
+    }
+    Ok(())
+}
+
 fn output_i128(output: &quest_language::vm::RunOutput, name: &str) -> Result<i128> {
     Ok(output
         .outputs

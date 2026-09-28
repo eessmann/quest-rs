@@ -5,7 +5,7 @@
 //! use quest_language::semantic::builder::Builder;
 //! let mut b=Builder::new().unwrap();
 //! let n=b.integer::<32>(0).unwrap(); let local=b.local("n",&n).unwrap();
-//! let flag=b.boolean(true); b.assign(&local,&flag).unwrap();
+//! let flag=b.boolean(true).unwrap(); b.assign(&local,&flag).unwrap();
 //! ```
 //! ```compile_fail
 //! use quest_language::semantic::builder::Builder;
@@ -18,6 +18,7 @@
 //! b.while_loop(&n,|_|Ok(())).unwrap();
 //! ```
 mod expressions;
+mod shared;
 mod types;
 use super::{CompileLimits, ErrorKind, SemanticError, TypedModule};
 use crate::{
@@ -25,13 +26,15 @@ use crate::{
     ssa::ProgramId,
     syntax::{self, Expression, ExpressionKind as E, Statement, StatementKind as S},
 };
+use shared::SharedExpression;
 use std::marker::PhantomData;
 pub use types::{Angle, Arithmetic, Bit, Bool, Classical, Float, Int, Numeric, Uint};
 /// An owned expression carrying a checked builder identity and classical category.
 #[derive(Debug, Clone)]
 pub struct Expr<T: Classical> {
     owner: ProgramId,
-    expression: Expression,
+    expression: SharedExpression,
+    limits: CompileLimits,
     marker: PhantomData<T>,
 }
 /// A scoped classical storage handle, distinct from a value expression.
@@ -53,6 +56,7 @@ pub struct Builder {
     statements: Vec<Statement>,
     depth: usize,
     next_symbol: usize,
+    expression_limits: CompileLimits,
 }
 const fn expression(kind: E) -> Expression {
     Expression { kind, span: None }
@@ -67,11 +71,20 @@ impl Builder {
     /// # Errors
     /// Reports exhaustion of program identities.
     pub fn new() -> Result<Self, SemanticError> {
+        Self::with_limits(CompileLimits::default())
+    }
+    /// Bound each shared expression before construction or syntax materialization.
+    /// `finish` separately admits the complete program under its supplied limits.
+    /// Expression depth is additionally bounded to 256 to keep recursive drop safe.
+    /// # Errors
+    /// Reports exhaustion of program identities.
+    pub fn with_limits(expression_limits: CompileLimits) -> Result<Self, SemanticError> {
         Ok(Self {
             owner: ProgramId::fresh()?,
             statements: Vec::new(),
             depth: 0,
             next_symbol: 0,
+            expression_limits,
         })
     }
     fn check(&self, owner: ProgramId) -> Result<(), SemanticError> {
@@ -120,7 +133,7 @@ impl Builder {
         self.push(S::Declare {
             name: name.clone(),
             ty: T::syntax_type()?,
-            initializer: Some(initial.expression.clone()),
+            initializer: Some(initial.expression.materialize(self.expression_limits)?),
             qualifier: syntax::Qualifier::Local,
         });
         Ok(Local {
@@ -133,7 +146,10 @@ impl Builder {
     /// Rejects a storage handle from another builder.
     pub fn read<T: Classical>(&self, local: &Local<T>) -> Result<Expr<T>, SemanticError> {
         self.check(local.owner)?;
-        Ok(self.wrap(expression(E::Name(local.name.clone()))))
+        Ok(self.wrap(SharedExpression::leaf(
+            expression(E::Name(local.name.clone())),
+            self.expression_limits,
+        )?))
     }
     /// # Errors
     /// Rejects foreign expression or storage handles.
@@ -147,7 +163,7 @@ impl Builder {
         self.push(S::Assign {
             target: expression(E::Name(local.name.clone())),
             operator: None,
-            value: value.expression.clone(),
+            value: value.expression.materialize(self.expression_limits)?,
         });
         Ok(())
     }
@@ -163,7 +179,7 @@ impl Builder {
         let then_body = self.body(then_body)?;
         let else_body = self.body(else_body)?;
         self.push(S::If {
-            condition: condition.expression.clone(),
+            condition: condition.expression.materialize(self.expression_limits)?,
             then_body,
             else_body,
         });
@@ -179,7 +195,7 @@ impl Builder {
         self.check(condition.owner)?;
         let body = self.body(body)?;
         self.push(S::While {
-            condition: condition.expression.clone(),
+            condition: condition.expression.materialize(self.expression_limits)?,
             body,
         });
         Ok(())
@@ -236,7 +252,7 @@ impl Builder {
             owner: self.owner,
             expression: expression(E::Index(
                 Box::new(qubit.expression.clone()),
-                Box::new(index.expression.clone()),
+                Box::new(index.expression.materialize(self.expression_limits)?),
             )),
         })
     }
@@ -259,8 +275,8 @@ impl Builder {
             name: gate.definition().name.into(),
             arguments: arguments
                 .iter()
-                .map(|value| value.expression.clone())
-                .collect(),
+                .map(|value| value.expression.materialize(self.expression_limits))
+                .collect::<Result<_, _>>()?,
             operands: operands
                 .iter()
                 .map(|value| value.expression.clone())
@@ -280,10 +296,11 @@ impl Builder {
             limits,
         )
     }
-    const fn wrap<T: Classical>(&self, expression: Expression) -> Expr<T> {
+    const fn wrap<T: Classical>(&self, expression: SharedExpression) -> Expr<T> {
         Expr {
             owner: self.owner,
             expression,
+            limits: self.expression_limits,
             marker: PhantomData,
         }
     }

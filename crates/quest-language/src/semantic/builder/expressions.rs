@@ -1,6 +1,6 @@
 use super::{
     Angle, Arithmetic, Bit, Bool, Builder, Classical, E, Expr, Float, Int, Numeric, SemanticError,
-    Uint, expression, foreign, types,
+    SharedExpression, Uint, expression, foreign, types,
 };
 use crate::{
     classical::{ScalarValue, Width},
@@ -8,9 +8,13 @@ use crate::{
 };
 use std::marker::PhantomData;
 impl Builder {
-    #[must_use]
-    pub const fn boolean(&self, value: bool) -> Expr<Bool> {
-        self.wrap(expression(E::Bool(value)))
+    /// # Errors
+    /// Rejects expression construction beyond the configured resource limits.
+    pub fn boolean(&self, value: bool) -> Result<Expr<Bool>, SemanticError> {
+        Ok(self.wrap(SharedExpression::leaf(
+            expression(E::Bool(value)),
+            self.expression_limits,
+        )?))
     }
     /// # Errors
     /// Rejects invalid widths or an out-of-range signed integer.
@@ -52,10 +56,10 @@ impl Builder {
         )))
     }
     fn literal<T: Classical>(&self, value: E) -> Result<Expr<T>, SemanticError> {
-        Ok(self.wrap(expression(E::Cast(
-            T::syntax_type()?,
-            Box::new(expression(value)),
-        ))))
+        Ok(self.wrap(
+            SharedExpression::leaf(expression(value), self.expression_limits)?
+                .cast(T::syntax_type()?, self.expression_limits)?,
+        ))
     }
 }
 impl<T: Classical> Expr<T> {
@@ -72,11 +76,10 @@ impl<T: Classical> Expr<T> {
         }
         Ok(Expr {
             owner: self.owner,
-            expression: expression(E::Binary(
-                operator,
-                Box::new(self.expression.clone()),
-                Box::new(rhs.expression.clone()),
-            )),
+            expression: self
+                .expression
+                .binary(&rhs.expression, operator, self.limits)?,
+            limits: self.limits,
             marker: PhantomData,
         })
     }
@@ -91,10 +94,8 @@ impl<T: Classical> Expr<T> {
     pub fn cast<R: Classical>(&self) -> Result<Expr<R>, SemanticError> {
         Ok(Expr {
             owner: self.owner,
-            expression: expression(E::Cast(
-                R::syntax_type()?,
-                Box::new(self.expression.clone()),
-            )),
+            expression: self.expression.cast(R::syntax_type()?, self.limits)?,
+            limits: self.limits,
             marker: PhantomData,
         })
     }

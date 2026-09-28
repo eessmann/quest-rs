@@ -2379,6 +2379,7 @@ dependencies = [
  "codespan-reporting",
  "googletest",
  "num-traits",
+ "petgraph 0.8.3",
  "serde",
  "serde_json",
  "thiserror 2.0.20",

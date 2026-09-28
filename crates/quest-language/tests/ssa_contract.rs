@@ -11,6 +11,18 @@ fn compile(
     let source = SourceSnapshot::new(SourceId::new(7), "ssa", text);
     Ok(admit(parse_source(&source)?, CompileLimits::default())?.into_ssa()?)
 }
+
+#[gtest]
+fn branch_heavy_region_verifies_with_linear_dominance_storage() -> Result<()> {
+    let mut source = String::from("input bool flag; qubit q;");
+    for _ in 0..150 {
+        source.push_str("if (flag) { x q; } else { h q; }");
+    }
+    let program = compile(&source).map_err(|error| std::io::Error::other(error.to_string()))?;
+    verify_that!(program.blocks().len(), gt(400))?;
+    verify_that!(program.retained_bytes()?, lt(4 * 1024 * 1024))?;
+    Ok(())
+}
 #[gtest]
 fn verifies_loop_back_edges_and_preserves_gate_occurrences() -> Result<()> {
     let program = compile("qubit q; int n = 3; while (n > 0) { x q; x q; n -= 1; }")

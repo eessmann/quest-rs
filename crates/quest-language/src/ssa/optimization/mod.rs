@@ -1,7 +1,7 @@
 //! Bounded exact classical transformations. Results become visible only after re-verification.
 mod cleanup;
 mod constants;
-use super::{Program, VerifiedProgram};
+use super::{Program, SnapshotId, VerifiedProgram};
 use crate::semantic::{CompileLimits, SemanticError};
 /// Independent hard limits for analysis and the returned executable representation.
 #[derive(Debug, Clone, Copy)]
@@ -21,8 +21,10 @@ impl Default for OptimizationLimits {
         }
     }
 }
-#[derive(Debug, Default, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct OptimizationReport {
+    pub input_snapshot: SnapshotId,
+    pub output_snapshot: SnapshotId,
     pub constants_folded: usize,
     pub branches_simplified: usize,
     pub unreachable_blocks_removed: usize,
@@ -30,6 +32,21 @@ pub struct OptimizationReport {
     pub dead_instructions_removed: usize,
     pub analysis_rounds: usize,
     pub work: usize,
+}
+impl OptimizationReport {
+    const fn new(snapshot: SnapshotId) -> Self {
+        Self {
+            input_snapshot: snapshot,
+            output_snapshot: snapshot,
+            constants_folded: 0,
+            branches_simplified: 0,
+            unreachable_blocks_removed: 0,
+            common_expressions_removed: 0,
+            dead_instructions_removed: 0,
+            analysis_rounds: 0,
+            work: 0,
+        }
+    }
 }
 pub type OptimizationError = SemanticError;
 pub(super) struct Budget {
@@ -61,8 +78,8 @@ pub fn optimize(
     limits: OptimizationLimits,
 ) -> Result<(VerifiedProgram, OptimizationReport), OptimizationError> {
     preflight(&program, limits)?;
+    let mut report = OptimizationReport::new(program.snapshot());
     let mut program = program.into_unverified();
-    let mut report = OptimizationReport::default();
     let mut budget = Budget {
         remaining: limits.work,
         limit: limits.work,
@@ -82,6 +99,7 @@ pub fn optimize(
         ..limits.compile
     };
     let verified = program.verify(compile)?;
+    report.output_snapshot = verified.snapshot();
     Ok((verified, report))
 }
 fn preflight(program: &VerifiedProgram, limits: OptimizationLimits) -> Result<(), SemanticError> {

@@ -186,8 +186,7 @@ impl SemanticError {
 #[derive(Debug, Clone)]
 pub struct TypedModule {
     syntax: syntax::Module,
-    program: ssa::Program,
-    limits: CompileLimits,
+    program: ssa::VerifiedProgram,
 }
 impl TypedModule {
     #[must_use]
@@ -203,24 +202,24 @@ impl TypedModule {
         retained::sum([
             std::mem::size_of::<Self>(),
             self.syntax.heap()?,
-            self.program.heap()?,
+            self.program.program().heap()?,
         ])
     }
     /// Move the export authority and verified executable representation without cloning.
     ///
     /// # Errors
-    /// Reports executable invariant or resource violations during independent verification.
+    /// This transfer is infallible; admission has already verified this immutable SSA.
     pub fn into_verified_parts(
         self,
     ) -> Result<(syntax::Module, ssa::VerifiedProgram), SemanticError> {
-        Ok((self.syntax, self.program.verify(self.limits)?))
+        Ok((self.syntax, self.program))
     }
-    /// Consume admission and independently verify the executable SSA.
+    /// Consume admission and transfer the already verified executable SSA.
     ///
     /// # Errors
-    /// Reports invalid CFG, dominance, type, effect, interface, or resource contracts.
+    /// This transfer is infallible; mutation requires leaving the verified representation.
     pub fn into_ssa(self) -> Result<ssa::VerifiedProgram, SemanticError> {
-        self.program.verify(self.limits)
+        Ok(self.program)
     }
 }
 /// Admit scoped, typed structured syntax and construct its executable representation.
@@ -241,11 +240,10 @@ pub fn admit(module: syntax::Module, limits: CompileLimits) -> Result<TypedModul
     }
     let program = compile::compile(&module, limits)?;
     // Admission itself must reject definite-assignment and verifier errors.
-    program.validate(limits)?;
+    let program = program.verify(limits)?;
     Ok(TypedModule {
         syntax: module,
         program,
-        limits,
     })
 }
 pub(crate) use types::{binary_type, place_type, storage_size};

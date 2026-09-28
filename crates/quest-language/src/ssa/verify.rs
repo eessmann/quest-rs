@@ -3,8 +3,10 @@ use crate::semantic::retained::Heap as _;
 use crate::semantic::{CompileLimits, SemanticError, storage_size};
 use std::collections::{BTreeMap, BTreeSet};
 mod assignment;
+mod dominance;
 mod instruction;
 mod interfaces;
+use dominance::Dominance;
 
 pub(super) struct Definition {
     pub block: BlockId,
@@ -36,7 +38,7 @@ pub(super) fn verify(program: &Program, limits: CompileLimits) -> Result<(), Sem
             .filter(|block| block.region == region.id)
             .map(|block| block.id)
             .collect::<BTreeSet<_>>();
-        let dominators = dominance(region.entry, &blocks, &predecessors);
+        let dominators = Dominance::new(region.entry, &blocks, &predecessors)?;
         for id in &blocks {
             let block = program
                 .blocks
@@ -91,24 +93,7 @@ fn resources(program: &Program, limits: CompileLimits) -> Result<(), SemanticErr
                 .ok_or_else(|| SemanticError::budget("IR value count overflow"))?;
         }
     }
-    let analysis = program
-        .blocks
-        .len()
-        .checked_mul(program.blocks.len())
-        .and_then(|pairs| {
-            program
-                .blocks
-                .len()
-                .checked_mul(program.slots.len())
-                .and_then(|slots| pairs.checked_add(slots))
-        })
-        .and_then(|entries| entries.checked_mul(512))
-        .and_then(|bytes| bytes.checked_add(storage))
-        .and_then(|bytes| bytes.checked_add(retained))
-        .and_then(|bytes| {
-            partial_working_set(program).and_then(|partial| bytes.checked_add(partial))
-        })
-        .ok_or_else(|| SemanticError::budget("verification storage overflow"))?;
+    let analysis = analysis_storage(program, nodes, storage, retained)?;
     if analysis > limits.storage_bytes {
         return Err(SemanticError::limit(
             crate::ResourceKind::StorageBytes,
@@ -143,6 +128,49 @@ fn resources(program: &Program, limits: CompileLimits) -> Result<(), SemanticErr
     }
 
     Ok(())
+}
+fn analysis_storage(
+    program: &Program,
+    nodes: usize,
+    storage: usize,
+    retained: usize,
+) -> Result<usize, SemanticError> {
+    let edge_count = program
+        .blocks
+        .iter()
+        .try_fold(0usize, |count, block| {
+            count.checked_add(block.predecessors.len())
+        })
+        .ok_or_else(|| SemanticError::budget("verification edge count overflow"))?;
+    // Dominators retain a graph and immediate-parent tree, not a set per pair
+    // of blocks. Definite assignment still keeps block-by-slot facts.
+    program
+        .blocks
+        .len()
+        .checked_add(edge_count)
+        .and_then(|graph| {
+            program
+                .blocks
+                .len()
+                .checked_mul(program.slots.len())
+                .and_then(|slots| graph.checked_add(slots))
+        })
+        .and_then(|entries| entries.checked_mul(512))
+        .and_then(|bytes| {
+            nodes
+                .checked_mul(256)
+                .and_then(|values| bytes.checked_add(values))
+        })
+        .and_then(|bytes| bytes.checked_add(storage))
+        .and_then(|bytes| {
+            retained
+                .checked_mul(4)
+                .and_then(|retained| bytes.checked_add(retained))
+        })
+        .and_then(|bytes| {
+            partial_working_set(program).and_then(|partial| bytes.checked_add(partial))
+        })
+        .ok_or_else(|| SemanticError::budget("verification storage overflow"))
 }
 fn partial_working_set(program: &Program) -> Option<usize> {
     let writes = program.blocks.iter().flat_map(|block| &block.instructions).filter(|item| matches!(&item.kind, super::InstructionKind::Store { place, .. } if !place.indices.is_empty())).count();
@@ -352,56 +380,12 @@ fn edges(context: &Context<'_>) -> Result<BTreeMap<BlockId, BTreeSet<BlockId>>, 
     }
     Ok(predecessors)
 }
-fn dominance(
-    entry: BlockId,
-    blocks: &BTreeSet<BlockId>,
-    predecessors: &BTreeMap<BlockId, BTreeSet<BlockId>>,
-) -> BTreeMap<BlockId, BTreeSet<BlockId>> {
-    let mut sets: BTreeMap<_, _> = blocks
-        .iter()
-        .map(|id| {
-            (
-                *id,
-                if *id == entry {
-                    BTreeSet::from([entry])
-                } else {
-                    blocks.clone()
-                },
-            )
-        })
-        .collect();
-    loop {
-        let mut changed = false;
-        for id in blocks {
-            if *id == entry {
-                continue;
-            }
-            let mut incoming = predecessors
-                .get(id)
-                .into_iter()
-                .flatten()
-                .filter_map(|predecessor| sets.get(predecessor));
-            let mut set = incoming.next().cloned().unwrap_or_default();
-            for other in incoming {
-                set = set.intersection(other).copied().collect();
-            }
-            set.insert(*id);
-            if sets.get(id) != Some(&set) {
-                sets.insert(*id, set);
-                changed = true;
-            }
-        }
-        if !changed {
-            return sets;
-        }
-    }
-}
 fn check_use(
     context: &Context<'_>,
     block: &Block,
     order: usize,
     value: ValueId,
-    dominators: &BTreeMap<BlockId, BTreeSet<BlockId>>,
+    dominators: &Dominance,
 ) -> Result<(), SemanticError> {
     let definition = context
         .values
@@ -411,10 +395,7 @@ fn check_use(
         if definition.order >= order && definition.order != 0 {
             return Err(SemanticError::invalid("SSA use precedes definition"));
         }
-    } else if dominators
-        .get(&block.id)
-        .is_none_or(|set| !set.contains(&definition.block))
-    {
+    } else if !dominators.contains(definition.block, block.id) {
         return Err(SemanticError::invalid(
             "SSA definition does not dominate use",
         ));
@@ -424,7 +405,7 @@ fn check_use(
 fn check_block(
     context: &Context<'_>,
     block: &Block,
-    dominators: &BTreeMap<BlockId, BTreeSet<BlockId>>,
+    dominators: &Dominance,
 ) -> Result<(), SemanticError> {
     let mut memory = block
         .arguments

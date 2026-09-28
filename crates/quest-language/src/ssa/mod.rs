@@ -42,6 +42,27 @@ macro_rules! identity {
 // Separate newtypes prevent mixing logical identifier categories.
 identity!(SlotId, ValueId, BlockId, RegionId);
 
+/// Identity of one immutable verified publication; clones retain this identity.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct SnapshotId(ProgramId);
+
+/// A block position tied to an immutable publication, rather than a mutable edit.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct BlockHandle {
+    snapshot: SnapshotId,
+    block: BlockId,
+}
+impl BlockHandle {
+    #[must_use]
+    pub const fn snapshot(self) -> SnapshotId {
+        self.snapshot
+    }
+    #[must_use]
+    pub const fn id(self) -> BlockId {
+        self.block
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Type {
     Scalar(ScalarType),
@@ -490,7 +511,10 @@ impl Program {
     /// Rejects any malformed or unsupported executable representation.
     pub fn verify(self, limits: CompileLimits) -> Result<VerifiedProgram, SemanticError> {
         verify::verify(&self, limits)?;
-        Ok(VerifiedProgram { program: self })
+        Ok(VerifiedProgram {
+            program: self,
+            snapshot: SnapshotId(ProgramId::fresh()?),
+        })
     }
 }
 /// A program whose executable invariants passed independent verification.
@@ -507,8 +531,38 @@ impl Program {
 #[derive(Debug, Clone, PartialEq)]
 pub struct VerifiedProgram {
     program: Program,
+    snapshot: SnapshotId,
 }
 impl VerifiedProgram {
+    #[must_use]
+    pub const fn snapshot(&self) -> SnapshotId {
+        self.snapshot
+    }
+
+    /// Attach the current publication identity after checking the block owner.
+    #[must_use]
+    pub fn block_handle(&self, block: BlockId) -> Option<BlockHandle> {
+        self.program
+            .blocks
+            .get(block.index())
+            .filter(|value| value.id == block)
+            .map(|_| BlockHandle {
+                snapshot: self.snapshot,
+                block,
+            })
+    }
+
+    /// Resolve a handle only in the publication from which it was obtained.
+    #[must_use]
+    pub fn block(&self, handle: BlockHandle) -> Option<&Block> {
+        if handle.snapshot != self.snapshot {
+            return None;
+        }
+        self.program
+            .blocks
+            .get(handle.block.index())
+            .filter(|block| block.id == handle.block)
+    }
     /// Owned bytes including nested allocation capacities; excludes allocator bookkeeping.
     ///
     /// # Errors

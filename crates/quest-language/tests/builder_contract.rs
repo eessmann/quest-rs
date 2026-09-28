@@ -8,6 +8,31 @@ use quest_language::{
 };
 
 #[gtest]
+fn typed_builder_bounds_shared_expression_expansion_before_materialization() -> Result<()> {
+    let mut builder = Builder::with_limits(CompileLimits {
+        nodes: 64,
+        ..CompileLimits::default()
+    })?;
+    let mut value = builder.integer::<32>(1)?;
+    let mut rejected = false;
+    for _ in 0..10 {
+        match value.add(&value) {
+            Ok(next) => value = next,
+            Err(error) => {
+                expect_eq!(error.kind, quest_language::semantic::ErrorKind::Resource);
+                rejected = true;
+                break;
+            }
+        }
+    }
+    expect_true!(rejected);
+    // Rejecting the next node leaves the accepted expression and builder usable.
+    builder.local("sum", &value)?;
+    builder.finish(CompileLimits::default())?.into_ssa()?;
+    Ok(())
+}
+
+#[gtest]
 fn typed_builder_constructs_control_flow_through_shared_admission() -> Result<()> {
     let mut builder = Builder::new()?;
     let zero = builder.integer::<32>(0)?;
@@ -47,11 +72,11 @@ fn typed_builder_uses_hygienic_names_and_rejects_nested_qubit_declarations() -> 
     let mut builder = Builder::new()?;
     let zero = builder.integer::<32>(0)?;
     let local = builder.local("value", &zero)?;
-    let condition = builder.boolean(true);
+    let condition = builder.boolean(true)?;
     builder.if_else(
         &condition,
         |body| {
-            body.local("value", &body.boolean(false))?;
+            body.local("value", &body.boolean(false)?)?;
             body.assign(&local, &zero)
         },
         |_| Ok(()),
@@ -77,5 +102,23 @@ fn typed_builder_gate_parameters_do_not_bypass_explicit_cast_rules() -> Result<(
     let theta = invalid.angle_bits::<8>(128)?.cast::<Float<64>>()?;
     invalid.gate(GateKind::Rx, &[theta], &[q])?;
     verify_that!(invalid.finish(CompileLimits::default()).is_err(), eq(true))?;
+    Ok(())
+}
+
+#[gtest]
+fn boolean_construction_obeys_zero_storage_and_node_budgets() -> Result<()> {
+    for limits in [
+        CompileLimits {
+            storage_bytes: 0,
+            ..CompileLimits::default()
+        },
+        CompileLimits {
+            nodes: 0,
+            ..CompileLimits::default()
+        },
+    ] {
+        let builder = Builder::with_limits(limits)?;
+        expect_true!(builder.boolean(true).is_err());
+    }
     Ok(())
 }
