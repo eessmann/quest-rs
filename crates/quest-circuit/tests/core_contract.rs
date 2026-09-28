@@ -47,7 +47,7 @@ fn stochastic_and_classical_hazards_preserve_order() -> Result<()> {
 fn missing_nonfinite_and_duplicate_bindings_are_rejected() -> Result<()> {
     let mut b = ProgramBuilder::new(1, 0)?;
     let t = b.parameter("theta")?;
-    b.gate(Gate::Rx(Angle::parameter(t)), &[b.qubit(0)?], &[])?;
+    b.gate(Gate::Rx(Angle::parameter(t)?), &[b.qubit(0)?], &[])?;
     let p = b.finish()?;
     expect_true!(p.clone().bind(&[]).is_err());
     expect_true!(p.clone().bind(&[(t, f64::INFINITY)]).is_err());

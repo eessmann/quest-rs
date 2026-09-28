@@ -1,8 +1,13 @@
-use std::{collections::BTreeMap, sync::Arc};
+use std::{
+    collections::BTreeMap,
+    ops::Deref,
+    sync::{Arc, OnceLock},
+};
 
 use crate::BigRational;
 use num_bigint::BigInt;
 use num_traits::Zero;
+use quest_symbolic::{Expr, Owner, Symbol};
 
 use crate::{Error, NumericalOperator, Result};
 
@@ -30,25 +35,162 @@ owned_id!(GateDefinitionId);
 #[derive(Debug, Clone, PartialEq)]
 pub struct Angle(pub(crate) AngleExpr);
 
+#[derive(Debug)]
+#[expect(
+    clippy::redundant_pub_crate,
+    reason = "Internal wrapper is reachable only through the private model module"
+)]
+pub(crate) struct SymbolicAngle {
+    expr: Expr,
+    finite_constant: OnceLock<f64>,
+}
+impl SymbolicAngle {
+    fn new(expr: Expr) -> Arc<Self> {
+        Arc::new(Self {
+            expr,
+            finite_constant: OnceLock::new(),
+        })
+    }
+}
+impl Deref for SymbolicAngle {
+    type Target = Expr;
+    fn deref(&self) -> &Self::Target {
+        &self.expr
+    }
+}
+impl PartialEq for SymbolicAngle {
+    fn eq(&self, other: &Self) -> bool {
+        self.expr == other.expr
+    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 #[expect(
     clippy::redundant_pub_crate,
     reason = "Keep internal state out of the crate wildcard public re-export"
 )]
 pub(crate) enum AngleExpr {
-    Pi(BigRational),
-    Parameter(ParameterId),
+    Symbolic(Arc<SymbolicAngle>),
     Opaque(f64),
     Negative(Arc<Self>),
 }
 
+/// Exact target identity retained beside a numerical bound gate parameter.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum BoundAngleTarget {
+    DyadicRadians {
+        bits: u64,
+    },
+    RationalPi {
+        numerator: BigInt,
+        denominator: BigInt,
+    },
+    AffinePi {
+        radians_numerator: BigInt,
+        radians_denominator: BigInt,
+        pi_numerator: BigInt,
+        pi_denominator: BigInt,
+    },
+}
+
 impl Angle {
-    pub(crate) fn substitute(&self, bindings: &BTreeMap<ParameterId, Self>) -> Result<Self> {
-        Ok(match &self.0 {
-            AngleExpr::Parameter(p) => bindings.get(p).ok_or(Error::Binding)?.clone(),
-            AngleExpr::Negative(a) => Self((**a).clone()).substitute(bindings)?.negated(),
-            _ => self.clone(),
-        })
+    pub(crate) fn binding_work_estimate(&self) -> Result<u64> {
+        match &self.0 {
+            AngleExpr::Symbolic(value) => value.binding_work_estimate().map_err(Error::from),
+            AngleExpr::Opaque(_) => Ok(1),
+            AngleExpr::Negative(inner) => Self((**inner).clone())
+                .binding_work_estimate()?
+                .checked_add(1)
+                .ok_or(Error::Budget("angle binding work")),
+        }
+    }
+    pub(crate) fn retained_bytes(&self) -> Result<usize> {
+        match &self.0 {
+            AngleExpr::Symbolic(value) => value
+                .retained_bytes()
+                .map_err(Error::from)?
+                .checked_add(
+                    const {
+                        std::mem::size_of::<SymbolicAngle>() - std::mem::size_of::<Expr>()
+                            + 3 * std::mem::size_of::<usize>()
+                    },
+                )
+                .ok_or(Error::Budget("symbolic angle storage")),
+            AngleExpr::Opaque(_) => Ok(0),
+            AngleExpr::Negative(inner) => Self((**inner).clone())
+                .retained_bytes()?
+                .checked_add(
+                    const { std::mem::size_of::<AngleExpr>() + 2 * std::mem::size_of::<usize>() },
+                )
+                .ok_or(Error::Budget("angle storage")),
+        }
+    }
+    pub(crate) fn equivalent_checked(&self, other: &Self) -> Result<bool> {
+        match (&self.0, &other.0) {
+            (AngleExpr::Symbolic(a), AngleExpr::Symbolic(b)) => Ok(a.equivalent_checked(b)?),
+            _ => Ok(self == other),
+        }
+    }
+    pub(crate) fn equivalence_work_estimate(&self) -> Result<u64> {
+        match &self.0 {
+            AngleExpr::Symbolic(value) => u64::try_from(value.source_node_count())
+                .map_err(|_| Error::Budget("angle equivalence work")),
+            AngleExpr::Opaque(_) => Ok(1),
+            AngleExpr::Negative(inner) => Self((**inner).clone())
+                .equivalence_work_estimate()?
+                .checked_add(1)
+                .ok_or(Error::Budget("angle equivalence work")),
+        }
+    }
+    pub(crate) fn substitute(
+        &self,
+        bindings: &BTreeMap<ParameterId, Self>,
+        owner: u64,
+    ) -> Result<Self> {
+        match &self.0 {
+            AngleExpr::Symbolic(value) => {
+                let mut replacements = Vec::new();
+                for symbol in value.parameters() {
+                    let id = ParameterId {
+                        owner: symbol.owner().id(),
+                        index: usize::try_from(symbol.index()).map_err(|_| Error::InvalidId)?,
+                    };
+                    replacements.push((symbol, bindings.get(&id).ok_or(Error::Binding)?));
+                }
+                if replacements.is_empty() {
+                    return Ok(self.clone());
+                }
+                if replacements.iter().any(|(_, angle)| !angle.is_exact()) {
+                    if let Some((symbol, negative)) = value.signed_parameter_leaf() {
+                        let id = ParameterId {
+                            owner: symbol.owner().id(),
+                            index: usize::try_from(symbol.index()).map_err(|_| Error::InvalidId)?,
+                        };
+                        let argument = bindings.get(&id).ok_or(Error::Binding)?;
+                        return if negative {
+                            argument.negated()
+                        } else {
+                            Ok(argument.clone())
+                        };
+                    }
+                    return Err(Error::Unsupported("opaque compound angle substitution"));
+                }
+                let exact = replacements
+                    .into_iter()
+                    .map(|(symbol, angle)| match &angle.0 {
+                        AngleExpr::Symbolic(value) => Ok((symbol, value.expr.clone())),
+                        _ => Err(Error::Unsupported("opaque compound angle substitution")),
+                    })
+                    .collect::<Result<Vec<_>>>()?;
+                Ok(Self(AngleExpr::Symbolic(SymbolicAngle::new(
+                    value.substitute_into(Owner::new(owner), &exact)?,
+                ))))
+            }
+            AngleExpr::Negative(inner) => Self((**inner).clone())
+                .substitute(bindings, owner)?
+                .negated(),
+            AngleExpr::Opaque(_) => Ok(self.clone()),
+        }
     }
     /// # Errors
     /// Rejects a zero denominator.
@@ -56,10 +198,9 @@ impl Angle {
         if denominator == 0 {
             return Err(Error::ZeroDenominator);
         }
-        Ok(Self(AngleExpr::Pi(BigRational::new(
-            numerator.into(),
-            denominator.into(),
-        ))))
+        Ok(Self(AngleExpr::Symbolic(SymbolicAngle::new(Expr::pi(
+            BigRational::new(numerator.into(), denominator.into()),
+        )?))))
     }
     /// Admit an arbitrary rational multiple of pi. Ratios made with
     /// `BigRational::new_raw` are validated and normalized here. Conversion to
@@ -74,10 +215,34 @@ impl Angle {
         if value.denom().is_zero() {
             return Err(Error::ZeroDenominator);
         }
-        Ok(Self(AngleExpr::Pi(BigRational::new(
-            value.numer().clone(),
-            value.denom().clone(),
-        ))))
+        if value.numer().bits().max(value.denom().bits()) > 16_384 {
+            return Err(Error::Budget("exact angle coefficient bits"));
+        }
+        Ok(Self(AngleExpr::Symbolic(SymbolicAngle::new(Expr::pi(
+            BigRational::new(value.numer().clone(), value.denom().clone()),
+        )?))))
+    }
+    /// Admit an exact `r + s*pi` angle.
+    /// # Errors
+    /// Rejects invalid rationals or exhausted exact-expression budgets.
+    pub fn affine(radians: BigRational, pi: BigRational) -> Result<Self> {
+        if radians.denom().is_zero() || pi.denom().is_zero() {
+            return Err(Error::ZeroDenominator);
+        }
+        if [
+            radians.numer().bits(),
+            radians.denom().bits(),
+            pi.numer().bits(),
+            pi.denom().bits(),
+        ]
+        .into_iter()
+        .any(|bits| bits > 16_384)
+        {
+            return Err(Error::Budget("exact angle coefficient bits"));
+        }
+        Ok(Self(AngleExpr::Symbolic(SymbolicAngle::new(Expr::affine(
+            radians, pi,
+        )?))))
     }
     /// # Errors
     /// Rejects nonfinite angle values.
@@ -87,87 +252,239 @@ impl Angle {
         }
         Ok(Self(AngleExpr::Opaque(value)))
     }
-    #[must_use]
-    pub const fn parameter(id: ParameterId) -> Self {
-        Self(AngleExpr::Parameter(id))
+    /// # Errors
+    /// Rejects an unrepresentable parameter index or exhausted exact budgets.
+    pub fn parameter(id: ParameterId) -> Result<Self> {
+        let index = u64::try_from(id.index).map_err(|_| Error::InvalidId)?;
+        Ok(Self(AngleExpr::Symbolic(SymbolicAngle::new(
+            Expr::parameter(Symbol::new(Owner::new(id.owner), index))?,
+        ))))
     }
-    #[must_use]
-    pub fn negated(&self) -> Self {
+    /// # Errors
+    /// Rejects exhausted exact-expression budgets.
+    pub fn negated(&self) -> Result<Self> {
         match &self.0 {
-            AngleExpr::Pi(x) => Self(AngleExpr::Pi(std::ops::Neg::neg(x))),
-            AngleExpr::Negative(x) => Self((**x).clone()),
-            x => Self(AngleExpr::Negative(Arc::new(x.clone()))),
+            AngleExpr::Symbolic(value) => {
+                let result = SymbolicAngle::new(value.neg()?);
+                if let Some(finite) = value.finite_constant.get() {
+                    let _ = result.finite_constant.set(-finite);
+                }
+                Ok(Self(AngleExpr::Symbolic(result)))
+            }
+            AngleExpr::Negative(x) => Ok(Self((**x).clone())),
+            x @ AngleExpr::Opaque(_) => Ok(Self(AngleExpr::Negative(Arc::new(x.clone())))),
         }
     }
-    pub(crate) fn is_exact(&self) -> bool {
+    /// Checked exact addition. Opaque radians do not gain algebraic privileges.
+    /// # Errors
+    /// Rejects opaque operands, foreign owners, or exhausted exact budgets.
+    pub fn added(&self, other: &Self) -> Result<Self> {
+        match (&self.0, &other.0) {
+            (AngleExpr::Symbolic(a), AngleExpr::Symbolic(b)) => {
+                Ok(Self(AngleExpr::Symbolic(SymbolicAngle::new(a.add(b)?))))
+            }
+            _ => Err(Error::Unsupported("opaque angle addition")),
+        }
+    }
+    /// Checked exact rational scaling.
+    /// # Errors
+    /// Rejects opaque operands, zero denominators, or exhausted budgets.
+    pub fn scaled_ratio(&self, numerator: BigInt, denominator: BigInt) -> Result<Self> {
         match &self.0 {
-            AngleExpr::Opaque(_) => false,
-            AngleExpr::Negative(a) => Self((**a).clone()).is_exact(),
-            _ => true,
+            AngleExpr::Symbolic(value) => Ok(Self(AngleExpr::Symbolic(SymbolicAngle::new(
+                value.scale_ratio(numerator, denominator)?,
+            )))),
+            _ => Err(Error::Unsupported("opaque angle scaling")),
+        }
+    }
+    pub(crate) const fn is_exact(&self) -> bool {
+        matches!(&self.0, AngleExpr::Symbolic(_))
+    }
+    pub(crate) fn rational_pi_identity(&self) -> Option<BigRational> {
+        if let AngleExpr::Symbolic(value) = &self.0 {
+            value.pi_identity()
+        } else {
+            None
+        }
+    }
+    pub(crate) fn safe_inverse(&self) -> bool {
+        match &self.0 {
+            AngleExpr::Symbolic(value) if value.signed_parameter_leaf().is_some() => true,
+            AngleExpr::Symbolic(value) if !value.has_source_parameters() => {
+                self.evaluate(&BTreeMap::new()).is_ok()
+            }
+            _ => false,
         }
     }
     pub(crate) fn plus_exact(&self, other: &Self) -> Option<Self> {
-        if !self.is_exact() || !other.is_exact() {
+        let (AngleExpr::Symbolic(a), AngleExpr::Symbolic(b)) = (&self.0, &other.0) else {
+            return None;
+        };
+        if a.has_source_parameters() || b.has_source_parameters() {
             return None;
         }
-        if self == &other.negated() {
-            return Some(Self(AngleExpr::Pi(BigRational::zero())));
+        self.evaluate(&BTreeMap::new()).ok()?;
+        other.evaluate(&BTreeMap::new()).ok()?;
+        let sum = self.added(other).ok()?;
+        if let AngleExpr::Symbolic(value) = &sum.0 {
+            let finite =
+                crate::rational::to_affine_f64(value.constant(), value.pi_coefficient()).ok()?;
+            let _ = value.finite_constant.set(finite);
         }
-        match (&self.0, &other.0) {
-            (AngleExpr::Pi(a), AngleExpr::Pi(b)) => {
-                let sum = Self(AngleExpr::Pi(std::ops::Add::add(a, b)));
-                // Preserve the finite binding domain. In particular, two
-                // individually finite rotations must not merge into overflow.
-                sum.evaluate(&BTreeMap::new()).ok()?;
-                Some(sum)
-            }
-            // A sum of symbolic finite values need not remain finite. Keep
-            // their evaluation separate; structural inverse pairs above are
-            // still safe for every admitted parameter binding.
-            _ => None,
-        }
+        Some(sum)
     }
     pub(crate) fn is_zero(&self) -> bool {
-        matches!(&self.0, AngleExpr::Pi(x) if x.is_zero())
+        matches!(&self.0, AngleExpr::Symbolic(value)
+            if value.is_zero()
+                && !value.has_source_parameters()
+                && self.evaluate(&BTreeMap::new()).is_ok())
     }
-    pub(crate) fn parameters(&self, output: &mut Vec<ParameterId>) {
-        fn visit(x: &AngleExpr, out: &mut Vec<ParameterId>) {
-            match x {
-                AngleExpr::Parameter(p) => out.push(*p),
-                AngleExpr::Negative(a) => visit(a, out),
-                _ => {}
+    pub(crate) fn parameters(&self, output: &mut Vec<ParameterId>) -> Result<()> {
+        match &self.0 {
+            AngleExpr::Symbolic(value) => {
+                for symbol in value.parameters() {
+                    output.push(ParameterId {
+                        owner: symbol.owner().id(),
+                        index: usize::try_from(symbol.index()).map_err(|_| Error::InvalidId)?,
+                    });
+                }
             }
+            AngleExpr::Negative(inner) => Self((**inner).clone()).parameters(output)?,
+            AngleExpr::Opaque(_) => {}
         }
-        visit(&self.0, output);
+        Ok(())
     }
     pub(crate) fn evaluate(&self, bindings: &BTreeMap<ParameterId, f64>) -> Result<f64> {
-        fn eval(x: &AngleExpr, bindings: &BTreeMap<ParameterId, f64>) -> Result<f64> {
-            let value = match x {
-                AngleExpr::Pi(x) => crate::rational::to_pi_f64(x).map_err(|error| match error {
-                    crate::rational::PiConversionError::NonFinite => Error::NonFinite,
-                    crate::rational::PiConversionError::Precision => {
-                        Error::Budget("rational pi precision")
-                    }
-                })?,
-                AngleExpr::Parameter(p) => *bindings.get(p).ok_or(Error::Binding)?,
-                AngleExpr::Opaque(x) => *x,
-                AngleExpr::Negative(x) => -eval(x, bindings)?,
-            };
-            if value.is_finite() {
-                Ok(value)
-            } else {
-                Err(Error::NonFinite)
+        self.evaluate_target(bindings).map(|(value, _)| value)
+    }
+    pub(crate) fn evaluate_target(
+        &self,
+        bindings: &BTreeMap<ParameterId, f64>,
+    ) -> Result<(f64, BoundAngleTarget)> {
+        match &self.0 {
+            AngleExpr::Opaque(value) => Ok((
+                *value,
+                BoundAngleTarget::DyadicRadians {
+                    bits: value.to_bits(),
+                },
+            )),
+            AngleExpr::Negative(inner) => {
+                let (value, target) = Self((**inner).clone()).evaluate_target(bindings)?;
+                let value = -value;
+                let target = match target {
+                    BoundAngleTarget::DyadicRadians { .. } => BoundAngleTarget::DyadicRadians {
+                        bits: value.to_bits(),
+                    },
+                    BoundAngleTarget::RationalPi {
+                        numerator,
+                        denominator,
+                    } => BoundAngleTarget::RationalPi {
+                        numerator: std::ops::Neg::neg(numerator),
+                        denominator,
+                    },
+                    BoundAngleTarget::AffinePi {
+                        radians_numerator,
+                        radians_denominator,
+                        pi_numerator,
+                        pi_denominator,
+                    } => BoundAngleTarget::AffinePi {
+                        radians_numerator: std::ops::Neg::neg(radians_numerator),
+                        radians_denominator,
+                        pi_numerator: std::ops::Neg::neg(pi_numerator),
+                        pi_denominator,
+                    },
+                };
+                Ok((value, target))
             }
+            AngleExpr::Symbolic(expr) => evaluate_symbolic_target(expr, bindings),
         }
-        eval(&self.0, bindings)
     }
 }
-
-impl From<i64> for Angle {
-    fn from(value: i64) -> Self {
-        Self(AngleExpr::Pi(BigRational::from_integer(BigInt::from(
+fn evaluate_symbolic_target(
+    expr: &SymbolicAngle,
+    bindings: &BTreeMap<ParameterId, f64>,
+) -> Result<(f64, BoundAngleTarget)> {
+    if let Some(finite) = expr.finite_constant.get() {
+        return Ok((*finite, exact_target_from_expr(expr)));
+    }
+    if let Some((symbol, negative)) = expr.signed_parameter_leaf() {
+        let id = ParameterId {
+            owner: symbol.owner().id(),
+            index: usize::try_from(symbol.index()).map_err(|_| Error::InvalidId)?,
+        };
+        let value = *bindings.get(&id).ok_or(Error::Binding)?;
+        let value = if negative { -value } else { value };
+        return Ok((
             value,
-        ))))
+            BoundAngleTarget::DyadicRadians {
+                bits: value.to_bits(),
+            },
+        ));
+    }
+    if let Some(pi) = expr.pi_identity() {
+        let value = crate::rational::to_pi_f64(&pi).map_err(map_pi_conversion)?;
+        let _ = expr.finite_constant.set(value);
+        return Ok((
+            value,
+            BoundAngleTarget::RationalPi {
+                numerator: pi.numer().clone(),
+                denominator: pi.denom().clone(),
+            },
+        ));
+    }
+    let parameters: Vec<_> = expr.parameters().collect();
+    let mut exact_bindings = Vec::new();
+    exact_bindings
+        .try_reserve_exact(parameters.len())
+        .map_err(|_| Error::Budget("angle bindings"))?;
+    for symbol in parameters {
+        let id = ParameterId {
+            owner: symbol.owner().id(),
+            index: usize::try_from(symbol.index()).map_err(|_| Error::InvalidId)?,
+        };
+        let value = bindings.get(&id).ok_or(Error::Binding)?;
+        exact_bindings.push((
+            symbol,
+            crate::rational::dyadic_from_bits(value.to_bits()).ok_or(Error::NonFinite)?,
+        ));
+    }
+    let (radians, pi) = expr.bind_checked(&exact_bindings, |radians, pi| {
+        crate::rational::to_affine_f64(radians, pi)
+            .map(|_| ())
+            .map_err(map_pi_conversion)
+    })?;
+    let value = crate::rational::to_affine_f64(&radians, &pi).map_err(map_pi_conversion)?;
+    if exact_bindings.is_empty() {
+        let _ = expr.finite_constant.set(value);
+    }
+    Ok((
+        value,
+        BoundAngleTarget::AffinePi {
+            radians_numerator: radians.numer().clone(),
+            radians_denominator: radians.denom().clone(),
+            pi_numerator: pi.numer().clone(),
+            pi_denominator: pi.denom().clone(),
+        },
+    ))
+}
+fn exact_target_from_expr(expr: &Expr) -> BoundAngleTarget {
+    expr.pi_identity().map_or_else(
+        || BoundAngleTarget::AffinePi {
+            radians_numerator: expr.constant().numer().clone(),
+            radians_denominator: expr.constant().denom().clone(),
+            pi_numerator: expr.pi_coefficient().numer().clone(),
+            pi_denominator: expr.pi_coefficient().denom().clone(),
+        },
+        |pi| BoundAngleTarget::RationalPi {
+            numerator: pi.numer().clone(),
+            denominator: pi.denom().clone(),
+        },
+    )
+}
+const fn map_pi_conversion(error: crate::rational::PiConversionError) -> Error {
+    match error {
+        crate::rational::PiConversionError::NonFinite => Error::NonFinite,
+        crate::rational::PiConversionError::Precision => Error::Budget("rational pi precision"),
     }
 }
 
@@ -224,16 +541,71 @@ pub enum Gate {
 }
 
 impl Gate {
-    pub(crate) fn substitute(&self, bindings: &BTreeMap<ParameterId, Angle>) -> Result<Self> {
+    /// Lift a bound gate without assigning exact symbolic identities to radians.
+    /// # Errors
+    /// Rejects nonfinite bound angle values.
+    pub fn from_bound(gate: &BoundGate) -> Result<Self> {
+        Ok(match *gate {
+            BoundGate::Id => Self::Id,
+            BoundGate::X => Self::X,
+            BoundGate::Y => Self::Y,
+            BoundGate::Z => Self::Z,
+            BoundGate::H => Self::H,
+            BoundGate::S => Self::S,
+            BoundGate::Sdg => Self::Sdg,
+            BoundGate::T => Self::T,
+            BoundGate::Tdg => Self::Tdg,
+            BoundGate::Sx => Self::Sx,
+            BoundGate::Sxdg => Self::Sxdg,
+            BoundGate::Swap => Self::Swap,
+            BoundGate::Rx(value) => Self::Rx(Angle::radians(value)?),
+            BoundGate::Ry(value) => Self::Ry(Angle::radians(value)?),
+            BoundGate::Rz(value) => Self::Rz(Angle::radians(value)?),
+            BoundGate::Phase(value) => Self::Phase(Angle::radians(value)?),
+            BoundGate::U { theta, phi, lambda } => Self::U {
+                theta: Angle::radians(theta)?,
+                phi: Angle::radians(phi)?,
+                lambda: Angle::radians(lambda)?,
+            },
+        })
+    }
+    pub(crate) fn equivalent_checked(&self, other: &Self) -> Result<bool> {
+        match (self, other) {
+            (Self::Rx(a), Self::Rx(b))
+            | (Self::Ry(a), Self::Ry(b))
+            | (Self::Rz(a), Self::Rz(b))
+            | (Self::Phase(a), Self::Phase(b)) => a.equivalent_checked(b),
+            (
+                Self::U {
+                    theta: at,
+                    phi: ap,
+                    lambda: al,
+                },
+                Self::U {
+                    theta: bt,
+                    phi: bp,
+                    lambda: bl,
+                },
+            ) => Ok(at.equivalent_checked(bt)?
+                && ap.equivalent_checked(bp)?
+                && al.equivalent_checked(bl)?),
+            _ => Ok(self == other),
+        }
+    }
+    pub(crate) fn substitute(
+        &self,
+        bindings: &BTreeMap<ParameterId, Angle>,
+        owner: u64,
+    ) -> Result<Self> {
         Ok(match self {
-            Self::Rx(a) => Self::Rx(a.substitute(bindings)?),
-            Self::Ry(a) => Self::Ry(a.substitute(bindings)?),
-            Self::Rz(a) => Self::Rz(a.substitute(bindings)?),
-            Self::Phase(a) => Self::Phase(a.substitute(bindings)?),
+            Self::Rx(a) => Self::Rx(a.substitute(bindings, owner)?),
+            Self::Ry(a) => Self::Ry(a.substitute(bindings, owner)?),
+            Self::Rz(a) => Self::Rz(a.substitute(bindings, owner)?),
+            Self::Phase(a) => Self::Phase(a.substitute(bindings, owner)?),
             Self::U { theta, phi, lambda } => Self::U {
-                theta: theta.substitute(bindings)?,
-                phi: phi.substitute(bindings)?,
-                lambda: lambda.substitute(bindings)?,
+                theta: theta.substitute(bindings, owner)?,
+                phi: phi.substitute(bindings, owner)?,
+                lambda: lambda.substitute(bindings, owner)?,
             },
             x => x.clone(),
         })
@@ -265,26 +637,27 @@ impl Gate {
             Self::U { .. } => quest_language::GateKind::U,
         }
     }
-    #[must_use]
-    pub fn adjoint(&self) -> Self {
-        match self {
+    /// # Errors
+    /// Rejects exhausted exact angle budgets during negation.
+    pub fn adjoint(&self) -> Result<Self> {
+        Ok(match self {
             Self::S => Self::Sdg,
             Self::Sdg => Self::S,
             Self::T => Self::Tdg,
             Self::Tdg => Self::T,
             Self::Sx => Self::Sxdg,
             Self::Sxdg => Self::Sx,
-            Self::Rx(x) => Self::Rx(x.negated()),
-            Self::Ry(x) => Self::Ry(x.negated()),
-            Self::Rz(x) => Self::Rz(x.negated()),
-            Self::Phase(x) => Self::Phase(x.negated()),
+            Self::Rx(x) => Self::Rx(x.negated()?),
+            Self::Ry(x) => Self::Ry(x.negated()?),
+            Self::Rz(x) => Self::Rz(x.negated()?),
+            Self::Phase(x) => Self::Phase(x.negated()?),
             Self::U { theta, phi, lambda } => Self::U {
-                theta: theta.negated(),
-                phi: lambda.negated(),
-                lambda: phi.negated(),
+                theta: theta.negated()?,
+                phi: lambda.negated()?,
+                lambda: phi.negated()?,
             },
             other => other.clone(),
-        }
+        })
     }
     pub(crate) fn angles(&self) -> impl Iterator<Item = &Angle> + Clone {
         match self {
@@ -295,15 +668,21 @@ impl Gate {
         .into_iter()
         .flatten()
     }
-    pub(crate) fn bind(&self, bindings: &BTreeMap<ParameterId, f64>) -> Result<BoundGate> {
+    pub(crate) fn bind(
+        &self,
+        bindings: &BTreeMap<ParameterId, f64>,
+    ) -> Result<(BoundGate, Vec<Option<BoundAngleTarget>>)> {
         let mut parameters = [0.0; 3];
+        let mut targets = Vec::new();
         for (output, angle) in parameters.iter_mut().zip(self.angles()) {
-            *output = angle.evaluate(bindings)?;
+            let (value, target) = angle.evaluate_target(bindings)?;
+            *output = value;
+            targets.push(Some(target));
         }
         let parameters = parameters
             .get(..self.kind().definition().parameter_count)
             .ok_or(Error::Unsupported("gate parameter capacity"))?;
-        BoundGate::from_kind(self.kind(), parameters)
+        Ok((BoundGate::from_kind(self.kind(), parameters)?, targets))
     }
 }
 
@@ -685,6 +1064,78 @@ pub(crate) fn remap_operands(
 }
 
 impl SemanticOperation {
+    pub(crate) fn equivalence_work_estimate(&self) -> Result<u64> {
+        match self {
+            Self::Gate { gate, .. } => gate.angles().try_fold(1u64, |total, angle| {
+                total
+                    .checked_add(angle.equivalence_work_estimate()?)
+                    .ok_or(Error::Budget("operation equivalence work"))
+            }),
+            Self::GlobalPhase { angle, .. } => angle.equivalence_work_estimate(),
+            _ => Ok(1),
+        }
+    }
+    pub(crate) fn binding_work_estimate(&self) -> Result<u64> {
+        let work = match self {
+            Self::Gate { gate, .. } => gate.angles().try_fold(1u64, |total, angle| {
+                total
+                    .checked_add(angle.binding_work_estimate()?)
+                    .ok_or(Error::Budget("angle binding work"))
+            })?,
+            Self::GlobalPhase { angle, .. } => angle.binding_work_estimate()?,
+            Self::Conditional { operation, .. } => operation.binding_work_estimate()?,
+            Self::Numerical { .. }
+            | Self::Oracle { .. }
+            | Self::Measure { .. }
+            | Self::Reset { .. }
+            | Self::Barrier { .. }
+            | Self::Channel { .. } => 1,
+        };
+        Ok(work)
+    }
+    pub(crate) fn retained_bytes(&self) -> Result<usize> {
+        let operands = self.operands();
+        let array = |count: usize, element: usize| {
+            count
+                .checked_mul(element)
+                .and_then(|bytes| bytes.checked_add(const { 3 * std::mem::size_of::<usize>() }))
+                .ok_or(Error::Budget("ideal operand storage"))
+        };
+        let mut bytes = array(operands.targets().len(), std::mem::size_of::<QubitId>())?
+            .checked_add(array(
+                operands.controls().len(),
+                std::mem::size_of::<Control>(),
+            )?)
+            .ok_or(Error::Budget("ideal operand storage"))?;
+        let extra = match self {
+            Self::Gate { gate, .. } => gate.angles().try_fold(0usize, |total, angle| {
+                total
+                    .checked_add(angle.retained_bytes()?)
+                    .ok_or(Error::Budget("ideal angle storage"))
+            })?,
+            Self::GlobalPhase { angle, .. } => angle.retained_bytes()?,
+            Self::Numerical { matrix, .. } => matrix.bytes(),
+            Self::Oracle { fragment, .. } => {
+                crate::OracleFragment::shared_storage_bytes([fragment])?
+            }
+            Self::Channel { kraus, .. } => kraus.iter().try_fold(
+                array(kraus.len(), std::mem::size_of::<NumericalOperator>())?,
+                |total, matrix| {
+                    total
+                        .checked_add(matrix.bytes())
+                        .ok_or(Error::Budget("ideal channel storage"))
+                },
+            )?,
+            Self::Conditional { operation, .. } => std::mem::size_of::<Self>()
+                .checked_add(operation.retained_bytes()?)
+                .ok_or(Error::Budget("ideal conditional storage"))?,
+            Self::Measure { .. } | Self::Reset { .. } | Self::Barrier { .. } => 0,
+        };
+        bytes = bytes
+            .checked_add(extra)
+            .ok_or(Error::Budget("ideal storage"))?;
+        Ok(bytes)
+    }
     pub(crate) fn operands(&self) -> Operands<'_> {
         operand_view!(self)
     }
@@ -703,60 +1154,96 @@ impl SemanticOperation {
             Self::Gate { .. } | Self::GlobalPhase { .. } | Self::Barrier { .. }
         )
     }
-    pub(crate) fn bind(&self, b: &BTreeMap<ParameterId, f64>) -> Result<Operation> {
+    pub(crate) fn bind(
+        &self,
+        b: &BTreeMap<ParameterId, f64>,
+    ) -> Result<(Operation, Vec<Option<BoundAngleTarget>>)> {
         Ok(match self {
             Self::Gate {
                 gate,
                 targets,
                 controls,
-            } => Operation::Gate {
-                gate: gate.bind(b)?,
-                targets: targets.clone(),
-                controls: controls.clone(),
-            },
-            Self::GlobalPhase { angle, controls } => Operation::GlobalPhase {
-                radians: angle.evaluate(b)?,
-                controls: controls.clone(),
-            },
+            } => {
+                let (gate, identities) = gate.bind(b)?;
+                (
+                    Operation::Gate {
+                        gate,
+                        targets: targets.clone(),
+                        controls: controls.clone(),
+                    },
+                    identities,
+                )
+            }
+            Self::GlobalPhase { angle, controls } => {
+                let (radians, target) = angle.evaluate_target(b)?;
+                (
+                    Operation::GlobalPhase {
+                        radians,
+                        controls: controls.clone(),
+                    },
+                    vec![Some(target)],
+                )
+            }
             Self::Numerical {
                 matrix,
                 targets,
                 controls,
-            } => Operation::Numerical {
-                matrix: matrix.clone(),
-                targets: targets.clone(),
-                controls: controls.clone(),
-            },
+            } => (
+                Operation::Numerical {
+                    matrix: matrix.clone(),
+                    targets: targets.clone(),
+                    controls: controls.clone(),
+                },
+                vec![],
+            ),
             Self::Oracle {
                 fragment,
                 targets,
                 controls,
-            } => Operation::Oracle {
-                fragment: fragment.clone(),
-                targets: targets.clone(),
-                controls: controls.clone(),
-            },
-            Self::Measure { qubit, bit } => Operation::Measure {
-                qubit: *qubit,
-                bit: *bit,
-            },
-            Self::Reset { qubit } => Operation::Reset { qubit: *qubit },
-            Self::Barrier { qubits } => Operation::Barrier {
-                qubits: qubits.clone(),
-            },
-            Self::Channel { kraus, targets } => Operation::Channel {
-                kraus: kraus.clone(),
-                targets: targets.clone(),
-            },
+            } => (
+                Operation::Oracle {
+                    fragment: fragment.clone(),
+                    targets: targets.clone(),
+                    controls: controls.clone(),
+                },
+                vec![],
+            ),
+            Self::Measure { qubit, bit } => (
+                Operation::Measure {
+                    qubit: *qubit,
+                    bit: *bit,
+                },
+                vec![],
+            ),
+            Self::Reset { qubit } => (Operation::Reset { qubit: *qubit }, vec![]),
+            Self::Barrier { qubits } => (
+                Operation::Barrier {
+                    qubits: qubits.clone(),
+                },
+                vec![],
+            ),
+            Self::Channel { kraus, targets } => (
+                Operation::Channel {
+                    kraus: kraus.clone(),
+                    targets: targets.clone(),
+                },
+                vec![],
+            ),
             Self::Conditional {
                 bit,
                 expected,
                 operation,
-            } => Operation::Conditional {
-                bit: *bit,
-                expected: *expected,
-                operation: Box::new(operation.bind(b)?),
-            },
+            } => {
+                let (body, identities) = operation.bind(b)?;
+                (
+                    Operation::Conditional {
+                        bit: *bit,
+                        expected: *expected,
+                        operation: Box::new(body),
+                    },
+                    identities,
+                )
+            }
         })
     }
 }
@@ -779,6 +1266,7 @@ pub struct Instruction {
     pub(crate) provenance: crate::ProvenanceId,
     pub(crate) source: Option<SourceSpan>,
     pub(crate) operation: Operation,
+    pub(crate) angle_targets: Arc<[Option<BoundAngleTarget>]>,
 }
 impl Instruction {
     #[must_use]
@@ -796,6 +1284,58 @@ impl Instruction {
     #[must_use]
     pub const fn operation(&self) -> &Operation {
         &self.operation
+    }
+    /// Exact source target identities for this instruction's angle parameters.
+    #[must_use]
+    pub fn angle_targets(&self) -> &[Option<BoundAngleTarget>] {
+        &self.angle_targets
+    }
+    /// Conservative retained storage for exact angle-target sidecars.
+    /// # Errors
+    /// Rejects size arithmetic overflow.
+    pub fn angle_target_storage_bytes(&self) -> Result<usize> {
+        fn coefficient(value: &BigInt) -> Result<usize> {
+            let limbs = value.bits().div_ceil(64);
+            let bytes = usize::try_from(limbs)
+                .map_err(|_| Error::Budget("angle target storage"))?
+                .checked_mul(8)
+                .and_then(|x| x.checked_mul(2))
+                .and_then(|x| x.checked_add(const { 3 * std::mem::size_of::<usize>() }))
+                .ok_or(Error::Budget("angle target storage"))?;
+            Ok(bytes)
+        }
+        let mut bytes = self
+            .angle_targets
+            .len()
+            .checked_mul(std::mem::size_of::<Option<BoundAngleTarget>>())
+            .and_then(|x| x.checked_add(const { 3 * std::mem::size_of::<usize>() }))
+            .ok_or(Error::Budget("angle target storage"))?;
+        for target in self.angle_targets.iter().flatten() {
+            let coefficients: &[&BigInt] = match target {
+                BoundAngleTarget::DyadicRadians { .. } => &[],
+                BoundAngleTarget::RationalPi {
+                    numerator,
+                    denominator,
+                } => &[numerator, denominator],
+                BoundAngleTarget::AffinePi {
+                    radians_numerator,
+                    radians_denominator,
+                    pi_numerator,
+                    pi_denominator,
+                } => &[
+                    radians_numerator,
+                    radians_denominator,
+                    pi_numerator,
+                    pi_denominator,
+                ],
+            };
+            for value in coefficients {
+                bytes = bytes
+                    .checked_add(coefficient(value)?)
+                    .ok_or(Error::Budget("angle target storage"))?;
+            }
+        }
+        Ok(bytes)
     }
 }
 

@@ -9,7 +9,7 @@
 //! use quest_circuit::{Angle, Gate, ProgramBuilder};
 //! let mut builder = ProgramBuilder::new(1, 0)?;
 //! let theta = builder.parameter("theta")?;
-//! builder.gate(Gate::Rx(Angle::parameter(theta)), &[builder.qubit(0)?], &[])?;
+//! builder.gate(Gate::Rx(Angle::parameter(theta)?), &[builder.qubit(0)?], &[])?;
 //! let plan = builder.finish()?.bind(&[(theta, 0.25)])?.plan()?;
 //! assert_eq!(plan.instructions().len(), 1);
 //! # Ok::<(), quest_circuit::Error>(())
@@ -69,6 +69,8 @@ pub enum Error {
     NonFinite,
     #[error("rational angle denominator must be nonzero")]
     ZeroDenominator,
+    #[error("exact symbolic angle rejected: {0}")]
+    Symbolic(#[from] quest_symbolic::Error),
     #[error("resource budget exceeded: {0}")]
     Budget(&'static str),
     #[error("matrix must be a nonempty square with power-of-two dimension")]

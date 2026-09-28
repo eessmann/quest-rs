@@ -519,7 +519,11 @@ fn openqasm31_u_phase_survives_native_adjoint_signed_controls_and_fusion() -> go
                         };
                         builder
                             .gate(
-                                if inverse { gate.adjoint() } else { gate },
+                                if inverse {
+                                    gate.adjoint().or_fail()?
+                                } else {
+                                    gate
+                                },
                                 &[target],
                                 &controls,
                             )

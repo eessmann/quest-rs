@@ -19,6 +19,7 @@ quest-macros = { workspace = true, optional = true }
 quest-math = { workspace = true, optional = true }
 quest-optimizer-client = { workspace = true, optional = true }
 quest-qasm.workspace = true
+quest-symbolic.workspace = true
 thiserror = { workspace = true }
 
 [lints]

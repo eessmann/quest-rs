@@ -8,6 +8,40 @@ use num_traits::{Signed, ToPrimitive, Zero};
 /// uses the same generic rational implementation with bigint 0.5 instead.
 pub type BigRational = num_rational::Ratio<BigInt>;
 
+/// Decode finite binary64 bits as an exact rational. Signed zero is kept by
+/// the caller's source identity because a rational has only one zero.
+pub fn dyadic_from_bits(bits: u64) -> Option<BigRational> {
+    let exponent = (bits >> 52) & 0x7ff;
+    if exponent == 0x7ff {
+        return None;
+    }
+    let fraction = bits & 0x000f_ffff_ffff_ffff;
+    let mantissa = if exponent == 0 {
+        fraction
+    } else {
+        fraction | 0x0010_0000_0000_0000
+    };
+    if mantissa == 0 {
+        return Some(BigRational::from_integer(0.into()));
+    }
+    let shift = if exponent == 0 {
+        -1074i32
+    } else {
+        i32::try_from(exponent).ok()?.checked_sub(1075)?
+    };
+    let mut numerator = BigInt::from(mantissa);
+    let mut denominator = BigInt::from(1);
+    if shift >= 0 {
+        numerator = std::ops::Shl::shl(numerator, usize::try_from(shift).ok()?);
+    } else {
+        denominator = std::ops::Shl::shl(denominator, usize::try_from(shift.unsigned_abs()).ok()?);
+    }
+    if bits >> 63 != 0 {
+        numerator = std::ops::Neg::neg(numerator);
+    }
+    Some(BigRational::new(numerator, denominator))
+}
+
 /// Correctly rounded binary64 conversion without intermediate integer floats.
 pub fn to_f64(value: &BigRational) -> Option<f64> {
     if value.denom().is_zero() {
@@ -78,9 +112,11 @@ pub fn to_f64(value: &BigRational) -> Option<f64> {
 }
 
 /// Failure to obtain a finite, certified binary64 value for a rational multiple of pi.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, thiserror::Error)]
 pub enum PiConversionError {
+    #[error("nonfinite exact angle")]
     NonFinite,
+    #[error("exact angle rounding remains unresolved")]
     Precision,
 }
 
@@ -109,6 +145,41 @@ pub fn to_pi_f64(value: &BigRational) -> Result<f64, PiConversionError> {
             (Some(lower), Some(upper)) if lower.to_bits() == upper.to_bits() => return Ok(lower),
             (None, None) => return Err(PiConversionError::NonFinite),
             _ => {}
+        }
+    }
+    Err(PiConversionError::Precision)
+}
+
+/// Convert exact `r+s*pi` by enclosing the combined sum before one rounding.
+/// Neither term is independently rounded or required to be finite.
+pub fn to_affine_f64(radians: &BigRational, pi: &BigRational) -> Result<f64, PiConversionError> {
+    static BOUNDS: [std::sync::OnceLock<Result<PiBounds, PiConversionError>>; 6] =
+        [const { std::sync::OnceLock::new() }; 6];
+    if radians.denom().is_zero() || pi.denom().is_zero() {
+        return Err(PiConversionError::NonFinite);
+    }
+    if pi.numer().is_zero() {
+        return to_f64(radians).ok_or(PiConversionError::NonFinite);
+    }
+    if radians.numer().is_zero() {
+        return to_pi_f64(pi);
+    }
+    let maximum = dyadic_from_bits(f64::MAX.to_bits()).ok_or(PiConversionError::Precision)?;
+    for (bits, cache) in [128, 256, 512, 1024, 2048, 4096].into_iter().zip(&BOUNDS) {
+        let bounds = cache
+            .get_or_init(|| pi_bounds(bits))
+            .as_ref()
+            .map_err(|error| *error)?;
+        let a = std::ops::Add::add(radians, &std::ops::Mul::mul(pi, &bounds.lower));
+        let b = std::ops::Add::add(radians, &std::ops::Mul::mul(pi, &bounds.upper));
+        let (lower, upper) = if a <= b { (a, b) } else { (b, a) };
+        if lower > maximum || upper < std::ops::Neg::neg(&maximum) {
+            return Err(PiConversionError::NonFinite);
+        }
+        if let (Some(left), Some(right)) = (to_f64(&lower), to_f64(&upper))
+            && left.to_bits() == right.to_bits()
+        {
+            return Ok(left);
         }
     }
     Err(PiConversionError::Precision)
@@ -168,9 +239,30 @@ fn arctangent_bounds(reciprocal: u16, bits: usize) -> Result<(BigInt, BigInt), P
 
 #[cfg(test)]
 mod tests {
-    use super::{BigRational, to_f64, to_pi_f64};
+    use super::{BigRational, pi_bounds, to_affine_f64, to_f64, to_pi_f64};
     use googletest::prelude::*;
     use num_bigint::BigInt;
+
+    #[gtest]
+    fn direct_affine_conversion_admits_finite_cancellation_of_overflowing_terms()
+    -> googletest::Result<()> {
+        let bounds = pi_bounds(1024)?;
+        let midpoint = std::ops::Div::div(
+            std::ops::Add::add(&bounds.lower, &bounds.upper),
+            BigInt::from(2),
+        );
+        let pi_coefficient =
+            BigRational::from_integer(std::ops::Shl::shl(BigInt::from(1), 1100usize));
+        let radians = std::ops::Neg::neg(std::ops::Mul::mul(&pi_coefficient, &midpoint));
+        expect_true!(to_f64(&radians).is_none());
+        expect_true!(to_pi_f64(&pi_coefficient).is_err());
+        expect_true!(to_affine_f64(&radians, &pi_coefficient)?.is_finite());
+        let direct = crate::Angle::affine(radians, pi_coefficient)?;
+        let mut builder = crate::ProgramBuilder::new(1, 0)?;
+        builder.gate(crate::Gate::Rz(direct), &[builder.qubit(0)?], &[])?;
+        expect_true!(builder.finish()?.bind(&[]).is_ok());
+        Ok(())
+    }
 
     #[gtest]
     fn rational_conversion_rounds_ties_and_subnormals_once() {

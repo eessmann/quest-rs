@@ -135,8 +135,8 @@ fn symbolic_merging_preserves_all_finite_bindings() -> Result<()> {
     let mut b = ProgramBuilder::new(1, 0)?;
     let q = b.qubit(0)?;
     let p = b.parameter("large")?;
-    b.gate(Gate::Rx(Angle::parameter(p)), &[q], &[])?;
-    b.gate(Gate::Rx(Angle::parameter(p)), &[q], &[])?;
+    b.gate(Gate::Rx(Angle::parameter(p)?), &[q], &[])?;
+    b.gate(Gate::Rx(Angle::parameter(p)?), &[q], &[])?;
     let original = b.finish()?;
     expect_true!(original.clone().bind(&[(p, 1e308)]).is_ok());
     let (optimized, _) = original.optimize_exact()?;

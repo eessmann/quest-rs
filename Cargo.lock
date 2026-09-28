@@ -2368,6 +2368,7 @@ dependencies = [
  "quest-math",
  "quest-optimizer-client",
  "quest-qasm",
+ "quest-symbolic",
  "thiserror 2.0.20",
  "trybuild",
 ]

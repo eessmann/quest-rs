@@ -1,6 +1,9 @@
 //! Optional candidate replacements. Certificates are owned independently of native resources.
-use crate::model::{AngleExpr, Occurrence, SemanticOperation};
-use crate::{Angle, Control, ControlState, Error, Gate, OccurrenceId, QubitId, ValidatedProgram};
+use crate::model::{Occurrence, SemanticOperation};
+use crate::{
+    Angle, BoundAngleTarget, Control, ControlState, Error, Gate, OccurrenceId, QubitId,
+    ValidatedProgram,
+};
 use crate::{ProvenanceGraph, ProvenanceId};
 use num_traits::ToPrimitive;
 use quest_math::{
@@ -65,34 +68,47 @@ pub struct ZxReport {
     pub after_operations: usize,
 }
 fn target_angle(angle: &Angle, limits: Limits) -> Result<AngleTarget, WorkerError> {
-    let mut expression = &angle.0;
-    let mut negative = false;
-    while let AngleExpr::Negative(inner) = expression {
-        negative = !negative;
-        expression = inner;
-    }
-    match expression {
-        AngleExpr::Pi(value) => {
-            if value.numer().bits() > limits.coefficient_bits.min(16_384)
-                || value.denom().bits() > limits.coefficient_bits.min(16_384)
-            {
-                return Err(WorkerError::Budget("angle identity bits"));
-            }
-            let numerator = if negative {
-                std::ops::Neg::neg(value.numer())
-            } else {
-                value.numer().clone()
-            };
-            Ok(AngleTarget::RationalPi {
-                numerator,
-                denominator: value.denom().clone(),
-            })
+    let (_, target) = angle.evaluate_target(&std::collections::BTreeMap::new())?;
+    let cap = limits.coefficient_bits.min(16_384);
+    let check = |values: &[&num_bigint::BigInt]| {
+        if values.iter().any(|value| value.bits() > cap) {
+            Err(WorkerError::Budget("angle identity bits"))
+        } else {
+            Ok(())
         }
-        AngleExpr::Opaque(value) => Ok(AngleTarget::DyadicRadians {
-            bits: value.to_bits() ^ if negative { 1u64 << 63 } else { 0 },
-        }),
-        AngleExpr::Parameter(_) | AngleExpr::Negative(_) => Err(Error::Binding.into()),
-    }
+    };
+    Ok(match target {
+        BoundAngleTarget::DyadicRadians { bits } => AngleTarget::DyadicRadians { bits },
+        BoundAngleTarget::RationalPi {
+            numerator,
+            denominator,
+        } => {
+            check(&[&numerator, &denominator])?;
+            AngleTarget::RationalPi {
+                numerator,
+                denominator,
+            }
+        }
+        BoundAngleTarget::AffinePi {
+            radians_numerator,
+            radians_denominator,
+            pi_numerator,
+            pi_denominator,
+        } => {
+            check(&[
+                &radians_numerator,
+                &radians_denominator,
+                &pi_numerator,
+                &pi_denominator,
+            ])?;
+            AngleTarget::AffinePi {
+                radians_numerator,
+                radians_denominator,
+                pi_numerator,
+                pi_denominator,
+            }
+        }
+    })
 }
 fn rotation(operation: &SemanticOperation, limits: Limits) -> Result<Option<Target>, WorkerError> {
     if let SemanticOperation::Gate { gate, .. } = operation {
@@ -396,9 +412,8 @@ impl ValidatedProgram {
 }
 
 fn quarter_turns(angle: &Angle) -> Option<usize> {
-    let AngleExpr::Pi(value) = &angle.0 else {
-        return None;
-    };
+    let value = angle.rational_pi_identity()?;
+    angle.evaluate(&std::collections::BTreeMap::new()).ok()?;
     if value.numer().bits() > 16_384 || value.denom().bits() > 16_384 {
         return None;
     }
@@ -641,7 +656,7 @@ mod review_tests {
     #[gtest]
     fn borrowed_negative_targets_preserve_identity_and_apply_leaf_bit_limits() -> Result<()> {
         let value = Angle::pi(3, 8)?;
-        let negative = Angle(AngleExpr::Negative(std::sync::Arc::new(value.0)));
+        let negative = value.negated()?;
         expect_eq!(
             target_angle(&negative, Limits::default())?,
             AngleTarget::RationalPi {
@@ -659,9 +674,7 @@ mod review_tests {
             )
             .is_err()
         );
-        let zero = Angle(AngleExpr::Negative(std::sync::Arc::new(AngleExpr::Opaque(
-            0.0,
-        ))));
+        let zero = Angle::radians(0.0)?.negated()?;
         expect_eq!(
             target_angle(&zero, Limits::default())?,
             AngleTarget::DyadicRadians {

@@ -5,7 +5,7 @@ use quest_circuit::*;
 fn shared_definitions_expand_with_fresh_occurrences_and_ordered_arguments() -> Result<()> {
     let mut body = ProgramBuilder::new(2, 0)?;
     let theta = body.parameter("theta")?;
-    body.gate(Gate::Rx(Angle::parameter(theta)), &[body.qubit(0)?], &[])?;
+    body.gate(Gate::Rx(Angle::parameter(theta)?), &[body.qubit(0)?], &[])?;
     body.gate(Gate::Z, &[body.qubit(1)?], &[])?;
     let unitary = body.finish()?.into_unitary()?;
     let mut b = ProgramBuilder::new(4, 0)?;

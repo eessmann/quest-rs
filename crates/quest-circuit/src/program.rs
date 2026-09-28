@@ -6,11 +6,12 @@ use crate::{
 use petgraph::{
     Direction,
     stable_graph::{NodeIndex, StableDiGraph},
-    visit::EdgeRef,
+    visit::{EdgeRef, IntoEdgeReferences},
 };
 use std::{
     cmp::Reverse,
     collections::{BTreeMap, BTreeSet, BinaryHeap},
+    mem::size_of,
     sync::{
         Arc,
         atomic::{AtomicU64, Ordering},
@@ -18,6 +19,60 @@ use std::{
 };
 
 static NEXT_PROGRAM: AtomicU64 = AtomicU64::new(1);
+static NEXT_SNAPSHOT: AtomicU64 = AtomicU64::new(1);
+static NEXT_BOUND_SNAPSHOT: AtomicU64 = AtomicU64::new(1);
+
+/// Mint an identity for a newly published immutable program snapshot.
+/// # Errors
+/// Rejects exhausted snapshot identifiers.
+pub fn fresh_snapshot_id() -> Result<IdealSnapshotId> {
+    let id = NEXT_SNAPSHOT
+        .try_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+            value.checked_add(1)
+        })
+        .map_err(|_| Error::Budget("snapshot identifiers"))?;
+    Ok(IdealSnapshotId(id))
+}
+/// Mint an identity for one new bound publication.
+/// # Errors
+/// Rejects exhausted bound snapshot identifiers.
+pub fn fresh_bound_snapshot_id() -> Result<BoundSnapshotId> {
+    let id = NEXT_BOUND_SNAPSHOT
+        .try_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+            value.checked_add(1)
+        })
+        .map_err(|_| Error::Budget("bound snapshot identifiers"))?;
+    Ok(BoundSnapshotId(id))
+}
+
+fn add_retained(total: &mut usize, addition: usize) -> Result<()> {
+    *total = total
+        .checked_add(addition)
+        .ok_or(Error::Budget("program storage"))?;
+    Ok(())
+}
+fn bound_operation_payload_bytes(operation: &Operation) -> Result<usize> {
+    match operation {
+        Operation::Numerical { matrix, .. } => Ok(matrix.bytes()),
+        Operation::Oracle { fragment, .. } => {
+            crate::OracleFragment::shared_storage_bytes([fragment])
+        }
+        Operation::Channel { kraus, .. } => kraus.iter().try_fold(0usize, |total, matrix| {
+            total
+                .checked_add(matrix.bytes())
+                .ok_or(Error::Budget("bound channel storage"))
+        }),
+        Operation::Conditional { operation, .. } => size_of::<Operation>()
+            .checked_add(operation.operand_storage_bytes()?)
+            .and_then(|bytes| bytes.checked_add(bound_operation_payload_bytes(operation).ok()?))
+            .ok_or(Error::Budget("bound conditional storage")),
+        Operation::Gate { .. }
+        | Operation::GlobalPhase { .. }
+        | Operation::Measure { .. }
+        | Operation::Reset { .. }
+        | Operation::Barrier { .. } => Ok(0),
+    }
+}
 
 #[derive(Debug, Clone, Copy)]
 pub struct ProgramLimits {
@@ -238,12 +293,12 @@ impl ProgramBuilder {
             let mapped = crate::model::remap_operands(o.operation.operands(), arguments, controls)?;
             let operation = match &o.operation {
                 SemanticOperation::Gate { gate, .. } => self.gate_operation(
-                    gate.substitute(&bindings)?,
+                    gate.substitute(&bindings, self.owner)?,
                     &mapped.targets,
                     &mapped.controls,
                 )?,
                 SemanticOperation::GlobalPhase { angle, .. } => SemanticOperation::GlobalPhase {
-                    angle: angle.substitute(&bindings)?,
+                    angle: angle.substitute(&bindings, self.owner)?,
                     controls: self.operands(&[], &mapped.controls)?,
                 },
                 SemanticOperation::Barrier { .. } => SemanticOperation::Barrier {
@@ -331,7 +386,7 @@ impl ProgramBuilder {
     }
     fn check_angle(&self, a: &Angle) -> Result<()> {
         let mut ids = vec![];
-        a.parameters(&mut ids);
+        a.parameters(&mut ids)?;
         if ids
             .iter()
             .any(|x| x.owner != self.owner || x.index >= self.parameters.len())
@@ -567,10 +622,36 @@ pub enum DependencyKind {
     Stochastic,
     Explicit,
 }
+/// A retained mandatory ordering edge and the reason it exists.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DependencyEdge {
+    pub before: OccurrenceId,
+    pub after: OccurrenceId,
+    pub kind: DependencyKind,
+}
+/// Identity of the admitted ideal program from which a bound plan arose.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct IdealSnapshotId(u64);
+impl IdealSnapshotId {
+    #[must_use]
+    pub const fn value(self) -> u64 {
+        self.0
+    }
+}
+/// Identity of one immutable bound program publication.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct BoundSnapshotId(u64);
+impl BoundSnapshotId {
+    #[must_use]
+    pub const fn value(self) -> u64 {
+        self.0
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct ValidatedProgram {
     pub(crate) owner: u64,
+    snapshot_id: IdealSnapshotId,
     pub(crate) num_qubits: usize,
     pub(crate) num_bits: usize,
     pub(crate) parameters: Vec<String>,
@@ -586,6 +667,119 @@ pub struct ValidatedProgram {
 pub type Program = ValidatedProgram;
 
 impl ValidatedProgram {
+    /// Conservative bind-work allowance derived from every original source DAG.
+    /// # Errors
+    /// Rejects work arithmetic overflow.
+    pub fn binding_work_estimate(&self) -> Result<u64> {
+        let count = u64::try_from(self.parameters.len())
+            .map_err(|_| Error::Budget("binding work"))?
+            .checked_add(
+                u64::try_from(self.schedule.len()).map_err(|_| Error::Budget("binding work"))?,
+            )
+            .and_then(|count| count.checked_add(u64::try_from(self.graph.edge_count()).ok()?))
+            .ok_or(Error::Budget("binding work"))?;
+        let mut work = count.checked_mul(64).ok_or(Error::Budget("binding work"))?;
+        for occurrence in &self.occurrences {
+            work = work
+                .checked_add(occurrence.operation.binding_work_estimate()?)
+                .ok_or(Error::Budget("binding work"))?;
+        }
+        Ok(work)
+    }
+    /// Conservative live ideal-program bytes used for pre-bind reservation.
+    /// # Errors
+    /// Rejects size arithmetic overflow.
+    pub fn retained_bytes(&self) -> Result<usize> {
+        let mut bytes = size_of::<Self>();
+        add_retained(
+            &mut bytes,
+            self.parameters
+                .capacity()
+                .checked_mul(size_of::<String>())
+                .ok_or(Error::Budget("ideal storage"))?,
+        )?;
+        for name in &self.parameters {
+            add_retained(&mut bytes, name.capacity())?;
+        }
+        add_retained(
+            &mut bytes,
+            self.occurrences
+                .capacity()
+                .checked_mul(size_of::<Occurrence>())
+                .ok_or(Error::Budget("ideal storage"))?,
+        )?;
+        for occurrence in &self.occurrences {
+            add_retained(&mut bytes, occurrence.operation.retained_bytes()?)?;
+            if let Some(source) = &occurrence.source {
+                add_retained(
+                    &mut bytes,
+                    source
+                        .source()
+                        .len()
+                        .checked_add(const { 3 * size_of::<usize>() })
+                        .ok_or(Error::Budget("ideal storage"))?,
+                )?;
+            }
+        }
+        add_retained(
+            &mut bytes,
+            self.explicit_edges
+                .capacity()
+                .checked_mul(size_of::<(OccurrenceId, OccurrenceId)>())
+                .ok_or(Error::Budget("ideal storage"))?,
+        )?;
+        add_retained(
+            &mut bytes,
+            self.schedule
+                .capacity()
+                .checked_mul(size_of::<OccurrenceId>())
+                .ok_or(Error::Budget("ideal storage"))?,
+        )?;
+        let (nodes, edges) = self.graph.capacity();
+        add_retained(
+            &mut bytes,
+            nodes
+                .checked_mul(size_of::<(OccurrenceId, [usize; 6])>())
+                .ok_or(Error::Budget("ideal graph storage"))?,
+        )?;
+        add_retained(
+            &mut bytes,
+            edges
+                .checked_mul(size_of::<(DependencyKind, [usize; 8])>())
+                .ok_or(Error::Budget("ideal graph storage"))?,
+        )?;
+        add_retained(
+            &mut bytes,
+            self.nodes
+                .len()
+                .checked_mul(
+                    const { size_of::<(OccurrenceId, NodeIndex)>() + 5 * size_of::<usize>() },
+                )
+                .ok_or(Error::Budget("ideal graph storage"))?,
+        )?;
+        add_retained(&mut bytes, self.provenance.retained_bytes()?)?;
+        Ok(bytes)
+    }
+    #[must_use]
+    pub const fn snapshot_id(&self) -> IdealSnapshotId {
+        self.snapshot_id
+    }
+    #[must_use]
+    pub fn dependency_count(&self) -> usize {
+        self.graph.edge_count()
+    }
+    /// Borrowed graph order is converted into owned, typed mandatory edges.
+    #[must_use]
+    pub fn dependencies(&self) -> Vec<DependencyEdge> {
+        self.graph
+            .edge_references()
+            .map(|edge| DependencyEdge {
+                before: self.graph[edge.source()],
+                after: self.graph[edge.target()],
+                kind: *edge.weight(),
+            })
+            .collect()
+    }
     #[must_use]
     pub fn provenance(&self) -> &crate::ProvenanceGraph {
         &self.provenance
@@ -679,6 +873,7 @@ impl ValidatedProgram {
         }
         Ok(Self {
             owner,
+            snapshot_id: fresh_snapshot_id()?,
             num_qubits,
             num_bits,
             parameters,
@@ -797,32 +992,27 @@ impl ValidatedProgram {
             .iter()
             .map(|id| {
                 let o = by_id.get(id).ok_or(Error::InvalidId)?;
+                let (operation, angle_targets) = o.operation.bind(&values)?;
                 Ok(Instruction {
                     id: *id,
                     provenance: o.provenance,
                     source: o.source.clone(),
-                    operation: o.operation.bind(&values)?,
+                    operation,
+                    angle_targets: angle_targets.into(),
                 })
             })
             .collect::<Result<Vec<_>>>()?;
+        let dependencies = self.dependencies();
         Ok(BoundProgram {
             num_qubits: self.num_qubits,
             num_bits: self.num_bits,
+            source_snapshot_id: self.snapshot_id,
+            snapshot_id: fresh_bound_snapshot_id()?,
             instructions,
             bindings: values,
             provenance: self.provenance,
             limits: self.limits,
-            dependencies: self
-                .graph
-                .edge_indices()
-                .map(|edge| {
-                    let (a, b) = self.graph.edge_endpoints(edge).ok_or(Error::InvalidId)?;
-                    Ok((
-                        *self.graph.node_weight(a).ok_or(Error::InvalidId)?,
-                        *self.graph.node_weight(b).ok_or(Error::InvalidId)?,
-                    ))
-                })
-                .collect::<Result<Vec<_>>>()?,
+            dependencies,
         })
     }
 }
@@ -847,8 +1037,8 @@ impl UnitaryCircuit {
         // stable, while their scheduling order follows the reversed circuit.
         for o in &mut p.occurrences {
             match &mut o.operation {
-                SemanticOperation::Gate { gate, .. } => *gate = gate.adjoint(),
-                SemanticOperation::GlobalPhase { angle, .. } => *angle = angle.negated(),
+                SemanticOperation::Gate { gate, .. } => *gate = gate.adjoint()?,
+                SemanticOperation::GlobalPhase { angle, .. } => *angle = angle.negated()?,
                 SemanticOperation::Barrier { .. } => {}
                 _ => return Err(Error::NotUnitary),
             }
@@ -933,13 +1123,74 @@ impl UnitaryCircuit {
 pub struct BoundProgram {
     pub(crate) num_qubits: usize,
     pub(crate) num_bits: usize,
+    pub(crate) source_snapshot_id: IdealSnapshotId,
+    pub(crate) snapshot_id: BoundSnapshotId,
     pub(crate) instructions: Vec<Instruction>,
     pub(crate) bindings: BTreeMap<ParameterId, f64>,
     pub(crate) limits: ProgramLimits,
-    pub(crate) dependencies: Vec<(OccurrenceId, OccurrenceId)>,
+    pub(crate) dependencies: Vec<DependencyEdge>,
     pub(crate) provenance: Arc<crate::ProvenanceGraph>,
 }
 impl BoundProgram {
+    /// Conservative live bound-program bytes used by optimizer admission.
+    /// # Errors
+    /// Rejects size arithmetic overflow.
+    pub fn retained_bytes(&self) -> Result<usize> {
+        let mut bytes = size_of::<Self>();
+        add_retained(
+            &mut bytes,
+            self.instructions
+                .capacity()
+                .checked_mul(size_of::<Instruction>())
+                .ok_or(Error::Budget("bound storage"))?,
+        )?;
+        add_retained(
+            &mut bytes,
+            self.dependencies
+                .capacity()
+                .checked_mul(size_of::<DependencyEdge>())
+                .ok_or(Error::Budget("bound storage"))?,
+        )?;
+        add_retained(
+            &mut bytes,
+            self.bindings
+                .len()
+                .checked_mul(const { size_of::<(ParameterId, f64)>() + 5 * size_of::<usize>() })
+                .ok_or(Error::Budget("bound storage"))?,
+        )?;
+        add_retained(&mut bytes, self.provenance.retained_bytes()?)?;
+        for instruction in &self.instructions {
+            if let Some(source) = &instruction.source {
+                add_retained(
+                    &mut bytes,
+                    source
+                        .source()
+                        .len()
+                        .checked_add(const { 3 * size_of::<usize>() })
+                        .ok_or(Error::Budget("bound storage"))?,
+                )?;
+            }
+            add_retained(&mut bytes, instruction.operation.operand_storage_bytes()?)?;
+            add_retained(
+                &mut bytes,
+                bound_operation_payload_bytes(&instruction.operation)?,
+            )?;
+            add_retained(&mut bytes, instruction.angle_target_storage_bytes()?)?;
+        }
+        Ok(bytes)
+    }
+    #[must_use]
+    pub const fn snapshot_id(&self) -> BoundSnapshotId {
+        self.snapshot_id
+    }
+    #[must_use]
+    pub const fn source_snapshot_id(&self) -> IdealSnapshotId {
+        self.source_snapshot_id
+    }
+    #[must_use]
+    pub fn dependencies(&self) -> &[DependencyEdge] {
+        &self.dependencies
+    }
     #[must_use]
     pub fn provenance(&self) -> &crate::ProvenanceGraph {
         &self.provenance
@@ -960,8 +1211,8 @@ impl BoundProgram {
     #[must_use]
     pub fn dependency_depth(&self) -> usize {
         let mut incoming: BTreeMap<_, Vec<_>> = BTreeMap::new();
-        for (a, b) in &self.dependencies {
-            incoming.entry(*b).or_default().push(*a);
+        for edge in &self.dependencies {
+            incoming.entry(edge.after).or_default().push(edge.before);
         }
         let mut depths = BTreeMap::new();
         for instruction in &self.instructions {
@@ -984,13 +1235,105 @@ impl BoundProgram {
     pub fn plan(self) -> Result<ExecutablePlan> {
         i32::try_from(self.num_qubits).map_err(|_| Error::NativeIndex)?;
         i32::try_from(self.num_bits).map_err(|_| Error::NativeIndex)?;
+        let positions: BTreeMap<_, _> = self
+            .instructions
+            .iter()
+            .enumerate()
+            .map(|(index, instruction)| (instruction.id, index))
+            .collect();
+        if positions.len() != self.instructions.len() {
+            return Err(Error::InvalidId);
+        }
+        for edge in &self.dependencies {
+            let before = positions.get(&edge.before).ok_or(Error::InvalidId)?;
+            let after = positions.get(&edge.after).ok_or(Error::InvalidId)?;
+            if before >= after {
+                return Err(Error::Cycle);
+            }
+        }
         Ok(ExecutablePlan(self))
+    }
+}
+
+#[cfg(test)]
+mod plan_order_tests {
+    use super::ProgramBuilder;
+    use crate::{Error, Gate};
+    use googletest::{Result, prelude::*};
+
+    #[gtest]
+    fn plan_rejects_reordered_mandatory_edge() -> Result<()> {
+        let mut builder = ProgramBuilder::new(1, 0)?;
+        let qubit = builder.qubit(0)?;
+        builder.gate(Gate::H, &[qubit], &[])?;
+        builder.gate(Gate::X, &[qubit], &[])?;
+        let mut bound = builder.finish()?.bind(&[])?;
+        bound.instructions.swap(0, 1);
+        expect_true!(matches!(bound.plan(), Err(Error::Cycle)));
+        Ok(())
+    }
+
+    #[gtest]
+    fn independently_published_rewrites_get_distinct_snapshot_tokens() -> Result<()> {
+        let mut builder = ProgramBuilder::new(1, 0)?;
+        let qubit = builder.qubit(0)?;
+        builder.gate(Gate::H, &[qubit], &[])?;
+        builder.gate(Gate::H, &[qubit], &[])?;
+        let original = builder.finish()?;
+        let clone = original.clone();
+        expect_eq!(original.snapshot_id(), clone.snapshot_id());
+        let left = clone.optimize_exact()?.0;
+        let right = original.clone().optimize_exact()?.0;
+        expect_ne!(left.snapshot_id(), right.snapshot_id());
+        expect_ne!(left.snapshot_id(), original.snapshot_id());
+        let first_bound = original.clone().bind(&[])?;
+        let second_bound = original.clone().bind(&[])?;
+        expect_eq!(first_bound.source_snapshot_id(), original.snapshot_id());
+        expect_ne!(first_bound.snapshot_id(), second_bound.snapshot_id());
+        let bound_clone = first_bound.clone();
+        expect_eq!(first_bound.snapshot_id(), bound_clone.snapshot_id());
+        let fused = bound_clone.fuse(crate::FusionOptions::default())?.0;
+        expect_ne!(first_bound.snapshot_id(), fused.snapshot_id());
+        expect_eq!(first_bound.source_snapshot_id(), fused.source_snapshot_id());
+        Ok(())
+    }
+
+    #[gtest]
+    fn distinct_parameter_bindings_have_distinct_bound_snapshots() -> Result<()> {
+        let mut builder = ProgramBuilder::new(1, 0)?;
+        let parameter = builder.parameter("theta")?;
+        builder.gate(
+            Gate::Rz(crate::Angle::parameter(parameter)?),
+            &[builder.qubit(0)?],
+            &[],
+        )?;
+        let source = builder.finish()?;
+        let zero = source.clone().bind(&[(parameter, 0.0)])?;
+        let pi = source.bind(&[(parameter, std::f64::consts::PI)])?;
+        expect_eq!(zero.source_snapshot_id(), pi.source_snapshot_id());
+        expect_ne!(zero.snapshot_id(), pi.snapshot_id());
+        let clone = zero.clone();
+        expect_eq!(zero.snapshot_id(), clone.snapshot_id());
+        let _plan = clone.plan()?;
+        Ok(())
     }
 }
 
 #[derive(Debug, Clone)]
 pub struct ExecutablePlan(BoundProgram);
 impl ExecutablePlan {
+    #[must_use]
+    pub const fn snapshot_id(&self) -> BoundSnapshotId {
+        self.0.snapshot_id
+    }
+    #[must_use]
+    pub const fn source_snapshot_id(&self) -> IdealSnapshotId {
+        self.0.source_snapshot_id
+    }
+    #[must_use]
+    pub fn dependencies(&self) -> &[DependencyEdge] {
+        &self.0.dependencies
+    }
     #[must_use]
     pub fn provenance(&self) -> &crate::ProvenanceGraph {
         self.0.provenance()

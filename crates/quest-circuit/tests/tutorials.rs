@@ -125,7 +125,7 @@ fn ideal_builder_separates_exact_rewrites_binding_and_numerical_fusion() -> Resu
     let theta = builder.parameter("theta")?;
     builder.gate(Gate::H, &[q], &[])?;
     builder.gate(Gate::H, &[q], &[])?;
-    builder.gate(Gate::Rx(Angle::parameter(theta)), &[q], &[])?;
+    builder.gate(Gate::Rx(Angle::parameter(theta)?), &[q], &[])?;
     builder.gate(Gate::Z, &[q], &[])?;
     let (exact, exact_report) = builder.finish()?.optimize_exact()?;
     verify_eq!(exact_report.removed.len(), 2)?;

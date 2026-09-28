@@ -20,7 +20,7 @@
 //! forecasts. They do not impose a wall-clock deadline or a process-RSS bound.
 use crate::ProvenanceGraph;
 use crate::linear::{self, Work};
-use crate::model::{AngleExpr, SemanticOperation};
+use crate::model::SemanticOperation;
 use crate::{
     Angle, BigRational, Cnot, Error, Gate, LinearOptions, LinearRewrite, QubitId, Result,
     ValidatedProgram,
@@ -348,12 +348,10 @@ pub fn fold_parity(
         },
     )
 }
-const fn rational_angle(angle: &Angle) -> Option<&BigRational> {
-    if let AngleExpr::Pi(value) = &angle.0 {
-        Some(value)
-    } else {
-        None
-    }
+fn rational_angle(angle: &Angle) -> Option<BigRational> {
+    let coefficient = angle.rational_pi_identity()?;
+    angle.evaluate(&BTreeMap::new()).ok()?;
+    Some(coefficient)
 }
 fn admitted(operation: &SemanticOperation) -> bool {
     if linear::cnot(operation).is_some() {
@@ -379,7 +377,7 @@ fn source_coefficient_check(operation: &SemanticOperation, options: ParityOption
             ..
         } => {
             if let Some(value) = rational_angle(angle) {
-                coefficient_bits(value, options)?;
+                coefficient_bits(&value, options)?;
             }
         }
         _ => {}
@@ -393,7 +391,7 @@ fn adapter(operation: &SemanticOperation) -> Option<AffinePhaseOperation> {
     match operation {
         SemanticOperation::GlobalPhase { angle, controls } if controls.is_empty() => {
             Some(AffinePhaseOperation::GlobalPhase {
-                coefficient: rational_angle(angle)?.clone(),
+                coefficient: rational_angle(angle)?,
             })
         }
         SemanticOperation::Gate {
@@ -409,11 +407,11 @@ fn adapter(operation: &SemanticOperation) -> Option<AffinePhaseOperation> {
                 Gate::X => AffinePhaseOperation::X { target },
                 Gate::Rz(angle) => AffinePhaseOperation::Rz {
                     target,
-                    coefficient: rational_angle(angle)?.clone(),
+                    coefficient: rational_angle(angle)?,
                 },
                 Gate::Phase(angle) => AffinePhaseOperation::Phase {
                     target,
-                    coefficient: rational_angle(angle)?.clone(),
+                    coefficient: rational_angle(angle)?,
                 },
                 Gate::Z => AffinePhaseOperation::Phase {
                     target,

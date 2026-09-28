@@ -111,9 +111,12 @@ fn combine(
                 controls: cy,
             },
         ) if tx == ty && cx == cy => {
-            if x.angles().all(crate::Angle::is_exact)
-                && y.angles().all(crate::Angle::is_exact)
-                && x.adjoint() == *y
+            if x.angles().all(crate::Angle::safe_inverse)
+                && y.angles().all(crate::Angle::safe_inverse)
+                && x.adjoint()
+                    .ok()
+                    .and_then(|adjoint| adjoint.equivalent_checked(y).ok())
+                    == Some(true)
             {
                 return Some((RewriteKind::InverseCancellation, None));
             }
@@ -201,6 +204,9 @@ fn commuting_candidate(
     // Bounded search prevents quadratic work on very large independent circuits.
     for (index, previous) in output.iter().enumerate().rev().take(128) {
         work.charge(1)?;
+        // Candidate proof may perform one newly rounded exact-angle conversion.
+        // Charge it before the proof; prior constant evidence is shared.
+        work.charge(1)?;
         if let Some((kind, combined)) = combine(&previous.operation, operation) {
             return Ok(Some((index, kind, combined)));
         }
@@ -231,9 +237,8 @@ impl ValidatedProgram {
     /// Guarded exact algebra with a bounded dependency search. Disjoint symbolic
     /// unitaries and diagonal gates may commute. Effects, barriers and unknown
     /// matrix payloads stop the search. Explicit user order constraints
-    /// conservatively disable these rewrites. Successful finite
-    /// bindings stay valid. Exact identities may eliminate rational constants
-    /// that would otherwise exceed the machine-radian range during binding.
+    /// conservatively disable these rewrites. Successful finite bindings stay
+    /// valid; source conversion obligations prevent unsafe cancellation.
     /// # Errors
     /// Rejects invalid identifiers or cyclic dependencies when rebuilding the optimized program.
     pub fn optimize_exact(self) -> Result<(Self, OptimizationReport)> {
@@ -466,7 +471,11 @@ fn realize(op: &Operation, policy: MatrixPolicy) -> Result<NumericalOperator> {
     }
 }
 
-fn union_interface(
+#[expect(
+    clippy::redundant_pub_crate,
+    reason = "Internal fusion helper must not enter the public glob export"
+)]
+pub(crate) fn union_interface(
     a: &Operation,
     b: &Operation,
     max_width: usize,
@@ -500,7 +509,11 @@ fn union_interface(
     }
     Some((targets, controls))
 }
-fn realize_on(
+#[expect(
+    clippy::redundant_pub_crate,
+    reason = "Internal fusion helper must not enter the public glob export"
+)]
+pub(crate) fn realize_on(
     op: &Operation,
     targets: &[QubitId],
     retained: &[Control],
@@ -747,6 +760,7 @@ impl BoundProgram {
                         id: previous.id,
                         provenance: history,
                         source: previous.source,
+                        angle_targets: Arc::from([]),
                         operation: Operation::Numerical {
                             matrix,
                             targets: targets.into(),
@@ -771,17 +785,22 @@ impl BoundProgram {
         self.dependencies = self
             .dependencies
             .into_iter()
-            .map(|(a, b)| {
-                let a = *representatives.get(&a).ok_or(Error::InvalidId)?;
-                let b = *representatives.get(&b).ok_or(Error::InvalidId)?;
-                Ok((a, b))
+            .map(|edge| {
+                let before = *representatives.get(&edge.before).ok_or(Error::InvalidId)?;
+                let after = *representatives.get(&edge.after).ok_or(Error::InvalidId)?;
+                Ok(crate::DependencyEdge {
+                    before,
+                    after,
+                    kind: edge.kind,
+                })
             })
             .collect::<Result<Vec<_>>>()?
             .into_iter()
-            .filter(|(a, b)| a != b)
+            .filter(|edge| edge.before != edge.after)
             .collect();
         report.after_operations = output.len();
         self.instructions = output;
+        self.snapshot_id = crate::program::fresh_bound_snapshot_id()?;
         report.simulator_after = Some(self.simulator_cost(profile)?);
         report.after_depth = self.dependency_depth();
         report.elapsed = start.elapsed();

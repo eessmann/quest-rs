@@ -196,10 +196,11 @@ impl NumericalOperator {
             mask |= bit;
         }
         let target_mask = positions.iter().try_fold(0usize, |mask, bit| {
-            Ok(mask
-                | 1usize
+            Ok::<usize, Error>(
+                mask | 1usize
                     .checked_shl(u32::try_from(*bit).map_err(|_| Error::MatrixDimension)?)
-                    .ok_or(Error::MatrixDimension)?)
+                    .ok_or(Error::MatrixDimension)?,
+            )
         })?;
         // Width and positions were checked before allocation; closure arithmetic cannot overflow.
         let project = |basis: usize| {

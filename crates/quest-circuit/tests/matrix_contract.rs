@@ -165,7 +165,7 @@ fn openqasm31_u_adjoint_keeps_the_conjugated_specification_phase() -> Result<()>
         lambda: Angle::pi(1, 1)?,
     };
     let mut builder = ProgramBuilder::new(1, 0)?;
-    builder.gate(gate.adjoint(), &[builder.qubit(0)?], &[])?;
+    builder.gate(gate.adjoint()?, &[builder.qubit(0)?], &[])?;
     let bound = builder.finish()?.bind(&[])?;
     let Operation::Gate { gate, .. } = bound
         .instructions()

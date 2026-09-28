@@ -674,7 +674,7 @@ impl Circuit {
                 .first()
                 .ok_or_else(|| syn::Error::new(name.span(), "missing gate angle"))?;
             let a = if *inverse {
-                quote!((#a).negated())
+                quote!((#a).negated()?)
             } else {
                 quote!(#a)
             };
@@ -701,7 +701,7 @@ impl Circuit {
                 quote!(#root::Gate::#variant)
             };
             let gate = if *inverse {
-                quote!((#gate).adjoint())
+                quote!((#gate).adjoint()?)
             } else {
                 gate
             };
