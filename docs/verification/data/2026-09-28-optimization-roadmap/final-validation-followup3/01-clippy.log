@@ -1,0 +1,43 @@
+   Compiling quest-sys v0.2.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-sys)
+   Compiling quest-qsvt-cli v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-qsvt-cli)
+    Checking quest-circuit v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-circuit)
+    Checking quest-optimizer-client v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-optimizer-client)
+    Checking quest-qsp v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-qsp)
+    Checking quest-polynomial v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-polynomial)
+    Checking quest-numerics v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-numerics)
+    Checking quest-symbolic v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-symbolic)
+    Checking quest-optimizer-protocol v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-optimizer-protocol)
+    Checking quest-math v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-math)
+    Checking quest-language v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-language)
+warning: quest-sys@0.2.0: Using QuEST 4.3.0 from /var/home/erich/Projects/opt/quest with /usr/bin/c++
+warning: quest-sys@0.2.0: Verified rsmpi MPICC /var/home/linuxbrew/.linuxbrew/Cellar/mpich/5.0.1/bin/mpicc matches QuEST MPI ABI and loaded library
+   Compiling quest-rs v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest)
+error: this function has too many lines (138/100)
+  --> crates/quest/src/oracle_execution.rs:65:5
+   |
+65 | /     pub(crate) fn include(
+66 | |         &mut self,
+67 | |         fragment: &OracleFragment,
+68 | |         controls: &[bool],
+69 | |         depth: usize,
+70 | |         max_qubits: usize,
+71 | |     ) -> Result<usize> {
+   | |______________________^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/main/index.html#too_many_lines
+   = note: `-D clippy::too-many-lines` implied by `-D clippy::pedantic`
+   = help: to override `-D clippy::pedantic` add `#[allow(clippy::too_many_lines)]`
+
+error: slicing may panic
+   --> crates/quest/src/oracle_execution.rs:132:21
+    |
+132 |                 && !discovered[..position]
+    |                     ^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: consider using `.get(..n)`or `.get_mut(..n)` instead
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/main/index.html#indexing_slicing
+    = note: requested on the command line with `-D clippy::indexing-slicing`
+
+error: could not compile `quest-rs` (lib) due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `quest-rs` (lib test) due to 2 previous errors

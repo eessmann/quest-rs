@@ -1,0 +1,126 @@
+ M Cargo.lock
+ M Cargo.toml
+ M crates/quest-circuit/Cargo.toml
+ M crates/quest-circuit/README.md
+ M crates/quest-circuit/src/lib.rs
+ M crates/quest-circuit/src/linear.rs
+ M crates/quest-circuit/src/matrix.rs
+ M crates/quest-circuit/src/model.rs
+ M crates/quest-circuit/src/optimize.rs
+ M crates/quest-circuit/src/parity.rs
+ M crates/quest-circuit/src/program.rs
+ M crates/quest-circuit/src/provenance.rs
+ M crates/quest-circuit/src/rational.rs
+ M crates/quest-circuit/src/structured.rs
+ M crates/quest-circuit/src/structured_optimize.rs
+ M crates/quest-circuit/src/workers.rs
+ M crates/quest-circuit/tests/core_contract.rs
+ M crates/quest-circuit/tests/definitions_contract.rs
+ M crates/quest-circuit/tests/linear_contract.rs
+ M crates/quest-circuit/tests/matrix_contract.rs
+ M crates/quest-circuit/tests/optimization_contract.rs
+ M crates/quest-circuit/tests/parity_contract.rs
+ M crates/quest-circuit/tests/structured_optimization.rs
+ M crates/quest-circuit/tests/tutorials.rs
+ M crates/quest-circuit/tests/worker_contract.rs
+ M crates/quest-language/src/ssa/edit.rs
+ M crates/quest-language/src/ssa/mod.rs
+ M crates/quest-language/src/ssa/verify.rs
+ M crates/quest-language/src/ssa/verify/interfaces.rs
+ M crates/quest-language/tests/edit_contract.rs
+ M crates/quest-language/tests/ssa_contract.rs
+ M crates/quest-macros/src/lib.rs
+ M crates/quest-math/README.md
+ M crates/quest-math/src/approx.rs
+ M crates/quest-math/src/controlled.rs
+ M crates/quest-math/src/lib.rs
+ M crates/quest-math/src/matrix.rs
+ M crates/quest-math/src/types.rs
+ M crates/quest-math/tests/approximation.rs
+ M crates/quest-math/tests/controlled.rs
+ M crates/quest-optimizer-client/src/lib.rs
+ M crates/quest-optimizer-client/tests/process_contract.rs
+ M crates/quest-optimizer-protocol/Cargo.toml
+ M crates/quest-optimizer-protocol/src/lib.rs
+ M crates/quest-optimizer-worker/Cargo.toml
+ M crates/quest-optimizer-worker/src/main.rs
+ M crates/quest-optimizer-worker/src/synthesis.rs
+ M crates/quest-optimizer-worker/src/zx.rs
+ M crates/quest-sys/src/cxx_bindings/include/quest_bindings.hpp
+ M crates/quest-sys/src/cxx_bindings/quest_bindings.cpp
+ M crates/quest-sys/src/lib.rs
+ M crates/quest/Cargo.toml
+ M crates/quest/src/collective.rs
+ M crates/quest/src/execution.rs
+ M crates/quest/src/lib.rs
+ M crates/quest/src/oracle_execution.rs
+ M crates/quest/src/qsvt/reporting.rs
+ M crates/quest/src/register.rs
+ M crates/quest/tests/collective_runtime.rs
+ M crates/quest/tests/runtime.rs
+ M crates/quest/tests/structured_optimization.rs
+A  crates/vendor/mathcore/.cargo_vcs_info.json
+A  crates/vendor/mathcore/.github/dependabot.yml
+A  crates/vendor/mathcore/.github/workflows/ci.yml
+A  crates/vendor/mathcore/.github/workflows/release.yml
+A  crates/vendor/mathcore/.gitignore
+A  crates/vendor/mathcore/CHANGELOG.md
+A  crates/vendor/mathcore/CONTRIBUTING.md
+AM crates/vendor/mathcore/Cargo.toml
+A  crates/vendor/mathcore/Cargo.toml.orig
+A  crates/vendor/mathcore/LICENSE
+A  crates/vendor/mathcore/MARKETING.md
+A  crates/vendor/mathcore/README.md
+AM crates/vendor/mathcore/UPSTREAM.md
+A  crates/vendor/mathcore/awesome-rust-pr.md
+A  crates/vendor/mathcore/benches/expression_bench.rs
+A  crates/vendor/mathcore/examples/demo.rs
+A  crates/vendor/mathcore/examples/optimization.rs
+A  crates/vendor/mathcore/examples/scientific_computing.rs
+A  crates/vendor/mathcore/social-media-posts.md
+A  crates/vendor/mathcore/src/calculus/limits.rs
+A  crates/vendor/mathcore/src/calculus/mod.rs
+A  crates/vendor/mathcore/src/differential/mod.rs
+A  crates/vendor/mathcore/src/engine/mod.rs
+AM crates/vendor/mathcore/src/lib.rs
+A  crates/vendor/mathcore/src/matrix/mod.rs
+A  crates/vendor/mathcore/src/ml/mod.rs
+A  crates/vendor/mathcore/src/parser/mod.rs
+AM crates/vendor/mathcore/src/precision/mod.rs
+A  crates/vendor/mathcore/src/solver/mod.rs
+A  crates/vendor/mathcore/src/transforms/mod.rs
+A  crates/vendor/mathcore/src/types/mod.rs
+A  crates/vendor/mathcore/tests/integration_test.rs
+?? crates/quest-circuit/src/beam.rs
+?? crates/quest-circuit/src/beam_approx.rs
+?? crates/quest-circuit/src/beam_mitm.rs
+?? crates/quest-circuit/src/dispatch_recipe.rs
+?? crates/quest-circuit/src/optimizer_contracts.rs
+?? crates/quest-circuit/src/parity/
+?? crates/quest-circuit/src/structured_pipeline.rs
+?? crates/quest-circuit/src/structured_terminal.rs
+?? crates/quest-circuit/src/terminal.rs
+?? crates/quest-circuit/tests/beam_approx_contract.rs
+?? crates/quest-circuit/tests/beam_contract.rs
+?? crates/quest-circuit/tests/beam_mitm_contract.rs
+?? crates/quest-circuit/tests/beam_timeout_contract.rs
+?? crates/quest-circuit/tests/dispatch_recipe.rs
+?? crates/quest-circuit/tests/optimizer_contract.rs
+?? crates/quest-circuit/tests/structured_terminal.rs
+?? crates/quest-circuit/tests/symbolic_contract.rs
+?? crates/quest-circuit/tests/terminal_contract.rs
+?? crates/quest-language/src/ssa/quantum_flow.rs
+?? crates/quest-language/tests/quantum_flow.rs
+?? crates/quest-math/tests/mitm_enclosure.rs
+?? crates/quest-math/tests/mitm_matrix.rs
+?? crates/quest-optimizer-client/tests/mitm_parent.rs
+?? crates/quest-optimizer-protocol/tests/
+?? crates/quest-optimizer-worker/src/mitm/
+?? crates/quest-symbolic/
+?? crates/quest/examples/optimize.rs
+?? crates/quest/examples/optimize_workers.rs
+?? crates/quest/tests/deployment.rs
+?? crates/vendor/mathcore/src/exact/
+?? crates/vendor/mathcore/tests/exact_affine.rs
+?? docs/verification/2026-09-28-optimization-roadmap-migration.md
+?? docs/verification/fixtures/optimization-roadmap/

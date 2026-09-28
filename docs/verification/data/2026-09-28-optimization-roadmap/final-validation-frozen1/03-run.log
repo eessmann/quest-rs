@@ -1,0 +1,8 @@
+   Compiling quest-sys v0.2.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-sys)
+warning: quest-sys@0.2.0: Using QuEST 4.3.0 from /var/home/erich/Projects/opt/quest with /usr/bin/c++
+   Compiling quest-rs v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.37s
+     Running `/var/home/erich/Projects/quest-rs/target/debug/examples/optimize_workers /var/home/erich/Projects/quest-rs/target/release/quest-optimizer-worker`
+status=RoundLimit, evidence=ExactVerified, rounding=Unchanged
+request slots=2, exact certificates=1, MITM=[Candidate { window: (0, 3) }]
+amplitudes: Complex { re: 0.7071067811865475, im: 0.0 }, Complex { re: -0.7071067811865475, im: 0.0 }

@@ -1,0 +1,48 @@
+{
+  "gpu": {
+    "command": [
+      "nvidia-smi",
+      "--query-gpu=name,driver_version,memory.total,compute_cap",
+      "--format=csv,noheader"
+    ],
+    "exit_code": 0,
+    "stdout": "NVIDIA GeForce RTX 4080, 615.71.09, 16376 MiB, 8.9\n",
+    "stderr": ""
+  },
+  "rust": {
+    "command": [
+      "rustc",
+      "-Vv"
+    ],
+    "exit_code": 0,
+    "stdout": "rustc 1.100.0-nightly (f248f4038 2026-09-05)\nbinary: rustc\ncommit-hash: f248f4038796913873f11ca65b1b901e311c8dae\ncommit-date: 2026-09-05\nhost: x86_64-unknown-linux-gnu\nrelease: 1.100.0-nightly\nLLVM version: 23.1.1\n",
+    "stderr": ""
+  },
+  "cmake": {
+    "command": [
+      "cmake",
+      "--version"
+    ],
+    "exit_code": 0,
+    "stdout": "cmake version 4.3.0\n\nCMake suite maintained and supported by Kitware (kitware.com/cmake).\n",
+    "stderr": ""
+  },
+  "cc": {
+    "command": [
+      "/usr/bin/gcc",
+      "--version"
+    ],
+    "exit_code": 0,
+    "stdout": "gcc (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)\nCopyright (C) 2026 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+    "stderr": ""
+  },
+  "mpi": {
+    "command": [
+      "/home/linuxbrew/.linuxbrew/bin/mpiexec",
+      "--version"
+    ],
+    "exit_code": 0,
+    "stdout": "HYDRA build details:\n    Version:                                 5.0.1\n    Release Date:                            Fri Apr 10 09:45:31 AM CDT 2026\n    CC:                              gcc-13        \n    Configure options:                       '--disable-option-checking' '--prefix=/home/linuxbrew/.linuxbrew/Cellar/mpich/5.0.1' '--disable-dependency-tracking' '--disable-silent-rules' '--enable-fast=all,O3' '--enable-g=dbg' '--enable-romio' '--enable-shared' '--with-hwloc=/home/linuxbrew/.linuxbrew/opt/hwloc' '--with-pm=hydra' '--mandir=/home/linuxbrew/.linuxbrew/Cellar/mpich/5.0.1/share/man' 'F77=gfortran' 'FC=gfortran' '--with-device=ch4:ofi' '--with-libfabric=/home/linuxbrew/.linuxbrew/opt/libfabric' 'CC=gcc-13' 'CXX=g++-13' '--cache-file=/dev/null' '--srcdir=.' 'CFLAGS= -DNDEBUG -DNVALGRIND -g -O3' 'LDFLAGS= -L/home/linuxbrew/.linuxbrew/opt/libfabric/lib -L/home/linuxbrew/.linuxbrew/opt/hwloc/lib' 'LIBS= ' 'CPPFLAGS= -I/home/linuxbrew/.linuxbrew/opt/libfabric/include -DNETMOD_INLINE=__netmod_inline_ofi__ -DPOSIX_EAGER_INLINE=__posix_eager_inline_iqueue__ -I/var/tmp/mpich-20260616-7129-cymuzy/mpich-5.0.1/src/mpl/include -I/var/tmp/mpich-20260616-7129-cymuzy/mpich-5.0.1/modules/json-c -I/home/linuxbrew/.linuxbrew/opt/hwloc/include -D_REENTRANT -I/var/tmp/mpich-20260616-7129-cymuzy/mpich-5.0.1/src/mpi/romio/include -I/var/tmp/mpich-20260616-7129-cymuzy/mpich-5.0.1/src/pmi/include -I/var/tmp/mpich-20260616-7129-cymuzy/mpich-5.0.1/src/mpi/datatype/typerep/yaksa/src/frontend/include'\n    Process Manager:                         pmi\n    Launchers available:                     ssh rsh fork slurm ll lsf sge manual persist\n    Topology libraries available:            hwloc\n    Resource management kernels available:   user slurm ll lsf sge pbs cobalt\n    Demux engines available:                 poll select\n",
+    "stderr": ""
+  }
+}

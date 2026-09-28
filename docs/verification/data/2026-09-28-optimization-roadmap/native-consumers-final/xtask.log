@@ -1,0 +1,327 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.24
+   Compiling quote v1.0.47
+   Compiling libc v0.2.189
+   Compiling cfg-if v1.0.4
+   Compiling memchr v2.8.3
+   Compiling serde_core v1.0.229
+   Compiling zmij v1.0.23
+   Compiling object v0.37.3
+   Compiling syn v3.0.3
+   Compiling syn v2.0.119
+   Compiling glob v0.3.4
+   Compiling serde_json v1.0.151
+   Compiling serde v1.0.229
+   Compiling thiserror v1.0.69
+   Compiling clang-sys v1.9.1
+   Compiling getrandom v0.4.3
+   Compiling once_cell v1.21.4
+   Compiling shlex v2.0.1
+   Compiling find-msvc-tools v0.1.10
+   Compiling gimli v0.32.3
+   Compiling adler2 v2.0.1
+   Compiling serde_derive v1.0.229
+   Compiling thiserror-impl v1.0.69
+   Compiling rustix v1.1.4
+   Compiling eyre v0.6.12
+   Compiling thiserror v2.0.20
+   Compiling owo-colors v4.3.0
+   Compiling itoa v1.0.18
+   Compiling miniz_oxide v0.8.9
+   Compiling thiserror-impl v2.0.20
+   Compiling addr2line v0.25.1
+   Compiling cc v1.4.2
+   Compiling libloading v0.8.9
+   Compiling bitflags v2.13.1
+   Compiling indenter v0.3.4
+   Compiling rustc-demangle v0.1.28
+   Compiling linux-raw-sys v0.12.1
+   Compiling shlex v1.3.0
+   Compiling cmake-file-api v0.1.2
+   Compiling cmake v0.1.58
+   Compiling fastrand v2.5.0
+   Compiling backtrace v0.3.76
+   Compiling clang v2.1.0
+   Compiling color-eyre v0.6.5
+   Compiling tempfile v3.27.0
+   Compiling quest-build v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-build)
+   Compiling xtask v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/xtask)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 5.42s
+     Running `.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/native-consumers-final/xtask-target/debug/xtask check-native-consumers --work-dir /var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/native-consumers-final/fixture`
+cargo:rerun-if-env-changed=QUEST_DIR
+cargo:rerun-if-env-changed=QUEST_ROOT
+cargo:rerun-if-env-changed=QuEST_DIR
+cargo:rerun-if-env-changed=QuEST_ROOT
+cargo:rerun-if-env-changed=QUEST_NATIVE_CONFIG
+cargo:rerun-if-env-changed=QUEST_RUNTIME_LIBRARY_PATH
+cargo:rerun-if-env-changed=CMAKE_PREFIX_PATH
+cargo:rerun-if-env-changed=CMAKE
+cargo:rerun-if-env-changed=CMAKE_GENERATOR
+cargo:rerun-if-env-changed=CMAKE_TOOLCHAIN_FILE
+cargo:rerun-if-env-changed=CXX
+cargo:rerun-if-env-changed=CXXFLAGS
+cargo:rerun-if-env-changed=CC
+cargo:rerun-if-env-changed=CFLAGS
+cargo:rerun-if-env-changed=LD_LIBRARY_PATH
+cargo:rerun-if-env-changed=LD_PRELOAD
+cargo:rerun-if-env-changed=LD_AUDIT
+cargo:rerun-if-env-changed=CXX_x86_64-unknown-linux-gnu
+cargo:rerun-if-env-changed=CXX_x86_64_unknown_linux_gnu
+cargo:rerun-if-env-changed=HOST_CXX
+cargo:rerun-if-env-changed=TARGET_CXX
+cargo:rerun-if-env-changed=CXXFLAGS_x86_64-unknown-linux-gnu
+cargo:rerun-if-env-changed=CXXFLAGS_x86_64_unknown_linux_gnu
+cargo:rerun-if-env-changed=HOST_CXXFLAGS
+cargo:rerun-if-env-changed=TARGET_CXXFLAGS
+cargo:rerun-if-env-changed=CXXFLAGS
+cargo:rerun-if-env-changed=CXXSTDLIB_x86_64-unknown-linux-gnu
+cargo:rerun-if-env-changed=CXXSTDLIB_x86_64_unknown_linux_gnu
+cargo:rerun-if-env-changed=HOST_CXXSTDLIB
+cargo:rerun-if-env-changed=TARGET_CXXSTDLIB
+cargo:rerun-if-env-changed=CXXSTDLIB
+cargo:rerun-if-env-changed=CMAKE_TOOLCHAIN_FILE_x86_64-unknown-linux-gnu
+cargo:rerun-if-env-changed=CMAKE_TOOLCHAIN_FILE_x86_64_unknown_linux_gnu
+cargo:rerun-if-env-changed=HOST_CMAKE_TOOLCHAIN_FILE
+cargo:rerun-if-env-changed=TARGET_CMAKE_TOOLCHAIN_FILE
+cargo:rerun-if-env-changed=CMAKE_TOOLCHAIN_FILE
+cargo:rerun-if-env-changed=CMAKE_PREFIX_PATH_x86_64-unknown-linux-gnu
+cargo:rerun-if-env-changed=CMAKE_PREFIX_PATH_x86_64_unknown_linux_gnu
+cargo:rerun-if-env-changed=HOST_CMAKE_PREFIX_PATH
+cargo:rerun-if-env-changed=TARGET_CMAKE_PREFIX_PATH
+cargo:rerun-if-env-changed=CPATH
+cargo:rerun-if-env-changed=CPLUS_INCLUDE_PATH
+cargo:rerun-if-env-changed=C_INCLUDE_PATH
+cargo:rerun-if-env-changed=OBJC_INCLUDE_PATH
+cargo:rerun-if-env-changed=GCC_EXEC_PREFIX
+cargo:rerun-if-env-changed=COMPILER_PATH
+cargo:rerun-if-env-changed=LIBRARY_PATH
+cargo:rerun-if-env-changed=SDKROOT
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CMAKE_TOOLCHAIN_FILE_x86_64-unknown-linux-gnu = None
+CMAKE_TOOLCHAIN_FILE_x86_64_unknown_linux_gnu = None
+HOST_CMAKE_TOOLCHAIN_FILE = None
+CMAKE_TOOLCHAIN_FILE = None
+CMAKE_GENERATOR_x86_64-unknown-linux-gnu = None
+CMAKE_GENERATOR_x86_64_unknown_linux_gnu = None
+HOST_CMAKE_GENERATOR = None
+CMAKE_GENERATOR = None
+CMAKE_PREFIX_PATH_x86_64-unknown-linux-gnu = None
+CMAKE_PREFIX_PATH_x86_64_unknown_linux_gnu = None
+HOST_CMAKE_PREFIX_PATH = None
+CMAKE_PREFIX_PATH = None
+CMAKE_x86_64-unknown-linux-gnu = None
+CMAKE_x86_64_unknown_linux_gnu = None
+HOST_CMAKE = None
+CMAKE = None
+running: cd "/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/native-consumers-final/fixture/native-discovery/build" && CMAKE_PREFIX_PATH="" LC_ALL="C" "cmake" "/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/native-consumers-final/fixture/native-discovery/source" "-B" "/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/native-consumers-final/fixture/native-discovery/build" "-DCMAKE_CXX_COMPILER=c++" "-DCMAKE_CXX_FLAGS=" "-DCMAKE_PREFIX_PATH=" "-DQuEST_DIR=/var/home/erich/Projects/opt/quest/lib64/cmake/QuEST" "-DCMAKE_INSTALL_PREFIX=/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/native-consumers-final/fixture/native-discovery" "-DCMAKE_C_FLAGS= -w" "-DCMAKE_C_COMPILER=/usr/bin/cc" "-DCMAKE_ASM_FLAGS= -w" "-DCMAKE_ASM_COMPILER=/usr/bin/cc" "-DCMAKE_BUILD_TYPE=Release" "--fresh"
+-- The CXX compiler identification is GNU 16.2.1
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+CMake Warning (dev) at CMakeLists.txt:3 (find_package):
+  Policy CMP0144 is not set: find_package uses upper-case <PACKAGENAME>_ROOT
+  variables.  Run "cmake --help-policy CMP0144" for policy details.  Use the
+  cmake_policy command to set the policy and suppress this warning.
+
+  Environment variable QUEST_ROOT is set to:
+
+    /var/home/erich/Projects/opt/quest
+
+  For compatibility, find_package is ignoring the variable, but code in a
+  .cmake module might still use it.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Found MPI_CXX: /var/home/linuxbrew/.linuxbrew/Cellar/mpich/5.0.1/lib/libmpicxx.so (found version "5.0")
+-- Found MPI: TRUE (found version "5.0") found components: CXX
+-- Configuring done (0.5s)
+-- Generating done (0.0s)
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_ASM_COMPILER
+    CMAKE_ASM_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+
+
+-- Build files have been written to: /var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/native-consumers-final/fixture/native-discovery/build
+running: cd "/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/native-consumers-final/fixture/native-discovery/build" && LC_ALL="C" "cmake" "--build" "/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/native-consumers-final/fixture/native-discovery/build" "--target" "quest_bridge" "--config" "Release"
+[ 50%] Building CXX object CMakeFiles/quest_bridge.dir/abi.cpp.o
+[100%] Linking CXX static library libquest_bridge.a
+[100%] Built target quest_bridge
+cargo:root=/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/native-consumers-final/fixture/native-discovery
+cargo:rerun-if-env-changed=CXX_x86_64-unknown-linux-gnu
+cargo:rerun-if-env-changed=CXX_x86_64_unknown_linux_gnu
+cargo:rerun-if-env-changed=HOST_CXX
+cargo:rerun-if-env-changed=TARGET_CXX
+cargo:rerun-if-env-changed=CXXFLAGS_x86_64-unknown-linux-gnu
+cargo:rerun-if-env-changed=CXXFLAGS_x86_64_unknown_linux_gnu
+cargo:rerun-if-env-changed=HOST_CXXFLAGS
+cargo:rerun-if-env-changed=TARGET_CXXFLAGS
+cargo:rerun-if-env-changed=CXXFLAGS
+cargo:rerun-if-env-changed=CXXSTDLIB_x86_64-unknown-linux-gnu
+cargo:rerun-if-env-changed=CXXSTDLIB_x86_64_unknown_linux_gnu
+cargo:rerun-if-env-changed=HOST_CXXSTDLIB
+cargo:rerun-if-env-changed=TARGET_CXXSTDLIB
+cargo:rerun-if-env-changed=CXXSTDLIB
+cargo:rerun-if-env-changed=CMAKE_TOOLCHAIN_FILE_x86_64-unknown-linux-gnu
+cargo:rerun-if-env-changed=CMAKE_TOOLCHAIN_FILE_x86_64_unknown_linux_gnu
+cargo:rerun-if-env-changed=HOST_CMAKE_TOOLCHAIN_FILE
+cargo:rerun-if-env-changed=TARGET_CMAKE_TOOLCHAIN_FILE
+cargo:rerun-if-env-changed=CMAKE_TOOLCHAIN_FILE
+cargo:rerun-if-env-changed=CMAKE_PREFIX_PATH_x86_64-unknown-linux-gnu
+cargo:rerun-if-env-changed=CMAKE_PREFIX_PATH_x86_64_unknown_linux_gnu
+cargo:rerun-if-env-changed=HOST_CMAKE_PREFIX_PATH
+cargo:rerun-if-env-changed=TARGET_CMAKE_PREFIX_PATH
+cargo:rerun-if-env-changed=CPATH
+cargo:rerun-if-env-changed=CPLUS_INCLUDE_PATH
+cargo:rerun-if-env-changed=C_INCLUDE_PATH
+cargo:rerun-if-env-changed=OBJC_INCLUDE_PATH
+cargo:rerun-if-env-changed=GCC_EXEC_PREFIX
+cargo:rerun-if-env-changed=COMPILER_PATH
+cargo:rerun-if-env-changed=LIBRARY_PATH
+cargo:rerun-if-env-changed=SDKROOT
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeCXXCompiler.cmake.in
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeCXXInformation.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeCommonLanguageInclude.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeCompilerIdDetection.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeDetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeDetermineCompilerABI.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeDetermineCompilerSupport.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeDetermineSystem.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeFindBinUtils.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeFindDependencyMacro.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeGenericSystem.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeInitializeConfigs.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeLanguageInformation.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeParseImplicitIncludeInfo.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeParseImplicitLinkInfo.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeParseLibraryArchitecture.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeSystem.cmake.in
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeSystemSpecificInformation.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeSystemSpecificInitialize.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeTestCXXCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeTestCompilerCommon.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeUnixFindMake.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/ADSP-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/ARMCC-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/ARMClang-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/AppleClang-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/Borland-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/CMakeCommonCompilerMacros.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/Clang-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/Clang-DetermineCompilerInternal.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/Compaq-CXX-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/Cray-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/CrayClang-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/Diab-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/Embarcadero-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/Fujitsu-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/GHS-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/GNU-CXX-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/GNU-CXX.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/GNU-FindBinUtils.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/GNU.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/HP-CXX-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/IAR-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/IBMClang-CXX-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/Intel-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/LCC-CXX-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/MSVC-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/NVHPC-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/NVIDIA-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/OrangeC-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/PGI-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/PathScale-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/Renesas-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/SCO-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/SunPro-CXX-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/TI-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/TIClang-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/Tasking-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/VisualAge-CXX-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/Watcom-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/XL-CXX-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/XLClang-CXX-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/zOS-CXX-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/FindMPI.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/FindPackageHandleStandardArgs.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/FindPackageMessage.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/FindPkgConfig.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Internal/CMakeCXXLinkerInformation.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Internal/CMakeCommonLinkerInformation.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Internal/CMakeDetermineLinkerId.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Internal/CMakeInspectCXXLinker.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Internal/FeatureTesting.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Linker/GNU-CXX.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Linker/GNU.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Platform/Linker/GNU.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Platform/Linker/Linux-GNU-CXX.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Platform/Linker/Linux-GNU.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Platform/Linux-Determine-CXX.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Platform/Linux-GNU-CXX.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Platform/Linux-GNU.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Platform/Linux-Initialize.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Platform/Linux.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Platform/UnixPaths.cmake
+cargo:rerun-if-changed=/var/home/erich/Projects/opt/quest/include
+cargo:rerun-if-changed=/var/home/erich/Projects/opt/quest/include/quest
+cargo:rerun-if-changed=/var/home/erich/Projects/opt/quest/include/quest/include
+cargo:rerun-if-changed=/var/home/erich/Projects/opt/quest/include/quest/include/calculations.h
+cargo:rerun-if-changed=/var/home/erich/Projects/opt/quest/include/quest/include/channels.h
+cargo:rerun-if-changed=/var/home/erich/Projects/opt/quest/include/quest/include/config.h
+cargo:rerun-if-changed=/var/home/erich/Projects/opt/quest/include/quest/include/debug.h
+cargo:rerun-if-changed=/var/home/erich/Projects/opt/quest/include/quest/include/decoherence.h
+cargo:rerun-if-changed=/var/home/erich/Projects/opt/quest/include/quest/include/deprecated.h
+cargo:rerun-if-changed=/var/home/erich/Projects/opt/quest/include/quest/include/environment.h
+cargo:rerun-if-changed=/var/home/erich/Projects/opt/quest/include/quest/include/experimental.h
+cargo:rerun-if-changed=/var/home/erich/Projects/opt/quest/include/quest/include/initialisations.h
+cargo:rerun-if-changed=/var/home/erich/Projects/opt/quest/include/quest/include/matrices.h
+cargo:rerun-if-changed=/var/home/erich/Projects/opt/quest/include/quest/include/modes.h
+cargo:rerun-if-changed=/var/home/erich/Projects/opt/quest/include/quest/include/multiplication.h
+cargo:rerun-if-changed=/var/home/erich/Projects/opt/quest/include/quest/include/operations.h
+cargo:rerun-if-changed=/var/home/erich/Projects/opt/quest/include/quest/include/paulis.h
+cargo:rerun-if-changed=/var/home/erich/Projects/opt/quest/include/quest/include/precision.h
+cargo:rerun-if-changed=/var/home/erich/Projects/opt/quest/include/quest/include/qureg.h
+cargo:rerun-if-changed=/var/home/erich/Projects/opt/quest/include/quest/include/trotterisation.h
+cargo:rerun-if-changed=/var/home/erich/Projects/opt/quest/include/quest/include/types.h
+cargo:rerun-if-changed=/var/home/erich/Projects/opt/quest/include/quest/include/wrappers.h
+cargo:rerun-if-changed=/var/home/erich/Projects/opt/quest/include/quest.h
+cargo:rerun-if-changed=/var/home/erich/Projects/opt/quest/lib64/cmake/QuEST/QuESTConfig.cmake
+cargo:rerun-if-changed=/var/home/erich/Projects/opt/quest/lib64/cmake/QuEST/QuESTConfigDependencies.cmake
+cargo:rerun-if-changed=/var/home/erich/Projects/opt/quest/lib64/cmake/QuEST/QuESTConfigVersion.cmake
+cargo:rerun-if-changed=/var/home/erich/Projects/opt/quest/lib64/cmake/QuEST/QuESTTargets-release.cmake
+cargo:rerun-if-changed=/var/home/erich/Projects/opt/quest/lib64/cmake/QuEST/QuESTTargets.cmake
+cargo:rerun-if-changed=/var/home/erich/Projects/opt/quest/lib64/libQuEST.so.4.3.0
+cargo:rerun-if-changed=/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/native-consumers-final/fixture/native-discovery/build/CMakeFiles/4.3.0/CMakeCXXCompiler.cmake
+cargo:rerun-if-changed=/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/native-consumers-final/fixture/native-discovery/build/CMakeFiles/4.3.0/CMakeSystem.cmake
+cargo:rerun-if-changed=/var/home/linuxbrew/.linuxbrew/Cellar/mpich/5.0.1/include
+cargo:rerun-if-changed=/var/home/linuxbrew/.linuxbrew/Cellar/mpich/5.0.1/include/mpi.h
+cargo:rerun-if-changed=/var/home/linuxbrew/.linuxbrew/Cellar/mpich/5.0.1/include/mpi.mod
+cargo:rerun-if-changed=/var/home/linuxbrew/.linuxbrew/Cellar/mpich/5.0.1/include/mpi_base.mod
+cargo:rerun-if-changed=/var/home/linuxbrew/.linuxbrew/Cellar/mpich/5.0.1/include/mpi_constants.mod
+cargo:rerun-if-changed=/var/home/linuxbrew/.linuxbrew/Cellar/mpich/5.0.1/include/mpi_proto.h
+cargo:rerun-if-changed=/var/home/linuxbrew/.linuxbrew/Cellar/mpich/5.0.1/include/mpi_sizeofs.mod
+cargo:rerun-if-changed=/var/home/linuxbrew/.linuxbrew/Cellar/mpich/5.0.1/include/mpicxx.h
+cargo:rerun-if-changed=/var/home/linuxbrew/.linuxbrew/Cellar/mpich/5.0.1/include/mpif.h
+cargo:rerun-if-changed=/var/home/linuxbrew/.linuxbrew/Cellar/mpich/5.0.1/include/pmpi_base.mod
+cargo:rerun-if-changed=/var/home/linuxbrew/.linuxbrew/Cellar/mpich/5.0.1/lib/libmpi.so
+cargo:rerun-if-changed=/var/home/linuxbrew/.linuxbrew/Cellar/mpich/5.0.1/lib/libmpi.so.12.6.1
+cargo:rerun-if-changed=/var/home/linuxbrew/.linuxbrew/Cellar/mpich/5.0.1/lib/libmpicxx.so
+cargo:rerun-if-changed=/var/home/linuxbrew/.linuxbrew/Cellar/mpich/5.0.1/lib/libmpicxx.so.12.6.1
+direct: RUNPATH, complete native closure, and numerical check passed
+facade: RUNPATH, complete native closure, and numerical check passed
+wrapped: RUNPATH, complete native closure, and numerical check passed
+renamed: RUNPATH, complete native closure, and numerical check passed
+Checked QuEST 4.3.0 from /var/home/erich/Projects/opt/quest with /usr/bin/c++.
+Preserved consumer fixture and evidence: /var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/native-consumers-final/fixture

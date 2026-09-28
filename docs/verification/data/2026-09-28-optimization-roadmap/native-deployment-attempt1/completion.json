@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "source_sha256": "c47cb70451fec2355ad9cac44ebb1f09d2e5806581a5761dfcdd6db356655f84",
+  "repository": "/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap",
+  "started_unix": 1790561328.011822,
+  "cases": [
+    {
+      "mode": "cpu",
+      "kind": "sv",
+      "exit_code": 0,
+      "status": "complete"
+    },
+    {
+      "mode": "cpu",
+      "kind": "dm",
+      "exit_code": 0,
+      "status": "complete"
+    },
+    {
+      "mode": "omp",
+      "kind": "sv",
+      "exit_code": 0,
+      "status": "complete"
+    },
+    {
+      "mode": "omp",
+      "kind": "dm",
+      "exit_code": 0,
+      "status": "complete"
+    },
+    {
+      "mode": "gpu",
+      "kind": "sv",
+      "exit_code": 0,
+      "status": "complete"
+    },
+    {
+      "mode": "gpu",
+      "kind": "dm",
+      "exit_code": 0,
+      "status": "complete"
+    }
+  ],
+  "build_command": [
+    "cargo",
+    "build",
+    "--offline",
+    "--manifest-path",
+    "/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/native-deployment-attempt1/Cargo.toml",
+    "--target-dir",
+    "/var/home/erich/Projects/quest-rs/target"
+  ],
+  "build_status": 0,
+  "readelf_status": 0,
+  "ldd_status": 0,
+  "status": "complete",
+  "finished_unix": 1790561335.1909137
+}

@@ -1,0 +1,6 @@
+    Checking quest-numerics v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-numerics)
+    Checking faer v0.24.4
+    Checking astro-float v0.9.6
+    Checking quest-polynomial v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-polynomial)
+    Checking quest-qsp v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-qsp)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 7.56s

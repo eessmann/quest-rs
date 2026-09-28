@@ -1,0 +1,95 @@
+     Locking 148 packages to highest Rust 1.100.0-nightly compatible versions
+   Compiling proc-macro2 v1.0.107
+   Compiling libc v0.2.189
+   Compiling shlex v2.0.1
+   Compiling find-msvc-tools v0.1.10
+   Compiling memchr v2.8.3
+   Compiling hashbrown v0.17.1
+   Compiling quote v1.0.47
+   Compiling equivalent v1.0.2
+   Compiling indexmap v2.14.0
+   Compiling syn v3.0.5
+   Compiling syn v2.0.119
+   Compiling jobserver v0.1.35
+   Compiling cc v1.4.2
+   Compiling shlex v1.3.0
+   Compiling thiserror v2.0.20
+   Compiling serde_core v1.0.229
+   Compiling zmij v1.0.23
+   Compiling serde v1.0.229
+   Compiling thiserror v1.0.69
+   Compiling glob v0.3.4
+   Compiling clang-sys v1.9.1
+   Compiling serde_json v1.0.151
+   Compiling itoa v1.0.18
+   Compiling once_cell v1.21.4
+   Compiling regex-syntax v0.8.11
+   Compiling thiserror-impl v2.0.20
+   Compiling serde_derive v1.0.229
+   Compiling thiserror-impl v1.0.69
+   Compiling cfg-if v1.0.4
+   Compiling minimal-lexical v0.2.1
+   Compiling nom v7.1.3
+   Compiling libloading v0.8.9
+   Compiling regex-automata v0.4.18
+   Compiling link-cplusplus v1.0.12
+   Compiling cmake v0.1.58
+   Compiling scratch v1.0.9
+   Compiling pkg-config v0.3.34
+   Compiling bindgen v0.72.1
+   Compiling either v1.18.0
+   Compiling shell-words v1.1.1
+   Compiling build-probe-mpi v0.1.6
+   Compiling itertools v0.13.0
+   Compiling regex v1.13.1
+   Compiling gemm-common v0.19.0
+   Compiling cexpr v0.6.0
+   Compiling cmake-file-api v0.1.2
+   Compiling bitflags v2.13.1
+   Compiling termcolor v1.4.1
+   Compiling rustc-hash v2.1.3
+   Compiling unicode-width v0.2.2
+   Compiling cxxbridge-flags v1.0.198
+   Compiling cxx v1.0.198
+   Compiling codespan-reporting v0.13.1
+   Compiling syn v1.0.109
+   Compiling num-traits v0.2.19
+   Compiling foldhash v0.1.5
+   Compiling quest-build v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-build)
+   Compiling hashbrown v0.15.5
+   Compiling cxx-build v1.0.198
+   Compiling interpol v0.2.1
+   Compiling fixedbitset v0.5.7
+   Compiling winnow v1.0.4
+   Compiling quest-sys v0.2.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-sys)
+   Compiling private-gemm-x86 v0.1.20
+   Compiling toml_parser v1.1.3+spec-1.1.0
+   Compiling petgraph v0.8.3
+   Compiling equator-macro v0.2.1
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling mpi-sys v0.2.4
+   Compiling toml_edit v0.25.13+spec-1.1.0
+   Compiling quest-language v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-language)
+   Compiling equator v0.2.2
+   Compiling gemm-f64 v0.19.0
+   Compiling gemm-c64 v0.19.0
+   Compiling gemm-f32 v0.19.0
+   Compiling gemm-c32 v0.19.0
+   Compiling mpi v0.8.2
+   Compiling custom_derive v0.1.7
+   Compiling conv v0.3.3
+   Compiling gemm v0.19.0
+   Compiling quest-qasm v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-qasm)
+   Compiling nano-gemm v0.2.2
+   Compiling proc-macro-crate v3.5.0
+   Compiling cxxbridge-macro v1.0.198
+   Compiling smallvec v1.16.0
+   Compiling foldhash v0.2.0
+   Compiling quest-macros v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-macros)
+   Compiling faer v0.24.4
+   Compiling quest-rs v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest)
+   Compiling quest-roadmap-native-optimization v0.0.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/native-optimization-attempt1)
+warning: quest-sys@0.2.0: Using QuEST 4.3.0 from /var/home/erich/Projects/opt/quest with /usr/bin/c++
+warning: quest-sys@0.2.0: Verified rsmpi MPICC /var/home/linuxbrew/.linuxbrew/Cellar/mpich/5.0.1/bin/mpicc matches QuEST MPI ABI and loaded library
+   Compiling quest-circuit v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-circuit)
+    Finished `release` profile [optimized] target(s) in 40.68s

@@ -1,0 +1,9 @@
+[package]
+name = "quest-roadmap-native-deployment"
+version = "0.0.0"
+edition = "2024"
+[workspace]
+[dependencies]
+quest-sys = { path = "/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-sys" }
+[build-dependencies]
+quest-build = { path = "/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-build" }

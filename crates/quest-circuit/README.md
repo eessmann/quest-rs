@@ -48,7 +48,7 @@ use quest_circuit::{Angle, Gate, ProgramBuilder};
 let mut builder = ProgramBuilder::new(1, 0)?;
 let q = builder.qubit(0)?;
 let theta = builder.parameter("theta")?;
-builder.gate(Gate::Rx(Angle::parameter(theta)), &[q], &[])?;
+builder.gate(Gate::Rx(Angle::parameter(theta)?), &[q], &[])?;
 let plan = builder.finish()?.bind(&[(theta, 0.25)])?.plan()?;
 # Ok::<(), quest_circuit::Error>(())
 ```
@@ -64,6 +64,12 @@ binding. The ideal APIs cover exact symbolic and bound numerical representations
 static scalar-place quantum windows available in structured SSA. Reports retain
 rewrites and resource/cost evidence. Numerical fusion changes rounding and grants
 no exact inverse or certified approximation guarantee.
+
+`Optimizer::search_with_workers` uses a bounded beam. Its exact MITM generator
+uses depth 6 for both one- and two-qubit windows; the standalone one-qubit
+adapter permits depth 12. A `Complete` beam status means its configured generators
+and caps completed, not that the full standalone MITM search space was exhausted.
+Structured search reports worker search as a skipped stage.
 
 Numerical operators own immutable faer matrices and act as `A|psi>` or
 `A rho A†`. The first target is the least significant local matrix bit. Products

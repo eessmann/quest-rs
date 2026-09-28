@@ -1,0 +1,86 @@
+warning: unused workspace dependency `quest-symbolic`
+  --> Cargo.toml:38:1
+   |
+38 | quest-symbolic = { path = "crates/quest-symbolic", version = "0.1" }
+   | ^^^^^^^^^^^^^^
+   |
+   = note: `cargo::unused_workspace_dependencies` is set to `warn` by default
+help: consider removing the workspace dependency `quest-symbolic`
+warning: workspace (manifest) generated 1 warning
+   Compiling quest-math v0.1.0 (/tmp/quest-affine-foundation-4c040eb8/crates/quest-math)
+   Compiling quest-language v0.1.0 (/tmp/quest-affine-foundation-4c040eb8/crates/quest-language)
+   Compiling quest-rsgridsynth v0.2.2-quest.1 (/tmp/quest-affine-foundation-4c040eb8/crates/vendor/rsgridsynth)
+   Compiling quest-optimizer-protocol v0.1.0 (/tmp/quest-affine-foundation-4c040eb8/crates/quest-optimizer-protocol)
+   Compiling quest-optimizer-client v0.1.0 (/tmp/quest-affine-foundation-4c040eb8/crates/quest-optimizer-client)
+   Compiling quest-optimizer-worker v0.1.0 (/tmp/quest-affine-foundation-4c040eb8/crates/quest-optimizer-worker)
+   Compiling quest-qasm v0.1.0 (/tmp/quest-affine-foundation-4c040eb8/crates/quest-qasm)
+   Compiling quest-macros v0.1.0 (/tmp/quest-affine-foundation-4c040eb8/crates/quest-macros)
+   Compiling quest-circuit v0.1.0 (/tmp/quest-affine-foundation-4c040eb8/crates/quest-circuit)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.74s
+────────────
+ Nextest run ID 41689eca-0ec2-4669-be0a-4452a5f89b98 with nextest profile: default
+    Starting 62 tests across 15 binaries
+        PASS [   0.004s] ( 1/62) quest-math::ring eighth_roots_and_sqrt_two_retain_exact_phase
+        PASS [   0.005s] ( 2/62) quest-math::approximation affine_pi_rejects_bad_denominators_and_input_budget
+        PASS [   0.005s] ( 3/62) quest-math::approximation tiny_dyadic_angles_have_proved_pass_fail_tolerance_boundaries
+        PASS [   0.005s] ( 4/62) quest-math::exact hadamard_then_t_has_independent_exact_coefficients
+        PASS [   0.005s] ( 5/62) quest-math::exact signed_controls_and_nonsorted_targets_match_independent_basis_maps
+        PASS [   0.005s] ( 6/62) quest-math::mitm_enclosure box_gap_is_closed_at_the_boundary
+        PASS [   0.005s] ( 7/62) quest-math::approximation golden_frobenius_bound_for_t_minus_identity_is_two_minus_sqrt_two
+        PASS [   0.005s] ( 8/62) quest-math::mitm_enclosure exact_identity_and_zero_rotation_boxes_overlap
+        PASS [   0.005s] ( 9/62) quest-math::exact sequence_and_matrix_allocations_share_one_budget
+        PASS [   0.005s] (10/62) quest-math::mitm_matrix exact_matrix_key_preserves_global_phase
+        PASS [   0.006s] (11/62) quest-math::approximation rotation_two_pi_phase_is_not_reduced_away
+        PASS [   0.006s] (12/62) quest-math::controlled affine_two_pi_scalar_phase_survives_negative_control_lift
+        PASS [   0.006s] (13/62) quest-math::controlled controlled_lift_rejects_incomplete_overlapping_and_over_budget_interfaces
+        PASS [   0.006s] (14/62) quest-math::exact exact_matrices_preserve_product_order_and_scalar_phase
+        PASS [   0.006s] (15/62) quest-math::controlled exact_controlled_rotation_matches_signed_nonsorted_full_matrix
+        PASS [   0.006s] (16/62) quest-math::controlled controlled_lift_rechecks_affine_target_identity_budget
+        PASS [   0.006s] (17/62) quest-math::approximation exact_dyadic_decoding_preserves_subnormals_and_rejects_nonfinite_payloads
+        PASS [   0.006s] (18/62) quest-math::approximation affine_pi_reduction_keeps_full_four_pi_phase
+        PASS [   0.006s] (19/62) quest-math::approximation basis_conjugation_orientations_are_certified_independently
+        PASS [   0.007s] (20/62) quest-math::exact all_primitive_inverses_and_controlled_scalar_phases_are_exact
+        PASS [   0.008s] (21/62) quest-math::approximation mathematical_rotation_certificates_keep_phase_and_input_identity
+        PASS [   0.010s] (22/62) quest-math::exact bounds_and_duplicate_operands_are_checked_before_matrix_work
+        PASS [   0.012s] (23/62) quest-math::ring conjugation_and_admission_respect_exact_resource_bounds
+        PASS [   0.012s] (24/62) quest-math::mitm_matrix checked_small_matrix_product_matches_chronological_reconstruction
+        PASS [   0.012s] (25/62) quest-math::controlled existing_base_scalar_control_is_remapped_to_the_new_target
+        PASS [   0.012s] (26/62) quest-math::approximation affine_pi_certifies_both_exact_terms_and_retains_target
+        PASS [   0.012s] (27/62) quest-optimizer-client process::review_tests::exit_observation_keeps_pid_owned_until_group_cleanup_and_reap
+        PASS [   0.013s] (28/62) quest-math::approximation large_nondyadic_affine_radians_require_refinement_and_respect_budget
+        PASS [   0.013s] (29/62) quest-math::mitm_enclosure angle_input_kinds_share_certified_enclosure_path
+        PASS [   0.007s] (30/62) quest-optimizer-worker::bin/quest-optimizer-worker synthesis::tests::affine_pi_requires_an_exact_two_term_engine_interface
+        PASS [   0.006s] (31/62) quest-optimizer-worker::bin/quest-optimizer-worker synthesis::tests::impossible_precision_is_rejected_before_search
+        PASS [   0.011s] (32/62) quest-optimizer-client::process_contract bounded_valid_response_and_capability_rejection
+        PASS [   0.005s] (33/62) quest-optimizer-worker::bin/quest-optimizer-worker zx::tests::extracted_ancilla_and_changed_interfaces_are_not_admitted
+        PASS [   0.005s] (34/62) quest-optimizer-worker::bin/quest-optimizer-worker zx::tests::unsupported_controls_and_malformed_interfaces_return_errors
+        PASS [   0.013s] (35/62) quest-optimizer-worker::zx_process real_zx_worker_certifies_negative_control_and_declines_unsupported_control
+        PASS [   0.005s] (36/62) quest-optimizer-worker::bin/quest-optimizer-worker zx::tests::zero_qubit_scalar_and_deterministic_seed_interface_are_preserved
+        PASS [   0.014s] (37/62) quest-optimizer-worker::structured_contract structured_zx_preserves_a_real_extracted_nonidentity_scalar
+        PASS [   0.014s] (38/62) quest-optimizer-worker::structured_contract structured_zx_retains_effects_cfg_and_failed_candidates
+        PASS [   0.008s] (39/62) quest-optimizer-worker::bin/quest-optimizer-worker zx::tests::extracted_scalar_phase_is_recovered_with_candidate_target_order
+        PASS [   0.007s] (40/62) quest-optimizer-worker::bin/quest-optimizer-worker zx::tests::real_engine_cancels_gates_and_preserves_idle_interface
+        PASS [   0.015s] (41/62) quest-optimizer-client::process_contract rejects_malformed_output_and_wrong_seed
+        PASS [   0.015s] (42/62) quest-optimizer-worker::circuit_contract zx_replacements_are_transactional_and_preserve_measurement_occurrences
+        PASS [   0.015s] (43/62) quest-optimizer-client::process_contract well_formed_candidates_still_need_independent_mathematical_admission
+        PASS [   0.022s] (44/62) quest-math::oracle pinned_nonclifford_pi_over_seven_sequence_is_certified_at_one_e_minus_twelve
+        PASS [   0.008s] (45/62) quest-optimizer-worker::bin/quest-optimizer-worker zx::tests::exactly_supported_signed_controls_survive_extraction
+        PASS [   0.022s] (46/62) quest-optimizer-worker::zx_process real_zx_worker_returns_phase_sensitive_certificate_for_original_interface
+        PASS [   0.037s] (47/62) quest-math::approximation huge_finite_dyadic_angles_use_certified_range_reduction
+        PASS [   0.038s] (48/62) quest-math::oracle independent_decimal_full_matrix_oracles_bracket_every_axis_and_angle_kind
+        PASS [   0.033s] (49/62) quest-optimizer-client::process_contract memory_limit_is_applied_before_worker_execution
+        PASS [   0.061s] (50/62) quest-optimizer-worker::bin/quest-optimizer-worker synthesis::tests::exact_pi_over_four_preserves_scalar_phase_at_twelve_digits
+        PASS [   0.072s] (51/62) quest-optimizer-worker::synthesis_process fixed_exact_phase_sequence_survives_the_bounded_process
+        PASS [   0.090s] (52/62) quest-optimizer-client::process_contract timeout_and_output_limit_kill_the_process_group
+        PASS [   0.094s] (53/62) quest-optimizer-worker::synthesis_process nontrivial_process_certificate_lifts_to_signed_controls_without_losing_its_bound
+        PASS [   0.100s] (54/62) quest-optimizer-worker::bin/quest-optimizer-worker synthesis::tests::x_and_y_basis_changes_retain_full_phase
+        PASS [   0.108s] (55/62) quest-optimizer-worker::circuit_contract explicit_synthesis_retains_target_identity_control_phase_and_local_certificates
+        PASS [   0.130s] (56/62) quest-optimizer-worker::structured_contract structured_synthesis_preserves_signed_control_phase_and_source_export
+        PASS [   0.139s] (57/62) quest-optimizer-worker::structured_contract structured_synthesis_maps_a_middle_target_and_mixed_controls
+        PASS [   0.137s] (58/62) quest-optimizer-worker::bin/quest-optimizer-worker zx::tests::complete_uncontrolled_gate_set_and_exact_control_extensions_certify
+        PASS [   0.168s] (59/62) quest-optimizer-worker::bin/quest-optimizer-worker synthesis::tests::seeded_pi_over_seven_is_deterministic_and_certified_at_twelve_digits
+        PASS [   0.462s] (60/62) quest-optimizer-worker::structured_contract structured_synthesis_bounds_exclusive_paths_and_proves_finite_loop_counts
+        PASS [   0.487s] (61/62) quest-optimizer-client::process_contract exited_leader_with_inherited_pipes_keeps_cleanup_ownership
+        PASS [   0.762s] (62/62) quest-optimizer-worker::synthesis_process seeded_targets_are_reproducible_and_independently_certified
+────────────
+     Summary [   0.768s] 62 tests run: 62 passed, 0 skipped

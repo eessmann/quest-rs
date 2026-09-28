@@ -1,0 +1,8 @@
+   Compiling cmake-file-api v0.1.2
+    Checking quest-numerics v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-numerics)
+    Checking hdf5-metno v0.14.1
+    Checking quest-polynomial v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-polynomial)
+    Checking quest-qsp v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-qsp)
+   Compiling quest-build v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-build)
+   Compiling quest-qsvt-io v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-qsvt-io)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.28s

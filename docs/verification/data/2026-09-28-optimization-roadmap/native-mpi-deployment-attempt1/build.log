@@ -1,0 +1,5 @@
+     Locking 51 packages to highest Rust 1.100.0-nightly compatible versions
+   Compiling quest-roadmap-native-deployment v0.0.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/native-mpi-deployment-attempt1)
+   Compiling quest-sys v0.2.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-sys)
+warning: quest-sys@0.2.0: Using QuEST 4.3.0 from /var/home/erich/Projects/opt/quest with /usr/bin/c++
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.97s

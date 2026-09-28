@@ -1,0 +1,285 @@
+   Compiling quest-optimizer-worker v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-optimizer-worker)
+   Compiling quest-circuit v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-circuit)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.28s
+────────────
+ Nextest run ID e5d0e3c8-dec8-4075-bc49-674b54f3b304 with nextest profile: default
+    Starting 277 tests across 33 binaries
+        PASS [   0.006s] (  1/277) quest-circuit beam::structured_error_tests::structured_language_error_keeps_its_specific_cause
+        PASS [   0.006s] (  2/277) quest-circuit::beam_approx_contract approximate_mitm_admits_request_limits_before_any_worker_call
+        PASS [   0.006s] (  3/277) quest-circuit model::rational_pi_binding_tests::rational_pi_binding_rounds_only_after_multiplying_by_pi
+        PASS [   0.006s] (  4/277) quest-circuit::adapters_contract bindings_share_frozen_operands_without_merging_occurrences
+        PASS [   0.006s] (  5/277) quest-circuit program::plan_order_tests::distinct_parameter_bindings_have_distinct_bound_snapshots
+        PASS [   0.007s] (  6/277) quest-circuit beam::tests::equal_operations_with_distinct_exact_histories_are_not_deduplicated
+        PASS [   0.007s] (  7/277) quest-circuit rational::tests::rational_conversion_rounds_ties_and_subnormals_once
+        PASS [   0.007s] (  8/277) quest-circuit workers::review_tests::borrowed_negative_targets_preserve_identity_and_apply_leaf_bit_limits
+        PASS [   0.007s] (  9/277) quest-circuit rational::tests::rational_pi_refines_around_an_independently_computed_midpoint
+        PASS [   0.007s] ( 10/277) quest-circuit program::plan_order_tests::independently_published_rewrites_get_distinct_snapshot_tokens
+        PASS [   0.007s] ( 11/277) quest-circuit::adapters_contract checked_gate_adapter_uses_registry_arity_and_finite_parameters
+        PASS [   0.007s] ( 12/277) quest-circuit::adapters_contract bound_plan_checks_native_indices_without_an_empty_intermediate_stage
+        PASS [   0.008s] ( 13/277) quest-circuit program::plan_order_tests::plan_rejects_reordered_mandatory_edge
+        PASS [   0.008s] ( 14/277) quest-circuit rational::tests::rational_pi_keeps_subnormals_until_the_final_rounding
+        PASS [   0.008s] ( 15/277) quest-circuit structured::optimizer_accounting_tests::repeated_shared_oracle_bank_entries_are_charged_separately
+        PASS [   0.008s] ( 16/277) quest-circuit::beam_contract beam_reports_round_and_candidate_caps_without_losing_best
+        PASS [   0.009s] ( 17/277) quest-circuit::beam_contract bound_entry_rewrites_discrete_clifford_window
+        PASS [   0.009s] ( 18/277) quest-circuit workers::review_tests::zx_quarter_turn_admission_retains_pi_conversion_obligation
+        PASS [   0.009s] ( 19/277) quest-circuit::beam_contract beam_admits_replayed_longer_linear_candidate_before_scoring
+        PASS [   0.010s] ( 20/277) quest-circuit::beam_contract bound_entry_uses_exact_phase_targets
+        PASS [   0.011s] ( 21/277) quest-circuit structured_workers::tests::deterministic_trace_proves_loops_calls_and_rejects_observation_or_exhaustion
+        PASS [   0.013s] ( 22/277) quest-circuit::beam_approx_contract approximate_mitm_large_output_ceiling_reserves_only_reachable_depth
+        PASS [   0.013s] ( 23/277) quest-circuit::beam_approx_contract approximate_mitm_lifts_full_phase_through_negative_control_after_effect_fence
+        PASS [   0.008s] ( 24/277) quest-circuit::beam_contract deterministic_beam_publishes_verified_exact_improvement
+        PASS [   0.006s] ( 25/277) quest-circuit::beam_mitm_contract exact_mitm_charges_source_phase_replay_before_visiting_window
+        PASS [   0.008s] ( 26/277) quest-circuit::beam_contract ideal_source_remains_original_binding_authority
+        PASS [   0.008s] ( 27/277) quest-circuit::beam_contract bound_work_exhaustion_keeps_original_snapshot
+        PASS [   0.007s] ( 28/277) quest-circuit::beam_contract tied_rewrites_deduplicate_and_search_terminates_deterministically
+        PASS [   0.015s] ( 29/277) quest-circuit structured_workers::tests::scalar_word_lowering_preserves_signed_control_phase_exactly
+        PASS [   0.007s] ( 30/277) quest-circuit::beam_mitm_contract exact_mitm_charges_wide_operand_scan_before_visiting_window
+        PASS [   0.005s] ( 31/277) quest-circuit::beam_mitm_contract exact_mitm_rejects_malformed_limits_even_without_an_eligible_window
+        PASS [   0.010s] ( 32/277) quest-circuit::beam_mitm_contract exact_mitm_candidate_keeps_effect_fence_and_certified_longer_region
+        PASS [   0.019s] ( 33/277) quest-circuit::beam_approx_contract approximate_mitm_rejects_forged_worker_and_preserves_terminal_status
+        PASS [   0.012s] ( 34/277) quest-circuit::beam_contract synthesis_keeps_local_certificate_and_exact_cumulative_allowance
+        PASS [   0.010s] ( 35/277) quest-circuit::beam_mitm_contract exact_mitm_rejects_a_certified_worker_result_beyond_requested_depth
+        PASS [   0.013s] ( 36/277) quest-circuit::beam_contract forged_worker_envelope_is_a_typed_error
+        PASS [   0.012s] ( 37/277) quest-circuit::beam_contract rational_pi_rotation_does_not_spend_exact_mitm_slot_before_synthesis
+        PASS [   0.010s] ( 38/277) quest-circuit::beam_mitm_contract exact_mitm_rejects_a_worker_candidate_without_parent_certificate
+        PASS [   0.020s] ( 39/277) quest-circuit::beam_approx_contract approximate_mitm_classifies_certified_overlimit_output_as_worker_rejection
+        PASS [   0.012s] ( 40/277) quest-circuit::beam_mitm_contract exact_mitm_large_output_ceiling_reserves_only_reachable_depth
+        PASS [   0.014s] ( 41/277) quest-circuit::beam_contract bound_worker_search_uses_discrete_source_and_preserves_bound_authority
+        PASS [   0.014s] ( 42/277) quest-circuit::beam_contract budget_after_zx_worker_proof_returns_a_complete_prior_publication
+        PASS [   0.012s] ( 43/277) quest-circuit::beam_mitm_contract exact_mitm_preserves_signed_controls_and_preflights_work
+        PASS [   0.006s] ( 44/277) quest-circuit::core_contract controlled_full_turn_rotation_keeps_relative_phase
+        PASS [   0.013s] ( 45/277) quest-circuit::beam_contract worker_search_retains_exact_certificate_and_original_authority
+        PASS [   0.021s] ( 46/277) quest-circuit::beam_contract beam_keeps_parent_certified_approx_mitm_region_and_rational_budget
+        PASS [   0.006s] ( 47/277) quest-circuit::core_contract exact_cancellation_stops_at_measurement
+        PASS [   0.007s] ( 48/277) quest-circuit::core_contract channel_admission_counts_existing_payloads_and_residual_scratch
+        PASS [   0.006s] ( 49/277) quest-circuit::core_contract missing_nonfinite_and_duplicate_bindings_are_rejected
+        PASS [   0.007s] ( 50/277) quest-circuit::core_contract arbitrary_rational_angles_validate_and_normalize_raw_ratios
+        PASS [   0.006s] ( 51/277) quest-circuit::core_contract rejects_foreign_operands_without_consuming_an_occurrence
+        PASS [   0.022s] ( 52/277) quest-circuit::beam_contract beam_keeps_parent_certified_exact_mitm_region
+        PASS [   0.024s] ( 53/277) quest-circuit::beam_approx_contract approximate_mitm_retains_other_typed_terminal_outcomes_without_publication
+        PASS [   0.018s] ( 54/277) quest-circuit::beam_contract mitm_shortlist_exhaustion_is_incomplete_even_with_original_best
+        PASS [   0.011s] ( 55/277) quest-circuit::beam_mitm_contract exact_mitm_reports_post_request_output_cap_separately_from_preflight
+        PASS [   0.006s] ( 56/277) quest-circuit::definitions_contract adjoint_reverses_explicit_edges_without_serializing_independent_gates
+        PASS [   0.018s] ( 57/277) quest-circuit::beam_contract pure_phase_window_reaches_exact_mitm_after_zx
+        PASS [   0.006s] ( 58/277) quest-circuit::definitions_contract definition_expansion_preserves_explicit_body_dependencies
+        PASS [   0.006s] ( 59/277) quest-circuit::diagnostics source_renderer_labels_original_text_and_rejects_invalid_utf8_ranges
+        PASS [   0.006s] ( 60/277) quest-circuit::definitions_contract failed_definition_expansion_does_not_partially_append
+        PASS [   0.007s] ( 61/277) quest-circuit::core_contract stochastic_and_classical_hazards_preserve_order
+        PASS [   0.007s] ( 62/277) quest-circuit::core_contract upgraded_bigint_rationals_keep_large_ratio_and_subnormal_conversion
+        PASS [   0.006s] ( 63/277) quest-circuit::definitions_contract shared_definitions_expand_with_fresh_occurrences_and_ordered_arguments
+        PASS [   0.011s] ( 64/277) quest-circuit::beam_mitm_contract exact_mitm_retains_symbolic_binding_obligations_across_a_fenced_region
+        PASS [   0.006s] ( 65/277) quest-circuit::differential channels_are_effectful_and_completeness_is_checked
+        PASS [   0.006s] ( 66/277) quest-circuit::dispatch_recipe matrix_recipe_embeds_ordered_signed_controls_and_both_variants
+        PASS [   0.006s] ( 67/277) quest-circuit::dispatch_recipe gate_recipe_preserves_u_order_and_signed_phase_cost
+        PASS [   0.006s] ( 68/277) quest-circuit::differential controlling_a_global_phase_changes_only_the_active_branch
+        PASS [   0.007s] ( 69/277) quest-circuit::differential union_fusion_preserves_ordered_operands_and_signed_controls
+        PASS [   0.007s] ( 70/277) quest-circuit::differential numerical_approximate_unitarity_does_not_grant_exact_capability
+        PASS [   0.006s] ( 71/277) quest-circuit::dispatch_recipe matrix_recipe_rejects_shifted_dimension_overflow
+        PASS [   0.006s] ( 72/277) quest-circuit::dispatch_recipe nested_adjoint_oracles_share_payload_per_full_signed_profile
+        PASS [   0.006s] ( 73/277) quest-circuit::dispatch_recipe preparation_shares_storage_and_ordered_profile_but_counts_occurrences
+        PASS [   0.006s] ( 74/277) quest-circuit::linear_contract candidate_generation_is_independent_of_local_shortening
+        PASS [   0.006s] ( 75/277) quest-circuit::dispatch_recipe scalar_numerical_promotes_to_one_native_qubit_and_prepares_adjoint
+        PASS [   0.006s] ( 76/277) quest-circuit::linear_contract cnot_cancellations_and_preflight_bounds_are_checked
+        PASS [   0.006s] ( 77/277) quest-circuit::linear_contract gaussian_and_pmh_preserve_independent_basis_permutations_and_order
+        PASS [   0.005s] ( 78/277) quest-circuit::linear_contract whole_program_scan_and_output_copy_are_in_the_pass_budget
+        PASS [   0.031s] ( 79/277) quest-circuit rational::tests::direct_affine_conversion_admits_finite_cancellation_of_overflowing_terms
+        PASS [   0.006s] ( 80/277) quest-circuit::macro_contract macro_operations_retain_original_file_and_keyword_byte_ranges
+        PASS [   0.007s] ( 81/277) quest-circuit::macro_contract bell_macro_uses_the_same_builder_semantics
+        PASS [   0.007s] ( 82/277) quest-circuit::linear_contract program_linear_windows_preserve_barriers_and_explicit_dependencies
+        PASS [   0.006s] ( 83/277) quest-circuit::macro_contract nonfinite_interpolation_is_rejected_at_shared_admission
+        PASS [   0.005s] ( 84/277) quest-circuit::matrix_contract openqasm31_u_has_specification_phase_and_two_pi_periodicity
+        PASS [   0.006s] ( 85/277) quest-circuit::matrix_contract logical_views_are_copied_including_transpose_and_conjugation
+        PASS [   0.006s] ( 86/277) quest-circuit::matrix_contract faer_product_matches_independent_scalar_complex_fixture
+        PASS [   0.006s] ( 87/277) quest-circuit::matrix_contract matrix_admission_checks_finiteness_shape_and_budget
+        PASS [   0.007s] ( 88/277) quest-circuit::macro_contract interpolation_evaluates_once_in_source_order_and_modifiers_keep_phase
+        PASS [   0.006s] ( 89/277) quest-circuit::matrix_contract registry_u_decomposition_reconstructs_the_full_specification_matrix
+        PASS [   0.007s] ( 90/277) quest-circuit::matrix_contract openqasm31_u_adjoint_keeps_the_conjugated_specification_phase
+        PASS [   0.006s] ( 91/277) quest-circuit::matrix_contract padding_is_counted_and_noncontiguous_views_keep_logical_coordinates
+        PASS [   0.006s] ( 92/277) quest-circuit::matrix_contract u_realization_keeps_finite_large_phases_without_overflowing_their_sum
+        PASS [   0.006s] ( 93/277) quest-circuit::optimization_contract cycles_and_classical_read_write_hazards_are_checked
+        PASS [   0.006s] ( 94/277) quest-circuit::optimization_contract fusion_skips_blocks_when_retained_matrices_exhaust_program_budget
+        PASS [   0.006s] ( 95/277) quest-circuit::optimization_contract dependency_cancellation_crosses_proven_commuting_gates_only
+        PASS [   0.006s] ( 96/277) quest-circuit::optimization_contract opaque_float_rotations_are_not_merged
+        PASS [   0.007s] ( 97/277) quest-circuit::optimization_contract exact_rotation_merging_is_phase_correct_and_idempotent
+        PASS [   0.006s] ( 98/277) quest-circuit::optimization_contract fusion_preserves_multiplication_order_and_provenance
+        PASS [   0.009s] ( 99/277) quest-circuit::macro_contract full_macro_gate_inventory_matches_builder
+        PASS [   0.007s] (100/277) quest-circuit::optimization_contract reports_dependency_depth_before_and_after_exact_rewrites_and_fusion
+        PASS [   0.028s] (101/277) quest-circuit::beam_mitm_contract exact_mitm_preserves_typed_terminal_status_and_original_program
+        PASS [   0.006s] (102/277) quest-circuit::optimizer_contract bound_input_accounts_for_retained_numerical_payload_before_publication
+        PASS [   0.006s] (103/277) quest-circuit::optimizer_contract clifford_profile_orders_lexicographically
+        PASS [   0.007s] (104/277) quest-circuit::optimization_contract symbolic_merging_preserves_all_finite_bindings
+        PASS [   0.006s] (105/277) quest-circuit::optimizer_contract embedded_fragment_cost_uses_actual_wider_deployment
+        PASS [   0.006s] (106/277) quest-circuit::optimizer_contract failed_opaque_trace_spends_bounded_work_in_shared_ledger
+        PASS [   0.007s] (107/277) quest-circuit::optimizer_contract changed_opaque_communication_is_unscorable
+        PASS [   0.006s] (108/277) quest-circuit::optimizer_contract deployment_rejects_inconsistent_local_state_and_density_sizes
+        PASS [   0.006s] (109/277) quest-circuit::optimizer_contract distributed_opaque_trace_uses_operation_content_not_fresh_occurrence_ids
+        PASS [   0.007s] (110/277) quest-circuit::optimizer_contract consuming_entrypoints_preserve_input_kind_and_expose_no_search
+        PASS [   0.007s] (111/277) quest-circuit::optimizer_contract concurrent_ledger_clones_admit_only_one_retained_allowance
+        PASS [   0.006s] (112/277) quest-circuit::optimizer_contract native_v1_score_is_exact_and_density_multiplier_is_single_sided
+        PASS [   0.007s] (113/277) quest-circuit::optimizer_contract ideal_binding_reserves_symbolic_replay_work_before_bind
+        PASS [   0.007s] (114/277) quest-circuit::optimizer_contract options_reject_invalid_global_epsilon_and_hard_limit_excess
+        PASS [   0.007s] (115/277) quest-circuit::optimizer_contract mandatory_order_guard_rejects_deleted_endpoint_and_contraction_cycle
+        PASS [   0.006s] (116/277) quest-circuit::optimizer_contract shared_ledger_admits_categories_under_one_limit_and_releases_bytes
+        PASS [   0.006s] (117/277) quest-circuit::optimizer_contract plan_cost_derives_u_signed_flips_and_density_scalar_noop
+        PASS [   0.007s] (118/277) quest-circuit::optimizer_contract ordinary_128_angle_ideal_program_fits_default_shared_work_limit
+        PASS [   0.006s] (119/277) quest-circuit::optimizer_contract structured_input_rejects_target_width_mismatch
+        PASS [   0.006s] (120/277) quest-circuit::optimizer_contract shared_nested_oracle_trace_stops_at_work_limit_before_expansion
+        PASS [   0.006s] (121/277) quest-circuit::optimizer_contract recipe_inventory_counts_density_numerical_pass_once
+        PASS [   0.006s] (122/277) quest-circuit::optimizer_contract structured_input_accounts_for_retained_source_before_publication
+        PASS [   0.007s] (123/277) quest-circuit::optimizer_contract required_global_rejects_uncertified_numerical_composition
+        PASS [   0.006s] (124/277) quest-circuit::oracle_contract adjoint_reverses_operations_and_controls_global_phase
+        PASS [   0.007s] (125/277) quest-circuit::oracle_contract capture_arity_is_checked_before_a_verified_plan_exists
+        PASS [   0.007s] (126/277) quest-circuit::oracle_contract inverse_of_a_gate_containing_a_numerical_oracle_fails_before_dispatch
+        PASS [   0.007s] (127/277) quest-circuit::oracle_contract negative_runtime_power_of_oracle_never_dispatches
+        PASS [   0.006s] (128/277) quest-circuit::oracle_contract retained_calls_share_storage_but_keep_distinct_occurrences
+        PASS [   0.006s] (129/277) quest-circuit::oracle_contract storage_accounting_deduplicates_shared_bodies_without_deduplicating_queries
+        PASS [   0.006s] (130/277) quest-circuit::oracle_contract numerical_adjoint_is_conjugate_transpose_without_exact_admission
+        PASS [   0.007s] (131/277) quest-circuit::oracle_contract nested_call_adjoint_reverses_oracle_order_and_preserves_controls
+        PASS [   0.006s] (132/277) quest-circuit::oracle_contract portable_oracle_export_retains_global_phase_and_target_order
+        PASS [   0.006s] (133/277) quest-circuit::parity_contract bound_parity_keeps_rz_two_pi_scalar_and_signed_zero_source
+        PASS [   0.016s] (134/277) quest-circuit::optimization_contract rational_merging_preserves_finite_lowering
+        PASS [   0.006s] (135/277) quest-circuit::parity_contract bound_symbolic_parity_cancels_only_after_original_binding_and_keeps_source_identity
+        PASS [   0.005s] (136/277) quest-circuit::parity_contract complemented_rz_keeps_the_exact_scalar_phase
+        PASS [   0.006s] (137/277) quest-circuit::parity_contract negative_controls_and_explicit_edges_guard_parity_replacements
+        PASS [   0.006s] (138/277) quest-circuit::parity_contract parity_candidate_can_be_longer_while_the_existing_pass_retains_input
+        PASS [   0.005s] (139/277) quest-circuit::parity_contract repeated_parity_phase_and_affine_x_network_fold_exactly
+        PASS [   0.006s] (140/277) quest-circuit::parity_contract bound_symbolic_parity_falls_back_on_new_overflow_and_rejects_foreign_bound_input
+        PASS [   0.045s] (141/277) quest-circuit::beam_contract approximation_across_rounds_spends_one_exact_budget_against_original
+        PASS [   0.006s] (142/277) quest-circuit::parity_contract program_candidate_can_start_after_an_earlier_affine_window
+        PASS [   0.006s] (143/277) quest-circuit::parity_contract program_candidate_expands_a_window_after_a_fence_with_fresh_ids
+        PASS [   0.005s] (144/277) quest-circuit::parity_contract shared_pivot_reuses_symmetric_difference_and_restores_the_wire
+        PASS [   0.007s] (145/277) quest-circuit::oracle_contract structured_oracle_captures_once_and_preserves_calls
+        PASS [   0.008s] (146/277) quest-circuit::parity_contract bound_parity_precharges_original_binding_and_independent_affine_replay
+        PASS [   0.007s] (147/277) quest-circuit::parity_contract program_folding_retains_rz_scalar_phase_and_stops_at_effects_and_opaque_angles
+        PASS [   0.006s] (148/277) quest-circuit::provenance_contract definition_history_budget_rejection_keeps_the_builder_transactional
+        PASS [   0.006s] (149/277) quest-circuit::provenance_contract empty_replacements_retain_distinct_rewrite_events
+        PASS [   0.006s] (150/277) quest-circuit::structured_contract capture_admission_rejects_missing_values
+        PASS [   0.008s] (151/277) quest-circuit::provenance_contract diverging_snapshot_edits_cannot_exchange_history_roots
+        PASS [   0.006s] (152/277) quest-circuit::structured_contract parsed_language_error_owns_renderable_source
+        PASS [   0.006s] (153/277) quest-circuit::structured_macro macro_float_pi_and_integer_division_remain_language_values
+        PASS [   0.007s] (154/277) quest-circuit::structured_contract structured_stages_retain_source_and_verified_loop_arguments
+        PASS [   0.006s] (155/277) quest-circuit::structured_macro macro_uses_shared_types_declarations_and_loop_ssa
+        PASS [   0.007s] (156/277) quest-circuit::provenance_contract parity_outputs_share_history_and_later_fusion_deduplicates_sources
+        PASS [   0.006s] (157/277) quest-circuit::structured_macro captures_do_not_collide_with_macro_local_names
+        PASS [   0.006s] (158/277) quest-circuit::structured_optimization branching_join_blocks_cross_edge_cancellation
+        PASS [   0.006s] (159/277) quest-circuit::structured_optimization exclusive_scalar_quantum_parameter_body_can_cancel_inverse_gates
+        PASS [   0.006s] (160/277) quest-circuit::structured_optimization classical_constants_enable_quantum_windows_without_crossing_trapping_work
+        PASS [   0.006s] (161/277) quest-circuit::structured_optimization macro_captures_and_original_export_sources_survive_quantum_replacement
+        PASS [   0.008s] (162/277) quest-circuit::provenance_contract exact_then_fusion_preserves_history_and_current_dependency_endpoints
+        PASS [   0.006s] (163/277) quest-circuit::structured_optimization exclusive_straight_cfg_chain_cancels_inverse_gates_and_preserves_vm
+        PASS [   0.006s] (164/277) quest-circuit::structured_optimization float_parameters_only_allow_structural_inverse_and_never_ideal_pi_folding
+        PASS [   0.007s] (165/277) quest-circuit::structured_optimization dynamic_indices_reference_parameters_and_effects_guard_windows
+        PASS [   0.007s] (166/277) quest-circuit::structured_optimization exact_quantum_windows_cancel_across_constant_indices_and_keep_loop_cfg
+        PASS [   0.007s] (167/277) quest-circuit::structured_optimization loop_backedge_blocks_cross_iteration_inverse_cancellation
+        PASS [   0.006s] (168/277) quest-circuit::structured_optimization posttransform_compile_and_work_limits_are_enforced
+        PASS [   0.030s] (169/277) quest-circuit::linear_contract seeded_binary_matrices_verify_both_algorithms_through_sixty_four_wires
+        PASS [   0.008s] (170/277) quest-circuit::structured_optimization parity_scalar_omega_is_encoded_as_a_proved_exact_clifford_word
+        PASS [   0.007s] (171/277) quest-circuit::structured_terminal exhausted_structured_transaction_keeps_original_snapshot_and_bank
+        PASS [   0.014s] (172/277) quest-circuit::provenance_contract exact_rewrite_work_and_history_storage_budgets_reject_without_publishing
+        PASS [   0.007s] (173/277) quest-circuit::structured_terminal structured_pipeline_exhaustion_retains_original_publication
+        PASS [   0.013s] (174/277) quest-circuit::structured_macro compiler_tracked_file_and_bundled_includes_share_admission
+        PASS [   0.005s] (175/277) quest-circuit::symbolic_contract bound_parameter_leaf_preserves_negative_zero_bits
+        PASS [   0.007s] (176/277) quest-circuit::structured_terminal global_approximation_skips_uncertified_fusion_and_zero_wire_windows
+        PASS [   0.005s] (177/277) quest-circuit::symbolic_contract binding_with_unrelated_declared_parameter_preserves_angle_target
+        PASS [   0.007s] (178/277) quest-circuit::structured_terminal structured_pipeline_rejects_wrong_deployment_before_resource_fallback
+        PASS [   0.007s] (179/277) quest-circuit::structured_terminal semantic_storage_exhaustion_keeps_the_original_publication
+        PASS [   0.007s] (180/277) quest-circuit::structured_terminal structured_pipeline_declines_unknown_mpi_communication
+        PASS [   0.007s] (181/277) quest-circuit::structured_terminal structured_pipeline_releases_scratch_before_terminal_comparison
+        PASS [   0.005s] (182/277) quest-circuit::symbolic_contract cancelled_foreign_parameter_is_still_rejected
+        PASS [   0.006s] (183/277) quest-circuit::symbolic_contract affine_constant_binds_without_rounding_terms_separately
+        PASS [   0.006s] (184/277) quest-circuit::symbolic_contract bound_affine_angle_retains_exact_target_after_parameter_substitution
+        PASS [   0.008s] (185/277) quest-circuit::structured_terminal mixed_parameter_bodies_fuse_and_dynamic_or_trapping_windows_stay_separate
+        PASS [   0.008s] (186/277) quest-circuit::structured_terminal structured_pipeline_compares_branch_blocks_without_frequency_assumptions
+        PASS [   0.007s] (187/277) quest-circuit::structured_terminal user_gate_bodies_stay_symbolic_for_inverse_and_negative_power
+        PASS [   0.007s] (188/277) quest-circuit::structured_terminal structured_pipeline_runs_exact_cleanup_before_terminal_fusion
+        PASS [   0.007s] (189/277) quest-circuit::structured_terminal structured_terminal_publishes_ssa_and_oracles_together
+        PASS [   0.005s] (190/277) quest-circuit::symbolic_contract compound_exact_definition_rejects_opaque_argument
+        PASS [   0.005s] (191/277) quest-circuit::symbolic_contract definition_parameter_substitution_preserves_opaque_signed_zero
+        PASS [   0.008s] (192/277) quest-circuit::structured_terminal synthetic_capture_is_fresh_beside_existing_oracle_and_scalar_captures
+        PASS [   0.008s] (193/277) quest-circuit::symbolic_contract cancelled_pi_leaves_keep_original_finite_conversion_obligations
+        PASS [   0.036s] (194/277) quest-circuit::optimization_contract exact_merge_reports_retain_only_immediate_rewrite_inputs
+        PASS [   0.013s] (195/277) quest-circuit::structured_optimization vm_executed_loop_windows_and_signed_controls_have_exact_full_matrix_equality
+        PASS [   0.005s] (196/277) quest-circuit::symbolic_contract inverse_parameter_leaf_pair_is_removed_with_retained_bindings
+        PASS [   0.005s] (197/277) quest-circuit::symbolic_contract finite_exact_zero_merge_can_be_removed
+        PASS [   0.006s] (198/277) quest-circuit::terminal_contract scheduling_is_stable_and_favors_compatible_ready_gates
+        PASS [   0.006s] (199/277) quest-circuit::terminal_contract negative_control_cross_target_is_not_a_commutation_proof
+        PASS [   0.007s] (200/277) quest-circuit::terminal_contract deterministic_exhaustion_returns_original_valid_snapshot
+        PASS [   0.006s] (201/277) quest-circuit::terminal_contract opaque_matrices_are_schedule_and_fusion_boundaries
+        PASS [   0.007s] (202/277) quest-circuit::terminal_contract matrix_limit_includes_external_controls
+        PASS [   0.008s] (203/277) quest-circuit::symbolic_contract direct_affine_leaf_and_derived_scaling_keep_original_conversion_obligations
+        PASS [   0.007s] (204/277) quest-circuit::terminal_contract all_pair_precedence_prevents_nontransitive_commutation
+        PASS [   0.007s] (205/277) quest-circuit::terminal_contract only_strict_improvement_over_identical_terminal_baseline_is_published
+        PASS [   0.007s] (206/277) quest-circuit::terminal_contract reuse_and_preparation_cost_can_reject_a_shorter_matrix_program
+        PASS [   0.007s] (207/277) quest-circuit::terminal_contract mandatory_edges_remain_ordered_and_prevent_contraction
+        PASS [   0.008s] (208/277) quest-circuit::terminal_contract fusion_preserves_ordered_targets_signed_controls_and_relative_global_phase
+        PASS [   0.006s] (209/277) quest-circuit::terminal_contract unknown_mpi_cost_cannot_authorize_changed_dispatches
+        PASS [   0.007s] (210/277) quest-circuit::terminal_contract terminal_fusion_improves_native_score_and_marks_rounding
+        PASS [   0.008s] (211/277) quest-circuit::symbolic_contract parity_rewrite_preserves_unbindable_pi_leaf
+        PASS [   0.007s] (212/277) quest-circuit::tutorials compiler_tracked_source_uses_the_same_structured_pipeline
+        PASS [   0.007s] (213/277) quest-circuit::tutorials classical_optimization_reports_changes_and_retains_export_authority
+        PASS [   0.007s] (214/277) quest-circuit::tutorials ideal_builder_separates_exact_rewrites_binding_and_numerical_fusion
+        PASS [   0.006s] (215/277) quest-circuit::tutorials owned_diagnostic_retains_source_and_typed_cause
+        PASS [   0.006s] (216/277) quest-circuit::tutorials numeric_widths_and_integer_division_are_explicit
+        PASS [   0.007s] (217/277) quest-circuit::worker_contract explicit_synthesis_validates_epsilon_even_without_any_rotation
+        PASS [   0.008s] (218/277) quest-circuit::tutorials typed_builder_keeps_classical_categories_and_loop_values
+        PASS [   0.006s] (219/277) quest-circuit::worker_contract unchanged_worker_output_obeys_aggregate_provenance_budget
+        PASS [   0.008s] (220/277) quest-circuit::tutorials structured_quantum_optimization_keeps_syntax_and_reports_inverse_pairs
+        PASS [   0.008s] (221/277) quest-circuit::tutorials structured_macro_builds_bell_program
+        PASS [   0.006s] (222/277) quest-circuit::worker_contract zx_candidate_propagates_worker_error_after_an_effect_fence
+        PASS [   0.007s] (223/277) quest-optimizer-worker::bin/quest-optimizer-worker mitm::approx::tests::admission_distinguishes_resource_exhaustion_from_request_caps
+        PASS [   0.013s] (224/277) quest-circuit::tutorials import_export_preserves_explicit_includes_and_owned_sources
+        PASS [   0.007s] (225/277) quest-optimizer-worker::bin/quest-optimizer-worker mitm::approx::tests::approximate_mitm_certifies_zero_rotation
+        PASS [   0.035s] (226/277) quest-circuit::provenance_contract composed_passes_budget_retained_history_even_with_one_surviving_operation
+        PASS [   0.005s] (227/277) quest-optimizer-worker::bin/quest-optimizer-worker mitm::approx::tests::interval_tree_keeps_boundary_equality_and_prunes_strictly_far_boxes
+        PASS [   0.006s] (228/277) quest-optimizer-worker::bin/quest-optimizer-worker mitm::exact::tests::exact_mitm_preserves_scalar_phase_and_reports_capacity_cutoff
+        PASS [   0.011s] (229/277) quest-optimizer-worker::bin/quest-optimizer-worker mitm::approx::tests::approximate_search_distinguishes_complete_absence_and_capacity_cutoff
+        PASS [   0.013s] (230/277) quest-circuit::worker_contract zx_expanded_candidate_uses_its_distinct_request_and_keeps_growth_for_scoring
+        PASS [   0.006s] (231/277) quest-optimizer-worker::bin/quest-optimizer-worker mitm::exact::tests::exact_mitm_reconstructs_noncommuting_chronological_halves
+        PASS [   0.007s] (232/277) quest-optimizer-worker::bin/quest-optimizer-worker mitm::approx::tests::interval_tree_radius_matches_exhaustive_boxes_across_splits
+        PASS [   0.013s] (233/277) quest-optimizer-worker::structured_contract structured_zx_retains_effects_cfg_and_failed_candidates
+        PASS [   0.014s] (234/277) quest-optimizer-worker::structured_contract structured_zx_preserves_a_real_extracted_nonidentity_scalar
+        PASS [   0.010s] (235/277) quest-optimizer-worker::bin/quest-optimizer-worker mitm::approx::tests::huge_finite_dyadic_angle_can_be_unresolved_without_becoming_invalid
+        PASS [   0.005s] (236/277) quest-optimizer-worker::bin/quest-optimizer-worker mitm::representatives::tests::same_full_phase_state_keeps_incomparable_wire_transfers
+        PASS [   0.005s] (237/277) quest-optimizer-worker::bin/quest-optimizer-worker synthesis::tests::affine_pi_requires_an_exact_two_term_engine_interface
+        PASS [   0.017s] (238/277) quest-optimizer-worker::circuit_contract zx_replacements_are_transactional_and_preserve_measurement_occurrences
+        PASS [   0.015s] (239/277) quest-optimizer-worker::zx_process real_zx_worker_certifies_negative_control_and_declines_unsupported_control
+        PASS [   0.005s] (240/277) quest-optimizer-worker::bin/quest-optimizer-worker synthesis::tests::impossible_precision_is_rejected_before_search
+        PASS [   0.005s] (241/277) quest-optimizer-worker::bin/quest-optimizer-worker zx::tests::bounded_local_complement_preflights_clique_growth_before_mutation
+        PASS [   0.019s] (242/277) quest-circuit::worker_contract zx_candidate_accepts_a_longer_certified_region_with_fresh_identities
+        PASS [   0.005s] (243/277) quest-optimizer-worker::bin/quest-optimizer-worker zx::tests::examination_budget_charges_sorting_and_clique_before_rewrite
+        PASS [   0.005s] (244/277) quest-optimizer-worker::bin/quest-optimizer-worker zx::tests::extracted_ancilla_and_changed_interfaces_are_not_admitted
+        PASS [   0.005s] (245/277) quest-optimizer-worker::bin/quest-optimizer-worker zx::tests::output_cap_accepts_exactly_the_limit_and_rejects_the_next_gate
+        PASS [   0.005s] (246/277) quest-optimizer-worker::bin/quest-optimizer-worker zx::tests::flow_baseline_remains_certifiable_when_optional_rules_exhaust
+        PASS [   0.004s] (247/277) quest-optimizer-worker::bin/quest-optimizer-worker zx::tests::pivot_cross_neighborhood_growth_is_rejected_before_mutation
+        PASS [   0.005s] (248/277) quest-optimizer-worker::bin/quest-optimizer-worker zx::tests::pivot_and_gadget_rules_are_exercised_under_bounds
+        PASS [   0.007s] (249/277) quest-optimizer-worker::bin/quest-optimizer-worker zx::tests::extracted_scalar_phase_is_recovered_with_candidate_target_order
+        PASS [   0.005s] (250/277) quest-optimizer-worker::bin/quest-optimizer-worker zx::tests::rule_limits_reject_vertices_edges_examinations_and_rewrites
+        PASS [   0.017s] (251/277) quest-optimizer-worker::bin/quest-optimizer-worker mitm::exact::tests::two_qubit_ordered_targets_use_full_embedded_matrices
+        PASS [   0.023s] (252/277) quest-optimizer-worker::zx_process real_zx_worker_returns_phase_sensitive_certificate_for_original_interface
+        PASS [   0.010s] (253/277) quest-optimizer-worker::bin/quest-optimizer-worker zx::tests::exactly_supported_signed_controls_survive_extraction
+        PASS [   0.005s] (254/277) quest-optimizer-worker::bin/quest-optimizer-worker zx::tests::unsupported_controls_and_malformed_interfaces_return_errors
+        PASS [   0.005s] (255/277) quest-optimizer-worker::bin/quest-optimizer-worker zx::tests::zero_qubit_scalar_and_deterministic_seed_interface_are_preserved
+        PASS [   0.009s] (256/277) quest-optimizer-worker::bin/quest-optimizer-worker zx::tests::real_engine_cancels_gates_and_preserves_idle_interface
+        PASS [   0.035s] (257/277) quest-circuit::worker_contract numerical_oracle_calls_keep_local_certificates_without_a_global_bound
+        PASS [   0.034s] (258/277) quest-optimizer-worker::bin/quest-optimizer-worker mitm::exact::tests::legal_large_target_is_not_rejected_by_small_table_coefficient_cap
+        PASS [   0.042s] (259/277) quest-optimizer-worker::bin/quest-optimizer-worker mitm::representatives::tests::exhaustive_small_words_preserve_every_continuation_cost
+        PASS [   0.111s] (260/277) quest-circuit::beam_timeout_contract worker_timeout_discards_request_and_preserves_prior_exact_improvement
+        PASS [   0.070s] (261/277) quest-optimizer-worker::synthesis_process fixed_exact_phase_sequence_survives_the_bounded_process
+        PASS [   0.080s] (262/277) quest-optimizer-worker::bin/quest-optimizer-worker synthesis::tests::exact_pi_over_four_preserves_scalar_phase_at_twelve_digits
+        PASS [   0.100s] (263/277) quest-optimizer-worker::synthesis_process nontrivial_process_certificate_lifts_to_signed_controls_without_losing_its_bound
+        PASS [   0.114s] (264/277) quest-optimizer-worker::circuit_contract explicit_synthesis_retains_target_identity_control_phase_and_local_certificates
+        PASS [   0.120s] (265/277) quest-optimizer-worker::bin/quest-optimizer-worker synthesis::tests::x_and_y_basis_changes_retain_full_phase
+        PASS [   0.144s] (266/277) quest-optimizer-worker::structured_contract structured_synthesis_preserves_signed_control_phase_and_source_export
+        PASS [   0.214s] (267/277) quest-circuit rational::tests::rational_pi_rejects_uncertainty_beyond_the_precision_cap
+        PASS [   0.152s] (268/277) quest-optimizer-worker::structured_contract structured_synthesis_maps_a_middle_target_and_mixed_controls
+        PASS [   0.202s] (269/277) quest-circuit::differential randomized_exact_pass_and_fusion_preserve_complex_state_including_phase
+        PASS [   0.177s] (270/277) quest-optimizer-worker::bin/quest-optimizer-worker synthesis::tests::seeded_pi_over_seven_is_deterministic_and_certified_at_twelve_digits
+        PASS [   0.199s] (271/277) quest-optimizer-worker::bin/quest-optimizer-worker mitm::exact::tests::exact_mitm_distinguishes_complete_absence_from_partial_enumeration
+        PASS [   0.236s] (272/277) quest-circuit::parity_contract seeded_affine_phase_windows_preserve_every_basis_column_and_scalar_phase
+        PASS [   0.229s] (273/277) quest-optimizer-worker::bin/quest-optimizer-worker zx::tests::complete_uncontrolled_gate_set_and_exact_control_extensions_certify
+        PASS [   0.494s] (274/277) quest-circuit::compile_fail invalid_dsl_and_semantic_capabilities_are_rejected
+        PASS [   0.470s] (275/277) quest-optimizer-worker::structured_contract structured_synthesis_bounds_exclusive_paths_and_proves_finite_loop_counts
+        PASS [   0.608s] (276/277) quest-circuit::provenance_contract long_merge_history_is_linear_and_expands_every_source_without_recursion
+        PASS [   0.775s] (277/277) quest-optimizer-worker::synthesis_process seeded_targets_are_reproducible_and_independently_certified
+────────────
+     Summary [   0.841s] 277 tests run: 277 passed, 0 skipped

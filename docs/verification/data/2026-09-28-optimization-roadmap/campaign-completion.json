@@ -1,0 +1,175 @@
+{
+  "status": "failed",
+  "campaigns": [
+    {
+      "name": "compiler-current-attempt1",
+      "command": [
+        "python3",
+        "/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/docs/verification/fixtures/optimization-roadmap/run_baseline.py",
+        "--repository",
+        "/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap",
+        "--output",
+        "/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/compiler-current-attempt1",
+        "--target-dir",
+        "/var/home/erich/Projects/quest-rs/target",
+        "--fixture",
+        "baseline"
+      ],
+      "started_unix": 1790570370.8910234,
+      "exit_code": 0,
+      "finished_unix": 1790570378.8352175,
+      "status": "complete",
+      "samples": 200,
+      "cases": []
+    },
+    {
+      "name": "compiler-roadmap-attempt1",
+      "command": [
+        "python3",
+        "/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/docs/verification/fixtures/optimization-roadmap/run_baseline.py",
+        "--repository",
+        "/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap",
+        "--output",
+        "/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/compiler-roadmap-attempt1",
+        "--target-dir",
+        "/var/home/erich/Projects/quest-rs/target",
+        "--fixture",
+        "roadmap"
+      ],
+      "started_unix": 1790570378.83553,
+      "exit_code": 0,
+      "finished_unix": 1790570379.8267167,
+      "status": "complete",
+      "samples": 150,
+      "cases": []
+    },
+    {
+      "name": "compiler-workers-attempt1",
+      "command": [
+        "python3",
+        "/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/docs/verification/fixtures/optimization-roadmap/run_baseline.py",
+        "--repository",
+        "/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap",
+        "--output",
+        "/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/compiler-workers-attempt1",
+        "--target-dir",
+        "/var/home/erich/Projects/quest-rs/target",
+        "--fixture",
+        "workers",
+        "--worker",
+        "/var/home/erich/Projects/quest-rs/target/release/quest-optimizer-worker"
+      ],
+      "started_unix": 1790570379.826963,
+      "exit_code": 1,
+      "finished_unix": 1790570412.4487064,
+      "status": "failed",
+      "samples": 100,
+      "cases": []
+    },
+    {
+      "name": "native-optimization-attempt1",
+      "command": [
+        "python3",
+        "/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/docs/verification/fixtures/optimization-roadmap/run_native_optimization.py",
+        "--repository",
+        "/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap",
+        "--output",
+        "/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/native-optimization-attempt1",
+        "--target-dir",
+        "/var/home/erich/Projects/quest-rs/target"
+      ],
+      "started_unix": 1790570412.4489608,
+      "exit_code": 0,
+      "finished_unix": 1790570464.3454947,
+      "status": "complete",
+      "samples": null,
+      "cases": [
+        {
+          "mode": "cpu",
+          "kind": "sv",
+          "nodes": 1,
+          "status": "complete",
+          "samples": 330,
+          "error": null
+        },
+        {
+          "mode": "cpu",
+          "kind": "dm",
+          "nodes": 1,
+          "status": "complete",
+          "samples": 330,
+          "error": null
+        },
+        {
+          "mode": "omp",
+          "kind": "sv",
+          "nodes": 1,
+          "status": "complete",
+          "samples": 330,
+          "error": null
+        },
+        {
+          "mode": "omp",
+          "kind": "dm",
+          "nodes": 1,
+          "status": "complete",
+          "samples": 330,
+          "error": null
+        },
+        {
+          "mode": "gpu",
+          "kind": "sv",
+          "nodes": 1,
+          "status": "complete",
+          "samples": 330,
+          "error": null
+        },
+        {
+          "mode": "gpu",
+          "kind": "dm",
+          "nodes": 1,
+          "status": "complete",
+          "samples": 330,
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "native-mpi-optimization-attempt1",
+      "command": [
+        "python3",
+        "/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/docs/verification/fixtures/optimization-roadmap/run_native_optimization.py",
+        "--repository",
+        "/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap",
+        "--output",
+        "/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/native-mpi-optimization-attempt1",
+        "--target-dir",
+        "/var/home/erich/Projects/quest-rs/target",
+        "--mpi-only"
+      ],
+      "started_unix": 1790570464.346319,
+      "exit_code": 0,
+      "finished_unix": 1790570473.5243933,
+      "status": "complete",
+      "samples": null,
+      "cases": [
+        {
+          "mode": "mpi",
+          "kind": "sv",
+          "nodes": 2,
+          "status": "complete",
+          "samples": 550,
+          "error": null
+        },
+        {
+          "mode": "mpi",
+          "kind": "sv",
+          "nodes": 4,
+          "status": "complete",
+          "samples": 1100,
+          "error": null
+        }
+      ]
+    }
+  ]
+}

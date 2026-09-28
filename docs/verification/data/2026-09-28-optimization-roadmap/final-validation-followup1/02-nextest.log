@@ -1,0 +1,70 @@
+   Compiling zerocopy v0.8.57
+   Compiling num-rational v0.4.2
+   Compiling serde_json v1.0.151
+   Compiling num-bigint v0.5.1
+   Compiling quest-language v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-language)
+   Compiling quest-math v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-math)
+   Compiling quest-optimizer-protocol v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-optimizer-protocol)
+   Compiling quest-mathcore v0.3.1-quest.1 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/vendor/mathcore)
+   Compiling quest-qasm v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-qasm)
+   Compiling ppv-lite86 v0.2.21
+   Compiling quest-symbolic v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-symbolic)
+   Compiling rand_chacha v0.9.0
+   Compiling rand v0.9.5
+   Compiling quest-optimizer-client v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-optimizer-client)
+   Compiling half v2.7.1
+   Compiling quest-macros v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-macros)
+   Compiling ciborium-ll v0.2.2
+   Compiling ciborium v0.2.2
+   Compiling tinytemplate v1.2.1
+   Compiling criterion v0.8.2
+   Compiling proptest v1.11.0
+   Compiling quest-circuit v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-circuit)
+   Compiling trybuild v1.0.121
+   Compiling logos-derive v0.12.1
+   Compiling num v0.4.3
+   Compiling rstest_macros v0.23.0
+   Compiling logos v0.12.1
+   Compiling rand_chacha v0.3.1
+   Compiling openqasm v0.1.2
+   Compiling rand v0.8.8
+   Compiling nalgebra v0.34.2
+   Compiling rstest v0.23.0
+   Compiling quizx v0.3.0
+   Compiling quest-rsgridsynth v0.2.2-quest.1 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/vendor/rsgridsynth)
+   Compiling quest-optimizer-worker v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-optimizer-worker)
+error[E0308]: mismatched types
+   --> crates/quest-optimizer-worker/src/mitm/representatives.rs:162:29
+    |
+150 |     fn depth(mut wires: [usize; 2], word: &[Operation]) -> Result<[usize; 2]> {
+    |                                                            ------------------ expected `std::result::Result<[usize; 2], googletest::internal::test_outcome::TestAssertionFailure>` because of return type
+...
+162 |                 _ => return fail!("unexpected operation arity in two-wire reference"),
+    |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `Result<[usize; 2], TestAssertionFailure>`, found `Result<(), TestAssertionFailure>`
+    |
+    = note: expected enum `Result<[usize; 2], _>`
+               found enum `Result<(), _>`
+    = note: this error originates in the macro `fail` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: the `?` operator can only be used in a closure that returns `Result` or `Option` (or another type that implements `FromResidual`)
+   --> crates/quest-optimizer-worker/src/mitm/representatives.rs:302:67
+    |
+301 | ...                   && [[0, 0], [1, 3], [5, 0]].iter().all(|&incoming| {
+    |                                                              ----------- this function should return `Result` or `Option` to accept `?`
+302 | ...                       let a = depth(incoming, &original)?;
+    |                                                             ^ cannot use the `?` operator in a closure that returns `bool`
+
+error[E0277]: the `?` operator can only be used in a closure that returns `Result` or `Option` (or another type that implements `FromResidual`)
+   --> crates/quest-optimizer-worker/src/mitm/representatives.rs:303:69
+    |
+301 | ...                   && [[0, 0], [1, 3], [5, 0]].iter().all(|&incoming| {
+    |                                                              ----------- this function should return `Result` or `Option` to accept `?`
+302 | ...                       let a = depth(incoming, &original)?;
+303 | ...                       let b = depth(incoming, &substitute)?;
+    |                                                               ^ cannot use the `?` operator in a closure that returns `bool`
+
+Some errors have detailed explanations: E0277, E0308.
+For more information about an error, try `rustc --explain E0277`.
+error: could not compile `quest-optimizer-worker` (bin "quest-optimizer-worker" test) due to 3 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: command `/var/home/erich/.rustup/toolchains/nightly-2026-09-06-x86_64-unknown-linux-gnu/bin/cargo test --no-run --message-format json-render-diagnostics --package quest-circuit --package quest-optimizer-worker --all-features --locked` exited with code 101
