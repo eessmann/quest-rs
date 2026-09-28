@@ -56,6 +56,12 @@ pub enum Error {
     WorkerPool(#[from] rayon::ThreadPoolBuildError),
     #[error("this command requires the {0} feature")]
     Feature(&'static str),
+    #[error("{primary}; trace export also failed: {trace}")]
+    DispatchAndTrace {
+        #[source]
+        primary: Box<Self>,
+        trace: Box<Self>,
+    },
 }
 
 /// Command parser and application entrypoint, usable without installing a global error hook.
@@ -311,9 +317,24 @@ impl Cli {
         } else {
             span.fail();
         }
-        if let Some(path) = self.trace.filter(|_| output_rank) {
-            std::fs::write(path, trace.to_chrome_json()?)?;
-        }
+        let trace_result = self.trace.filter(|_| output_rank).map_or_else(
+            || Ok(()),
+            |path| {
+                trace
+                    .to_chrome_json()
+                    .map_err(Error::from)
+                    .and_then(|json| std::fs::write(path, json).map_err(Error::from))
+            },
+        );
+        let result = match (result, trace_result) {
+            (Err(primary), Err(trace)) => Err(Error::DispatchAndTrace {
+                primary: Box::new(primary),
+                trace: Box::new(trace),
+            }),
+            (Err(primary), _) => Err(primary),
+            (Ok(_), Err(trace)) => Err(trace),
+            (Ok(value), Ok(())) => Ok(value),
+        };
         result.and_then(|mut value| {
             set(&mut value,"emit_report",json!(output_rank))?;
             set(&mut value, "timings_seconds", Value::Object(timings))?;

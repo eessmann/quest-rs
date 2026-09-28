@@ -255,8 +255,11 @@ impl OfflineBuilder {
         }
         let mut source = vec![Complex64::new(0.0, 0.0); count];
         let offset = usize::try_from(offset).map_err(|_| OfflineError::Budget("source support"))?;
+        let end = offset
+            .checked_add(polynomial.coefficients().len())
+            .ok_or(OfflineError::Budget("source support"))?;
         source
-            .get_mut(offset..)
+            .get_mut(offset..end)
             .ok_or(OfflineError::Budget("source support"))?
             .copy_from_slice(polynomial.coefficients());
         Ok(OfflineBuilder {

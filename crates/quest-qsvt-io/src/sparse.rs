@@ -127,7 +127,12 @@ impl SparseMatrixBuilder<SuppliedEntries> {
             return Err(Error::Format("sparse dimensions"));
         }
         let entries = self.state.data.len();
-        policy.check(entries, 3)?;
+        policy.check_sparse_storage(entries, self.state.indptr.len())?;
+        policy.check_sparse_retained(
+            self.state.data.capacity(),
+            self.state.indices.capacity(),
+            self.state.indptr.capacity(),
+        )?;
         if self.state.indices.len() != entries {
             return Err(Error::Format("sparse data/index lengths"));
         }

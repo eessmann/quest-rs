@@ -4,6 +4,15 @@ use quest_polynomial::{Chebyshev, Laurent, Limits, Polynomial};
 use quest_qsp::Complex64;
 use quest_qsp::offline::{OfflineBuilder, OfflineError, OfflinePolicy};
 #[gtest]
+fn empty_offline_generalized_laurent_preserves_zero_and_positive_offset() -> Result<()> {
+    for offset in [0, 3] {
+        let target = Polynomial::new(Laurent::new(offset), vec![], Limits::default())?;
+        let original = OfflineBuilder::new().generalized(&target)?;
+        expect_true!(original.policy(OfflinePolicy::default()).is_ok());
+    }
+    Ok(())
+}
+#[gtest]
 fn explicit_offline_complex_synthesis_exports_then_independently_certifies() -> Result<()> {
     let target = Polynomial::new(
         Laurent::new(0),

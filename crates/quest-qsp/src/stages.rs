@@ -146,8 +146,11 @@ impl SynthesisBuilder<MissingTarget> {
         admit_target_storage(count, count, self.policy)?;
         let mut values = zeros(count, self.policy.limits)?;
         let start = usize::try_from(first).map_err(|_| Error::Budget("support"))?;
+        let end = start
+            .checked_add(target.coefficients().len())
+            .ok_or(Error::Budget("support"))?;
         values
-            .get_mut(start..)
+            .get_mut(start..end)
             .ok_or(Error::Budget("support"))?
             .copy_from_slice(target.coefficients());
         let source = Arc::new(values.clone());

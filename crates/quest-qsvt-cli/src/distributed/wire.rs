@@ -13,7 +13,7 @@ fn word(value: usize) -> Result<[u8; 8]> {
         .to_le_bytes())
 }
 pub fn encode(input: &FrozenInput) -> Result<Vec<u8>> {
-    let qsp = quest_qsvt_io::write_qsp_json(&input.qsp)?;
+    let qsp = quest_qsvt_io::write_qsp_execution_json(&input.qsp)?;
     let evidence = serde_json::to_string(&input.evidence)?;
     let matrices = [
         input.block.u(),
@@ -218,7 +218,7 @@ pub fn decode(bytes: &[u8]) -> Result<FrozenInput> {
         .build(IoPolicy::default())?;
     let input = reader.vector()?;
     let reference = reader.vector()?;
-    let qsp = quest_qsvt_io::read_qsp_json(reader.text()?, IoPolicy::default())?;
+    let qsp = quest_qsvt_io::read_qsp_execution_json(reader.text()?, IoPolicy::default())?;
     if matches!(qsp, quest_qsvt_io::QspInput::Polynomial(_)) {
         return Err(Error::Input("distributed payload must already be frozen"));
     }
@@ -275,6 +275,51 @@ mod tests {
         let mut truncated = encoded;
         truncated.pop();
         expect_true!(decode(&truncated).is_err());
+        Ok(())
+    }
+
+    #[gtest]
+    fn imported_angle_wire_preserves_source_and_admitted_matrix_words() -> googletest::Result<()> {
+        let matrix = Mat::from_fn(2, 2, |r, c| C::new(if r == c { 1.0 } else { 0.0 }, 0.0));
+        let basis = Mat::from_fn(2, 1, |r, _| C::new(if r == 0 { 1.0 } else { 0.0 }, 0.0));
+        let block = StoredBlockEncoding::builder(matrix, basis.clone(), basis)
+            .metadata(1.0, [1, 1], [1, 1])
+            .build(IoPolicy::default())?;
+        let qsp = quest_qsvt_io::read_qsp_json(
+            r#"{"psi":[0.2,-0.4],"phi":[-0.7,1.2]}"#,
+            IoPolicy::default(),
+        )?;
+        let input = FrozenInput {
+            workflow: Workflow::Embedded,
+            route: TransformRoute::Direct,
+            block,
+            qsp,
+            input: vec![C::new(1.0, 0.0)],
+            reference: vec![],
+            evidence: serde_json::json!({}),
+        };
+        let encoded = encode(&input)?;
+        let decoded = decode(&encoded)?;
+        let QspInput::GeneralizedAngles(original) = &input.qsp else {
+            return fail!("source lost");
+        };
+        let QspInput::GeneralizedAngles(received) = &decoded.qsp else {
+            return fail!("source lost on worker");
+        };
+        expect_eq!(received.psi(), original.psi());
+        expect_eq!(received.phi(), original.phi());
+        let words = |controls: &quest_qsp::ControlSequence| {
+            controls
+                .matrices()
+                .iter()
+                .flat_map(|matrix| {
+                    matrix
+                        .iter()
+                        .flat_map(|row| row.iter().flat_map(|z| [z.re.to_bits(), z.im.to_bits()]))
+                })
+                .collect::<Vec<_>>()
+        };
+        expect_eq!(words(received.controls()), words(original.controls()));
         Ok(())
     }
 }

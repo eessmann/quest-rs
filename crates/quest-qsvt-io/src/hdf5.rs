@@ -128,11 +128,7 @@ impl Hdf5Input {
             if pointer_count != expected {
                 return Err(Error::Format("sparse pointer length mismatch"));
             }
-            let bytes = entries
-                .checked_mul(64)
-                .and_then(|n| pointer_count.checked_mul(16).and_then(|p| n.checked_add(p)))
-                .ok_or(Error::Budget("sparse storage"))?;
-            check_bytes(bytes, self.policy)?;
+            self.policy.check_sparse_storage(entries, pointer_count)?;
             let base = if group.attr_names()?.iter().any(|name| name == "index_base") {
                 scalar_integer(&group, "index_base", self.policy)?
             } else {

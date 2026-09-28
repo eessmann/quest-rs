@@ -3,6 +3,38 @@ use googletest::prelude::*;
 use quest_qsvt_cli::Cli;
 
 #[gtest]
+fn failed_trace_export_retains_primary_dispatch_error() -> googletest::Result<()> {
+    let directory = tempfile::tempdir()?;
+    let trace = directory.path().join("missing-parent").join("trace.json");
+    let result = Cli::try_parse_from([
+        std::ffi::OsStr::new("qsvt"),
+        std::ffi::OsStr::new("--trace"),
+        trace.as_os_str(),
+        std::ffi::OsStr::new("catalog"),
+        std::ffi::OsStr::new("check"),
+        std::ffi::OsStr::new("--tolerance"),
+        std::ffi::OsStr::new("0"),
+    ])?
+    .run();
+    let error = result.expect_err("invalid tolerance must fail");
+    let quest_qsvt_cli::Error::DispatchAndTrace { primary, trace } = &error else {
+        return fail!("primary computation error was replaced");
+    };
+    expect_true!(matches!(
+        primary.as_ref(),
+        quest_qsvt_cli::Error::Input("positive finite tolerance required")
+    ));
+    expect_true!(matches!(trace.as_ref(), quest_qsvt_cli::Error::Io(_)));
+    expect_true!(
+        error
+            .to_string()
+            .contains("positive finite tolerance required")
+    );
+    expect_true!(error.to_string().contains("trace"));
+    Ok(())
+}
+
+#[gtest]
 fn trace_outer_scope_is_application_dispatch_after_preflight() -> googletest::Result<()> {
     let directory = tempfile::tempdir()?;
     let path = directory.path().join("trace.json");

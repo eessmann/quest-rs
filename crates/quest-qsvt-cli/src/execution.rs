@@ -66,20 +66,32 @@ pub fn transform(
         (TransformRoute::Standard, QspInput::Laurent(phases)) => {
             Ok(builder.standard(phases).build()?)
         }
-        (
-            route,
-            QspInput::GeneralizedAngles { controls, .. } | QspInput::GeneralizedMatrices(controls),
-        ) => Ok(match route {
-            TransformRoute::Standard => {
-                return Err(Error::Input("standard route requires tagged Wx phases"));
-            }
-            TransformRoute::Direct => builder.direct(controls).build()?,
-            TransformRoute::HermitianizedFull => builder.hermitianized_full(controls).build()?,
-            TransformRoute::HermitianizedEven => builder.hermitianized_even(controls).build()?,
-            TransformRoute::HermitianizedOdd => builder.hermitianized_odd(controls).build()?,
-            TransformRoute::MultiplicationEven => builder.multiplication_even(controls).build()?,
-            TransformRoute::MultiplicationOdd => builder.multiplication_odd(controls).build()?,
-        }),
+        (route, qsp @ (QspInput::GeneralizedAngles(_) | QspInput::GeneralizedMatrices(_))) => {
+            let controls = match qsp {
+                QspInput::GeneralizedAngles(angles) => angles.into_controls(),
+                QspInput::GeneralizedMatrices(controls) => controls,
+                _ => return Err(Error::Input("generalized controls missing")),
+            };
+            Ok(match route {
+                TransformRoute::Standard => {
+                    return Err(Error::Input("standard route requires tagged Wx phases"));
+                }
+                TransformRoute::Direct => builder.direct(controls).build()?,
+                TransformRoute::HermitianizedFull => {
+                    builder.hermitianized_full(controls).build()?
+                }
+                TransformRoute::HermitianizedEven => {
+                    builder.hermitianized_even(controls).build()?
+                }
+                TransformRoute::HermitianizedOdd => builder.hermitianized_odd(controls).build()?,
+                TransformRoute::MultiplicationEven => {
+                    builder.multiplication_even(controls).build()?
+                }
+                TransformRoute::MultiplicationOdd => {
+                    builder.multiplication_odd(controls).build()?
+                }
+            })
+        }
         _ => Err(Error::Input(
             "route and imported convention disagree; synthesize polynomial input explicitly first",
         )),

@@ -8,6 +8,25 @@ fn close(actual: Complex64, expected: Complex64) {
 }
 
 #[gtest]
+fn empty_generalized_laurent_is_zero_at_zero_and_positive_offset() -> Result<()> {
+    for offset in [0, 3] {
+        let target = Polynomial::new(Laurent::new(offset), vec![], Limits::default())?;
+        let admitted = SynthesisBuilder::new().generalized(&target)?.admit()?;
+        expect_that!(
+            admitted.source_coefficients().len(),
+            eq(usize::try_from(offset)?.saturating_add(1))
+        );
+        expect_true!(
+            admitted
+                .source_coefficients()
+                .iter()
+                .all(|v| *v == Complex64::new(0.0, 0.0))
+        );
+    }
+    Ok(())
+}
+
+#[gtest]
 fn generalized_constant_keeps_complex_phase_and_final_convention_factor() -> Result<()> {
     let target = Polynomial::new(
         Laurent::new(0),

@@ -13,7 +13,10 @@ mod sparse;
 #[rustfmt::skip]
 mod catalog_data;
 pub use catalog::{CatalogFamily, catalog_families, find_catalog_family};
-pub use json::{PolynomialInput, QspInput, read_qsp_json, write_qsp_json};
+pub use json::{
+    GeneralizedAngleInput, PolynomialInput, QspInput, read_qsp_execution_json, read_qsp_json,
+    write_qsp_execution_json, write_qsp_json,
+};
 pub use num_complex::Complex64;
 pub use sparse::{
     MissingEntries, SparseFormat, SparseMatrix, SparseMatrixBuilder, SuppliedEntries,
@@ -57,6 +60,41 @@ impl Default for IoPolicy {
     }
 }
 impl IoPolicy {
+    fn check_sparse_storage(self, entries: usize, pointers: usize) -> Result<()> {
+        // Peak sparse import retains value/index buffers and pointer storage.
+        let bytes = entries
+            .checked_mul(64)
+            .and_then(|n| pointers.checked_mul(16).and_then(|p| n.checked_add(p)))
+            .ok_or(Error::Budget("sparse storage"))?;
+        if bytes > self.max_bytes || isize::try_from(bytes).is_err() {
+            return Err(Error::Budget("sparse storage"));
+        }
+        Ok(())
+    }
+    fn check_sparse_retained(
+        self,
+        data_capacity: usize,
+        index_capacity: usize,
+        pointer_capacity: usize,
+    ) -> Result<()> {
+        let bytes = data_capacity
+            .checked_mul(size_of::<Complex64>())
+            .and_then(|bytes| {
+                index_capacity
+                    .checked_mul(size_of::<usize>())
+                    .and_then(|indices| bytes.checked_add(indices))
+            })
+            .and_then(|bytes| {
+                pointer_capacity
+                    .checked_mul(size_of::<usize>())
+                    .and_then(|pointers| bytes.checked_add(pointers))
+            })
+            .ok_or(Error::Budget("sparse retained storage"))?;
+        if bytes > self.max_bytes || isize::try_from(bytes).is_err() {
+            return Err(Error::Budget("sparse retained storage"));
+        }
+        Ok(())
+    }
     fn check(self, count: usize, copies: usize) -> Result<()> {
         if count
             .checked_mul(size_of::<Complex64>())
