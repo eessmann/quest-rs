@@ -225,19 +225,25 @@ fn canonical_freezing_checks_actual_exported_phase_trigonometry() -> Result<()> 
         })
     ));
 
-    let target = Polynomial::new(
-        Chebyshev,
-        vec![Complex64::new(0.505_859_375, 0.0)],
-        Limits::default(),
-    )?;
-    let candidate = SynthesisBuilder::new()
-        .canonical(&target)?
-        .admit()?
-        .complete()?
-        .synthesize()?;
-    let actual = (candidate.response(0.0)? - 0.505_859_375).abs();
-    expect_that!(candidate.reconstruction_residual(), ge(actual));
-    expect_that!(actual, gt(0.0));
+    // Trigonometric rounding can make one reconstructed value equal its target exactly.
+    // Keep independent constants so at least one exposes reconstruction error.
+    let mut largest_actual = 0.0_f64;
+    for value in [0.013_671_875, 0.505_859_375] {
+        let target = Polynomial::new(
+            Chebyshev,
+            vec![Complex64::new(value, 0.0)],
+            Limits::default(),
+        )?;
+        let candidate = SynthesisBuilder::new()
+            .canonical(&target)?
+            .admit()?
+            .complete()?
+            .synthesize()?;
+        let actual = (candidate.response(0.0)? - value).abs();
+        expect_that!(candidate.reconstruction_residual(), ge(actual));
+        largest_actual = largest_actual.max(actual);
+    }
+    expect_that!(largest_actual, gt(0.0));
     Ok(())
 }
 

@@ -1,4 +1,4 @@
-#![cfg(feature = "workers")]
+#![cfg(all(feature = "workers", target_os = "linux"))]
 use googletest::{Result, prelude::*};
 use quest_circuit::{Gate, ProgramBuilder};
 use quest_math::Limits;

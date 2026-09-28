@@ -30,12 +30,34 @@ and optimization certificates. The runnable source is
 
 ## Build
 
-The workspace pins `nightly-2026-09-06` with rustfmt and Clippy. Install QuEST
-**4.3.x**, binary64 precision, deprecated APIs disabled, plus CMake and a C++20
-compiler. The tested native build recipe currently supports Linux GNU targets.
-Pure circuit and macro builds need neither QuEST nor libclang nor external BLAS.
-The full workspace also builds the QSVT application, whose default IO feature
-requires a **serial HDF5** installation; a parallel HDF5 build is rejected.
+The workspace pins `nightly-2026-09-06` with rustfmt, Clippy and Rust sources
+for reproducible compile-fail diagnostics. Native
+recipes target Linux GNU and aarch64/x86_64 Darwin. Each architecture needs its
+own build and runtime validation; Nix evaluation alone is not that evidence.
+The bridge requires CMake 3.28+, a C++20 compiler, QuEST 4.3.x with binary64
+precision and deprecated APIs disabled. Pure circuit and macro builds need
+neither QuEST nor libclang nor external BLAS. The full workspace also builds
+the QSVT application and requires **serial HDF5**; parallel HDF5 is rejected.
+
+The standalone [devenv](devenv.nix) provisions the pinned Rust toolchain,
+compiler, CMake, libclang, serial HDF5 and an installed shared CPU/OpenMP QuEST
+package without MPI or GPU. Its inputs are pinned in `devenv.lock`, including
+`eessmann/QuEST`'s `cmake-packaging` source at commit `5035520`. From the
+repository root:
+
+```sh
+devenv shell                 # enter the development shell
+devenv build outputs.quest   # build the installed QuEST package
+devenv test                  # run the native minimal example
+```
+
+The shell selects the built package with `QUEST_ROOT` and serial HDF5 with
+`HDF5_DIR`. Use `devenv update quest-src` to intentionally refresh the QuEST
+source lock. If native shell integration is already configured, `devenv allow`
+can activate it in this directory; no `.envrc` is required. Run the workspace
+validation commands below from the shell to test more than the minimal example.
+
+A separately installed QuEST package remains supported:
 
 ```sh
 export QUEST_ROOT=/path/to/installed/quest
@@ -45,25 +67,20 @@ cargo run --locked --example minimal
 ```
 
 For just the facade and its default examples, use `cargo build -p quest-rs --locked`;
-that package does not require HDF5.
+that package does not require HDF5. The installed package must export
+`QuEST::QuEST` and resolve its own runtime dependencies. CMake compiles the
+static CXX bridge against that target; the evaluated target supplies native
+link requirements. Standard `QuEST_DIR` and `CMAKE_PREFIX_PATH` selection also
+work. See [`quest-build`](crates/quest-build/README.md) for package selection.
 
-The installed package must export `QuEST::QuEST` and resolve its own runtime
-dependencies. CMake compiles the static CXX bridge against that target; the
-evaluated target supplies the native link requirements. Standard `QuEST_DIR`
-and `CMAKE_PREFIX_PATH` selection are also supported. See
-[`quest-build`](crates/quest-build/README.md) for selection and compiler details.
-
-For a local QuEST installation whose CUDA/cuQuantum or MPI libraries live
-outside the system loader paths, configure **QuEST itself** with
-`-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON` before installing. The upstream RPATH
-helper must honor that standard option. Default native packaging retains
-relative `$ORIGIN` paths. Cargo builds do not repair or bundle native libraries.
-
-The Linux development helper emits absolute **DT_RUNPATH** entries for directly
-linked libraries. Cross compilation, macOS, Windows and relocatable application
-bundles need separate verified recipes. The old `QUEST_NATIVE_CONFIG` JSON
-record and `QUEST_RUNTIME_LIBRARY_PATH` workflow have been removed; unset those
-variables and select the installed package normally.
+For a local QuEST installation whose external native libraries live outside
+system loader paths, configure **QuEST itself** with
+`-DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON` before installing. The package must
+resolve its indirect dependencies: Linux uses ELF `$ORIGIN`/`DT_RUNPATH`, while
+Darwin uses Mach-O install names and `@loader_path`/`LC_RPATH`. The final-target
+helper emits search paths for direct dependencies. Cargo does not repair or
+bundle native installations. Unset the removed `QUEST_NATIVE_CONFIG` and
+`QUEST_RUNTIME_LIBRARY_PATH` variables and select the installed package normally.
 
 Cargo does not propagate a library build script's linker arguments into an
 arbitrarily distant executable. Every final executable that uses this runtime,

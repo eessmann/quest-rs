@@ -26,3 +26,8 @@ target/
 **/.DS_Store
 
 .superpowers/
+
+# Project-owned Nix development environment
+.devenv*
+result
+result-*

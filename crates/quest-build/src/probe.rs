@@ -23,9 +23,9 @@ pub fn discover(
     validate_target(host, target)?;
     validate_compiler_environment(target, None)?;
     let explicit = explicit_prefix()?;
-    let search_prefixes = env::var_os("CMAKE_PREFIX_PATH")
-        .map(|value| env::split_paths(&value).collect::<Vec<_>>())
-        .unwrap_or_default();
+    let search_prefixes = env::var_os("CMAKE_PREFIX_PATH").map_or_else(Vec::new, |value| {
+        env::split_paths(&value).collect::<Vec<_>>()
+    });
     let setup = configure(
         work,
         host,
@@ -39,13 +39,18 @@ pub fn discover(
     let probe = read_target(&reader, &setup.profile, "quest_link_query")?;
     let compiler = read_compiler(&reader, target)?;
     validate_compiler_environment(target, Some(&compiler.path))?;
-    let (prefix, configuration, headers) = inspect_headers(&probe, explicit.as_deref())?;
-    let mut link = inspect_link(&probe, &setup.build_directory, &setup.profile)?;
+    let exported_includes = read_exported_includes(&setup.build_directory, &setup.profile)?;
+    let (prefix, configuration, mut headers) =
+        inspect_headers(&probe, explicit.as_deref(), &exported_includes)?;
+    headers.implicit_include_dirs = compiler.implicit_include_dirs;
+    headers.sysroot.clone_from(&setup.sysroot);
+    validate_header_context(&headers, target)?;
+    let mut link = inspect_link(&probe, &setup.build_directory, &setup.profile, target)?;
     // CMake's link fragments omit the driver's implicit standard library.
     // Use the evaluated toolchain rather than assuming GCC or Clang defaults.
     let stdlib = compiler.standard_library;
     link.libraries.push(stdlib);
-    watch_inputs(&reader, &probe, &link.linked_files)?;
+    watch_inputs(&reader, &probe, &link.linked_files, &exported_includes)?;
     let bridge_archive = inputs
         .map(|_| {
             read_target(&reader, &setup.profile, "quest_bridge").and_then(|bridge| {
@@ -58,6 +63,7 @@ pub fn discover(
         })
         .transpose()?;
     let package = NativePackage {
+        target: target.to_owned(),
         prefix,
         version: configuration.version,
         mpi_enabled: configuration.mpi_enabled,
@@ -68,6 +74,7 @@ pub fn discover(
         compiler_version: compiler.version,
         library: link.library,
         link_search_dirs: link.search_dirs,
+        framework_search_dirs: link.framework_search_dirs,
         link_libraries: link.libraries,
         link_options: link.options,
         runtime_library_dirs: link.runtime_dirs,
@@ -85,6 +92,7 @@ pub fn discover(
 }
 
 struct Setup {
+    sysroot: Option<PathBuf>,
     build_directory: PathBuf,
     profile: String,
 }
@@ -97,6 +105,17 @@ fn configure(
     inputs: Option<&BridgeInputs>,
     search_prefixes: &[PathBuf],
 ) -> Result<Setup> {
+    let sysroot = if target.ends_with("-apple-darwin") {
+        let path = if let Some(root) = env::var_os("SDKROOT") {
+            PathBuf::from(root)
+        } else {
+            let output = run(Command::new("xcrun").args(["--sdk", "macosx", "--show-sdk-path"]))?;
+            PathBuf::from(String::from_utf8_lossy(&output.stdout).trim())
+        };
+        Some(validate_sdk(&path)?)
+    } else {
+        None
+    };
     let source = work.join("source");
     let mut config = cmake::Config::new(&source);
     config
@@ -116,6 +135,9 @@ fn configure(
     config
         .define("CMAKE_CXX_COMPILER", &cxx)
         .define("CMAKE_CXX_FLAGS", "");
+    if let Some(sysroot) = &sysroot {
+        config.define("CMAKE_OSX_SYSROOT", cmake_path(sysroot)?);
+    }
     let prefix_value = search_prefixes
         .iter()
         .map(|path| cmake_path(path))
@@ -159,7 +181,15 @@ fn configure(
             BuildError::CmakeBuild(message.to_owned())
         },
     )?;
+    if let Some(requested) = &sysroot {
+        let evaluated = build_directory.join("quest-sysroot.txt");
+        let value = fs::read_to_string(&evaluated).map_err(|error| io(&evaluated, error))?;
+        if validate_sdk(Path::new(value.trim()))? != *requested {
+            return Err(invalid("CMake changed the selected Darwin SDK"));
+        }
+    }
     Ok(Setup {
+        sysroot,
         build_directory,
         profile,
     })
@@ -227,6 +257,7 @@ struct CompilerConfiguration {
     id: String,
     version: String,
     standard_library: String,
+    implicit_include_dirs: Vec<PathBuf>,
 }
 
 fn read_compiler(reader: &reply::Reader, target: &str) -> Result<CompilerConfiguration> {
@@ -246,34 +277,156 @@ fn read_compiler(reader: &reply::Reader, target: &str) -> Result<CompilerConfigu
     let path = fs::canonicalize(compiler_path).map_err(|error| io(compiler_path, error))?;
     let compiler_target = run(Command::new(&path).arg("-dumpmachine"))?;
     let compiler_target = String::from_utf8_lossy(&compiler_target.stdout);
-    let arch = target.split_once('-').map_or(target, |(arch, _)| arch);
-    if !compiler_target.trim().starts_with(&format!("{arch}-"))
-        || !compiler_target.contains("linux")
-    {
-        return Err(invalid(format!(
-            "C++ compiler targets {}, Rust targets {target}",
-            compiler_target.trim()
-        )));
-    }
-    let standard_library = compiler
+    validate_compiler_target(target, compiler_target.trim())?;
+    let id = compiler.id.unwrap_or_default();
+    let standard_library = select_standard_library(target, &id, &compiler.implicit.link_libraries)?;
+    let implicit_include_dirs = compiler
         .implicit
-        .link_libraries
+        .include_directories
+        .into_iter()
+        .map(|path| {
+            cmake_path(&path)?;
+            if !path.is_absolute() {
+                return Err(invalid("relative compiler implicit include directory"));
+            }
+            Ok(path)
+        })
+        .collect::<Result<Vec<_>>>()?;
+    Ok(CompilerConfiguration {
+        path,
+        id,
+        version: compiler.version.unwrap_or_default(),
+        standard_library,
+        implicit_include_dirs,
+    })
+}
+
+fn select_standard_library(target: &str, id: &str, libraries: &[PathBuf]) -> Result<String> {
+    libraries
         .iter()
         .filter_map(|path| path.to_str())
         .find(|name| matches!(*name, "stdc++" | "c++"))
-        .ok_or_else(|| invalid("CMake did not identify a supported C++ standard library"))?
-        .to_owned();
-    Ok(CompilerConfiguration {
-        path,
-        id: compiler.id.unwrap_or_default(),
-        version: compiler.version.unwrap_or_default(),
-        standard_library,
-    })
+        // CMake can omit implicit libraries for the validated Darwin Clang driver.
+        .or_else(|| {
+            (target.ends_with("-apple-darwin") && matches!(id, "Clang" | "AppleClang"))
+                .then_some("c++")
+        })
+        .map(str::to_owned)
+        .ok_or_else(|| invalid("CMake did not identify a supported C++ standard library"))
+}
+
+fn validate_compiler_target(target: &str, compiler: &str) -> Result<()> {
+    let arch = target.split('-').next().unwrap_or_default();
+    let compiler_arch = compiler.split('-').next().unwrap_or_default();
+    let darwin = target.ends_with("-apple-darwin");
+    let same_arch =
+        arch == compiler_arch || (darwin && arch == "aarch64" && compiler_arch == "arm64");
+    let same_platform = if darwin {
+        compiler.contains("-apple-darwin")
+    } else {
+        compiler.contains("-linux-gnu")
+    };
+    if !same_arch || !same_platform {
+        return Err(invalid(format!(
+            "C++ compiler targets {compiler}, Rust targets {target}"
+        )));
+    }
+    Ok(())
+}
+
+fn validate_sdk(path: &Path) -> Result<PathBuf> {
+    cmake_path(path)?;
+    if !path.is_absolute()
+        || !path.join("usr/include").is_dir()
+        || !path.join("System/Library/Frameworks").is_dir()
+        || !(path.join("SDKSettings.plist").is_file() || path.join("SDKSettings.json").is_file())
+    {
+        return Err(invalid(
+            "SDKROOT must select an absolute installed macOS SDK with SDKSettings and system headers",
+        ));
+    }
+    fs::canonicalize(path).map_err(|error| io(path, error))
+}
+
+fn validate_header_context(headers: &HeaderContext, target: &str) -> Result<()> {
+    let mut flags = headers.frontend_flags.iter();
+    while let Some(flag) = flags.next() {
+        let (kind, value) = match flag.as_str() {
+            "-arch" | "-target" | "--target" | "-isysroot" | "--sysroot" => (
+                flag.as_str(),
+                flags
+                    .next()
+                    .map(String::as_str)
+                    .ok_or_else(|| invalid(format!("missing compile argument after {flag}")))?,
+            ),
+            _ => {
+                if let Some(value) = flag
+                    .strip_prefix("--target=")
+                    .or_else(|| flag.strip_prefix("-target="))
+                {
+                    ("-target", value)
+                } else if let Some(value) = flag.strip_prefix("--sysroot=") {
+                    ("-isysroot", value)
+                } else if let Some(value) = flag.strip_prefix("-isysroot") {
+                    ("-isysroot", value)
+                } else if flag.starts_with("-Xarch_") || matches!(flag.as_str(), "-m32" | "-m64") {
+                    return Err(invalid(format!(
+                        "unsupported compile architecture override {flag}"
+                    )));
+                } else {
+                    continue;
+                }
+            }
+        };
+        match kind {
+            "-arch" => {
+                let expected = match target {
+                    "aarch64-apple-darwin" => "arm64",
+                    "x86_64-apple-darwin" => "x86_64",
+                    _ => return Err(invalid("-arch compile option requires a Darwin target")),
+                };
+                if value != expected {
+                    return Err(invalid(
+                        "compile architecture differs from the native Cargo target",
+                    ));
+                }
+            }
+            "-target" | "--target" => validate_compiler_target(target, value)?,
+            _ => {
+                let path = Path::new(value);
+                if !path.is_absolute() {
+                    return Err(invalid("compile sysroot must be absolute"));
+                }
+                let canonical = fs::canonicalize(path).map_err(|error| io(path, error))?;
+                if headers.sysroot.as_ref() != Some(&canonical) {
+                    return Err(invalid("compile sysroot differs from the evaluated SDK"));
+                }
+            }
+        }
+    }
+    Ok(())
+}
+
+fn read_exported_includes(build_directory: &Path, profile: &str) -> Result<Vec<PathBuf>> {
+    let file = build_directory.join(format!("quest-includes-{profile}.txt"));
+    let text = fs::read_to_string(&file).map_err(|error| io(&file, error))?;
+    text.lines()
+        .filter(|line| !line.is_empty())
+        .map(|line| {
+            let path = Path::new(line);
+            cmake_path(path)?;
+            if !path.is_absolute() {
+                return Err(invalid("relative imported QuEST include directory"));
+            }
+            fs::canonicalize(path).map_err(|error| io(path, error))
+        })
+        .collect()
 }
 
 fn inspect_headers(
     probe: &Target,
     explicit: Option<&Path>,
+    exported_includes: &[PathBuf],
 ) -> Result<(PathBuf, crate::HeaderConfiguration, HeaderContext)> {
     let mut headers = HeaderContext::default();
     for group in &probe.compile_groups {
@@ -300,9 +453,16 @@ fn inspect_headers(
             }
         }
     }
-    let prefix = headers
-        .include_dirs
+    for path in exported_includes {
+        if !headers.include_dirs.contains(path) {
+            // A target include absent from the codemodel is compiler-implicit.
+            push_unique(&mut headers.include_dirs, path.clone());
+            push_unique(&mut headers.system_include_dirs, path.clone());
+        }
+    }
+    let prefix = exported_includes
         .iter()
+        .chain(&headers.include_dirs)
         .find(|directory| directory.join("quest.h").is_file())
         .and_then(|directory| directory.parent())
         .ok_or_else(|| invalid("QuEST::QuEST did not supply installed include/quest.h"))?;
@@ -321,6 +481,10 @@ fn inspect_headers(
 
 #[derive(Default)]
 struct NativeLink {
+    target_os: Option<&'static str>,
+    architecture: Option<&'static str>,
+    sysroot: Option<PathBuf>,
+    framework_search_dirs: Vec<PathBuf>,
     library: PathBuf,
     search_dirs: Vec<PathBuf>,
     libraries: Vec<String>,
@@ -330,7 +494,12 @@ struct NativeLink {
     library_files_by_name: BTreeMap<String, PathBuf>,
 }
 
-fn inspect_link(probe: &Target, build_directory: &Path, profile: &str) -> Result<NativeLink> {
+fn inspect_link(
+    probe: &Target,
+    build_directory: &Path,
+    profile: &str,
+    target: &str,
+) -> Result<NativeLink> {
     let file = build_directory.join(format!("quest-library-{profile}.txt"));
     let text = fs::read_to_string(&file).map_err(|error| io(&file, error))?;
     let library =
@@ -339,7 +508,25 @@ fn inspect_link(probe: &Target, build_directory: &Path, profile: &str) -> Result
         .link
         .as_ref()
         .ok_or_else(|| invalid("CMake link query has no link model"))?;
+    let sysroot = if target.ends_with("-apple-darwin") {
+        let file = build_directory.join("quest-sysroot.txt");
+        let value = fs::read_to_string(&file).map_err(|error| io(&file, error))?;
+        Some(validate_sdk(Path::new(value.trim()))?)
+    } else {
+        None
+    };
     let mut link = NativeLink {
+        sysroot,
+        target_os: Some(if target.ends_with("-apple-darwin") {
+            "macos"
+        } else {
+            "linux"
+        }),
+        architecture: match target {
+            "aarch64-apple-darwin" => Some("arm64"),
+            "x86_64-apple-darwin" => Some("x86_64"),
+            _ => None,
+        },
         library,
         ..NativeLink::default()
     };
@@ -369,9 +556,53 @@ fn record_link_tokens(tokens: &[String], link: &mut NativeLink) -> Result<()> {
                 .and_then(|value| value.strip_prefix("-Wl,"))
                 .ok_or_else(|| invalid(format!("missing paired path after {token}")))?;
             let option = format!("{token},{value}");
-            validate_link_option(&option)?;
+            validate_link_option(&option, link.target_os.unwrap_or("linux"))?;
             link.options.push(option);
-        } else if token == "-L" || token == "-l" {
+        } else if token == "-framework" && link.target_os == Some("macos") {
+            let name = iter
+                .next()
+                .ok_or_else(|| invalid("missing framework name"))?;
+            if name.is_empty()
+                || !name
+                    .chars()
+                    .all(|ch| ch.is_ascii_alphanumeric() || ch == '_')
+            {
+                return Err(invalid("unsupported framework name"));
+            }
+            link.libraries.push(format!("framework={name}"));
+        } else if token == "-isysroot" && link.target_os == Some("macos") {
+            let root = iter
+                .next()
+                .ok_or_else(|| invalid("missing Darwin sysroot"))?;
+            let sdk = validate_sdk(Path::new(root))?;
+            if link
+                .sysroot
+                .as_ref()
+                .is_some_and(|expected| expected != &sdk)
+            {
+                return Err(invalid(
+                    "Darwin link sysroot differs from the evaluated SDK",
+                ));
+            }
+            runtime_link_args("macos", std::slice::from_ref(&sdk))?;
+            link.options
+                .push(format!("-Wl,-syslibroot,{}", sdk.display()));
+        } else if token == "-arch" && link.target_os == Some("macos") {
+            let arch = iter
+                .next()
+                .ok_or_else(|| invalid("missing Darwin architecture"))?;
+            if !matches!(arch.as_str(), "arm64" | "x86_64")
+                || link.architecture.is_some_and(|expected| expected != arch)
+            {
+                return Err(invalid(
+                    "Darwin link architecture differs from the native Cargo target",
+                ));
+            }
+            // Rust already selects the validated native architecture.
+        } else if token == "-L"
+            || token == "-l"
+            || (token == "-F" && link.target_os == Some("macos"))
+        {
             let value = iter
                 .next()
                 .ok_or_else(|| invalid(format!("missing argument after {token}")))?;
@@ -397,15 +628,28 @@ fn record_link_token(token: &str, link: &mut NativeLink) -> Result<()> {
             "unevaluated or invalid CMake link token: {token}"
         )));
     }
-    if let Some(directory) = token.strip_prefix("-L") {
+    if let Some(directory) = token
+        .strip_prefix("-F")
+        .filter(|_| link.target_os == Some("macos"))
+    {
         let directory = PathBuf::from(directory);
-        if !directory.is_absolute() {
-            return Err(invalid("relative native link search directory"));
-        }
+        runtime_link_args("macos", std::slice::from_ref(&directory))?;
+        push_unique(&mut link.framework_search_dirs, directory);
+    } else if let Some(directory) = token.strip_prefix("-L") {
+        let directory = PathBuf::from(directory);
+        runtime_link_args(
+            link.target_os.unwrap_or("linux"),
+            std::slice::from_ref(&directory),
+        )?;
         push_unique(&mut link.search_dirs, directory);
     } else if let Some(name) = token.strip_prefix("-l") {
-        if name.is_empty() {
-            return Err(invalid("empty native library name"));
+        if name.is_empty() || name.contains(['=', ',', '/', ' ']) || name.starts_with('-') {
+            return Err(invalid("invalid native library name"));
+        }
+        if link.target_os == Some("macos") && name.starts_with(':') {
+            return Err(invalid(
+                "Darwin does not support GNU -l:filename library syntax",
+            ));
         }
         link.libraries.push(name.strip_prefix(':').map_or_else(
             || name.to_owned(),
@@ -414,7 +658,7 @@ fn record_link_token(token: &str, link: &mut NativeLink) -> Result<()> {
     } else if Path::new(token).is_absolute() {
         record_linked_file(token, link)?;
     } else {
-        validate_link_option(token)?;
+        validate_link_option(token, link.target_os.unwrap_or("linux"))?;
         link.options.push(token.to_owned());
     }
     Ok(())
@@ -444,7 +688,18 @@ fn record_linked_file(token: &str, link: &mut NativeLink) -> Result<()> {
     if kind == "dylib" {
         push_unique(&mut link.runtime_dirs, parent.to_owned());
     }
-    link.libraries.push(format!("{kind}:+verbatim={name}"));
+    if kind == "dylib" && link.target_os == Some("macos") {
+        let stem = name
+            .strip_prefix("lib")
+            .and_then(|name| name.strip_suffix(".dylib"))
+            .filter(|name| !name.is_empty())
+            .ok_or_else(|| invalid("Darwin shared libraries must have a libNAME.dylib filename"))?;
+        // ld64 uses -lNAME, and does not implement GNU -l:filename. Keep the
+        // version in NAME and validate search resolution against the exact file.
+        link.libraries.push(format!("dylib={stem}"));
+    } else {
+        link.libraries.push(format!("{kind}:+verbatim={name}"));
+    }
     link.library_files_by_name
         .insert(name.to_owned(), path.clone());
     link.linked_files.insert(PathBuf::from(token));
@@ -457,16 +712,43 @@ fn split_flags(fragment: &str) -> Result<Vec<String>> {
         .ok_or_else(|| invalid(format!("cannot parse CMake command fragment: {fragment}")))
 }
 
-fn validate_link_option(option: &str) -> Result<()> {
-    if matches!(option, "-pthread" | "-fopenmp" | "-Wl,--enable-new-dtags")
-        || option.starts_with("-fopenmp=")
+fn validate_link_option(option: &str, target_os: &str) -> Result<()> {
+    if matches!(option, "-pthread" | "-fopenmp") || option.starts_with("-fopenmp=") {
+        return Ok(());
+    }
+    if target_os == "linux" && option == "-Wl,--enable-new-dtags" {
+        return Ok(());
+    }
+    if target_os == "macos"
+        && matches!(
+            option,
+            "-Wl,-search_paths_first" | "-Wl,-headerpad_max_install_names"
+        )
+    {
+        // Global Mach-O options: path-first search matches exact-file validation;
+        // header padding changes capacity, without changing library ordering.
+        return Ok(());
+    }
+    if target_os == "macos"
+        && option
+            .strip_prefix("-mmacosx-version-min=")
+            .is_some_and(|value| {
+                !value.is_empty() && value.chars().all(|ch| ch.is_ascii_digit() || ch == '.')
+            })
     {
         return Ok(());
     }
     for prefix in ["-Wl,-rpath,", "-Wl,-rpath-link,"] {
+        if prefix == "-Wl,-rpath-link," && target_os != "linux" {
+            continue;
+        }
         if let Some(paths) = option.strip_prefix(prefix) {
-            let directories = paths.split(':').map(PathBuf::from).collect::<Vec<_>>();
-            runtime_link_args("linux", &directories)?;
+            let directories = if target_os == "linux" {
+                paths.split(':').map(PathBuf::from).collect()
+            } else {
+                vec![PathBuf::from(paths)]
+            };
+            runtime_link_args(target_os, &directories)?;
             return Ok(());
         }
     }
@@ -479,6 +761,7 @@ fn watch_inputs(
     reader: &reply::Reader,
     probe: &Target,
     linked_files: &BTreeSet<PathBuf>,
+    exported_includes: &[PathBuf],
 ) -> Result<()> {
     let mut inputs = linked_files.clone();
     for include in probe
@@ -487,6 +770,9 @@ fn watch_inputs(
         .flat_map(|group| &group.includes)
     {
         collect_files(&include.path, &mut inputs, &mut BTreeSet::new())?;
+    }
+    for include in exported_includes {
+        collect_files(include, &mut inputs, &mut BTreeSet::new())?;
     }
     let cmake_files: objects::CMakeFilesV1 = reader
         .read_object()
@@ -526,7 +812,10 @@ fn native_library_kind(path: &Path, name: &str) -> Result<&'static str> {
         .as_bytes()
         .windows(4)
         .any(|window| window.eq_ignore_ascii_case(b".so."));
-    if extension.is_some_and(|extension| extension.eq_ignore_ascii_case("so")) || versioned_shared {
+    if extension
+        .is_some_and(|extension| matches!(extension.to_ascii_lowercase().as_str(), "so" | "dylib"))
+        || versioned_shared
+    {
         return Ok("dylib");
     }
     Err(invalid(format!(
@@ -581,7 +870,11 @@ mod tests {
         fs::write(include.join("quest.h"), "#include <quest/include/config.h>\nusing qreal = double;\ninline bool isQuESTEnvInit() { return false; }\n").or_fail()?;
         fs::write(include.join("quest/include/config.h"), "#define QUEST_VERSION_MAJOR 4\n#define QUEST_VERSION_MINOR 3\n#define QUEST_VERSION_PATCH 9\n#define QUEST_FLOAT_PRECISION 2\n#define QUEST_INCLUDE_DEPRECATED_FUNCTIONS 0\n").or_fail()?;
         fs::write(
-            prefix.join("lib/libQuEST.so"),
+            prefix.join(if cfg!(target_os = "macos") {
+                "lib/libQuEST.dylib"
+            } else {
+                "lib/libQuEST.so"
+            }),
             "unused imported location: archive build never links it",
         )
         .or_fail()?;
@@ -596,11 +889,11 @@ mod tests {
 get_filename_component(fixture_prefix "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
 add_library(QuEST::QuEST SHARED IMPORTED)
 set_target_properties(QuEST::QuEST PROPERTIES
-  IMPORTED_LOCATION "${fixture_prefix}/lib/libQuEST.so"
+  IMPORTED_LOCATION "${fixture_prefix}/lib/libQuEST${CMAKE_SHARED_LIBRARY_SUFFIX}"
   INTERFACE_INCLUDE_DIRECTORIES "${fixture_prefix}/include"
   INTERFACE_COMPILE_DEFINITIONS "$<$<CONFIG:Release>:QUEST_FIXTURE_EVALUATED=1>;$<$<CONFIG:Debug>:QUEST_FIXTURE_EVALUATED=2>"
   INTERFACE_COMPILE_OPTIONS "$<$<COMPILE_LANGUAGE:CXX>:-DQUEST_FIXTURE_CXX=1>"
-  INTERFACE_LINK_OPTIONS "$<$<CONFIG:Release>:LINKER:--enable-new-dtags>"
+  INTERFACE_LINK_OPTIONS "$<$<AND:$<CONFIG:Release>,$<PLATFORM_ID:Linux>>:LINKER:--enable-new-dtags>"
   INTERFACE_LINK_LIBRARIES "$<$<CONFIG:Release>:m>")
 "#,
         )
@@ -679,8 +972,8 @@ set_target_properties(QuEST::QuEST PROPERTIES
                 configure(&work, host, host, explicit, None, &[search.to_owned()]).or_fail()?;
             let reader = reply::Reader::from_build_dir(&setup.build_directory).or_fail()?;
             let query = read_target(&reader, &setup.profile, "quest_link_query").or_fail()?;
-            let (selected, _, _) = inspect_headers(&query, None).or_fail()?;
-            expect_that!(selected, eq(expected));
+            let (selected, _, _) = inspect_headers(&query, None, &[]).or_fail()?;
+            expect_that!(selected, eq(&expected.canonicalize().or_fail()?));
         }
         Ok(())
     }
@@ -714,8 +1007,9 @@ set_target_properties(QuEST::QuEST PROPERTIES
         .or_fail()?;
         let reader = reply::Reader::from_build_dir(&setup.build_directory).or_fail()?;
         let query = read_target(&reader, &setup.profile, "quest_link_query").or_fail()?;
-        let (_, configuration, headers) = inspect_headers(&query, Some(&prefix)).or_fail()?;
-        let link = inspect_link(&query, &setup.build_directory, &setup.profile).or_fail()?;
+        let (_, configuration, headers) =
+            inspect_headers(&query, Some(&prefix.canonicalize().or_fail()?), &[]).or_fail()?;
+        let link = inspect_link(&query, &setup.build_directory, &setup.profile, host).or_fail()?;
         expect_eq!(configuration.version, "4.3.9");
         let expected_profile =
             env::var("QUEST_BUILD_FIXTURE_PROFILE").unwrap_or_else(|_| "Release".to_owned());
@@ -733,7 +1027,9 @@ set_target_properties(QuEST::QuEST PROPERTIES
             contains(eq("-DQUEST_FIXTURE_CXX=1"))
         );
         if expected_profile == "Release" {
-            expect_that!(link.options, contains(eq("-Wl,--enable-new-dtags")));
+            if !host.ends_with("-apple-darwin") {
+                expect_that!(link.options, contains(eq("-Wl,--enable-new-dtags")));
+            }
             expect_that!(link.libraries, contains(eq("m")));
         } else {
             expect_that!(
@@ -906,7 +1202,10 @@ set_target_properties(QuEST::QuEST PROPERTIES
         let mut link = NativeLink::default();
         record_linked_file(cmake_path(&alias).or_fail()?, &mut link).or_fail()?;
         expect_that!(&link.linked_files, contains(eq(&alias)));
-        expect_that!(&link.linked_files, contains(eq(&native)));
+        expect_that!(
+            &link.linked_files,
+            contains(eq(&native.canonicalize().or_fail()?))
+        );
         let headers = directory.path().join("include");
         let target_headers = directory.path().join("actual headers");
         fs::create_dir_all(&target_headers).or_fail()?;
@@ -917,7 +1216,11 @@ set_target_properties(QuEST::QuEST PROPERTIES
         std::os::unix::fs::symlink(&header, &header_alias).or_fail()?;
         let mut watched = BTreeSet::new();
         collect_files(&headers, &mut watched, &mut BTreeSet::new()).or_fail()?;
-        for path in [&header, &headers.join("quest.h"), &headers.join("alias.h")] {
+        for path in [
+            &header.canonicalize().or_fail()?,
+            &headers.join("quest.h"),
+            &headers.join("alias.h"),
+        ] {
             expect_that!(&watched, contains(eq(path)));
         }
         Ok(())
@@ -1003,6 +1306,327 @@ set_target_properties(QuEST::QuEST PROPERTIES
             link.runtime_dirs,
             elements_are![eq(&directory.path().canonicalize().or_fail()?)]
         );
+        Ok(())
+    }
+    #[gtest]
+    fn darwin_dylibs_preserve_versioned_filename() -> googletest::Result<()> {
+        let directory = tempfile::tempdir()?;
+        for name in ["libQuEST.dylib", "libomp.5.dylib"] {
+            let library = directory.path().join(name);
+            fs::write(&library, "fixture")?;
+            let mut link = NativeLink {
+                target_os: Some("macos"),
+                ..NativeLink::default()
+            };
+            record_linked_file(cmake_path(&library)?, &mut link)?;
+            expect_eq!(
+                link.libraries,
+                vec![format!(
+                    "dylib={}",
+                    name.strip_prefix("lib")
+                        .unwrap()
+                        .strip_suffix(".dylib")
+                        .unwrap()
+                )]
+            );
+            expect_eq!(link.runtime_dirs, vec![directory.path().canonicalize()?]);
+        }
+        Ok(())
+    }
+
+    #[gtest]
+    fn darwin_framework_pairs_preserve_order_and_reject_state() -> googletest::Result<()> {
+        let mut link = NativeLink {
+            target_os: Some("macos"),
+            ..NativeLink::default()
+        };
+        record_link_tokens(
+            &split_flags(
+                "-F '/SDK/System/Library/Frameworks' -framework Accelerate -lomp -framework Foundation",
+            )?,
+            &mut link,
+        )?;
+        expect_eq!(
+            link.framework_search_dirs,
+            vec![PathBuf::from("/SDK/System/Library/Frameworks")]
+        );
+        expect_eq!(
+            link.libraries,
+            vec!["framework=Accelerate", "omp", "framework=Foundation"]
+        );
+        for flags in [
+            "-framework",
+            "-framework -lomp",
+            "-F",
+            "-Frelative",
+            "-Wl,-force_load,/tmp/lib.a",
+            "-Wl,-all_load",
+            "-Wl,--enable-new-dtags",
+            "-Wl,-rpath,/a:/b",
+        ] {
+            expect_true!(
+                record_link_tokens(
+                    &split_flags(flags)?,
+                    &mut NativeLink {
+                        target_os: Some("macos"),
+                        ..NativeLink::default()
+                    }
+                )
+                .is_err()
+            );
+        }
+        Ok(())
+    }
+
+    #[gtest]
+    fn compiler_target_validation_normalizes_only_darwin_arm64() -> googletest::Result<()> {
+        for (rust, compiler) in [
+            ("aarch64-apple-darwin", "arm64-apple-darwin25.0.0"),
+            ("aarch64-apple-darwin", "aarch64-apple-darwin"),
+            ("x86_64-apple-darwin", "x86_64-apple-darwin24.6"),
+            ("x86_64-unknown-linux-gnu", "x86_64-pc-linux-gnu"),
+        ] {
+            validate_compiler_target(rust, compiler)?;
+        }
+        for (rust, compiler) in [
+            ("aarch64-apple-darwin", "x86_64-apple-darwin"),
+            ("aarch64-apple-darwin", "aarch64-unknown-linux-gnu"),
+            ("x86_64-unknown-linux-gnu", "x86_64-apple-darwin"),
+            ("x86_64-unknown-linux-gnu", "x86_64-linux-musl"),
+        ] {
+            expect_true!(validate_compiler_target(rust, compiler).is_err());
+        }
+        Ok(())
+    }
+
+    #[gtest]
+    fn darwin_sdk_requires_an_absolute_installed_sdk() -> googletest::Result<()> {
+        let directory = tempfile::tempdir()?;
+        expect_true!(validate_sdk(Path::new("relative.sdk")).is_err());
+        expect_true!(validate_sdk(directory.path()).is_err());
+        fs::create_dir_all(directory.path().join("usr/include"))?;
+        fs::create_dir_all(directory.path().join("System/Library/Frameworks"))?;
+        fs::write(directory.path().join("SDKSettings.json"), "{}")?;
+        expect_eq!(
+            validate_sdk(directory.path())?,
+            directory.path().canonicalize()?
+        );
+        Ok(())
+    }
+
+    #[gtest]
+    fn darwin_link_architecture_must_match_the_cargo_target() -> googletest::Result<()> {
+        let mut link = NativeLink {
+            target_os: Some("macos"),
+            architecture: Some("arm64"),
+            ..NativeLink::default()
+        };
+        record_link_tokens(&split_flags("-arch arm64")?, &mut link)?;
+        expect_true!(record_link_tokens(&split_flags("-arch x86_64")?, &mut link).is_err());
+        Ok(())
+    }
+    #[gtest]
+    fn libcxx_fallback_is_confined_to_darwin_clang() -> googletest::Result<()> {
+        for id in ["Clang", "AppleClang"] {
+            expect_eq!(
+                select_standard_library("aarch64-apple-darwin", id, &[])?,
+                "c++"
+            );
+        }
+        expect_true!(select_standard_library("aarch64-apple-darwin", "GNU", &[]).is_err());
+        expect_true!(select_standard_library("x86_64-unknown-linux-gnu", "Clang", &[]).is_err());
+        expect_eq!(
+            select_standard_library(
+                "x86_64-unknown-linux-gnu",
+                "GNU",
+                &[PathBuf::from("stdc++")]
+            )?,
+            "stdc++"
+        );
+        Ok(())
+    }
+    #[gtest]
+    fn darwin_link_sysroot_must_match_the_evaluated_sdk() -> googletest::Result<()> {
+        let directory = tempfile::tempdir()?;
+        let mut roots = Vec::new();
+        for name in ["first.sdk", "second.sdk"] {
+            let root = directory.path().join(name);
+            fs::create_dir_all(root.join("usr/include"))?;
+            fs::create_dir_all(root.join("System/Library/Frameworks"))?;
+            fs::write(root.join("SDKSettings.json"), "{}")?;
+            roots.push(root.canonicalize()?);
+        }
+        let mut link = NativeLink {
+            target_os: Some("macos"),
+            sysroot: Some(roots[0].clone()),
+            ..NativeLink::default()
+        };
+        expect_true!(
+            record_link_tokens(
+                &["-isysroot".into(), roots[1].to_string_lossy().into_owned()],
+                &mut link
+            )
+            .is_err()
+        );
+        record_link_tokens(
+            &["-isysroot".into(), roots[0].to_string_lossy().into_owned()],
+            &mut link,
+        )?;
+        Ok(())
+    }
+    #[cfg(target_os = "macos")]
+    #[gtest]
+    fn darwin_exact_dylib_metadata_links_a_real_rust_consumer() -> googletest::Result<()> {
+        let directory = tempfile::tempdir()?;
+        let root = directory.path().canonicalize()?;
+        let source = root.join("native.cpp");
+        let dylib = root.join("libnative_fixture.7.dylib");
+        fs::write(&source, "extern \"C\" int native_value() { return 73; }")?;
+        run(
+            Command::new(env::var_os("CXX").unwrap_or_else(|| "c++".into()))
+                .arg("-dynamiclib")
+                .arg(&source)
+                .arg("-o")
+                .arg(&dylib),
+        )?;
+        let rust = root.join("main.rs");
+        fs::write(
+            &rust,
+            "unsafe extern \"C\" { fn native_value() -> i32; } fn main() { assert_eq!(unsafe { native_value() }, 73); }",
+        )?;
+        let mut link = NativeLink {
+            target_os: Some("macos"),
+            ..NativeLink::default()
+        };
+        record_linked_file(cmake_path(&dylib)?, &mut link)?;
+        let executable = root.join("consumer");
+        let mut command = Command::new("rustc");
+        command.arg(&rust).arg("-o").arg(&executable);
+        for dir in &link.search_dirs {
+            command.arg("-L").arg(format!("native={}", dir.display()));
+        }
+        for library in &link.libraries {
+            command.arg("-l").arg(library);
+        }
+        run(&mut command)?;
+        run(&mut Command::new(&executable))?;
+        Ok(())
+    }
+
+    #[gtest]
+    fn compile_only_target_and_sdk_overrides_cannot_diverge_from_native_context()
+    -> googletest::Result<()> {
+        let fixture = tempfile::tempdir()?;
+        let root = fixture.path().canonicalize()?;
+        let other = root.join("other.sdk");
+        fs::create_dir(&other)?;
+        let mut headers = HeaderContext {
+            sysroot: Some(root.clone()),
+            ..HeaderContext::default()
+        };
+        for flags in [
+            "-arch x86_64".to_owned(),
+            "-target x86_64-apple-darwin".to_owned(),
+            "--target=x86_64-apple-darwin".to_owned(),
+            format!("-isysroot {}", other.display()),
+            format!("--sysroot={}", other.display()),
+        ] {
+            headers.frontend_flags = split_flags(&flags)?;
+            expect_true!(
+                validate_header_context(&headers, "aarch64-apple-darwin").is_err(),
+                "admitted {flags}"
+            );
+        }
+        for flags in [
+            "-arch arm64".to_owned(),
+            "-target arm64-apple-darwin25.0.0".to_owned(),
+            "--target=aarch64-apple-darwin".to_owned(),
+            format!("-isysroot {}", root.display()),
+            format!("--sysroot={}", root.display()),
+        ] {
+            headers.frontend_flags = split_flags(&flags)?;
+            validate_header_context(&headers, "aarch64-apple-darwin")?;
+        }
+        Ok(())
+    }
+    #[cfg(unix)]
+    #[gtest]
+    fn imported_header_identity_survives_compiler_implicit_include_suppression()
+    -> googletest::Result<()> {
+        use std::os::unix::fs::PermissionsExt as _;
+
+        if let Some(prefix) = env::var_os("QUEST_IMPLICIT_INCLUDE_CHILD") {
+            let prefix = PathBuf::from(prefix).canonicalize()?;
+            let work = tempfile::tempdir()?;
+            let host = fixture_host()?;
+            let result = discover(work.path(), &host, &host, None);
+            if env::var_os("QUEST_IMPLICIT_NO_EXPORT").is_some() {
+                expect_that!(
+                    result.unwrap_err().to_string(),
+                    contains_substring("did not supply installed include/quest.h")
+                );
+                return Ok(());
+            }
+            let package = result?;
+            expect_eq!(&package.prefix, &prefix);
+            expect_that!(
+                &package.headers.include_dirs,
+                contains(eq(&prefix.join("include")))
+            );
+            expect_that!(
+                &package.headers.implicit_include_dirs,
+                contains(eq(&prefix.join("include")))
+            );
+            return Ok(());
+        }
+        let fixture = tempfile::tempdir()?;
+        let prefix = fixture.path().join("package");
+        fixture_package(&prefix)?;
+        let compiler = env::var_os("CXX").unwrap_or_else(|| "c++".into());
+        let compiler = if Path::new(&compiler).is_absolute() {
+            PathBuf::from(compiler)
+        } else {
+            env::split_paths(&env::var_os("PATH").ok_or_else(|| invalid("missing PATH"))?)
+                .map(|dir| dir.join(&compiler))
+                .find(|path| path.is_file())
+                .ok_or_else(|| invalid("missing compiler"))?
+        };
+        let wrapper = fixture.path().join("cxx-wrapper");
+        let quote = |value: &Path| format!("'{}'", value.to_string_lossy().replace('\'', "'\\''"));
+        fs::write(
+            &wrapper,
+            format!(
+                "#!/bin/sh\nexec {} -isystem {} \"$@\"\n",
+                quote(&compiler),
+                quote(&prefix.join("include").canonicalize()?)
+            ),
+        )?;
+        fs::set_permissions(&wrapper, fs::Permissions::from_mode(0o755))?;
+        let mut command = Command::new(env::current_exe()?);
+        command.args(["--exact", "probe::tests::imported_header_identity_survives_compiler_implicit_include_suppression", "--nocapture"])
+            .env("QUEST_IMPLICIT_INCLUDE_CHILD", &prefix).env("QUEST_ROOT", &prefix).env("CXX", &wrapper);
+        for key in ["QUEST_DIR", "QuEST_DIR", "QuEST_ROOT"] {
+            command.env_remove(key);
+        }
+        let output = run(&mut command)?;
+        expect_that!(
+            String::from_utf8_lossy(&output.stdout),
+            contains_substring(format!(
+                "cargo:rerun-if-changed={}/include/quest.h",
+                prefix.canonicalize()?.display()
+            ))
+        );
+        let config = prefix.join("lib/cmake/QuEST/QuESTConfig.cmake");
+        let source = fs::read_to_string(&config)?;
+        fs::write(
+            &config,
+            source.replace(
+                "  INTERFACE_INCLUDE_DIRECTORIES \"${fixture_prefix}/include\"\n",
+                "",
+            ),
+        )?;
+        command.env("QUEST_IMPLICIT_NO_EXPORT", "1");
+        run(&mut command)?;
         Ok(())
     }
 }

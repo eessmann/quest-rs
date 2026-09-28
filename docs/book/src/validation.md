@@ -8,7 +8,18 @@ cargo test -p quest-language --locked
 cargo test -p quest-qasm --locked
 ```
 
-Native examples require installed QuEST 4.3.x, binary64 precision, deprecated APIs disabled, CMake, and a C++20 compiler. Set `QUEST_ROOT` to an installation exporting `QuEST::QuEST` whose native runtime dependencies are resolvable. The repository root README describes standard CMake selection and the final-executable link helper; no JSON native record is required. Once configured:
+Native examples need CMake 3.28+, a C++20 compiler and an installed QuEST
+4.3.x package with binary64 precision and deprecated APIs disabled. From the
+repository root, `devenv shell` supplies the pinned toolchain and a shared
+CPU/OpenMP QuEST package; `devenv build outputs.quest` builds that package, and
+`devenv test` runs the minimal native example. The full workspace also uses the
+shell's serial HDF5. The native recipes target Linux GNU and aarch64/x86_64
+Darwin; each architecture needs separate runtime validation.
+
+For a manual installation, set `QUEST_ROOT` to a package exporting
+`QuEST::QuEST` whose native dependencies resolve, and set `HDF5_DIR` for the
+full workspace. The repository root README describes CMake selection and the
+final-executable link helper. Once configured:
 
 ```sh
 cargo run -p quest-rs --example tutorials --locked
@@ -62,7 +73,7 @@ cargo nextest run -p quest-rs --test qsvt_runtime --features qsvt --locked
 
 ## Optional real workers
 
-Build a worker explicitly, then pass its absolute path. The client does not search PATH or silently substitute an engine:
+The optional optimizer process client runs on Linux only; macOS returns a capability error. Linux worker execution requires `/usr/bin/prlimit` specifically, including when another `prlimit` is on `PATH`. On a supported Linux host, build a worker explicitly, then pass its absolute path. The client does not search PATH or silently substitute an engine:
 
 ```sh
 cargo build -p quest-optimizer-worker --features synthesis,zx --locked

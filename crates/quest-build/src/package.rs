@@ -1,4 +1,4 @@
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::path::PathBuf;
 
@@ -15,6 +15,10 @@ pub struct BridgeInputs {
 #[derive(Clone, Debug, Default)]
 pub struct HeaderContext {
     pub include_dirs: Vec<PathBuf>,
+    /// Evaluated compiler implicit system includes (including the C++ library).
+    pub implicit_include_dirs: Vec<PathBuf>,
+    /// Evaluated Darwin SDK shared by `CMake` and binding generation.
+    pub sysroot: Option<PathBuf>,
     pub system_include_dirs: Vec<PathBuf>,
     pub definitions: Vec<String>,
     pub frontend_flags: Vec<String>,
@@ -23,6 +27,8 @@ pub struct HeaderContext {
 /// An installed package and its evaluated consumer requirements.
 #[derive(Clone, Debug)]
 pub struct NativePackage {
+    /// Validated native Cargo target triple.
+    pub target: String,
     pub prefix: PathBuf,
     pub version: String,
     pub mpi_enabled: bool,
@@ -33,6 +39,7 @@ pub struct NativePackage {
     pub headers: HeaderContext,
     pub library: PathBuf,
     pub link_search_dirs: Vec<PathBuf>,
+    pub framework_search_dirs: Vec<PathBuf>,
     pub link_libraries: Vec<String>,
     pub link_options: Vec<String>,
     pub runtime_library_dirs: Vec<PathBuf>,
@@ -80,6 +87,9 @@ impl NativePackage {
         for directory in &self.link_search_dirs {
             println!("cargo:rustc-link-search=native={}", directory.display());
         }
+        for directory in &self.framework_search_dirs {
+            println!("cargo:rustc-link-search=framework={}", directory.display());
+        }
         for library in &self.link_libraries {
             println!("cargo:rustc-link-lib={library}");
         }
@@ -103,14 +113,33 @@ impl NativePackage {
     /// # Errors
     /// Returns an error when a runtime directory cannot be safely represented.
     pub fn emit_runtime_paths(&self) -> Result<()> {
-        for option in &self.link_options {
-            println!("cargo:rustc-link-arg={option}");
-        }
-        for option in runtime_link_args("linux", &self.runtime_library_dirs)? {
+        for option in runtime_options(&self.target, &self.link_options, &self.runtime_library_dirs)?
+        {
             println!("cargo:rustc-link-arg={option}");
         }
         Ok(())
     }
+}
+
+fn runtime_options(
+    target: &str,
+    link_options: &[String],
+    directories: &[PathBuf],
+) -> Result<Vec<String>> {
+    let target_os = if target.ends_with("-apple-darwin") {
+        "macos"
+    } else {
+        "linux"
+    };
+    let mut options = link_options.to_vec();
+    options.extend(runtime_link_args(target_os, directories)?);
+    if target_os == "macos" {
+        let mut seen_rpaths = BTreeSet::new();
+        options.retain(|option| {
+            !option.starts_with("-Wl,-rpath,") || seen_rpaths.insert(option.clone())
+        });
+    }
+    Ok(options)
 }
 
 pub fn validate_library_resolution(
@@ -120,7 +149,20 @@ pub fn validate_library_resolution(
     for (name, expected) in files {
         let first = directories
             .iter()
-            .map(|directory| directory.join(name))
+            .flat_map(|directory| {
+                // ld64 prefers a text stub to the dylib in the same directory.
+                // A matching earlier archive also shadows a later dylib.
+                name.strip_suffix(".dylib").map_or_else(
+                    || vec![directory.join(name)],
+                    |stem| {
+                        vec![
+                            directory.join(format!("{stem}.tbd")),
+                            directory.join(name),
+                            directory.join(format!("{stem}.a")),
+                        ]
+                    },
+                )
+            })
             .find(|candidate| candidate.is_file())
             .ok_or_else(|| {
                 invalid(format!(
@@ -155,6 +197,7 @@ mod tests {
         let library = native.join("libsame.so");
         fs::write(&library, "selected").or_fail()?;
         let mut package = NativePackage {
+            target: "x86_64-unknown-linux-gnu".into(),
             prefix: fixture.path().to_owned(),
             version: "4.3.9".into(),
             mpi_enabled: false,
@@ -165,17 +208,91 @@ mod tests {
             headers: HeaderContext::default(),
             library: library.clone(),
             link_search_dirs: vec![native],
+            framework_search_dirs: Vec::new(),
             link_libraries: Vec::new(),
             link_options: Vec::new(),
             runtime_library_dirs: Vec::new(),
             bridge_archive: Some(bridge.join("libquest_bridge.a")),
             build_directory: PathBuf::new(),
             mpi_probe: PathBuf::new(),
-            exact_library_files: BTreeMap::from([("libsame.so".to_owned(), library)]),
+            exact_library_files: BTreeMap::from([(
+                "libsame.so".to_owned(),
+                library.canonicalize().or_fail()?,
+            )]),
         };
         expect_that!(package.validate_link_search().is_err(), eq(true));
         package.bridge_archive = None;
         package.validate_link_search().or_fail()?;
+        Ok(())
+    }
+    #[gtest]
+    fn darwin_archive_in_earlier_search_directory_cannot_shadow_selected_dylib()
+    -> googletest::Result<()> {
+        let fixture = tempfile::tempdir()?;
+        let earlier = fixture.path().join("earlier");
+        let selected = fixture.path().join("selected");
+        fs::create_dir_all(&earlier)?;
+        fs::create_dir_all(&selected)?;
+        fs::write(earlier.join("libsame.7.a"), "archive")?;
+        let dylib = selected.join("libsame.7.dylib");
+        fs::write(&dylib, "selected")?;
+        expect_true!(
+            validate_library_resolution(
+                &[earlier, selected],
+                &BTreeMap::from([("libsame.7.dylib".into(), dylib.canonicalize()?)])
+            )
+            .is_err()
+        );
+        Ok(())
+    }
+    #[gtest]
+    fn darwin_text_stub_beside_selected_dylib_is_rejected() -> googletest::Result<()> {
+        let fixture = tempfile::tempdir()?;
+        let dylib = fixture.path().join("libsame.7.dylib");
+        fs::write(&dylib, "selected")?;
+        fs::write(fixture.path().join("libsame.7.tbd"), "shadow")?;
+        expect_true!(
+            validate_library_resolution(
+                &[fixture.path().to_owned()],
+                &BTreeMap::from([("libsame.7.dylib".into(), dylib.canonicalize()?)])
+            )
+            .is_err()
+        );
+        Ok(())
+    }
+    #[gtest]
+    fn darwin_runtime_paths_are_unique_across_evaluated_and_direct_options()
+    -> googletest::Result<()> {
+        let evaluated = vec![
+            "-Wl,-rpath,/opt/quest/lib".into(),
+            "-pthread".into(),
+            "-Wl,-rpath,/opt/other/lib".into(),
+            "-pthread".into(),
+            "-Wl,-rpath,/opt/quest/lib".into(),
+        ];
+        let directories = vec![
+            PathBuf::from("/opt/quest/lib"),
+            PathBuf::from("/opt/omp/lib"),
+        ];
+        expect_eq!(
+            runtime_options("aarch64-apple-darwin", &evaluated, &directories)?,
+            vec![
+                "-Wl,-rpath,/opt/quest/lib",
+                "-pthread",
+                "-Wl,-rpath,/opt/other/lib",
+                "-pthread",
+                "-Wl,-rpath,/opt/omp/lib"
+            ]
+        );
+        let linux = runtime_options("x86_64-unknown-linux-gnu", &evaluated, &directories)?;
+        expect_eq!(&linux[..evaluated.len()], evaluated.as_slice());
+        expect_eq!(
+            &linux[evaluated.len()..],
+            &[
+                "-Wl,--enable-new-dtags",
+                "-Wl,-rpath,/opt/quest/lib:/opt/omp/lib"
+            ]
+        );
         Ok(())
     }
 }

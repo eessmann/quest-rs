@@ -34,7 +34,7 @@ pub enum BuildError {
     #[error("invalid native configuration: {0}")]
     InvalidConfiguration(String),
     #[error(
-        "native QuEST discovery supports native Linux GNU targets only; host={host}, target={target}; cross compilation requires a separately implemented target toolchain and loader recipe"
+        "native QuEST discovery supports native Linux GNU and Apple Darwin targets only; host={host}, target={target}; cross compilation requires a separately implemented target toolchain and loader recipe"
     )]
     UnsupportedTarget { host: String, target: String },
     #[error("{program} failed ({status}):\n{output}")]
@@ -146,13 +146,20 @@ fn watch_environment() {
         "LD_LIBRARY_PATH",
         "LD_PRELOAD",
         "LD_AUDIT",
+        "SDKROOT",
+        "DYLD_LIBRARY_PATH",
+        "DYLD_FALLBACK_LIBRARY_PATH",
+        "DYLD_INSERT_LIBRARIES",
     ]) {
         println!("cargo:rerun-if-env-changed={name}");
     }
 }
 
 pub(crate) fn validate_target(host: &str, target: &str) -> Result<()> {
-    if host != target || !target.ends_with("-linux-gnu") {
+    if host != target
+        || !(target.ends_with("-linux-gnu")
+            || matches!(target, "aarch64-apple-darwin" | "x86_64-apple-darwin"))
+    {
         return Err(BuildError::UnsupportedTarget {
             host: host.into(),
             target: target.into(),
@@ -194,12 +201,14 @@ fn compiler_override_variables(target: &str) -> Vec<String> {
             "GCC_EXEC_PREFIX",
             "COMPILER_PATH",
             "LIBRARY_PATH",
-            "SDKROOT",
             "CRATE_CC_NO_DEFAULTS",
         ]
         .into_iter()
         .map(str::to_owned),
     );
+    if !target.ends_with("-apple-darwin") {
+        names.push("SDKROOT".into());
+    }
     names
 }
 
@@ -315,7 +324,7 @@ pub(crate) fn parse_header_configuration(header: &str) -> Result<HeaderConfigura
 /// Returns an error for unsupported targets, relative or non-UTF-8 paths, or
 /// paths containing characters that cannot be represented safely.
 pub fn runtime_link_args(target_os: &str, directories: &[PathBuf]) -> Result<Vec<String>> {
-    if target_os != "linux" {
+    if !matches!(target_os, "linux" | "macos") {
         return Err(invalid(format!(
             "no verified runtime loader recipe for {target_os}"
         )));
@@ -338,10 +347,17 @@ pub fn runtime_link_args(target_os: &str, directories: &[PathBuf]) -> Result<Vec
             Ok(text)
         })
         .collect::<Result<Vec<_>>>()?;
-    Ok(vec![
-        "-Wl,--enable-new-dtags".into(),
-        format!("-Wl,-rpath,{}", paths.join(":")),
-    ])
+    if target_os == "macos" {
+        Ok(paths
+            .into_iter()
+            .map(|path| format!("-Wl,-rpath,{path}"))
+            .collect())
+    } else {
+        Ok(vec![
+            "-Wl,--enable-new-dtags".into(),
+            format!("-Wl,-rpath,{}", paths.join(":")),
+        ])
+    }
 }
 
 pub(crate) fn explicit_prefix() -> Result<Option<PathBuf>> {
@@ -564,6 +580,27 @@ mod tests {
                 eq(&directory.path().canonicalize().or_fail()?)
             );
         }
+        Ok(())
+    }
+    #[gtest]
+    fn native_darwin_targets_and_individual_rpaths_are_supported() -> googletest::Result<()> {
+        for target in ["aarch64-apple-darwin", "x86_64-apple-darwin"] {
+            expect_true!(validate_target(target, target).is_ok());
+        }
+        expect_true!(validate_target("aarch64-apple-darwin", "x86_64-apple-darwin").is_err());
+        expect_true!(
+            validate_target("x86_64-unknown-linux-musl", "x86_64-unknown-linux-musl").is_err()
+        );
+        expect_eq!(
+            runtime_link_args(
+                "macos",
+                &[
+                    PathBuf::from("/opt/quest/lib"),
+                    PathBuf::from("/opt/omp/lib")
+                ]
+            )?,
+            vec!["-Wl,-rpath,/opt/quest/lib", "-Wl,-rpath,/opt/omp/lib"]
+        );
         Ok(())
     }
 }

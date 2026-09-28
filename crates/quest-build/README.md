@@ -1,10 +1,12 @@
 # quest-build
 
 Installed-QuEST discovery, CMake bridge compilation and final-executable linking.
-The supported recipe is native Linux GNU, QuEST **4.3.x**, binary64 precision,
-deprecated APIs disabled, CMake 3.24+ and a C++20 compiler. Cross compilation,
-macOS, Windows, relocatable application bundles and stateful static-linker groups
-require separate verified recipes and fail explicitly when unsupported.
+The supported recipes are native Linux GNU and native `aarch64-apple-darwin` or
+`x86_64-apple-darwin`, QuEST **4.3.x**, binary64 precision, deprecated APIs disabled,
+CMake 3.28+ and a C++20 compiler. Darwin development uses shared CPU/OpenMP QuEST;
+MPI and GPU deployments are not covered by the Darwin recipe. Cross compilation,
+Windows, relocatable application bundles and stateful static-linker groups
+remain unsupported.
 
 ## Select an installed package
 
@@ -18,6 +20,12 @@ cargo build --workspace --locked
 `QuEST_ROOT` aliases remain supported. Conflicting explicit selections fail.
 Package discovery and compilation share the selected compiler and build profile.
 The compiled admission source verifies the supported version and configuration.
+On Darwin, `SDKROOT` must name an absolute installed macOS SDK; when absent,
+`xcrun --sdk macosx --show-sdk-path` selects it. The validated SDK is supplied as
+`CMAKE_OSX_SYSROOT` and shared with binding generation together with the evaluated
+compiler implicit system includes. Global `CXX` can select a Nix compiler wrapper;
+per-target compiler and header-search overrides remain rejected. Compiler target
+checks normalize Clang `arm64` to Rust `aarch64` on Darwin.
 
 CXX generates the bridge sources; `cmake` builds a static C++20 archive linked
 against `QuEST::QuEST`. This lets CMake evaluate compile features, system includes,
@@ -73,7 +81,11 @@ fn main() -> quest_build::Result<()> {
 Despite its retained name, the helper emits both required evaluated native link
 options and direct-library runtime paths. It and `quest-sys` must use the same
 package selection and compiler configuration. Linux executables use ordinary
-`DT_RUNPATH`; indirect dependency deployment is the native installation's
+`DT_RUNPATH`; Darwin executables receive one Mach-O `LC_RPATH` per absolute
+direct-library directory. Evaluated `.dylib` files retain their exact filename,
+and framework pairs preserve library order. The serial HDF5 helper selects
+`libhdf5.dylib` on Darwin while retaining its parallel-HDF5 rejection.
+Indirect dependency deployment is the native installation's
 responsibility. Unsupported linker-state constructs produce an error instead of
 silently changing link semantics.
 
@@ -84,9 +96,9 @@ cargo run --locked -p xtask -- check-native-consumers
 ```
 
 The Rust harness builds an independent workspace containing direct `quest-sys`,
-facade, wrapped and renamed consumers. It inspects ELF dynamic tags and resolved
-libraries, then runs their quantum checks outside Cargo with `LD_LIBRARY_PATH`,
-`LD_PRELOAD` and `LD_AUDIT` removed. These loader tools are acceptance dependencies,
+facade, wrapped and renamed consumers. It inspects platform loader metadata and resolved
+libraries, then runs quantum checks outside Cargo with loader overrides removed.
+Linux acceptance inspects ELF dynamic tags; Darwin acceptance uses Mach-O tools. These loader tools are acceptance dependencies,
 not production discovery dependencies. `--work-dir PATH` selects the preserved
 fixture/log directory. Actual GPU execution is separate from resolving GPU
 runtime libraries.

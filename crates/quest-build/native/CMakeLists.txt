@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.24)
 project(quest_rust_bridge LANGUAGES CXX)
+file(WRITE "${CMAKE_BINARY_DIR}/quest-sysroot.txt" "${CMAKE_OSX_SYSROOT}\n")
 find_package(QuEST 4.3 REQUIRED CONFIG)
 if(NOT TARGET QuEST::QuEST)
     message(FATAL_ERROR "The installed package does not export QuEST::QuEST")
@@ -20,6 +21,12 @@ set_target_properties(quest_bridge PROPERTIES POSITION_INDEPENDENT_CODE ON)
 add_executable(quest_link_query EXCLUDE_FROM_ALL query.cpp)
 target_compile_features(quest_link_query PRIVATE cxx_std_20)
 target_link_libraries(quest_link_query PRIVATE QuEST::QuEST ${CMAKE_DL_LIBS})
+# The codemodel omits include directories that the compiler already treats as
+# implicit (for example a Nix wrapper). Preserve the imported target's evaluated
+# include interface so discovery retains package identity in that environment.
+file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/quest-includes-$<CONFIG>.txt"
+    CONTENT "$<JOIN:$<TARGET_GENEX_EVAL:QuEST::QuEST,$<TARGET_PROPERTY:QuEST::QuEST,INTERFACE_INCLUDE_DIRECTORIES>>,\n>\n"
+    TARGET quest_link_query)
 file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/quest-library-$<CONFIG>.txt"
     CONTENT "$<TARGET_FILE:QuEST::QuEST>\n")
 # Built only when the Rust rsmpi feature requests an ABI/link-identity witness.

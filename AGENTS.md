@@ -11,9 +11,9 @@
 
 ## Build, Test, and Development Commands
 
-Use the pinned nightly-2026-09-06, CMake, a C++20 compiler, and an installed QuEST 4.3.x package. Set `export QUEST_ROOT=/path/to/quest`; `QUEST_DIR` or `CMAKE_PREFIX_PATH` also work. The bridge requires double precision and deprecated QuEST APIs disabled. Generation additionally needs libclang; set `LIBCLANG_PATH` if discovery fails.
+Use the pinned nightly-2026-09-06, CMake 3.28+, a C++20 compiler, and an installed QuEST 4.3.x package. The standalone `devenv shell` provisions these, the `cmake-packaging` QuEST source pinned in `devenv.lock`, and serial HDF5 for the full workspace. Its shared CPU/OpenMP QuEST build uses binary64 precision with deprecated APIs, MPI, and GPU disabled. Run `devenv build outputs.quest` to build QuEST, `devenv test` for the native minimal example, and `devenv update quest-src` only when intentionally refreshing that source. Optional `devenv allow` uses existing native shell integration; no `.envrc` is needed. Manual installed packages remain supported: set `QUEST_ROOT=/path/to/quest`, or use `QUEST_DIR` or `CMAKE_PREFIX_PATH`, and set `HDF5_DIR` for full-workspace builds. Generation additionally needs matching Clang and libclang; set `LIBCLANG_PATH` if discovery fails.
 
-Run from the repository root:
+Run from the repository root inside `devenv shell` or a configured manual environment. Native recipes target Linux GNU and aarch64/x86_64 Darwin; validate each architecture separately. The optional optimizer process client remains Linux-only.
 
 - `cargo build --workspace --locked`: build all crates and native bridges.
 - `cargo nextest run --workspace --locked`: run unit and integration tests.

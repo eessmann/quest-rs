@@ -138,12 +138,10 @@ fn clang_arguments(
         args.push(resource_dir.display().to_string());
     }
 
-    if let Some(target) = clang_target(&package.compiler) {
-        args.push("-target".to_owned());
-        args.push(target);
-    }
+    args.push("-target".to_owned());
+    args.push(package.target.clone());
 
-    if let Some(sdk_path) = macos_sdk_path() {
+    if let Some(sdk_path) = parser_sysroot(&package.headers, macos_sdk_path) {
         args.push("-isysroot".to_owned());
         args.push(sdk_path.display().to_string());
         let sdk_include = sdk_path.join("usr").join("include");
@@ -171,14 +169,19 @@ fn clang_major_version(version: &str) -> Option<u32> {
         .ok()
 }
 
-fn clang_target(compiler: &Path) -> Option<String> {
-    let output = Command::new(compiler).arg("-dumpmachine").output().ok()?;
-    if !output.status.success() {
-        return None;
+fn manifest_canonical_type(ty: &str) -> String {
+    if ty == "std::string" {
+        "std::basic_string<char>".to_owned()
+    } else {
+        ty.to_owned()
     }
+}
 
-    let target = String::from_utf8(output.stdout).ok()?.trim().to_owned();
-    (!target.is_empty()).then_some(target)
+fn parser_sysroot(
+    headers: &quest_build::HeaderContext,
+    fallback: impl FnOnce() -> Option<PathBuf>,
+) -> Option<PathBuf> {
+    headers.sysroot.clone().or_else(fallback)
 }
 
 fn macos_sdk_path() -> Option<PathBuf> {
@@ -236,6 +239,12 @@ fn header_context_arguments(headers: &quest_build::HeaderContext) -> Vec<String>
         arguments.push("-isystem".to_owned());
         arguments.push(include.display().to_string());
     }
+    for include in &headers.implicit_include_dirs {
+        if !headers.system_include_dirs.contains(include) {
+            arguments.push("-isystem".to_owned());
+            arguments.push(include.display().to_string());
+        }
+    }
     for definition in &headers.definitions {
         if definition.starts_with("-D") {
             arguments.push(definition.clone());
@@ -243,7 +252,20 @@ fn header_context_arguments(headers: &quest_build::HeaderContext) -> Vec<String>
             arguments.push(format!("-D{definition}"));
         }
     }
-    arguments.extend(headers.frontend_flags.iter().cloned());
+    let mut flags = headers.frontend_flags.iter();
+    while let Some(flag) = flags.next() {
+        match flag.as_str() {
+            "-arch" | "-target" | "--target" => {
+                flags.next();
+            }
+            "-isysroot" | "--sysroot" if headers.sysroot.is_some() => {
+                flags.next();
+            }
+            _ if flag.starts_with("-isysroot=") && headers.sysroot.is_some() => {}
+            _ if flag.starts_with("--target=") => {}
+            _ => arguments.push(flag.clone()),
+        }
+    }
     arguments
 }
 
@@ -314,7 +336,8 @@ fn api_item_from_entity(entity: Entity<'_>, include_root: &Path) -> Option<ApiIt
         .to_string();
     let result_type = entity.get_result_type()?;
     let result_type_name = result_type.get_display_name();
-    let result_canonical_type = result_type.get_canonical_type().get_display_name();
+    let result_canonical_type =
+        manifest_canonical_type(&result_type.get_canonical_type().get_display_name());
     let arguments = entity
         .get_arguments()
         .unwrap_or_default()
@@ -328,7 +351,9 @@ fn api_item_from_entity(entity: Entity<'_>, include_root: &Path) -> Option<ApiIt
                     .filter(|name| !name.is_empty())
                     .unwrap_or_else(|| format!("arg{index}")),
                 ty: ty.get_display_name(),
-                canonical_type: ty.get_canonical_type().get_display_name(),
+                canonical_type: manifest_canonical_type(
+                    &ty.get_canonical_type().get_display_name(),
+                ),
             })
         })
         .collect::<Option<Vec<_>>>()?;
@@ -403,8 +428,10 @@ mod tests {
         let headers = quest_build::HeaderContext {
             include_dirs: vec![PathBuf::from("/opt/QuEST install/include")],
             system_include_dirs: vec![PathBuf::from("/opt/MPI include")],
+            implicit_include_dirs: vec![PathBuf::from("/opt/LLVM include")],
             definitions: vec!["QUEST_MPI=1".to_owned()],
             frontend_flags: vec!["-pthread".to_owned()],
+            sysroot: Some(PathBuf::from("/opt/macOS SDK")),
         };
 
         verify_that!(
@@ -413,9 +440,58 @@ mod tests {
                 eq("-I/opt/QuEST install/include"),
                 eq("-isystem"),
                 eq("/opt/MPI include"),
+                eq("-isystem"),
+                eq("/opt/LLVM include"),
                 eq("-DQUEST_MPI=1"),
                 eq("-pthread")
             ]
+        )
+    }
+
+    #[gtest]
+    fn evaluated_sysroot_takes_precedence_over_fallback() -> googletest::Result<()> {
+        let headers = quest_build::HeaderContext {
+            sysroot: Some(PathBuf::from("/opt/evaluated SDK")),
+            ..Default::default()
+        };
+        let mut fallback_called = false;
+        let sysroot = parser_sysroot(&headers, || {
+            fallback_called = true;
+            Some(PathBuf::from("/opt/ambient SDK"))
+        });
+        expect_that!(fallback_called, eq(false));
+        verify_that!(sysroot, some(eq(&PathBuf::from("/opt/evaluated SDK"))))
+    }
+
+    #[gtest]
+    fn evaluated_target_and_sysroot_are_not_repeated_from_cmake_flags() -> googletest::Result<()> {
+        let headers = quest_build::HeaderContext {
+            sysroot: Some(PathBuf::from("/opt/macOS SDK")),
+            frontend_flags: vec![
+                "-arch".into(),
+                "arm64".into(),
+                "-isysroot".into(),
+                "/opt/macOS SDK".into(),
+                "-mmacosx-version-min=14.0".into(),
+            ],
+            ..Default::default()
+        };
+        verify_that!(
+            header_context_arguments(&headers),
+            elements_are![eq("-mmacosx-version-min=14.0")]
+        )
+    }
+
+    #[gtest]
+    fn manifest_canonical_string_spelling_is_independent_of_standard_library()
+    -> googletest::Result<()> {
+        expect_that!(
+            manifest_canonical_type("std::string"),
+            eq("std::basic_string<char>")
+        );
+        verify_that!(
+            manifest_canonical_type("std::basic_string<char>"),
+            eq("std::basic_string<char>")
         )
     }
 

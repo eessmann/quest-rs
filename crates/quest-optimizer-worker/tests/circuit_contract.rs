@@ -1,4 +1,4 @@
-#![cfg(any(feature = "synthesis", feature = "zx"))]
+#![cfg(all(target_os = "linux", any(feature = "synthesis", feature = "zx")))]
 use googletest::prelude::*;
 #[cfg(feature = "synthesis")]
 use quest_circuit::{Angle, Control, ControlState};

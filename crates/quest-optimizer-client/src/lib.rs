@@ -73,6 +73,7 @@ pub enum MitmResult<T> {
 /// Explicit executable path; no search of untrusted working directories.
 #[derive(Debug, Clone)]
 pub struct Client {
+    #[cfg(target_os = "linux")]
     executable: PathBuf,
     limits: WorkerLimits,
 }
@@ -89,13 +90,18 @@ impl Client {
         {
             return Err(Error::Limits);
         }
-        if !cfg!(target_os = "linux") {
-            return Err(Error::Capability("Linux prlimit enforcement required"));
+        #[cfg(not(target_os = "linux"))]
+        {
+            drop(executable);
+            Err(Error::Capability("Linux prlimit enforcement required"))
         }
-        Ok(Self {
-            executable: executable.into(),
-            limits,
-        })
+        #[cfg(target_os = "linux")]
+        {
+            Ok(Self {
+                executable: executable.into(),
+                limits,
+            })
+        }
     }
     /// Obtain an untrusted response. Use `synthesize`/`optimize_zx` for admission.
     /// # Errors
@@ -119,6 +125,7 @@ impl Client {
         Ok(response.outcome)
     }
     #[cfg(not(target_os = "linux"))]
+    #[allow(clippy::unused_self)] // Keep the same receiver as the Linux implementation.
     fn run(&self, _bytes: Vec<u8>) -> Result<Vec<u8>, Error> {
         Err(Error::Capability("Linux prlimit enforcement required"))
     }

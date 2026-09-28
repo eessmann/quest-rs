@@ -15,7 +15,7 @@ use std::{
 ///
 /// # Errors
 /// Reports missing headers/libraries, parallel HDF5, unsupported targets or
-/// paths that the supported Linux linker interface cannot represent.
+/// paths that the supported native linker interface cannot represent.
 pub fn emit_serial_hdf5_runtime_paths() -> Result<()> {
     for key in [
         "HDF5_DIR",
@@ -48,9 +48,19 @@ pub fn emit_serial_hdf5_runtime_paths() -> Result<()> {
         .ok_or_else(|| invalid("serial HDF5 headers were not found; set HDF5_DIR to the same prefix used by hdf5-metno"))?;
     check_serial_header(&header)?;
     println!("cargo::rerun-if-changed={}", header.display());
+    let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap_or_default();
+    let library_name = match target_os.as_str() {
+        "linux" => "libhdf5.so",
+        "macos" => "libhdf5.dylib",
+        _ => {
+            return Err(invalid(
+                "serial HDF5 loader support requires Linux or macOS",
+            ));
+        }
+    };
     let mut directories = Vec::new();
     for directory in libraries {
-        let library = directory.join("libhdf5.so");
+        let library = directory.join(library_name);
         if library.is_file() {
             println!("cargo::rerun-if-changed={}", library.display());
             directories.push(directory);
@@ -58,14 +68,11 @@ pub fn emit_serial_hdf5_runtime_paths() -> Result<()> {
     }
     // pkg-config omits standard system search directories. They need no RUNPATH.
     if env::var_os("HDF5_DIR").is_some() && directories.is_empty() {
-        return Err(invalid(
-            "HDF5_DIR must contain a shared serial libhdf5.so in lib (matching hdf5-metno discovery)",
-        ));
+        return Err(invalid(format!(
+            "HDF5_DIR must contain a shared serial {library_name} in lib (matching hdf5-metno discovery)"
+        )));
     }
-    for argument in runtime_link_args(
-        &env::var("CARGO_CFG_TARGET_OS").unwrap_or_default(),
-        &directories,
-    )? {
+    for argument in runtime_link_args(&target_os, &directories)? {
         println!("cargo::rustc-link-arg={argument}");
     }
     Ok(())
@@ -138,6 +145,38 @@ mod tests {
             ]
         );
         expect_true!(flag_paths(b"-L", "-L").is_err());
+        Ok(())
+    }
+    #[gtest]
+    fn darwin_serial_hdf5_emits_a_direct_dylib_runtime_path() -> googletest::Result<()> {
+        if env::var_os("QUEST_HDF5_DARWIN_CHILD").is_some() {
+            emit_serial_hdf5_runtime_paths()?;
+            return Ok(());
+        }
+        let directory = tempfile::tempdir()?;
+        fs::create_dir_all(directory.path().join("include"))?;
+        fs::create_dir_all(directory.path().join("lib"))?;
+        fs::write(directory.path().join("include/H5pubconf.h"), "/* serial */")?;
+        fs::write(directory.path().join("lib/libhdf5.dylib"), "fixture")?;
+        let output = Command::new(env::current_exe()?)
+            .args([
+                "--exact",
+                "hdf5::tests::darwin_serial_hdf5_emits_a_direct_dylib_runtime_path",
+                "--nocapture",
+            ])
+            .env("QUEST_HDF5_DARWIN_CHILD", "1")
+            .env("HDF5_DIR", directory.path())
+            .env("CARGO_CFG_TARGET_OS", "macos")
+            .output()?;
+        expect_true!(
+            output.status.success(),
+            "{}",
+            String::from_utf8_lossy(&output.stdout)
+        );
+        expect_that!(
+            String::from_utf8_lossy(&output.stdout),
+            contains_substring(format!("-Wl,-rpath,{}/lib", directory.path().display()))
+        );
         Ok(())
     }
 }
