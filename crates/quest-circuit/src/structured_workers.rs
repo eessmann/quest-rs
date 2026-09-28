@@ -378,8 +378,15 @@ fn bound(
                     return None;
                 }
                 K::Call { region, .. } => {
+                    let callee = program.regions.get(region.index())?;
+                    // Captured oracles have empty SSA placeholder regions. Their
+                    // numerical bodies have no composed unitary/norm certificate,
+                    // so summing local errors through them is not justified.
+                    if callee.oracle.is_some() {
+                        return None;
+                    }
                     count = count.checked_add(visit(
-                        program.regions.get(region.index())?.entry,
+                        callee.entry,
                         program,
                         weights,
                         memo,
