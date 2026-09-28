@@ -1,6 +1,7 @@
 use crate::types::MathError;
-use num_bigint::BigInt;
-use num_rational::BigRational;
+use legacy_bigint::BigInt;
+use num_rational::Ratio;
+type BigRational = Ratio<BigInt>;
 use num_traits::{FromPrimitive, One, Signed, ToPrimitive, Zero};
 use std::fmt;
 use std::str::FromStr;

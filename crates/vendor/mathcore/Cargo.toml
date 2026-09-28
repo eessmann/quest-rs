@@ -11,8 +11,8 @@
 
 [package]
 edition = "2021"
-name = "mathcore"
-version = "0.3.1"
+name = "quest-mathcore"
+version = "0.3.1-quest.1"
 authors = ["Mehmet Yilmaz <mehmet@nonanti.dev>"]
 build = false
 autolib = false
@@ -21,7 +21,6 @@ autoexamples = false
 autotests = false
 autobenches = false
 description = "Symbolic math library and computer algebra system for Rust"
-readme = "README.md"
 keywords = [
     "math",
     "symbolic",
@@ -34,22 +33,24 @@ categories = [
     "science",
 ]
 license = "MIT"
+publish = false
 repository = "https://github.com/Nonanti/mathcore"
 
 [features]
-default = [
-    "parallel",
-    "fft",
-]
-fft = ["rustfft"]
+default = ["legacy", "parallel", "fft"]
+exact = ["dep:num-bigint", "dep:num-rational", "dep:num-traits"]
+legacy = ["dep:nom", "dep:num-complex", "dep:num-traits", "dep:legacy-bigint", "dep:num-rational", "num-rational/num-bigint", "dep:nalgebra", "dep:thiserror", "dep:indexmap", "dep:ndarray"]
+fft = ["legacy", "dep:rustfft"]
 full = [
+    "legacy",
     "parallel",
     "fft",
 ]
-parallel = ["rayon"]
+parallel = ["legacy", "dep:rayon"]
 wasm = [
-    "wasm-bindgen",
-    "getrandom",
+    "legacy",
+    "dep:wasm-bindgen",
+    "dep:getrandom",
 ]
 
 [lib]
@@ -59,22 +60,32 @@ path = "src/lib.rs"
 [[example]]
 name = "demo"
 path = "examples/demo.rs"
+required-features = ["legacy"]
 
 [[example]]
 name = "optimization"
 path = "examples/optimization.rs"
+required-features = ["legacy"]
 
 [[example]]
 name = "scientific_computing"
 path = "examples/scientific_computing.rs"
+required-features = ["legacy"]
 
 [[test]]
 name = "integration_test"
 path = "tests/integration_test.rs"
+required-features = ["legacy"]
+
+[[test]]
+name = "exact_affine"
+path = "tests/exact_affine.rs"
+required-features = ["exact"]
 
 [[bench]]
 name = "expression_bench"
 path = "benches/expression_bench.rs"
+required-features = ["legacy"]
 
 [dependencies.getrandom]
 version = "0.2"
@@ -83,27 +94,42 @@ optional = true
 
 [dependencies.indexmap]
 version = "2.0"
+optional = true
 
 [dependencies.nalgebra]
 version = "0.32"
+optional = true
 
 [dependencies.ndarray]
 version = "0.15"
+optional = true
 
 [dependencies.nom]
 version = "7.1"
+optional = true
 
 [dependencies.num-bigint]
+version = "0.5"
+optional = true
+
+[dependencies.legacy-bigint]
+package = "num-bigint"
 version = "0.4"
+optional = true
 
 [dependencies.num-complex]
 version = "0.4"
+optional = true
 
 [dependencies.num-rational]
 version = "0.4"
+default-features = false
+features = ["std"]
+optional = true
 
 [dependencies.num-traits]
 version = "0.2"
+optional = true
 
 [dependencies.rayon]
 version = "1.7"
@@ -115,6 +141,7 @@ optional = true
 
 [dependencies.thiserror]
 version = "1.0"
+optional = true
 
 [dependencies.wasm-bindgen]
 version = "0.2"
@@ -129,9 +156,8 @@ version = "0.5"
 [dev-dependencies.proptest]
 version = "1.4"
 
-[target.'cfg(target_arch = "wasm32")'.dependencies.getrandom]
-version = "0.2"
-features = ["js"]
+[dev-dependencies.googletest]
+version = "0.14"
 
 [profile.bench]
 inherits = "release"
@@ -140,3 +166,6 @@ inherits = "release"
 opt-level = 3
 lto = true
 codegen-units = 1
+
+# The audited fork remains outside the parent workspace and its lint inheritance.
+[workspace]

@@ -1,42 +1,41 @@
-//! MathCore - symbolic math library for Rust
-//!
-//! basically a CAS (computer algebra system) that can do symbolic math,
-//! solve equations, differentiate, integrate, etc.
-//!
-//! ```rust
-//! use mathcore::MathCore;
-//!
-//! let math = MathCore::new();
-//!
-//! // basic stuff
-//! let result = math.calculate("2 + 3 * 4").unwrap();
-//! assert_eq!(result, 14.0);
-//!
-//! // calculus
-//! let derivative = MathCore::differentiate("x^2", "x").unwrap();
-//!
-//! // solve equations
-//! let roots = MathCore::solve("x^2 - 4", "x").unwrap();
-//! ```
+//! The exact affine domain is available with `exact`; the upstream
+//! approximate computer-algebra API is available with `legacy`.
 
+#[cfg(feature = "exact")]
+pub mod exact;
+
+#[cfg(feature = "legacy")]
 pub mod calculus;
+#[cfg(feature = "legacy")]
 pub mod differential;
+#[cfg(feature = "legacy")]
 pub mod engine;
+#[cfg(feature = "legacy")]
 pub mod matrix;
+#[cfg(feature = "legacy")]
 pub mod ml;
+#[cfg(feature = "legacy")]
 pub mod parser;
+#[cfg(feature = "legacy")]
 pub mod precision;
+#[cfg(feature = "legacy")]
 pub mod solver;
+#[cfg(feature = "legacy")]
 pub mod transforms;
+#[cfg(feature = "legacy")]
 pub mod types;
 
+#[cfg(feature = "legacy")]
 use std::collections::HashMap;
+#[cfg(feature = "legacy")]
 pub use types::{Expr, MathError};
 
+#[cfg(feature = "legacy")]
 pub struct MathCore {
     engine: engine::Engine,
 }
 
+#[cfg(feature = "legacy")]
 impl MathCore {
     pub fn new() -> Self {
         MathCore {
@@ -265,13 +264,14 @@ impl MathCore {
     }
 }
 
+#[cfg(feature = "legacy")]
 impl Default for MathCore {
     fn default() -> Self {
         Self::new()
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "legacy"))]
 mod tests {
     use super::*;
 
