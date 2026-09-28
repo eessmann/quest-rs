@@ -473,6 +473,13 @@ struct Context {
     count: usize,
     roots: BTreeMap<usize, Arc<Vec<Number>>>,
 }
+fn modeled_scalar_bytes(precision: u32) -> OfflineResult<usize> {
+    usize::try_from(precision)
+        .map_err(|_| OfflineError::Budget("precision bytes"))?
+        .div_ceil(8)
+        .checked_add(size_of::<BigFloat>())
+        .ok_or(OfflineError::Budget("precision bytes"))
+}
 impl Context {
     fn new(count: usize, precision: u32, policy: OfflinePolicy) -> OfflineResult<Self> {
         let grid = count
@@ -555,11 +562,7 @@ impl Context {
         if grid > policy.max_grid {
             return Err(OfflineError::Budget("offline grid"));
         }
-        let scalar_bytes = usize::try_from(precision)
-            .map_err(|_| OfflineError::Budget("precision bytes"))?
-            .div_ceil(8)
-            .checked_add(size_of::<BigFloat>())
-            .ok_or(OfflineError::Budget("precision bytes"))?;
+        let scalar_bytes = modeled_scalar_bytes(precision)?;
         let levels = usize::try_from(count.max(1).ilog2())
             .map_err(|_| OfflineError::Budget("offline levels"))?
             .saturating_add(1);

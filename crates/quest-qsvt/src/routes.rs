@@ -1,7 +1,7 @@
 use crate::{
     Complex64, Error, LogicalSpace, NumericalPolicy, OperandLayout, OracleFragment,
     ProjectedEncoding, Projection, QueryCounts, Result, Route, StandardConvention,
-    TransformEvidence, ValidatedTransform, materialize_oracle, matrix,
+    TransformContinuation, TransformEvidence, ValidatedTransform, materialize_oracle, matrix,
 };
 use faer::MatRef;
 use quest_circuit::{
@@ -281,8 +281,7 @@ pub fn standard<C: StandardConvention>(
         degree,
         layout,
         main,
-        bridge: None,
-        continuation: None,
+        continuation_stage: TransformContinuation::Direct,
         queries,
         evidence,
     })
@@ -323,7 +322,7 @@ pub fn generalized(
         circuit.control_matrix(control, layout.response())?;
     }
     let main = circuit.finish()?;
-    let (input, output, bridge, continuation) = stages(&encoding, &layout, route)?;
+    let (input, output, continuation_stage) = stages(&encoding, &layout, route)?;
     let mut queries = QueryCounts {
         semantic: degree,
         source_forward: degree,
@@ -334,7 +333,11 @@ pub fn generalized(
         },
         retained_oracle_calls: retained_counts(&main)?,
     };
-    if let Some(continuation) = &continuation {
+    if let TransformContinuation::Projected {
+        program: continuation,
+        ..
+    } = &continuation_stage
+    {
         queries.source_forward = queries
             .source_forward
             .checked_add(1)
@@ -353,8 +356,7 @@ pub fn generalized(
         main,
         input,
         output,
-        bridge,
-        continuation,
+        continuation_stage,
         queries,
         evidence,
     })
@@ -374,21 +376,16 @@ fn barred_oracle(encoding: &ProjectedEncoding) -> Result<OracleFragment> {
         .matrix_policy(encoding.policy().matrix_policy())
         .build()?)
 }
-type Stages = (
-    Projection,
-    Projection,
-    Option<Projection>,
-    Option<BoundProgram>,
-);
+type Stages = (Projection, Projection, TransformContinuation);
 fn stages(encoding: &ProjectedEncoding, layout: &OperandLayout, route: Route) -> Result<Stages> {
     match route {
         Route::DirectHermitian => {
             let input = Projection::source(encoding, layout, false, None);
-            Ok((input.clone(), input, None, None))
+            Ok((input.clone(), input, TransformContinuation::Direct))
         }
         Route::HermitianizedFull => {
             let input = Projection::joint(encoding, layout)?;
-            Ok((input.clone(), input, None, None))
+            Ok((input.clone(), input, TransformContinuation::Direct))
         }
         Route::HermitianizedEven | Route::HermitianizedOdd => Ok((
             Projection::source(encoding, layout, false, Some(true)),
@@ -398,21 +395,22 @@ fn stages(encoding: &ProjectedEncoding, layout: &OperandLayout, route: Route) ->
                 route == Route::HermitianizedOdd,
                 Some(route == Route::HermitianizedEven),
             ),
-            None,
-            None,
+            TransformContinuation::Direct,
         )),
         Route::MultiplicationEven | Route::MultiplicationOdd => {
             let input = Projection::source(encoding, layout, false, Some(false));
             if route == Route::MultiplicationEven {
-                return Ok((input.clone(), input, None, None));
+                return Ok((input.clone(), input, TransformContinuation::Direct));
             }
             let mut continuation = Circuit::new(layout.num_qubits(), encoding.policy())?;
             continuation.oracle(encoding.oracle(), layout.source(), &[])?;
             Ok((
                 input.clone(),
                 Projection::source(encoding, layout, true, Some(false)),
-                Some(input),
-                Some(continuation.finish()?),
+                TransformContinuation::Projected {
+                    bridge: Box::new(input),
+                    program: continuation.finish()?,
+                },
             ))
         }
         Route::Standard => Err(Error::Encoding("standard stages require degree")),

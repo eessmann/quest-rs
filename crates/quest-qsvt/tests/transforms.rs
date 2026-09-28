@@ -4,7 +4,7 @@ use quest_circuit::{NumericalOperator, OracleFragment, ProgramBuilder};
 use quest_qsp::{ControlSequence, PhaseSequence, WxSymmetric};
 use quest_qsvt::{
     Complex64, EncodingBuilder, Left, LogicalSpace, NumericalPolicy, ProjectedEncoding, Right,
-    TransformBuilder,
+    TransformBuilder, TransformContinuation,
 };
 use std::ops::{Add, Mul, Sub};
 
@@ -56,6 +56,10 @@ fn standard_degree_zero_and_one_keep_exact_readout_and_counts() -> Result<()> {
         expect_that!(transform.query_counts().source_adjoint, eq(0));
         expect_true!(transform.bridge().is_none());
         expect_true!(transform.continuation().is_none());
+        expect_true!(matches!(
+            transform.continuation_stage(),
+            TransformContinuation::Direct
+        ));
     }
     Ok(())
 }
@@ -72,6 +76,10 @@ fn odd_multiplication_retains_bridge_and_source_at_reduced_degree_zero() -> Resu
         .build()?;
     expect_true!(transform.bridge().is_some());
     expect_true!(transform.continuation().is_some());
+    expect_true!(matches!(
+        transform.continuation_stage(),
+        TransformContinuation::Projected { .. }
+    ));
     expect_that!(transform.query_counts().source_forward, eq(1));
     expect_that!(transform.query_counts().source_adjoint, eq(0));
     expect_that!(

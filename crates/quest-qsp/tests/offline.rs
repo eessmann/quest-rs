@@ -13,6 +13,61 @@ fn empty_offline_generalized_laurent_preserves_zero_and_positive_offset() -> Res
     Ok(())
 }
 #[gtest]
+fn remez_policy_rejects_unbounded_subdivision_storage() -> Result<()> {
+    use quest_polynomial::{Interval, function};
+    use quest_qsp::offline::{OfflineRemezBuilder, OfflineRemezPolicy};
+    let policy = OfflineRemezPolicy {
+        max_subdivisions: usize::MAX,
+        ..OfflineRemezPolicy::default()
+    };
+    let result = OfflineRemezBuilder::new()
+        .function(function!(|x| x))
+        .domain(Interval::new(-1.0, 1.0)?)?
+        .degree(1)
+        .policy(policy);
+    expect_true!(matches!(result, Err(OfflineError::Budget(_))));
+    Ok(())
+}
+#[gtest]
+fn remez_policy_checks_exact_modeled_storage_boundary() -> Result<()> {
+    use quest_polynomial::{Interval, function};
+    use quest_qsp::offline::{OfflinePolicy, OfflineRemezBuilder, OfflineRemezPolicy};
+    let subdivisions = 8_usize;
+    let scalar_bytes = usize::try_from(OfflinePolicy::default().max_precision)?
+        .checked_div(8)
+        .and_then(|bytes| bytes.checked_add(size_of::<astro_float::BigFloat>()))
+        .expect("default Remez precision fits the test model");
+    let exact = 36_usize
+        .checked_mul(scalar_bytes)
+        .and_then(|bytes| {
+            subdivisions
+                .checked_mul(size_of::<Interval>())
+                .and_then(|stack| bytes.checked_add(stack))
+        })
+        .and_then(|bytes| bytes.checked_add(65_536))
+        .expect("small Remez test model fits usize");
+    for (budget, accepted) in [
+        (exact, true),
+        (exact.checked_sub(1).expect("positive byte budget"), false),
+    ] {
+        let policy = OfflineRemezPolicy {
+            offline: OfflinePolicy {
+                max_bytes: budget,
+                ..OfflinePolicy::default()
+            },
+            max_subdivisions: subdivisions,
+            ..OfflineRemezPolicy::default()
+        };
+        let result = OfflineRemezBuilder::new()
+            .function(function!(|x| x))
+            .domain(Interval::new(-1.0, 1.0)?)?
+            .degree(1)
+            .policy(policy);
+        expect_eq!(result.is_ok(), accepted);
+    }
+    Ok(())
+}
+#[gtest]
 fn explicit_offline_complex_synthesis_exports_then_independently_certifies() -> Result<()> {
     let target = Polynomial::new(
         Laurent::new(0),

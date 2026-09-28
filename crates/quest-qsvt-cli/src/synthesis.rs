@@ -3,7 +3,10 @@ use crate::{
     read_qsp,
 };
 use quest_polynomial::{Chebyshev, Laurent, Polynomial};
-use quest_qsp::{Canonical, FrozenCandidate, Generalized, Policy, SynthesisBuilder};
+use quest_qsp::{
+    AdmittedTarget, Canonical, CompletedPolynomial, FrozenCandidate, Generalized, Policy,
+    SynthesisBuilder,
+};
 use quest_qsvt_io::{CatalogFamily, IoPolicy, QspInput};
 use serde_json::{Value, json};
 use std::time::Instant;
@@ -42,6 +45,15 @@ fn policy(tolerance: f64) -> Result<Policy> {
         ..Policy::default()
     })
 }
+fn complete<M>(
+    admitted: AdmittedTarget<M>,
+    context: &mut Context<'_>,
+) -> Result<CompletedPolynomial<M>> {
+    let execution = context.execution;
+    context.measure("completion", Stage::Construction, || {
+        Ok(admitted.complete_with(execution)?)
+    })
+}
 fn canonical(
     target: &Polynomial<Chebyshev>,
     tolerance: f64,
@@ -54,10 +66,8 @@ fn canonical(
             .canonical(target)?
             .admit()?)
     })?;
+    let completed = complete(admitted, context)?;
     let execution = context.execution;
-    let completed = context.measure("completion", Stage::Construction, || {
-        Ok(admitted.complete_with(execution)?)
-    })?;
     context.measure("synthesis", Stage::Synthesis, || {
         Ok(Candidate::Canonical(completed.synthesize_with(execution)?))
     })
@@ -74,10 +84,8 @@ fn generalized(
             .generalized(target)?
             .admit()?)
     })?;
+    let completed = complete(admitted, context)?;
     let execution = context.execution;
-    let completed = context.measure("completion", Stage::Construction, || {
-        Ok(admitted.complete_with(execution)?)
-    })?;
     context.measure("synthesis", Stage::Synthesis, || {
         Ok(Candidate::Generalized(
             completed.synthesize_with(execution)?,
@@ -349,6 +357,24 @@ fn offline_report<M>(solution: &quest_qsp::offline::OfflineSolution<M>) -> Value
             "certification_seconds":attempt.certification_elapsed().as_secs_f64()
         })).collect::<Vec<_>>()})
 }
+#[cfg(feature = "offline-synthesis")]
+fn finish_offline<M>(
+    solution: quest_qsp::offline::OfflineSolution<M>,
+    wrap: impl FnOnce(FrozenCandidate<M>) -> Candidate,
+) -> Result<(Candidate, Value)> {
+    let mut report = offline_report(&solution);
+    let candidate = wrap(solution.into_certified().into_candidate());
+    crate::set(
+        &mut report,
+        "degree",
+        candidate
+            .report()?
+            .get("degree")
+            .cloned()
+            .ok_or(Error::Input("candidate report degree"))?,
+    )?;
+    Ok((candidate, report))
+}
 fn offline_canonical(
     target: &Polynomial<Chebyshev>,
     tolerance: f64,
@@ -368,18 +394,7 @@ fn offline_canonical(
                     .canonical(target)?
                     .policy(policy)?
                     .solve()?;
-                let mut report = offline_report(&solution);
-                let candidate = Candidate::Canonical(solution.into_certified().into_candidate());
-                crate::set(
-                    &mut report,
-                    "degree",
-                    candidate
-                        .report()?
-                        .get("degree")
-                        .cloned()
-                        .ok_or(Error::Input("candidate report degree"))?,
-                )?;
-                Ok((candidate, report))
+                finish_offline(solution, Candidate::Canonical)
             },
         )
     }
@@ -410,18 +425,7 @@ fn offline_generalized(
                     .generalized(target)?
                     .policy(policy)?
                     .solve()?;
-                let mut report = offline_report(&solution);
-                let candidate = Candidate::Generalized(solution.into_certified().into_candidate());
-                crate::set(
-                    &mut report,
-                    "degree",
-                    candidate
-                        .report()?
-                        .get("degree")
-                        .cloned()
-                        .ok_or(Error::Input("candidate report degree"))?,
-                )?;
-                Ok((candidate, report))
+                finish_offline(solution, Candidate::Generalized)
             },
         )
     }

@@ -22,7 +22,7 @@ pub use quest_circuit::{MatrixPolicy, OracleFragment};
 pub use space::{Left, LogicalSpace, ProjectorKind, Right};
 pub use transform::{
     GeneralizedRecipe, QueryCounts, Route, StandardConvention, StandardRecipe, SuppliedEncoding,
-    TransformBuilder, TransformEvidence, ValidatedTransform,
+    TransformBuilder, TransformContinuation, TransformEvidence, ValidatedTransform,
 };
 
 /// Fallible construction or cold-reference result.

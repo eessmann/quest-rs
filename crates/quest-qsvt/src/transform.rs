@@ -61,6 +61,16 @@ pub struct TransformEvidence {
     /// certificate. A source-polynomial certificate does not cover these shifts.
     pub phase_conversion_roundoff_estimate: f64,
 }
+/// Coherent continuation after the main circuit. A projected continuation
+/// carries its bridge and source program together, so neither can be omitted.
+#[derive(Debug, Clone)]
+pub enum TransformContinuation {
+    Direct,
+    Projected {
+        bridge: Box<Projection>,
+        program: BoundProgram,
+    },
+}
 /// Owned staged transform. Projection and continuation cannot be implicitly
 /// discarded to obtain an oracle. All matrices and circuit bodies are immutable.
 /// ```compile_fail
@@ -79,8 +89,7 @@ pub struct ValidatedTransform {
     pub(super) layout: OperandLayout,
     pub(super) main: BoundProgram,
     pub(super) input: Projection,
-    pub(super) bridge: Option<Projection>,
-    pub(super) continuation: Option<BoundProgram>,
+    pub(super) continuation_stage: TransformContinuation,
     pub(super) output: Projection,
     pub(super) queries: QueryCounts,
     pub(super) evidence: TransformEvidence,
@@ -124,12 +133,23 @@ impl ValidatedTransform {
     /// Projection between main and continuation for odd multiplication.
     #[must_use]
     pub const fn bridge(&self) -> Option<&Projection> {
-        self.bridge.as_ref()
+        match &self.continuation_stage {
+            TransformContinuation::Direct => None,
+            TransformContinuation::Projected { bridge, .. } => Some(bridge),
+        }
     }
     /// Final coherent source application for odd multiplication, even at degree zero.
     #[must_use]
     pub const fn continuation(&self) -> Option<&BoundProgram> {
-        self.continuation.as_ref()
+        match &self.continuation_stage {
+            TransformContinuation::Direct => None,
+            TransformContinuation::Projected { program, .. } => Some(program),
+        }
+    }
+    /// One admitted stage following the main circuit.
+    #[must_use]
+    pub const fn continuation_stage(&self) -> &TransformContinuation {
+        &self.continuation_stage
     }
     /// Logical output extraction after all coherent and projection stages.
     #[must_use]
@@ -187,13 +207,11 @@ impl ValidatedTransform {
             .materialize_isometry(self.layout.num_qubits(), policy)?;
         let main = materialize_program(&self.main, policy)?;
         let mut current = matrix::multiply(main.as_ref(), input.as_ref(), policy)?;
-        if let Some(bridge) = &self.bridge {
+        if let TransformContinuation::Projected { bridge, program } = &self.continuation_stage {
             let basis = bridge.materialize_isometry(self.layout.num_qubits(), policy)?;
             let logical = matrix::multiply(basis.adjoint(), current.as_ref(), policy)?;
             current = matrix::multiply(basis.as_ref(), logical.as_ref(), policy)?;
-        }
-        if let Some(continuation) = &self.continuation {
-            let continuation = materialize_program(continuation, policy)?;
+            let continuation = materialize_program(program, policy)?;
             current = matrix::multiply(continuation.as_ref(), current.as_ref(), policy)?;
         }
         let output = self
