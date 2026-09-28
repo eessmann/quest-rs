@@ -286,37 +286,24 @@ impl Gate {
             other => other.clone(),
         }
     }
-    pub(crate) fn angles(&self) -> Vec<&Angle> {
+    pub(crate) fn angles(&self) -> impl Iterator<Item = &Angle> + Clone {
         match self {
-            Self::Rx(x) | Self::Ry(x) | Self::Rz(x) | Self::Phase(x) => vec![x],
-            Self::U { theta, phi, lambda } => vec![theta, phi, lambda],
-            _ => vec![],
+            Self::Rx(x) | Self::Ry(x) | Self::Rz(x) | Self::Phase(x) => [Some(x), None, None],
+            Self::U { theta, phi, lambda } => [Some(theta), Some(phi), Some(lambda)],
+            _ => [None, None, None],
         }
+        .into_iter()
+        .flatten()
     }
-    pub(crate) fn bind(&self, b: &BTreeMap<ParameterId, f64>) -> Result<BoundGate> {
-        Ok(match self {
-            Self::Id => BoundGate::Id,
-            Self::X => BoundGate::X,
-            Self::Y => BoundGate::Y,
-            Self::Z => BoundGate::Z,
-            Self::H => BoundGate::H,
-            Self::S => BoundGate::S,
-            Self::Sdg => BoundGate::Sdg,
-            Self::T => BoundGate::T,
-            Self::Tdg => BoundGate::Tdg,
-            Self::Sx => BoundGate::Sx,
-            Self::Sxdg => BoundGate::Sxdg,
-            Self::Swap => BoundGate::Swap,
-            Self::Rx(a) => BoundGate::Rx(a.evaluate(b)?),
-            Self::Ry(a) => BoundGate::Ry(a.evaluate(b)?),
-            Self::Rz(a) => BoundGate::Rz(a.evaluate(b)?),
-            Self::Phase(a) => BoundGate::Phase(a.evaluate(b)?),
-            Self::U { theta, phi, lambda } => BoundGate::U {
-                theta: theta.evaluate(b)?,
-                phi: phi.evaluate(b)?,
-                lambda: lambda.evaluate(b)?,
-            },
-        })
+    pub(crate) fn bind(&self, bindings: &BTreeMap<ParameterId, f64>) -> Result<BoundGate> {
+        let mut parameters = [0.0; 3];
+        for (output, angle) in parameters.iter_mut().zip(self.angles()) {
+            *output = angle.evaluate(bindings)?;
+        }
+        let parameters = parameters
+            .get(..self.kind().definition().parameter_count)
+            .ok_or(Error::Unsupported("gate parameter capacity"))?;
+        BoundGate::from_kind(self.kind(), parameters)
     }
 }
 
@@ -339,6 +326,97 @@ pub enum BoundGate {
     Rz(f64),
     Phase(f64),
     U { theta: f64, phi: f64, lambda: f64 },
+}
+
+impl BoundGate {
+    /// Shared semantic registry identity for this circuit adapter.
+    #[must_use]
+    pub const fn kind(&self) -> quest_language::GateKind {
+        match self {
+            Self::Id => quest_language::GateKind::Id,
+            Self::X => quest_language::GateKind::X,
+            Self::Y => quest_language::GateKind::Y,
+            Self::Z => quest_language::GateKind::Z,
+            Self::H => quest_language::GateKind::H,
+            Self::S => quest_language::GateKind::S,
+            Self::Sdg => quest_language::GateKind::Sdg,
+            Self::T => quest_language::GateKind::T,
+            Self::Tdg => quest_language::GateKind::Tdg,
+            Self::Sx => quest_language::GateKind::Sx,
+            Self::Sxdg => quest_language::GateKind::Sxdg,
+            Self::Swap => quest_language::GateKind::Swap,
+            Self::Rx(..) => quest_language::GateKind::Rx,
+            Self::Ry(..) => quest_language::GateKind::Ry,
+            Self::Rz(..) => quest_language::GateKind::Rz,
+            Self::Phase(..) => quest_language::GateKind::Phase,
+            Self::U { .. } => quest_language::GateKind::U,
+        }
+    }
+    /// Adapt a registry gate after intrinsic controls have been separated into operands.
+    /// Global phase is a scalar operation and must use the caller's scalar dispatch.
+    /// # Errors
+    /// Rejects missing/extra or nonfinite parameters and scalar global phase.
+    pub fn from_kind(kind: quest_language::GateKind, parameters: &[f64]) -> Result<Self> {
+        use quest_language::{Decomposition, GateKind as G};
+        let expected = kind.definition().parameter_count;
+        if parameters.len() != expected {
+            return Err(Error::ParameterArity {
+                expected,
+                actual: parameters.len(),
+            });
+        }
+        if parameters.iter().any(|value| !value.is_finite()) {
+            return Err(Error::NonFinite);
+        }
+        if let Decomposition::Controlled { base, .. } = kind.definition().decomposition {
+            return Self::from_kind(base, parameters);
+        }
+        let parameter = |index| {
+            parameters.get(index).copied().ok_or(Error::ParameterArity {
+                expected,
+                actual: parameters.len(),
+            })
+        };
+        Ok(match kind {
+            G::Id => Self::Id,
+            G::X => Self::X,
+            G::Y => Self::Y,
+            G::Z => Self::Z,
+            G::H => Self::H,
+            G::S => Self::S,
+            G::Sdg => Self::Sdg,
+            G::T => Self::T,
+            G::Tdg => Self::Tdg,
+            G::Sx => Self::Sx,
+            G::Sxdg => Self::Sxdg,
+            G::Swap => Self::Swap,
+            G::Rx => Self::Rx(parameter(0)?),
+            G::Ry => Self::Ry(parameter(0)?),
+            G::Rz => Self::Rz(parameter(0)?),
+            G::Phase => Self::Phase(parameter(0)?),
+            G::U => Self::U {
+                theta: parameter(0)?,
+                phi: parameter(1)?,
+                lambda: parameter(2)?,
+            },
+            G::GlobalPhase => {
+                return Err(Error::Unsupported("global phase requires scalar dispatch"));
+            }
+            G::Cx | G::Cy | G::Cz | G::Ccx => {
+                return Err(Error::Unsupported("registry control base"));
+            }
+        })
+    }
+    /// Parameters in shared-registry order, without allocating a temporary list.
+    pub fn parameters(&self) -> impl Iterator<Item = f64> + Clone {
+        match self {
+            Self::Rx(x) | Self::Ry(x) | Self::Rz(x) | Self::Phase(x) => [Some(*x), None, None],
+            Self::U { theta, phi, lambda } => [Some(*theta), Some(*phi), Some(*lambda)],
+            _ => [None, None, None],
+        }
+        .into_iter()
+        .flatten()
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -384,22 +462,22 @@ impl SourceSpan {
 pub(crate) enum SemanticOperation {
     Gate {
         gate: Gate,
-        targets: Vec<QubitId>,
-        controls: Vec<Control>,
+        targets: Arc<[QubitId]>,
+        controls: Arc<[Control]>,
     },
     GlobalPhase {
         angle: Angle,
-        controls: Vec<Control>,
+        controls: Arc<[Control]>,
     },
     Numerical {
         matrix: NumericalOperator,
-        targets: Vec<QubitId>,
-        controls: Vec<Control>,
+        targets: Arc<[QubitId]>,
+        controls: Arc<[Control]>,
     },
     Oracle {
         fragment: crate::OracleFragment,
-        targets: Vec<QubitId>,
-        controls: Vec<Control>,
+        targets: Arc<[QubitId]>,
+        controls: Arc<[Control]>,
     },
     Measure {
         qubit: QubitId,
@@ -409,11 +487,11 @@ pub(crate) enum SemanticOperation {
         qubit: QubitId,
     },
     Barrier {
-        qubits: Vec<QubitId>,
+        qubits: Arc<[QubitId]>,
     },
     Channel {
-        kraus: Vec<NumericalOperator>,
-        targets: Vec<QubitId>,
+        kraus: Arc<[NumericalOperator]>,
+        targets: Arc<[QubitId]>,
     },
     Conditional {
         bit: BitId,
@@ -426,22 +504,22 @@ pub(crate) enum SemanticOperation {
 pub enum Operation {
     Gate {
         gate: BoundGate,
-        targets: Vec<QubitId>,
-        controls: Vec<Control>,
+        targets: Arc<[QubitId]>,
+        controls: Arc<[Control]>,
     },
     GlobalPhase {
         radians: f64,
-        controls: Vec<Control>,
+        controls: Arc<[Control]>,
     },
     Numerical {
         matrix: NumericalOperator,
-        targets: Vec<QubitId>,
-        controls: Vec<Control>,
+        targets: Arc<[QubitId]>,
+        controls: Arc<[Control]>,
     },
     Oracle {
         fragment: crate::OracleFragment,
-        targets: Vec<QubitId>,
-        controls: Vec<Control>,
+        targets: Arc<[QubitId]>,
+        controls: Arc<[Control]>,
     },
     Measure {
         qubit: QubitId,
@@ -451,11 +529,11 @@ pub enum Operation {
         qubit: QubitId,
     },
     Barrier {
-        qubits: Vec<QubitId>,
+        qubits: Arc<[QubitId]>,
     },
     Channel {
-        kraus: Vec<NumericalOperator>,
-        targets: Vec<QubitId>,
+        kraus: Arc<[NumericalOperator]>,
+        targets: Arc<[QubitId]>,
     },
     Conditional {
         bit: BitId,
@@ -464,9 +542,32 @@ pub enum Operation {
     },
 }
 
-impl SemanticOperation {
-    pub(crate) fn qubits(&self) -> Vec<QubitId> {
-        match self {
+/// Ordered borrowed operands. A conditional exposes its quantum body's operands.
+/// Classical read/write dependencies remain separate from this view.
+#[derive(Debug, Clone, Copy)]
+pub struct Operands<'a> {
+    targets: &'a [QubitId],
+    controls: &'a [Control],
+}
+impl<'a> Operands<'a> {
+    #[must_use]
+    pub const fn targets(self) -> &'a [QubitId] {
+        self.targets
+    }
+    #[must_use]
+    pub const fn controls(self) -> &'a [Control] {
+        self.controls
+    }
+    pub fn qubits(self) -> impl Iterator<Item = QubitId> + Clone + 'a {
+        self.targets
+            .iter()
+            .copied()
+            .chain(self.controls.iter().map(|control| control.qubit()))
+    }
+}
+macro_rules! operand_view {
+    ($operation:expr) => {
+        match $operation {
             Self::Gate {
                 targets, controls, ..
             }
@@ -475,17 +576,120 @@ impl SemanticOperation {
             }
             | Self::Oracle {
                 targets, controls, ..
-            } => targets
-                .iter()
-                .copied()
-                .chain(controls.iter().map(|c| c.qubit()))
-                .collect(),
-            Self::GlobalPhase { controls, .. } => controls.iter().map(|c| c.qubit()).collect(),
-            Self::Measure { qubit, .. } | Self::Reset { qubit } => vec![*qubit],
-            Self::Barrier { qubits } => qubits.clone(),
-            Self::Channel { targets, .. } => targets.clone(),
-            Self::Conditional { operation, .. } => operation.qubits(),
+            } => Operands { targets, controls },
+            Self::GlobalPhase { controls, .. } => Operands {
+                targets: &[],
+                controls,
+            },
+            Self::Measure { qubit, .. } | Self::Reset { qubit } => Operands {
+                targets: std::slice::from_ref(qubit),
+                controls: &[],
+            },
+            Self::Barrier { qubits } => Operands {
+                targets: qubits,
+                controls: &[],
+            },
+            Self::Channel { targets, .. } => Operands {
+                targets,
+                controls: &[],
+            },
+            Self::Conditional { operation, .. } => operation.operands(),
         }
+    };
+}
+impl Operation {
+    /// Retained operand payloads and Arc headers, counted per occurrence even when shared.
+    /// Allocator bookkeeping is excluded. Conditional body inline storage is included.
+    /// # Errors
+    /// Rejects storage arithmetic overflow.
+    pub fn operand_storage_bytes(&self) -> Result<usize> {
+        fn bank<T>(values: &[T]) -> Result<usize> {
+            values
+                .len()
+                .checked_mul(size_of::<T>())
+                .and_then(|bytes| bytes.checked_add(const { 2 * size_of::<usize>() }))
+                .and_then(|bytes| bytes.checked_add(align_of::<T>()))
+                .ok_or(Error::Budget("operand storage"))
+        }
+        let bytes = match self {
+            Self::Gate {
+                targets, controls, ..
+            }
+            | Self::Numerical {
+                targets, controls, ..
+            }
+            | Self::Oracle {
+                targets, controls, ..
+            } => bank(targets.as_ref())?.checked_add(bank(controls.as_ref())?),
+            Self::GlobalPhase { controls, .. } => Some(bank(controls.as_ref())?),
+            Self::Barrier { qubits } => Some(bank(qubits.as_ref())?),
+            Self::Channel { targets, kraus } => {
+                bank(targets.as_ref())?.checked_add(bank(kraus.as_ref())?)
+            }
+            Self::Conditional { operation, .. } => operation
+                .operand_storage_bytes()?
+                .checked_add(size_of::<Self>()),
+            Self::Measure { .. } | Self::Reset { .. } => Some(0),
+        };
+        bytes.ok_or(Error::Budget("operand storage"))
+    }
+    #[must_use]
+    pub fn operands(&self) -> Operands<'_> {
+        operand_view!(self)
+    }
+    pub fn qubits(&self) -> impl Iterator<Item = QubitId> + Clone + '_ {
+        self.operands().qubits()
+    }
+}
+#[expect(
+    clippy::redundant_pub_crate,
+    reason = "Keep internal mapping out of the wildcard public re-export"
+)]
+pub(crate) struct MappedOperands {
+    pub(crate) targets: Arc<[QubitId]>,
+    pub(crate) controls: Arc<[Control]>,
+}
+impl MappedOperands {
+    pub(crate) fn scope(self) -> Arc<[QubitId]> {
+        self.targets
+            .iter()
+            .copied()
+            .chain(self.controls.iter().map(|c| c.qubit()))
+            .collect()
+    }
+}
+#[expect(
+    clippy::redundant_pub_crate,
+    reason = "Keep internal mapping out of the wildcard public re-export"
+)]
+pub(crate) fn remap_operands(
+    local: Operands<'_>,
+    mapping: &[QubitId],
+    outer: &[Control],
+) -> Result<MappedOperands> {
+    let map = |qubit: QubitId| mapping.get(qubit.index()).copied().ok_or(Error::InvalidId);
+    Ok(MappedOperands {
+        targets: local
+            .targets
+            .iter()
+            .copied()
+            .map(map)
+            .collect::<Result<_>>()?,
+        controls: local
+            .controls
+            .iter()
+            .map(|c| Ok(Control::new(map(c.qubit())?, c.state())))
+            .chain(outer.iter().copied().map(Ok))
+            .collect::<Result<_>>()?,
+    })
+}
+
+impl SemanticOperation {
+    pub(crate) fn operands(&self) -> Operands<'_> {
+        operand_view!(self)
+    }
+    pub(crate) fn qubits(&self) -> impl Iterator<Item = QubitId> + Clone + '_ {
+        self.operands().qubits()
     }
     pub(crate) const fn stochastic(&self) -> bool {
         matches!(
@@ -564,7 +768,7 @@ impl SemanticOperation {
 )]
 pub(crate) struct Occurrence {
     pub(crate) id: OccurrenceId,
-    pub(crate) provenance: Vec<OccurrenceId>,
+    pub(crate) provenance: crate::ProvenanceId,
     pub(crate) source: Option<SourceSpan>,
     pub(crate) operation: SemanticOperation,
 }
@@ -572,7 +776,7 @@ pub(crate) struct Occurrence {
 #[derive(Debug, Clone)]
 pub struct Instruction {
     pub(crate) id: OccurrenceId,
-    pub(crate) provenance: Vec<OccurrenceId>,
+    pub(crate) provenance: crate::ProvenanceId,
     pub(crate) source: Option<SourceSpan>,
     pub(crate) operation: Operation,
 }
@@ -582,8 +786,8 @@ impl Instruction {
         self.id
     }
     #[must_use]
-    pub fn provenance(&self) -> &[OccurrenceId] {
-        &self.provenance
+    pub const fn provenance(&self) -> crate::ProvenanceId {
+        self.provenance
     }
     #[must_use]
     pub const fn source(&self) -> Option<&SourceSpan> {

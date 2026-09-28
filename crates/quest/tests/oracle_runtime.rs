@@ -99,7 +99,7 @@ fn retained_oracles_match_expanded_phase_target_and_density_semantics() -> googl
                         append_expanded(&mut builder, &fragment, &targets, &controls)?;
                     }
                 }
-                Ok(builder.finish()?.bind(&[])?.lower()?.plan()?)
+                Ok(builder.finish()?.bind(&[])?.plan()?)
             };
             let mut retained = environment.prepare_plan(build(true)?)?;
             let mut expanded = environment.prepare_plan(build(false)?)?;

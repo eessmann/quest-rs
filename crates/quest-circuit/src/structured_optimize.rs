@@ -74,8 +74,10 @@ pub struct StructuredQuantumRewrite {
     pub inputs: Vec<StructuredOccurrence>,
     pub outputs: Vec<ValueId>,
 }
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct StructuredQuantumReport {
+    pub input_snapshot: ssa::SnapshotId,
+    pub output_snapshot: ssa::SnapshotId,
     pub before_gates: usize,
     pub after_gates: usize,
     pub windows: usize,
@@ -727,8 +729,19 @@ fn optimize(
             constants.insert(result.id, *value);
         }
     }
+    let snapshot = program.snapshot();
     let mut program = program.into_unverified();
-    let mut report = StructuredQuantumReport::default();
+    let mut report = StructuredQuantumReport {
+        input_snapshot: snapshot,
+        output_snapshot: snapshot,
+        before_gates: 0,
+        after_gates: 0,
+        windows: 0,
+        inverse_pairs: 0,
+        resynthesized_windows: 0,
+        work: 0,
+        rewrites: Vec::new(),
+    };
     let mut replacements = BTreeMap::new();
     let context = Context {
         slots: &program.slots,
@@ -770,10 +783,9 @@ fn optimize(
         storage_bytes: options.compile.storage_bytes.min(options.storage_bytes),
         ..options.compile
     };
-    Ok((
-        program.verify(compile).map_err(LanguageError::from)?,
-        report,
-    ))
+    let program = program.verify(compile).map_err(LanguageError::from)?;
+    report.output_snapshot = program.snapshot();
+    Ok((program, report))
 }
 impl VerifiedStructuredProgram {
     /// Optimize independent straight-line quantum windows and reverify all SSA.

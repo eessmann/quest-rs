@@ -203,21 +203,7 @@ impl<'env, K: RegisterKind> Register<'env, K> {
     /// # Errors
     /// Rejects allocation overflow, memory budget exhaustion, or native clone failure.
     pub fn try_clone(&self) -> Result<Self> {
-        let entries = if K::DENSITY {
-            self.dimension()
-                .checked_mul(self.dimension())
-                .ok_or(Error::Overflow)?
-        } else {
-            self.dimension()
-        };
-        let reservation = self.resources().reserve(bytes_for(
-            entries,
-            if self.resources().capabilities().gpu {
-                8
-            } else {
-                4
-            },
-        )?)?;
+        let reservation = Self::admit_allocation(self.resources(), self.count)?;
         let native = quest_sys::create_clone_qureg(&self.native).context("cloning register")?;
         Ok(Self {
             native,
@@ -346,16 +332,7 @@ impl Register<'_, DensityMatrix> {
             .checked_mul(view.ncols())
             .ok_or(Error::Overflow)?;
         let _scratch = self.resources().reserve(bytes_for(count, 4)?)?;
-        let mut values = reserve_vec(count)?;
-        for r in 0..view.nrows() {
-            for c in 0..view.ncols() {
-                let v = logical(view, r, c);
-                if !v.re.is_finite() || !v.im.is_finite() {
-                    return Err(Error::Value("matrix entries must be finite"));
-                }
-                values.push(quest_sys::QuestComplex { re: v.re, im: v.im });
-            }
-        }
+        let values = pack_matrix(view)?;
         quest_sys::set_density_qureg_amps(
             self.pin(),
             i64::try_from(row).map_err(|_| Error::Overflow)?,
@@ -433,4 +410,18 @@ pub fn pack(
         buffer.push(quest_sys::QuestComplex { re: v.re, im: v.im });
     }
     Ok(buffer)
+}
+
+/// Pack the logical view, including conjugation, in the bridge's row-major order.
+pub fn pack_matrix<T: Conjugate<Canonical = Complex64>>(
+    view: MatRef<'_, T>,
+) -> Result<Vec<quest_sys::QuestComplex>> {
+    let count = view
+        .nrows()
+        .checked_mul(view.ncols())
+        .ok_or(Error::Overflow)?;
+    pack(
+        (0..view.nrows()).flat_map(|row| (0..view.ncols()).map(move |col| logical(view, row, col))),
+        count,
+    )
 }

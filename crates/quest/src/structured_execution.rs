@@ -4,7 +4,7 @@ use crate::{
     Environment, Error, Outcome, QubitCount, Register, RegisterKind, Result,
     environment::Reservation,
     error::{BackendResult, StructuredExecutionError},
-    execution::{NativeControls, admit_fingerprint, apply_gate, phase},
+    execution::{NativeControls, admit_fingerprint, apply_gate, phase, reset_channel},
     values::reserve_vec,
 };
 use cxx::UniquePtr;
@@ -97,26 +97,10 @@ impl Environment {
             })
             .collect();
         let capacity = plan.num_qubits();
-        let controls = NativeControls {
-            wires: reserve_vec(capacity)?,
-            states: reserve_vec(capacity)?,
-            zeros: reserve_vec(capacity)?,
-            phase_targets: reserve_vec(capacity)?,
-        };
+        let controls = NativeControls::with_capacity(capacity, false)?;
         let targets = reserve_vec(capacity)?;
         let reset = if reset_needed {
-            let zero = quest_sys::QuestComplex { re: 0., im: 0. };
-            let one = quest_sys::QuestComplex { re: 1., im: 0. };
-            let mut map =
-                quest_sys::create_kraus_map(1, 2).context("allocating structured reset")?;
-            quest_sys::set_kraus_map_flat(
-                map.pin_mut(),
-                &[one, zero, zero, zero, zero, one, zero, zero],
-                2,
-                2,
-            )
-            .context("preparing structured reset")?;
-            Some(map)
+            Some(reset_channel()?)
         } else {
             None
         };
@@ -242,26 +226,20 @@ impl<K: RegisterKind> QuantumBackend for Backend<'_, '_, K> {
         })())
     }
     fn apply_gate(&mut self, request: GateRequest<'_>) -> Result<()> {
-        self.controls.wires.clear();
-        self.controls.states.clear();
-        self.controls.zeros.clear();
-        self.controls.phase_targets.clear();
         self.targets.clear();
-        for control in request.controls {
-            let index = self.register.check_qubit(control.qubit)?;
-            self.controls.wires.push(index);
-            self.controls.states.push(i32::from(control.positive));
-            self.controls.phase_targets.push(index);
-            if !control.positive {
-                self.controls.zeros.push(control.qubit);
-            }
-        }
         for target in request.targets {
+            if self.targets.len() == self.targets.capacity() {
+                return Err(Error::Value("target scratch capacity exceeded"));
+            }
             self.targets.push(self.register.check_qubit(*target)?);
         }
-        if let Some(target) = self.targets.first() {
-            self.controls.phase_targets.push(*target);
-        }
+        self.controls.load(
+            request
+                .controls
+                .iter()
+                .map(|control| Ok((self.register.check_qubit(control.qubit)?, control.positive))),
+            self.targets.first().copied(),
+        )?;
         let (kind, parameters) = adjoint_parameters(request)?;
         if kind == GateKind::GlobalPhase {
             return phase(self.register, parameter(&parameters, 0)?, self.controls);
@@ -326,28 +304,8 @@ fn adjoint_parameters(request: GateRequest<'_>) -> Result<(GateKind, [f64; 3])> 
     Ok((kind, result))
 }
 fn bound_gate(kind: GateKind, parameters: &[f64]) -> Result<BoundGate> {
-    Ok(match kind {
-        GateKind::Id => BoundGate::Id,
-        GateKind::X | GateKind::Cx | GateKind::Ccx => BoundGate::X,
-        GateKind::Y | GateKind::Cy => BoundGate::Y,
-        GateKind::Z | GateKind::Cz => BoundGate::Z,
-        GateKind::H => BoundGate::H,
-        GateKind::S => BoundGate::S,
-        GateKind::Sdg => BoundGate::Sdg,
-        GateKind::T => BoundGate::T,
-        GateKind::Tdg => BoundGate::Tdg,
-        GateKind::Sx => BoundGate::Sx,
-        GateKind::Sxdg => BoundGate::Sxdg,
-        GateKind::Swap => BoundGate::Swap,
-        GateKind::Rx => BoundGate::Rx(parameter(parameters, 0)?),
-        GateKind::Ry => BoundGate::Ry(parameter(parameters, 0)?),
-        GateKind::Rz => BoundGate::Rz(parameter(parameters, 0)?),
-        GateKind::Phase => BoundGate::Phase(parameter(parameters, 0)?),
-        GateKind::U => BoundGate::U {
-            theta: parameter(parameters, 0)?,
-            phi: parameter(parameters, 1)?,
-            lambda: parameter(parameters, 2)?,
-        },
-        GateKind::GlobalPhase => return Err(Error::Value("global phase must use scalar dispatch")),
-    })
+    let parameters = parameters
+        .get(..kind.definition().parameter_count)
+        .ok_or(Error::Value("gate parameter arity"))?;
+    Ok(BoundGate::from_kind(kind, parameters)?)
 }

@@ -16,7 +16,11 @@ fn exact_quantum_windows_cancel_across_constant_indices_and_keep_loop_cfg() -> R
     let source = "qubit[3] q; int i=0; while(i<3) { h q[0]; x q[2]; h q[0]; cx q[0],q[1]; cx q[0],q[1]; i+=1; }";
     let original = StructuredProgram::parse(source, "loop.qasm")?.verify()?;
     let blocks = original.ssa().blocks().len();
+    let input_snapshot = original.ssa().snapshot();
     let (optimized, report) = original.optimize_quantum(StructuredQuantumOptions::default())?;
+    expect_eq!(report.input_snapshot, input_snapshot);
+    expect_eq!(report.output_snapshot, optimized.ssa().snapshot());
+    expect_ne!(report.input_snapshot, report.output_snapshot);
     expect_eq!(gates(&optimized), 1);
     expect_eq!(optimized.ssa().blocks().len(), blocks);
     expect_eq!(report.before_gates, 5);

@@ -5,7 +5,7 @@ use quest_circuit::*;
 #[gtest]
 fn bell_macro_uses_the_same_builder_semantics() -> Result<()> {
     let p = legacy_circuit! {qubit[2] q; bit[2] c; h q[0]; cx q[0],q[1]; c[0] = measure q[0]; c[1] = measure q[1];}?;
-    let plan = p.bind(&[])?.lower()?.plan()?;
+    let plan = p.bind(&[])?.plan()?;
     expect_eq!(plan.num_qubits(), 2);
     expect_eq!(plan.num_bits(), 2);
     expect_eq!(plan.instructions().len(), 4);
@@ -36,7 +36,7 @@ fn interpolation_evaluates_once_in_source_order_and_modifiers_keep_phase() -> Re
         reset q[0];
     }?;
     expect_eq!(visits, &[1, 2]);
-    expect_eq!(p.bind(&[])?.lower()?.plan()?.instructions().len(), 7);
+    expect_eq!(p.bind(&[])?.plan()?.instructions().len(), 7);
     Ok(())
 }
 
@@ -100,8 +100,8 @@ fn full_macro_gate_inventory_matches_builder() -> Result<()> {
         &[q],
         &[],
     )?;
-    let a = macro_program.bind(&[])?.lower()?.plan()?;
-    let b = builder.finish()?.bind(&[])?.lower()?.plan()?;
+    let a = macro_program.bind(&[])?.plan()?;
+    let b = builder.finish()?.bind(&[])?.plan()?;
     expect_eq!(a.instructions().len(), b.instructions().len());
     for (a, b) in a.instructions().iter().zip(b.instructions()) {
         match (a.operation(), b.operation()) {
@@ -155,7 +155,7 @@ fn macro_operations_retain_original_file_and_keyword_byte_ranges() -> Result<()>
         measure q -> c;
     }?;
     expect_eq!(visits, &[1, 2]);
-    let plan = program.bind(&[])?.lower()?.plan()?;
+    let plan = program.bind(&[])?.plan()?;
     let mut previous_end = 0;
     let mut source = None;
     for (instruction, keyword) in plan

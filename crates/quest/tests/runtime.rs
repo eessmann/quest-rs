@@ -321,9 +321,7 @@ fn controlled_rotation_phase_matches_fused_and_unfused_execution() -> googletest
                 .fuse(FusionOptions::default())
                 .or_fail()?;
             let mut direct = env.prepare(validated).or_fail()?;
-            let mut optimized = env
-                .prepare_plan(fused.lower().or_fail()?.plan().or_fail()?)
-                .or_fail()?;
+            let mut optimized = env.prepare_plan(fused.plan().or_fail()?).or_fail()?;
             let mut left = env.state_vector(QubitCount::new(2).or_fail()?).or_fail()?;
             left.init_plus().or_fail()?;
             let mut right = left.try_clone().or_fail()?;
@@ -537,9 +535,7 @@ fn openqasm31_u_phase_survives_native_adjoint_signed_controls_and_fusion() -> go
                         } else {
                             bound
                         };
-                        let mut prepared = env
-                            .prepare_plan(bound.lower().or_fail()?.plan().or_fail()?)
-                            .or_fail()?;
+                        let mut prepared = env.prepare_plan(bound.plan().or_fail()?).or_fail()?;
                         let mut register =
                             env.state_vector(QubitCount::new(3).or_fail()?).or_fail()?;
                         let input = [

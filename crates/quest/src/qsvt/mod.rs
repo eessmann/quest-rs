@@ -8,11 +8,13 @@
 //! cannot authorize conditioning after the register has been released.
 #[cfg(all(feature = "mpi", quest_native_mpi))]
 pub mod collective;
+mod continuation;
 mod hadamard;
 mod projection;
 mod reporting;
 use crate::{Complex64, Environment, PreparedProgram, Register, StateVector};
 use crate::{environment::Reservation, error::BackendResult, values::bytes_for};
+use continuation::{AdmittedContinuation, PreparedContinuation};
 use faer::Mat;
 pub use hadamard::{AdmittedOverlap, OverlapBuilder, OverlapObservation, PreparedOverlap};
 use projection::PreparedProjection;
@@ -108,9 +110,8 @@ impl<'env> PreparationBuilder<'env, SuppliedTransform> {
 /// ```
 pub struct AdmittedTransform<'env> {
     main: crate::execution::AdmittedPlan<'env>,
-    continuation: Option<crate::execution::AdmittedPlan<'env>>,
+    continuation: AdmittedContinuation<'env>,
     input: projection::AdmittedProjection<'env>,
-    bridge: Option<projection::AdmittedProjection<'env>>,
     output: projection::AdmittedProjection<'env>,
     transform: ValidatedTransform,
     dispatches: NativeDispatchReport,
@@ -127,29 +128,14 @@ impl<'env> AdmittedTransform<'env> {
         transform: ValidatedTransform,
     ) -> Result<Self> {
         let main = resources.admit_plan(plan(transform.main())?)?;
-        let continuation = transform
-            .continuation()
-            .map(|p| resources.admit_plan(plan(p)?))
-            .transpose()?;
+        let continuation = AdmittedContinuation::new(resources, &transform, plan)?;
         let input = projection::AdmittedProjection::new(resources, transform.input())?;
-        let bridge = transform
-            .bridge()
-            .map(|p| projection::AdmittedProjection::new(resources, p))
-            .transpose()?;
         let output = projection::AdmittedProjection::new(resources, transform.output())?;
-        let dispatches = dispatch_schedule(
-            &main,
-            continuation.as_ref(),
-            &input,
-            bridge.as_ref(),
-            &output,
-            false,
-        )?;
+        let dispatches = dispatch_schedule(&main, &continuation, &input, &output, false)?;
         Ok(Self {
             main,
             continuation,
             input,
-            bridge,
             output,
             transform,
             dispatches,
@@ -158,15 +144,8 @@ impl<'env> AdmittedTransform<'env> {
     fn materialize(self) -> Result<PreparedTransform<'env>> {
         Ok(PreparedTransform {
             main: self.main.materialize()?,
-            continuation: self
-                .continuation
-                .map(crate::execution::AdmittedPlan::materialize)
-                .transpose()?,
+            continuation: self.continuation.materialize()?,
             input: self.input.materialize()?,
-            bridge: self
-                .bridge
-                .map(projection::AdmittedProjection::materialize)
-                .transpose()?,
             output: self.output.materialize()?,
             transform: self.transform,
             dispatches: self.dispatches,
@@ -175,9 +154,8 @@ impl<'env> AdmittedTransform<'env> {
 }
 fn dispatch_schedule(
     main: &crate::execution::AdmittedPlan<'_>,
-    continuation: Option<&crate::execution::AdmittedPlan<'_>>,
+    continuation: &AdmittedContinuation<'_>,
     input: &projection::AdmittedProjection<'_>,
-    bridge: Option<&projection::AdmittedProjection<'_>>,
     output: &projection::AdmittedProjection<'_>,
     overlap: bool,
 ) -> crate::Result<NativeDispatchReport> {
@@ -186,19 +164,28 @@ fn dispatch_schedule(
         reporting::circuit(program.plan())
     };
     let circuit = count(main)?
-        .checked_add(continuation.map(count).transpose()?.unwrap_or(0))
+        .checked_add(continuation.program().map(count).transpose()?.unwrap_or(0))
         .ok_or(crate::Error::Overflow)?;
     let projections = input
         .native_dispatches()
         .checked_add(output.native_dispatches())
         .and_then(|n| {
-            n.checked_add(bridge.map_or(0, projection::AdmittedProjection::native_dispatches))
+            n.checked_add(
+                continuation
+                    .bridge()
+                    .map_or(0, projection::AdmittedProjection::native_dispatches),
+            )
         })
         .ok_or(crate::Error::Overflow)?;
-    NativeDispatchReport::new(circuit, projections, overlap, bridge.is_some())
+    NativeDispatchReport::new(
+        circuit,
+        projections,
+        overlap,
+        continuation.bridge().is_some(),
+    )
 }
 fn plan(program: &quest_circuit::BoundProgram) -> crate::Result<quest_circuit::ExecutablePlan> {
-    Ok(program.clone().lower()?.plan()?)
+    Ok(program.clone().plan()?)
 }
 type RunAdmission = (Vec<bool>, Option<Vec<bool>>);
 /// Environment-bound native matrices and scratch, reusable for successive states.
@@ -213,9 +200,8 @@ type RunAdmission = (Vec<bool>, Option<Vec<bool>>);
 /// ```
 pub struct PreparedTransform<'env> {
     main: PreparedProgram<'env>,
-    continuation: Option<PreparedProgram<'env>>,
+    continuation: PreparedContinuation<'env>,
     input: PreparedProjection<'env>,
-    bridge: Option<PreparedProjection<'env>>,
     output: PreparedProjection<'env>,
     transform: ValidatedTransform,
     dispatches: NativeDispatchReport,
@@ -241,7 +227,7 @@ impl<'env> PreparedTransform<'env> {
         Ok((
             self.main.admit_run(register)?,
             self.continuation
-                .as_ref()
+                .program()
                 .map(|p| p.admit_run(register))
                 .transpose()?,
         ))
@@ -266,7 +252,7 @@ impl<'env> PreparedTransform<'env> {
             .run_admitted(register, main_bits)
             .map_err(|source| at(Stage::Main, completed, source))?;
         completed = completed.saturating_add(1);
-        let bridge = if let Some(projection) = &self.bridge {
+        let bridge = if let Some(projection) = self.continuation.bridge() {
             projection
                 .apply(register)
                 .map_err(|source| at(Stage::BridgeProjection, completed, source))?;
@@ -280,7 +266,7 @@ impl<'env> PreparedTransform<'env> {
         } else {
             None
         };
-        if let Some((program, bits)) = self.continuation.as_mut().zip(continuation_bits) {
+        if let Some((program, bits)) = self.continuation.program_mut().zip(continuation_bits) {
             program
                 .run_admitted(register, bits)
                 .map_err(|source| at(Stage::Continuation, completed, source))?;

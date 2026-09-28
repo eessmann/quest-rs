@@ -39,8 +39,10 @@ pub struct StructuredRotationCertificate {
     pub certificate: quest_math::ControlledApproxCertificate,
     pub outputs: Vec<ValueId>,
 }
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct StructuredSynthesisReport {
+    pub input_snapshot: ssa::SnapshotId,
+    pub output_snapshot: ssa::SnapshotId,
     pub rotations: Vec<StructuredRotationCertificate>,
     /// An exact classical trace count, or maximum-path count through an acyclic CFG.
     /// A trace must complete without inputs or quantum observations within fixed budgets.
@@ -60,10 +62,22 @@ pub struct StructuredSkippedCandidate {
     pub occurrences: Vec<StructuredOccurrence>,
     pub reason: String,
 }
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct StructuredZxReport {
+    pub input_snapshot: ssa::SnapshotId,
+    pub output_snapshot: ssa::SnapshotId,
     pub accepted: Vec<StructuredExactCertificate>,
     pub skipped: Vec<StructuredSkippedCandidate>,
+}
+impl StructuredZxReport {
+    const fn new(snapshot: ssa::SnapshotId) -> Self {
+        Self {
+            input_snapshot: snapshot,
+            output_snapshot: snapshot,
+            accepted: Vec::new(),
+            skipped: Vec::new(),
+        }
+    }
 }
 fn budget(reason: &'static str) -> StructuredWorkerError {
     LanguageError::Budget(reason).into()
@@ -485,12 +499,18 @@ impl VerifiedStructuredProgram {
         let multiplicity = trace_count(self.ssa(), self.captures(), 1_000_000);
         let constants = constants(self.ssa(), self.captures());
         self.transform_ssa(|verified| {
+            let snapshot = verified.snapshot();
             let mut program = verified.into_unverified();
             let mut allocator = program
                 .value_allocator(CompileLimits::default())
                 .map_err(LanguageError::from)?;
             let mut replacements = BTreeMap::new();
-            let mut report = StructuredSynthesisReport::default();
+            let mut report = StructuredSynthesisReport {
+                input_snapshot: snapshot,
+                output_snapshot: snapshot,
+                rotations: Vec::new(),
+                operator_error_bound: None,
+            };
             let mut weights = BTreeMap::new();
             let context = Context {
                 slots: &program.slots,
@@ -563,12 +583,11 @@ impl VerifiedStructuredProgram {
             report.operator_error_bound = multiplicity
                 .map(|count| std::ops::Mul::mul(&epsilon, Rational::from_integer(count.into())))
                 .or_else(|| bound(&program, &weights, &epsilon));
-            Ok((
-                program
-                    .verify(CompileLimits::default())
-                    .map_err(LanguageError::from)?,
-                report,
-            ))
+            let program = program
+                .verify(CompileLimits::default())
+                .map_err(LanguageError::from)?;
+            report.output_snapshot = program.snapshot();
+            Ok((program, report))
         })
     }
 }
@@ -584,6 +603,7 @@ impl VerifiedStructuredProgram {
         seed: u64,
         limits: Limits,
     ) -> Result<(Self, StructuredZxReport)> {
+        let snapshot = self.ssa().snapshot();
         if let Err(error) = check_input(self.ssa()) {
             return Ok((
                 self,
@@ -592,12 +612,13 @@ impl VerifiedStructuredProgram {
                         occurrences: vec![],
                         reason: error.to_string(),
                     }],
-                    ..StructuredZxReport::default()
+                    ..StructuredZxReport::new(snapshot)
                 },
             ));
         }
         let constants = constants(self.ssa(), self.captures());
         self.transform_ssa(|verified| {
+            let snapshot = verified.snapshot();
             let mut program = verified.into_unverified();
             let allocator = program
                 .value_allocator(CompileLimits::default())
@@ -613,14 +634,14 @@ impl VerifiedStructuredProgram {
                 requests: 0,
                 allocator,
                 replacements: BTreeMap::new(),
-                report: StructuredZxReport::default(),
+                report: StructuredZxReport::new(snapshot),
             };
             for block in &mut program.blocks {
                 edit.block(block)?;
             }
             let ZxEdit {
                 replacements,
-                report,
+                mut report,
                 ..
             } = edit;
             exact::remap(
@@ -631,12 +652,11 @@ impl VerifiedStructuredProgram {
                     limit: 2_000_000,
                 },
             )?;
-            Ok((
-                program
-                    .verify(CompileLimits::default())
-                    .map_err(LanguageError::from)?,
-                report,
-            ))
+            let program = program
+                .verify(CompileLimits::default())
+                .map_err(LanguageError::from)?;
+            report.output_snapshot = program.snapshot();
+            Ok((program, report))
         })
     }
 }

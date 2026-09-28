@@ -18,7 +18,7 @@ fn explicit_synthesis_retains_target_identity_control_phase_and_local_certificat
     let mut builder = ProgramBuilder::new(3, 0)?;
     let q = builder.qubit(2)?;
     let c = builder.qubit(0)?;
-    builder.gate(
+    let source = builder.gate(
         Gate::Rz(Angle::pi(1, 7)?),
         &[q],
         &[Control::new(c, ControlState::Zero)],
@@ -30,17 +30,33 @@ fn explicit_synthesis_retains_target_identity_control_phase_and_local_certificat
     expect_eq!(report.rotations.len(), 1);
     expect_true!(report.operator_error_bound.is_some());
     expect_true!(candidate.schedule().len() > 1);
-    let plan = candidate.bind(&[])?.lower()?.plan()?;
+    let certificate_root = report.rotations[0].provenance;
+    expect_ne!(certificate_root, report.rotations[0].input);
+    expect_eq!(
+        report
+            .provenance
+            .source_leaves(certificate_root, quest_circuit::ExpansionLimits::default())?,
+        vec![source]
+    );
+    let (candidate, _) = candidate.optimize_exact()?;
+    let plan = candidate.bind(&[])?.plan()?;
     for instruction in plan.instructions() {
+        expect_eq!(
+            plan.provenance().source_leaves(
+                instruction.provenance(),
+                quest_circuit::ExpansionLimits::default()
+            )?,
+            vec![source]
+        );
         match instruction.operation() {
             quest_circuit::Operation::Gate {
                 targets, controls, ..
             } => {
-                expect_eq!(targets, &[q]);
-                expect_eq!(controls, &[Control::new(c, ControlState::Zero)]);
+                expect_eq!(targets.as_ref(), &[q]);
+                expect_eq!(controls.as_ref(), &[Control::new(c, ControlState::Zero)]);
             }
             quest_circuit::Operation::GlobalPhase { controls, .. } => {
-                expect_eq!(controls, &[Control::new(c, ControlState::Zero)]);
+                expect_eq!(controls.as_ref(), &[Control::new(c, ControlState::Zero)]);
             }
             _ => fail!("unexpected synthesized effect")?,
         }
@@ -78,6 +94,20 @@ fn zx_replacements_are_transactional_and_preserve_measurement_occurrences() -> R
     expect_eq!(optimized.schedule(), &[measure]);
     expect_eq!(report.accepted.len(), 2);
     for accepted in report.accepted {
+        expect_eq!(
+            report
+                .provenance
+                .source_leaves(
+                    accepted.provenance,
+                    quest_circuit::ExpansionLimits::default()
+                )?
+                .len(),
+            2
+        );
+        expect_true!(matches!(
+            report.provenance.node(accepted.provenance)?,
+            quest_circuit::ProvenanceNode::Rewrite(_)
+        ));
         quest_math::verify_exact(
             accepted.certificate.candidate(),
             accepted.certificate.target(),

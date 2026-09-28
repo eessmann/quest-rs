@@ -130,7 +130,7 @@ macro frontend is available as `legacy_circuit!`; it has different semantics
 from primary `circuit!`.
 
 ```text
-ProgramBuilder -> ValidatedProgram -> BoundProgram -> LoweredProgram
+ProgramBuilder -> ValidatedProgram -> BoundProgram
     -> ExecutablePlan -> PreparedProgram<'env>
 ```
 

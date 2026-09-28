@@ -24,7 +24,7 @@ fn controlled_full_turn_rotation_keeps_relative_phase() -> Result<()> {
     )?;
     let (program, report) = b.finish()?.optimize_exact()?;
     expect_eq!(report.removed.len(), 0);
-    let plan = program.bind(&[])?.lower()?.plan()?;
+    let plan = program.bind(&[])?.plan()?;
     expect_eq!(plan.instructions().len(), 1);
     Ok(())
 }
@@ -52,10 +52,7 @@ fn missing_nonfinite_and_duplicate_bindings_are_rejected() -> Result<()> {
     expect_true!(p.clone().bind(&[]).is_err());
     expect_true!(p.clone().bind(&[(t, f64::INFINITY)]).is_err());
     expect_true!(p.clone().bind(&[(t, 1.0), (t, 2.0)]).is_err());
-    expect_eq!(
-        p.bind(&[(t, 0.5)])?.lower()?.plan()?.instructions().len(),
-        1
-    );
+    expect_eq!(p.bind(&[(t, 0.5)])?.plan()?.instructions().len(), 1);
     Ok(())
 }
 

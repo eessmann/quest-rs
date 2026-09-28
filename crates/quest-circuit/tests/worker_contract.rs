@@ -3,6 +3,7 @@ use googletest::{Result, prelude::*};
 use quest_circuit::{Gate, ProgramBuilder};
 use quest_math::Limits;
 use quest_optimizer_client::{Client, WorkerLimits};
+
 #[cfg(all(target_os = "linux", feature = "macros"))]
 #[gtest]
 fn numerical_oracle_calls_keep_local_certificates_without_a_global_bound() -> Result<()> {
@@ -42,7 +43,11 @@ fn numerical_oracle_calls_keep_local_certificates_without_a_global_bound() -> Re
     let adjoint = circuit! { oracle amplified[1] = ${fragment.clone()}; qubit[2] q; rz(0.2) q[0]; adjoint @ amplified q[0]; }?;
     for program in [direct, nested, controlled, adjoint] {
         let program = program.verify()?;
-        let (_, report) = program.synthesize_rotations(&client, 0.15, 0, Limits::default())?;
+        let input_snapshot = program.ssa().snapshot();
+        let (output, report) = program.synthesize_rotations(&client, 0.15, 0, Limits::default())?;
+        expect_eq!(report.input_snapshot, input_snapshot);
+        expect_eq!(report.output_snapshot, output.ssa().snapshot());
+        expect_ne!(report.input_snapshot, report.output_snapshot);
         expect_eq!(report.rotations.len(), 1);
         expect_true!(
             report.rotations[0]

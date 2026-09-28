@@ -22,7 +22,7 @@ fn retained_calls_share_storage_but_keep_distinct_occurrences() -> googletest::R
     let first = builder.oracle(&fragment, &targets, &[])?;
     let second = builder.oracle(&fragment, &targets, &[])?;
     expect_ne!(first, second);
-    let plan = builder.finish()?.bind(&[])?.lower()?.plan()?;
+    let plan = builder.finish()?.bind(&[])?.plan()?;
     expect_eq!(plan.instructions().len(), 2);
     for instruction in plan.instructions() {
         let Operation::Oracle {
@@ -47,13 +47,13 @@ fn adjoint_reverses_operations_and_controls_global_phase() -> googletest::Result
     expect_true!(adjoint.shares_storage_with(&fragment));
     let operations = adjoint.decompose(&targets, &[control], MatrixPolicy::default())?;
     expect_true!(
-        matches!(operations.first().ok_or_else(|| std::io::Error::other("missing operation"))?, Operation::GlobalPhase { radians, controls } if radians.to_bits() == (-0.25f64).to_bits() && controls == &[control])
+        matches!(operations.first().ok_or_else(|| std::io::Error::other("missing operation"))?, Operation::GlobalPhase { radians, controls } if radians.to_bits() == (-0.25f64).to_bits() && controls.as_ref() == [control])
     );
     expect_true!(
-        matches!(operations.get(1).ok_or_else(|| std::io::Error::other("missing operation"))?, Operation::Gate { gate: BoundGate::Sdg, targets: mapped, .. } if mapped == &[targets[1]])
+        matches!(operations.get(1).ok_or_else(|| std::io::Error::other("missing operation"))?, Operation::Gate { gate: BoundGate::Sdg, targets: mapped, .. } if mapped.as_ref() == [targets[1]])
     );
     expect_true!(
-        matches!(operations.get(2).ok_or_else(|| std::io::Error::other("missing operation"))?, Operation::Gate { gate: BoundGate::X, targets: mapped, .. } if mapped == &[targets[0]])
+        matches!(operations.get(2).ok_or_else(|| std::io::Error::other("missing operation"))?, Operation::Gate { gate: BoundGate::X, targets: mapped, .. } if mapped.as_ref() == [targets[0]])
     );
     expect_true!(
         fragment

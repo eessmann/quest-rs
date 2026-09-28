@@ -169,34 +169,17 @@ impl OracleFragment {
         self.operations()
             .iter()
             .try_fold(initial, |total, operation| {
-                let (targets, controls, extra) = match operation {
-                    Operation::Gate {
-                        targets, controls, ..
-                    } => (targets.capacity(), controls.capacity(), 0),
-                    Operation::GlobalPhase { controls, .. } => (0, controls.capacity(), 0),
-                    Operation::Numerical {
-                        matrix,
-                        targets,
-                        controls,
-                    } => (targets.capacity(), controls.capacity(), matrix.bytes()),
-                    Operation::Oracle {
-                        fragment,
-                        targets,
-                        controls,
-                    } => (
-                        targets.capacity(),
-                        controls.capacity(),
-                        fragment.retained_bytes(seen)?,
-                    ),
-                    Operation::Barrier { qubits } => (qubits.capacity(), 0, 0),
+                let extra = match operation {
+                    Operation::Gate { .. }
+                    | Operation::GlobalPhase { .. }
+                    | Operation::Barrier { .. } => 0,
+                    Operation::Numerical { matrix, .. } => matrix.bytes(),
+                    Operation::Oracle { fragment, .. } => fragment.retained_bytes(seen)?,
                     _ => return Err(Error::NotUnitary),
                 };
-                targets
-                    .checked_mul(size_of::<QubitId>())
-                    .and_then(|bytes| {
-                        bytes.checked_add(controls.checked_mul(size_of::<Control>())?)
-                    })
-                    .and_then(|bytes| bytes.checked_add(extra))
+                operation
+                    .operand_storage_bytes()?
+                    .checked_add(extra)
                     .and_then(|bytes| total.checked_add(bytes))
                     .ok_or(Error::Budget("oracle storage"))
             })
@@ -233,16 +216,6 @@ impl OracleFragment {
         policy: MatrixPolicy,
     ) -> Result<Vec<Operation>> {
         self.check_operands(targets, controls)?;
-        let map = |q: QubitId| targets.get(q.index()).copied().ok_or(Error::InvalidId);
-        let map_targets =
-            |local: &[QubitId]| local.iter().copied().map(map).collect::<Result<Vec<_>>>();
-        let map_controls = |local: &[Control]| {
-            local
-                .iter()
-                .map(|c| Ok(Control::new(map(c.qubit())?, c.state())))
-                .chain(controls.iter().copied().map(Ok))
-                .collect::<Result<Vec<_>>>()
-        };
         let mut output = Vec::new();
         output
             .try_reserve_exact(self.body.operations.len())
@@ -258,55 +231,41 @@ impl OracleFragment {
                 position
             };
             let operation = self.body.operations.get(index).ok_or(Error::InvalidId)?;
+            let mapped = crate::model::remap_operands(operation.operands(), targets, controls)?;
             output.push(match operation {
-                Operation::Gate {
-                    gate,
-                    targets,
-                    controls,
-                } => Operation::Gate {
+                Operation::Gate { gate, .. } => Operation::Gate {
                     gate: if self.adjoint {
                         gate.adjoint()
                     } else {
                         gate.clone()
                     },
-                    targets: map_targets(targets)?,
-                    controls: map_controls(controls)?,
+                    targets: mapped.targets,
+                    controls: mapped.controls,
                 },
-                Operation::GlobalPhase { radians, controls } => Operation::GlobalPhase {
+                Operation::GlobalPhase { radians, .. } => Operation::GlobalPhase {
                     radians: if self.adjoint { -*radians } else { *radians },
-                    controls: map_controls(controls)?,
+                    controls: mapped.controls,
                 },
-                Operation::Numerical {
-                    matrix,
-                    targets,
-                    controls,
-                } => Operation::Numerical {
+                Operation::Numerical { matrix, .. } => Operation::Numerical {
                     matrix: if self.adjoint {
                         matrix.conjugate_transpose(policy)?
                     } else {
                         matrix.clone()
                     },
-                    targets: map_targets(targets)?,
-                    controls: map_controls(controls)?,
+                    targets: mapped.targets,
+                    controls: mapped.controls,
                 },
-                Operation::Oracle {
-                    fragment,
-                    targets,
-                    controls,
-                } => Operation::Oracle {
+                Operation::Oracle { fragment, .. } => Operation::Oracle {
                     fragment: if self.adjoint {
                         fragment.adjoint()
                     } else {
                         fragment.clone()
                     },
-                    targets: map_targets(targets)?,
-                    controls: map_controls(controls)?,
+                    targets: mapped.targets,
+                    controls: mapped.controls,
                 },
-                Operation::Barrier { qubits } => Operation::Barrier {
-                    qubits: map_targets(qubits)?
-                        .into_iter()
-                        .chain(controls.iter().map(|c| c.qubit()))
-                        .collect(),
+                Operation::Barrier { .. } => Operation::Barrier {
+                    qubits: mapped.scope(),
                 },
                 _ => return Err(Error::NotUnitary),
             });
@@ -479,40 +438,20 @@ fn portable_statement(operation: Operation) -> Result<crate::language::syntax::S
             gate,
             targets,
             controls,
-        } => {
-            let (name, values) = match gate {
-                BoundGate::Id => ("id", vec![]),
-                BoundGate::X => ("x", vec![]),
-                BoundGate::Y => ("y", vec![]),
-                BoundGate::Z => ("z", vec![]),
-                BoundGate::H => ("h", vec![]),
-                BoundGate::S => ("s", vec![]),
-                BoundGate::Sdg => ("sdg", vec![]),
-                BoundGate::T => ("t", vec![]),
-                BoundGate::Tdg => ("tdg", vec![]),
-                BoundGate::Sx => ("sx", vec![]),
-                BoundGate::Sxdg => ("sxdg", vec![]),
-                BoundGate::Swap => ("swap", vec![]),
-                BoundGate::Rx(a) => ("rx", vec![a]),
-                BoundGate::Ry(a) => ("ry", vec![a]),
-                BoundGate::Rz(a) => ("rz", vec![a]),
-                BoundGate::Phase(a) => ("p", vec![a]),
-                BoundGate::U { theta, phi, lambda } => ("U", vec![theta, phi, lambda]),
-            };
-            (
-                name,
-                values.into_iter().map(number).collect(),
-                targets,
-                controls,
-            )
-        }
+        } => (
+            gate.kind().definition().name,
+            gate.parameters().map(number).collect(),
+            targets,
+            controls,
+        ),
+
         Operation::GlobalPhase { radians, controls } => {
-            ("gphase", vec![number(radians)], Vec::new(), controls)
+            ("gphase", vec![number(radians)], Arc::from([]), controls)
         }
         Operation::Barrier { qubits } => {
             return Ok(Statement {
                 span: None,
-                kind: StatementKind::Barrier(qubits.into_iter().map(operand).collect()),
+                kind: StatementKind::Barrier(qubits.iter().copied().map(operand).collect()),
             });
         }
         _ => return Err(Error::Unsupported("portable oracle operation")),
@@ -525,7 +464,7 @@ fn portable_statement(operation: Operation) -> Result<crate::language::syntax::S
             operands: controls
                 .iter()
                 .map(|control| operand(control.qubit()))
-                .chain(targets.into_iter().map(operand))
+                .chain(targets.iter().copied().map(operand))
                 .collect(),
             modifiers: controls
                 .iter()

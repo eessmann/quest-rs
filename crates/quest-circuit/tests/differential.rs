@@ -159,14 +159,7 @@ fn randomized_exact_pass_and_fusion_preserve_complex_state_including_phase() -> 
             builder.gate(gate, &[q], &controls).unwrap();
         }
         let p = builder.finish().unwrap();
-        let original = p
-            .clone()
-            .bind(&[])
-            .unwrap()
-            .lower()
-            .unwrap()
-            .plan()
-            .unwrap();
+        let original = p.clone().bind(&[]).unwrap().plan().unwrap();
         let optimized = p
             .optimize_exact()
             .unwrap()
@@ -176,8 +169,6 @@ fn randomized_exact_pass_and_fusion_preserve_complex_state_including_phase() -> 
             .fuse(FusionOptions::default())
             .unwrap()
             .0
-            .lower()
-            .unwrap()
             .plan()
             .unwrap();
         let state = (0..8)
@@ -209,7 +200,6 @@ fn controlling_a_global_phase_changes_only_the_active_branch() -> Result<()> {
         .controlled(&[Control::new(control, ControlState::One)])?
         .into_program()
         .bind(&[])?
-        .lower()?
         .plan()?;
     let state = vec![C::new(1.0, 0.0); 4];
     let result = scalar_run(&plan, state)?;
@@ -252,7 +242,7 @@ fn channels_are_effectful_and_completeness_is_checked() -> Result<()> {
     expect_eq!(p.schedule().len(), 3);
     let (bound, _) = p.bind(&[])?.fuse(FusionOptions::default())?;
     expect_eq!(bound.instructions().len(), 3);
-    expect_true!(bound.lower()?.plan()?.requires_density_matrix());
+    expect_true!(bound.plan()?.requires_density_matrix());
     Ok(())
 }
 
@@ -278,7 +268,7 @@ fn union_fusion_preserves_ordered_operands_and_signed_controls() -> Result<()> {
         targets, controls, ..
     } = fused.instructions()[0].operation()
     {
-        expect_eq!(targets, &[q3, q1, q2, q0]);
+        expect_eq!(targets.as_ref(), &[q3, q1, q2, q0]);
         expect_true!(controls.is_empty());
     } else {
         fail!("expected union matrix")?;
@@ -286,8 +276,8 @@ fn union_fusion_preserves_ordered_operands_and_signed_controls() -> Result<()> {
     let state = (0..16)
         .map(|i| C::new(f64::from(i) / 17.0, f64::from(7 - i) / 23.0))
         .collect::<Vec<_>>();
-    let left = scalar_run(&original.lower()?.plan()?, state.clone())?;
-    let right = scalar_run(&fused.lower()?.plan()?, state)?;
+    let left = scalar_run(&original.plan()?, state.clone())?;
+    let right = scalar_run(&fused.plan()?, state)?;
     for (a, b) in left.iter().zip(right) {
         expect_lt!((*a - b).norm(), 1e-13);
     }

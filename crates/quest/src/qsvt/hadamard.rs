@@ -1,5 +1,9 @@
 //! Hadamard observations with a reusable reference, working state and scratch.
-use super::{PreparationBuilder, Result, SuppliedTransform, projection::PreparedProjection};
+use super::{
+    PreparationBuilder, Result, SuppliedTransform,
+    continuation::{AdmittedContinuation, PreparedContinuation},
+    projection::PreparedProjection,
+};
 use crate::{Complex64, Environment, PreparedProgram, QubitCount, Register, StateVector};
 use crate::{
     environment::{Reservation, RuntimeResources},
@@ -79,9 +83,8 @@ pub struct AdmittedOverlap<'env> {
     working: Reservation<'env>,
     scratch: Reservation<'env>,
     main: crate::execution::AdmittedPlan<'env>,
-    continuation: Option<crate::execution::AdmittedPlan<'env>>,
+    continuation: AdmittedContinuation<'env>,
     input: super::projection::AdmittedProjection<'env>,
-    bridge: Option<super::projection::AdmittedProjection<'env>>,
     output: super::projection::AdmittedProjection<'env>,
     outer: i32,
     transform: ValidatedTransform,
@@ -171,24 +174,12 @@ impl<'env> AdmittedOverlap<'env> {
             width,
             padding,
         )?)?;
-        let continuation = transform
-            .continuation()
-            .map(|p| resources.admit_plan(controlled_plan_padded(resources, p, width, padding)?))
-            .transpose()?;
+        let continuation = AdmittedContinuation::new(resources, &transform, |p| {
+            controlled_plan_padded(resources, p, width, padding)
+        })?;
         let input = super::projection::AdmittedProjection::new(resources, transform.input())?;
-        let bridge = transform
-            .bridge()
-            .map(|p| super::projection::AdmittedProjection::new(resources, p))
-            .transpose()?;
         let output = super::projection::AdmittedProjection::new(resources, transform.output())?;
-        let dispatches = super::dispatch_schedule(
-            &main,
-            continuation.as_ref(),
-            &input,
-            bridge.as_ref(),
-            &output,
-            true,
-        )?;
+        let dispatches = super::dispatch_schedule(&main, &continuation, &input, &output, true)?;
         Ok(Self {
             initial,
             working,
@@ -196,7 +187,6 @@ impl<'env> AdmittedOverlap<'env> {
             main,
             continuation,
             input,
-            bridge,
             output,
             outer,
             transform,
@@ -217,15 +207,8 @@ impl<'env> AdmittedOverlap<'env> {
             working,
             scratch,
             main: self.main.materialize()?,
-            continuation: self
-                .continuation
-                .map(crate::execution::AdmittedPlan::materialize)
-                .transpose()?,
+            continuation: self.continuation.materialize()?,
             input: self.input.materialize()?,
-            bridge: self
-                .bridge
-                .map(super::projection::AdmittedProjection::materialize)
-                .transpose()?,
             output: self.output.materialize()?,
             outer: self.outer,
             transform: self.transform,
@@ -276,7 +259,7 @@ pub(super) fn controlled_plan_padded(
             &targets,
             &[Control::new(builder.qubit(width)?, ControlState::One)],
         )?;
-        builder.finish()?.bind(&[])?.lower()?.plan()
+        builder.finish()?.bind(&[])?.plan()
     };
     Ok(build()?)
 }
@@ -291,9 +274,8 @@ pub struct PreparedOverlap<'env> {
     working: Register<'env, StateVector>,
     scratch: Register<'env, StateVector>,
     main: PreparedProgram<'env>,
-    continuation: Option<PreparedProgram<'env>>,
+    continuation: PreparedContinuation<'env>,
     input: PreparedProjection<'env>,
-    bridge: Option<PreparedProjection<'env>>,
     output: PreparedProjection<'env>,
     outer: i32,
     transform: ValidatedTransform,
@@ -315,7 +297,7 @@ impl PreparedOverlap<'_> {
         Ok((
             self.main.admit_run(&self.working)?,
             self.continuation
-                .as_ref()
+                .program()
                 .map(|p| p.admit_run(&self.working))
                 .transpose()?,
         ))
@@ -340,12 +322,12 @@ impl PreparedOverlap<'_> {
             .run_admitted(&mut self.working, bits)
             .map_err(|source| super::at(super::Stage::Main, completed, source))?;
         completed = completed.saturating_add(1);
-        if let Some(bridge) = &self.bridge {
+        if let Some(bridge) = self.continuation.bridge() {
             conditional_projection(bridge, &mut self.working, &mut self.scratch, self.outer)
                 .map_err(|source| super::at(super::Stage::BridgeProjection, completed, source))?;
             completed = completed.saturating_add(1);
         }
-        if let Some((continuation, bits)) = self.continuation.as_mut().zip(continuation_bits) {
+        if let Some((continuation, bits)) = self.continuation.program_mut().zip(continuation_bits) {
             continuation
                 .run_admitted(&mut self.working, bits)
                 .map_err(|source| super::at(super::Stage::Continuation, completed, source))?;

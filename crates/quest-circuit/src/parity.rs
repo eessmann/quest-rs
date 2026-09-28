@@ -18,6 +18,7 @@
 //! explicit user edges disable the pass. Limits cover source/candidate sizes,
 //! coefficient and intermediate bits, pass work, and conservative allocation
 //! forecasts. They do not impose a wall-clock deadline or a process-RSS bound.
+use crate::ProvenanceGraph;
 use crate::linear::{self, Work};
 use crate::model::{AngleExpr, SemanticOperation};
 use crate::{
@@ -26,7 +27,7 @@ use crate::{
 };
 use num_bigint::BigInt;
 use num_traits::{Signed, Zero};
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, sync::Arc};
 
 /// Straight-line adapter shared by program windows and external block frontends.
 /// Coefficients multiply mathematical pi; these DTOs are admitted on every call.
@@ -79,6 +80,7 @@ pub struct ParityReport {
     pub accepted_windows: usize,
     pub work: usize,
     pub rewrites: Vec<LinearRewrite>,
+    pub provenance: Arc<ProvenanceGraph>,
 }
 #[derive(Debug, PartialEq, Eq)]
 struct Signature {
@@ -399,7 +401,7 @@ fn adapter(operation: &SemanticOperation) -> Option<AffinePhaseOperation> {
             targets,
             controls,
         } if controls.is_empty() => {
-            let [target] = targets.as_slice() else {
+            let [target] = targets.as_ref() else {
                 return None;
             };
             let target = target.index();
@@ -445,7 +447,7 @@ fn operation(value: AffinePhaseOperation, owner: u64) -> Result<SemanticOperatio
         AffinePhaseOperation::GlobalPhase { coefficient } => {
             return Ok(SemanticOperation::GlobalPhase {
                 angle: Angle::rational_pi(coefficient)?,
-                controls: vec![],
+                controls: Arc::from([]),
             });
         }
         AffinePhaseOperation::X { target } => (Gate::X, target),
@@ -463,8 +465,9 @@ fn operation(value: AffinePhaseOperation, owner: u64) -> Result<SemanticOperatio
         targets: vec![QubitId {
             owner,
             index: target,
-        }],
-        controls: vec![],
+        }]
+        .into(),
+        controls: Arc::from([]),
     })
 }
 impl ValidatedProgram {
@@ -480,6 +483,7 @@ impl ValidatedProgram {
         let mut report = ParityReport {
             before_operations: self.occurrences.len(),
             after_operations: self.occurrences.len(),
+            provenance: Arc::clone(&self.provenance),
             ..ParityReport::default()
         };
         if !self.explicit_edges.is_empty() {
@@ -489,10 +493,14 @@ impl ValidatedProgram {
             linear: linear::program_preflight(&self, options.linear)?,
             ..options
         };
-        let mut work = Work {
-            used: self.occurrences.len(),
-            maximum: options.linear.max_work,
-        };
+        let mut provenance = ProvenanceGraph::edit(
+            Arc::clone(&self.provenance),
+            options
+                .linear
+                .max_bytes
+                .min(self.limits.max_provenance_bytes),
+        )?;
+        let mut work = linear::program_work(&self, options.linear)?;
         let mut output = vec![];
         let mut offset = 0;
         while let Some(current) = self.occurrences.get(offset) {
@@ -533,8 +541,9 @@ impl ValidatedProgram {
                     .into_iter()
                     .map(|value| operation(value, self.owner))
                     .collect::<Result<Vec<_>>>()?;
+                work.charge(window.len())?;
                 let (replacement, rewrite) =
-                    linear::replacement(window, operations, options.linear)?;
+                    linear::replacement(window, operations, options.linear, &mut provenance)?;
                 output.extend(replacement);
                 report.rewrites.push(rewrite);
                 report.accepted_windows = report
@@ -548,6 +557,7 @@ impl ValidatedProgram {
         }
         report.work = work.used;
         report.after_operations = output.len();
+        report.provenance = Arc::new(provenance);
         let result = Self::from_parts(
             self.owner,
             self.num_qubits,
@@ -556,6 +566,7 @@ impl ValidatedProgram {
             output,
             self.explicit_edges,
             self.limits,
+            Arc::clone(&report.provenance),
         )?;
         Ok((result, report))
     }

@@ -10,7 +10,7 @@
 //! let mut builder = ProgramBuilder::new(1, 0)?;
 //! let theta = builder.parameter("theta")?;
 //! builder.gate(Gate::Rx(Angle::parameter(theta)), &[builder.qubit(0)?], &[])?;
-//! let plan = builder.finish()?.bind(&[(theta, 0.25)])?.lower()?.plan()?;
+//! let plan = builder.finish()?.bind(&[(theta, 0.25)])?.plan()?;
 //! assert_eq!(plan.instructions().len(), 1);
 //! # Ok::<(), quest_circuit::Error>(())
 //! ```
@@ -27,6 +27,8 @@ mod matrix;
 mod model;
 mod optimize;
 mod program;
+mod provenance;
+pub use provenance::{ExpansionLimits, ProvenanceGraph, ProvenanceId, ProvenanceNode};
 mod rational;
 mod structured;
 mod structured_optimize;
@@ -61,6 +63,8 @@ pub enum Error {
     DuplicateOperand,
     #[error("operation expects {expected} targets, received {actual}")]
     Arity { expected: usize, actual: usize },
+    #[error("gate expects {expected} parameters, received {actual}")]
+    ParameterArity { expected: usize, actual: usize },
     #[error("invalid finite numerical value")]
     NonFinite,
     #[error("rational angle denominator must be nonzero")]

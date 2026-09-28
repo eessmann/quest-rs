@@ -35,7 +35,7 @@ fn bell() -> quest::Result<quest::ExecutablePlan> {
     let b = p.qubit(1)?;
     p.gate(Gate::H, &[a], &[])?;
     p.gate(Gate::X, &[b], &[Control::new(a, ControlState::One)])?;
-    Ok(p.finish()?.bind(&[])?.lower()?.plan()?)
+    Ok(p.finish()?.bind(&[])?.plan()?)
 }
 fn oracle(phase: f64) -> quest::Result<quest::ExecutablePlan> {
     let mut body = ProgramBuilder::new(1, 0)?;
@@ -51,7 +51,7 @@ fn oracle(phase: f64) -> quest::Result<quest::ExecutablePlan> {
         .build()?;
     let mut outer = ProgramBuilder::new(2, 0)?;
     outer.oracle(&fragment, &[outer.qubit(1)?], &[])?;
-    Ok(outer.finish()?.bind(&[])?.lower()?.plan()?)
+    Ok(outer.finish()?.bind(&[])?.plan()?)
 }
 #[gtest]
 fn collective_prepared_bell_oracle_and_projection_preserve_mpi() -> googletest::Result<()> {
@@ -259,7 +259,7 @@ fn differing_semantics(case: usize, different: bool) -> quest::Result<quest::Exe
             )?;
         }
     }
-    Ok(p.finish()?.bind(&[])?.lower()?.plan()?)
+    Ok(p.finish()?.bind(&[])?.plan()?)
 }
 #[gtest]
 fn collective_compares_full_semantics_and_prepared_identity() -> googletest::Result<()> {

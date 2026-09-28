@@ -120,7 +120,7 @@ impl Encoder {
             .map(|q| source.qubit(q))
             .collect::<quest_circuit::Result<Vec<_>>>()?;
         source.oracle(encoding.oracle(), &targets, &[])?;
-        self.plan(&source.finish()?.bind(&[])?.lower()?.plan()?)?;
+        self.plan(&source.finish()?.bind(&[])?.plan()?)?;
         Ok(())
     }
     fn raw(&mut self, bytes: &[u8]) -> Result<()> {

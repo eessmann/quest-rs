@@ -49,7 +49,7 @@ let mut builder = ProgramBuilder::new(1, 0)?;
 let q = builder.qubit(0)?;
 let theta = builder.parameter("theta")?;
 builder.gate(Gate::Rx(Angle::parameter(theta)), &[q], &[])?;
-let plan = builder.finish()?.bind(&[(theta, 0.25)])?.lower()?.plan()?;
+let plan = builder.finish()?.bind(&[(theta, 0.25)])?.plan()?;
 # Ok::<(), quest_circuit::Error>(())
 ```
 
@@ -114,7 +114,7 @@ let mut program = ProgramBuilder::new(3, 0)?;
 let targets = [program.qubit(2)?, program.qubit(0)?];
 program.oracle(&fragment, &targets, &[])?;
 program.oracle(&fragment.adjoint(), &targets, &[])?;
-let plan = program.finish()?.bind(&[])?.lower()?.plan()?;
+let plan = program.finish()?.bind(&[])?.plan()?;
 # Ok::<(), quest_circuit::Error>(())
 ```
 

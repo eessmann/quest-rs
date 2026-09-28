@@ -33,7 +33,7 @@
 //! let comm = runtime.world().unwrap();
 //! let env = CollectiveEnvironment::builder(&comm).unwrap().build().unwrap();
 //! let plan = quest::ProgramBuilder::new(2, 0).unwrap().finish().unwrap()
-//!     .bind(&[]).unwrap().lower().unwrap().plan().unwrap();
+//!     .bind(&[]).unwrap().plan().unwrap();
 //! let prepared = env.prepare_plan(plan).unwrap();
 //! drop(env);
 //! let _ = prepared.plan();
@@ -207,8 +207,7 @@ impl<'comm, 'runtime> CollectiveEnvironment<'comm, 'runtime> {
         let mut lane = self.begin(1, self.next_id.get(), 0, 0)?;
         let plan = program
             .bind(&[])
-            .and_then(quest_circuit::BoundProgram::lower)
-            .and_then(quest_circuit::LoweredProgram::plan)
+            .and_then(quest_circuit::BoundProgram::plan)
             .map_err(Error::from);
         let plan = agree_result(&mut lane, plan)?;
         drop(lane);

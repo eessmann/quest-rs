@@ -3,6 +3,25 @@ use googletest::prelude::*;
 use quest_circuit::*;
 
 #[gtest]
+fn exact_merge_reports_retain_only_immediate_rewrite_inputs() -> Result<()> {
+    let mut builder = ProgramBuilder::new(1, 0)?;
+    let q = builder.qubit(0)?;
+    for _ in 0..128 {
+        builder.gate(Gate::Rz(Angle::pi(1, 7)?), &[q], &[])?;
+    }
+    let (program, report) = builder.finish()?.optimize_exact()?;
+    expect_eq!(program.schedule().len(), 1);
+    expect_eq!(report.rewrites.len(), 127);
+    expect_true!(
+        report
+            .rewrites
+            .iter()
+            .all(|rewrite| rewrite.inputs.len() <= 2)
+    );
+    Ok(())
+}
+
+#[gtest]
 fn dependency_cancellation_crosses_proven_commuting_gates_only() -> Result<()> {
     let mut b = ProgramBuilder::new(3, 1)?;
     let q = b.qubit(0)?;
@@ -45,7 +64,7 @@ fn exact_rotation_merging_is_phase_correct_and_idempotent() -> Result<()> {
     expect_eq!(report.after_operations, 1);
     let (again, _) = p.clone().optimize_exact()?;
     expect_eq!(again.schedule().len(), 1);
-    let plan = p.bind(&[])?.lower()?.plan()?;
+    let plan = p.bind(&[])?.plan()?;
     if let Operation::Gate { gate, .. } = plan.instructions()[0].operation() {
         let matrix = gate.matrix(MatrixPolicy::default())?;
         expect_lt!((matrix.view()[(0, 0)].re + 1.0).abs(), 1e-12);
@@ -74,7 +93,13 @@ fn fusion_preserves_multiplication_order_and_provenance() -> Result<()> {
     let z = b.gate(Gate::Z, &[q], &[])?;
     let (bound, report) = b.finish()?.bind(&[])?.fuse(FusionOptions::default())?;
     expect_eq!(report.after_operations, 1);
-    expect_eq!(bound.instructions()[0].provenance(), &[a, z]);
+    expect_eq!(
+        bound.provenance().source_leaves(
+            bound.instructions()[0].provenance(),
+            ExpansionLimits::default()
+        )?,
+        vec![a, z]
+    );
     if let Operation::Numerical { matrix, .. } = bound.instructions()[0].operation() {
         expect_eq!(matrix.view()[(0, 1)].re, 1.0);
         expect_eq!(matrix.view()[(1, 0)].re, -1.0);

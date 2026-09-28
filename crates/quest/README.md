@@ -149,7 +149,7 @@ storage slots. Scheduling is deterministic and native execution is serial.
 Compilation consumes owners:
 
 ```text
-ProgramBuilder -> ValidatedProgram -> BoundProgram -> LoweredProgram
+ProgramBuilder -> ValidatedProgram -> BoundProgram
                -> ExecutablePlan -> PreparedProgram<'env>
 ```
 

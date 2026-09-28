@@ -338,12 +338,7 @@ impl OracleCache {
         let leaf = Leaf {
             targets: reserve_vec(width)?,
             profile: reserve_vec(width)?,
-            controls: NativeControls {
-                wires: reserve_vec(width)?,
-                states: reserve_vec(width)?,
-                zeros: reserve_vec(width)?,
-                phase_targets: reserve_vec(width)?,
-            },
+            controls: NativeControls::with_capacity(width, false)?,
         };
         Ok(Self {
             matrices,
@@ -497,10 +492,6 @@ impl Leaf {
     fn remap(&mut self, frame: &Frame) -> Result<()> {
         self.targets.clear();
         self.profile.clear();
-        self.controls.wires.clear();
-        self.controls.states.clear();
-        self.controls.zeros.clear();
-        self.controls.phase_targets.clear();
         for target in &frame.targets {
             bounded_push(
                 &mut self.targets,
@@ -508,18 +499,17 @@ impl Leaf {
             )?;
         }
         for control in &frame.controls {
-            let wire = i32::try_from(control.qubit).map_err(|_| Error::Overflow)?;
             bounded_push(&mut self.profile, control.positive)?;
-            bounded_push(&mut self.controls.wires, wire)?;
-            bounded_push(&mut self.controls.states, i32::from(control.positive))?;
-            bounded_push(&mut self.controls.phase_targets, wire)?;
-            if !control.positive {
-                bounded_push(&mut self.controls.zeros, control.qubit)?;
-            }
         }
-        if let Some(&target) = self.targets.first() {
-            bounded_push(&mut self.controls.phase_targets, target)?;
-        }
+        self.controls.load(
+            frame.controls.iter().map(|control| {
+                Ok((
+                    i32::try_from(control.qubit).map_err(|_| Error::Overflow)?,
+                    control.positive,
+                ))
+            }),
+            self.targets.first().copied(),
+        )?;
         Ok(())
     }
 }

@@ -19,7 +19,8 @@
 //! a partially replaced program.
 use crate::model::{Occurrence, SemanticOperation};
 use crate::{Control, ControlState, Error, Gate, OccurrenceId, QubitId, Result, ValidatedProgram};
-use std::collections::BTreeMap;
+use crate::{ProvenanceGraph, ProvenanceId};
+use std::{collections::BTreeMap, sync::Arc};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Cnot {
@@ -67,7 +68,8 @@ impl LinearSynthesis {
 }
 #[derive(Debug, Clone)]
 pub struct LinearRewrite {
-    pub inputs: Vec<OccurrenceId>,
+    pub inputs: Vec<ProvenanceId>,
+    pub provenance: ProvenanceId,
     pub outputs: Vec<OccurrenceId>,
 }
 #[derive(Debug, Clone, Default)]
@@ -80,6 +82,7 @@ pub struct LinearReport {
     pub pmh_operations: usize,
     pub work: usize,
     pub rewrites: Vec<LinearRewrite>,
+    pub provenance: Arc<ProvenanceGraph>,
 }
 
 pub struct Work {
@@ -279,7 +282,7 @@ pub fn cnot(operation: &SemanticOperation) -> Option<Cnot> {
             gate: Gate::X,
             targets,
             controls,
-        } => match (targets.as_slice(), controls.as_slice()) {
+        } => match (targets.as_ref(), controls.as_ref()) {
             ([target], [control]) if control.state() == ControlState::One => Some(Cnot {
                 control: control.qubit().index(),
                 target: target.index(),
@@ -295,88 +298,89 @@ pub fn cnot_operation(gate: Cnot, owner: u64) -> SemanticOperation {
         targets: vec![QubitId {
             owner,
             index: gate.target,
-        }],
+        }]
+        .into(),
         controls: vec![Control::new(
             QubitId {
                 owner,
                 index: gate.control,
             },
             ControlState::One,
-        )],
+        )]
+        .into(),
     }
 }
 pub fn replacement(
     window: &[Occurrence],
     operations: Vec<SemanticOperation>,
     options: LinearOptions,
+    provenance: &mut ProvenanceGraph,
 ) -> Result<(Vec<Occurrence>, LinearRewrite)> {
     if operations.len() > window.len() {
         return Err(Error::Budget("replacement occurrence IDs"));
     }
-    let count = window.iter().try_fold(0usize, |count, item| {
-        count
-            .checked_add(item.provenance.len())
-            .ok_or(Error::Budget("rewrite provenance"))
-    })?;
-    let bytes = count
-        .checked_mul(operations.len().saturating_add(2))
-        .and_then(|n| n.checked_mul(std::mem::size_of::<OccurrenceId>()))
-        .and_then(|n| n.checked_add(operations.len().checked_mul(512)?))
-        .ok_or(Error::Budget("rewrite bytes"))?;
-    if bytes > options.max_bytes {
-        return Err(Error::Budget("rewrite bytes"));
-    }
-    let mut inputs: Vec<_> = window
-        .iter()
-        .flat_map(|item| item.provenance.iter().copied())
-        .collect();
-    inputs.sort_unstable();
-    inputs.dedup();
+    let inputs: Vec<_> = window.iter().map(|item| item.provenance).collect();
+    let history = provenance.rewrite(&inputs, options.max_bytes)?;
     let mut output = vec![];
     for (original, operation) in window.iter().zip(operations) {
         output.push(Occurrence {
             id: original.id,
-            provenance: inputs.clone(),
+            provenance: history,
             source: original.source.clone(),
             operation,
         });
     }
     let rewrite = LinearRewrite {
         inputs,
+        provenance: history,
         outputs: output.iter().map(|item| item.id).collect(),
     };
     Ok((output, rewrite))
 }
-// Reserve all output/provenance/report copies before cloning any occurrence.
-// Each rewritten output can carry at most its bounded window's input provenance.
+// Reserve output/report storage before cloning occurrences; history is copied only once.
 pub fn program_preflight(
     program: &ValidatedProgram,
     options: LinearOptions,
 ) -> Result<LinearOptions> {
-    if program.occurrences.len() > options.max_work {
+    if program
+        .occurrences
+        .len()
+        .checked_add(program.provenance.copy_work()?)
+        .is_none_or(|work| work > options.max_work)
+    {
         return Err(Error::Budget("linear scan work"));
     }
-    let provenance = program.occurrences.iter().try_fold(0usize, |sum, item| {
-        sum.checked_add(item.provenance.len())
-            .ok_or(Error::Budget("program provenance"))
-    })?;
-    let copies = options
-        .max_window_operations
-        .checked_add(2)
-        .ok_or(Error::Budget("program copies"))?;
-    let bytes = provenance
-        .checked_mul(copies)
-        .and_then(|n| n.checked_mul(std::mem::size_of::<OccurrenceId>()))
-        .and_then(|n| n.checked_add(program.occurrences.len().checked_mul(512)?))
+    // One root per operation and one immediate-input edge per window member.
+    // Reports and rewritten occurrences share history instead of copying leaves.
+    let bytes = program
+        .occurrences
+        .len()
+        .checked_mul(1024)
+        .and_then(|bytes| {
+            program
+                .provenance
+                .retained_bytes()
+                .ok()
+                .and_then(|history| bytes.checked_add(history))
+        })
         .ok_or(Error::Budget("program output bytes"))?;
     let max_bytes = options
         .max_bytes
         .checked_sub(bytes)
         .ok_or(Error::Budget("program output bytes"))?;
     Ok(LinearOptions {
-        max_bytes,
+        max_bytes: max_bytes.min(program.limits.max_provenance_bytes),
         ..options
     })
+}
+pub fn program_work(program: &ValidatedProgram, options: LinearOptions) -> Result<Work> {
+    let mut work = Work {
+        used: 0,
+        maximum: options.max_work,
+    };
+    work.charge(program.occurrences.len())?;
+    work.charge(program.provenance.copy_work()?)?;
+    Ok(work)
 }
 impl ValidatedProgram {
     /// Resynthesize contiguous positive CNOT windows; explicit user edges disable rewriting.
@@ -391,16 +395,18 @@ impl ValidatedProgram {
         let mut report = LinearReport {
             before_operations: self.occurrences.len(),
             after_operations: self.occurrences.len(),
+            provenance: Arc::clone(&self.provenance),
             ..LinearReport::default()
         };
         if !self.explicit_edges.is_empty() {
             return Ok((self, report));
         }
         let options = program_preflight(&self, options)?;
-        let mut work = Work {
-            used: self.occurrences.len(),
-            maximum: options.max_work,
-        };
+        let mut provenance = ProvenanceGraph::edit(
+            Arc::clone(&self.provenance),
+            options.max_bytes.min(self.limits.max_provenance_bytes),
+        )?;
+        let mut work = program_work(&self, options)?;
         let mut output = vec![];
         let mut offset = 0;
         while let Some(current) = self.occurrences.get(offset) {
@@ -446,12 +452,14 @@ impl ValidatedProgram {
                 gaussian
             };
             if best.len() < input.len() {
+                work.charge(window.len())?;
                 let (replacement, rewrite) = replacement(
                     window,
                     best.into_iter()
                         .map(|gate| cnot_operation(gate, self.owner))
                         .collect(),
                     options,
+                    &mut provenance,
                 )?;
                 output.extend(replacement);
                 report.rewrites.push(rewrite);
@@ -466,6 +474,7 @@ impl ValidatedProgram {
         }
         report.work = work.used;
         report.after_operations = output.len();
+        report.provenance = Arc::new(provenance);
         let result = Self::from_parts(
             self.owner,
             self.num_qubits,
@@ -474,6 +483,7 @@ impl ValidatedProgram {
             output,
             self.explicit_edges,
             self.limits,
+            Arc::clone(&report.provenance),
         )?;
         Ok((result, report))
     }

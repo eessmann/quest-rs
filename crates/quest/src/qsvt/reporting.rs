@@ -229,10 +229,7 @@ mod tests {
         )?;
         // Negative outer: U=16, global phase=5, Sx=4 =>25.
         // Positive outer: U=10, global phase=3, Sx=2 =>15.
-        assert_that!(
-            circuit(&caller.finish()?.bind(&[])?.lower()?.plan()?)?,
-            eq(40)
-        );
+        assert_that!(circuit(&caller.finish()?.bind(&[])?.plan()?)?, eq(40));
         assert_that!(
             NativeDispatchReport::new(40, 3, false, true)?.total(),
             eq(47)

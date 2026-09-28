@@ -1,11 +1,13 @@
 //! Optional candidate replacements. Certificates are owned independently of native resources.
 use crate::model::{AngleExpr, Occurrence, SemanticOperation};
 use crate::{Angle, Control, ControlState, Error, Gate, OccurrenceId, QubitId, ValidatedProgram};
+use crate::{ProvenanceGraph, ProvenanceId};
 use num_traits::ToPrimitive;
 use quest_math::{
     AngleTarget, ApproxCertificate, Axis, ExactCertificate, Limits, Rational, Sequence, Target,
 };
 use quest_optimizer_client::Client;
+use std::sync::Arc;
 
 #[derive(Debug, thiserror::Error)]
 pub enum WorkerError {
@@ -24,8 +26,10 @@ pub enum WorkerError {
 #[derive(Debug, Clone)]
 pub struct RotationCertificate {
     pub occurrence: OccurrenceId,
-    pub targets: Vec<QubitId>,
-    pub controls: Vec<Control>,
+    pub input: ProvenanceId,
+    pub provenance: ProvenanceId,
+    pub targets: Arc<[QubitId]>,
+    pub controls: Arc<[Control]>,
     pub seed: u64,
     pub certificate: ApproxCertificate,
 }
@@ -35,23 +39,26 @@ pub struct SynthesisReport {
     /// Sum of requested certified local bounds, only through exact unitary operations.
     /// None retains local certificates without claiming a whole-program bound.
     pub operator_error_bound: Option<Rational>,
+    pub provenance: Arc<ProvenanceGraph>,
     pub before_operations: usize,
     pub after_operations: usize,
 }
 #[derive(Debug, Clone)]
 pub struct ExactRegionCertificate {
-    pub occurrences: Vec<OccurrenceId>,
+    pub occurrences: Vec<ProvenanceId>,
+    pub provenance: ProvenanceId,
     pub interface: Vec<QubitId>,
     pub seed: u64,
     pub certificate: ExactCertificate,
 }
 #[derive(Debug, Clone)]
 pub struct SkippedCandidate {
-    pub occurrences: Vec<OccurrenceId>,
+    pub occurrences: Vec<ProvenanceId>,
     pub reason: String,
 }
 #[derive(Debug, Clone, Default)]
 pub struct ZxReport {
+    pub provenance: Arc<ProvenanceGraph>,
     pub accepted: Vec<ExactRegionCertificate>,
     pub skipped: Vec<SkippedCandidate>,
     pub before_operations: usize,
@@ -116,17 +123,6 @@ fn positional_controls(controls: &[Control]) -> Result<Vec<quest_math::Control>,
         })
         .collect()
 }
-fn fresh_index(program: &ValidatedProgram) -> Result<usize, WorkerError> {
-    program
-        .occurrences
-        .iter()
-        .flat_map(|o| o.provenance.iter().chain(std::iter::once(&o.id)))
-        .map(|id| id.index())
-        .max()
-        .unwrap_or(0)
-        .checked_add(1)
-        .ok_or(WorkerError::Budget("occurrence identities"))
-}
 fn admit_output(count: usize, extra: usize, maximum: usize) -> Result<(), WorkerError> {
     if count
         .checked_add(extra)
@@ -172,7 +168,7 @@ fn semantic(
         quest_math::Gate::W => {
             return Ok(SemanticOperation::GlobalPhase {
                 angle: Angle::pi(1, 4)?,
-                controls,
+                controls: controls.into(),
             });
         }
         quest_math::Gate::Cx | quest_math::Gate::Cz => {
@@ -188,8 +184,8 @@ fn semantic(
     };
     Ok(SemanticOperation::Gate {
         gate,
-        targets,
-        controls,
+        targets: targets.into(),
+        controls: controls.into(),
     })
 }
 struct ProvenanceBudget {
@@ -207,7 +203,7 @@ impl ProvenanceBudget {
     }
     fn charge(&mut self, count: usize) -> Result<(), WorkerError> {
         let bytes = count
-            .checked_mul(size_of::<OccurrenceId>())
+            .checked_mul(size_of::<ProvenanceId>())
             .ok_or(WorkerError::Budget("aggregate provenance bytes"))?;
         self.remaining = self
             .remaining
@@ -215,23 +211,33 @@ impl ProvenanceBudget {
             .ok_or(WorkerError::Budget("aggregate provenance bytes"))?;
         Ok(())
     }
-    fn copy(&mut self, inputs: &[Occurrence]) -> Result<Vec<OccurrenceId>, WorkerError> {
-        let count = provenance_count(inputs)?;
+    fn edit(&mut self, program: &ValidatedProgram) -> Result<ProvenanceGraph, WorkerError> {
+        self.remaining = self.remaining.min(program.limits.max_provenance_bytes);
+        Ok(ProvenanceGraph::edit(
+            Arc::clone(&program.provenance),
+            self.remaining,
+        )?)
+    }
+    fn finish(
+        self,
+        mut graph: ProvenanceGraph,
+        next: usize,
+    ) -> Result<Arc<ProvenanceGraph>, WorkerError> {
+        if graph.retained_bytes()? > self.remaining {
+            return Err(WorkerError::Budget("aggregate provenance bytes"));
+        }
+        graph.retain_next_occurrence(next);
+        Ok(Arc::new(graph))
+    }
+    fn copy(&mut self, inputs: &[Occurrence]) -> Result<Vec<ProvenanceId>, WorkerError> {
+        let count = inputs.len();
         self.charge(count)?;
         let mut ids = Vec::new();
         ids.try_reserve_exact(count)
             .map_err(|_| WorkerError::Budget("provenance allocation"))?;
-        ids.extend(inputs.iter().flat_map(|o| o.provenance.iter().copied()));
+        ids.extend(inputs.iter().map(|o| o.provenance));
         Ok(ids)
     }
-}
-fn provenance_count(inputs: &[Occurrence]) -> Result<usize, WorkerError> {
-    inputs
-        .iter()
-        .try_fold(0usize, |count, input| {
-            count.checked_add(input.provenance.len())
-        })
-        .ok_or(WorkerError::Budget("provenance count"))
 }
 fn replacement(
     sequence: &Sequence,
@@ -239,22 +245,13 @@ fn replacement(
     inputs: &[Occurrence],
     next: &mut usize,
     budget: &mut ProvenanceBudget,
-) -> Result<Vec<Occurrence>, WorkerError> {
+    graph: &mut ProvenanceGraph,
+) -> Result<(Vec<Occurrence>, ProvenanceId), WorkerError> {
     let first = inputs.first().ok_or(Error::InvalidId)?;
-    let count = provenance_count(inputs)?;
-    let bytes = count
-        .checked_mul(sequence.operations.len().max(1))
-        .and_then(|count| count.checked_mul(size_of::<OccurrenceId>()))
-        .ok_or(WorkerError::Budget("provenance bytes"))?;
-    if bytes > 16 * 1024 * 1024 {
-        return Err(WorkerError::Budget("provenance bytes"));
-    }
-    budget.charge(
-        count
-            .checked_mul(sequence.operations.len())
-            .ok_or(WorkerError::Budget("provenance count"))?,
-    )?;
-    let provenance = budget.copy(inputs)?;
+    budget.charge(sequence.operations.len())?;
+    budget.charge(1)?; // Report root, including a rewrite with no surviving output.
+    let inputs = budget.copy(inputs)?;
+    let provenance = graph.rewrite(&inputs, budget.remaining)?;
     let mut output = Vec::new();
     output
         .try_reserve_exact(sequence.operations.len())
@@ -274,19 +271,19 @@ fn replacement(
         };
         output.push(Occurrence {
             id,
-            provenance: provenance.clone(),
+            provenance,
             source: first.source.clone(),
             operation: semantic(operation, interface)?,
         });
     }
-    Ok(output)
+    Ok((output, provenance))
 }
 impl ValidatedProgram {
     /// Explicit single-qubit synthesis. Every admitted rotation must receive a
     /// full-phase certificate; any failure returns an error. At most 32 requests
     /// and 16384 output operations are admitted per invocation.
     /// The error tolerance must be finite and strictly between zero and one.
-    /// Cloned provenance, including reports and temporary unions, is bounded by
+    /// Immediate provenance references, reports and retained history are bounded by
     /// the smaller of `limits.bytes` and 64 MiB across the invocation.
     /// # Errors
     /// Rejects unbound rotation angles, unsupported ordering, budgets and failed certificates.
@@ -313,12 +310,14 @@ impl ValidatedProgram {
                 .iter()
                 .all(|o| o.operation.exact_unitary())
                 .then(|| Rational::from_integer(0.into())),
+            provenance: Arc::clone(&self.provenance),
             before_operations: self.occurrences.len(),
             after_operations: 0,
         };
         let epsilon = quest_math::dyadic_from_bits(epsilon_per_rotation.to_bits(), limits)?;
         let mut budget = ProvenanceBudget::new(limits);
-        let mut next = fresh_index(&self)?;
+        let mut graph = budget.edit(&self)?;
+        let mut next = graph.next_occurrence();
         let mut output = Vec::new();
         for occurrence in &self.occurrences {
             if let Some(target) = rotation(&occurrence.operation, limits)? {
@@ -339,8 +338,7 @@ impl ValidatedProgram {
                 else {
                     return Err(Error::NotUnitary.into());
                 };
-                let mut interface = targets.clone();
-                interface.extend(controls.iter().map(|c| c.qubit()));
+                let interface = occurrence.operation.qubits().collect::<Vec<_>>();
                 let added_controls = positional_controls(controls)?;
                 let lifted = quest_math::lift_controlled_rotation(
                     &certificate,
@@ -354,18 +352,22 @@ impl ValidatedProgram {
                     lifted.sequence().operations.len(),
                     self.limits.max_operations,
                 )?;
-                output.extend(replacement(
+                let (replacement, provenance) = replacement(
                     lifted.sequence(),
                     &interface,
                     std::slice::from_ref(occurrence),
                     &mut next,
                     &mut budget,
-                )?);
+                    &mut graph,
+                )?;
+                output.extend(replacement);
                 if let Some(bound) = &mut report.operator_error_bound {
                     *bound = std::ops::Add::add(&*bound, &epsilon);
                 }
                 report.rotations.push(RotationCertificate {
                     occurrence: occurrence.id,
+                    input: occurrence.provenance,
+                    provenance,
                     targets: targets.clone(),
                     controls: controls.clone(),
                     seed: request_seed,
@@ -373,11 +375,12 @@ impl ValidatedProgram {
                 });
             } else {
                 admit_output(output.len(), 1, self.limits.max_operations)?;
-                budget.charge(occurrence.provenance.len())?;
+                budget.charge(1)?;
                 output.push(occurrence.clone());
             }
         }
         report.after_operations = output.len();
+        report.provenance = budget.finish(graph, next)?;
         let program = Self::from_parts(
             self.owner,
             self.num_qubits,
@@ -386,6 +389,7 @@ impl ValidatedProgram {
             output,
             self.explicit_edges,
             self.limits,
+            Arc::clone(&report.provenance),
         )?;
         Ok((program, report))
     }
@@ -434,13 +438,13 @@ fn quantum_sequence(operations: &[Occurrence], interface: &[QubitId]) -> Option<
                     Gate::Phase(angle) => (quest_math::Gate::T, quarter_turns(angle)?),
                     _ => return None,
                 };
-                (gate, repeat, targets.as_slice(), controls.as_slice())
+                (gate, repeat, targets.as_ref(), controls.as_ref())
             }
             SemanticOperation::GlobalPhase { angle, controls } => (
                 quest_math::Gate::W,
                 quarter_turns(angle)?,
                 [].as_slice(),
-                controls.as_slice(),
+                controls.as_ref(),
             ),
             _ => return None,
         };
@@ -521,7 +525,7 @@ impl ValidatedProgram {
     /// Optional bounded ZX regions. Failures and unprofitable candidates retain
     /// every original occurrence and are recorded as skipped. Each replacement
     /// requires complete exact matrix equality, including its recovered phase.
-    /// Cloned provenance, including reports and temporary unions, is bounded by
+    /// Immediate provenance references, reports and retained history are bounded by
     /// the smaller of `limits.bytes` and 64 MiB across the invocation.
     /// # Errors
     /// Rejects internal resource arithmetic and graph reconstruction failures.
@@ -532,6 +536,7 @@ impl ValidatedProgram {
         limits: Limits,
     ) -> Result<(Self, ZxReport), WorkerError> {
         let mut report = ZxReport {
+            provenance: Arc::clone(&self.provenance),
             before_operations: self.occurrences.len(),
             after_operations: self.occurrences.len(),
             ..ZxReport::default()
@@ -544,7 +549,8 @@ impl ValidatedProgram {
             return Ok((self, report));
         }
         let mut budget = ProvenanceBudget::new(limits);
-        let mut next = fresh_index(&self)?;
+        let mut graph = budget.edit(&self)?;
+        let mut next = graph.next_occurrence();
         let mut output = Vec::new();
         output
             .try_reserve_exact(self.occurrences.len())
@@ -568,15 +574,18 @@ impl ValidatedProgram {
                     .ok_or(WorkerError::Budget("requests"))?;
                 match client.optimize_zx(&sequence, request_seed, limits) {
                     Ok(certificate) if certificate.candidate().operations.len() < region.len() => {
-                        output.extend(replacement(
+                        let (replacement, provenance) = replacement(
                             certificate.candidate(),
                             &interface,
                             region,
                             &mut next,
                             &mut budget,
-                        )?);
+                            &mut graph,
+                        )?;
+                        output.extend(replacement);
                         report.accepted.push(ExactRegionCertificate {
                             occurrences: ids,
+                            provenance,
                             interface,
                             seed: request_seed,
                             certificate,
@@ -587,7 +596,7 @@ impl ValidatedProgram {
                             occurrences: ids,
                             reason: "candidate does not reduce native operations".into(),
                         });
-                        budget.charge(provenance_count(region)?)?;
+                        budget.charge(region.len())?;
                         output.extend_from_slice(region);
                     }
                     Err(error) => {
@@ -595,14 +604,14 @@ impl ValidatedProgram {
                             occurrences: ids,
                             reason: error.to_string(),
                         });
-                        budget.charge(provenance_count(region)?)?;
+                        budget.charge(region.len())?;
                         output.extend_from_slice(region);
                     }
                 }
                 offset = end;
             } else {
                 let occurrence = self.occurrences.get(offset).ok_or(Error::InvalidId)?;
-                budget.charge(occurrence.provenance.len())?;
+                budget.charge(1)?;
                 output.push(occurrence.clone());
                 offset = offset
                     .checked_add(1)
@@ -610,6 +619,7 @@ impl ValidatedProgram {
             }
         }
         report.after_operations = output.len();
+        report.provenance = budget.finish(graph, next)?;
         let program = Self::from_parts(
             self.owner,
             self.num_qubits,
@@ -618,6 +628,7 @@ impl ValidatedProgram {
             output,
             self.explicit_edges,
             self.limits,
+            Arc::clone(&report.provenance),
         )?;
         Ok((program, report))
     }

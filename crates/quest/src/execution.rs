@@ -30,33 +30,64 @@ pub struct NativeControls {
 }
 impl NativeControls {
     fn new(controls: &[Control], target: Option<i32>) -> Result<Self> {
-        let mut wires = reserve_vec(controls.len())?;
-        let mut states = reserve_vec(controls.len())?;
-        let mut zeros = reserve_vec(controls.len())?;
-        let mut phase_targets = reserve_vec(
-            controls
-                .len()
-                .checked_add(usize::from(target.is_some()))
-                .ok_or(Error::Overflow)?,
+        let mut result = Self::with_capacity(controls.len(), target.is_some())?;
+        result.load(
+            controls.iter().map(|control| {
+                Ok((
+                    i32::try_from(control.qubit().index()).map_err(|_| Error::Overflow)?,
+                    control.state() == ControlState::One,
+                ))
+            }),
+            target,
         )?;
+        Ok(result)
+    }
+    pub(crate) fn with_capacity(count: usize, extra_target: bool) -> Result<Self> {
+        Ok(Self {
+            wires: reserve_vec(count)?,
+            states: reserve_vec(count)?,
+            zeros: reserve_vec(count)?,
+            phase_targets: reserve_vec(
+                count
+                    .checked_add(usize::from(extra_target))
+                    .ok_or(Error::Overflow)?,
+            )?,
+        })
+    }
+    /// Reuse admitted scratch; never allocate while dispatching an instruction.
+    pub(crate) fn load(
+        &mut self,
+        controls: impl Iterator<Item = Result<(i32, bool)>>,
+        target: Option<i32>,
+    ) -> Result<()> {
+        self.wires.clear();
+        self.states.clear();
+        self.zeros.clear();
+        self.phase_targets.clear();
         for control in controls {
-            let qubit = control.qubit().index();
-            wires.push(i32::try_from(qubit).map_err(|_| Error::Overflow)?);
-            states.push(i32::from(control.state() == ControlState::One));
-            phase_targets.push(i32::try_from(qubit).map_err(|_| Error::Overflow)?);
-            if control.state() == ControlState::Zero {
-                zeros.push(qubit);
+            let (wire, positive) = control?;
+            let index = usize::try_from(wire).map_err(|_| Error::Overflow)?;
+            if self.wires.len() == self.wires.capacity()
+                || self.states.len() == self.states.capacity()
+                || self.phase_targets.len() == self.phase_targets.capacity()
+                || (!positive && self.zeros.len() == self.zeros.capacity())
+            {
+                return Err(Error::Value("control scratch capacity exceeded"));
+            }
+            self.wires.push(wire);
+            self.states.push(i32::from(positive));
+            self.phase_targets.push(wire);
+            if !positive {
+                self.zeros.push(index);
             }
         }
         if let Some(target) = target {
-            phase_targets.push(target);
+            if self.phase_targets.len() == self.phase_targets.capacity() {
+                return Err(Error::Value("phase scratch capacity exceeded"));
+            }
+            self.phase_targets.push(target);
         }
-        Ok(Self {
-            wires,
-            states,
-            zeros,
-            phase_targets,
-        })
+        Ok(())
     }
 }
 enum PreparedOp {
@@ -127,7 +158,7 @@ impl Environment {
     /// # Errors
     /// Rejects invalid bindings, unsupported numerical configuration, resource limits, or native preparation failure.
     pub fn prepare(&self, program: ValidatedProgram) -> Result<PreparedProgram<'_>> {
-        self.prepare_plan(program.bind(&[])?.lower()?.plan()?)
+        self.prepare_plan(program.bind(&[])?.plan()?)
     }
     /// # Errors
     /// Rejects unsupported numerical configuration, resource limits, or native preparation failure.
@@ -166,19 +197,12 @@ impl crate::environment::RuntimeResources {
                 },
             )
             .ok_or(Error::Overflow)?;
+        let provenance_bytes = plan.provenance().retained_bytes()?;
         required = required
             .checked_add(plan.num_bits())
+            .and_then(|bytes| bytes.checked_add(provenance_bytes))
             .ok_or(Error::Overflow)?;
         for instruction in plan.instructions() {
-            required = required
-                .checked_add(
-                    instruction
-                        .provenance()
-                        .len()
-                        .checked_mul(std::mem::size_of::<quest_circuit::OccurrenceId>())
-                        .ok_or(Error::Overflow)?,
-                )
-                .ok_or(Error::Overflow)?;
             if let Some(span) = instruction.source() {
                 required = required
                     .checked_add(span.source().len())
@@ -396,20 +420,19 @@ fn requires_density(op: &PreparedOp) -> bool {
     }
 }
 fn estimate(op: &Operation, gpu: bool) -> Result<usize> {
+    op.operand_storage_bytes()?
+        .checked_add(estimate_native(op, gpu)?)
+        .ok_or(Error::Overflow)
+}
+fn estimate_native(op: &Operation, gpu: bool) -> Result<usize> {
     let control_bytes = |count: usize| {
         count
-            .checked_mul(
-                const {
-                    std::mem::size_of::<Control>()
-                        + 3 * std::mem::size_of::<i32>()
-                        + std::mem::size_of::<usize>()
-                },
-            )
+            .checked_mul(const { 3 * std::mem::size_of::<i32>() + std::mem::size_of::<usize>() })
             .ok_or(Error::Overflow)
     };
     let targets_bytes = |count: usize| {
         count
-            .checked_mul(const { std::mem::size_of::<quest_circuit::QubitId>() + std::mem::size_of::<i32>() })
+            .checked_mul(std::mem::size_of::<i32>())
             .ok_or(Error::Overflow)
     };
     match op {
@@ -467,7 +490,7 @@ fn estimate(op: &Operation, gpu: bool) -> Result<usize> {
             bytes_for(elements, 1)
         }
         Operation::Reset { .. } => bytes_for(256, 1),
-        Operation::Conditional { operation, .. } => estimate(operation, gpu)?
+        Operation::Conditional { operation, .. } => estimate_native(operation, gpu)?
             .checked_add(std::mem::size_of::<PreparedOp>())
             .ok_or(Error::Overflow),
         Operation::Measure { .. } => Ok(0),
@@ -517,7 +540,7 @@ fn prepare_operation(
                 .iter()
                 .map(|q| i32::try_from(q.index()).map_err(|_| Error::Overflow))
                 .collect::<Result<_>>()?;
-            for control in controls {
+            for control in controls.iter() {
                 native_targets
                     .push(i32::try_from(control.qubit().index()).map_err(|_| Error::Overflow)?);
             }
@@ -549,7 +572,7 @@ fn prepare_operation(
                     .and_then(|n| n.checked_mul(kraus.len()))
                     .ok_or(Error::Overflow)?,
             )?;
-            for matrix in kraus {
+            for matrix in kraus.iter() {
                 for r in 0..dim {
                     for c in 0..dim {
                         let v = if matrix.dimension() == 1 {
@@ -592,17 +615,7 @@ fn prepare_operation(
             })
         }
         Operation::Reset { qubit } => {
-            let zero = quest_sys::QuestComplex { re: 0., im: 0. };
-            let one = quest_sys::QuestComplex { re: 1., im: 0. };
-            let mut map =
-                quest_sys::create_kraus_map(1, 2).context("allocating density reset channel")?;
-            quest_sys::set_kraus_map_flat(
-                map.pin_mut(),
-                &[one, zero, zero, zero, zero, one, zero, zero],
-                2,
-                2,
-            )
-            .context("preparing reset channel")?;
+            let map = reset_channel()?;
             let index = channels.len();
             channels.push(map);
             Ok(PreparedOp::Reset {
@@ -746,20 +759,23 @@ pub fn execute_matrix<K: RegisterKind>(
     }
     Ok(())
 }
+pub fn reset_channel() -> Result<UniquePtr<quest_sys::KrausMap>> {
+    let zero = quest_sys::QuestComplex { re: 0., im: 0. };
+    let one = quest_sys::QuestComplex { re: 1., im: 0. };
+    let mut map = quest_sys::create_kraus_map(1, 2).context("allocating density reset channel")?;
+    quest_sys::set_kraus_map_flat(
+        map.pin_mut(),
+        &[one, zero, zero, zero, zero, one, zero, zero],
+        2,
+        2,
+    )
+    .context("preparing reset channel")?;
+    Ok(map)
+}
 pub fn native_matrix<T: faer::traits::Conjugate<Canonical = Complex64>>(
     view: faer::MatRef<'_, T>,
 ) -> Result<UniquePtr<quest_sys::CompMatr>> {
-    let mut values = reserve_vec(
-        view.nrows()
-            .checked_mul(view.ncols())
-            .ok_or(Error::Overflow)?,
-    )?;
-    for row in 0..view.nrows() {
-        for col in 0..view.ncols() {
-            let v = crate::register::logical(view, row, col);
-            values.push(quest_sys::QuestComplex { re: v.re, im: v.im });
-        }
-    }
+    let values = crate::register::pack_matrix(view)?;
     let mut native = quest_sys::create_comp_matr(
         i32::try_from(view.nrows().ilog2()).map_err(|_| Error::Overflow)?,
     )

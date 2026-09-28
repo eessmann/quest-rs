@@ -143,7 +143,7 @@ fn ideal_builder_separates_exact_rewrites_binding_and_numerical_fusion() -> Resu
         le(parity_report.before_operations)
     )?;
     verify_that!(fusion_report.numerical_rounding_changed, eq(true))?;
-    verify_eq!(fused.lower()?.plan()?.num_qubits(), 1)?;
+    verify_eq!(fused.plan()?.num_qubits(), 1)?;
     Ok(())
 }
 // ANCHOR_END: ideal_optimization

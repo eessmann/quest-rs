@@ -3,7 +3,11 @@ use crate::{
     Operation, QubitId, Result, ValidatedProgram,
     model::{Occurrence, SemanticOperation},
 };
-use std::time::{Duration, Instant};
+use crate::{ProvenanceGraph, ProvenanceId};
+use std::{
+    sync::Arc,
+    time::{Duration, Instant},
+};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RewriteKind {
@@ -15,7 +19,9 @@ pub enum RewriteKind {
 #[derive(Debug, Clone)]
 pub struct Rewrite {
     pub kind: RewriteKind,
-    pub inputs: Vec<OccurrenceId>,
+    /// Immediate history inputs; expand source leaves explicitly through the report graph.
+    pub inputs: Vec<ProvenanceId>,
+    pub provenance: ProvenanceId,
     pub output: Option<OccurrenceId>,
 }
 #[derive(Debug, Clone)]
@@ -24,7 +30,9 @@ pub struct OptimizationReport {
     pub after_operations: usize,
     pub before_depth: usize,
     pub after_depth: usize,
-    pub removed: Vec<OccurrenceId>,
+    pub removed: Vec<ProvenanceId>,
+    pub provenance: Arc<ProvenanceGraph>,
+    pub work: usize,
     pub rewrites: Vec<Rewrite>,
     pub elapsed: Duration,
     pub matrix_bytes: usize,
@@ -37,13 +45,15 @@ pub struct OptimizationReport {
     pub simulator_after: Option<SimulatorCost>,
 }
 impl OptimizationReport {
-    const fn new(before: usize, depth: usize) -> Self {
+    const fn new(before: usize, depth: usize, provenance: Arc<ProvenanceGraph>) -> Self {
         Self {
             before_operations: before,
             after_operations: before,
             before_depth: depth,
             after_depth: depth,
             removed: vec![],
+            provenance,
+            work: 0,
             rewrites: vec![],
             elapsed: Duration::ZERO,
             matrix_bytes: 0,
@@ -53,6 +63,23 @@ impl OptimizationReport {
             simulator_after: None,
         }
     }
+}
+
+fn semantic_matrix_bytes(occurrences: &[Occurrence]) -> Result<usize> {
+    occurrences.iter().try_fold(0usize, |sum, o| {
+        let bytes = match &o.operation {
+            SemanticOperation::Numerical { matrix, .. } => matrix.bytes(),
+            SemanticOperation::Channel { kraus, .. } => {
+                kraus.iter().try_fold(0usize, |sum, k| {
+                    sum.checked_add(k.bytes())
+                        .ok_or(Error::Budget("program matrices"))
+                })?
+            }
+            _ => 0,
+        };
+        sum.checked_add(bytes)
+            .ok_or(Error::Budget("program matrices"))
+    })
 }
 
 fn identity(op: &SemanticOperation) -> bool {
@@ -84,8 +111,8 @@ fn combine(
                 controls: cy,
             },
         ) if tx == ty && cx == cy => {
-            if x.angles().iter().all(|a| a.is_exact())
-                && y.angles().iter().all(|a| a.is_exact())
+            if x.angles().all(crate::Angle::is_exact)
+                && y.angles().all(crate::Angle::is_exact)
                 && x.adjoint() == *y
             {
                 return Some((RewriteKind::InverseCancellation, None));
@@ -147,9 +174,7 @@ fn commutes(a: &SemanticOperation, b: &SemanticOperation) -> bool {
     if diagonal(a) && diagonal(b) {
         return true;
     }
-    let left = a.qubits();
-    let right = b.qubits();
-    !left.iter().any(|wire| right.contains(wire))
+    !a.qubits().any(|wire| b.qubits().any(|other| other == wire))
 }
 const fn diagonal(operation: &SemanticOperation) -> bool {
     matches!(
@@ -171,17 +196,35 @@ const fn diagonal(operation: &SemanticOperation) -> bool {
 fn commuting_candidate(
     output: &[Occurrence],
     operation: &SemanticOperation,
-) -> Option<(usize, RewriteKind, Option<SemanticOperation>)> {
+    work: &mut crate::linear::Work,
+) -> Result<Option<(usize, RewriteKind, Option<SemanticOperation>)>> {
     // Bounded search prevents quadratic work on very large independent circuits.
     for (index, previous) in output.iter().enumerate().rev().take(128) {
+        work.charge(1)?;
         if let Some((kind, combined)) = combine(&previous.operation, operation) {
-            return Some((index, kind, combined));
+            return Ok(Some((index, kind, combined)));
         }
         if !commutes(&previous.operation, operation) {
             break;
         }
     }
-    None
+    Ok(None)
+}
+
+/// Bounded exact rewrites. Storage covers retained history and report forecasts;
+/// source matrix payloads and allocator metadata are excluded.
+#[derive(Debug, Clone, Copy)]
+pub struct ExactOptions {
+    pub max_work: usize,
+    pub max_bytes: usize,
+}
+impl Default for ExactOptions {
+    fn default() -> Self {
+        Self {
+            max_work: 4_000_000,
+            max_bytes: 64 * 1024 * 1024,
+        }
+    }
 }
 
 impl ValidatedProgram {
@@ -194,56 +237,79 @@ impl ValidatedProgram {
     /// # Errors
     /// Rejects invalid identifiers or cyclic dependencies when rebuilding the optimized program.
     pub fn optimize_exact(self) -> Result<(Self, OptimizationReport)> {
+        self.optimize_exact_with_options(ExactOptions::default())
+    }
+    /// Apply exact rewrites within explicit work and provenance/report storage bounds.
+    /// # Errors
+    /// Rejects exhausted budgets or invalid rebuilt dependencies, without publishing partial edits.
+    pub fn optimize_exact_with_options(
+        self,
+        options: ExactOptions,
+    ) -> Result<(Self, OptimizationReport)> {
+        let mut work = crate::linear::Work {
+            used: 0,
+            maximum: options.max_work,
+        };
+        work.charge(self.occurrences.len())?;
+        work.charge(self.provenance.copy_work()?)?;
+        let report_bytes = self
+            .occurrences
+            .len()
+            .checked_mul(const { 2 * size_of::<Rewrite>() + 8 * size_of::<ProvenanceId>() })
+            .ok_or(Error::Budget("exact report storage"))?;
+        let graph_limit = options
+            .max_bytes
+            .checked_sub(report_bytes)
+            .ok_or(Error::Budget("exact report storage"))?
+            .min(self.limits.max_provenance_bytes);
         let start = Instant::now();
-        let mut report = OptimizationReport::new(self.occurrences.len(), self.dependency_depth());
-        report.matrix_bytes = self.occurrences.iter().try_fold(0usize, |sum, o| {
-            let bytes = match &o.operation {
-                SemanticOperation::Numerical { matrix, .. } => matrix.bytes(),
-                SemanticOperation::Channel { kraus, .. } => {
-                    kraus.iter().try_fold(0usize, |sum, k| {
-                        sum.checked_add(k.bytes())
-                            .ok_or(Error::Budget("program matrices"))
-                    })?
-                }
-                _ => 0,
-            };
-            sum.checked_add(bytes)
-                .ok_or(Error::Budget("program matrices"))
-        })?;
+        let mut report = OptimizationReport::new(
+            self.occurrences.len(),
+            self.dependency_depth(),
+            Arc::clone(&self.provenance),
+        );
+        let mut provenance = ProvenanceGraph::edit(Arc::clone(&self.provenance), graph_limit)?;
+        report.matrix_bytes = semantic_matrix_bytes(&self.occurrences)?;
         report.peak_matrix_bytes = report.matrix_bytes;
         if !self.explicit_edges.is_empty() {
             report.elapsed = start.elapsed();
+            report.work = work.used;
             return Ok((self, report));
         }
         let mut output: Vec<Occurrence> = vec![];
         for mut op in self.occurrences {
             if identity(&op.operation) {
-                report.removed.extend_from_slice(&op.provenance);
+                work.charge(1)?;
+                let history = provenance.rewrite(&[op.provenance], graph_limit)?;
+                report.removed.push(op.provenance);
                 report.rewrites.push(Rewrite {
                     kind: RewriteKind::Identity,
-                    inputs: op.provenance,
+                    inputs: vec![op.provenance],
+                    provenance: history,
                     output: None,
                 });
                 continue;
             }
-            if let Some((index, kind, combined)) = commuting_candidate(&output, &op.operation) {
+            if let Some((index, kind, combined)) =
+                commuting_candidate(&output, &op.operation, &mut work)?
+            {
                 // The index comes from this unchanged output slice.
+                work.charge(output.len().saturating_sub(index))?;
                 let previous = output.remove(index);
-                let inputs: Vec<_> = previous
-                    .provenance
-                    .into_iter()
-                    .chain(op.provenance)
-                    .collect();
+                let inputs = vec![previous.provenance, op.provenance];
+                work.charge(inputs.len())?;
+                let history = provenance.rewrite(&inputs, graph_limit)?;
                 let output_id = combined.as_ref().map(|_| previous.id);
                 report.rewrites.push(Rewrite {
                     kind,
                     inputs: inputs.clone(),
+                    provenance: history,
                     output: output_id,
                 });
                 if let Some(operation) = combined {
                     op = Occurrence {
                         id: previous.id,
-                        provenance: inputs,
+                        provenance: history,
                         source: previous.source,
                         operation,
                     };
@@ -256,6 +322,8 @@ impl ValidatedProgram {
         }
         report.after_operations = output.len();
         report.elapsed = start.elapsed();
+        report.work = work.used;
+        report.provenance = Arc::new(provenance);
         let p = Self::from_parts(
             self.owner,
             self.num_qubits,
@@ -264,6 +332,7 @@ impl ValidatedProgram {
             output,
             self.explicit_edges,
             self.limits,
+            Arc::clone(&report.provenance),
         )?;
         report.after_depth = p.dependency_depth();
         report.elapsed = start.elapsed();
@@ -362,6 +431,9 @@ pub struct FusionOptions {
     pub max_qubits: usize,
     pub max_matrix_bytes: usize,
     pub max_fused_operations: usize,
+    pub max_provenance_bytes: usize,
+    /// Bounds instruction visits and history copying/appending, independently of matrix work.
+    pub max_provenance_work: usize,
 }
 impl Default for FusionOptions {
     fn default() -> Self {
@@ -369,6 +441,8 @@ impl Default for FusionOptions {
             max_qubits: 4,
             max_matrix_bytes: 1024 * 1024,
             max_fused_operations: 32,
+            max_provenance_bytes: 64 * 1024 * 1024,
+            max_provenance_work: 4_000_000,
         }
     }
 }
@@ -544,7 +618,33 @@ impl BoundProgram {
         profile: SimulatorProfile,
     ) -> Result<(Self, OptimizationReport)> {
         let start = Instant::now();
-        let mut report = OptimizationReport::new(self.instructions.len(), self.dependency_depth());
+        let mut work = crate::linear::Work {
+            used: 0,
+            maximum: options.max_provenance_work,
+        };
+        work.charge(self.instructions.len())?;
+        work.charge(self.provenance.copy_work()?)?;
+        let mut report = OptimizationReport::new(
+            self.instructions.len(),
+            self.dependency_depth(),
+            Arc::clone(&self.provenance),
+        );
+        let report_bytes = self
+            .instructions
+            .len()
+            .checked_mul(const { 2 * size_of::<Rewrite>() + 8 * size_of::<ProvenanceId>() })
+            .ok_or(Error::Budget("fusion report storage"))?;
+        let graph_limit = options
+            .max_provenance_bytes
+            .checked_sub(report_bytes)
+            .ok_or(Error::Budget("fusion provenance storage"))?
+            .min(self.limits.max_provenance_bytes);
+        let mut provenance = ProvenanceGraph::edit(Arc::clone(&self.provenance), graph_limit)?;
+        let mut representatives = self
+            .instructions
+            .iter()
+            .map(|item| (item.id, item.id))
+            .collect::<std::collections::BTreeMap<_, _>>();
         report.simulator_before = Some(self.simulator_cost(profile)?);
         let policy = MatrixPolicy {
             max_bytes: options.max_matrix_bytes.min(self.limits.max_matrix_bytes),
@@ -632,25 +732,25 @@ impl BoundProgram {
                         .and_then(|bytes| bytes.checked_add(result_bytes))
                         .ok_or(Error::Budget("fusion retained matrices"))?;
                     let previous = output.pop().ok_or(Error::InvalidId)?;
-                    let provenance: Vec<_> = previous
-                        .provenance
-                        .into_iter()
-                        .chain(instruction.provenance)
-                        .collect();
+                    let inputs = vec![previous.provenance, instruction.provenance];
+                    work.charge(inputs.len())?;
+                    let history = provenance.rewrite(&inputs, graph_limit)?;
+                    representatives.insert(instruction.id, previous.id);
                     report.rewrites.push(Rewrite {
                         kind: RewriteKind::NumericalFusion,
-                        inputs: provenance.clone(),
+                        inputs,
+                        provenance: history,
                         output: Some(previous.id),
                     });
                     report.numerical_rounding_changed = true;
                     output.push(Instruction {
                         id: previous.id,
-                        provenance,
+                        provenance: history,
                         source: previous.source,
                         operation: Operation::Numerical {
                             matrix,
-                            targets,
-                            controls,
+                            targets: targets.into(),
+                            controls: controls.into(),
                         },
                     });
                     block_len = block_len
@@ -662,11 +762,12 @@ impl BoundProgram {
             output.push(instruction);
             block_len = 1;
         }
+        report.work = work.used;
         report.matrix_bytes = resident_bytes;
-        let representatives: std::collections::BTreeMap<_, _> = output
-            .iter()
-            .flat_map(|i| i.provenance.iter().map(move |id| (*id, i.id)))
-            .collect();
+        // Fusion always retains the first ID in each adjacent block. Resolve
+        // only this pass's occurrence mapping, not historical source identities.
+        report.provenance = Arc::new(provenance);
+        self.provenance = Arc::clone(&report.provenance);
         self.dependencies = self
             .dependencies
             .into_iter()

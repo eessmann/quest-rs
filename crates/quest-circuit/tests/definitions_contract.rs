@@ -23,7 +23,7 @@ fn shared_definitions_expand_with_fresh_occurrences_and_ordered_arguments() -> R
         &[],
     )?;
     expect_ne!(first, second);
-    let plan = b.finish()?.bind(&[])?.lower()?.plan()?;
+    let plan = b.finish()?.bind(&[])?.plan()?;
     expect_eq!(plan.instructions().len(), 4);
     if let Operation::Gate { targets, .. } = plan.instructions()[0].operation() {
         expect_eq!(targets[0].index(), 3);

@@ -11,7 +11,10 @@ use petgraph::{
 use std::{
     cmp::Reverse,
     collections::{BTreeMap, BTreeSet, BinaryHeap},
-    sync::atomic::{AtomicU64, Ordering},
+    sync::{
+        Arc,
+        atomic::{AtomicU64, Ordering},
+    },
 };
 
 static NEXT_PROGRAM: AtomicU64 = AtomicU64::new(1);
@@ -22,6 +25,8 @@ pub struct ProgramLimits {
     pub max_bits: usize,
     pub max_operations: usize,
     pub max_matrix_bytes: usize,
+    /// Maximum retained rewrite-history storage.
+    pub max_provenance_bytes: usize,
 }
 impl Default for ProgramLimits {
     fn default() -> Self {
@@ -30,6 +35,7 @@ impl Default for ProgramLimits {
             max_bits: 1 << 20,
             max_operations: 1 << 20,
             max_matrix_bytes: 64 * 1024 * 1024,
+            max_provenance_bytes: 64 * 1024 * 1024,
         }
     }
 }
@@ -46,6 +52,7 @@ pub struct ProgramBuilder {
     limits: ProgramLimits,
     source: Option<SourceSpan>,
     matrix_bytes: usize,
+    provenance: crate::ProvenanceGraph,
 }
 impl ProgramBuilder {
     /// # Errors
@@ -76,6 +83,7 @@ impl ProgramBuilder {
             limits,
             source: None,
             matrix_bytes: 0,
+            provenance: crate::ProvenanceGraph::default(),
         })
     }
     #[must_use]
@@ -171,7 +179,7 @@ impl ProgramBuilder {
         let controls = self.operands(targets, controls)?;
         self.push(SemanticOperation::Oracle {
             fragment: fragment.clone(),
-            targets: targets.to_vec(),
+            targets: targets.into(),
             controls,
         })
     }
@@ -227,44 +235,19 @@ impl ProgramBuilder {
         let mut expanded = Vec::with_capacity(body.occurrences.len());
         for id in body.schedule() {
             let o = ordered.get(id).ok_or(Error::InvalidId)?;
-            let map_controls = |inner: &[Control]| -> Result<Vec<Control>> {
-                inner
-                    .iter()
-                    .map(|c| {
-                        Ok(Control::new(
-                            *arguments.get(c.qubit().index).ok_or(Error::InvalidId)?,
-                            c.state(),
-                        ))
-                    })
-                    .chain(controls.iter().copied().map(Ok))
-                    .collect()
-            };
+            let mapped = crate::model::remap_operands(o.operation.operands(), arguments, controls)?;
             let operation = match &o.operation {
-                SemanticOperation::Gate {
-                    gate,
-                    targets,
-                    controls: inner,
-                } => self.gate_operation(
+                SemanticOperation::Gate { gate, .. } => self.gate_operation(
                     gate.substitute(&bindings)?,
-                    &targets
-                        .iter()
-                        .map(|q| arguments.get(q.index).copied().ok_or(Error::InvalidId))
-                        .collect::<Result<Vec<_>>>()?,
-                    &map_controls(inner)?,
+                    &mapped.targets,
+                    &mapped.controls,
                 )?,
-                SemanticOperation::GlobalPhase {
-                    angle,
-                    controls: inner,
-                } => SemanticOperation::GlobalPhase {
+                SemanticOperation::GlobalPhase { angle, .. } => SemanticOperation::GlobalPhase {
                     angle: angle.substitute(&bindings)?,
-                    controls: self.operands(&[], &map_controls(inner)?)?,
+                    controls: self.operands(&[], &mapped.controls)?,
                 },
-                SemanticOperation::Barrier { qubits } => SemanticOperation::Barrier {
-                    qubits: qubits
-                        .iter()
-                        .map(|q| arguments.get(q.index).copied().ok_or(Error::InvalidId))
-                        .chain(controls.iter().map(|c| Ok(c.qubit())))
-                        .collect::<Result<Vec<_>>>()?,
+                SemanticOperation::Barrier { .. } => SemanticOperation::Barrier {
+                    qubits: mapped.scope(),
                 },
                 _ => return Err(Error::NotUnitary),
             };
@@ -298,19 +281,34 @@ impl ProgramBuilder {
                 ))
             })
             .collect::<Result<Vec<_>>>()?;
-        let mut ids = Vec::with_capacity(expanded.len());
-        for (operation, source) in expanded {
-            let id = OccurrenceId {
-                owner: self.owner,
-                index: self.occurrences.len(),
-            };
+        let ids = (0..expanded.len())
+            .map(|offset| {
+                Ok(OccurrenceId {
+                    owner: self.owner,
+                    index: self
+                        .occurrences
+                        .len()
+                        .checked_add(offset)
+                        .ok_or(Error::Budget("definition expansion"))?,
+                })
+            })
+            .collect::<Result<Vec<_>>>()?;
+        self.occurrences
+            .try_reserve(expanded.len())
+            .map_err(|_| Error::Budget("definition allocation"))?;
+        self.explicit_edges
+            .try_reserve(explicit_edges.len())
+            .map_err(|_| Error::Budget("definition allocation"))?;
+        let histories = self
+            .provenance
+            .sources(&ids, self.limits.max_provenance_bytes)?;
+        for ((&id, provenance), (operation, source)) in ids.iter().zip(histories).zip(expanded) {
             self.occurrences.push(Occurrence {
                 id,
-                provenance: vec![id],
+                provenance,
                 source,
                 operation,
             });
-            ids.push(id);
         }
         self.explicit_edges.extend(explicit_edges);
         Ok(ids)
@@ -343,7 +341,7 @@ impl ProgramBuilder {
             Ok(())
         }
     }
-    fn operands(&self, targets: &[QubitId], controls: &[Control]) -> Result<Vec<Control>> {
+    fn operands(&self, targets: &[QubitId], controls: &[Control]) -> Result<Arc<[Control]>> {
         let mut used = BTreeSet::new();
         for q in targets
             .iter()
@@ -357,7 +355,7 @@ impl ProgramBuilder {
         }
         let mut controls = controls.to_vec();
         controls.sort();
-        Ok(controls)
+        Ok(controls.into())
     }
     fn gate_operation(
         &self,
@@ -377,7 +375,7 @@ impl ProgramBuilder {
         }
         Ok(SemanticOperation::Gate {
             gate,
-            targets: targets.to_vec(),
+            targets: targets.into(),
             controls,
         })
     }
@@ -391,7 +389,9 @@ impl ProgramBuilder {
         };
         self.occurrences.push(Occurrence {
             id,
-            provenance: vec![id],
+            provenance: self
+                .provenance
+                .source(id, self.limits.max_provenance_bytes)?,
             source: self.source.clone(),
             operation,
         });
@@ -458,7 +458,9 @@ impl ProgramBuilder {
             qubits.to_vec()
         };
         self.operands(&qubits, &[])?;
-        self.push(SemanticOperation::Barrier { qubits })
+        self.push(SemanticOperation::Barrier {
+            qubits: qubits.into(),
+        })
     }
     /// # Errors
     /// Rejects operand or matrix dimensions, invalid identifiers, and exhausted resource limits.
@@ -484,7 +486,7 @@ impl ProgramBuilder {
         }
         let id = self.push(SemanticOperation::Numerical {
             matrix,
-            targets: targets.to_vec(),
+            targets: targets.into(),
             controls,
         })?;
         self.matrix_bytes = bytes;
@@ -524,8 +526,8 @@ impl ProgramBuilder {
             return Err(Error::Budget("program matrix bytes"));
         }
         let id = self.push(SemanticOperation::Channel {
-            kraus,
-            targets: targets.to_vec(),
+            kraus: kraus.into(),
+            targets: targets.into(),
         })?;
         self.matrix_bytes = bytes;
         Ok(id)
@@ -553,6 +555,7 @@ impl ProgramBuilder {
             self.occurrences,
             self.explicit_edges,
             self.limits,
+            Arc::new(self.provenance),
         )
     }
 }
@@ -574,6 +577,7 @@ pub struct ValidatedProgram {
     pub(crate) occurrences: Vec<Occurrence>,
     pub(crate) explicit_edges: Vec<(OccurrenceId, OccurrenceId)>,
     pub(crate) limits: ProgramLimits,
+    pub(crate) provenance: Arc<crate::ProvenanceGraph>,
     graph: StableDiGraph<OccurrenceId, DependencyKind>,
     nodes: BTreeMap<OccurrenceId, NodeIndex>,
     schedule: Vec<OccurrenceId>,
@@ -582,6 +586,14 @@ pub struct ValidatedProgram {
 pub type Program = ValidatedProgram;
 
 impl ValidatedProgram {
+    #[must_use]
+    pub fn provenance(&self) -> &crate::ProvenanceGraph {
+        &self.provenance
+    }
+    #[expect(
+        clippy::too_many_arguments,
+        reason = "Central reconstruction validates the graph, source history, resources, and occurrence identities together"
+    )]
     pub(crate) fn from_parts(
         owner: u64,
         num_qubits: usize,
@@ -590,7 +602,14 @@ impl ValidatedProgram {
         occurrences: Vec<Occurrence>,
         explicit_edges: Vec<(OccurrenceId, OccurrenceId)>,
         limits: ProgramLimits,
+        provenance: Arc<crate::ProvenanceGraph>,
     ) -> Result<Self> {
+        if provenance.retained_bytes()? > limits.max_provenance_bytes {
+            return Err(Error::Budget("provenance storage"));
+        }
+        for item in &occurrences {
+            provenance.node(item.provenance)?;
+        }
         let mut graph = StableDiGraph::new();
         let mut nodes = BTreeMap::new();
         let mut quantum = BTreeMap::new();
@@ -666,6 +685,7 @@ impl ValidatedProgram {
             occurrences,
             explicit_edges,
             limits,
+            provenance,
             graph,
             nodes,
             schedule,
@@ -779,7 +799,7 @@ impl ValidatedProgram {
                 let o = by_id.get(id).ok_or(Error::InvalidId)?;
                 Ok(Instruction {
                     id: *id,
-                    provenance: o.provenance.clone(),
+                    provenance: o.provenance,
                     source: o.source.clone(),
                     operation: o.operation.bind(&values)?,
                 })
@@ -790,6 +810,7 @@ impl ValidatedProgram {
             num_bits: self.num_bits,
             instructions,
             bindings: values,
+            provenance: self.provenance,
             limits: self.limits,
             dependencies: self
                 .graph
@@ -844,6 +865,7 @@ impl UnitaryCircuit {
             p.occurrences,
             p.explicit_edges,
             p.limits,
+            p.provenance,
         )?))
     }
     /// Coherently controls the complete circuit, including its global phase.
@@ -863,7 +885,7 @@ impl UnitaryCircuit {
         }
         for o in &mut p.occurrences {
             if !matches!(o.operation, SemanticOperation::Barrier { .. })
-                && o.operation.qubits().iter().any(|q| unique.contains(q))
+                && o.operation.qubits().any(|q| unique.contains(&q))
             {
                 return Err(Error::DuplicateOperand);
             }
@@ -874,15 +896,22 @@ impl UnitaryCircuit {
                 | SemanticOperation::GlobalPhase {
                     controls: existing, ..
                 } => {
-                    existing.extend_from_slice(controls);
-                    existing.sort();
+                    let mut combined = existing
+                        .iter()
+                        .copied()
+                        .chain(controls.iter().copied())
+                        .collect::<Vec<_>>();
+                    combined.sort();
+                    *existing = combined.into();
                 }
                 SemanticOperation::Barrier { qubits } => {
+                    let mut combined = qubits.to_vec();
                     for c in controls {
-                        if !qubits.contains(&c.qubit()) {
-                            qubits.push(c.qubit());
+                        if !combined.contains(&c.qubit()) {
+                            combined.push(c.qubit());
                         }
                     }
+                    *qubits = combined.into();
                 }
                 _ => return Err(Error::NotUnitary),
             }
@@ -895,6 +924,7 @@ impl UnitaryCircuit {
             p.occurrences,
             p.explicit_edges,
             p.limits,
+            p.provenance,
         )?))
     }
 }
@@ -907,8 +937,13 @@ pub struct BoundProgram {
     pub(crate) bindings: BTreeMap<ParameterId, f64>,
     pub(crate) limits: ProgramLimits,
     pub(crate) dependencies: Vec<(OccurrenceId, OccurrenceId)>,
+    pub(crate) provenance: Arc<crate::ProvenanceGraph>,
 }
 impl BoundProgram {
+    #[must_use]
+    pub fn provenance(&self) -> &crate::ProvenanceGraph {
+        &self.provenance
+    }
     #[must_use]
     pub const fn num_qubits(&self) -> usize {
         self.num_qubits
@@ -943,27 +978,23 @@ impl BoundProgram {
         }
         depths.values().copied().max().unwrap_or(0)
     }
+    /// Check native index representation and publish the executable plan.
     /// # Errors
     /// Rejects wire counts that cannot be represented by native indices.
-    pub fn lower(self) -> Result<LoweredProgram> {
+    pub fn plan(self) -> Result<ExecutablePlan> {
         i32::try_from(self.num_qubits).map_err(|_| Error::NativeIndex)?;
         i32::try_from(self.num_bits).map_err(|_| Error::NativeIndex)?;
-        Ok(LoweredProgram(self))
-    }
-}
-#[derive(Debug, Clone)]
-pub struct LoweredProgram(BoundProgram);
-impl LoweredProgram {
-    /// # Errors
-    /// Currently infallible after successful lowering.
-    pub fn plan(self) -> Result<ExecutablePlan> {
-        Ok(ExecutablePlan(self.0))
+        Ok(ExecutablePlan(self))
     }
 }
 
 #[derive(Debug, Clone)]
 pub struct ExecutablePlan(BoundProgram);
 impl ExecutablePlan {
+    #[must_use]
+    pub fn provenance(&self) -> &crate::ProvenanceGraph {
+        self.0.provenance()
+    }
     /// Count retained oracle occurrences recursively, including each outer call.
     /// # Errors
     /// Rejects query-count overflow.
