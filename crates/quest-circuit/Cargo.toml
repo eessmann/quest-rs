@@ -18,6 +18,7 @@ quest-language.workspace = true
 quest-macros = { workspace = true, optional = true }
 quest-math = { workspace = true, optional = true }
 quest-optimizer-client = { workspace = true, optional = true }
+quest-optimizer-protocol = { workspace = true, optional = true }
 quest-qasm.workspace = true
 quest-symbolic.workspace = true
 thiserror = { workspace = true }
@@ -37,7 +38,7 @@ default = ["macros"]
 macros = ["dep:quest-macros"]
 codespan-reporting = ["dep:codespan-reporting", "quest-language/codespan-reporting", "quest-qasm/codespan-reporting"]
 serde = ["quest-language/serde", "quest-qasm/serde"]
-workers = ["dep:quest-optimizer-client", "dep:quest-math"]
+workers = ["dep:quest-optimizer-client", "dep:quest-optimizer-protocol", "dep:quest-math"]
 
 [[bench]]
 name = "compiler"

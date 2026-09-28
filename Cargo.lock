@@ -2367,6 +2367,7 @@ dependencies = [
  "quest-macros",
  "quest-math",
  "quest-optimizer-client",
+ "quest-optimizer-protocol",
  "quest-qasm",
  "quest-symbolic",
  "thiserror 2.0.20",

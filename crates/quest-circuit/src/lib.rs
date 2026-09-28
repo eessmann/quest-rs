@@ -15,6 +15,7 @@
 //! # Ok::<(), quest_circuit::Error>(())
 //! ```
 
+pub mod dispatch_recipe;
 mod oracle;
 pub use oracle::{NeedsOracleTolerance, OracleBuilder, OracleFragment, OracleTolerance};
 mod linear;
@@ -27,15 +28,25 @@ pub use parity::{
     AffinePhaseOperation, ParityOptions, ParityReport, ParitySynthesis, fold_parity,
     fold_parity_candidate,
 };
+mod beam;
 mod matrix;
 mod model;
 mod optimize;
+#[cfg(feature = "workers")]
+pub use beam::BeamMitmStatus;
+pub use beam::{BeamOptions, BeamReport};
+mod optimizer_contracts;
+mod terminal;
+pub use terminal::*;
 mod program;
 mod provenance;
 pub use provenance::{ExpansionLimits, ProvenanceGraph, ProvenanceId, ProvenanceNode};
 mod rational;
 mod structured;
 mod structured_optimize;
+mod structured_terminal;
+pub use structured_terminal::*;
+mod structured_pipeline;
 pub use quest_language as language;
 pub use quest_qasm as qasm;
 pub use rational::BigRational;
@@ -44,10 +55,12 @@ pub use structured_optimize::{
     StructuredOccurrence, StructuredQuantumError, StructuredQuantumOptions,
     StructuredQuantumReport, StructuredQuantumRewrite,
 };
+pub use structured_pipeline::*;
 
 pub use matrix::*;
 pub use model::*;
 pub use optimize::*;
+pub use optimizer_contracts::*;
 pub use program::*;
 
 extern crate self as quest_circuit;
@@ -97,8 +110,20 @@ pub enum Error {
     NativeIndex,
     #[error("unsupported capability: {0}")]
     Unsupported(&'static str),
+    #[error("structured optimization: {0}")]
+    Structured(Box<crate::StructuredTerminalError>),
+    #[cfg(feature = "workers")]
+    #[error("worker optimization: {0}")]
+    Worker(Box<crate::WorkerError>),
     #[error("source range end precedes its start")]
     SourceRange,
+}
+
+#[cfg(feature = "workers")]
+impl From<crate::WorkerError> for Error {
+    fn from(error: crate::WorkerError) -> Self {
+        Self::Worker(Box::new(error))
+    }
 }
 
 #[cfg(feature = "codespan-reporting")]
@@ -147,6 +172,15 @@ pub use quest_optimizer_client as optimizer;
 mod workers;
 #[cfg(feature = "workers")]
 pub use workers::*;
+
+#[cfg(feature = "workers")]
+mod beam_mitm;
+#[cfg(feature = "workers")]
+pub use beam_mitm::*;
+#[cfg(feature = "workers")]
+mod beam_approx;
+#[cfg(feature = "workers")]
+pub use beam_approx::*;
 
 #[cfg(feature = "workers")]
 mod structured_workers;
