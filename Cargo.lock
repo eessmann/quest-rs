@@ -2412,6 +2412,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "quest-mathcore"
+version = "0.3.1-quest.1"
+dependencies = [
+ "num-bigint 0.5.1",
+ "num-rational",
+ "num-traits",
+]
+
+[[package]]
 name = "quest-numerics"
 version = "0.1.0"
 dependencies = [
@@ -2585,6 +2594,17 @@ dependencies = [
  "num-traits",
  "once_cell",
  "rand 0.9.5",
+]
+
+[[package]]
+name = "quest-symbolic"
+version = "0.1.0"
+dependencies = [
+ "googletest",
+ "num-bigint 0.5.1",
+ "num-rational",
+ "num-traits",
+ "quest-mathcore",
 ]
 
 [[package]]

@@ -1,7 +1,7 @@
 [workspace]
 resolver = "3"
-members = ["crates/quest", "crates/quest-sys", "crates/quest-build", "crates/quest-circuit", "crates/quest-macros", "crates/xtask", "crates/quest-language", "crates/quest-qasm", "crates/quest-math", "crates/quest-optimizer-protocol", "crates/quest-optimizer-worker", "crates/quest-optimizer-client", "crates/quest-numerics", "crates/quest-polynomial", "crates/quest-qsp", "crates/quest-qsvt", "crates/quest-qsvt-io", "crates/quest-qsvt-cli"]
-exclude = ["crates/vendor/rsgridsynth"]
+members = ["crates/quest", "crates/quest-sys", "crates/quest-build", "crates/quest-circuit", "crates/quest-symbolic", "crates/quest-macros", "crates/xtask", "crates/quest-language", "crates/quest-qasm", "crates/quest-math", "crates/quest-optimizer-protocol", "crates/quest-optimizer-worker", "crates/quest-optimizer-client", "crates/quest-numerics", "crates/quest-polynomial", "crates/quest-qsp", "crates/quest-qsvt", "crates/quest-qsvt-io", "crates/quest-qsvt-cli"]
+exclude = ["crates/vendor/rsgridsynth", "crates/vendor/mathcore"]
 default-members = ["crates/quest"]
 
 [workspace.package]
@@ -35,6 +35,8 @@ color-eyre = { version = "0.6.5", default-features = false }
 quest-sys = { path = "crates/quest-sys", version = "0.2" }
 quest-build = { path = "crates/quest-build", version = "0.1" }
 quest-circuit = { path = "crates/quest-circuit", version = "0.1" }
+quest-symbolic = { path = "crates/quest-symbolic", version = "0.1" }
+mathcore = { package = "quest-mathcore", path = "crates/vendor/mathcore", version = "0.3.1-quest.1", default-features = false, features = ["exact"] }
 quest-macros = { path = "crates/quest-macros", version = "0.1" }
 clang = { version = "2.1", default-features = false }
 cxx = { version = "1", default-features = false }
