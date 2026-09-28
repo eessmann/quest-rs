@@ -191,17 +191,24 @@ guarantees.
 
 ## Delivery state
 
-Work remains isolated on `codex/correctness-consolidation`; main is unchanged at
-`9d614fb`. The plan and native correctness fixes have signed commits `064d3b2`
-and `9a1c3fd`. Subsequent signing attempts failed in the configured 1Password
-signer (`failed to fill whole buffer` / `agent returned an error`). The numerical
-correctness-only snapshot remains staged, and subsequent reviewed work remains
-in the worktree. Signing was not disabled and no merge or push was performed.
+Local `main` was fast-forwarded from `9d614fb` to `970fdd9` after the user
+authorized committing and merging. All nine plan, correctness, consolidation and
+evidence commits were signed with the configured signer. The committed tree
+`b1aa9476cd11535b0bcd970700ec618d553a59b7` exactly matches the reviewed and tested
+tree. This delivery-record update changes documentation only; the source
+manifest was verified again on merged `main` without rerunning unchanged suites.
+No remote push was performed.
+
+Earlier signing attempts failed in 1Password (`failed to fill whole buffer` /
+`agent returned an error`). The final retry succeeded; signing remained enabled
+throughout. Those failures are retained here as historical delivery evidence.
 
 The local delivery series in
 `.superpowers/sdd/2026-09-27-correctness-consolidation/patches/` separates remaining
 correctness fixes from native, language, numerical, circuit/facade and evidence
-changes. It applies in order after `9a1c3fd`; it supplements the preserved worktree
-and does not imply those patches have been committed or individually validated
-as release trees. The final integrated source is identified by
+changes. It applies in order after `9a1c3fd`; each patch was committed in sequence
+and its resulting tree checked against the saved series. Intermediate trees were
+not individually validated as releases. Review notes and patches were preserved
+in the main checkout before retiring the temporary worktree. The final integrated
+source is identified by
 [source-manifest.sha256](data/2026-09-28-consolidation/source-manifest.sha256).
