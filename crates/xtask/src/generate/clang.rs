@@ -367,7 +367,7 @@ fn canonicalize_existing(path: &Path) -> Result<PathBuf, DynError> {
 }
 
 #[cfg(test)]
-pub(crate) fn fixture_package() -> Result<Option<quest_build::NativePackage>, DynError> {
+pub fn fixture_package() -> Result<Option<quest_build::NativePackage>, DynError> {
     let explicitly_selected = QUEST_ENV_VARS
         .iter()
         .any(|name| env::var_os(name).is_some())

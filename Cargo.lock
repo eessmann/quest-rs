@@ -422,21 +422,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "cmake-package"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "13cd24990b85e3c97060e03e0034a4c03266247769e573e129425404a5601639"
-dependencies = [
- "itertools 0.14.0",
- "once_cell",
- "regex",
- "serde",
- "serde_json",
- "tempfile",
- "which",
-]
-
-[[package]]
 name = "codespan-reporting"
 version = "0.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1583,15 +1568,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "itertools"
-version = "0.14.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2b192c782037fadd9cfa75548310488aabdbf3d2da73885b31bd0abd03351285"
-dependencies = [
- "either",
-]
-
-[[package]]
 name = "itoa"
 version = "1.0.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2367,7 +2343,6 @@ version = "0.1.0"
 dependencies = [
  "cmake",
  "cmake-file-api",
- "cmake-package",
  "googletest",
  "shlex 2.0.1",
  "tempfile",
@@ -3449,15 +3424,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b67efb37e106e55ce722a510d6b5f9c17f083e5fc79afc2badeb12cc313d9487"
 dependencies = [
  "wit-bindgen",
-]
-
-[[package]]
-name = "which"
-version = "8.0.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bae2f2b2b816647a1cab1acc91f5bd20812d53cb344382635ec2181940c8034f"
-dependencies = [
- "libc",
 ]
 
 [[package]]

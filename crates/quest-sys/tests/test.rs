@@ -59,6 +59,38 @@ fn finalize_fails_while_raii_handles_are_live() -> googletest::Result<()> {
 }
 
 #[gtest]
+fn finalize_accounts_for_every_owned_native_resource_kind() -> googletest::Result<()> {
+    isolated_with_environment(
+        "finalize_accounts_for_every_owned_native_resource_kind",
+        || {
+            let qureg = quest_sys::create_qureg(1)?;
+            let comp = quest_sys::create_comp_matr(1)?;
+            let diag = quest_sys::create_diag_matr(1)?;
+            let full_diag = quest_sys::create_full_state_diag_matr(1)?;
+            let super_op = quest_sys::create_super_op(1)?;
+            let kraus = quest_sys::create_kraus_map(1, 1)?;
+            let sum = quest_sys::create_inline_pauli_str_sum("1 Z")?;
+            let Err(error) = quest_sys::finalize_quest_env() else {
+                return fail!("all owned resources must block finalization");
+            };
+            for name in [
+                "Qureg=1",
+                "CompMatr=1",
+                "DiagMatr=1",
+                "FullStateDiagMatr=1",
+                "SuperOp=1",
+                "KrausMap=1",
+                "PauliStrSum=1",
+            ] {
+                verify_that!(error.to_string(), contains_substring(name))?;
+            }
+            drop((qureg, comp, diag, full_diag, super_op, kraus, sum));
+            Ok(())
+        },
+    )
+}
+
+#[gtest]
 fn invalid_inputs_return_quest_errors() -> googletest::Result<()> {
     isolated_with_environment("invalid_inputs_return_quest_errors", || {
         let Err(err) = quest_sys::create_qureg(0) else {
@@ -150,6 +182,45 @@ fn primitive_operations_are_result_wrapped() -> googletest::Result<()> {
 
         Ok(())
     })
+}
+
+#[gtest]
+fn generated_pauli_control_families_preserve_axes_and_control_states() -> googletest::Result<()> {
+    isolated_with_environment(
+        "generated_pauli_control_families_preserve_axes_and_control_states",
+        || {
+            let mut qureg = quest_sys::create_qureg(2)?;
+            quest_sys::init_zero_state(qureg.pin_mut())?;
+            quest_sys::apply_pauli_x(qureg.pin_mut(), 1)?;
+            quest_sys::apply_multi_controlled_pauli_x(qureg.pin_mut(), &[1], 0)?;
+            expect_complex_near(quest_sys::get_qureg_amp(&qureg, 3)?, 1.0, 0.0);
+
+            quest_sys::init_zero_state(qureg.pin_mut())?;
+            quest_sys::apply_pauli_x(qureg.pin_mut(), 1)?;
+            quest_sys::apply_multi_controlled_pauli_y(qureg.pin_mut(), &[1], 0)?;
+            expect_complex_near(quest_sys::get_qureg_amp(&qureg, 3)?, 0.0, 1.0);
+
+            quest_sys::init_zero_state(qureg.pin_mut())?;
+            quest_sys::apply_pauli_x(qureg.pin_mut(), 1)?;
+            quest_sys::apply_pauli_x(qureg.pin_mut(), 0)?;
+            quest_sys::apply_multi_controlled_pauli_z(qureg.pin_mut(), &[1], 0)?;
+            expect_complex_near(quest_sys::get_qureg_amp(&qureg, 3)?, -1.0, 0.0);
+
+            quest_sys::init_zero_state(qureg.pin_mut())?;
+            quest_sys::apply_multi_state_controlled_pauli_x(qureg.pin_mut(), &[1], &[0], 0)?;
+            expect_complex_near(quest_sys::get_qureg_amp(&qureg, 1)?, 1.0, 0.0);
+
+            quest_sys::init_zero_state(qureg.pin_mut())?;
+            quest_sys::apply_multi_state_controlled_pauli_y(qureg.pin_mut(), &[1], &[0], 0)?;
+            expect_complex_near(quest_sys::get_qureg_amp(&qureg, 1)?, 0.0, 1.0);
+
+            quest_sys::init_zero_state(qureg.pin_mut())?;
+            quest_sys::apply_pauli_x(qureg.pin_mut(), 0)?;
+            quest_sys::apply_multi_state_controlled_pauli_z(qureg.pin_mut(), &[1], &[0], 0)?;
+            expect_complex_near(quest_sys::get_qureg_amp(&qureg, 1)?, -1.0, 0.0);
+            Ok(())
+        },
+    )
 }
 
 #[gtest]

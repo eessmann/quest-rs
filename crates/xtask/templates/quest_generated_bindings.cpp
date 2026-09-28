@@ -16,13 +16,13 @@
 namespace quest_sys {
 namespace {
 
-[[maybe_unused]] qcomp to_qcomp(const GeneratedComplex& value) {
+[[maybe_unused]] qcomp to_qcomp(const QuestComplex& value) {
   return qcomp(value.re, value.im);
 }
 
-[[maybe_unused]] GeneratedComplex from_qcomp(qcomp value) {
-  return GeneratedComplex{static_cast<double>(std::real(value)),
-                          static_cast<double>(std::imag(value))};
+[[maybe_unused]] QuestComplex from_qcomp(qcomp value) {
+  return QuestComplex{static_cast<double>(std::real(value)),
+                      static_cast<double>(std::imag(value))};
 }
 
 [[maybe_unused]] std::vector<int> to_int_vec(
@@ -56,7 +56,7 @@ namespace {
 }
 
 [[maybe_unused]] std::vector<qcomp> to_qcomp_vec(
-    rust::Slice<const GeneratedComplex> values) {
+    rust::Slice<const QuestComplex> values) {
   std::vector<qcomp> out;
   out.reserve(values.size());
   for (const auto& value : values) {
@@ -165,7 +165,7 @@ void apply_controlled_diag_matr_power(Qureg& qureg,
                                       std::int32_t control,
                                       rust::Slice<const std::int32_t> targets,
                                       const DiagMatr& matrix,
-                                      GeneratedComplex exponent) {
+                                      QuestComplex exponent) {
   const auto admission = admit_native_call();
   ::applyControlledDiagMatrPower(qureg.raw(), static_cast<int>(control),
                                  to_int_vec(targets), matrix.raw(),
@@ -339,7 +339,7 @@ void apply_diag_matr2(Qureg& qureg,
 void apply_diag_matr_power(Qureg& qureg,
                            rust::Slice<const std::int32_t> targets,
                            const DiagMatr& matrix,
-                           GeneratedComplex exponent) {
+                           QuestComplex exponent) {
   const auto admission = admit_native_call();
   ::applyDiagMatrPower(qureg.raw(), to_int_vec(targets), matrix.raw(),
                        to_qcomp(exponent));
@@ -374,7 +374,7 @@ void apply_full_state_diag_matr(Qureg& qureg, const FullStateDiagMatr& matrix) {
 
 void apply_full_state_diag_matr_power(Qureg& qureg,
                                       const FullStateDiagMatr& matrix,
-                                      GeneratedComplex exponent) {
+                                      QuestComplex exponent) {
   const auto admission = admit_native_call();
   ::applyFullStateDiagMatrPower(qureg.raw(), matrix.raw(), to_qcomp(exponent));
 }
@@ -442,7 +442,7 @@ void apply_multi_controlled_diag_matr_power(
     rust::Slice<const std::int32_t> controls,
     rust::Slice<const std::int32_t> targets,
     const DiagMatr& matrix,
-    GeneratedComplex exponent) {
+    QuestComplex exponent) {
   const auto admission = admit_native_call();
   ::applyMultiControlledDiagMatrPower(qureg.raw(), to_int_vec(controls),
                                       to_int_vec(targets), matrix.raw(),
@@ -484,29 +484,7 @@ void apply_multi_controlled_pauli_str(Qureg& qureg,
                                  str_arg.raw());
 }
 
-void apply_multi_controlled_pauli_x(Qureg& qureg,
-                                    rust::Slice<const std::int32_t> controls,
-                                    std::int32_t target) {
-  const auto admission = admit_native_call();
-  ::applyMultiControlledPauliX(qureg.raw(), to_int_vec(controls),
-                               static_cast<int>(target));
-}
-
-void apply_multi_controlled_pauli_y(Qureg& qureg,
-                                    rust::Slice<const std::int32_t> controls,
-                                    std::int32_t target) {
-  const auto admission = admit_native_call();
-  ::applyMultiControlledPauliY(qureg.raw(), to_int_vec(controls),
-                               static_cast<int>(target));
-}
-
-void apply_multi_controlled_pauli_z(Qureg& qureg,
-                                    rust::Slice<const std::int32_t> controls,
-                                    std::int32_t target) {
-  const auto admission = admit_native_call();
-  ::applyMultiControlledPauliZ(qureg.raw(), to_int_vec(controls),
-                               static_cast<int>(target));
-}
+// @pauli-multi-cpp@
 
 void apply_multi_controlled_phase_gadget(
     Qureg& qureg,
@@ -716,7 +694,7 @@ void apply_multi_state_controlled_diag_matr_power(
     rust::Slice<const std::int32_t> states,
     rust::Slice<const std::int32_t> targets,
     const DiagMatr& matrix,
-    GeneratedComplex exponent) {
+    QuestComplex exponent) {
   const auto admission = admit_native_call();
   ::applyMultiStateControlledDiagMatrPower(
       qureg.raw(), to_int_vec(controls), to_int_vec(states),
@@ -767,38 +745,7 @@ void apply_multi_state_controlled_pauli_str(
                                       to_int_vec(states), str_arg.raw());
 }
 
-void apply_multi_state_controlled_pauli_x(
-    Qureg& qureg,
-    rust::Slice<const std::int32_t> controls,
-    rust::Slice<const std::int32_t> states,
-    std::int32_t target) {
-  const auto admission = admit_native_call();
-  ::applyMultiStateControlledPauliX(qureg.raw(), to_int_vec(controls),
-                                    to_int_vec(states),
-                                    static_cast<int>(target));
-}
-
-void apply_multi_state_controlled_pauli_y(
-    Qureg& qureg,
-    rust::Slice<const std::int32_t> controls,
-    rust::Slice<const std::int32_t> states,
-    std::int32_t target) {
-  const auto admission = admit_native_call();
-  ::applyMultiStateControlledPauliY(qureg.raw(), to_int_vec(controls),
-                                    to_int_vec(states),
-                                    static_cast<int>(target));
-}
-
-void apply_multi_state_controlled_pauli_z(
-    Qureg& qureg,
-    rust::Slice<const std::int32_t> controls,
-    rust::Slice<const std::int32_t> states,
-    std::int32_t target) {
-  const auto admission = admit_native_call();
-  ::applyMultiStateControlledPauliZ(qureg.raw(), to_int_vec(controls),
-                                    to_int_vec(states),
-                                    static_cast<int>(target));
-}
+// @pauli-state-cpp@
 
 void apply_multi_state_controlled_phase_gadget(
     Qureg& qureg,
@@ -908,7 +855,7 @@ void apply_multi_state_controlled_t(Qureg& qureg,
 
 void apply_non_unitary_pauli_gadget(Qureg& qureg,
                                     const PauliStr& str_arg,
-                                    GeneratedComplex angle) {
+                                    QuestComplex angle) {
   const auto admission = admit_native_call();
   ::applyNonUnitaryPauliGadget(qureg.raw(), str_arg.raw(), to_qcomp(angle));
 }
@@ -1066,7 +1013,7 @@ void apply_trotterized_multi_state_controlled_pauli_str_sum_gadget(
 
 void apply_trotterized_non_unitary_pauli_str_sum_gadget(Qureg& qureg,
                                                         const PauliStrSum& sum,
-                                                        GeneratedComplex angle,
+                                                        QuestComplex angle,
                                                         std::int32_t order,
                                                         std::int32_t reps,
                                                         bool permuteTerms) {
@@ -1121,7 +1068,7 @@ double calc_expec_full_state_diag_matr_power(const Qureg& qureg,
       qureg.raw(), matrix.raw(), static_cast<qreal>(exponent)));
 }
 
-GeneratedComplex calc_expec_non_hermitian_full_state_diag_matr(
+QuestComplex calc_expec_non_hermitian_full_state_diag_matr(
     const Qureg& qureg,
     const FullStateDiagMatr& matr) {
   const auto admission = admit_native_call();
@@ -1129,18 +1076,17 @@ GeneratedComplex calc_expec_non_hermitian_full_state_diag_matr(
       ::calcExpecNonHermitianFullStateDiagMatr(qureg.raw(), matr.raw()));
 }
 
-GeneratedComplex calc_expec_non_hermitian_full_state_diag_matr_power(
+QuestComplex calc_expec_non_hermitian_full_state_diag_matr_power(
     const Qureg& qureg,
     const FullStateDiagMatr& matrix,
-    GeneratedComplex exponent) {
+    QuestComplex exponent) {
   const auto admission = admit_native_call();
   return from_qcomp(::calcExpecNonHermitianFullStateDiagMatrPower(
       qureg.raw(), matrix.raw(), to_qcomp(exponent)));
 }
 
-GeneratedComplex calc_expec_non_hermitian_pauli_str_sum(
-    const Qureg& qureg,
-    const PauliStrSum& sum) {
+QuestComplex calc_expec_non_hermitian_pauli_str_sum(const Qureg& qureg,
+                                                    const PauliStrSum& sum) {
   const auto admission = admit_native_call();
   return from_qcomp(::calcExpecNonHermitianPauliStrSum(qureg.raw(), sum.raw()));
 }
@@ -1160,7 +1106,7 @@ double calc_fidelity(const Qureg& qureg, const Qureg& other) {
   return static_cast<double>(::calcFidelity(qureg.raw(), other.raw()));
 }
 
-GeneratedComplex calc_inner_product(const Qureg& qureg, const Qureg& other) {
+QuestComplex calc_inner_product(const Qureg& qureg, const Qureg& other) {
   const auto admission = admit_native_call();
   return from_qcomp(::calcInnerProduct(qureg.raw(), other.raw()));
 }
@@ -1315,7 +1261,7 @@ create_full_state_diag_matr_from_pauli_str_sum(const PauliStrSum& in_arg) {
 
 std::unique_ptr<DiagMatr> create_inline_diag_matr(
     std::int32_t numQb,
-    rust::Slice<const GeneratedComplex> elems) {
+    rust::Slice<const QuestComplex> elems) {
   const auto admission = admit_native_call();
   return std::unique_ptr<DiagMatr>(new DiagMatr(
       ::createInlineDiagMatr(static_cast<int>(numQb), to_qcomp_vec(elems))));
@@ -1340,23 +1286,23 @@ std::unique_ptr<Qureg> create_qureg_from_file(rust::Str fn) {
       new Qureg(::createQuregFromFile(std::string(fn.data(), fn.size()))));
 }
 
-GeneratedComplex get_density_qureg_amp(const Qureg& qureg,
-                                       std::int64_t row,
-                                       std::int64_t column) {
+QuestComplex get_density_qureg_amp(const Qureg& qureg,
+                                   std::int64_t row,
+                                   std::int64_t column) {
   const auto admission = admit_native_call();
   return from_qcomp(::getDensityQuregAmp(qureg.raw(), static_cast<qindex>(row),
                                          static_cast<qindex>(column)));
 }
 
 std::unique_ptr<DiagMatr1> get_diag_matr1(
-    rust::Slice<const GeneratedComplex> in_arg) {
+    rust::Slice<const QuestComplex> in_arg) {
   const auto admission = admit_native_call();
   return std::unique_ptr<DiagMatr1>(
       new DiagMatr1(::getDiagMatr1(to_qcomp_vec(in_arg))));
 }
 
 std::unique_ptr<DiagMatr2> get_diag_matr2(
-    rust::Slice<const GeneratedComplex> in_arg) {
+    rust::Slice<const QuestComplex> in_arg) {
   const auto admission = admit_native_call();
   return std::unique_ptr<DiagMatr2>(
       new DiagMatr2(::getDiagMatr2(to_qcomp_vec(in_arg))));
@@ -1468,7 +1414,7 @@ void leftapply_diag_matr2(Qureg& qureg,
 void leftapply_diag_matr_power(Qureg& qureg,
                                rust::Slice<const std::int32_t> targets,
                                const DiagMatr& matrix,
-                               GeneratedComplex exponent) {
+                               QuestComplex exponent) {
   const auto admission = admit_native_call();
   ::leftapplyDiagMatrPower(qureg.raw(), to_int_vec(targets), matrix.raw(),
                            to_qcomp(exponent));
@@ -1482,7 +1428,7 @@ void leftapply_full_state_diag_matr(Qureg& qureg,
 
 void leftapply_full_state_diag_matr_power(Qureg& qureg,
                                           const FullStateDiagMatr& matrix,
-                                          GeneratedComplex exponent) {
+                                          QuestComplex exponent) {
   const auto admission = admit_native_call();
   ::leftapplyFullStateDiagMatrPower(qureg.raw(), matrix.raw(),
                                     to_qcomp(exponent));
@@ -1683,7 +1629,7 @@ void report_scalar_real(rust::Str label, double num) {
                  static_cast<qreal>(num));
 }
 
-void report_scalar(rust::Str label, GeneratedComplex num) {
+void report_scalar(rust::Str label, QuestComplex num) {
   const auto admission = admit_native_call();
   ::reportScalar(std::string(label.data(), label.size()), to_qcomp(num));
 }
@@ -1740,7 +1686,7 @@ void rightapply_diag_matr2(Qureg& qureg,
 void rightapply_diag_matr_power(Qureg& qureg,
                                 rust::Slice<const std::int32_t> targets,
                                 const DiagMatr& matrix,
-                                GeneratedComplex exponent) {
+                                QuestComplex exponent) {
   const auto admission = admit_native_call();
   ::rightapplyDiagMatrPower(qureg.raw(), to_int_vec(targets), matrix.raw(),
                             to_qcomp(exponent));
@@ -1754,7 +1700,7 @@ void rightapply_full_state_diag_matr(Qureg& qureg,
 
 void rightapply_full_state_diag_matr_power(Qureg& qureg,
                                            const FullStateDiagMatr& matrix,
-                                           GeneratedComplex exponent) {
+                                           QuestComplex exponent) {
   const auto admission = admit_native_call();
   ::rightapplyFullStateDiagMatrPower(qureg.raw(), matrix.raw(),
                                      to_qcomp(exponent));
@@ -1839,21 +1785,20 @@ void save_qureg_to_file(Qureg& qureg, rust::Str arg1) {
 
 void set_density_qureg_flat_amps(Qureg& qureg,
                                  std::int64_t startInd,
-                                 rust::Slice<const GeneratedComplex> amps) {
+                                 rust::Slice<const QuestComplex> amps) {
   const auto admission = admit_native_call();
   ::setDensityQuregFlatAmps(qureg.raw(), static_cast<qindex>(startInd),
                             to_qcomp_vec(amps));
 }
 
-void set_diag_matr(DiagMatr& out_arg,
-                   rust::Slice<const GeneratedComplex> in_arg) {
+void set_diag_matr(DiagMatr& out_arg, rust::Slice<const QuestComplex> in_arg) {
   const auto admission = admit_native_call();
   ::setDiagMatr(out_arg.raw(), to_qcomp_vec(in_arg));
 }
 
 void set_full_state_diag_matr(FullStateDiagMatr& out_arg,
                               std::int64_t startInd,
-                              rust::Slice<const GeneratedComplex> in_arg) {
+                              rust::Slice<const QuestComplex> in_arg) {
   const auto admission = admit_native_call();
   ::setFullStateDiagMatr(out_arg.raw(), static_cast<qindex>(startInd),
                          to_qcomp_vec(in_arg));
@@ -1867,17 +1812,16 @@ void set_full_state_diag_matr_from_pauli_str_sum(FullStateDiagMatr& out_arg,
 
 void set_inline_diag_matr(DiagMatr& matr,
                           std::int32_t numQb,
-                          rust::Slice<const GeneratedComplex> in_arg) {
+                          rust::Slice<const QuestComplex> in_arg) {
   const auto admission = admit_native_call();
   ::setInlineDiagMatr(matr.raw(), static_cast<int>(numQb),
                       to_qcomp_vec(in_arg));
 }
 
-void set_inline_full_state_diag_matr(
-    FullStateDiagMatr& matr,
-    std::int64_t startInd,
-    std::int64_t numElems,
-    rust::Slice<const GeneratedComplex> in_arg) {
+void set_inline_full_state_diag_matr(FullStateDiagMatr& matr,
+                                     std::int64_t startInd,
+                                     std::int64_t numElems,
+                                     rust::Slice<const QuestComplex> in_arg) {
   const auto admission = admit_native_call();
   ::setInlineFullStateDiagMatr(matr.raw(), static_cast<qindex>(startInd),
                                static_cast<qindex>(numElems),
@@ -1943,7 +1887,7 @@ void set_qu_est_validation_on() {
 
 void set_qureg_amps(Qureg& qureg,
                     std::int64_t startInd,
-                    rust::Slice<const GeneratedComplex> amps) {
+                    rust::Slice<const QuestComplex> amps) {
   const auto admission = admit_native_call();
   ::setQuregAmps(qureg.raw(), static_cast<qindex>(startInd),
                  to_qcomp_vec(amps));

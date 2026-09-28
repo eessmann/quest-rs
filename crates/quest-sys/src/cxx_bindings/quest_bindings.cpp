@@ -152,6 +152,28 @@ void ensure_no_live_resources_before_finalize() {
   }
 }
 
+template <typename Native, typename Destroy>
+void reset_owned(Native& value,
+                 bool& owns,
+                 ResourceKind kind,
+                 Destroy destroy) noexcept {
+  if (!owns) {
+    return;
+  }
+  try {
+    const auto admission = admit_native_call();
+    destroy(value);
+    owns = false;
+    unregister_resource(kind);
+  } catch (...) {
+    if (distributed_cleanup.load(std::memory_order_acquire)) {
+      mpi_abort_job();
+    }
+    // Fail closed: preserve the native allocation and live count. No exception
+    // may cross FFI or a noexcept owner destructor.
+  }
+}
+
 void throw_quest_input_error(const char* func, const char* msg) {
   std::string message = func != nullptr ? func : "QuEST";
   message += ": ";
@@ -283,22 +305,8 @@ Qureg& Qureg::operator=(Qureg&& other) noexcept {
 }
 
 void Qureg::reset() noexcept {
-  if (!owns_) {
-    return;
-  }
-
-  try {
-    const auto admission = admit_native_call();
-    ::destroyQureg(qureg_);
-    owns_ = false;
-    unregister_resource(ResourceKind::Qureg);
-  } catch (...) {
-    if (distributed_cleanup.load(std::memory_order_acquire)) {
-      mpi_abort_job();
-    }
-    // Fail closed: retain the native allocation and live count.
-    // Destruction must never cross FFI with an exception.
-  }
+  reset_owned(qureg_, owns_, ResourceKind::Qureg,
+              [](auto value) { ::destroyQureg(value); });
 }
 
 CompMatr1::CompMatr1(::CompMatr1 matrix) noexcept : matrix_(matrix) {}
@@ -342,22 +350,8 @@ std::int64_t CompMatr::num_rows() const noexcept {
 }
 
 void CompMatr::reset() noexcept {
-  if (!owns_) {
-    return;
-  }
-
-  try {
-    const auto admission = admit_native_call();
-    ::destroyCompMatr(matrix_);
-    owns_ = false;
-    unregister_resource(ResourceKind::CompMatr);
-  } catch (...) {
-    if (distributed_cleanup.load(std::memory_order_acquire)) {
-      mpi_abort_job();
-    }
-    // Fail closed: retain the native allocation and live count.
-    // Destruction must never cross FFI with an exception.
-  }
+  reset_owned(matrix_, owns_, ResourceKind::CompMatr,
+              [](auto value) { ::destroyCompMatr(value); });
 }
 
 DiagMatr1::DiagMatr1(::DiagMatr1 matrix) noexcept : matrix_(matrix) {}
@@ -401,22 +395,8 @@ std::int64_t DiagMatr::num_elems() const noexcept {
 }
 
 void DiagMatr::reset() noexcept {
-  if (!owns_) {
-    return;
-  }
-
-  try {
-    const auto admission = admit_native_call();
-    ::destroyDiagMatr(matrix_);
-    owns_ = false;
-    unregister_resource(ResourceKind::DiagMatr);
-  } catch (...) {
-    if (distributed_cleanup.load(std::memory_order_acquire)) {
-      mpi_abort_job();
-    }
-    // Fail closed: retain the native allocation and live count.
-    // Destruction must never cross FFI with an exception.
-  }
+  reset_owned(matrix_, owns_, ResourceKind::DiagMatr,
+              [](auto value) { ::destroyDiagMatr(value); });
 }
 
 FullStateDiagMatr::FullStateDiagMatr(::FullStateDiagMatr matrix) noexcept
@@ -450,22 +430,8 @@ std::int64_t FullStateDiagMatr::num_elems() const noexcept {
 }
 
 void FullStateDiagMatr::reset() noexcept {
-  if (!owns_) {
-    return;
-  }
-
-  try {
-    const auto admission = admit_native_call();
-    ::destroyFullStateDiagMatr(matrix_);
-    owns_ = false;
-    unregister_resource(ResourceKind::FullStateDiagMatr);
-  } catch (...) {
-    if (distributed_cleanup.load(std::memory_order_acquire)) {
-      mpi_abort_job();
-    }
-    // Fail closed: retain the native allocation and live count.
-    // Destruction must never cross FFI with an exception.
-  }
+  reset_owned(matrix_, owns_, ResourceKind::FullStateDiagMatr,
+              [](auto value) { ::destroyFullStateDiagMatr(value); });
 }
 
 SuperOp::SuperOp(::SuperOp op) noexcept : op_(op), owns_(true) {
@@ -493,22 +459,8 @@ SuperOp& SuperOp::operator=(SuperOp&& other) noexcept {
 }
 
 void SuperOp::reset() noexcept {
-  if (!owns_) {
-    return;
-  }
-
-  try {
-    const auto admission = admit_native_call();
-    ::destroySuperOp(op_);
-    owns_ = false;
-    unregister_resource(ResourceKind::SuperOp);
-  } catch (...) {
-    if (distributed_cleanup.load(std::memory_order_acquire)) {
-      mpi_abort_job();
-    }
-    // Fail closed: retain the native allocation and live count.
-    // Destruction must never cross FFI with an exception.
-  }
+  reset_owned(op_, owns_, ResourceKind::SuperOp,
+              [](auto value) { ::destroySuperOp(value); });
 }
 
 KrausMap::KrausMap(::KrausMap map) noexcept : map_(map), owns_(true) {
@@ -536,22 +488,8 @@ KrausMap& KrausMap::operator=(KrausMap&& other) noexcept {
 }
 
 void KrausMap::reset() noexcept {
-  if (!owns_) {
-    return;
-  }
-
-  try {
-    const auto admission = admit_native_call();
-    ::destroyKrausMap(map_);
-    owns_ = false;
-    unregister_resource(ResourceKind::KrausMap);
-  } catch (...) {
-    if (distributed_cleanup.load(std::memory_order_acquire)) {
-      mpi_abort_job();
-    }
-    // Fail closed: retain the native allocation and live count.
-    // Destruction must never cross FFI with an exception.
-  }
+  reset_owned(map_, owns_, ResourceKind::KrausMap,
+              [](auto value) { ::destroyKrausMap(value); });
 }
 
 PauliStr::PauliStr(::PauliStr str) noexcept : str_(str) {}
@@ -585,22 +523,8 @@ PauliStrSum& PauliStrSum::operator=(PauliStrSum&& other) noexcept {
 }
 
 void PauliStrSum::reset() noexcept {
-  if (!owns_) {
-    return;
-  }
-
-  try {
-    const auto admission = admit_native_call();
-    ::destroyPauliStrSum(sum_);
-    owns_ = false;
-    unregister_resource(ResourceKind::PauliStrSum);
-  } catch (...) {
-    if (distributed_cleanup.load(std::memory_order_acquire)) {
-      mpi_abort_job();
-    }
-    // Fail closed: retain the native allocation and live count.
-    // Destruction must never cross FFI with an exception.
-  }
+  reset_owned(sum_, owns_, ResourceKind::PauliStrSum,
+              [](auto value) { ::destroyPauliStrSum(value); });
 }
 
 void init_quest_env() {

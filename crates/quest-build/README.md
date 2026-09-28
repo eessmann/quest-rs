@@ -21,10 +21,10 @@ The compiled admission source verifies the supported version and configuration.
 
 CXX generates the bridge sources; `cmake` builds a static C++20 archive linked
 against `QuEST::QuEST`. This lets CMake evaluate compile features, system includes,
-conditional flags and imported dependencies. `cmake-package` performs discovery,
-while a small CMake File API query supplies evaluated link requirements from the
-same native project. Its `target.link()` shortcut cannot represent all generator
-expressions or preserve library ordering, so it is not used.
+conditional flags and imported dependencies. One CMake configure selects and
+evaluates the installed package; a CMake File API query then supplies its
+evaluated link requirements without a second package-discovery pass. This
+preserves generator expressions and library ordering from the native project.
 
 Cargo and CMake track native input changes normally. There is no attested native
 JSON record, compiler/library hashing or production `ldd` discovery. Unset the

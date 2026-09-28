@@ -116,30 +116,15 @@ fn configure(
     config
         .define("CMAKE_CXX_COMPILER", &cxx)
         .define("CMAKE_CXX_FLAGS", "");
-    let mut finder = cmake_package::find_package("QuEST")
-        .version("4.3")
-        .define("CMAKE_BUILD_TYPE", &profile)
-        .define("CMAKE_CXX_COMPILER", &cxx);
     let prefix_value = search_prefixes
         .iter()
         .map(|path| cmake_path(path))
         .collect::<Result<Vec<_>>>()?
         .join(";");
     config.define("CMAKE_PREFIX_PATH", &prefix_value);
-    finder = finder.prefix_paths(search_prefixes.to_vec());
     let package_directory = explicit.map(find_package_directory).transpose()?;
     if let Some(directory) = &package_directory {
-        finder = finder.define("QuEST_DIR", cmake_path(directory)?);
         config.define("QuEST_DIR", directory);
-    }
-    // cmake-package 0.2 requires OUT_DIR internally. Use its narrow package
-    // preflight in build scripts; tooling uses find_package in the authoritative
-    // project below, without mutating process-global environment variables.
-    // Never request target properties: they do not evaluate generator expressions.
-    if env::var_os("OUT_DIR").is_some() {
-        finder
-            .find()
-            .map_err(|error| invalid(format!("QuEST package discovery: {error}")))?;
     }
     let build_directory = work.join("build");
     fs::create_dir_all(&source).map_err(|error| io(&source, error))?;
@@ -620,6 +605,52 @@ set_target_properties(QuEST::QuEST PROPERTIES
 "#,
         )
         .or_fail()?;
+        Ok(())
+    }
+
+    #[gtest]
+    fn cargo_discovery_evaluates_the_selected_package_once() -> googletest::Result<()> {
+        if env::var_os("QUEST_BUILD_SINGLE_EVALUATION_CHILD").is_none() {
+            let work = tempfile::tempdir().or_fail()?;
+            let output = Command::new(env::current_exe().or_fail()?)
+                .args([
+                    "--exact",
+                    "probe::tests::cargo_discovery_evaluates_the_selected_package_once",
+                    "--nocapture",
+                ])
+                .env("OUT_DIR", work.path())
+                .env("PROFILE", "release")
+                .env("OPT_LEVEL", "3")
+                .env("DEBUG", "false")
+                .env("QUEST_BUILD_SINGLE_EVALUATION_CHILD", "1")
+                .output()
+                .or_fail()?;
+            if !output.status.success() {
+                return fail!(
+                    "discovery child failed:\n{}\n{}",
+                    String::from_utf8_lossy(&output.stdout),
+                    String::from_utf8_lossy(&output.stderr)
+                );
+            }
+            return Ok(());
+        }
+
+        let fixture = tempfile::tempdir().or_fail()?;
+        let prefix = fixture.path().join("package");
+        fixture_package(&prefix)?;
+        let config = prefix.join("lib/cmake/QuEST/QuESTConfig.cmake");
+        let original = fs::read_to_string(&config).or_fail()?;
+        let marker = prefix.join("evaluated.marker");
+        let guard = format!(
+            "if(EXISTS \"{}\")\n  message(FATAL_ERROR \"QuEST package evaluated twice\")\nendif()\nfile(WRITE \"{}\" \"once\")\n",
+            marker.display(),
+            marker.display()
+        );
+        fs::write(&config, format!("{guard}{original}")).or_fail()?;
+        let host = fixture_host()?;
+        let work = fixture.path().join("build");
+        configure(&work, &host, &host, Some(&prefix), None, &[]).or_fail()?;
+        expect_that!(marker.is_file(), eq(true));
         Ok(())
     }
 

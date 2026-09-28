@@ -9,7 +9,6 @@ repository.workspace = true
 [dependencies]
 cmake.workspace = true
 cmake-file-api = { workspace = true }
-cmake-package.workspace = true
 shlex = { workspace = true }
 thiserror.workspace = true
 

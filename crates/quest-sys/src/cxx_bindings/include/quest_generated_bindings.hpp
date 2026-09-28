@@ -1,10 +1,9 @@
 #pragma once
 
+#include "quest-sys/src/lib.rs.h"
 #include "quest_bindings.hpp"
 
 namespace quest_sys {
-
-struct GeneratedComplex;
 
 void apply_comp_matr1(Qureg& qureg,
                       std::int32_t target,
@@ -43,7 +42,7 @@ void apply_controlled_diag_matr_power(Qureg& qureg,
                                       std::int32_t control,
                                       rust::Slice<const std::int32_t> targets,
                                       const DiagMatr& matrix,
-                                      GeneratedComplex exponent);
+                                      QuestComplex exponent);
 void apply_controlled_hadamard(Qureg& qureg,
                                std::int32_t control,
                                std::int32_t target);
@@ -114,7 +113,7 @@ void apply_diag_matr2(Qureg& qureg,
 void apply_diag_matr_power(Qureg& qureg,
                            rust::Slice<const std::int32_t> targets,
                            const DiagMatr& matrix,
-                           GeneratedComplex exponent);
+                           QuestComplex exponent);
 double apply_forced_multi_qubit_measurement(
     Qureg& qureg,
     rust::Slice<const std::int32_t> qubits,
@@ -126,7 +125,7 @@ void apply_full_quantum_fourier_transform(Qureg& qureg, bool inverse);
 void apply_full_state_diag_matr(Qureg& qureg, const FullStateDiagMatr& matrix);
 void apply_full_state_diag_matr_power(Qureg& qureg,
                                       const FullStateDiagMatr& matrix,
-                                      GeneratedComplex exponent);
+                                      QuestComplex exponent);
 void apply_multi_controlled_comp_matr(Qureg& qureg,
                                       rust::Slice<const std::int32_t> controls,
                                       rust::Slice<const std::int32_t> targets,
@@ -158,7 +157,7 @@ void apply_multi_controlled_diag_matr_power(
     rust::Slice<const std::int32_t> controls,
     rust::Slice<const std::int32_t> targets,
     const DiagMatr& matrix,
-    GeneratedComplex exponent);
+    QuestComplex exponent);
 void apply_multi_controlled_hadamard(Qureg& qureg,
                                      rust::Slice<const std::int32_t> controls,
                                      std::int32_t target);
@@ -279,7 +278,7 @@ void apply_multi_state_controlled_diag_matr_power(
     rust::Slice<const std::int32_t> states,
     rust::Slice<const std::int32_t> targets,
     const DiagMatr& matrix,
-    GeneratedComplex exponent);
+    QuestComplex exponent);
 void apply_multi_state_controlled_hadamard(
     Qureg& qureg,
     rust::Slice<const std::int32_t> controls,
@@ -370,7 +369,7 @@ void apply_multi_state_controlled_t(Qureg& qureg,
                                     std::int32_t target);
 void apply_non_unitary_pauli_gadget(Qureg& qureg,
                                     const PauliStr& str_arg,
-                                    GeneratedComplex angle);
+                                    QuestComplex angle);
 void apply_pauli_gadget(Qureg& qureg, const PauliStr& str_arg, double angle);
 void apply_pauli_str(Qureg& qureg, const PauliStr& str_arg);
 void apply_phase_flip(Qureg& qureg, std::int32_t target);
@@ -429,7 +428,7 @@ void apply_trotterized_multi_state_controlled_pauli_str_sum_gadget(
     bool permuteTerms);
 void apply_trotterized_non_unitary_pauli_str_sum_gadget(Qureg& qureg,
                                                         const PauliStrSum& sum,
-                                                        GeneratedComplex angle,
+                                                        QuestComplex angle,
                                                         std::int32_t order,
                                                         std::int32_t reps,
                                                         bool permuteTerms);
@@ -451,19 +450,19 @@ double calc_expec_full_state_diag_matr(const Qureg& qureg,
 double calc_expec_full_state_diag_matr_power(const Qureg& qureg,
                                              const FullStateDiagMatr& matrix,
                                              double exponent);
-GeneratedComplex calc_expec_non_hermitian_full_state_diag_matr(
+QuestComplex calc_expec_non_hermitian_full_state_diag_matr(
     const Qureg& qureg,
     const FullStateDiagMatr& matr);
-GeneratedComplex calc_expec_non_hermitian_full_state_diag_matr_power(
+QuestComplex calc_expec_non_hermitian_full_state_diag_matr_power(
     const Qureg& qureg,
     const FullStateDiagMatr& matrix,
-    GeneratedComplex exponent);
-GeneratedComplex calc_expec_non_hermitian_pauli_str_sum(const Qureg& qureg,
-                                                        const PauliStrSum& sum);
+    QuestComplex exponent);
+QuestComplex calc_expec_non_hermitian_pauli_str_sum(const Qureg& qureg,
+                                                    const PauliStrSum& sum);
 double calc_expec_pauli_str(const Qureg& qureg, const PauliStr& str_arg);
 double calc_expec_pauli_str_sum(const Qureg& qureg, const PauliStrSum& sum);
 double calc_fidelity(const Qureg& qureg, const Qureg& other);
-GeneratedComplex calc_inner_product(const Qureg& qureg, const Qureg& other);
+QuestComplex calc_inner_product(const Qureg& qureg, const Qureg& other);
 std::unique_ptr<Qureg> calc_partial_trace(
     const Qureg& qureg,
     rust::Slice<const std::int32_t> traceOutQubits);
@@ -503,18 +502,18 @@ std::unique_ptr<FullStateDiagMatr>
 create_full_state_diag_matr_from_pauli_str_sum(const PauliStrSum& in_arg);
 std::unique_ptr<DiagMatr> create_inline_diag_matr(
     std::int32_t numQb,
-    rust::Slice<const GeneratedComplex> elems);
+    rust::Slice<const QuestComplex> elems);
 std::unique_ptr<PauliStrSum> create_pauli_str_sum_from_file(rust::Str fn);
 std::unique_ptr<PauliStrSum> create_pauli_str_sum_from_reversed_file(
     rust::Str fn);
 std::unique_ptr<Qureg> create_qureg_from_file(rust::Str fn);
-GeneratedComplex get_density_qureg_amp(const Qureg& qureg,
-                                       std::int64_t row,
-                                       std::int64_t column);
+QuestComplex get_density_qureg_amp(const Qureg& qureg,
+                                   std::int64_t row,
+                                   std::int64_t column);
 std::unique_ptr<DiagMatr1> get_diag_matr1(
-    rust::Slice<const GeneratedComplex> in_arg);
+    rust::Slice<const QuestComplex> in_arg);
 std::unique_ptr<DiagMatr2> get_diag_matr2(
-    rust::Slice<const GeneratedComplex> in_arg);
+    rust::Slice<const QuestComplex> in_arg);
 std::unique_ptr<PauliStr> get_pauli_str_from_string(rust::Str paulis);
 std::unique_ptr<PauliStr> get_pauli_str(
     rust::Str paulis,
@@ -549,12 +548,12 @@ void leftapply_diag_matr2(Qureg& qureg,
 void leftapply_diag_matr_power(Qureg& qureg,
                                rust::Slice<const std::int32_t> targets,
                                const DiagMatr& matrix,
-                               GeneratedComplex exponent);
+                               QuestComplex exponent);
 void leftapply_full_state_diag_matr(Qureg& qureg,
                                     const FullStateDiagMatr& matrix);
 void leftapply_full_state_diag_matr_power(Qureg& qureg,
                                           const FullStateDiagMatr& matrix,
-                                          GeneratedComplex exponent);
+                                          QuestComplex exponent);
 void leftapply_multi_qubit_not(Qureg& qureg,
                                rust::Slice<const std::int32_t> targets);
 void leftapply_multi_qubit_projector(Qureg& qureg,
@@ -612,7 +611,7 @@ void report_pauli_str_sum(const PauliStrSum& str_arg);
 void report_qureg(const Qureg& qureg);
 void report_qureg_params(const Qureg& qureg);
 void report_scalar_real(rust::Str label, double num);
-void report_scalar(rust::Str label, GeneratedComplex num);
+void report_scalar(rust::Str label, QuestComplex num);
 void report_str(rust::Str str_arg);
 void report_super_op(const SuperOp& op);
 void rightapply_comp_matr1(Qureg& qureg,
@@ -635,12 +634,12 @@ void rightapply_diag_matr2(Qureg& qureg,
 void rightapply_diag_matr_power(Qureg& qureg,
                                 rust::Slice<const std::int32_t> targets,
                                 const DiagMatr& matrix,
-                                GeneratedComplex exponent);
+                                QuestComplex exponent);
 void rightapply_full_state_diag_matr(Qureg& qureg,
                                      const FullStateDiagMatr& matrix);
 void rightapply_full_state_diag_matr_power(Qureg& qureg,
                                            const FullStateDiagMatr& matrix,
-                                           GeneratedComplex exponent);
+                                           QuestComplex exponent);
 void rightapply_multi_qubit_not(Qureg& qureg,
                                 rust::Slice<const std::int32_t> targets);
 void rightapply_multi_qubit_projector(Qureg& qureg,
@@ -666,22 +665,20 @@ void rightapply_swap(Qureg& qureg, std::int32_t qubit1, std::int32_t qubit2);
 void save_qureg_to_file(Qureg& qureg, rust::Str arg1);
 void set_density_qureg_flat_amps(Qureg& qureg,
                                  std::int64_t startInd,
-                                 rust::Slice<const GeneratedComplex> amps);
-void set_diag_matr(DiagMatr& out_arg,
-                   rust::Slice<const GeneratedComplex> in_arg);
+                                 rust::Slice<const QuestComplex> amps);
+void set_diag_matr(DiagMatr& out_arg, rust::Slice<const QuestComplex> in_arg);
 void set_full_state_diag_matr(FullStateDiagMatr& out_arg,
                               std::int64_t startInd,
-                              rust::Slice<const GeneratedComplex> in_arg);
+                              rust::Slice<const QuestComplex> in_arg);
 void set_full_state_diag_matr_from_pauli_str_sum(FullStateDiagMatr& out_arg,
                                                  const PauliStrSum& in_arg);
 void set_inline_diag_matr(DiagMatr& matr,
                           std::int32_t numQb,
-                          rust::Slice<const GeneratedComplex> in_arg);
-void set_inline_full_state_diag_matr(
-    FullStateDiagMatr& matr,
-    std::int64_t startInd,
-    std::int64_t numElems,
-    rust::Slice<const GeneratedComplex> in_arg);
+                          rust::Slice<const QuestComplex> in_arg);
+void set_inline_full_state_diag_matr(FullStateDiagMatr& matr,
+                                     std::int64_t startInd,
+                                     std::int64_t numElems,
+                                     rust::Slice<const QuestComplex> in_arg);
 void set_qu_est_max_num_reported_items(std::int64_t numRows,
                                        std::int64_t numCols);
 void set_qu_est_max_num_reported_sig_figs(std::int32_t numSigFigs);
@@ -695,7 +692,7 @@ void set_qu_est_validation_epsilon_to_default();
 void set_qu_est_validation_on();
 void set_qureg_amps(Qureg& qureg,
                     std::int64_t startInd,
-                    rust::Slice<const GeneratedComplex> amps);
+                    rust::Slice<const QuestComplex> amps);
 void set_qureg_to_clone(Qureg& outQureg, const Qureg& inQureg);
 void set_qureg_to_partial_trace(Qureg& out_arg,
                                 const Qureg& in_arg,

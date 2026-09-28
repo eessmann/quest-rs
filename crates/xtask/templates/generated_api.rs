@@ -15,14 +15,10 @@ use std::pin::Pin;
 
 #[cxx::bridge(namespace = "quest_sys")]
 mod ffi {
-    #[derive(Debug, Clone, Copy, PartialEq)]
-    pub struct GeneratedComplex {
-        pub re: f64,
-        pub im: f64,
-    }
-
     unsafe extern "C++" {
         include!("quest_generated_bindings.hpp");
+
+        type QuestComplex = crate::ffi::QuestComplex;
 
         type Qureg = crate::ffi::Qureg;
         type CompMatr1 = crate::ffi::CompMatr1;
@@ -87,7 +83,7 @@ mod ffi {
             control: i32,
             targets: &[i32],
             matrix: &DiagMatr,
-            exponent: GeneratedComplex,
+            exponent: QuestComplex,
         ) -> Result<()>;
         fn apply_controlled_hadamard(
             qureg: Pin<&mut Qureg>,
@@ -188,7 +184,7 @@ mod ffi {
             qureg: Pin<&mut Qureg>,
             targets: &[i32],
             matrix: &DiagMatr,
-            exponent: GeneratedComplex,
+            exponent: QuestComplex,
         ) -> Result<()>;
         fn apply_forced_multi_qubit_measurement(
             qureg: Pin<&mut Qureg>,
@@ -211,7 +207,7 @@ mod ffi {
         fn apply_full_state_diag_matr_power(
             qureg: Pin<&mut Qureg>,
             matrix: &FullStateDiagMatr,
-            exponent: GeneratedComplex,
+            exponent: QuestComplex,
         ) -> Result<()>;
         fn apply_multi_controlled_comp_matr(
             qureg: Pin<&mut Qureg>,
@@ -256,7 +252,7 @@ mod ffi {
             controls: &[i32],
             targets: &[i32],
             matrix: &DiagMatr,
-            exponent: GeneratedComplex,
+            exponent: QuestComplex,
         ) -> Result<()>;
         fn apply_multi_controlled_hadamard(
             qureg: Pin<&mut Qureg>,
@@ -279,21 +275,7 @@ mod ffi {
             controls: &[i32],
             str_arg: &PauliStr,
         ) -> Result<()>;
-        fn apply_multi_controlled_pauli_x(
-            qureg: Pin<&mut Qureg>,
-            controls: &[i32],
-            target: i32,
-        ) -> Result<()>;
-        fn apply_multi_controlled_pauli_y(
-            qureg: Pin<&mut Qureg>,
-            controls: &[i32],
-            target: i32,
-        ) -> Result<()>;
-        fn apply_multi_controlled_pauli_z(
-            qureg: Pin<&mut Qureg>,
-            controls: &[i32],
-            target: i32,
-        ) -> Result<()>;
+// @pauli-multi-ffi@
         fn apply_multi_controlled_phase_gadget(
             qureg: Pin<&mut Qureg>,
             controls: &[i32],
@@ -412,7 +394,7 @@ mod ffi {
             states: &[i32],
             targets: &[i32],
             matrix: &DiagMatr,
-            exponent: GeneratedComplex,
+            exponent: QuestComplex,
         ) -> Result<()>;
         fn apply_multi_state_controlled_hadamard(
             qureg: Pin<&mut Qureg>,
@@ -439,24 +421,7 @@ mod ffi {
             states: &[i32],
             str_arg: &PauliStr,
         ) -> Result<()>;
-        fn apply_multi_state_controlled_pauli_x(
-            qureg: Pin<&mut Qureg>,
-            controls: &[i32],
-            states: &[i32],
-            target: i32,
-        ) -> Result<()>;
-        fn apply_multi_state_controlled_pauli_y(
-            qureg: Pin<&mut Qureg>,
-            controls: &[i32],
-            states: &[i32],
-            target: i32,
-        ) -> Result<()>;
-        fn apply_multi_state_controlled_pauli_z(
-            qureg: Pin<&mut Qureg>,
-            controls: &[i32],
-            states: &[i32],
-            target: i32,
-        ) -> Result<()>;
+// @pauli-state-ffi@
         fn apply_multi_state_controlled_phase_gadget(
             qureg: Pin<&mut Qureg>,
             controls: &[i32],
@@ -524,7 +489,7 @@ mod ffi {
         fn apply_non_unitary_pauli_gadget(
             qureg: Pin<&mut Qureg>,
             str_arg: &PauliStr,
-            angle: GeneratedComplex,
+            angle: QuestComplex,
         ) -> Result<()>;
         fn apply_pauli_gadget(qureg: Pin<&mut Qureg>, str_arg: &PauliStr, angle: f64)
         -> Result<()>;
@@ -592,7 +557,7 @@ mod ffi {
         fn apply_trotterized_non_unitary_pauli_str_sum_gadget(
             qureg: Pin<&mut Qureg>,
             sum: &PauliStrSum,
-            angle: GeneratedComplex,
+            angle: QuestComplex,
             order: i32,
             reps: i32,
             permute_terms: bool,
@@ -625,20 +590,20 @@ mod ffi {
         fn calc_expec_non_hermitian_full_state_diag_matr(
             qureg: &Qureg,
             matr: &FullStateDiagMatr,
-        ) -> Result<GeneratedComplex>;
+        ) -> Result<QuestComplex>;
         fn calc_expec_non_hermitian_full_state_diag_matr_power(
             qureg: &Qureg,
             matrix: &FullStateDiagMatr,
-            exponent: GeneratedComplex,
-        ) -> Result<GeneratedComplex>;
+            exponent: QuestComplex,
+        ) -> Result<QuestComplex>;
         fn calc_expec_non_hermitian_pauli_str_sum(
             qureg: &Qureg,
             sum: &PauliStrSum,
-        ) -> Result<GeneratedComplex>;
+        ) -> Result<QuestComplex>;
         fn calc_expec_pauli_str(qureg: &Qureg, str_arg: &PauliStr) -> Result<f64>;
         fn calc_expec_pauli_str_sum(qureg: &Qureg, sum: &PauliStrSum) -> Result<f64>;
         fn calc_fidelity(qureg: &Qureg, other: &Qureg) -> Result<f64>;
-        fn calc_inner_product(qureg: &Qureg, other: &Qureg) -> Result<GeneratedComplex>;
+        fn calc_inner_product(qureg: &Qureg, other: &Qureg) -> Result<QuestComplex>;
         fn calc_partial_trace(qureg: &Qureg, trace_out_qubits: &[i32]) -> Result<UniquePtr<Qureg>>;
         fn calc_prob_of_basis_state(qureg: &Qureg, index: i64) -> Result<f64>;
         fn calc_prob_of_multi_qubit_outcome(
@@ -680,16 +645,16 @@ mod ffi {
         ) -> Result<UniquePtr<FullStateDiagMatr>>;
         fn create_inline_diag_matr(
             num_qb: i32,
-            elems: &[GeneratedComplex],
+            elems: &[QuestComplex],
         ) -> Result<UniquePtr<DiagMatr>>;
         fn create_pauli_str_sum_from_file(file_name: &str) -> Result<UniquePtr<PauliStrSum>>;
         fn create_pauli_str_sum_from_reversed_file(
             file_name: &str,
         ) -> Result<UniquePtr<PauliStrSum>>;
         fn create_qureg_from_file(file_name: &str) -> Result<UniquePtr<Qureg>>;
-        fn get_density_qureg_amp(qureg: &Qureg, row: i64, column: i64) -> Result<GeneratedComplex>;
-        fn get_diag_matr1(in_arg: &[GeneratedComplex]) -> Result<UniquePtr<DiagMatr1>>;
-        fn get_diag_matr2(in_arg: &[GeneratedComplex]) -> Result<UniquePtr<DiagMatr2>>;
+        fn get_density_qureg_amp(qureg: &Qureg, row: i64, column: i64) -> Result<QuestComplex>;
+        fn get_diag_matr1(in_arg: &[QuestComplex]) -> Result<UniquePtr<DiagMatr1>>;
+        fn get_diag_matr2(in_arg: &[QuestComplex]) -> Result<UniquePtr<DiagMatr2>>;
         fn get_pauli_str_from_string(paulis: &str) -> Result<UniquePtr<PauliStr>>;
         fn get_pauli_str(paulis: &str, indices: &[i32]) -> Result<UniquePtr<PauliStr>>;
         fn get_qu_est_gpu_cache_size() -> Result<i64>;
@@ -733,7 +698,7 @@ mod ffi {
             qureg: Pin<&mut Qureg>,
             targets: &[i32],
             matrix: &DiagMatr,
-            exponent: GeneratedComplex,
+            exponent: QuestComplex,
         ) -> Result<()>;
         fn leftapply_full_state_diag_matr(
             qureg: Pin<&mut Qureg>,
@@ -742,7 +707,7 @@ mod ffi {
         fn leftapply_full_state_diag_matr_power(
             qureg: Pin<&mut Qureg>,
             matrix: &FullStateDiagMatr,
-            exponent: GeneratedComplex,
+            exponent: QuestComplex,
         ) -> Result<()>;
         fn leftapply_multi_qubit_not(qureg: Pin<&mut Qureg>, targets: &[i32]) -> Result<()>;
         fn leftapply_multi_qubit_projector(
@@ -812,7 +777,7 @@ mod ffi {
         fn report_qureg(qureg: &Qureg) -> Result<()>;
         fn report_qureg_params(qureg: &Qureg) -> Result<()>;
         fn report_scalar_real(label: &str, num: f64) -> Result<()>;
-        fn report_scalar(label: &str, num: GeneratedComplex) -> Result<()>;
+        fn report_scalar(label: &str, num: QuestComplex) -> Result<()>;
         fn report_str(str_arg: &str) -> Result<()>;
         fn report_super_op(op: &SuperOp) -> Result<()>;
         fn rightapply_comp_matr1(
@@ -846,7 +811,7 @@ mod ffi {
             qureg: Pin<&mut Qureg>,
             targets: &[i32],
             matrix: &DiagMatr,
-            exponent: GeneratedComplex,
+            exponent: QuestComplex,
         ) -> Result<()>;
         fn rightapply_full_state_diag_matr(
             qureg: Pin<&mut Qureg>,
@@ -855,7 +820,7 @@ mod ffi {
         fn rightapply_full_state_diag_matr_power(
             qureg: Pin<&mut Qureg>,
             matrix: &FullStateDiagMatr,
-            exponent: GeneratedComplex,
+            exponent: QuestComplex,
         ) -> Result<()>;
         fn rightapply_multi_qubit_not(qureg: Pin<&mut Qureg>, targets: &[i32]) -> Result<()>;
         fn rightapply_multi_qubit_projector(
@@ -892,13 +857,13 @@ mod ffi {
         fn set_density_qureg_flat_amps(
             qureg: Pin<&mut Qureg>,
             start_ind: i64,
-            amps: &[GeneratedComplex],
+            amps: &[QuestComplex],
         ) -> Result<()>;
-        fn set_diag_matr(out_arg: Pin<&mut DiagMatr>, in_arg: &[GeneratedComplex]) -> Result<()>;
+        fn set_diag_matr(out_arg: Pin<&mut DiagMatr>, in_arg: &[QuestComplex]) -> Result<()>;
         fn set_full_state_diag_matr(
             out_arg: Pin<&mut FullStateDiagMatr>,
             start_ind: i64,
-            in_arg: &[GeneratedComplex],
+            in_arg: &[QuestComplex],
         ) -> Result<()>;
         fn set_full_state_diag_matr_from_pauli_str_sum(
             out_arg: Pin<&mut FullStateDiagMatr>,
@@ -907,13 +872,13 @@ mod ffi {
         fn set_inline_diag_matr(
             matr: Pin<&mut DiagMatr>,
             num_qb: i32,
-            in_arg: &[GeneratedComplex],
+            in_arg: &[QuestComplex],
         ) -> Result<()>;
         fn set_inline_full_state_diag_matr(
             matr: Pin<&mut FullStateDiagMatr>,
             start_ind: i64,
             num_elems: i64,
-            in_arg: &[GeneratedComplex],
+            in_arg: &[QuestComplex],
         ) -> Result<()>;
         fn set_qu_est_max_num_reported_items(num_rows: i64, num_cols: i64) -> Result<()>;
         fn set_qu_est_max_num_reported_sig_figs(num_sig_figs: i32) -> Result<()>;
@@ -928,7 +893,7 @@ mod ffi {
         fn set_qureg_amps(
             qureg: Pin<&mut Qureg>,
             start_ind: i64,
-            amps: &[GeneratedComplex],
+            amps: &[QuestComplex],
         ) -> Result<()>;
         fn set_qureg_to_clone(out_qureg: Pin<&mut Qureg>, in_qureg: &Qureg) -> Result<()>;
         fn set_qureg_to_partial_trace(
@@ -962,26 +927,6 @@ mod ffi {
             num_local_amps: i64,
         ) -> Result<()>;
         fn sync_super_op(op: Pin<&mut SuperOp>) -> Result<()>;
-    }
-}
-
-use ffi::GeneratedComplex;
-
-impl From<QuestComplex> for GeneratedComplex {
-    fn from(value: QuestComplex) -> Self {
-        Self {
-            re: value.re,
-            im: value.im,
-        }
-    }
-}
-
-impl From<GeneratedComplex> for QuestComplex {
-    fn from(value: GeneratedComplex) -> Self {
-        Self {
-            re: value.re,
-            im: value.im,
-        }
     }
 }
 
@@ -1077,13 +1022,8 @@ pub fn apply_controlled_diag_matr_power(
     matrix: &DiagMatr,
     exponent: QuestComplex,
 ) -> QuestResult<()> {
-    let exponent_ffi = GeneratedComplex::from(exponent);
     map_quest_result(ffi::apply_controlled_diag_matr_power(
-        qureg,
-        control,
-        targets,
-        matrix,
-        exponent_ffi,
+        qureg, control, targets, matrix, exponent,
     ))
 }
 
@@ -1261,13 +1201,7 @@ pub fn apply_diag_matr_power(
     matrix: &DiagMatr,
     exponent: QuestComplex,
 ) -> QuestResult<()> {
-    let exponent_ffi = GeneratedComplex::from(exponent);
-    map_quest_result(ffi::apply_diag_matr_power(
-        qureg,
-        targets,
-        matrix,
-        exponent_ffi,
-    ))
+    map_quest_result(ffi::apply_diag_matr_power(qureg, targets, matrix, exponent))
 }
 
 pub fn apply_forced_multi_qubit_measurement(
@@ -1307,11 +1241,8 @@ pub fn apply_full_state_diag_matr_power(
     matrix: &FullStateDiagMatr,
     exponent: QuestComplex,
 ) -> QuestResult<()> {
-    let exponent_ffi = GeneratedComplex::from(exponent);
     map_quest_result(ffi::apply_full_state_diag_matr_power(
-        qureg,
-        matrix,
-        exponent_ffi,
+        qureg, matrix, exponent,
     ))
 }
 
@@ -1390,13 +1321,8 @@ pub fn apply_multi_controlled_diag_matr_power(
     matrix: &DiagMatr,
     exponent: QuestComplex,
 ) -> QuestResult<()> {
-    let exponent_ffi = GeneratedComplex::from(exponent);
     map_quest_result(ffi::apply_multi_controlled_diag_matr_power(
-        qureg,
-        controls,
-        targets,
-        matrix,
-        exponent_ffi,
+        qureg, controls, targets, matrix, exponent,
     ))
 }
 
@@ -1441,29 +1367,7 @@ pub fn apply_multi_controlled_pauli_str(
     ))
 }
 
-pub fn apply_multi_controlled_pauli_x(
-    qureg: Pin<&mut Qureg>,
-    controls: &[i32],
-    target: i32,
-) -> QuestResult<()> {
-    map_quest_result(ffi::apply_multi_controlled_pauli_x(qureg, controls, target))
-}
-
-pub fn apply_multi_controlled_pauli_y(
-    qureg: Pin<&mut Qureg>,
-    controls: &[i32],
-    target: i32,
-) -> QuestResult<()> {
-    map_quest_result(ffi::apply_multi_controlled_pauli_y(qureg, controls, target))
-}
-
-pub fn apply_multi_controlled_pauli_z(
-    qureg: Pin<&mut Qureg>,
-    controls: &[i32],
-    target: i32,
-) -> QuestResult<()> {
-    map_quest_result(ffi::apply_multi_controlled_pauli_z(qureg, controls, target))
-}
+// @pauli-multi-rust@
 
 pub fn apply_multi_controlled_phase_gadget(
     qureg: Pin<&mut Qureg>,
@@ -1671,14 +1575,8 @@ pub fn apply_multi_state_controlled_diag_matr_power(
     matrix: &DiagMatr,
     exponent: QuestComplex,
 ) -> QuestResult<()> {
-    let exponent_ffi = GeneratedComplex::from(exponent);
     map_quest_result(ffi::apply_multi_state_controlled_diag_matr_power(
-        qureg,
-        controls,
-        states,
-        targets,
-        matrix,
-        exponent_ffi,
+        qureg, controls, states, targets, matrix, exponent,
     ))
 }
 
@@ -1727,38 +1625,7 @@ pub fn apply_multi_state_controlled_pauli_str(
     ))
 }
 
-pub fn apply_multi_state_controlled_pauli_x(
-    qureg: Pin<&mut Qureg>,
-    controls: &[i32],
-    states: &[i32],
-    target: i32,
-) -> QuestResult<()> {
-    map_quest_result(ffi::apply_multi_state_controlled_pauli_x(
-        qureg, controls, states, target,
-    ))
-}
-
-pub fn apply_multi_state_controlled_pauli_y(
-    qureg: Pin<&mut Qureg>,
-    controls: &[i32],
-    states: &[i32],
-    target: i32,
-) -> QuestResult<()> {
-    map_quest_result(ffi::apply_multi_state_controlled_pauli_y(
-        qureg, controls, states, target,
-    ))
-}
-
-pub fn apply_multi_state_controlled_pauli_z(
-    qureg: Pin<&mut Qureg>,
-    controls: &[i32],
-    states: &[i32],
-    target: i32,
-) -> QuestResult<()> {
-    map_quest_result(ffi::apply_multi_state_controlled_pauli_z(
-        qureg, controls, states, target,
-    ))
-}
+// @pauli-state-rust@
 
 pub fn apply_multi_state_controlled_phase_gadget(
     qureg: Pin<&mut Qureg>,
@@ -1874,10 +1741,7 @@ pub fn apply_non_unitary_pauli_gadget(
     str_arg: &PauliStr,
     angle: QuestComplex,
 ) -> QuestResult<()> {
-    let angle_ffi = GeneratedComplex::from(angle);
-    map_quest_result(ffi::apply_non_unitary_pauli_gadget(
-        qureg, str_arg, angle_ffi,
-    ))
+    map_quest_result(ffi::apply_non_unitary_pauli_gadget(qureg, str_arg, angle))
 }
 
 pub fn apply_pauli_gadget(
@@ -2051,11 +1915,10 @@ pub fn apply_trotterized_non_unitary_pauli_str_sum_gadget(
     reps: i32,
     permute_terms: bool,
 ) -> QuestResult<()> {
-    let angle_ffi = GeneratedComplex::from(angle);
     map_quest_result(ffi::apply_trotterized_non_unitary_pauli_str_sum_gadget(
         qureg,
         sum,
-        angle_ffi,
+        angle,
         order,
         reps,
         permute_terms,
@@ -2123,7 +1986,6 @@ pub fn calc_expec_non_hermitian_full_state_diag_matr(
     map_quest_result(ffi::calc_expec_non_hermitian_full_state_diag_matr(
         qureg, matr,
     ))
-    .map(QuestComplex::from)
 }
 
 pub fn calc_expec_non_hermitian_full_state_diag_matr_power(
@@ -2131,13 +1993,9 @@ pub fn calc_expec_non_hermitian_full_state_diag_matr_power(
     matrix: &FullStateDiagMatr,
     exponent: QuestComplex,
 ) -> QuestResult<QuestComplex> {
-    let exponent_ffi = GeneratedComplex::from(exponent);
     map_quest_result(ffi::calc_expec_non_hermitian_full_state_diag_matr_power(
-        qureg,
-        matrix,
-        exponent_ffi,
+        qureg, matrix, exponent,
     ))
-    .map(QuestComplex::from)
 }
 
 pub fn calc_expec_non_hermitian_pauli_str_sum(
@@ -2145,7 +2003,6 @@ pub fn calc_expec_non_hermitian_pauli_str_sum(
     sum: &PauliStrSum,
 ) -> QuestResult<QuestComplex> {
     map_quest_result(ffi::calc_expec_non_hermitian_pauli_str_sum(qureg, sum))
-        .map(QuestComplex::from)
 }
 
 pub fn calc_expec_pauli_str(qureg: &Qureg, str_arg: &PauliStr) -> QuestResult<f64> {
@@ -2161,7 +2018,7 @@ pub fn calc_fidelity(qureg: &Qureg, other: &Qureg) -> QuestResult<f64> {
 }
 
 pub fn calc_inner_product(qureg: &Qureg, other: &Qureg) -> QuestResult<QuestComplex> {
-    map_quest_result(ffi::calc_inner_product(qureg, other)).map(QuestComplex::from)
+    map_quest_result(ffi::calc_inner_product(qureg, other))
 }
 
 pub fn calc_partial_trace(
@@ -2271,12 +2128,7 @@ pub fn create_inline_diag_matr(
     num_qb: i32,
     elems: &[QuestComplex],
 ) -> QuestResult<UniquePtr<DiagMatr>> {
-    let elems_ffi = elems
-        .iter()
-        .copied()
-        .map(GeneratedComplex::from)
-        .collect::<Vec<_>>();
-    map_quest_result(ffi::create_inline_diag_matr(num_qb, &elems_ffi))
+    map_quest_result(ffi::create_inline_diag_matr(num_qb, elems))
 }
 
 pub fn create_pauli_str_sum_from_file(file_name: &str) -> QuestResult<UniquePtr<PauliStrSum>> {
@@ -2294,25 +2146,15 @@ pub fn create_qureg_from_file(file_name: &str) -> QuestResult<UniquePtr<Qureg>> 
 }
 
 pub fn get_density_qureg_amp(qureg: &Qureg, row: i64, column: i64) -> QuestResult<QuestComplex> {
-    map_quest_result(ffi::get_density_qureg_amp(qureg, row, column)).map(QuestComplex::from)
+    map_quest_result(ffi::get_density_qureg_amp(qureg, row, column))
 }
 
 pub fn get_diag_matr1(in_arg: &[QuestComplex]) -> QuestResult<UniquePtr<DiagMatr1>> {
-    let in_arg_ffi = in_arg
-        .iter()
-        .copied()
-        .map(GeneratedComplex::from)
-        .collect::<Vec<_>>();
-    map_quest_result(ffi::get_diag_matr1(&in_arg_ffi))
+    map_quest_result(ffi::get_diag_matr1(in_arg))
 }
 
 pub fn get_diag_matr2(in_arg: &[QuestComplex]) -> QuestResult<UniquePtr<DiagMatr2>> {
-    let in_arg_ffi = in_arg
-        .iter()
-        .copied()
-        .map(GeneratedComplex::from)
-        .collect::<Vec<_>>();
-    map_quest_result(ffi::get_diag_matr2(&in_arg_ffi))
+    map_quest_result(ffi::get_diag_matr2(in_arg))
 }
 
 pub fn get_pauli_str_from_string(paulis: &str) -> QuestResult<UniquePtr<PauliStr>> {
@@ -2411,12 +2253,8 @@ pub fn leftapply_diag_matr_power(
     matrix: &DiagMatr,
     exponent: QuestComplex,
 ) -> QuestResult<()> {
-    let exponent_ffi = GeneratedComplex::from(exponent);
     map_quest_result(ffi::leftapply_diag_matr_power(
-        qureg,
-        targets,
-        matrix,
-        exponent_ffi,
+        qureg, targets, matrix, exponent,
     ))
 }
 
@@ -2432,11 +2270,8 @@ pub fn leftapply_full_state_diag_matr_power(
     matrix: &FullStateDiagMatr,
     exponent: QuestComplex,
 ) -> QuestResult<()> {
-    let exponent_ffi = GeneratedComplex::from(exponent);
     map_quest_result(ffi::leftapply_full_state_diag_matr_power(
-        qureg,
-        matrix,
-        exponent_ffi,
+        qureg, matrix, exponent,
     ))
 }
 
@@ -2609,8 +2444,7 @@ pub fn report_scalar_real(label: &str, num: f64) -> QuestResult<()> {
 }
 
 pub fn report_scalar(label: &str, num: QuestComplex) -> QuestResult<()> {
-    let num_ffi = GeneratedComplex::from(num);
-    map_quest_result(ffi::report_scalar(label, num_ffi))
+    map_quest_result(ffi::report_scalar(label, num))
 }
 
 pub fn report_str(str_arg: &str) -> QuestResult<()> {
@@ -2669,12 +2503,8 @@ pub fn rightapply_diag_matr_power(
     matrix: &DiagMatr,
     exponent: QuestComplex,
 ) -> QuestResult<()> {
-    let exponent_ffi = GeneratedComplex::from(exponent);
     map_quest_result(ffi::rightapply_diag_matr_power(
-        qureg,
-        targets,
-        matrix,
-        exponent_ffi,
+        qureg, targets, matrix, exponent,
     ))
 }
 
@@ -2690,11 +2520,8 @@ pub fn rightapply_full_state_diag_matr_power(
     matrix: &FullStateDiagMatr,
     exponent: QuestComplex,
 ) -> QuestResult<()> {
-    let exponent_ffi = GeneratedComplex::from(exponent);
     map_quest_result(ffi::rightapply_full_state_diag_matr_power(
-        qureg,
-        matrix,
-        exponent_ffi,
+        qureg, matrix, exponent,
     ))
 }
 
@@ -2773,23 +2600,11 @@ pub fn set_density_qureg_flat_amps(
     start_ind: i64,
     amps: &[QuestComplex],
 ) -> QuestResult<()> {
-    let amps_ffi = amps
-        .iter()
-        .copied()
-        .map(GeneratedComplex::from)
-        .collect::<Vec<_>>();
-    map_quest_result(ffi::set_density_qureg_flat_amps(
-        qureg, start_ind, &amps_ffi,
-    ))
+    map_quest_result(ffi::set_density_qureg_flat_amps(qureg, start_ind, amps))
 }
 
 pub fn set_diag_matr(out_arg: Pin<&mut DiagMatr>, in_arg: &[QuestComplex]) -> QuestResult<()> {
-    let in_arg_ffi = in_arg
-        .iter()
-        .copied()
-        .map(GeneratedComplex::from)
-        .collect::<Vec<_>>();
-    map_quest_result(ffi::set_diag_matr(out_arg, &in_arg_ffi))
+    map_quest_result(ffi::set_diag_matr(out_arg, in_arg))
 }
 
 pub fn set_full_state_diag_matr(
@@ -2797,16 +2612,7 @@ pub fn set_full_state_diag_matr(
     start_ind: i64,
     in_arg: &[QuestComplex],
 ) -> QuestResult<()> {
-    let in_arg_ffi = in_arg
-        .iter()
-        .copied()
-        .map(GeneratedComplex::from)
-        .collect::<Vec<_>>();
-    map_quest_result(ffi::set_full_state_diag_matr(
-        out_arg,
-        start_ind,
-        &in_arg_ffi,
-    ))
+    map_quest_result(ffi::set_full_state_diag_matr(out_arg, start_ind, in_arg))
 }
 
 pub fn set_full_state_diag_matr_from_pauli_str_sum(
@@ -2823,12 +2629,7 @@ pub fn set_inline_diag_matr(
     num_qb: i32,
     in_arg: &[QuestComplex],
 ) -> QuestResult<()> {
-    let in_arg_ffi = in_arg
-        .iter()
-        .copied()
-        .map(GeneratedComplex::from)
-        .collect::<Vec<_>>();
-    map_quest_result(ffi::set_inline_diag_matr(matr, num_qb, &in_arg_ffi))
+    map_quest_result(ffi::set_inline_diag_matr(matr, num_qb, in_arg))
 }
 
 pub fn set_inline_full_state_diag_matr(
@@ -2837,16 +2638,8 @@ pub fn set_inline_full_state_diag_matr(
     num_elems: i64,
     in_arg: &[QuestComplex],
 ) -> QuestResult<()> {
-    let in_arg_ffi = in_arg
-        .iter()
-        .copied()
-        .map(GeneratedComplex::from)
-        .collect::<Vec<_>>();
     map_quest_result(ffi::set_inline_full_state_diag_matr(
-        matr,
-        start_ind,
-        num_elems,
-        &in_arg_ffi,
+        matr, start_ind, num_elems, in_arg,
     ))
 }
 
@@ -2897,12 +2690,7 @@ pub fn set_qureg_amps(
     start_ind: i64,
     amps: &[QuestComplex],
 ) -> QuestResult<()> {
-    let amps_ffi = amps
-        .iter()
-        .copied()
-        .map(GeneratedComplex::from)
-        .collect::<Vec<_>>();
-    map_quest_result(ffi::set_qureg_amps(qureg, start_ind, &amps_ffi))
+    map_quest_result(ffi::set_qureg_amps(qureg, start_ind, amps))
 }
 
 pub fn set_qureg_to_clone(out_qureg: Pin<&mut Qureg>, in_qureg: &Qureg) -> QuestResult<()> {

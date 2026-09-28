@@ -1,4 +1,5 @@
 use std::collections::{BTreeMap, BTreeSet};
+use std::fmt::Write as _;
 use std::fs;
 use std::path::Path;
 
@@ -22,6 +23,211 @@ const GENERATED_RUST_TEMPLATE: &str = include_str!("../../templates/generated_ap
 const GENERATED_HEADER_TEMPLATE: &str =
     include_str!("../../templates/quest_generated_bindings.hpp");
 const GENERATED_CPP_TEMPLATE: &str = include_str!("../../templates/quest_generated_bindings.cpp");
+
+// These two homogeneous native families share one reviewed signature. Pauli
+// gadgets and Pauli strings have different inputs and remain explicit templates.
+struct PauliFamily {
+    marker: &'static str,
+    rust_prefix: &'static str,
+    native_prefix: &'static str,
+    has_states: bool,
+}
+const PAULI_FAMILIES: [PauliFamily; 2] = [
+    PauliFamily {
+        marker: "multi",
+        rust_prefix: "apply_multi_controlled_pauli_",
+        native_prefix: "applyMultiControlledPauli",
+        has_states: false,
+    },
+    PauliFamily {
+        marker: "state",
+        rust_prefix: "apply_multi_state_controlled_pauli_",
+        native_prefix: "applyMultiStateControlledPauli",
+        has_states: true,
+    },
+];
+
+struct FamilyOutput {
+    ffi: String,
+    rust: String,
+    header: String,
+    cpp: String,
+}
+
+fn render_pauli_family(
+    family: &PauliFamily,
+    registry: &AdapterRegistry,
+) -> Result<FamilyOutput, DynError> {
+    let mut output = FamilyOutput {
+        ffi: String::new(),
+        rust: String::new(),
+        header: String::new(),
+        cpp: String::new(),
+    };
+    let mut expected = BTreeSet::new();
+    for (axis, upper) in [('x', 'X'), ('y', 'Y'), ('z', 'Z')] {
+        let rust_name = format!("{}{axis}", family.rust_prefix);
+        let quest_name = format!("{}{upper}", family.native_prefix);
+        let signature = if family.has_states {
+            "(Qureg, std::vector<int>, std::vector<int>, int) -> void"
+        } else {
+            "(Qureg, std::vector<int>, int) -> void"
+        };
+        let overload_key = format!("{quest_name}{signature}");
+        let entry = registry
+            .get(&overload_key)
+            .ok_or_else(|| format!("descriptor has no QuEST overload: {overload_key}"))?;
+        if entry.quest_name != quest_name
+            || entry.adapter_name != rust_name
+            || entry.rust_name != rust_name
+            || entry.source_kind != AdapterSourceKind::Generated
+        {
+            return Err(format!("descriptor differs from adapter registry: {overload_key}").into());
+        }
+        expected.insert(overload_key);
+
+        let rust_states = if family.has_states {
+            "            states: &[i32],\n"
+        } else {
+            ""
+        };
+        let rust_public_states = if family.has_states {
+            "    states: &[i32],\n"
+        } else {
+            ""
+        };
+        let rust_call = if family.has_states {
+            format!(
+                "    map_quest_result(ffi::{rust_name}(\n        qureg, controls, states, target,\n    ))\n"
+            )
+        } else {
+            format!("    map_quest_result(ffi::{rust_name}(qureg, controls, target))\n")
+        };
+        write!(
+            output.ffi,
+            "        fn {rust_name}(\n            qureg: Pin<&mut Qureg>,\n            controls: &[i32],\n{rust_states}            target: i32,\n        ) -> Result<()>;\n"
+        )?;
+        write!(
+            output.rust,
+            "pub fn {rust_name}(\n    qureg: Pin<&mut Qureg>,\n    controls: &[i32],\n{rust_public_states}    target: i32,\n) -> QuestResult<()> {{\n{rust_call}}}\n\n"
+        )?;
+        let cpp_states = if family.has_states {
+            "    rust::Slice<const std::int32_t> states,\n"
+        } else {
+            ""
+        };
+        let cpp_indent = " ".repeat(quest_name.len().checked_add(5).ok_or("indent overflow")?);
+        let cpp_call = if family.has_states {
+            format!(
+                "qureg.raw(), to_int_vec(controls),\n{cpp_indent}to_int_vec(states),\n{cpp_indent}static_cast<int>(target)"
+            )
+        } else {
+            format!("qureg.raw(), to_int_vec(controls),\n{cpp_indent}static_cast<int>(target)")
+        };
+        let cpp_params = if family.has_states {
+            format!(
+                "void {rust_name}(\n    Qureg& qureg,\n    rust::Slice<const std::int32_t> controls,\n{cpp_states}    std::int32_t target)"
+            )
+        } else {
+            let indent = " ".repeat(rust_name.len().checked_add(6).ok_or("indent overflow")?);
+            format!(
+                "void {rust_name}(Qureg& qureg,\n{indent}rust::Slice<const std::int32_t> controls,\n{indent}std::int32_t target)"
+            )
+        };
+        writeln!(output.header, "{cpp_params};")?;
+        write!(
+            output.cpp,
+            "{cpp_params} {{\n  const auto admission = admit_native_call();\n  ::{quest_name}({cpp_call});\n}}\n\n"
+        )?;
+    }
+
+    verify_pauli_family_exceptions(family, registry, &expected)?;
+    Ok(output)
+}
+
+fn verify_pauli_family_exceptions(
+    family: &PauliFamily,
+    registry: &AdapterRegistry,
+    expected: &BTreeSet<String>,
+) -> Result<(), DynError> {
+    let mut observed = BTreeSet::new();
+    for entry in registry
+        .entries()
+        .iter()
+        .filter(|entry| entry.quest_name.starts_with(family.native_prefix))
+    {
+        if expected.contains(&entry.overload_key) {
+            continue;
+        }
+        let suffix = entry
+            .quest_name
+            .strip_prefix(family.native_prefix)
+            .unwrap_or_default();
+        if !matches!(suffix, "Gadget" | "Str")
+            || entry.source_kind != AdapterSourceKind::Generated
+            || !GENERATED_CPP_TEMPLATE.contains(&format!("void {}(", entry.rust_name))
+            || !GENERATED_HEADER_TEMPLATE.contains(&format!("void {}(", entry.rust_name))
+            || !GENERATED_RUST_TEMPLATE.contains(&format!("pub fn {}(", entry.rust_name))
+        {
+            return Err(format!(
+                "unreviewed or missing exceptional adapter: {}",
+                entry.overload_key
+            )
+            .into());
+        }
+        observed.insert(suffix);
+    }
+    for required in ["Gadget", "Str"] {
+        if !observed.contains(required) {
+            return Err(format!(
+                "missing explicit exceptional adapter: {}{required}",
+                family.native_prefix
+            )
+            .into());
+        }
+    }
+    Ok(())
+}
+
+fn insert_once(template: &mut String, marker: &str, rendered: &str) -> Result<(), DynError> {
+    if template.matches(marker).count() != 1 {
+        return Err(format!("expected one generator insertion point: {marker}").into());
+    }
+    *template = template.replace(marker, rendered.trim_end());
+    Ok(())
+}
+
+fn render_source_templates(
+    registry: &AdapterRegistry,
+) -> Result<(String, String, String), DynError> {
+    let mut rust = GENERATED_RUST_TEMPLATE.to_owned();
+    let mut header = GENERATED_HEADER_TEMPLATE.to_owned();
+    let mut cpp = GENERATED_CPP_TEMPLATE.to_owned();
+    for family in &PAULI_FAMILIES {
+        let output = render_pauli_family(family, registry)?;
+        insert_once(
+            &mut rust,
+            &format!("// @pauli-{}-ffi@", family.marker),
+            &output.ffi,
+        )?;
+        insert_once(
+            &mut rust,
+            &format!("// @pauli-{}-rust@", family.marker),
+            &output.rust,
+        )?;
+        insert_once(
+            &mut header,
+            &format!("// @pauli-{}-header@", family.marker),
+            &output.header,
+        )?;
+        insert_once(
+            &mut cpp,
+            &format!("// @pauli-{}-cpp@", family.marker),
+            &output.cpp,
+        )?;
+    }
+    Ok((rust, header, cpp))
+}
 
 pub struct GeneratedOutput {
     pub path: &'static str,
@@ -56,18 +262,19 @@ pub fn render_outputs(
     items: &[ApiItem],
     registry: &AdapterRegistry,
 ) -> Result<Vec<GeneratedOutput>, DynError> {
+    let (rust, header, cpp) = render_source_templates(registry)?;
     Ok(vec![
         GeneratedOutput {
             path: GENERATED_RUST_PATH,
-            contents: GENERATED_RUST_TEMPLATE.to_owned(),
+            contents: rust,
         },
         GeneratedOutput {
             path: GENERATED_HEADER_PATH,
-            contents: GENERATED_HEADER_TEMPLATE.to_owned(),
+            contents: header,
         },
         GeneratedOutput {
             path: GENERATED_CPP_PATH,
-            contents: GENERATED_CPP_TEMPLATE.to_owned(),
+            contents: cpp,
         },
         GeneratedOutput {
             path: GENERATED_NAMES_PATH,
@@ -246,6 +453,99 @@ mod tests {
         }
 
         Ok(())
+    }
+
+    #[gtest]
+    fn generated_bridge_shares_the_public_complex_value_type() -> googletest::Result<()> {
+        for source in [
+            GENERATED_RUST_TEMPLATE,
+            GENERATED_HEADER_TEMPLATE,
+            GENERATED_CPP_TEMPLATE,
+        ] {
+            verify_that!(source, not(contains_substring("GeneratedComplex")))?;
+        }
+        verify_that!(
+            GENERATED_RUST_TEMPLATE,
+            contains_substring("type QuestComplex = crate::ffi::QuestComplex")
+        )
+    }
+
+    #[gtest]
+    fn pauli_control_families_have_generator_insertion_points() -> googletest::Result<()> {
+        for (source, markers) in [
+            (
+                GENERATED_RUST_TEMPLATE,
+                [
+                    "@pauli-multi-ffi@",
+                    "@pauli-state-ffi@",
+                    "@pauli-multi-rust@",
+                    "@pauli-state-rust@",
+                ]
+                .as_slice(),
+            ),
+            (
+                GENERATED_HEADER_TEMPLATE,
+                ["@pauli-multi-header@", "@pauli-state-header@"].as_slice(),
+            ),
+            (
+                GENERATED_CPP_TEMPLATE,
+                ["@pauli-multi-cpp@", "@pauli-state-cpp@"].as_slice(),
+            ),
+        ] {
+            for marker in markers {
+                verify_that!(source.contains(marker), eq(true))?;
+            }
+        }
+        Ok(())
+    }
+
+    #[gtest]
+    fn pauli_family_descriptors_cover_the_registry_and_generated_sources() -> googletest::Result<()>
+    {
+        let workspace = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .and_then(Path::parent)
+            .or_fail()?;
+        let registry = load_adapter_registry(workspace, true).or_fail()?;
+        let (rust, header, cpp) = render_source_templates(&registry).or_fail()?;
+
+        for family in &PAULI_FAMILIES {
+            for axis in ['x', 'y', 'z'] {
+                let name = format!("{}{axis}", family.rust_prefix);
+                verify_that!(rust.matches(&format!("fn {name}(")).count(), eq(2))?;
+                verify_that!(header.matches(&format!("void {name}(")).count(), eq(1))?;
+                verify_that!(cpp.matches(&format!("void {name}(")).count(), eq(1))?;
+            }
+        }
+        verify_that!(rust, not(contains_substring("@pauli-")))?;
+        verify_that!(header, not(contains_substring("@pauli-")))?;
+        verify_that!(cpp, not(contains_substring("@pauli-")))?;
+
+        let omitted = "applyMultiControlledPauliX(Qureg, std::vector<int>, int) -> void";
+        let entries = registry
+            .entries()
+            .iter()
+            .filter(|entry| entry.overload_key != omitted)
+            .cloned()
+            .collect();
+        let incomplete_registry = AdapterRegistry::new(entries).or_fail()?;
+        let Err(error) = render_source_templates(&incomplete_registry) else {
+            return fail!("missing family overload must fail generation");
+        };
+        verify_that!(error.to_string(), contains_substring(omitted))?;
+
+        let exceptional = "applyMultiControlledPauliGadget";
+        let entries = registry
+            .entries()
+            .iter()
+            .filter(|entry| entry.quest_name != exceptional)
+            .cloned()
+            .collect();
+        let incomplete_registry = AdapterRegistry::new(entries).or_fail()?;
+        let Err(error) = render_source_templates(&incomplete_registry) else {
+            return fail!("missing explicit exception must fail generation");
+        };
+        verify_that!(error.to_string(), contains_substring(exceptional))
     }
 
     #[gtest]
