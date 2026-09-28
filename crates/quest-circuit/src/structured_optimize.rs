@@ -124,7 +124,11 @@ impl Budget {
 }
 pub fn wire(place: &Place, context: &Context<'_>) -> Option<Wire> {
     let slot = context.slots.get(place.slot.index())?;
-    if slot.reference {
+    if slot.reference
+        && !(slot.interface == ssa::Interface::Parameter
+            && slot.mutable
+            && slot.ty == ssa::Type::Qubit(1))
+    {
         return None;
     }
     let ssa::Type::Qubit(count) = slot.ty else {
@@ -621,6 +625,164 @@ fn transform_block(
     block.instructions = output;
     Ok(())
 }
+fn reaches_block(
+    blocks: &[ssa::Block],
+    from: ssa::BlockId,
+    target: ssa::BlockId,
+    budget: &mut Budget,
+) -> Result<bool> {
+    let mut pending = vec![from];
+    let mut visited = BTreeSet::new();
+    while let Some(id) = pending.pop() {
+        budget.charge(1)?;
+        if id == target {
+            return Ok(true);
+        }
+        if !visited.insert(id) {
+            continue;
+        }
+        let block = blocks.get(id.index()).ok_or(crate::Error::InvalidId)?;
+        if let Some(terminator) = &block.terminator {
+            let edges = terminator.edges();
+            budget.charge(edges.len())?;
+            pending.extend(edges.into_iter().map(|edge| edge.target));
+        }
+    }
+    Ok(false)
+}
+
+#[allow(clippy::too_many_lines)] // CFG proof, rewrite publication, and provenance stay in one transaction.
+fn transform_straight_chains(
+    blocks: &mut [ssa::Block],
+    context: &Context<'_>,
+    budget: &mut Budget,
+    report: &mut StructuredQuantumReport,
+    replacements: &mut BTreeMap<ValueId, ValueId>,
+) -> Result<()> {
+    for start_index in 0..blocks.len() {
+        budget.charge(1)?;
+        let Some(start) = blocks.get(start_index) else {
+            continue;
+        };
+        let Some(first_position) = start
+            .instructions
+            .iter()
+            .rposition(|item| matches!(item.kind, K::Gate { .. }))
+        else {
+            continue;
+        };
+        let after_first = first_position
+            .checked_add(1)
+            .ok_or(LanguageError::Budget("quantum position"))?;
+        if !start
+            .instructions
+            .iter()
+            .skip(after_first)
+            .all(|item| matches!(item.kind, K::Constant(_)))
+        {
+            continue;
+        }
+        let first_item = start
+            .instructions
+            .get(first_position)
+            .ok_or(crate::Error::InvalidId)?;
+        let Some(first_gate) = gate(first_item, context) else {
+            continue;
+        };
+        let Some(ssa::Terminator::Jump(edge)) = &start.terminator else {
+            continue;
+        };
+        let mut next = edge.target;
+        let mut previous = start.id;
+        let mut seen = BTreeSet::new();
+        let endpoint = loop {
+            budget.charge(1)?;
+            if !seen.insert(next) || reaches_block(blocks, next, start.id, budget)? {
+                break None;
+            }
+            let block = blocks.get(next.index()).ok_or(crate::Error::InvalidId)?;
+            if block.region != start.region || block.predecessors.as_slice() != [previous] {
+                break None;
+            }
+            if let Some(item) = block.instructions.first() {
+                break gate(item, context)
+                    .filter(|candidate| inverses(&first_gate, candidate))
+                    .map(|_| next.index());
+            }
+            if block.arguments.len() != 1 {
+                break None;
+            }
+            let Some(ssa::Terminator::Jump(edge)) = &block.terminator else {
+                break None;
+            };
+            previous = block.id;
+            next = edge.target;
+        };
+        let Some(end_index) = endpoint else { continue };
+        if end_index == start_index {
+            continue;
+        }
+        let first = blocks
+            .get(start_index)
+            .ok_or(crate::Error::InvalidId)?
+            .instructions
+            .get(first_position)
+            .ok_or(crate::Error::InvalidId)?
+            .clone();
+        let last = blocks
+            .get(end_index)
+            .ok_or(crate::Error::InvalidId)?
+            .instructions
+            .first()
+            .ok_or(crate::Error::InvalidId)?
+            .clone();
+        let first_old = memory_result(&first)?;
+        let last_old = memory_result(&last)?;
+        let first_prior = first.kind.memory().ok_or(crate::Error::InvalidId)?;
+        let last_prior = last.kind.memory().ok_or(crate::Error::InvalidId)?;
+        budget.charge(4)?;
+        replacements.insert(first_old, first_prior);
+        replacements.insert(last_old, last_prior);
+        let start_id = blocks.get(start_index).ok_or(crate::Error::InvalidId)?.id;
+        let end_id = blocks.get(end_index).ok_or(crate::Error::InvalidId)?.id;
+        blocks
+            .get_mut(start_index)
+            .ok_or(crate::Error::InvalidId)?
+            .instructions
+            .remove(first_position);
+        blocks
+            .get_mut(end_index)
+            .ok_or(crate::Error::InvalidId)?
+            .instructions
+            .remove(0);
+        report.after_gates = report
+            .after_gates
+            .checked_sub(2)
+            .ok_or(LanguageError::Budget("quantum report"))?;
+        report.inverse_pairs = report
+            .inverse_pairs
+            .checked_add(1)
+            .ok_or(LanguageError::Budget("quantum report"))?;
+        report.rewrites.push(StructuredQuantumRewrite {
+            inputs: vec![
+                StructuredOccurrence {
+                    block: start_id,
+                    instruction: first_position,
+                    memory: first_old,
+                    span: first.span,
+                },
+                StructuredOccurrence {
+                    block: end_id,
+                    instruction: 0,
+                    memory: last_old,
+                    span: last.span,
+                },
+            ],
+            outputs: vec![],
+        });
+    }
+    Ok(())
+}
 pub fn resolve(
     mut id: ValueId,
     replacements: &BTreeMap<ValueId, ValueId>,
@@ -685,6 +847,7 @@ pub fn remap(
     }
     Ok(())
 }
+#[allow(clippy::too_many_lines)] // Admission, rewrite, remap, and independent verification are sequential.
 fn optimize(
     program: ssa::VerifiedProgram,
     options: StructuredQuantumOptions,
@@ -777,6 +940,13 @@ fn optimize(
             )
             .ok_or(LanguageError::Budget("quantum report"))?;
     }
+    transform_straight_chains(
+        &mut program.blocks,
+        &context,
+        &mut budget,
+        &mut report,
+        &mut replacements,
+    )?;
     remap(&mut program, &replacements, &mut budget)?;
     report.work = budget.used;
     let compile = CompileLimits {

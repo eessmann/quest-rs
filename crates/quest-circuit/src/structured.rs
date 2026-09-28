@@ -350,6 +350,53 @@ pub struct VerifiedStructuredProgram {
     retained_ir: usize,
 }
 impl VerifiedStructuredProgram {
+    /// Retained syntax, SSA, captures, oracle bodies and source metadata.
+    /// Shared Arc allocations are counted once for this publication.
+    /// # Errors
+    /// Rejects accounting overflow.
+    pub fn retained_bytes(&self) -> Result<usize, LanguageError> {
+        let mut bytes = self
+            .retained_ir
+            .checked_add(source_storage(&self.sources)?)
+            .and_then(|n| n.checked_add(std::mem::size_of_val(self.captures.as_ref())))
+            .and_then(|n| n.checked_add(std::mem::size_of_val(self.locations.as_ref())))
+            .and_then(|n| n.checked_add(std::mem::size_of::<Self>()))
+            .ok_or(LanguageError::Budget("structured retained storage"))?;
+        bytes = bytes
+            .checked_add(
+                crate::OracleFragment::shared_storage_bytes(self.oracles.values())
+                    .map_err(|_| LanguageError::Budget("structured oracle storage"))?,
+            )
+            .ok_or(LanguageError::Budget("structured retained storage"))?;
+        // Bodies can be shared across bank keys, but every BTreeMap entry and
+        // its node storage remains live. Triple the pair size to cover sparse
+        // nodes/capacity and add pointer/header room per entry.
+        let bank_pair = std::mem::size_of::<(usize, crate::OracleFragment)>();
+        let bank_entry = bank_pair
+            .checked_mul(3)
+            .and_then(|n| n.checked_add(std::mem::size_of::<[usize; 8]>()))
+            .ok_or(LanguageError::Budget("structured oracle bank"))?;
+        let bank_bytes = self
+            .oracles
+            .len()
+            .checked_mul(bank_entry)
+            .and_then(|n| {
+                n.checked_add(std::mem::size_of::<
+                    std::collections::BTreeMap<usize, crate::OracleFragment>,
+                >())
+            })
+            .and_then(|n| n.checked_add(std::mem::size_of::<[usize; 2]>()))
+            .ok_or(LanguageError::Budget("structured oracle bank"))?;
+        bytes = bytes
+            .checked_add(bank_bytes)
+            .ok_or(LanguageError::Budget("structured retained storage"))?;
+        for location in self.locations.iter() {
+            bytes = bytes
+                .checked_add(location.file.capacity())
+                .ok_or(LanguageError::Budget("structured source locations"))?;
+        }
+        Ok(bytes)
+    }
     pub(crate) fn transform_ssa<R, E>(
         mut self,
         transform: impl FnOnce(ssa::VerifiedProgram) -> Result<(ssa::VerifiedProgram, R), E>,
@@ -414,9 +461,37 @@ impl VerifiedStructuredProgram {
     pub const fn ssa(&self) -> &ssa::VerifiedProgram {
         &self.program
     }
-    #[cfg(feature = "workers")]
     pub(crate) fn captures(&self) -> &[ScalarValue] {
         &self.captures
+    }
+    pub(crate) fn oracle_bank(&self) -> &std::collections::BTreeMap<usize, crate::OracleFragment> {
+        &self.oracles
+    }
+    /// Publish already reverified SSA and its matching bank in one transaction.
+    pub(crate) fn publish_oracles(
+        self,
+        program: ssa::VerifiedProgram,
+        oracles: std::collections::BTreeMap<usize, crate::OracleFragment>,
+        max_bytes: usize,
+    ) -> Result<Self, LanguageError> {
+        for region in program.regions() {
+            if let Some(id) = &region.oracle {
+                let fragment = oracles
+                    .get(&id.index())
+                    .ok_or(LanguageError::Unsupported("missing transformed oracle"))?;
+                if fragment.num_qubits() != region.parameters.len() {
+                    return Err(LanguageError::Unsupported("transformed oracle arity"));
+                }
+            }
+        }
+        let (mut result, ()) = self.transform_ssa(|_| Ok::<_, LanguageError>((program, ())))?;
+        result.oracles = Arc::new(oracles);
+        if result.retained_bytes()? > max_bytes {
+            return Err(LanguageError::Budget(
+                "combined transformed SSA and oracle bank",
+            ));
+        }
+        Ok(result)
     }
     /// Admit native representability of every quantum interface.
     ///
@@ -655,4 +730,43 @@ fn source_storage(sources: &SourceMap) -> Result<usize, LanguageError> {
             .and_then(|n| n.checked_add(1024))
             .ok_or(LanguageError::Budget("source accounting"))
     })
+}
+
+#[cfg(test)]
+mod optimizer_accounting_tests {
+    use super::*;
+    use googletest::{Result, prelude::*};
+
+    #[gtest]
+    fn repeated_shared_oracle_bank_entries_are_charged_separately() -> Result<()> {
+        let mut verified = StructuredProgram::parse("qubit q; h q;", "bank.qasm")?.verify()?;
+        let before = verified.retained_bytes()?;
+        let mut builder = crate::ProgramBuilder::new(1, 0)?;
+        builder.gate(crate::Gate::H, &[builder.qubit(0)?], &[])?;
+        let fragment = crate::OracleFragment::from_program(
+            builder.finish()?.bind(&[])?,
+            0.0,
+            crate::MatrixPolicy::default(),
+        )?;
+        let body = crate::OracleFragment::shared_storage_bytes([&fragment])?;
+        let mut bank = std::collections::BTreeMap::new();
+        for key in 0..64 {
+            bank.insert(key, fragment.clone());
+        }
+        verified.oracles = Arc::new(bank);
+        let added = verified
+            .retained_bytes()?
+            .checked_sub(before)
+            .ok_or(crate::Error::Budget("oracle bank accounting"))?;
+        let entry_payload = std::mem::size_of::<(usize, crate::OracleFragment)>()
+            .checked_mul(64)
+            .ok_or(crate::Error::Budget("oracle bank accounting"))?;
+        expect_true!(
+            added
+                > body
+                    .checked_add(entry_payload)
+                    .ok_or(crate::Error::Budget("oracle bank accounting"))?
+        );
+        Ok(())
+    }
 }

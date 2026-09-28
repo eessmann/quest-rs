@@ -1,6 +1,7 @@
 //! Executable SSA with explicit storage and memory-state block arguments.
 pub mod optimization;
 mod quantum;
+mod quantum_flow;
 mod verify;
 use super::semantic::{CompileLimits, SemanticError};
 use crate::{
@@ -9,6 +10,10 @@ use crate::{
     syntax::{BinaryOperator, UnaryOperator},
 };
 pub use quantum::{QuantumDag, QuantumNode};
+pub use quantum_flow::{
+    AliasRelation, QuantumEdge, QuantumEvent, QuantumFact, QuantumFlow, QuantumFlowLimits,
+    QuantumFlowUsage, QuantumStorage, QuantumVersion,
+};
 use std::sync::atomic::{AtomicU64, Ordering};
 
 static NEXT_PROGRAM: AtomicU64 = AtomicU64::new(1);

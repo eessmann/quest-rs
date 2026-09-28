@@ -130,6 +130,22 @@ fn admits_mixed_functions_dynamic_parameters_aliases_and_typed_return() -> Resul
 }
 
 #[gtest]
+fn verifier_rejects_forged_readonly_quantum_reference_parameter() -> Result<()> {
+    let valid = compile("def flip(qubit q) { x q; } qubit q;")
+        .map_err(|error| std::io::Error::other(error.to_string()))?;
+    let mut forged = valid.clone().into_unverified();
+    let parameter = forged
+        .slots
+        .iter_mut()
+        .find(|slot| slot.reference && matches!(slot.ty, quest_language::ssa::Type::Qubit(_)))
+        .ok_or_else(|| std::io::Error::other("missing quantum parameter"))?;
+    parameter.mutable = false;
+    verify_that!(forged.verify(CompileLimits::default()), err(anything()))?;
+    verify_that!(valid.regions().len(), eq(2))?;
+    Ok(())
+}
+
+#[gtest]
 fn rejects_invalid_mutability_return_width_and_control_context() {
     for text in [
         "const int n = 1; n = 2;",

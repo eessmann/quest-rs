@@ -25,6 +25,11 @@ pub(super) fn verify(program: &Program) -> Result<(), SemanticError> {
         {
             return Err(SemanticError::invalid("invalid reference interface"));
         }
+        if slot.reference && matches!(slot.ty, Type::Qubit(_)) && !slot.mutable {
+            return Err(SemanticError::invalid(
+                "quantum reference parameter must be exclusive",
+            ));
+        }
         if matches!(slot.interface, Interface::Input | Interface::Output)
             && (slot.region != program.entry || matches!(slot.ty, Type::Qubit(_)))
         {

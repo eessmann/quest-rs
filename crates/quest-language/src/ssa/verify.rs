@@ -50,6 +50,21 @@ pub(super) fn verify(program: &Program, limits: CompileLimits) -> Result<(), Sem
     assignment::verify(&context, &predecessors)?;
     calls(program, limits.call_depth)
 }
+pub(super) fn node_count(program: &Program) -> Result<usize, SemanticError> {
+    let mut nodes = program.regions.len();
+    for block in &program.blocks {
+        nodes = nodes
+            .checked_add(block.arguments.len())
+            .and_then(|count| count.checked_add(block.instructions.len()))
+            .ok_or_else(|| SemanticError::budget("IR node count overflow"))?;
+        for instruction in &block.instructions {
+            nodes = nodes
+                .checked_add(instruction.results.len())
+                .ok_or_else(|| SemanticError::budget("IR value count overflow"))?;
+        }
+    }
+    Ok(nodes)
+}
 fn resources(program: &Program, limits: CompileLimits) -> Result<(), SemanticError> {
     if program.blocks.len() > limits.blocks {
         return Err(SemanticError::limit(
@@ -67,7 +82,7 @@ fn resources(program: &Program, limits: CompileLimits) -> Result<(), SemanticErr
             "slot budget exceeded",
         ));
     }
-    let mut nodes = program.regions.len();
+    let nodes = node_count(program)?;
     let retained =
         crate::semantic::retained::sum([std::mem::size_of::<Program>(), program.heap()?])?;
     let mut storage = 0usize;
@@ -80,17 +95,6 @@ fn resources(program: &Program, limits: CompileLimits) -> Result<(), SemanticErr
             qubits = qubits
                 .checked_add(count)
                 .ok_or_else(|| SemanticError::budget("qubit count overflow"))?;
-        }
-    }
-    for block in &program.blocks {
-        nodes = nodes
-            .checked_add(block.arguments.len())
-            .and_then(|count| count.checked_add(block.instructions.len()))
-            .ok_or_else(|| SemanticError::budget("IR node count overflow"))?;
-        for instruction in &block.instructions {
-            nodes = nodes
-                .checked_add(instruction.results.len())
-                .ok_or_else(|| SemanticError::budget("IR value count overflow"))?;
         }
     }
     let analysis = analysis_storage(program, nodes, storage, retained)?;
