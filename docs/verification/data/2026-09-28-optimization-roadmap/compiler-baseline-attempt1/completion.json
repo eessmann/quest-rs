@@ -1,20 +1,9 @@
 {
   "schema": 1,
   "source_sha256": "5f608283667c8045cc7918fc05e3aa28809580fa41214ff462b3e85d236ae498",
-  "repository": "/var/home/erich/Projects/quest-rs",
   "expected_samples": 200,
   "started_unix": 1790559913.9982402,
   "commit": "a9bafa443cf8f0b2bfef8fa272f86251144eaee8",
-  "build_command": [
-    "cargo",
-    "build",
-    "--offline",
-    "--release",
-    "--manifest-path",
-    "/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/compiler-baseline-attempt1/Cargo.toml",
-    "--target-dir",
-    "/var/home/erich/Projects/quest-rs/target"
-  ],
   "build_status": 0,
   "run_status": 0,
   "samples": 200,

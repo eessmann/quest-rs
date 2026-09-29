@@ -1,7 +1,6 @@
 {
   "schema": 1,
   "source_sha256": "04376bdb134f679a4c7012cecf50a29e0d5bf3c1cbdd0d0b362635b1b762273b",
-  "repository": "/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap",
   "started_unix": 1790561529.3620286,
   "cases": [
     {
@@ -32,15 +31,6 @@
       "exit_code": 0,
       "status": "complete"
     }
-  ],
-  "build_command": [
-    "cargo",
-    "build",
-    "--offline",
-    "--manifest-path",
-    "/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/native-mpi-deployment-attempt1/Cargo.toml",
-    "--target-dir",
-    "/var/home/erich/Projects/quest-rs/target"
   ],
   "build_status": 0,
   "readelf_status": 0,

@@ -9,6 +9,9 @@ Read the [guide](docs/book/src/index.md) for the
 Bell/teleportation/feedback tutorials, include/export workflows, verified SSA,
 and optimization certificates. The runnable source is
 [examples/tutorials.rs](crates/quest/examples/tutorials.rs).
+The [documentation index](docs/README.md) links setup guides, crate references,
+and verification results. See [Contributing](CONTRIBUTING.md) for development
+commands and repository conventions.
 
 | Crate | Purpose |
 | --- | --- |
@@ -217,7 +220,7 @@ Generate the API references locally with:
 cargo doc -p quest-qsp -p quest-qsvt --all-features --no-deps --locked
 ```
 
-The [verification record](docs/verification/2026-09-11-qsvt-port.md) separates
+The [QSP/QSVT verification record](docs/verification/2026-09-11-qsvt-port.md) separates
 mathematical certificates, numerical comparisons, measured costs and unverified
 platforms. Generalized QSVT theorem-level robustness is not certified.
 
@@ -269,12 +272,6 @@ worker tutorials require a supplied worker executable path.
 
 Binding generation also needs libclang (`LIBCLANG_PATH` when necessary). Edit
 generator templates and the adapter registry, then regenerate artifacts together.
-The [approved compiler plan](docs/superpowers/plans/2026-09-10-openqasm-ssa-implementation.md)
-tracks current implementation and evidence. The
-[dated bridge audit](docs/superpowers/specs/2026-09-10-quest-bridge-audit.md) and
-[compiler research](docs/superpowers/specs/2026-09-10-quest-circuit-research.md)
-preserve historical findings; they are not current feature checklists.
-
-Local compiler evidence is preserved in [the M6–M11 verification record](docs/verification/2026-09-10-m6-m11.md).
-The updated native build and loader checks are recorded in
-[native CMake verification](docs/verification/2026-09-10-native-cmake.md).
+The [contributor guide](CONTRIBUTING.md) describes the development process, and
+the [verification index](docs/verification/README.md) collects dated compiler,
+numerical, and native-backend results with their tested configurations.

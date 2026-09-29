@@ -2,7 +2,7 @@
 
 This document records the implemented interfaces and migration requirements.
 Final integration validation and measurements are recorded separately in the
-[delivery results](2026-09-28-optimization-roadmap-results.md).
+[validation results](2026-09-28-optimization-roadmap-results.md).
 
 ## Exact symbolic angles
 

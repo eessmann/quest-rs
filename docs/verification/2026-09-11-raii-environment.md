@@ -1,9 +1,8 @@
 # RAII environment lifecycle verification — 2026-09-11
 
-Implements the approved [RAII-only lifecycle](../superpowers/specs/2026-09-11-raii-environment.md)
-on `codex/raii-environment`, based on `main` at `84f2bc3`. This record describes
-the implementation working tree. Earlier dated records retain their original
-evidence; their explicit-close/recovery design is superseded.
+This record covers the [environment lifecycle](../book/src/runtime.md) after
+removing explicit facade shutdown. Earlier dated records describe the former
+explicit-close/recovery API.
 
 ## Behavior and regression evidence
 
@@ -46,7 +45,6 @@ fixtures use lexical cleanup. Deliberate resource drops used for accounting,
 input-independence checks or reuse of a memory budget remain. No dependency or
 workspace lint-policy changes were needed. Two unwind tests have scoped
 `panic_in_result_fn` expectations for their deliberately caught sentinel panics.
-An independent source review found no actionable correctness issues.
 
 ## Configuration and commands
 
@@ -56,7 +54,7 @@ binary64 with deprecated APIs disabled; CUDA, cuQuantum, MPI, OpenMP,
 subcommunicators and BMI2 are enabled. The bridge compiler is `/usr/bin/c++`.
 No native installation or native source changes were made.
 
-Commands ran from the implementation worktree with these settings:
+The checks used:
 
 ```sh
 unset QUEST_NATIVE_CONFIG QUEST_RUNTIME_LIBRARY_PATH
@@ -88,11 +86,6 @@ non-distributed CPU configuration. The independent consumers ran outside Cargo
 with loader variables unset; ELF inspection confirmed RUNPATH and resolution of
 QuEST, MPI, OpenMP, cuStateVec and cuBLAS/cuBLASLt. This dependency check is
 separate from the low-level example's limited GPU execution smoke check.
-
-Detailed temporary logs use `/tmp/quest-raii-`; independent consumer sources,
-locked manifests, ELF/dependency inspection and execution logs are preserved at
-`/tmp/quest raii native consumers`. The conclusions above remain useful if those
-temporary files are removed.
 
 ## Limits
 

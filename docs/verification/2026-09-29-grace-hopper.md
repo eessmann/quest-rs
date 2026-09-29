@@ -1,10 +1,9 @@
-# Grace Hopper implementation and verification
+# Grace Hopper verification
 
 The workspace builds and executes against the installed QuEST package on the
 single-node Grace Hopper host `gh02`. CPU, OpenMP and GPU register deployment,
 including cuQuantum, passed Rust consumer checks outside Cargo. The setup uses
 manual and Spack dependencies; see the [reproduction guide](../grace-hopper.md).
-Implementation started from `7f0f684` on `codex/grace-hopper`.
 
 ## Changes
 
@@ -52,7 +51,7 @@ NUMA support. No native feature settings were changed other than installation
 runtime paths. The installed `libQuEST.so` resolves CUDA, cuStateVec and Spack GCC
 dependencies with loader overrides cleared. Runtime paths exclude CUDA stubs.
 
-Verification used the following environment in the implementation worktree:
+Verification used:
 
 ```sh
 export QUEST_ROOT=/work/erich/opt/quest
@@ -122,8 +121,7 @@ Shared-matrix regressions cover repeated storage across target orders and signed
 control profiles, separate charging for distinct profiles, conditional
 operations, and failed preparation preserving allocations and existing programs.
 The AArch64 adapter test modifies FPCR, detects the changed numerical policy,
-and restores the original control word. Independent source reviews accepted
-the implementation with no remaining actionable findings.
+and restores the original control word.
 
 ## Scope
 
@@ -135,7 +133,3 @@ are outside this pass. The existing Nix workflow is retained but was not execute
 on this node. Matrix budgets remain conservative estimates, not allocator-exact
 peak measurements. Broader optimizer fallback cleanup and crate restructuring
 remain deferred.
-
-The user authorized committing this implementation on `codex/grace-hopper` and
-merging it into local `main`. No remote push is part of this delivery. Historical
-verification records are unchanged.

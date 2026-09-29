@@ -95,8 +95,9 @@ cargo test -p quest-circuit --doc --locked
 The [optimization chapter](../../docs/book/src/optimization.md) distinguishes
 exact transformations, local synthesis certificates, scalar phase recovery, and
 numerical fusion. Compiler budgets, runtime budgets and worker budgets are
-separate checked contracts. Dated architecture and audit documents remain
-historical evidence; the approved implementation plan records current progress.
+separate checked contracts. See the [contributor guide](../../CONTRIBUTING.md)
+for development checks and the [verification index](../../docs/verification/README.md)
+for tested configurations and results.
 
 `LanguageError::report` produces one owned diagnostic across structured compiler
 stages. Errors that already carry a diagnostic retain its original stage and

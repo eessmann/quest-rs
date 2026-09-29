@@ -1,44 +1,28 @@
 # Optimization roadmap validation and measurements
 
-The exact mathcore foundation and five optimization directions are implemented
-on `codex/optimization-roadmap`. The frozen source passed the workspace checks
-and native execution campaigns below. Performance is mixed: terminal fusion is
+The exact mathcore foundation and optimizer passed the workspace checks and
+native execution measurements below. Performance is mixed: terminal fusion is
 useful on several workloads, the prescribed Native V1 score misranks small CPU
 QFT windows, and default beam limits often stop before the existing combined
 passes' result. These measurements do not establish a universal speedup.
 
-The implementation is delivered as ten independently reviewed signed commits,
-from the verified upstream import `356096c` through native integration
-`d219582`. Every implementation signature was verified against the configured
-ED25519 signing identity. The earlier 1Password signing failure was resolved by
-unlocking the signer; it was not bypassed. No remote push was made. Origin's
-README correction was already merged without rewriting local signed history
-(`a9bafa4`). Measurements were taken at plan HEAD
-`0bbbd067b433b8c7deedd385d10cb84ab435f59e` plus the recorded worktree sources;
-all 538 source/configuration files in the final validation snapshot match the
-finished working source byte for byte. Signed delivery metadata is preserved in
-[signed-implementation-commits.json](data/2026-09-28-optimization-roadmap/signed-implementation-commits.json).
-
 See the [implementation map](2026-09-28-optimization-roadmap-implementation.md),
 [migration guide](2026-09-28-optimization-roadmap-migration.md), and
-[severity-ranked review record](2026-09-28-optimization-roadmap-review.md).
+[correctness regressions](2026-09-28-optimization-roadmap-review.md).
 
-## Evidence identity and environment
+## Environment and evidence
 
-The [data directory](data/2026-09-28-optimization-roadmap/README.md) preserves raw
-samples, completion manifests, harness source, dependency locks, validation logs
-and SHA-256 checksums. Each campaign records the committed HEAD, tracked diff
-checksum and untracked source checksums; the HEAD alone does not identify the
-uncommitted implementation. The final downstream check's source hash before and
-after was `7ff4b82e96d6166e9d390cf6f117854acc13b3913f2f7b8166341d592455076a`.
-No production source changed within a timing campaign. Attempt 1 exposed
-cache-dependent logical work accounting; attempt 2 follows its regression fix.
-Attempt 1 evidence is retained and is not treated as final-source performance.
+The [data directory](data/2026-09-28-optimization-roadmap/README.md) retains
+numerical samples, completion status, environment metadata and summaries.
+The tables below use measurements after the cache-dependent binding-work
+accounting fix. Earlier samples remain separately labeled and do not establish
+performance for the corrected implementation. Reproduction uses the maintained
+[measurement fixtures](fixtures/optimization-roadmap/README.md).
 
 Linux GNU x86-64; AMD Ryzen 9 7950X (32 logical CPUs); NVIDIA RTX 4080 (16 GiB,
 compute 8.9), driver 615.71.09; Rust nightly-2026-09-06 (`f248f4038`), GNU 16.2.1,
 CMake 4.3.0, MPICH 5.0.1 and the installed QuEST 4.3.0 fork. Serial HDF5 came from
-the existing local installation recorded in validation environment manifests.
+the existing local installation recorded in the environment metadata.
 OpenMP used four threads. Native processes ran outside the sandbox; direct
 binary launches cleared `LD_LIBRARY_PATH`, `LD_PRELOAD` and `LD_AUDIT`.
 
@@ -60,20 +44,6 @@ binary launches cleared `LD_LIBRARY_PATH`, `LD_PRELOAD` and `LD_AUDIT`.
 | Measurement harness regressions | 7 passed |
 | Independent direct, facade, wrapped and renamed consumers | All four passed numerical execution, RUNPATH and dependency resolution |
 
-The first complete test run already passed 787 tests. Strict Clippy then exposed
-three test-only lints; an attempted fallible test-helper cleanup introduced
-compile errors, which were corrected and independently reviewed. Further lint
-checks found another test assertion style issue and two facade oracle-admission
-lints. The latter were fixed by a behavior-preserving helper extraction and
-checked prefix access. The frozen source then passed strict Clippy and all 787
-tests again. A later measurement review found and fixed cache-dependent binding
-work admission; the final suite passed all 789 tests, including two new
-determinism regressions. Every failed validation attempt is
-retained. The earlier binding, feature and fork checks apply to their
-recorded snapshots; the later changes touched test code and the reviewed oracle
-helper, not those interfaces or generated bindings. The final build and all 58 doctests
-were rerun after the deterministic-accounting correction.
-
 The skipped tests are the QSP degree-8105 parallel acceptance test, degree-8105
 dense catalog certification test, and degree-8192 interval-FFT scale test. They
 remain unrun by this final normal suite. The ignored doctest is the facade's
@@ -93,7 +63,7 @@ No remote CI or non-Linux platform run is claimed.
 | Separate native bridge deployment witnesses | CPU/OpenMP/GPU SV/DM and two/four-rank SV/DM all passed full-complex checks |
 
 The tables and performance discussion use attempt 2 after the cache-accounting
-fix; attempt 1 remains archived. Every beam group now has identical logical work
+fix; attempt 1 samples are retained separately. Every beam group now has identical logical work
 and completion status across its five samples. The first worker campaign had
 reported different signed-control stop reasons for a cold and warmed source.
 
@@ -248,7 +218,5 @@ communication optimization or scaling improvement.
   globally optimal synthesis, and complete search coverage are not claimed.
 - The default aggregate limits visibly constrain these beam corpora. Native V1
   calibration and candidate-order/budget tuning should be measured separately;
-  this delivery preserves the approved score and limits rather than adjusting
-  them retrospectively to the benchmark.
-- The implementation is committed locally on `codex/optimization-roadmap`; no
-  remote push or remote CI execution was requested or performed.
+  these measurements used the specified score and limits without fitting
+  them to the benchmark.

@@ -3,7 +3,6 @@
   "measurement_profile": "debug, standalone offline consumers, CARGO_BUILD_JOBS=4",
   "toolchain": "rustc 1.100.0-nightly (f248f4038 2026-09-05)",
   "platform": "Linux x86_64",
-  "consolidated_state": "Signed commits through 970fdd9 merged into local main; reviewed tree b1aa9476cd11535b0bcd970700ec618d553a59b7; source-manifest.sha256 reverified after merge",
   "allocator_scope": "requested bytes, excludes allocator metadata and RSS",
-  "source_manifest": "source-manifest.sha256"
+  "consolidated_commit": "970fdd9"
 }

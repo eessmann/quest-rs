@@ -1,4 +1,0 @@
-    Checking quest-math v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-math)
-    Checking quest-optimizer-protocol v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-optimizer-protocol)
-    Checking quest-optimizer-worker v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-optimizer-worker)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.37s

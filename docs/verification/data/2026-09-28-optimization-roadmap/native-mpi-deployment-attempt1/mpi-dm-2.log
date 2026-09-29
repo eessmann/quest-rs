@@ -1,2 +1,0 @@
-{"mode":"mpi","kind":"dm","status":"complete","complex_entries":256,"rank":0,"nodes":2,"local_amplitudes":128,"max_error":0.0000000000000002220446049250313,"probability":0.9999999999999998}
-{"mode":"mpi","kind":"dm","status":"complete","complex_entries":256,"rank":1,"nodes":2,"local_amplitudes":128,"max_error":0.0000000000000002220446049250313,"probability":0.9999999999999998}

@@ -60,7 +60,7 @@ This tutorial synthesizes a Z rotation from an exact dyadic representation of th
 
 The QuiZX adapter uses bounded Clifford+T regions with at most four qubits and 128 input gates. It neither adds ancillas nor changes the interface. Extraction can ignore global scalar phase, so the parent recovers and verifies an exact eighth-root scalar against the original full operator. Phase-insensitive equality is insufficient. Unsupported signed controls or gates produce capability errors instead of an approximate translation.
 
-Certificates retain both the target and the accepted candidate. Reports distinguish exact replacements, local approximation evidence, numerical rounding changes, and resource failures. The pinned research/provenance ledger lives in `docs/openqasm-provenance.md` and the compiler research documents; dated audits remain historical evidence rather than current feature checklists.
+Certificates retain both the target and the accepted candidate. Reports distinguish exact replacements, local approximation evidence, numerical rounding changes, and resource failures. Source provenance and research references are documented in the repository's `docs/openqasm-provenance.md`.
 
 
 ## Workers on structured SSA

@@ -1,6 +1,6 @@
-# Optimization roadmap implementation map
+# Optimization implementation and references
 
-This is a reviewer map from the five directions in the [research roadmap](../superpowers/specs/2026-09-28-optimization-roadmap.md) to the implemented interfaces. The papers motivate the approaches; they do not establish correctness or speedup for this implementation. Focused regressions are linked below. The [final validation and timing results](2026-09-28-optimization-roadmap-results.md) are recorded separately; this map makes no performance claim. For changed caller contracts, see the [migration guide](2026-09-28-optimization-roadmap-migration.md) and runnable [ideal](../../crates/quest/examples/optimize.rs) and [worker](../../crates/quest/examples/optimize_workers.rs) examples.
+This map connects the [optimizer interfaces](../book/src/optimization.md) to their research references, implementation and focused regressions. The papers motivate the approaches; they do not establish correctness or speedup for this implementation. Focused regressions are linked below. The [final validation and timing results](2026-09-28-optimization-roadmap-results.md) are recorded separately; this map makes no performance claim. For changed caller contracts, see the [migration guide](2026-09-28-optimization-roadmap-migration.md) and runnable [ideal](../../crates/quest/examples/optimize.rs) and [worker](../../crates/quest/examples/optimize_workers.rs) examples.
 
 ## Exact foundation and publication boundary
 

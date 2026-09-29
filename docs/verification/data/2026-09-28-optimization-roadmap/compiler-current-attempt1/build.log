@@ -1,8 +1,0 @@
-     Locking 92 packages to highest Rust 1.100.0-nightly compatible versions
-   Compiling quest-mathcore v0.3.1-quest.1 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/vendor/mathcore)
-   Compiling quest-language v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-language)
-   Compiling quest-symbolic v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-symbolic)
-   Compiling quest-qasm v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-qasm)
-   Compiling quest-circuit v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-circuit)
-   Compiling quest-roadmap-baseline v0.0.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/compiler-current-attempt1)
-    Finished `release` profile [optimized] target(s) in 7.80s

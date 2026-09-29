@@ -17,7 +17,8 @@ is **`quest-rs`**, with Rust library name **`quest`**.
 
 The workspace uses rolling `nightly` with rustfmt and Clippy. Install `QuEST`
 **4.3.x**, binary64 precision, deprecated APIs disabled, plus `CMake` and a C++20
-compiler. The tested native build recipe currently supports Linux GNU targets.
+compiler. Native recipes target Linux GNU and aarch64/x86_64 Darwin; each
+architecture needs its own build and runtime validation.
 Pure circuit and macro builds need neither `QuEST` nor libclang nor external BLAS.
 
 ```sh
@@ -27,7 +28,7 @@ cargo run --locked --example minimal
 ```
 
 Building the entire workspace also selects the QSVT application and its serial
-HDF5 support. Install serial HDF5, set `HDF5_DIR` to its prefix, then use
+HDF5 support. Select serial HDF5 through pkg-config or `HDF5_DIR`, then use
 `cargo build --workspace --locked`. The facade itself does not require HDF5.
 
 The installed package must export `QuEST::QuEST` and resolve its own runtime
@@ -37,11 +38,15 @@ installs with external CUDA/cuQuantum or MPI libraries can use `CMake`'s
 `CMAKE_INSTALL_RPATH_USE_LINK_PATH=ON` option, provided `QuEST`'s RPATH helper
 honors it. Cargo does not repair or bundle native installations.
 
-The Linux development helper emits absolute `DT_RUNPATH` entries for directly
-linked libraries. Cross compilation, macOS, Windows and relocatable application
-bundles need separate verified recipes. The old `QUEST_NATIVE_CONFIG` JSON record
+The development helper emits absolute runtime paths for directly linked libraries:
+`DT_RUNPATH` on Linux and `LC_RPATH` on Darwin. Cross compilation, Windows and
+relocatable application bundles remain unsupported. The old `QUEST_NATIVE_CONFIG` JSON record
 and `QUEST_RUNTIME_LIBRARY_PATH` workflow are removed; unset those variables and
 select the installed package normally.
+
+See the [workspace setup](../../README.md#build) for the Nix development shell or
+the [Grace Hopper guide](../../docs/grace-hopper.md) for manual/Spack dependencies,
+including the matching Rust linker and GPU checks.
 
 Cargo does not propagate a library build script's linker arguments into an
 arbitrarily distant executable. Every final executable that uses this runtime,
@@ -188,7 +193,7 @@ same diagnostic data.
 cargo nextest run --workspace --locked
 cargo test --doc --workspace --locked
 cargo fmt --all -- --check
-cargo clippy --workspace --all-targets --locked
+cargo clippy --workspace --all-targets --locked -- -D warnings
 cargo run --locked -p xtask -- generate-quest-bindings --check
 cargo run --locked -p xtask -- check-native-consumers
 cargo test --locked -p quest-circuit --no-default-features
@@ -200,12 +205,11 @@ standard libraries. Edit its templates and adapter registry, then regenerate the
 artifacts together. Native tests are serialized in Nextest; lifecycle regressions
 use subprocesses where ordinary Cargo's in-process test harness needs isolation.
 
-The [architecture](https://github.com/eessmann/quest-rs/blob/main/docs/superpowers/specs/2026-09-10-quest-rust-design.md),
-[dated bridge audit](https://github.com/eessmann/quest-rs/blob/main/docs/superpowers/specs/2026-09-10-quest-bridge-audit.md), and
-[compiler research](https://github.com/eessmann/quest-rs/blob/main/docs/superpowers/specs/2026-09-10-quest-circuit-research.md)
-preserve the design and dated research evidence. Text import/export, structured
-execution and optional certified synthesis/ZX workers are implemented; the guide
-documents their supported profile and validation boundaries.
+The [guide](../../docs/book/src/index.md) documents text import/export, structured
+execution, optional certified synthesis/ZX workers, and their validation
+boundaries. The [contributor guide](../../CONTRIBUTING.md) covers development;
+the [verification index](../../docs/verification/README.md) records tested
+configurations and results.
 
 Shared `OracleFragment` calls remain retained in both ordinary and structured
 plans. Preparation builds each shared body once and caches numerical matrices by

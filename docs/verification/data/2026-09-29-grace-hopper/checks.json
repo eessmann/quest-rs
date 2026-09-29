@@ -188,7 +188,7 @@
         "QUEST_REGISTER_TEST_MODE": null
       },
       "exit_code": 0,
-      "evidence": "register-modes task report; executed independently in fresh processes"
+      "evidence": "Process-isolated register-mode regression"
     },
     {
       "name": "register-threads",
@@ -206,7 +206,7 @@
         "QUEST_REGISTER_TEST_MODE": "threads"
       },
       "exit_code": 0,
-      "evidence": "register-modes task report; executed independently in fresh processes"
+      "evidence": "Process-isolated register-mode regression"
     },
     {
       "name": "register-gpu",
@@ -224,7 +224,7 @@
         "QUEST_REGISTER_TEST_MODE": "gpu"
       },
       "exit_code": 0,
-      "evidence": "register-modes task report; executed independently in fresh processes"
+      "evidence": "Process-isolated register-mode regression"
     },
     {
       "name": "register-auto",
@@ -242,7 +242,7 @@
         "QUEST_REGISTER_TEST_MODE": "auto"
       },
       "exit_code": 0,
-      "evidence": "register-modes task report; executed independently in fresh processes"
+      "evidence": "Process-isolated register-mode regression"
     },
     {
       "command": [

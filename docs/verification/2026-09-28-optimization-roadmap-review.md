@@ -1,10 +1,8 @@
-# Optimization roadmap review record
+# Optimization correctness regressions
 
-This record consolidates the scoped implementation reviews. Priority ranks the
-impact of the **resolved** findings; it is not a list of open defects. The
-reviews inspected bounded task deltas and focused regressions. Final workspace,
-native, feature-matrix and timing results belong in the separate delivery
-results document and are not claimed here.
+This record links corrected defects to source and regression coverage. Priority
+ranks the impact of the resolved defects. Workspace validation and timing
+measurements are in the [results record](2026-09-28-optimization-roadmap-results.md).
 
 ## P1 — semantic correctness and proof identity, resolved
 
@@ -42,7 +40,7 @@ See the [runner](fixtures/optimization-roadmap/run_native_optimization.py),
 [MPI fixture](fixtures/optimization-roadmap/native_mpi_optimization.rs), and
 [campaign-free harness tests](fixtures/optimization-roadmap/test_measurement_harness.py).
 
-## Supported boundaries and pending results
+## Supported boundaries
 
 - The [vendored fork](../../crates/vendor/mathcore/UPSTREAM.md) adds a separate
   exact affine domain. Its legacy CAS algorithms remain unchanged and
@@ -65,19 +63,3 @@ See the [runner](fixtures/optimization-roadmap/run_native_optimization.py),
   simplification/extraction operations, which are separately process-bounded.
   The collective MPI facade fixture's marginals cannot independently detect a
   global-phase or correlation error; full-complex native witnesses are separate.
-- Scoped reviews and focused tests are evidence for their named contracts only.
-  This record does not report completed final workspace validation, feature
-  matrix results, native campaign completion, speedups or timing medians. Those
-  belong in the delivery results document with completion manifests and raw
-  measurements.
-
-The detailed independent review records are local, Git-ignored handoff artifacts
-under `.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/`,
-including the [exact fork](../../.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/task-1-review.md),
-[affine certificate](../../.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/task-2-review.md),
-[foundation contracts](../../.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/task-4-core-review.md),
-[beam](../../.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/task-6-beam-review.md),
-[MITM](../../.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/task-9-review.md),
-and [measurement fixture](../../.superpowers/sdd/2026-09-28-optimization-roadmap-implementation/measurement-fixture-review.md)
-reviews. They are not part of the repository publication; the durable evidence
-links above point to source, focused tests and fixtures.

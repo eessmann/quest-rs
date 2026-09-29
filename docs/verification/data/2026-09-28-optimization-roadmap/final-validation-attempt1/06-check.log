@@ -1,5 +1,0 @@
-    Checking quest-language v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-language)
-    Checking quest-symbolic v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-symbolic)
-    Checking quest-qasm v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-qasm)
-    Checking quest-circuit v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-circuit)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.72s

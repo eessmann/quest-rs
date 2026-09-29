@@ -114,9 +114,10 @@ Use a new or empty work directory on the large work filesystem: independent
 consumer builds can require several GiB, and the node's `/tmp` is small. Evidence
 is preserved there, so use a different directory name for the next run.
 The default is `--backends cpu`; GPU execution requires access to `/dev/nvidia*`.
-An agent sandbox may hide those devices even when `nvidia-smi` works on the host.
+A container or sandbox may hide those devices even when `nvidia-smi` works on the
+host; run GPU checks with device access enabled.
 
-`Environment::builder().gpu(ExecutionMode::Enabled)` now requires GPU registers,
+`Environment::builder().gpu(ExecutionMode::Enabled)` requires GPU registers,
 including small ones. The same rule applies to `multithreading(Enabled)`.
 `Disabled` prevents the mode; `Auto` retains QuEST's size thresholds. Existing
 callers that enabled an environment but relied on small CPU registers should
@@ -124,8 +125,8 @@ select `Auto`. `Register::deployment()` reports actual placement.
 
 State-vector promotion to density matrices uses native conversion and preserves
 subnormalized states. Prepared numerical matrices share their native allocation
-budget when storage identity and ordered control signs match. These changes do
-not alter public method signatures or the default CPU execution policy.
+budget when storage identity and ordered control signs match. The default is CPU
+execution without native multithreading.
 
 Run optional features without MPI using:
 
@@ -138,5 +139,7 @@ Record `rustc -Vv`, native compiler/library versions, driver information and
 command results with each verification run. Rolling nightly can change Clippy
 and compile-fail diagnostics; review those changes rather than disabling checks.
 
-The [2026-09-29 verification record](verification/2026-09-29-grace-hopper.md)
-contains the tested configuration, complete feature selection and results.
+The [Grace Hopper verification record](verification/2026-09-29-grace-hopper.md)
+contains the tested configuration, complete feature selection and results. See
+the [documentation index](README.md) for the runtime guide and crate references,
+or [Contributing](../CONTRIBUTING.md) for repository conventions.

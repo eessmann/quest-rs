@@ -1,11 +1,9 @@
 # QSP/QSVT documentation and integration checks — 2026-09-11
 
-This records the local checks before integrating `codex/qsvt-port` into `main`,
-based on `cb77d2c43ed0265c11f22a26aa1dca9c536ba88e`. It supplements the
-[implementation and numerical verification record](2026-09-11-qsvt-port.md);
-it makes no claim of a push or remote CI run.
+These documentation checks supplement the
+[QSP/QSVT numerical verification record](2026-09-11-qsvt-port.md).
 
-## Documentation delivered
+## Documentation coverage
 
 - QSP and QSVT READMEs are included directly as crate rustdoc, with executable
   canonical/generalized synthesis, encoding and transform examples.
@@ -33,13 +31,13 @@ conversion, numerical lowering or native execution.
 The environment matches the implementation record: Linux x86_64, pinned
 `nightly-2026-09-06`, QuEST 4.3.0 with MPI/SUBCOMM, MPICH 5.0.1 and serial HDF5
 1.14.6. Native tests used CPU execution and local MPI subprocess sockets.
-Commands ran from the feature worktree with:
+The checks used:
 
 ```sh
 export QUEST_ROOT=/var/home/erich/Projects/opt/quest
 export MPICC=/home/linuxbrew/.linuxbrew/bin/mpicc
 export MPICH_CC=/usr/bin/gcc
-export HDF5_DIR="$PWD/.superpowers/sdd/2026-09-11-qsvt-port/hdf5-serial/install"
+export HDF5_DIR=/path/to/serial-hdf5-1.14.6
 export CARGO_BUILD_JOBS=2
 ```
 
@@ -57,14 +55,8 @@ export CARGO_BUILD_JOBS=2
 | `cargo run -p xtask --locked --offline -- generate-quest-bindings --check` | Passed. |
 | `cargo package --workspace --list --allow-dirty --locked --offline` | Passed; crate READMEs, analysis guide, tutorials, data and license notices included. This is a contents check, not publication. |
 
-Fresh logs use the `merge-` prefix in
-[the retained data directory](data/2026-09-11-qsvt/). A separate review checked
-documentation against public APIs and route/convention implementations; the
-identified setup and navigation defects were corrected before integration.
-
 The three release scale tests, all 43 catalog certificates, four downstream
 consumers, serial-native API hiding and C++ comparisons retain their earlier
 results in the implementation record. They were not rerun for documentation
 changes. This pass adds no GPU execution, multi-node MPI or alternate-provider
-coverage. The worktree's ignored native installations and verbose reference
-artifacts are retained for reproduction.
+coverage.

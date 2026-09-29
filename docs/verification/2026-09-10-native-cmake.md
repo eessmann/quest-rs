@@ -1,9 +1,9 @@
 # Installed-target native build verification — 2026-09-10
 
 This record supersedes the setup recipe, not the historical evidence, in the
-[M6–M11 verification record](2026-09-10-m6-m11.md). The implementation baseline is
-`codex/openqasm-ssa` at `2c2135d`. Native installation source baseline: QuEST
-`411b762c` plus the small RPATH property fix in its separate working tree.
+[compiler verification record](2026-09-10-m6-m11.md). The Rust baseline is
+`2c2135d`; the native baseline is QuEST `411b762c` with the RPATH property fix.
+For current setup, use the [build guide](../../README.md#build).
 
 ## Native configuration and initial failure
 
@@ -68,7 +68,7 @@ the current installed public headers expose it.
 
 ## Reproduction and acceptance
 
-Run from the implementation worktree using the pinned `nightly-2026-09-06`:
+The historical checks used pinned `nightly-2026-09-06` and:
 
 ```sh
 unset QUEST_NATIVE_CONFIG QUEST_RUNTIME_LIBRARY_PATH
@@ -135,24 +135,7 @@ env QUEST_ROOT=/quest-native-unavailable CMAKE=/quest-cmake-unavailable \
   -p quest-circuit -p quest-macros --no-default-features
 ```
 
-Two independent Rust reviews and a native-fix review completed. Their findings
-on cache selection, library resolution, symlink tracking and dependency-prefix
-preservation were corrected and covered by regression tests before the final
-acceptance run.
-
-Local detailed logs use the `/tmp/quest-native-cmake-` prefix; native installation
-and packaging logs use `/tmp/quest-native-` and `/tmp/quest-rpath-package-`.
-This record retains the conclusions because these temporary logs are
-not durable artifacts.
-
 ## Limits of this evidence
-
-During final audit, concurrent changes appeared in the separate QuEST working
-tree: broader RPATH defaults/tests, native CI and setup documentation. They were
-left untouched. The six native packaging checks above describe this task's
-installed revision, not acceptance of those additional changes or their CI.
-The three original RPATH regressions were rerun after detecting these changes
-and still passed.
 
 Native dependency resolution is distinct from GPU kernel execution. Beyond the
 GPU smoke check described above, no dedicated GPU correctness/performance suite,
@@ -164,11 +147,9 @@ translation rejects stateful static-linker groups. Arbitrary downstream
 `RUSTFLAGS` and Cargo configuration can introduce additional link search paths
 outside the evaluated native project's contract.
 
-## Merge-time revalidation
+## Relocated CPU package
 
-Before the local merge, the original `/var/home/erich/Projects/opt/quest`
-installation was removed during separate native work. The complete workspace
-suite was rerun using the preserved relocated CPU package at
+The complete workspace suite also passed using the relocated CPU package at
 `/tmp/quest-rpath-package-build/tests/packaging/work/install/relocated prefix`:
 **333 Nextest tests passed, zero skipped; 13 doctests passed, one intentional
 ignore**. This package is QuEST 4.3.0, binary64, deprecated APIs disabled, with
@@ -181,16 +162,12 @@ could not enumerate native tests against that installation. This is a new native
 installation limitation; it does not replace the earlier GPU-enabled acceptance
 evidence above. Its setup needs the documented
 `CMAKE_INSTALL_RPATH_USE_LINK_PATH=ON` installation step before those libraries
-can load without loader environment variables. No native configuration was
-changed as part of the Rust merge.
-
-Merge-time logs are `/tmp/quest-main-merge-nextest-cpu.log`,
-`/tmp/quest-main-merge-doctests-cpu.log` and `/tmp/quest-main-merge-nextest.log`.
+can load without loader environment variables.
 
 ## Repaired GPU installation revalidation
 
-The merge-time loader failure above is **resolved**. After the user repaired the
-native installation, the merged Rust source at `fcdcf0c` was revalidated against
+The loader failure above was resolved by repairing the native installation.
+Rust source at `fcdcf0c` was revalidated against
 `QUEST_ROOT=/var/home/erich/Projects`. The native repository was at `adfd00d6`;
 its build cache records `CMAKE_INSTALL_RPATH_USE_LINK_PATH=ON`. Installed headers
 report QuEST 4.3.0, binary64, deprecated APIs disabled, and CUDA, cuQuantum, MPI,
@@ -223,10 +200,3 @@ independent consumers and the GPU example ran with the loader variables above
 unset. The GPU example reported `CUDA=1 OpenMP=1 MPI=1`, one MPI rank and
 `cuQuantum=1`. This remains a GPU smoke check, not a full GPU or distributed
 simulation validation suite.
-
-The preserved Rust consumer fixture is `/tmp/quest gpu retry consumers`; the
-native consumer fixture is `/tmp/quest-gpu-retry-cmake-Rsr5wA`. Detailed logs use
-the `/tmp/quest-gpu-retry-` prefix, including `nextest.log`, `doctests.log`,
-`clippy.log`, `generator.log`, `consumers.log`, `example-run.log` and
-`cmake-run.log`. No Rust implementation changes or native configuration changes
-were needed during this revalidation.

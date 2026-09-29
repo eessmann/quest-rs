@@ -1,2 +1,0 @@
-# Preserve raw process transcripts, including their final blank lines.
-*.log -whitespace

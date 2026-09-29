@@ -1,8 +1,0 @@
-[package]
-name = "quest-roadmap-baseline"
-version = "0.0.0"
-edition = "2024"
-[workspace]
-[dependencies]
-quest-circuit = { path = "/var/home/erich/Projects/quest-rs/crates/quest-circuit", default-features = false }
-serde_json = "1"

@@ -1,3 +1,0 @@
-warning: manifest has no description
-  |
-  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info

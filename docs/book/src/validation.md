@@ -18,8 +18,11 @@ Darwin; each architecture needs separate runtime validation.
 
 For a manual installation, set `QUEST_ROOT` to a package exporting
 `QuEST::QuEST` whose native dependencies resolve, and select serial HDF5 through
-pkg-config or `HDF5_DIR` for the full workspace. The repository root README describes CMake selection and the
-final-executable link helper. Once configured:
+pkg-config or `HDF5_DIR` for the full workspace. The
+[workspace setup](https://github.com/eessmann/quest-rs/blob/main/README.md#build)
+describes CMake selection and the final-executable link helper. The
+[Grace Hopper guide](https://github.com/eessmann/quest-rs/blob/main/docs/grace-hopper.md)
+covers manual/Spack dependencies and GPU checks. Once configured:
 
 ```sh
 cargo run -p quest-rs --example tutorials --locked
@@ -93,4 +96,10 @@ mdbook build docs/book
 
 Its output directory is the worktree's `target/book`. Source includes resolve directly to the Rust examples and integration tests, so displayed code changes with tested source. mdBook rendering alone does not compile Rust snippets; run the Cargo commands too.
 
-For repository-wide validation, use Nextest for runtime tests and Cargo doctests separately, then rustfmt, strict Clippy, and generated-binding freshness checks. Native lifecycle tests require the serialized Nextest group or their explicit subprocess harness. Focused tutorial success does not claim a complete workspace release audit.
+For repository-wide validation, follow the
+[contributor guide](https://github.com/eessmann/quest-rs/blob/main/CONTRIBUTING.md):
+use Nextest for runtime tests and Cargo doctests separately, then rustfmt, strict
+Clippy, and generated-binding freshness checks. Native lifecycle tests require
+the serialized Nextest group or their explicit subprocess harness. The
+[verification index](https://github.com/eessmann/quest-rs/blob/main/docs/verification/README.md)
+records tested configurations and results.

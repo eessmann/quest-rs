@@ -1,9 +1,0 @@
-    Checking quest-circuit v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-circuit)
-   Compiling quest-sys v0.2.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-sys)
-   Compiling quest-qsvt-cli v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-qsvt-cli)
-    Checking quest-qsvt v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-qsvt)
-    Checking quest-optimizer-worker v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-optimizer-worker)
-warning: quest-sys@0.2.0: Using QuEST 4.3.0 from /var/home/erich/Projects/opt/quest with /usr/bin/c++
-warning: quest-sys@0.2.0: Verified rsmpi MPICC /var/home/linuxbrew/.linuxbrew/Cellar/mpich/5.0.1/bin/mpicc matches QuEST MPI ABI and loaded library
-   Compiling quest-rs v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 6.00s

@@ -37,8 +37,7 @@ cmake --build /tmp/quest-qsvt-execution-reference --target cpp_execution -j2
 The optional existing CPM bootstrap is checked against its pinned SHA256 and
 copied into the new build; this permits offline configuration. The external
 checkout and native installation are never modified. This reproducer was tested
-with GCC 16.1.1 and C++23 on Linux; upstream compilation produced warnings, which
-remain recorded in the build log.
+with GCC 16.1.1 and C++23 on Linux; upstream compilation produced warnings.
 
 ## Measured comparison, 2026-09-11
 
@@ -80,8 +79,9 @@ construction/preparation destruction is outside the timer; Rust Criterion
 construction includes ownership turnover. No speedup claim follows from this tiny
 fixture: Rust repeated execution is slower in this measurement.
 
-Full JSONL, the cross-language comparison, exact configure command, fresh build
-log, source/binary/native-library hashes, compiler/link commands and loaded
-libraries are retained under
-`.superpowers/sdd/2026-09-11-qsvt-port/cpp-execution-*` and
-`cpp-rust-execution-comparison.json`; Rust evidence is `rust-qsvt-benchmark.log`.
+The [QSP/QSVT verification record](../../docs/verification/2026-09-11-qsvt-port.md)
+summarizes this comparison and its validation limits. The measured
+[C++ execution rows](../../docs/verification/data/2026-09-11-qsvt/cpp-execution-smoke.jsonl)
+and [cross-language comparison](../../docs/verification/data/2026-09-11-qsvt/cpp-rust-execution-comparison.json)
+retain the numerical results and five-run medians. See the
+[verification index](../../docs/verification/README.md) for other measurements.

@@ -1,17 +1,12 @@
-# Correctness-first consolidation review
+# Consolidation correctness and measurements
 
-Implementation started from `9d614fb` on isolated branch
-`codex/correctness-consolidation`. The project already had 18 workspace crates,
-a typed native runtime, an ideal DAG, structured SSA, two OpenQASM token
-frontends, exact/fusion/parity/linear passes, and checked external workers.
-This review preserves those boundaries. It does not introduce new quantum
-optimization algorithms.
+This record covers correctness fixes and storage consolidation against baseline
+`9d614fb`. The native runtime, ideal DAG, structured SSA, OpenQASM frontends,
+exact and numerical optimization passes, and checked external workers retain
+their separate contracts. Caller changes are in the
+[migration notes](2026-09-28-consolidation-migration.md).
 
-Implementation and independent review are complete. The final integrated source
-tree passes the acceptance checks below; Git signing/delivery status is recorded
-separately from code and test acceptance.
-
-## Severity-ranked findings
+## Corrected defects
 
 | Severity | Finding | Correction and evidence |
 | --- | --- | --- |
@@ -27,16 +22,15 @@ separately from code and test acceptance.
 | P2 | Block positions could be reused across edited publications without a snapshot identity | Fresh verified snapshot identities, checked block handles, and input/output identities on analysis reports |
 | P2 | Remez enclosure subdivision and solver scratch lacked complete storage admission; work did not scale with evaluated expression size | Checked subdivision plus solver storage, fallible scratch allocation, cumulative size-scaled enclosure work and exact boundary regressions |
 
-Review of the first shared-expression implementation found missing retained
-`Arc<Node>` overhead and an infallible boolean-constructor budget bypass.
+The initial shared-expression admission omitted retained `Arc<Node>` overhead
+and allowed an infallible boolean constructor to bypass its budget.
 A shallow-node regression reproduced the gap before correction. Admission now
 bounds the conservative retained graph plus simultaneous syntax materialization;
-boolean construction is fallible. Independent re-review accepted that correction.
-Independent numerical review also found that charging one unit per enclosure
-interval ignored the cost of the function AST and polynomial. The final charge
+boolean construction is fallible. Charging one unit per enclosure interval also
+ignored the cost of the function AST and polynomial. The corrected charge
 scales with checked AST/coefficient size and accounts for all four possible jet
 evaluations per interval. A nonzero-work-limit regression failed before this
-correction and passed afterward; the independent reviewer accepted the result.
+correction and passed afterward.
 
 The [native probability witness](fixtures/native-probability/witness.cpp) links
 the relevant QuEST source translation unit with shift sanitization. One target
@@ -47,7 +41,7 @@ is a focused translation-unit witness, not a full native sanitizer campaign.
 
 ## Architecture and coverage map
 
-| Crates | Responsibility retained and review focus |
+| Crates | Responsibility |
 | --- | --- |
 | `quest-rs`, `quest-sys`, `quest-build`, `xtask` | Environment lifetimes, sealed register kinds, transactional preparation, non-panicking cleanup, generated boundary coverage, installed CMake configuration and final executable linking |
 | `quest-language`, `quest-qasm`, `quest-macros` | Classical SSA, verified publication identity, bounded expressions/dominance, gate registry, capture evaluation order, diagnostics, OpenQASM 3.1 simulator profile and renamed macro dependencies |
@@ -64,11 +58,10 @@ requested bytes, live retained bytes, peak live requested bytes and allocation
 calls. Counts exclude allocator bookkeeping and are not RSS. Measurements are
 single-process debug runs; elapsed times are diagnostic, not a performance claim.
 
-Baseline source is the unchanged main tree at `9d614fb`; raw
-[allocation results](data/2026-09-28-consolidation/baseline-allocations.jsonl) and
-[expected rejected admission](data/2026-09-28-consolidation/baseline-diagnostics.log)
-are retained. The 4096-rotation merge retains 134,547,032 bytes. Doubling from 2048
-to 4096 grows retained bytes from 33,719,896 to 134,547,032. Building a depth-14
+Baseline source is `9d614fb`; the raw
+[allocation results](data/2026-09-28-consolidation/baseline-allocations.jsonl)
+include rejected admission. The 4096-rotation merge retains 134,547,032 bytes.
+Doubling from 2048 to 4096 grows retained bytes from 33,719,896 to 134,547,032. Building a depth-14
 self-shared expression performs 196,572 allocation calls and retains 5,914,448
 bytes. The 451-block program is rejected by the old quadratic working-storage
 forecast under default limits.
@@ -114,17 +107,6 @@ This is not a claim that every file is shorter. Added budget checks, source
 identity and regression coverage are deliberate complexity needed to preserve
 the guarantees while removing duplicated rules and retained data.
 
-## Independent review
-
-Separate reviewers accepted native correctness/consolidation, numerical
-correctness/consolidation, circuit representation/facade integration, and language
-representation changes. Review findings on sparse retained capacity, expression
-storage/literal budgets and enclosure work accounting were fixed and re-reviewed.
-Native owner failure order, signed controls, scalar phase, ordered operands,
-transactional preparation and numerical arithmetic order were checked explicitly.
-Compile-fail coverage remains for environment lifetimes, thread confinement,
-register kinds, stage/capability use and foreign identifiers.
-
 ## Validation scope and limitations
 
 | Final check | Result |
@@ -138,15 +120,6 @@ register kinds, stage/capability use and foreign identifiers.
 | Direct/facade/renamed/wrapper consumers outside Cargo | All 4 passed RUNPATH, dependency closure and numerical checks |
 | Explicit CPU/OpenMP/GPU register execution | All 3 passed complete complex-amplitude and norm checks |
 | MPI integration | Passed actual 2/4-rank and subgroup tests |
-
-[Final commands and exit status](data/2026-09-28-consolidation/final-checks.json),
-[Nextest log](data/2026-09-28-consolidation/workspace-nextest-final.log), and
-[doctest log](data/2026-09-28-consolidation/workspace-doctests-final.log) retain the
-integrated evidence. The failed first final attempt is also retained: a newly
-added regression used an ambiguous integer literal for checked size arithmetic.
-Typing that literal as `usize` fixed the test-only compilation error; Nextest,
-Clippy and formatting were rerun successfully. Unchanged production/doc/generator
-checks from the same final production tree remain valid.
 
 Host coverage is Linux x86-64 GNU, pinned `nightly-2026-09-06`, GNU C++ 16.2.1,
 QuEST fork 4.3.0 with double precision and deprecated APIs disabled, MPICH 5.0.1,
@@ -170,9 +143,10 @@ the installed native library's responsibility.
 
 The standalone backend probe explicitly selects CPU, OpenMP or GPU for both the
 environment and register; all three passed every complex-amplitude and norm
-check. The [GPU log](data/2026-09-28-consolidation/native-gpu.log) confirms GPU
-register residency, avoiding an inference from build flags or automatic small
-register deployment. Multi-rank integration tests exercise actual two/four-rank
+check. The [backend results](data/2026-09-28-consolidation/native-modes.json)
+record successful execution of these deployment checks. GPU residency was
+asserted on the allocated register, rather than inferred from build flags or
+automatic small-register deployment. Multi-rank integration tests exercise actual two/four-rank
 MPI execution, collective mismatch recovery and subgroup schedules.
 
 Earlier sandboxed native attempts failed because MPICH could not create its
@@ -188,27 +162,3 @@ They were not run in this pass. Existing degree-8105 pinned C++ phase comparison
 does run and passes. Allocation measurements count requested storage, not RSS;
 production budget estimates are conservative models, not allocator-exact peak
 guarantees.
-
-## Delivery state
-
-Local `main` was fast-forwarded from `9d614fb` to `970fdd9` after the user
-authorized committing and merging. All nine plan, correctness, consolidation and
-evidence commits were signed with the configured signer. The committed tree
-`b1aa9476cd11535b0bcd970700ec618d553a59b7` exactly matches the reviewed and tested
-tree. This delivery-record update changes documentation only; the source
-manifest was verified again on merged `main` without rerunning unchanged suites.
-No remote push was performed.
-
-Earlier signing attempts failed in 1Password (`failed to fill whole buffer` /
-`agent returned an error`). The final retry succeeded; signing remained enabled
-throughout. Those failures are retained here as historical delivery evidence.
-
-The local delivery series in
-`.superpowers/sdd/2026-09-27-correctness-consolidation/patches/` separates remaining
-correctness fixes from native, language, numerical, circuit/facade and evidence
-changes. It applies in order after `9a1c3fd`; each patch was committed in sequence
-and its resulting tree checked against the saved series. Intermediate trees were
-not individually validated as releases. Review notes and patches were preserved
-in the main checkout before retiring the temporary worktree. The final integrated
-source is identified by
-[source-manifest.sha256](data/2026-09-28-consolidation/source-manifest.sha256).

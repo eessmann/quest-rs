@@ -1,8 +1,0 @@
-   Compiling cmake-file-api v0.1.2
-    Checking quest-circuit v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-circuit)
-   Compiling quest-build v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-build)
-   Compiling quest-sys v0.2.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest-sys)
-   Compiling quest-rs v0.1.0 (/var/home/erich/Projects/quest-rs/.superpowers/worktrees/optimization-roadmap/crates/quest)
-warning: quest-sys@0.2.0: Using QuEST 4.3.0 from /var/home/erich/Projects/opt/quest with /usr/bin/c++
-warning: quest-sys@0.2.0: Verified rsmpi MPICC /var/home/linuxbrew/.linuxbrew/Cellar/mpich/5.0.1/bin/mpicc matches QuEST MPI ABI and loaded library
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 5.90s
