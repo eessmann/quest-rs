@@ -11,7 +11,19 @@ use quest_circuit::{
     BoundGate, Control, ControlState, ExecutablePlan, Operation, ValidatedProgram,
     dispatch_recipe::{self, DispatchStep, MatrixRecipe, PrimitiveGate},
 };
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
+
+pub type MatrixCacheKey = (usize, Vec<bool>);
+
+pub fn matrix_cache_key(
+    matrix: &quest_circuit::NumericalOperator,
+    controls: impl IntoIterator<Item = bool>,
+) -> MatrixCacheKey {
+    (
+        matrix.view().as_ptr().addr(),
+        controls.into_iter().collect(),
+    )
+}
 
 pub enum NativeMatrix {
     Dense {
@@ -183,6 +195,7 @@ impl crate::environment::RuntimeResources {
                 .bytes()
                 .saturating_sub(self.allocated_bytes()),
         );
+        let mut seen_matrices = BTreeSet::new();
         for instruction in plan.instructions() {
             inventory.include_operation(instruction.operation(), plan.num_qubits())?;
         }
@@ -213,12 +226,19 @@ impl crate::environment::RuntimeResources {
                     .ok_or(Error::Overflow)?;
             }
             required = required
-                .checked_add(estimate(instruction.operation(), self.capabilities().gpu)?)
+                .checked_add(estimate(
+                    instruction.operation(),
+                    self.capabilities().gpu,
+                    &mut seen_matrices,
+                )?)
                 .ok_or(Error::Overflow)?;
         }
         required = required
             .checked_add(inventory.estimated_bytes(plan.num_qubits(), self.capabilities().gpu)?)
             .ok_or(Error::Overflow)?;
+        // Admission keys are temporary; the reserved key allowance also covers
+        // the materialization cache after this set is released.
+        drop(seen_matrices);
         let reservation = self.reserve(required)?;
         Ok(AdmittedPlan {
             plan,
@@ -256,7 +276,7 @@ impl<'env> AdmittedPlan<'env> {
         let oracles = OracleCache::prepare(&inventory, plan.num_qubits())?;
         let mut matrices = reserve_vec(plan.instructions().len())?;
         let mut channels = reserve_vec(plan.instructions().len())?;
-        let mut cache = BTreeMap::new();
+        let mut cache: BTreeMap<MatrixCacheKey, usize> = BTreeMap::new();
         let mut operations = reserve_vec(plan.instructions().len())?;
         for instruction in plan.instructions() {
             operations.push(prepare_operation(
@@ -423,12 +443,20 @@ fn requires_density(op: &PreparedOp) -> bool {
         _ => false,
     }
 }
-fn estimate(op: &Operation, gpu: bool) -> Result<usize> {
+fn estimate(
+    op: &Operation,
+    gpu: bool,
+    seen_matrices: &mut BTreeSet<MatrixCacheKey>,
+) -> Result<usize> {
     op.operand_storage_bytes()?
-        .checked_add(estimate_native(op, gpu)?)
+        .checked_add(estimate_native(op, gpu, seen_matrices)?)
         .ok_or(Error::Overflow)
 }
-fn estimate_native(op: &Operation, gpu: bool) -> Result<usize> {
+fn estimate_native(
+    op: &Operation,
+    gpu: bool,
+    seen_matrices: &mut BTreeSet<MatrixCacheKey>,
+) -> Result<usize> {
     let control_bytes = |count: usize| {
         count
             .checked_mul(const { 3 * std::mem::size_of::<i32>() + std::mem::size_of::<usize>() })
@@ -461,6 +489,27 @@ fn estimate_native(op: &Operation, gpu: bool) -> Result<usize> {
                 .num_qubits()
                 .checked_add(controls.len())
                 .ok_or(Error::Overflow)?;
+            let targets = targets_bytes(width.max(1))?;
+            let key = matrix_cache_key(
+                matrix,
+                controls
+                    .iter()
+                    .map(|control| control.state() == ControlState::One),
+            );
+            let key_storage = key
+                .1
+                .len()
+                .checked_add(
+                    const {
+                        std::mem::size_of::<MatrixCacheKey>()
+                            + 5 * std::mem::size_of::<usize>()
+                            + 64
+                    },
+                )
+                .ok_or(Error::Overflow)?;
+            if !seen_matrices.insert(key) {
+                return Ok(targets);
+            }
             let dimension = 1usize
                 .checked_shl(u32::try_from(width.max(1)).map_err(|_| Error::Overflow)?)
                 .ok_or(Error::Overflow)?;
@@ -471,8 +520,9 @@ fn estimate_native(op: &Operation, gpu: bool) -> Result<usize> {
             };
             bytes_for(entries, if gpu { 16 } else { 12 })?
                 .checked_add(matrix.bytes())
+                .and_then(|bytes| bytes.checked_add(key_storage))
                 .ok_or(Error::Overflow)?
-                .checked_add(targets_bytes(width)?)
+                .checked_add(targets)
                 .ok_or(Error::Overflow)
         }
         Operation::Channel { kraus, .. } => {
@@ -494,7 +544,7 @@ fn estimate_native(op: &Operation, gpu: bool) -> Result<usize> {
             bytes_for(elements, 1)
         }
         Operation::Reset { .. } => bytes_for(256, 1),
-        Operation::Conditional { operation, .. } => estimate_native(operation, gpu)?
+        Operation::Conditional { operation, .. } => estimate_native(operation, gpu, seen_matrices)?
             .checked_add(std::mem::size_of::<PreparedOp>())
             .ok_or(Error::Overflow),
         Operation::Measure { .. } => Ok(0),
@@ -508,7 +558,7 @@ fn prepare_operation(
     op: &Operation,
     matrices: &mut Vec<NativeMatrix>,
     channels: &mut Vec<UniquePtr<quest_sys::KrausMap>>,
-    cache: &mut BTreeMap<(usize, Vec<bool>), usize>,
+    cache: &mut BTreeMap<MatrixCacheKey, usize>,
     inventory: &OracleInventory,
 ) -> Result<PreparedOp> {
     match op {
@@ -533,12 +583,9 @@ fn prepare_operation(
             targets,
             controls,
         } => {
-            let key = (
-                numerical.view().as_ptr().addr(),
-                controls
-                    .iter()
-                    .map(|c| c.state() == ControlState::One)
-                    .collect::<Vec<_>>(),
+            let key = matrix_cache_key(
+                numerical,
+                controls.iter().map(|c| c.state() == ControlState::One),
             );
             let mut native_targets: Vec<i32> = targets
                 .iter()
@@ -972,4 +1019,48 @@ fn apply_primitive<K: RegisterKind>(
         ),
     };
     result.context("applying standard gate")
+}
+
+#[cfg(test)]
+mod matrix_budget_tests {
+    use super::{MatrixCacheKey, estimate};
+    use googletest::prelude::*;
+    use quest_circuit::{
+        Control, ControlState, MatrixPolicy, NumericalOperator, Operation, ProgramBuilder,
+    };
+    use std::collections::BTreeSet;
+
+    #[gtest]
+    fn conditional_numerical_occurrences_reuse_only_matching_control_profile()
+    -> googletest::Result<()> {
+        let builder = ProgramBuilder::new(6, 1)?;
+        let targets = (0..5)
+            .map(|index| builder.qubit(index))
+            .collect::<Result<Vec<_>, _>>()?;
+        let control = builder.qubit(5)?;
+        let bit = builder.bit(0)?;
+        let matrix = faer::Mat::from_fn(32, 32, |row, col| {
+            crate::Complex64::new(f64::from(row == (col.wrapping_add(1) & 31)), 0.0)
+        });
+        let matrix = NumericalOperator::from_view(matrix.as_ref(), MatrixPolicy::default())?;
+        let wrapped = |state| Operation::Conditional {
+            bit,
+            expected: false,
+            operation: Box::new(Operation::Numerical {
+                matrix: matrix.clone(),
+                targets: targets.clone().into(),
+                controls: vec![Control::new(control, state)].into(),
+            }),
+        };
+        let mut seen = BTreeSet::<MatrixCacheKey>::new();
+        let first = estimate(&wrapped(ControlState::Zero), false, &mut seen)?;
+        let repeated = estimate(&wrapped(ControlState::Zero), false, &mut seen)?;
+        let other_profile = estimate(&wrapped(ControlState::One), false, &mut seen)?;
+        // A 64x64 dense native pair has at least 64^2 * 16 bytes of payload.
+        verify_that!(first, gt(65_536))?;
+        verify_that!(repeated, gt(100))?;
+        verify_that!(repeated, lt(1_000))?;
+        verify_that!(other_profile, gt(65_536))?;
+        Ok(())
+    }
 }

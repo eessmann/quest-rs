@@ -15,7 +15,41 @@ const EXECUTABLES: &[(&str, &str)] = &[
     ("renamed", "quest-consumer-renamed"),
 ];
 
-pub fn run(requested_work_dir: Option<PathBuf>) -> Result<(), DynError> {
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum Backend {
+    Cpu,
+    Omp,
+    Gpu,
+}
+
+impl Backend {
+    const fn as_str(self) -> &'static str {
+        match self {
+            Self::Cpu => "cpu",
+            Self::Omp => "omp",
+            Self::Gpu => "gpu",
+        }
+    }
+}
+
+pub fn parse_backends(value: &str) -> Result<Vec<Backend>, DynError> {
+    let mut backends = Vec::new();
+    for name in value.split(',') {
+        let backend = match name {
+            "cpu" => Backend::Cpu,
+            "omp" => Backend::Omp,
+            "gpu" => Backend::Gpu,
+            _ => return Err(format!("unknown or empty native backend: {name:?}").into()),
+        };
+        if backends.contains(&backend) {
+            return Err(format!("duplicate native backend: {name}").into());
+        }
+        backends.push(backend);
+    }
+    Ok(backends)
+}
+
+pub fn run(requested_work_dir: Option<PathBuf>, backends: &[Backend]) -> Result<(), DynError> {
     let repository = crate::generate::find_workspace_root()?;
     let work = prepare_work_directory(requested_work_dir)?;
     let package = quest_build::discover_for_tooling(work.join("native-discovery"), None)?;
@@ -51,20 +85,57 @@ pub fn run(requested_work_dir: Option<PathBuf>) -> Result<(), DynError> {
         let executable = target.join("debug").join(binary);
         #[cfg(target_os = "linux")]
         inspect_elf(&work, fixture, &executable)?;
-        let mut execute = Command::new(&executable);
-        execute.current_dir(&work);
-        clean_loader_environment(&mut execute);
-        run_logged(
-            &mut execute,
-            &work.join(format!("{fixture}-run.log")),
-            &format!("{fixture} consumer execution"),
+        for backend in backends {
+            let kinds: &[&str] = if *fixture == "direct" {
+                &["sv", "dm"]
+            } else {
+                &[""]
+            };
+            for kind in kinds {
+                let mut execute = Command::new(&executable);
+                execute.current_dir(&work).arg(backend.as_str());
+                if !kind.is_empty() {
+                    execute.arg(kind);
+                }
+                clean_loader_environment(&mut execute);
+                let case = if kind.is_empty() {
+                    format!("{fixture}-{}", backend.as_str())
+                } else {
+                    format!("{fixture}-{}-{kind}", backend.as_str())
+                };
+                run_logged(
+                    &mut execute,
+                    &work.join(format!("{case}-run.log")),
+                    &format!("{case} consumer execution"),
+                )?;
+                println!("{case}: numerical and deployment checks passed");
+            }
+            if *fixture == "direct" {
+                let mut modes = Command::new(target.join("debug/native-modes"));
+                modes.current_dir(&work).arg(backend.as_str());
+                clean_loader_environment(&mut modes);
+                run_logged(
+                    &mut modes,
+                    &work.join(format!("direct-{}-modes-run.log", backend.as_str())),
+                    &format!("direct {} mode consumer execution", backend.as_str()),
+                )?;
+            }
+        }
+        #[cfg(target_os = "macos")]
+        inspect_macho(
+            &work,
+            fixture,
+            &executable,
+            &package,
+            backends
+                .first()
+                .copied()
+                .ok_or("at least one native backend is required")?,
         )?;
-        #[cfg(target_os = "macos")]
-        inspect_macho(&work, fixture, &executable, &package)?;
         #[cfg(target_os = "linux")]
-        println!("{fixture}: RUNPATH, complete native closure, and numerical check passed");
+        println!("{fixture}: RUNPATH and complete native closure passed");
         #[cfg(target_os = "macos")]
-        println!("{fixture}: LC_RPATH, installed native closure, and numerical check passed");
+        println!("{fixture}: LC_RPATH and installed native closure passed");
     }
 
     println!(
@@ -227,7 +298,27 @@ fn write_consumer_workspace(
         Some(build_script),
     )?;
 
-    write_file(&work.join("direct/src/main.rs"), DIRECT_SOURCE)?;
+    let direct = fs::read_to_string(
+        repository.join("docs/verification/fixtures/optimization-roadmap/native_deployment.rs"),
+    )?;
+    let anchor = "    drop(register);\n";
+    if direct.matches(anchor).count() != 1 {
+        return Err("native deployment fixture no longer has its expected register cleanup".into());
+    }
+    let direct = direct.replace(anchor, &format!("{DIRECT_CLONE_CHECK}{anchor}"));
+    let direct = direct.replace(
+        "    quest_sys::init_custom_quest_env(distributed, gpu, threads)?;\n",
+        "    quest_sys::init_custom_quest_env(distributed, gpu, threads)?;\n    println!(\"cuquantum={}\", quest_sys::get_quest_env()?.is_cu_quantum_enabled);\n",
+    );
+    write_file(&work.join("direct/src/main.rs"), &direct)?;
+    let native_modes = fs::read_to_string(
+        repository.join("docs/verification/fixtures/consolidation/native_modes.rs"),
+    )?;
+    let native_modes = native_modes.replace(
+        "    assert_eq!(environment.is_gpu_accelerated, gpu);\n",
+        "    println!(\"cuquantum={}\", environment.is_cu_quantum_enabled);\n    assert_eq!(environment.is_gpu_accelerated, gpu);\n",
+    );
+    write_file(&work.join("direct/src/bin/native-modes.rs"), &native_modes)?;
     write_file(&work.join("facade/src/main.rs"), &facade_source("quest"))?;
     write_file(
         &work.join("wrapper/src/lib.rs"),
@@ -287,45 +378,101 @@ fn facade_source(crate_name: &str) -> String {
 
 fn facade_library_source(crate_name: &str) -> String {
     format!(
-        r"pub fn run() -> Result<(), Box<dyn std::error::Error>> {{
+        r#"pub fn run() -> Result<(), Box<dyn std::error::Error>> {{
+    let mode = std::env::args().nth(1).ok_or("supply cpu, omp or gpu")?;
+    let (gpu, threads) = match mode.as_str() {{
+        "cpu" => (false, false),
+        "omp" => (false, true),
+        "gpu" => (true, false),
+        _ => return Err("supply cpu, omp or gpu".into()),
+    }};
     let program = {crate_name}::circuit! {{
         qubit[2] q;
         h q[0];
         cx q[0], q[1];
+        s q[1];
     }}?;
-    let environment = {crate_name}::Environment::builder().build()?;
+    let environment = {crate_name}::Environment::builder()
+        .gpu(if gpu {{ {crate_name}::ExecutionMode::Enabled }} else {{ {crate_name}::ExecutionMode::Disabled }})
+        .multithreading(if threads {{ {crate_name}::ExecutionMode::Enabled }} else {{ {crate_name}::ExecutionMode::Disabled }})
+        .build()?;
+    let capabilities = environment.capabilities();
+    assert_eq!(capabilities.gpu, gpu);
+    assert_eq!(capabilities.multithreaded, threads);
+    println!("cuquantum={{}}", capabilities.cu_quantum);
     let mut prepared = environment.prepare_structured(program)?;
     let mut register = environment.state_vector({crate_name}::QubitCount::new(2)?)?;
+    check_deployment(register.deployment(), false, gpu, threads);
     prepared.run(&mut register, &{crate_name}::RunInputs::default())?;
-    let state = register.snapshot()?;
-    let expected = std::f64::consts::FRAC_1_SQRT_2;
-    assert_eq!((state.nrows(), state.ncols()), (4, 1));
-    for (row, expected_re) in [expected, 0.0, 0.0, expected].into_iter().enumerate() {{
-        assert!((state[(row, 0)].re - expected_re).abs() < 1e-12);
-        assert!(state[(row, 0)].im.abs() < 1e-12);
+    let cloned = register.try_clone()?;
+    check_deployment(cloned.deployment(), false, gpu, threads);
+    let expected = [(std::f64::consts::FRAC_1_SQRT_2, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, std::f64::consts::FRAC_1_SQRT_2)];
+    for state in [register.snapshot()?, cloned.snapshot()?] {{
+        assert_eq!((state.nrows(), state.ncols()), (4, 1));
+        for (row, (re, im)) in expected.into_iter().enumerate() {{
+            assert!((state[(row, 0)].re - re).abs() < 1e-12);
+            assert!((state[(row, 0)].im - im).abs() < 1e-12);
+        }}
     }}
+    assert!((register.total_probability()? - 1.0).abs() < 1e-12);
+    assert!((cloned.total_probability()? - 1.0).abs() < 1e-12);
+    let density = register.to_density()?;
+    let density_clone = density.try_clone()?;
+    for matrix in [density.snapshot()?, density_clone.snapshot()?] {{
+        assert_eq!((matrix.nrows(), matrix.ncols()), (4, 4));
+        for row in 0..4 {{
+            for col in 0..4 {{
+                let (ar, ai) = expected[row];
+                let (br, bi) = expected[col];
+                let re = ar * br + ai * bi;
+                let im = ai * br - ar * bi;
+                assert!((matrix[(row, col)].re - re).abs() < 1e-12);
+                assert!((matrix[(row, col)].im - im).abs() < 1e-12);
+            }}
+        }}
+    }}
+    for item in [&density, &density_clone] {{
+        check_deployment(item.deployment(), true, gpu, threads);
+        assert!((item.total_probability()? - 1.0).abs() < 1e-12);
+    }}
+    println!("mode={{mode}}; statevector and density clones checked");
     Ok(())
 }}
-"
+
+fn check_deployment(actual: {crate_name}::RegisterDeployment, density: bool, gpu: bool, threads: bool) {{
+    assert_eq!(actual.is_density_matrix(), density);
+    assert_eq!(actual.is_gpu_accelerated(), gpu);
+    assert_eq!(actual.is_multithreaded(), threads);
+    assert!(!actual.is_distributed());
+    assert_eq!(actual.width(), 2);
+    assert_eq!(actual.nodes(), 1);
+    assert_eq!(actual.rank(), 0);
+    assert_eq!(actual.local_amplitudes(), if density {{ 16 }} else {{ 4 }});
+}}
+"#
     )
 }
 
-const DIRECT_SOURCE: &str = r"fn main() -> Result<(), Box<dyn std::error::Error>> {
-    quest_sys::init_custom_quest_env(false, false, false)?;
-    let mut register = quest_sys::create_qureg(2)?;
-    quest_sys::init_zero_state(register.pin_mut())?;
-    quest_sys::apply_hadamard(register.pin_mut(), 0)?;
-    quest_sys::apply_controlled_pauli_x(register.pin_mut(), 0, 1)?;
-    let expected = std::f64::consts::FRAC_1_SQRT_2;
-    for (index, expected_re) in [expected, 0.0, 0.0, expected].into_iter().enumerate() {
-        let amplitude = quest_sys::get_qureg_amp(&register, i64::try_from(index)?)?;
-        assert!((amplitude.re - expected_re).abs() < 1e-12);
-        assert!(amplitude.im.abs() < 1e-12);
+const DIRECT_CLONE_CHECK: &str = r"    let clone = quest_sys::create_clone_qureg(&register)?;
+    assert_eq!(quest_sys::get_qureg_deployment(&clone)?, deployment);
+    for row in 0..16 {
+        for col in 0..if density { 16 } else { 1 } {
+            let original = if density {
+                quest_sys::get_density_qureg_amp(&register, row, col)?
+            } else {
+                quest_sys::get_qureg_amp(&register, row)?
+            };
+            let copied = if density {
+                quest_sys::get_density_qureg_amp(&clone, row, col)?
+            } else {
+                quest_sys::get_qureg_amp(&clone, row)?
+            };
+            assert!((copied.re - original.re).abs() < 1e-12);
+            assert!((copied.im - original.im).abs() < 1e-12);
+        }
     }
-    drop(register);
-    quest_sys::finalize_quest_env()?;
-    Ok(())
-}
+    assert!((quest_sys::calc_total_prob(&clone)? - 1.0).abs() < 1e-12);
+    drop(clone);
 ";
 
 #[cfg(target_os = "linux")]
@@ -385,6 +532,7 @@ fn inspect_macho(
     fixture: &str,
     executable: &Path,
     package: &quest_build::NativePackage,
+    backend: Backend,
 ) -> Result<(), DynError> {
     let mut load_commands = Command::new("otool");
     load_commands.arg("-l").arg(executable).current_dir(work);
@@ -438,7 +586,10 @@ fn inspect_macho(
     )?;
 
     let mut diagnostic = Command::new(executable);
-    diagnostic.current_dir(work);
+    diagnostic.current_dir(work).arg(backend.as_str());
+    if fixture == "direct" {
+        diagnostic.arg("sv");
+    }
     clean_loader_environment(&mut diagnostic);
     diagnostic.env("DYLD_PRINT_LIBRARIES", "1");
     let loaded = run_captured(
@@ -796,13 +947,16 @@ mod tests {
         expect_that!(names, len(eq(5)));
 
         let direct = fs::read_to_string(fixture.join("direct/src/main.rs")).or_fail()?;
+        let modes = fs::read_to_string(fixture.join("direct/src/bin/native-modes.rs")).or_fail()?;
         let facade = fs::read_to_string(fixture.join("facade/src/main.rs")).or_fail()?;
         let wrapped = fs::read_to_string(fixture.join("wrapped/Cargo.toml")).or_fail()?;
         let renamed = fs::read_to_string(fixture.join("renamed/Cargo.toml")).or_fail()?;
         expect_that!(
             direct,
-            contains_substring("quest_sys::init_custom_quest_env(false, false, false)")
+            contains_substring("quest_sys::create_custom_qureg(")
         );
+        expect_that!(direct, contains_substring("create_clone_qureg"));
+        expect_that!(modes, contains_substring("is_multithreaded"));
         expect_that!(facade, contains_substring("prepare_structured"));
         expect_that!(wrapped, contains_substring("quest-consumer-wrapper"));
         verify_that!(renamed, contains_substring("package = \"quest-rs\""))

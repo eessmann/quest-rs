@@ -2,12 +2,24 @@ use crate::error::BackendResult;
 use crate::{DensityMatrix, Error, MemoryBudget, QubitCount, Register, Result, StateVector};
 use std::{cell::Cell, fmt, marker::PhantomData, rc::Rc};
 
-/// Selection of native environment features.
+/// Selection of native environment and per-register GPU or threading modes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ExecutionMode {
+    /// Let `QuEST` choose each register's deployment using its native thresholds.
     Auto,
+    /// Require this feature for the environment and each register.
     Enabled,
+    /// Disable this feature for the environment and each register.
     Disabled,
+}
+impl ExecutionMode {
+    const fn native_flag(self) -> i32 {
+        match self {
+            Self::Auto => -1,
+            Self::Enabled => 1,
+            Self::Disabled => 0,
+        }
+    }
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[expect(
@@ -38,11 +50,15 @@ impl Default for EnvironmentBuilder {
     }
 }
 impl EnvironmentBuilder {
+    /// Set GPU use for the environment and all registers. `Auto` lets `QuEST`
+    /// choose each register's actual GPU deployment independently.
     #[must_use]
     pub const fn gpu(mut self, mode: ExecutionMode) -> Self {
         self.gpu = mode;
         self
     }
+    /// Set threading for the environment and all registers. `Auto` lets `QuEST`
+    /// choose each register's actual threading deployment independently.
     #[must_use]
     pub const fn multithreading(mut self, mode: ExecutionMode) -> Self {
         self.threads = mode;
@@ -72,13 +88,12 @@ impl EnvironmentBuilder {
         if self.distribution != ExecutionMode::Disabled {
             return Err(Error::Unsupported("distributed runtime resources"));
         }
-        let native_mode = |mode| match mode {
-            ExecutionMode::Auto => -1,
-            ExecutionMode::Enabled => 1,
-            ExecutionMode::Disabled => 0,
-        };
-        quest_sys::init_custom_quest_env_modes(0, native_mode(self.gpu), native_mode(self.threads))
-            .context("initializing environment")?;
+        quest_sys::init_custom_quest_env_modes(
+            0,
+            self.gpu.native_flag(),
+            self.threads.native_flag(),
+        )
+        .context("initializing environment")?;
         let native = match quest_sys::get_quest_env().context("reading environment") {
             Ok(value) => value,
             Err(error) => {
@@ -89,7 +104,7 @@ impl EnvironmentBuilder {
             }
         };
         Ok(Environment {
-            resources: RuntimeResources::new(native, self.budget),
+            resources: RuntimeResources::new_local(native, self.budget, self.gpu, self.threads),
         })
     }
 }
@@ -116,10 +131,16 @@ pub struct Environment {
 
 pub struct RuntimeResources {
     capabilities: Capabilities,
+    register_modes: RegisterModes,
     budget: MemoryBudget,
     allocated: Cell<usize>,
     seed_storage: Cell<bool>,
     thread: PhantomData<Rc<()>>,
+}
+struct RegisterModes {
+    distribution: i32,
+    gpu: ExecutionMode,
+    threads: ExecutionMode,
 }
 impl Environment {
     #[must_use]
@@ -168,7 +189,11 @@ impl EnvironmentView<'_> {
     }
 }
 impl RuntimeResources {
-    pub(crate) const fn new(native: quest_sys::QuestEnvironment, budget: MemoryBudget) -> Self {
+    const fn new(
+        native: quest_sys::QuestEnvironment,
+        budget: MemoryBudget,
+        register_modes: RegisterModes,
+    ) -> Self {
         Self {
             capabilities: Capabilities {
                 gpu: native.is_gpu_accelerated,
@@ -176,11 +201,58 @@ impl RuntimeResources {
                 distributed: native.is_distributed,
                 cu_quantum: native.is_cu_quantum_enabled,
             },
+            register_modes,
             budget,
             allocated: Cell::new(0),
             seed_storage: Cell::new(false),
             thread: PhantomData,
         }
+    }
+    pub(crate) const fn new_local(
+        native: quest_sys::QuestEnvironment,
+        budget: MemoryBudget,
+        gpu: ExecutionMode,
+        threads: ExecutionMode,
+    ) -> Self {
+        Self::new(
+            native,
+            budget,
+            RegisterModes {
+                distribution: 0,
+                gpu,
+                threads,
+            },
+        )
+    }
+    #[cfg(all(feature = "mpi", quest_native_mpi))]
+    pub(crate) const fn new_collective(
+        native: quest_sys::QuestEnvironment,
+        budget: MemoryBudget,
+    ) -> Self {
+        Self::new(
+            native,
+            budget,
+            RegisterModes {
+                distribution: 1,
+                gpu: if native.is_gpu_accelerated {
+                    ExecutionMode::Enabled
+                } else {
+                    ExecutionMode::Disabled
+                },
+                threads: if native.is_multithreaded {
+                    ExecutionMode::Enabled
+                } else {
+                    ExecutionMode::Disabled
+                },
+            },
+        )
+    }
+    pub(crate) const fn register_allocation_modes(&self) -> (i32, i32, i32) {
+        (
+            self.register_modes.distribution,
+            self.register_modes.gpu.native_flag(),
+            self.register_modes.threads.native_flag(),
+        )
     }
     pub(crate) const fn capabilities(&self) -> Capabilities {
         self.capabilities

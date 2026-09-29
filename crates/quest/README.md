@@ -15,7 +15,7 @@ is **`quest-rs`**, with Rust library name **`quest`**.
 
 ## Build
 
-The workspace pins `nightly-2026-09-06` with rustfmt and Clippy. Install `QuEST`
+The workspace uses rolling `nightly` with rustfmt and Clippy. Install `QuEST`
 **4.3.x**, binary64 precision, deprecated APIs disabled, plus `CMake` and a C++20
 compiler. The tested native build recipe currently supports Linux GNU targets.
 Pure circuit and macro builds need neither `QuEST` nor libclang nor external BLAS.

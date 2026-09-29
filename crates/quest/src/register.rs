@@ -177,20 +177,14 @@ impl<'env, K: RegisterKind> Register<'env, K> {
         reservation: Reservation<'env>,
         count: QubitCount,
     ) -> Result<Self> {
-        let native = if reservation.environment.capabilities().distributed {
-            let caps = reservation.environment.capabilities();
-            quest_sys::create_custom_qureg(
-                count.native(),
-                i32::from(K::DENSITY),
-                1,
-                i32::from(caps.gpu),
-                i32::from(caps.multithreaded),
-            )
-        } else if K::DENSITY {
-            quest_sys::create_density_qureg(count.native())
-        } else {
-            quest_sys::create_qureg(count.native())
-        }
+        let (distribution, gpu, threads) = reservation.environment.register_allocation_modes();
+        let native = quest_sys::create_custom_qureg(
+            count.native(),
+            i32::from(K::DENSITY),
+            distribution,
+            gpu,
+            threads,
+        )
         .context("allocating register")?;
         let deployment = RegisterDeployment::from_native(
             quest_sys::get_qureg_deployment(&native).context("reading register deployment")?,
@@ -412,8 +406,8 @@ impl<'env> Register<'env, StateVector> {
     /// Rejects resource limits or native state transfer failure.
     pub fn to_density(&self) -> Result<Register<'env, DensityMatrix>> {
         let mut density = self.resources().density_matrix(self.count)?;
-        let values = self.amplitudes(0, self.dimension())?;
-        density.init_pure(&values)?;
+        quest_sys::init_pure_state(density.pin(), &self.native)
+            .context("initializing density from pure state")?;
         Ok(density)
     }
     #[cfg(feature = "ndarray")]

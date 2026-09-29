@@ -147,6 +147,69 @@ mod tests {
         expect_true!(flag_paths(b"-L", "-L").is_err());
         Ok(())
     }
+    #[cfg(target_os = "linux")]
+    #[gtest]
+    fn linux_hdf5_selection_matches_dependency_layouts() -> googletest::Result<()> {
+        if env::var_os("QUEST_HDF5_LINUX_CHILD").is_some() {
+            emit_serial_hdf5_runtime_paths()?;
+            return Ok(());
+        }
+        let directory = tempfile::tempdir()?;
+        for (layout, explicit, succeeds) in [
+            ("lib", true, true),
+            ("bin", true, true),
+            ("lib64", true, false),
+            ("lib64", false, true),
+        ] {
+            let root = directory
+                .path()
+                .join(format!("serial hdf5 {layout} {explicit}"));
+            fs::create_dir_all(root.join("include"))?;
+            fs::create_dir_all(root.join(layout))?;
+            fs::create_dir_all(root.join("pkgconfig"))?;
+            fs::write(root.join("include/H5pubconf.h"), "/* serial */")?;
+            fs::write(root.join(layout).join("libhdf5.so"), "fixture")?;
+            fs::write(
+                root.join("pkgconfig/hdf5.pc"),
+                format!(
+                    "prefix={}\nName: HDF5\nDescription: serial layout fixture\nVersion: 1.10.7\nLibs: -L\"${{prefix}}/{layout}\" -lhdf5\nCflags: -I\"${{prefix}}/include\"\n",
+                    root.display()
+                ),
+            )?;
+            let mut command = Command::new(env::current_exe()?);
+            command
+                .args([
+                    "--exact",
+                    "hdf5::tests::linux_hdf5_selection_matches_dependency_layouts",
+                    "--nocapture",
+                ])
+                .env("QUEST_HDF5_LINUX_CHILD", "1")
+                .env("CARGO_CFG_TARGET_OS", "linux")
+                .env("PKG_CONFIG", "pkg-config")
+                .env("PKG_CONFIG_LIBDIR", root.join("pkgconfig"))
+                .env_remove("PKG_CONFIG_PATH")
+                .env_remove("PKG_CONFIG_SYSROOT_DIR")
+                .env_remove("HDF5_DIR");
+            if explicit {
+                command.env("HDF5_DIR", &root);
+            }
+            let output = command.output()?;
+            expect_eq!(
+                output.status.success(),
+                succeeds,
+                "layout={layout}, explicit={explicit}: {} {}",
+                String::from_utf8_lossy(&output.stdout),
+                String::from_utf8_lossy(&output.stderr)
+            );
+            if succeeds {
+                expect_that!(
+                    String::from_utf8_lossy(&output.stdout),
+                    contains_substring(format!("-Wl,-rpath,{}/{layout}", root.display()))
+                );
+            }
+        }
+        Ok(())
+    }
     #[gtest]
     fn darwin_serial_hdf5_emits_a_direct_dylib_runtime_path() -> googletest::Result<()> {
         if env::var_os("QUEST_HDF5_DARWIN_CHILD").is_some() {

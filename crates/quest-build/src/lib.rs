@@ -139,6 +139,13 @@ fn watch_environment() {
         "CMAKE",
         "CMAKE_GENERATOR",
         "CMAKE_TOOLCHAIN_FILE",
+        // CMake package dependencies and compiler lookup share this environment
+        // across discovery, bridge compilation, and final-target build scripts.
+        "CUDAToolkit_ROOT",
+        "CUDATOOLKIT_ROOT",
+        "CUDA_PATH",
+        "CUQUANTUM_ROOT",
+        "PATH",
         "CXX",
         "CXXFLAGS",
         "CC",

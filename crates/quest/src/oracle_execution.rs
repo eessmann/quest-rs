@@ -2,7 +2,8 @@
 use crate::{
     Error, Register, RegisterKind, Result,
     execution::{
-        NativeControls, NativeMatrix, apply_gate, execute_matrix, phase, prepare_numerical,
+        MatrixCacheKey, NativeControls, NativeMatrix, apply_gate, execute_matrix, matrix_cache_key,
+        phase, prepare_numerical,
     },
     values::reserve_vec,
 };
@@ -306,13 +307,9 @@ impl OracleInventory {
                                     .ok_or(Error::Overflow)?,
                             )
                             .ok_or(Error::Overflow)?;
-                        let key = (
-                            matrix.view().as_ptr().addr(),
-                            profile
-                                .iter()
-                                .copied()
-                                .chain(states(controls))
-                                .collect::<Vec<_>>(),
+                        let key = matrix_cache_key(
+                            matrix,
+                            profile.iter().copied().chain(states(controls)),
                         );
                         if !seen_matrices.insert(key) {
                             continue;
@@ -475,7 +472,7 @@ fn prepare_operation(
     profiles: &BTreeMap<Vec<bool>, usize>,
     inventory: &OracleInventory,
     matrices: &mut Vec<NativeMatrix>,
-    cache: &mut BTreeMap<(usize, Vec<bool>), usize>,
+    cache: &mut BTreeMap<MatrixCacheKey, usize>,
 ) -> Result<OracleOp> {
     let targets =
         |targets: &[quest_circuit::QubitId]| targets.iter().map(|target| target.index()).collect();
@@ -515,7 +512,7 @@ fn prepare_operation(
                     .copied()
                     .chain(states(controls))
                     .collect::<Vec<_>>();
-                let key = (matrix.view().as_ptr().addr(), profile.clone());
+                let key = matrix_cache_key(matrix, profile.iter().copied());
                 let index = if let Some(index) = cache.get(&key) {
                     *index
                 } else {

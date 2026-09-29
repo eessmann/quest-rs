@@ -30,8 +30,9 @@ and optimization certificates. The runnable source is
 
 ## Build
 
-The workspace pins `nightly-2026-09-06` with rustfmt, Clippy and Rust sources
-for reproducible compile-fail diagnostics. Native
+The workspace uses rolling `nightly` with rustfmt, Clippy and Rust sources.
+Record `rustc -Vv` with validation results; compile-fail diagnostics can change
+when nightly advances. Native
 recipes target Linux GNU and aarch64/x86_64 Darwin. Each architecture needs its
 own build and runtime validation; Nix evaluation alone is not that evidence.
 The bridge requires CMake 3.28+, a C++20 compiler, QuEST 4.3.x with binary64
@@ -39,7 +40,7 @@ precision and deprecated APIs disabled. Pure circuit and macro builds need
 neither QuEST nor libclang nor external BLAS. The full workspace also builds
 the QSVT application and requires **serial HDF5**; parallel HDF5 is rejected.
 
-The standalone [devenv](devenv.nix) provisions the pinned Rust toolchain,
+The standalone [devenv](devenv.nix) provisions the configured Rust toolchain,
 compiler, CMake, libclang, serial HDF5 and an installed shared CPU/OpenMP QuEST
 package without MPI or GPU. Its inputs are pinned in `devenv.lock`, including
 `eessmann/QuEST`'s `cmake-packaging` source at commit `5035520`. From the
@@ -65,6 +66,11 @@ export HDF5_DIR=/path/to/installed/serial-hdf5
 cargo build --workspace --locked
 cargo run --locked --example minimal
 ```
+
+For ARM64 Grace Hopper nodes using manual/Spack dependencies, follow the
+[no-Nix setup and GPU validation recipe](docs/grace-hopper.md). Select the
+matching Rust linker when Spack's GCC differs from the system `cc`. Serial HDF5
+can also be selected through its `hdf5` pkg-config entry without `HDF5_DIR`.
 
 For just the facade and its default examples, use `cargo build -p quest-rs --locked`;
 that package does not require HDF5. The installed package must export
@@ -231,7 +237,9 @@ bridge use retains lifecycle and native validation checks too. Pure Rust matrix
 payloads and owned snapshots remain independent of the environment lifetime.
 
 CPU execution without native multithreading is the default. GPU and threading
-are explicit choices. `MemoryBudget` bounds admission with conservative host,
+are explicit choices: `ExecutionMode::Enabled` requires that mode for allocated
+registers, `Disabled` prevents it, and `Auto` uses QuEST's size thresholds.
+`MemoryBudget` bounds admission with conservative host,
 device and scratch estimates. Returned snapshots belong to the caller and leave
 facade accounting. Direct `quest-sys` calls are outside facade memory accounting.
 

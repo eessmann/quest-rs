@@ -1,6 +1,6 @@
 # Build and validate the tutorials
 
-Use the repository's pinned `nightly-2026-09-06`. Pure compiler tests need no native QuEST installation:
+Use the repository's rolling `nightly` and record `rustc -Vv` with results. Pure compiler tests need no native QuEST installation:
 
 ```sh
 cargo test -p quest-circuit --test tutorials --locked
@@ -10,15 +10,15 @@ cargo test -p quest-qasm --locked
 
 Native examples need CMake 3.28+, a C++20 compiler and an installed QuEST
 4.3.x package with binary64 precision and deprecated APIs disabled. From the
-repository root, `devenv shell` supplies the pinned toolchain and a shared
+repository root, `devenv shell` supplies the configured toolchain and a shared
 CPU/OpenMP QuEST package; `devenv build outputs.quest` builds that package, and
 `devenv test` runs the minimal native example. The full workspace also uses the
 shell's serial HDF5. The native recipes target Linux GNU and aarch64/x86_64
 Darwin; each architecture needs separate runtime validation.
 
 For a manual installation, set `QUEST_ROOT` to a package exporting
-`QuEST::QuEST` whose native dependencies resolve, and set `HDF5_DIR` for the
-full workspace. The repository root README describes CMake selection and the
+`QuEST::QuEST` whose native dependencies resolve, and select serial HDF5 through
+pkg-config or `HDF5_DIR` for the full workspace. The repository root README describes CMake selection and the
 final-executable link helper. Once configured:
 
 ```sh

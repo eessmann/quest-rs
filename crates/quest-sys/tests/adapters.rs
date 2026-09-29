@@ -236,3 +236,49 @@ fn numerical_fingerprint_detects_ambient_simd_changes() -> googletest::Result<()
         Ok(())
     })
 }
+
+#[cfg(target_arch = "aarch64")]
+#[gtest]
+fn numerical_fingerprint_detects_ambient_fpcr_policy() -> googletest::Result<()> {
+    isolated("numerical_fingerprint_detects_ambient_fpcr_policy", || {
+        struct Restore(u64);
+        impl Drop for Restore {
+            fn drop(&mut self) {
+                // SAFETY: FPCR belongs to this test thread. The saved value
+                // includes every implementation-defined and reserved bit.
+                unsafe {
+                    core::arch::asm!("msr fpcr, {value}", value = in(reg) self.0);
+                }
+            }
+        }
+
+        quest_sys::init_custom_quest_env(false, false, false)?;
+        let before = quest_sys::get_numerical_fingerprint()?;
+        {
+            let original: u64;
+            // SAFETY: Reading this thread's FPCR has no memory side effects.
+            unsafe {
+                core::arch::asm!("mrs {value}, fpcr", value = out(reg) original);
+            }
+            let _restore = Restore(original);
+            // AArch64 defines FZ and RMode on every implementation. Changing
+            // only these bits also preserves optional FEAT_AFP controls.
+            let changed_word = original ^ (1_u64 << 24) ^ (1_u64 << 22);
+            // SAFETY: Only architected FZ and RMode bits are modified, and
+            // Restore reinstates the original word on every exit path.
+            unsafe {
+                core::arch::asm!("msr fpcr, {value}", value = in(reg) changed_word);
+            }
+            let changed = quest_sys::get_numerical_fingerprint()?;
+            expect_that!(changed.flush_to_zero, eq(!before.flush_to_zero));
+            expect_that!(
+                changed.simd_control,
+                eq(before.simd_control ^ ((1_u64 << 24) | (1_u64 << 22)))
+            );
+            expect_that!(changed, not(eq(before)));
+        }
+        expect_that!(quest_sys::get_numerical_fingerprint()?, eq(before));
+        quest_sys::finalize_quest_env()?;
+        Ok(())
+    })
+}

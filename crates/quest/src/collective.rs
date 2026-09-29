@@ -88,7 +88,7 @@ impl<'comm, 'runtime> CollectiveEnvironmentBuilder<'comm, 'runtime> {
             fatal(|| quest_sys::get_quest_env().context("reading collective environment"));
         Ok(CollectiveEnvironment {
             _native: native,
-            resources: RuntimeResources::new(snapshot, self.budget),
+            resources: RuntimeResources::new_collective(snapshot, self.budget),
             communicator: self.communicator,
             next_id: Cell::new(0),
         })

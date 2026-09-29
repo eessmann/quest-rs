@@ -27,6 +27,12 @@ compiler implicit system includes. Global `CXX` can select a Nix compiler wrappe
 per-target compiler and header-search overrides remain rejected. Compiler target
 checks normalize Clang `arm64` to Rust `aarch64` on Darwin.
 
+For manual/Spack Linux builds, select a Rust target linker from the same GCC
+installation as `CXX`; loading Spack's `gcc` may leave the system `cc` unchanged.
+The [Grace Hopper recipe](../../docs/grace-hopper.md) includes this setting.
+Native dependency roots (`CUDAToolkit_ROOT`, `CUDATOOLKIT_ROOT`, `CUDA_PATH`,
+`CUQUANTUM_ROOT`) and compiler lookup through `PATH` are tracked Cargo inputs.
+
 CXX generates the bridge sources; `cmake` builds a static C++20 archive linked
 against `QuEST::QuEST`. This lets CMake evaluate compile features, system includes,
 conditional flags and imported dependencies. One CMake configure selects and
@@ -94,6 +100,10 @@ silently changing link semantics.
 ```sh
 cargo run --locked -p xtask -- check-native-consumers
 ```
+
+Use `--backends cpu,omp,gpu` to require and execute all three backends in fresh
+processes, including actual state-vector/density placement and clone checks.
+The default remains `cpu`; a requested unavailable backend fails.
 
 The Rust harness builds an independent workspace containing direct `quest-sys`,
 facade, wrapped and renamed consumers. It inspects platform loader metadata and resolved

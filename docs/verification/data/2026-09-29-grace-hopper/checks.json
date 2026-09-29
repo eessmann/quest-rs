@@ -1,0 +1,279 @@
+{
+  "date": "2026-09-29",
+  "host": "gh02",
+  "target": "aarch64-unknown-linux-gnu",
+  "base_commit": "7f0f684",
+  "checks": [
+    {
+      "name": "build-default",
+      "command": [
+        "cargo",
+        "build",
+        "--workspace",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 14.57
+    },
+    {
+      "name": "nextest-default",
+      "command": [
+        "cargo",
+        "nextest",
+        "run",
+        "--workspace",
+        "--locked",
+        "--no-fail-fast"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 67.35,
+      "result": {
+        "passed": 712,
+        "skipped": 1
+      }
+    },
+    {
+      "name": "doctests-default",
+      "command": [
+        "cargo",
+        "test",
+        "--doc",
+        "--workspace",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.46,
+      "result": {
+        "passed": 47,
+        "ignored": 1
+      }
+    },
+    {
+      "name": "build-features",
+      "command": [
+        "cargo",
+        "build",
+        "--workspace",
+        "--locked",
+        "--features",
+        "quest-rs/qsvt,quest-rs/ndarray,quest-rs/workers,quest-rs/serde,quest-rs/codespan-reporting,quest-qsvt-cli/offline-synthesis,quest-qsvt-cli/rayon,quest-qsp/simd,quest-optimizer-worker/synthesis,quest-optimizer-worker/zx,quest-optimizer-worker/mitm"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 20.59
+    },
+    {
+      "name": "nextest-features",
+      "command": [
+        "cargo",
+        "nextest",
+        "run",
+        "--workspace",
+        "--locked",
+        "--no-fail-fast",
+        "--features",
+        "quest-rs/qsvt,quest-rs/ndarray,quest-rs/workers,quest-rs/serde,quest-rs/codespan-reporting,quest-qsvt-cli/offline-synthesis,quest-qsvt-cli/rayon,quest-qsp/simd,quest-optimizer-worker/synthesis,quest-optimizer-worker/zx,quest-optimizer-worker/mitm"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 60.46,
+      "result": {
+        "passed": 800,
+        "skipped": 3
+      }
+    },
+    {
+      "name": "doctests-features",
+      "command": [
+        "cargo",
+        "test",
+        "--doc",
+        "--workspace",
+        "--locked",
+        "--features",
+        "quest-rs/qsvt,quest-rs/ndarray,quest-rs/workers,quest-rs/serde,quest-rs/codespan-reporting,quest-qsvt-cli/offline-synthesis,quest-qsvt-cli/rayon,quest-qsp/simd,quest-optimizer-worker/synthesis,quest-optimizer-worker/zx,quest-optimizer-worker/mitm"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 7.25,
+      "result": {
+        "passed": 49,
+        "ignored": 1
+      }
+    },
+    {
+      "name": "clippy-features",
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--locked",
+        "--features",
+        "quest-rs/qsvt,quest-rs/ndarray,quest-rs/workers,quest-rs/serde,quest-rs/codespan-reporting,quest-qsvt-cli/offline-synthesis,quest-qsvt-cli/rayon,quest-qsp/simd,quest-optimizer-worker/synthesis,quest-optimizer-worker/zx,quest-optimizer-worker/mitm",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 17.8
+    },
+    {
+      "name": "format",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.95
+    },
+    {
+      "name": "clippy-default",
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "bindings",
+      "command": [
+        "cargo",
+        "run",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "generate-quest-bindings",
+        "--check"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "native-consumers",
+      "command": [
+        "cargo",
+        "run",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "check-native-consumers",
+        "--backends",
+        "cpu,omp,gpu",
+        "--work-dir",
+        "/work/erich/Projects/quest-rs/target/grace-hopper-consumers-final"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "register-cpu",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "quest-rs",
+        "--test",
+        "register_modes",
+        "--locked",
+        "--quiet"
+      ],
+      "environment": {
+        "QUEST_REGISTER_TEST_MODE": null
+      },
+      "exit_code": 0,
+      "evidence": "register-modes task report; executed independently in fresh processes"
+    },
+    {
+      "name": "register-threads",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "quest-rs",
+        "--test",
+        "register_modes",
+        "--locked",
+        "--quiet"
+      ],
+      "environment": {
+        "QUEST_REGISTER_TEST_MODE": "threads"
+      },
+      "exit_code": 0,
+      "evidence": "register-modes task report; executed independently in fresh processes"
+    },
+    {
+      "name": "register-gpu",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "quest-rs",
+        "--test",
+        "register_modes",
+        "--locked",
+        "--quiet"
+      ],
+      "environment": {
+        "QUEST_REGISTER_TEST_MODE": "gpu"
+      },
+      "exit_code": 0,
+      "evidence": "register-modes task report; executed independently in fresh processes"
+    },
+    {
+      "name": "register-auto",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "quest-rs",
+        "--test",
+        "register_modes",
+        "--locked",
+        "--quiet"
+      ],
+      "environment": {
+        "QUEST_REGISTER_TEST_MODE": "auto"
+      },
+      "exit_code": 0,
+      "evidence": "register-modes task report; executed independently in fresh processes"
+    },
+    {
+      "command": [
+        "/work/erich/Projects/quest-rs/target/grace-hopper-consumers-final/target/debug/quest-consumer-direct",
+        "gpu",
+        "sv"
+      ],
+      "exit_code": 1,
+      "expected": "nonzero; requested GPU unavailable",
+      "name": "unavailable-gpu-direct",
+      "environment": {
+        "CUDA_VISIBLE_DEVICES": "",
+        "LD_LIBRARY_PATH": null,
+        "LD_PRELOAD": null,
+        "LD_AUDIT": null
+      }
+    },
+    {
+      "command": [
+        "/work/erich/Projects/quest-rs/target/grace-hopper-consumers-final/target/debug/quest-consumer-facade",
+        "gpu"
+      ],
+      "exit_code": 1,
+      "expected": "nonzero; requested GPU unavailable",
+      "name": "unavailable-gpu-facade",
+      "environment": {
+        "CUDA_VISIBLE_DEVICES": "",
+        "LD_LIBRARY_PATH": null,
+        "LD_PRELOAD": null,
+        "LD_AUDIT": null
+      }
+    }
+  ]
+}

@@ -549,17 +549,13 @@ impl Compiler {
         self.region = id;
         self.switch_block(region.entry)?;
         self.loops.clear();
-        let constants = self
-            .scopes
-            .first()
-            .map(|scope| {
-                scope
-                    .iter()
-                    .filter(|(_, binding)| binding.constant.is_some())
-                    .map(|(name, binding)| (name.clone(), binding.clone()))
-                    .collect()
-            })
-            .unwrap_or_default();
+        let constants = self.scopes.first().map_or_default(|scope| {
+            scope
+                .iter()
+                .filter(|(_, binding)| binding.constant.is_some())
+                .map(|(name, binding)| (name.clone(), binding.clone()))
+                .collect()
+        });
         self.scopes = vec![constants, BTreeMap::new()];
         for parameter in &region.parameters {
             let slot = self

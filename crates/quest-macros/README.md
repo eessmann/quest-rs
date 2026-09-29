@@ -12,7 +12,7 @@ source spans. Rust interpolations are evaluated once in source order and pass
 through the same finite-value admission as ordinary builder calls.
 
 Emitted operations retain the compiler's display filename and original keyword
-byte range through `SourceSpan`. The pinned nightly compiler's
+byte range through `SourceSpan`. The nightly compiler's
 `proc_macro_span` feature provides those offsets. Filenames honor path remapping;
 no source files or stringified tokens are read during expansion. Locations do
 not include a complete expansion stack.

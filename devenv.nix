@@ -16,7 +16,7 @@ in
   languages.rust = {
     enable = true;
     toolchainFile = ./rust-toolchain.toml;
-    # The pinned minimal toolchain does not request rust-analyzer.
+    # Editor integration is managed separately from the configured toolchain.
     lsp.enable = false;
   };
   languages.c.enable = false;

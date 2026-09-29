@@ -17,7 +17,9 @@ fn main() -> Result<()> {
 fn run() -> Result<(), generate::DynError> {
     match parse_command(env::args_os().skip(1))? {
         CommandKind::GenerateQuestBindings { check } => generate::run(check),
-        CommandKind::CheckNativeConsumers { work_dir } => native_consumers::run(work_dir),
+        CommandKind::CheckNativeConsumers { work_dir, backends } => {
+            native_consumers::run(work_dir, &backends)
+        }
         CommandKind::GenerateQsvtCatalog { source, check } => qsvt_catalog::run(&source, check),
         CommandKind::Help => {
             eprintln!("{USAGE}");
@@ -26,13 +28,21 @@ fn run() -> Result<(), generate::DynError> {
     }
 }
 
-const USAGE: &str = "usage: cargo run -p xtask -- generate-quest-bindings [--check]\n       cargo run -p xtask -- check-native-consumers [--work-dir PATH]\n       cargo run -p xtask -- generate-qsvt-catalog --source CPP_REPOSITORY [--check]";
+const USAGE: &str = "usage: cargo run -p xtask -- generate-quest-bindings [--check]\n       cargo run -p xtask -- check-native-consumers [--work-dir PATH] [--backends cpu,omp,gpu]\n       cargo run -p xtask -- generate-qsvt-catalog --source CPP_REPOSITORY [--check]";
 
 #[derive(Debug, Eq, PartialEq)]
 enum CommandKind {
-    GenerateQuestBindings { check: bool },
-    CheckNativeConsumers { work_dir: Option<PathBuf> },
-    GenerateQsvtCatalog { source: PathBuf, check: bool },
+    GenerateQuestBindings {
+        check: bool,
+    },
+    CheckNativeConsumers {
+        work_dir: Option<PathBuf>,
+        backends: Vec<native_consumers::Backend>,
+    },
+    GenerateQsvtCatalog {
+        source: PathBuf,
+        check: bool,
+    },
     Help,
 }
 
@@ -76,25 +86,37 @@ fn parse_command(
             )
             .into()),
         },
-        Some("check-native-consumers") => match arguments.next().as_deref() {
-            None => Ok(CommandKind::CheckNativeConsumers { work_dir: None }),
-            Some(argument) if argument == "--work-dir" => {
-                let work_dir = arguments
-                    .next()
-                    .ok_or_else(|| format!("--work-dir requires a path\n{USAGE}"))?;
-                if arguments.next().is_some() {
-                    return Err(format!("unexpected trailing arguments\n{USAGE}").into());
+        Some("check-native-consumers") => {
+            let mut work_dir = None;
+            let mut backends = None;
+            while let Some(argument) = arguments.next() {
+                if argument == "--work-dir" {
+                    if work_dir.is_some() {
+                        return Err("duplicate --work-dir option".into());
+                    }
+                    work_dir = Some(PathBuf::from(
+                        arguments.next().ok_or("--work-dir requires a path")?,
+                    ));
+                } else if argument == "--backends" {
+                    if backends.is_some() {
+                        return Err("duplicate --backends option".into());
+                    }
+                    let value = arguments.next().ok_or("--backends requires a list")?;
+                    let value = value.to_str().ok_or("backend list is not valid UTF-8")?;
+                    backends = Some(native_consumers::parse_backends(value)?);
+                } else {
+                    return Err(format!(
+                        "unexpected check-native-consumers argument: {}\n{USAGE}",
+                        argument.to_string_lossy()
+                    )
+                    .into());
                 }
-                Ok(CommandKind::CheckNativeConsumers {
-                    work_dir: Some(PathBuf::from(work_dir)),
-                })
             }
-            Some(argument) => Err(format!(
-                "unexpected check-native-consumers argument: {}\n{USAGE}",
-                argument.to_string_lossy()
-            )
-            .into()),
-        },
+            Ok(CommandKind::CheckNativeConsumers {
+                work_dir,
+                backends: backends.unwrap_or_else(|| vec![native_consumers::Backend::Cpu]),
+            })
+        }
         Some(command) => Err(format!("unknown xtask command: {command}\n{USAGE}").into()),
         None => Err(format!("xtask command is not valid UTF-8\n{USAGE}").into()),
     }
@@ -124,6 +146,7 @@ mod tests {
             &command,
             eq(&CommandKind::CheckNativeConsumers {
                 work_dir: Some(PathBuf::from("/tmp/fixture with spaces")),
+                backends: vec![native_consumers::Backend::Cpu],
             })
         )
     }
@@ -139,5 +162,78 @@ mod tests {
 
         expect_that!(configure, err(anything()));
         verify_that!(trailing, err(anything()))
+    }
+
+    #[gtest]
+    fn native_consumers_accept_backend_list_in_either_option_order() -> googletest::Result<()> {
+        for arguments in [
+            [
+                "check-native-consumers",
+                "--backends",
+                "cpu,omp,gpu",
+                "--work-dir",
+                "/tmp/cases",
+            ],
+            [
+                "check-native-consumers",
+                "--work-dir",
+                "/tmp/cases",
+                "--backends",
+                "cpu,omp,gpu",
+            ],
+        ] {
+            let parsed = parse_command(arguments.into_iter().map(OsString::from)).or_fail()?;
+            expect_that!(
+                &parsed,
+                eq(&CommandKind::CheckNativeConsumers {
+                    work_dir: Some(PathBuf::from("/tmp/cases")),
+                    backends: vec![
+                        native_consumers::Backend::Cpu,
+                        native_consumers::Backend::Omp,
+                        native_consumers::Backend::Gpu
+                    ],
+                })
+            );
+        }
+        verify_that!(
+            &parse_command([OsString::from("check-native-consumers")]).or_fail()?,
+            eq(&CommandKind::CheckNativeConsumers {
+                work_dir: None,
+                backends: vec![native_consumers::Backend::Cpu],
+            })
+        )
+    }
+
+    #[gtest]
+    fn native_consumers_reject_invalid_backend_lists() {
+        for value in ["", "cpu,", ",gpu", "cpu,,gpu", "cpu,cpu", "other"] {
+            let parsed = parse_command(
+                ["check-native-consumers", "--backends", value]
+                    .into_iter()
+                    .map(OsString::from),
+            );
+            expect_that!(parsed, err(anything()));
+        }
+        for arguments in [
+            [
+                "check-native-consumers",
+                "--backends",
+                "cpu",
+                "--backends",
+                "gpu",
+            ],
+            [
+                "check-native-consumers",
+                "--work-dir",
+                "first",
+                "--work-dir",
+                "second",
+            ],
+        ] {
+            expect_that!(
+                parse_command(arguments.into_iter().map(OsString::from)),
+                err(anything())
+            );
+        }
     }
 }
