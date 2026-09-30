@@ -1,0 +1,2 @@
+digits,epsilon_bits,gates,t_count,synthesis_and_acceptance_ns,independent_replay_ns,logical_work,working_precision_bits,grid_exponent,modeled_matrix_output_reservation_bytes,request_max_bytes,seed
+3,4562254508917369340,81,32,243995125,221917,1195227,256,18,815104,67108864,0

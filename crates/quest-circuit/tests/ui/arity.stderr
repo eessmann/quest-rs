@@ -1,4 +1,4 @@
-error: cx expects 2 qubit operands with these modifiers, received 1
+error: gate operand arity mismatch
  --> tests/ui/arity.rs:2:38
   |
 2 | fn main(){let _=circuit!{qubit[2] q; cx q[0];};}

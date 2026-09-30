@@ -1,0 +1,16 @@
+[package]
+name = "quest-synthesis"
+version = "0.1.0"
+description = "Bounded paper-derived Clifford+T synthesis with independent certificates"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+quest-math.workspace = true
+num-bigint.workspace = true
+num-traits.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true

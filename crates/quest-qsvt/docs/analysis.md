@@ -20,7 +20,7 @@ mathematical fact. A separate `full_oracle_error(delta, assumption)` describes a
 full-unitary error; a projected-block error never supplies it automatically.
 
 Standard-QSVT reports additionally require `StandardPremises::for_transform(t)`
-and all three named premise groups:
+and three premise groups:
 
 - exact projected-unitary/subspace semantics, the standard extraction, and
   applicability of the supplied source bound;
@@ -32,8 +32,12 @@ These tokens borrow the exact immutable transform. A token for a different
 transform object is rejected, including a content-equivalent clone. The API does
 not accept a synthesis certificate for unrelated or pre-conversion phases.
 Rounded phase shifts do not inherit exact linkage from an earlier payload.
-A caller must establish the premise for the actual frozen transform or leave the
-report uncertified. Numerical observations remain available separately through
+For `certified_standard`, `certified_actual_phase_response()` obtains the
+phase premise from the transform’s immutable converted-phase certificate and
+adds its response error to the bound. Imported phases require the caller’s named
+`assume_actual_phase_response` premise. Encoding and completion assumptions
+remain explicit in either case. Without those premises, leave the report
+uncertified. Numerical observations remain available separately through
 `TransformReport::observations()` and have no conversion into theorem premises.
 
 With those explicit premises, the standard robustness contribution is
@@ -49,9 +53,8 @@ Generalized routes cannot obtain the standard premise type. Their
 `uncertified()` reports retain optional full-oracle query telescoping but expose
 no standard robustness or total theorem bound. The distinction follows the
 separate route setting in [Sünderhauf, Generalized Quantum Singular Value
-Transformation](https://arxiv.org/abs/2312.00723). The legacy
-`ValidatedTransform::theorem_error_bound()` remains `None`: a transform alone
-contains no caller-supplied theorem premises.
+Transformation](https://arxiv.org/abs/2312.00723). A transform alone contains no caller-supplied theorem premises; only an
+explicit analysis report can publish a conditional bound.
 
 The following helper shows the complete standard report transition. It receives
 the source guarantee and mathematical assumptions from its caller; supplying

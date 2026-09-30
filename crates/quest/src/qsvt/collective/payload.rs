@@ -115,7 +115,7 @@ impl Encoder {
                 self.blob(premise.description().as_bytes())?;
             }
         }
-        let mut source = quest_circuit::ProgramBuilder::new(encoding.num_qubits(), 0)?;
+        let mut source = quest_circuit::QuantumRegionBuilder::new(encoding.num_qubits(), 0)?;
         let targets = (0..encoding.num_qubits())
             .map(|q| source.qubit(q))
             .collect::<quest_circuit::Result<Vec<_>>>()?;
@@ -172,7 +172,7 @@ impl Encoder {
         }
         Ok(())
     }
-    fn plan(&mut self, plan: &quest_circuit::ExecutablePlan) -> Result<()> {
+    fn plan(&mut self, plan: &quest_circuit::RegionPlan) -> Result<()> {
         // Keep both the temporary plan bytes and retained transform bytes within
         // the same limit, including the append copy while the temporary lives.
         let remaining = self

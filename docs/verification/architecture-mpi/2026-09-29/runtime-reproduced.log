@@ -1,0 +1,34 @@
+• Running devenv:files:cleanup
+✓ Running devenv:files:cleanup in 34.7ms
+• Running devenv:enterShell
+✓ Running devenv:enterShell in 47.4ms
+• Running devenv:enterTest
+✓ Running devenv:enterTest in 500ns (no command)
+   Compiling quest-math v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-math)
+   Compiling quest-language v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-language)
+   Compiling quest-sys v0.2.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-sys)
+   Compiling quest-synthesis v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-synthesis)
+   Compiling quest-optimizer-protocol v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-optimizer-protocol)
+   Compiling quest-optimizer-client v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-optimizer-client)
+   Compiling quest-qasm v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-qasm)
+   Compiling quest-compile v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-compile)
+   Compiling quest-macros v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-macros)
+   Compiling quest-circuit v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-circuit)
+   Compiling quest-qsvt v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-qsvt)
+warning: quest-sys@0.2.0: Using QuEST 4.3.0 from /nix/store/9zfxh0j6dngfdaj972bxfcd9mm44cnjc-quest-mpi-validation-4.3.0 with /nix/store/2yfrcmkvspsrjhj283gdawqp37aghxva-clang-wrapper-21.1.8/bin/clang++
+warning: quest-sys@0.2.0: Verified rsmpi MPICC /nix/store/rdalrrvgqig1hz05ma3j8ws07fnc8s6l-openmpi-5.0.10-dev/bin/mpicc matches QuEST MPI ABI and loaded library
+   Compiling quest-rs v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 29.56s
+     Running tests/collective_runtime.rs (/tmp/quest-architecture-mpi/debug/build/quest-rs/2e1585474fd2d1e6/out/collective_runtime-2e1585474fd2d1e6)
+
+running 7 tests
+test collective_budget_failure_on_one_rank_precedes_native_allocation ... ok
+test collective_compares_full_semantics_and_prepared_identity ... ok
+test collective_mismatched_payload_and_preflight_recover_together ... ok
+test collective_prepared_bell_oracle_and_projection_preserve_mpi ... ok
+test collective_rejects_different_cache_sharing_before_materialization ... ok
+test collective_rejects_different_classical_results_and_step_counts ... ok
+test collective_subgroups_execute_independent_schedules ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.10s
+

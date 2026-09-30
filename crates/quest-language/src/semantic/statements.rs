@@ -122,6 +122,20 @@ impl Compiler {
                     Ok(())
                 }
             }
+            S::Payload { capture, operands } => {
+                let places = operands
+                    .iter()
+                    .map(|value| self.place(value).map(|binding| binding.place))
+                    .collect::<Result<Vec<_>, _>>()?;
+                self.effect(
+                    K::Payload {
+                        capture: *capture,
+                        places,
+                        memory: self.memory,
+                    },
+                    span,
+                )
+            }
             S::Reset(value) => {
                 let place = self.place(value)?.place;
                 self.effect(

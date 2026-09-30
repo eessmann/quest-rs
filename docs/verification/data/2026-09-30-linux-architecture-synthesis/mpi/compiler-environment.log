@@ -1,0 +1,45 @@
+• Validating lock
+✓ Validating lock in 5.94ms
+  evaluating file '«nix-internal»/derivation-internal.nix'
+• Configuring shell
+• Configuring cachix
+✓ Configuring cachix in 2.04ms
+• Evaluating shell
+✓ Evaluating shell in 4.13ms (cached)
+✓ Configuring shell in 8.15ms
+• Loading tasks
+• Evaluating devenv.config.task.config
+✓ Evaluating devenv.config.task.config in 231µs (cached)
+✓ Loading tasks in 936µs
+• Running tasks
+• Running devenv:files:cleanup
+✓ Running devenv:files:cleanup in 6.12ms
+• Running devenv:enterShell
+✓ Running devenv:enterShell in 5.86ms
+• Running devenv:enterTest
+✓ Running devenv:enterTest in 450ns (no command)
+✓ Running tasks in 12.1ms
+CXX=clang++
+CC=clang
+NIX_CXXSTDLIB_COMPILE=
+/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/clang++
+NIX_CFLAGS_COMPILE_FOR_BUILD= -isystem /nix/store/l472345nc50yyj2sds4qwk45hdrcrmrf-bash-interactive-5.3p15-dev/include -fmacro-prefix-map=/nix/store/l472345nc50yyj2sds4qwk45hdrcrmrf-bash-interactive-5.3p15-dev=/nix/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-bash-interactive-5.3p15-dev -isystem /nix/store/did4j5wk64y2g930gp8f2bppn7z5kggg-clang-21.1.8-dev/include -fmacro-prefix-map=/nix/store/did4j5wk64y2g930gp8f2bppn7z5kggg-clang-21.1.8-dev=/nix/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-clang-21.1.8-dev -isystem /nix/store/61725hqjqivlf2byjbbzbnq81bgb16vz-compiler-rt-libc-21.1.8-dev/include -fmacro-prefix-map=/nix/store/61725hqjqivlf2byjbbzbnq81bgb16vz-compiler-rt-libc-21.1.8-dev=/nix/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-compiler-rt-libc-21.1.8-dev -isystem /nix/store/l472345nc50yyj2sds4qwk45hdrcrmrf-bash-interactive-5.3p15-dev/include -fmacro-prefix-map=/nix/store/l472345nc50yyj2sds4qwk45hdrcrmrf-bash-interactive-5.3p15-dev=/nix/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-bash-interactive-5.3p15-dev -isystem /nix/store/did4j5wk64y2g930gp8f2bppn7z5kggg-clang-21.1.8-dev/include -fmacro-prefix-map=/nix/store/did4j5wk64y2g930gp8f2bppn7z5kggg-clang-21.1.8-dev=/nix/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-clang-21.1.8-dev -isystem /nix/store/61725hqjqivlf2byjbbzbnq81bgb16vz-compiler-rt-libc-21.1.8-dev/include -fmacro-prefix-map=/nix/store/61725hqjqivlf2byjbbzbnq81bgb16vz-compiler-rt-libc-21.1.8-dev=/nix/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-compiler-rt-libc-21.1.8-dev -isystem /nix/store/l472345nc50yyj2sds4qwk45hdrcrmrf-bash-interactive-5.3p15-dev/include -fmacro-prefix-map=/nix/store/l472345nc50yyj2sds4qwk45hdrcrmrf-bash-interactive-5.3p15-dev=/nix/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-bash-interactive-5.3p15-dev -isystem /nix/store/did4j5wk64y2g930gp8f2bppn7z5kggg-clang-21.1.8-dev/include -fmacro-prefix-map=/nix/store/did4j5wk64y2g930gp8f2bppn7z5kggg-clang-21.1.8-dev=/nix/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-clang-21.1.8-dev -isystem /nix/store/61725hqjqivlf2byjbbzbnq81bgb16vz-compiler-rt-libc-21.1.8-dev/include -fmacro-prefix-map=/nix/store/61725hqjqivlf2byjbbzbnq81bgb16vz-compiler-rt-libc-21.1.8-dev=/nix/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-compiler-rt-libc-21.1.8-dev
+NIX_ENFORCE_NO_NATIVE=1
+CXX=clang++
+NIX_BINTOOLS=/nix/store/06cd0la3gmknmkfnl3h2l2d462hl757q-binutils-wrapper-2.46
+CXX_FOR_BUILD=g++
+NIX_STORE=/nix/store
+NIX_BINTOOLS_FOR_BUILD=/nix/store/0fdc105g1896ganr8916rsjxhvr9qv5b-binutils-wrapper-2.46
+NIX_CC_WRAPPER_TARGET_BUILD_x86_64_unknown_linux_gnu=1
+NIX_BINTOOLS_WRAPPER_TARGET_BUILD_x86_64_unknown_linux_gnu=1
+CC_FOR_BUILD=gcc
+NIX_BINTOOLS_WRAPPER_TARGET_HOST_x86_64_unknown_linux_gnu=1
+NIX_LDFLAGS_FOR_BUILD= -L/nix/store/7jyzh8sbm1h140bdya4kvi01hndnzfac-rust-default-1.100.0-nightly-2026-09-23/lib -L/nix/store/a3kjvvlm7f8abcmxh6f8dndiwc4vp726-clang-21.1.8-lib/lib -L/nix/store/7jyzh8sbm1h140bdya4kvi01hndnzfac-rust-default-1.100.0-nightly-2026-09-23/lib -L/nix/store/a3kjvvlm7f8abcmxh6f8dndiwc4vp726-clang-21.1.8-lib/lib -L/nix/store/7jyzh8sbm1h140bdya4kvi01hndnzfac-rust-default-1.100.0-nightly-2026-09-23/lib -L/nix/store/a3kjvvlm7f8abcmxh6f8dndiwc4vp726-clang-21.1.8-lib/lib
+NIX_CFLAGS_COMPILE= -frandom-seed=r5p4x07c3x -isystem /nix/store/l472345nc50yyj2sds4qwk45hdrcrmrf-bash-interactive-5.3p15-dev/include -fmacro-prefix-map=/nix/store/l472345nc50yyj2sds4qwk45hdrcrmrf-bash-interactive-5.3p15-dev=/nix/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-bash-interactive-5.3p15-dev -isystem /nix/store/l472345nc50yyj2sds4qwk45hdrcrmrf-bash-interactive-5.3p15-dev/include -fmacro-prefix-map=/nix/store/l472345nc50yyj2sds4qwk45hdrcrmrf-bash-interactive-5.3p15-dev=/nix/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-bash-interactive-5.3p15-dev -isystem /nix/store/did4j5wk64y2g930gp8f2bppn7z5kggg-clang-21.1.8-dev/include -fmacro-prefix-map=/nix/store/did4j5wk64y2g930gp8f2bppn7z5kggg-clang-21.1.8-dev=/nix/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-clang-21.1.8-dev -isystem /nix/store/did4j5wk64y2g930gp8f2bppn7z5kggg-clang-21.1.8-dev/include -fmacro-prefix-map=/nix/store/did4j5wk64y2g930gp8f2bppn7z5kggg-clang-21.1.8-dev=/nix/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-clang-21.1.8-dev -isystem /nix/store/61725hqjqivlf2byjbbzbnq81bgb16vz-compiler-rt-libc-21.1.8-dev/include -fmacro-prefix-map=/nix/store/61725hqjqivlf2byjbbzbnq81bgb16vz-compiler-rt-libc-21.1.8-dev=/nix/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-compiler-rt-libc-21.1.8-dev -isystem /nix/store/61725hqjqivlf2byjbbzbnq81bgb16vz-compiler-rt-libc-21.1.8-dev/include -fmacro-prefix-map=/nix/store/61725hqjqivlf2byjbbzbnq81bgb16vz-compiler-rt-libc-21.1.8-dev=/nix/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-compiler-rt-libc-21.1.8-dev -isystem /nix/store/l472345nc50yyj2sds4qwk45hdrcrmrf-bash-interactive-5.3p15-dev/include -fmacro-prefix-map=/nix/store/l472345nc50yyj2sds4qwk45hdrcrmrf-bash-interactive-5.3p15-dev=/nix/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-bash-interactive-5.3p15-dev -isystem /nix/store/l472345nc50yyj2sds4qwk45hdrcrmrf-bash-interactive-5.3p15-dev/include -fmacro-prefix-map=/nix/store/l472345nc50yyj2sds4qwk45hdrcrmrf-bash-interactive-5.3p15-dev=/nix/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-bash-interactive-5.3p15-dev -isystem /nix/store/did4j5wk64y2g930gp8f2bppn7z5kggg-clang-21.1.8-dev/include -fmacro-prefix-map=/nix/store/did4j5wk64y2g930gp8f2bppn7z5kggg-clang-21.1.8-dev=/nix/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-clang-21.1.8-dev -isystem /nix/store/did4j5wk64y2g930gp8f2bppn7z5kggg-clang-21.1.8-dev/include -fmacro-prefix-map=/nix/store/did4j5wk64y2g930gp8f2bppn7z5kggg-clang-21.1.8-dev=/nix/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-clang-21.1.8-dev -isystem /nix/store/61725hqjqivlf2byjbbzbnq81bgb16vz-compiler-rt-libc-21.1.8-dev/include -fmacro-prefix-map=/nix/store/61725hqjqivlf2byjbbzbnq81bgb16vz-compiler-rt-libc-21.1.8-dev=/nix/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-compiler-rt-libc-21.1.8-dev -isystem /nix/store/61725hqjqivlf2byjbbzbnq81bgb16vz-compiler-rt-libc-21.1.8-dev/include -fmacro-prefix-map=/nix/store/61725hqjqivlf2byjbbzbnq81bgb16vz-compiler-rt-libc-21.1.8-dev=/nix/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-compiler-rt-libc-21.1.8-dev
+NIX_PKG_CONFIG_WRAPPER_TARGET_HOST_x86_64_unknown_linux_gnu=1
+CC=clang
+NIX_CC=/nix/store/mn2y6cydn5phwf2hxgfc3n7zjf48d5xg-clang-wrapper-21.1.8
+NIX_CC_WRAPPER_TARGET_HOST_x86_64_unknown_linux_gnu=1
+NIX_HARDENING_ENABLE=bindnow format fortify fortify3 libcxxhardeningfast pic relro stackclashprotection stackprotector strictflexarrays1 strictoverflow zerocallusedregs
+NIX_LDFLAGS=-rpath /nix/store/r5p4x07c3xjy60rk8y0ka8wzlvnq28fl-devenv-shell-env/lib  -L/nix/store/7jyzh8sbm1h140bdya4kvi01hndnzfac-rust-default-1.100.0-nightly-2026-09-23/lib -L/nix/store/7jyzh8sbm1h140bdya4kvi01hndnzfac-rust-default-1.100.0-nightly-2026-09-23/lib -L/nix/store/a3kjvvlm7f8abcmxh6f8dndiwc4vp726-clang-21.1.8-lib/lib -L/nix/store/a3kjvvlm7f8abcmxh6f8dndiwc4vp726-clang-21.1.8-lib/lib -L/nix/store/7jyzh8sbm1h140bdya4kvi01hndnzfac-rust-default-1.100.0-nightly-2026-09-23/lib -L/nix/store/7jyzh8sbm1h140bdya4kvi01hndnzfac-rust-default-1.100.0-nightly-2026-09-23/lib -L/nix/store/a3kjvvlm7f8abcmxh6f8dndiwc4vp726-clang-21.1.8-lib/lib -L/nix/store/a3kjvvlm7f8abcmxh6f8dndiwc4vp726-clang-21.1.8-lib/lib
+NIX_CC_FOR_BUILD=/nix/store/z4c6k0mrlkwl3s4w9ysxc8vq1wylm3ms-gcc-wrapper-15.3.0

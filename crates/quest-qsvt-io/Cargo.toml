@@ -24,7 +24,7 @@ workspace = true
 
 [features]
 hdf5 = ["dep:hdf5-metno"]
-certification = ["quest-qsp/certification"]
+certification = ["quest-qsp/artifact"]
 offline-synthesis = ["quest-qsp/offline-synthesis"]
 
 [build-dependencies]

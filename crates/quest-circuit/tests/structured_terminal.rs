@@ -1,9 +1,11 @@
 use googletest::{Result, prelude::*};
+#[allow(unused_imports)]
+use quest_circuit::prelude::*;
 use quest_circuit::*;
 
 #[gtest]
 fn structured_pipeline_runs_exact_cleanup_before_terminal_fusion() -> Result<()> {
-    let program = StructuredProgram::parse("qubit q; h q; h q;", "pipeline.qasm")?.verify()?;
+    let program = Program::<Constructed>::parse("qubit q; h q; h q;", "pipeline.qasm")?.verify()?;
     let snapshot = program.ssa().snapshot();
     let outcome = program.optimize_structured(
         &options(1, ApproximationMode::Disabled)?,
@@ -33,7 +35,7 @@ fn structured_pipeline_runs_exact_cleanup_before_terminal_fusion() -> Result<()>
 
 #[gtest]
 fn structured_pipeline_exhaustion_retains_original_publication() -> Result<()> {
-    let program = StructuredProgram::parse("qubit q; h q; h q;", "pipeline.qasm")?.verify()?;
+    let program = Program::<Constructed>::parse("qubit q; h q; h q;", "pipeline.qasm")?.verify()?;
     let snapshot = program.ssa().snapshot();
     let outcome = program.optimize_structured(
         &options(1, ApproximationMode::Disabled)?,
@@ -46,7 +48,7 @@ fn structured_pipeline_exhaustion_retains_original_publication() -> Result<()> {
 
 #[gtest]
 fn structured_pipeline_releases_scratch_before_terminal_comparison() -> Result<()> {
-    let program = StructuredProgram::parse("qubit q; h q; h q;", "pipeline.qasm")?.verify()?;
+    let program = Program::<Constructed>::parse("qubit q; h q; h q;", "pipeline.qasm")?.verify()?;
     let ledger = BudgetLedger::new(OptimizationLimits::new(10_000_000, 1024 * 1024)?);
     let outcome =
         program.optimize_structured(&options(1, ApproximationMode::Disabled)?, &ledger)?;
@@ -58,7 +60,7 @@ fn structured_pipeline_releases_scratch_before_terminal_comparison() -> Result<(
 
 #[gtest]
 fn structured_pipeline_compares_branch_blocks_without_frequency_assumptions() -> Result<()> {
-    let program = StructuredProgram::parse(
+    let program = Program::<Constructed>::parse(
         "input bool flag; qubit q; if (flag) { h q; h q; } else { x q; }",
         "branches.qasm",
     )?
@@ -89,7 +91,7 @@ fn structured_pipeline_compares_branch_blocks_without_frequency_assumptions() ->
 
 #[gtest]
 fn structured_pipeline_declines_unknown_mpi_communication() -> Result<()> {
-    let program = StructuredProgram::parse("qubit q; h q; h q;", "mpi.qasm")?.verify()?;
+    let program = Program::<Constructed>::parse("qubit q; h q; h q;", "mpi.qasm")?.verify()?;
     let snapshot = program.ssa().snapshot();
     let options = OptimizationOptions::new(
         OptimizationTarget::once(
@@ -113,7 +115,7 @@ fn structured_pipeline_declines_unknown_mpi_communication() -> Result<()> {
 
 #[gtest]
 fn structured_pipeline_rejects_wrong_deployment_before_resource_fallback() -> Result<()> {
-    let program = StructuredProgram::parse("qubit q; h q; h q;", "width.qasm")?.verify()?;
+    let program = Program::<Constructed>::parse("qubit q; h q; h q;", "width.qasm")?.verify()?;
     let result = program.optimize_structured(
         &options(2, ApproximationMode::Disabled)?,
         &BudgetLedger::new(OptimizationLimits::default()),
@@ -153,7 +155,7 @@ fn options(
 #[gtest]
 fn structured_terminal_publishes_ssa_and_oracles_together() -> Result<()> {
     let source = "qubit q; h q; x q;";
-    let program = StructuredProgram::parse(source, "terminal.qasm")?.verify()?;
+    let program = Program::<Constructed>::parse(source, "terminal.qasm")?.verify()?;
     let snapshot = program.ssa().snapshot();
     let ledger = BudgetLedger::new(OptimizationLimits::default());
     let outcome = program.fuse_terminal(
@@ -167,7 +169,7 @@ fn structured_terminal_publishes_ssa_and_oracles_together() -> Result<()> {
     expect_eq!(plan.oracle_captures().len(), 1);
     expect_eq!(
         plan.syntax(),
-        &StructuredProgram::parse(source, "terminal.qasm")?
+        &Program::<Constructed>::parse(source, "terminal.qasm")?
             .verify()?
             .lower()?
             .plan()?
@@ -179,7 +181,7 @@ fn structured_terminal_publishes_ssa_and_oracles_together() -> Result<()> {
 
 #[gtest]
 fn user_gate_bodies_stay_symbolic_for_inverse_and_negative_power() -> Result<()> {
-    let program = StructuredProgram::parse(
+    let program = Program::<Constructed>::parse(
         "gate pair q { h q; x q; } qubit q; inv @ pair q; pow(-2) @ pair q;",
         "gate.qasm",
     )?
@@ -204,7 +206,7 @@ fn user_gate_bodies_stay_symbolic_for_inverse_and_negative_power() -> Result<()>
 
 #[gtest]
 fn global_approximation_skips_uncertified_fusion_and_zero_wire_windows() -> Result<()> {
-    let program = StructuredProgram::parse("qubit q; h q; x q;", "global.qasm")?.verify()?;
+    let program = Program::<Constructed>::parse("qubit q; h q; x q;", "global.qasm")?.verify()?;
     let snapshot = program.ssa().snapshot();
     let ledger = BudgetLedger::new(OptimizationLimits::default());
     let mode = ApproximationMode::global(BigRational::new(1.into(), 100.into()))?;
@@ -212,7 +214,8 @@ fn global_approximation_skips_uncertified_fusion_and_zero_wire_windows() -> Resu
     expect_eq!(outcome.program().ssa().snapshot(), snapshot);
     expect_eq!(outcome.report().fused_windows(), 0);
     let program =
-        StructuredProgram::parse("qubit q; gphase(0.25); gphase(0.5);", "scalar.qasm")?.verify()?;
+        Program::<Constructed>::parse("qubit q; gphase(0.25); gphase(0.5);", "scalar.qasm")?
+            .verify()?;
     let outcome = program.fuse_terminal(
         TerminalOptions::default(),
         &options(1, ApproximationMode::Disabled)?,
@@ -224,7 +227,7 @@ fn global_approximation_skips_uncertified_fusion_and_zero_wire_windows() -> Resu
 
 #[gtest]
 fn mixed_parameter_bodies_fuse_and_dynamic_or_trapping_windows_stay_separate() -> Result<()> {
-    let program = StructuredProgram::parse(
+    let program = Program::<Constructed>::parse(
         "def pair(qubit a) { h a; x a; } qubit q; pair(q);",
         "mixed.qasm",
     )?
@@ -247,7 +250,7 @@ fn mixed_parameter_bodies_fuse_and_dynamic_or_trapping_windows_stay_separate() -
     );
     outcome.into_program().lower()?.plan()?;
     let program =
-        StructuredProgram::parse("qubit[2] q; input int i; h q[i]; x q[i];", "dynamic.qasm")?
+        Program::<Constructed>::parse("qubit[2] q; input int i; h q[i]; x q[i];", "dynamic.qasm")?
             .verify()?;
     let outcome = program.fuse_terminal(
         TerminalOptions::default(),
@@ -260,7 +263,7 @@ fn mixed_parameter_bodies_fuse_and_dynamic_or_trapping_windows_stay_separate() -
 
 #[gtest]
 fn exhausted_structured_transaction_keeps_original_snapshot_and_bank() -> Result<()> {
-    let program = StructuredProgram::parse("qubit q; h q; x q;", "budget.qasm")?.verify()?;
+    let program = Program::<Constructed>::parse("qubit q; h q; x q;", "budget.qasm")?.verify()?;
     let snapshot = program.ssa().snapshot();
     let ledger = BudgetLedger::new(OptimizationLimits::new(1, 256 * 1024 * 1024)?);
     let outcome = program.fuse_terminal(
@@ -284,7 +287,7 @@ fn exhausted_structured_transaction_keeps_original_snapshot_and_bank() -> Result
 
 #[gtest]
 fn synthetic_capture_is_fresh_beside_existing_oracle_and_scalar_captures() -> Result<()> {
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     builder.gate(Gate::H, &[builder.qubit(0)?], &[])?;
     let fragment =
         OracleFragment::from_program(builder.finish()?.bind(&[])?, 0.0, MatrixPolicy::default())?;
@@ -323,7 +326,7 @@ fn synthetic_capture_is_fresh_beside_existing_oracle_and_scalar_captures() -> Re
 
 #[gtest]
 fn semantic_storage_exhaustion_keeps_the_original_publication() -> Result<()> {
-    let program = StructuredProgram::parse("qubit q; h q; x q;", "storage.qasm")?.verify()?;
+    let program = Program::<Constructed>::parse("qubit q; h q; x q;", "storage.qasm")?.verify()?;
     let snapshot = program.ssa().snapshot();
     let default = options(1, ApproximationMode::Disabled)?;
     let small = OptimizationOptions::new(

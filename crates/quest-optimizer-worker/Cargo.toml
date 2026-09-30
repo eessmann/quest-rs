@@ -13,12 +13,12 @@ quest-math = { workspace = true, features = ["serde"] }
 serde_json.workspace = true
 color-eyre = { workspace = true, features = ["track-caller"] }
 num-bigint.workspace = true
-rsgridsynth = { package = "quest-rsgridsynth", version = "=0.2.2-quest.1", path = "../vendor/rsgridsynth", optional = true }
+quest-synthesis = { workspace = true, optional = true }
 quizx = { workspace = true, optional = true }
 
 [features]
 default = []
-synthesis = ["dep:rsgridsynth"]
+synthesis = ["dep:quest-synthesis"]
 zx = ["dep:quizx"]
 mitm = []
 

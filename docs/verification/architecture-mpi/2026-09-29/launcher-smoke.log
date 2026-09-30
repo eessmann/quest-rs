@@ -1,0 +1,12 @@
+[home-mac:37219] *** Process received signal ***
+[home-mac:37219] Signal: Segmentation fault: 11 (11)
+[home-mac:37219] Signal code: Invalid permissions (2)
+[home-mac:37219] Failing at address: 0x0
+[home-mac:37219] [ 0] 0   libsystem_platform.dylib            0x000000018acb8144 _sigtramp + 56
+[home-mac:37219] [ 1] 0   libprrte.3.dylib                    0x0000000102581178 prte_hwloc_base_get_topo_signature + 1084
+[home-mac:37219] [ 2] 0   libprrte.3.dylib                    0x0000000102581178 prte_hwloc_base_get_topo_signature + 1084
+[home-mac:37219] [ 3] 0   libprrte.3.dylib                    0x00000001025a8d14 rte_init + 2028
+[home-mac:37219] [ 4] 0   libprrte.3.dylib                    0x0000000102547d18 prte_init + 1064
+[home-mac:37219] [ 5] 0   libprrte.3.dylib                    0x000000010255eea4 prte + 3920
+[home-mac:37219] [ 6] 0   dyld                                0x000000018a8d7e80 start + 6688
+[home-mac:37219] *** End of error message ***

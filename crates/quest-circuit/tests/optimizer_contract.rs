@@ -3,13 +3,15 @@ use googletest::{Result, prelude::*};
 use num_bigint::BigInt;
 use num_complex::Complex64;
 use quest_circuit::dispatch_recipe::PreparedRecipeInventory;
+#[allow(unused_imports)]
+use quest_circuit::prelude::*;
 use quest_circuit::{
     Angle, ApproximationMode, BudgetCategory, BudgetLedger, CliffordCost, CommunicationCost,
-    Control, ControlState, CostComparison, CostComponents, CostProfile, DependencyKind,
-    DeploymentKind, DeploymentSnapshot, Gate, MatrixPolicy, NativeCost, NumericalOperator,
-    OptimizationLimits, OptimizationOptions, OptimizationTarget, Optimizer, OptimizerInput,
-    OptimizerInputKind, OptimizerSnapshot, OracleFragment, ProgramBuilder, StopReason,
-    StructuredProgram, validate_mandatory_projection,
+    Constructed, Control, ControlState, CostComparison, CostComponents, CostProfile,
+    DependencyKind, DeploymentKind, DeploymentSnapshot, Gate, MatrixPolicy, NativeCost,
+    NumericalOperator, OptimizationLimits, OptimizationOptions, OptimizationTarget, Optimizer,
+    OptimizerInput, OptimizerInputKind, OptimizerSnapshot, OracleFragment, Program,
+    QuantumRegionBuilder, StopReason, validate_mandatory_projection,
 };
 use std::sync::{Arc, Barrier};
 
@@ -19,7 +21,7 @@ fn ratio(n: i64, d: i64) -> quest_circuit::BigRational {
 
 #[gtest]
 fn embedded_fragment_cost_uses_actual_wider_deployment() -> Result<()> {
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     builder.gate(Gate::H, &[builder.qubit(0)?], &[])?;
     let plan = builder.finish()?.bind(&[])?.plan()?;
     let deployment =
@@ -127,7 +129,7 @@ fn deployment_rejects_inconsistent_local_state_and_density_sizes() {
 #[gtest]
 fn failed_opaque_trace_spends_bounded_work_in_shared_ledger() -> Result<()> {
     let ledger = BudgetLedger::new(OptimizationLimits::new(4, 128)?);
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     builder.gate(Gate::H, &[builder.qubit(0)?], &[])?;
     let plan = builder.finish()?.bind(&[])?.plan()?;
     expect_true!(CommunicationCost::from_plan(&plan, &ledger).is_err());
@@ -138,12 +140,12 @@ fn failed_opaque_trace_spends_bounded_work_in_shared_ledger() -> Result<()> {
 
 #[gtest]
 fn shared_nested_oracle_trace_stops_at_work_limit_before_expansion() -> Result<()> {
-    let mut base = ProgramBuilder::new(1, 0)?;
+    let mut base = QuantumRegionBuilder::new(1, 0)?;
     base.gate(Gate::H, &[base.qubit(0)?], &[])?;
     let mut fragment =
         OracleFragment::from_program(base.finish()?.bind(&[])?, 0.0, MatrixPolicy::default())?;
     for _ in 0..18 {
-        let mut wrapper = ProgramBuilder::new(1, 0)?;
+        let mut wrapper = QuantumRegionBuilder::new(1, 0)?;
         let target = wrapper.qubit(0)?;
         wrapper.oracle(&fragment, &[target], &[])?;
         wrapper.oracle(&fragment, &[target], &[])?;
@@ -153,7 +155,7 @@ fn shared_nested_oracle_trace_stops_at_work_limit_before_expansion() -> Result<(
             MatrixPolicy::default(),
         )?;
     }
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     builder.oracle(&fragment, &[builder.qubit(0)?], &[])?;
     let plan = builder.finish()?.bind(&[])?.plan()?;
     let ledger = BudgetLedger::new(OptimizationLimits::new(32, 1024)?);
@@ -271,7 +273,7 @@ fn options_reject_invalid_global_epsilon_and_hard_limit_excess() -> Result<()> {
 fn recipe_inventory_counts_density_numerical_pass_once() -> Result<()> {
     let matrix = Mat::from_fn(2, 2, |row, col| Complex64::new(f64::from(row != col), 0.0));
     let numerical = NumericalOperator::from_view(matrix.as_ref(), MatrixPolicy::default())?;
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     builder.numerical(numerical, &[builder.qubit(0)?], &[])?;
     let plan = builder.finish()?.bind(&[])?.plan()?;
     let inventory = PreparedRecipeInventory::from_plan(&plan, true)?;
@@ -308,15 +310,15 @@ fn consuming_entrypoints_preserve_input_kind_and_expose_no_search() -> Result<()
         OptimizationLimits::default(),
         ApproximationMode::Disabled,
     )?;
-    let ideal = ProgramBuilder::new(1, 0)?.finish()?;
+    let ideal = QuantumRegionBuilder::new(1, 0)?.finish()?;
     let snapshot = ideal.snapshot_id();
-    let result = Optimizer::from_ideal(ideal, &[], options.clone())?.finish_without_search();
-    expect_eq!(result.input_kind(), OptimizerInputKind::Ideal);
+    let result = Optimizer::from_region(ideal, &[], options.clone())?.finish_without_search();
+    expect_eq!(result.input_kind(), OptimizerInputKind::Region);
     expect_eq!(result.stop_reason(), StopReason::NoSearchConfigured);
-    expect_eq!(result.snapshot_id(), OptimizerSnapshot::Ideal(snapshot));
+    expect_eq!(result.snapshot_id(), OptimizerSnapshot::Region(snapshot));
     expect_true!(result.budget().work > 0);
     match result.into_input() {
-        OptimizerInput::Ideal { source, bound } => {
+        OptimizerInput::Region { source, bound } => {
             expect_eq!(source.schedule().len(), 0);
             expect_eq!(bound.instructions().len(), 0);
         }
@@ -324,7 +326,7 @@ fn consuming_entrypoints_preserve_input_kind_and_expose_no_search() -> Result<()
             expect_true!(false, "ideal input was discarded");
         }
     }
-    let bound = ProgramBuilder::new(1, 0)?.finish()?.bind(&[])?;
+    let bound = QuantumRegionBuilder::new(1, 0)?.finish()?.bind(&[])?;
     let bound_snapshot = bound.snapshot_id();
     let result = Optimizer::from_bound(bound, options.clone())?.finish_without_search();
     expect_eq!(result.input_kind(), OptimizerInputKind::Bound);
@@ -332,7 +334,7 @@ fn consuming_entrypoints_preserve_input_kind_and_expose_no_search() -> Result<()
         result.snapshot_id(),
         OptimizerSnapshot::Bound(bound_snapshot)
     );
-    let structured = StructuredProgram::parse("qubit q; h q;", "optimizer.qasm")?.verify()?;
+    let structured = Program::<Constructed>::parse("qubit q; h q;", "optimizer.qasm")?.verify()?;
     let result = Optimizer::from_verified_structured(structured, options)?.finish_without_search();
     expect_eq!(result.input_kind(), OptimizerInputKind::VerifiedStructured);
     Ok(())
@@ -340,7 +342,7 @@ fn consuming_entrypoints_preserve_input_kind_and_expose_no_search() -> Result<()
 
 #[gtest]
 fn mandatory_order_guard_rejects_deleted_endpoint_and_contraction_cycle() -> Result<()> {
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     let q = builder.qubit(0)?;
     let a = builder.gate(Gate::H, &[q], &[])?;
     let middle = builder.gate(Gate::Id, &[q], &[])?;
@@ -396,7 +398,7 @@ fn mandatory_order_guard_rejects_deleted_endpoint_and_contraction_cycle() -> Res
 fn required_global_rejects_uncertified_numerical_composition() -> Result<()> {
     let matrix = Mat::from_fn(2, 2, |row, col| Complex64::new(f64::from(row == col), 0.0));
     let numerical = NumericalOperator::from_view(matrix.as_ref(), MatrixPolicy::default())?;
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     builder.numerical(numerical, &[builder.qubit(0)?], &[])?;
     let deployment =
         DeploymentSnapshot::new(DeploymentKind::StateVector, 1, false, false, false, 0, 1, 2)?;
@@ -405,7 +407,7 @@ fn required_global_rejects_uncertified_numerical_composition() -> Result<()> {
         OptimizationLimits::default(),
         ApproximationMode::global(ratio(1, 10))?,
     )?;
-    expect_true!(Optimizer::from_ideal(builder.finish()?, &[], options).is_err());
+    expect_true!(Optimizer::from_region(builder.finish()?, &[], options).is_err());
     Ok(())
 }
 
@@ -415,7 +417,7 @@ fn bound_input_accounts_for_retained_numerical_payload_before_publication() -> R
         Complex64::new(f64::from(row == col.wrapping_add(1) % 16), 0.0)
     });
     let numerical = NumericalOperator::from_view(matrix.as_ref(), MatrixPolicy::default())?;
-    let mut builder = ProgramBuilder::new(4, 0)?;
+    let mut builder = QuantumRegionBuilder::new(4, 0)?;
     let targets = (0..4)
         .map(|index| builder.qubit(index))
         .collect::<quest_circuit::Result<Vec<_>>>()?;
@@ -436,14 +438,14 @@ fn bound_input_accounts_for_retained_numerical_payload_before_publication() -> R
         OptimizationLimits::new(10_000_000, 1_024)?,
         ApproximationMode::Disabled,
     )?;
-    expect_true!(Optimizer::from_ideal(ideal.clone(), &[], options.clone()).is_err());
+    expect_true!(Optimizer::from_region(ideal.clone(), &[], options.clone()).is_err());
     expect_true!(Optimizer::from_bound(ideal.bind(&[])?, options).is_err());
     Ok(())
 }
 
 #[gtest]
 fn ideal_binding_reserves_symbolic_replay_work_before_bind() -> Result<()> {
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     builder.gate(Gate::Rz(Angle::pi(1, 2)?), &[builder.qubit(0)?], &[])?;
     let deployment =
         DeploymentSnapshot::new(DeploymentKind::StateVector, 1, false, false, false, 0, 1, 2)?;
@@ -452,13 +454,13 @@ fn ideal_binding_reserves_symbolic_replay_work_before_bind() -> Result<()> {
         OptimizationLimits::new(10_000, 256 * 1024 * 1024)?,
         ApproximationMode::Disabled,
     )?;
-    expect_true!(Optimizer::from_ideal(builder.finish()?, &[], options).is_err());
+    expect_true!(Optimizer::from_region(builder.finish()?, &[], options).is_err());
     Ok(())
 }
 
 #[gtest]
 fn warmed_ideal_clones_keep_the_same_work_admission_limit() -> Result<()> {
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     builder.gate(Gate::Rz(Angle::pi(1, 7)?), &[builder.qubit(0)?], &[])?;
     let ideal = builder.finish()?;
     let deployment =
@@ -468,15 +470,15 @@ fn warmed_ideal_clones_keep_the_same_work_admission_limit() -> Result<()> {
         OptimizationLimits::new(10_000, 256 * 1024 * 1024)?,
         ApproximationMode::Disabled,
     )?;
-    expect_true!(Optimizer::from_ideal(ideal.clone(), &[], options.clone()).is_err());
+    expect_true!(Optimizer::from_region(ideal.clone(), &[], options.clone()).is_err());
     ideal.clone().bind(&[])?.plan()?;
-    expect_true!(Optimizer::from_ideal(ideal, &[], options).is_err());
+    expect_true!(Optimizer::from_region(ideal, &[], options).is_err());
     Ok(())
 }
 
 #[gtest]
 fn ordinary_128_angle_ideal_program_fits_default_shared_work_limit() -> Result<()> {
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     let target = builder.qubit(0)?;
     let angle = Angle::pi(1, 2)?;
     for _ in 0..128 {
@@ -489,8 +491,8 @@ fn ordinary_128_angle_ideal_program_fits_default_shared_work_limit() -> Result<(
         OptimizationLimits::default(),
         ApproximationMode::Disabled,
     )?;
-    let result = Optimizer::from_ideal(builder.finish()?, &[], options)?.finish_without_search();
-    expect_eq!(result.input_kind(), OptimizerInputKind::Ideal);
+    let result = Optimizer::from_region(builder.finish()?, &[], options)?.finish_without_search();
+    expect_eq!(result.input_kind(), OptimizerInputKind::Region);
     expect_true!(result.budget().work < 10_000_000);
     Ok(())
 }
@@ -498,7 +500,7 @@ fn ordinary_128_angle_ideal_program_fits_default_shared_work_limit() -> Result<(
 #[gtest]
 fn structured_input_accounts_for_retained_source_before_publication() -> Result<()> {
     let source = format!("qubit q; h q; {}", " ".repeat(4096));
-    let structured = StructuredProgram::parse(&source, "large.qasm")?.verify()?;
+    let structured = Program::<Constructed>::parse(&source, "large.qasm")?.verify()?;
     let deployment =
         DeploymentSnapshot::new(DeploymentKind::StateVector, 1, false, false, false, 0, 1, 2)?;
     let options = OptimizationOptions::new(
@@ -512,7 +514,7 @@ fn structured_input_accounts_for_retained_source_before_publication() -> Result<
 
 #[gtest]
 fn structured_input_rejects_target_width_mismatch() -> Result<()> {
-    let structured = StructuredProgram::parse("qubit q; h q;", "width.qasm")?.verify()?;
+    let structured = Program::<Constructed>::parse("qubit q; h q;", "width.qasm")?.verify()?;
     let deployment =
         DeploymentSnapshot::new(DeploymentKind::StateVector, 2, false, false, false, 0, 1, 4)?;
     let options = OptimizationOptions::new(
@@ -528,7 +530,7 @@ fn structured_input_rejects_target_width_mismatch() -> Result<()> {
 fn distributed_opaque_trace_uses_operation_content_not_fresh_occurrence_ids() -> Result<()> {
     let ledger = BudgetLedger::new(OptimizationLimits::default());
     let make_plan = |gate| -> quest_circuit::Result<_> {
-        let mut builder = ProgramBuilder::new(1, 0)?;
+        let mut builder = QuantumRegionBuilder::new(1, 0)?;
         builder.gate(gate, &[builder.qubit(0)?], &[])?;
         builder.finish()?.bind(&[])?.plan()
     };
@@ -549,7 +551,7 @@ fn distributed_opaque_trace_uses_operation_content_not_fresh_occurrence_ids() ->
 #[gtest]
 fn plan_cost_derives_u_signed_flips_and_density_scalar_noop() -> Result<()> {
     let ledger = BudgetLedger::new(OptimizationLimits::default());
-    let mut builder = ProgramBuilder::new(2, 0)?;
+    let mut builder = QuantumRegionBuilder::new(2, 0)?;
     let target = builder.qubit(0)?;
     let control = Control::new(builder.qubit(1)?, ControlState::Zero);
     builder.gate(Gate::Sx, &[target], &[])?;

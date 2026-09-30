@@ -1,10 +1,12 @@
 use googletest::Result;
 use googletest::prelude::*;
+#[allow(unused_imports)]
+use quest_circuit::prelude::*;
 use quest_circuit::*;
 
 #[gtest]
 fn exact_merge_reports_retain_only_immediate_rewrite_inputs() -> Result<()> {
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     let q = builder.qubit(0)?;
     for _ in 0..128 {
         builder.gate(Gate::Rz(Angle::pi(1, 7)?), &[q], &[])?;
@@ -23,7 +25,7 @@ fn exact_merge_reports_retain_only_immediate_rewrite_inputs() -> Result<()> {
 
 #[gtest]
 fn dependency_cancellation_crosses_proven_commuting_gates_only() -> Result<()> {
-    let mut b = ProgramBuilder::new(3, 1)?;
+    let mut b = QuantumRegionBuilder::new(3, 1)?;
     let q = b.qubit(0)?;
     let r = b.qubit(1)?;
     let c = b.qubit(2)?;
@@ -39,7 +41,7 @@ fn dependency_cancellation_crosses_proven_commuting_gates_only() -> Result<()> {
     expect_eq!(optimized.schedule().len(), 2);
     expect_eq!(report.removed.len(), 2);
     for effect in [false, true] {
-        let mut b = ProgramBuilder::new(2, 1)?;
+        let mut b = QuantumRegionBuilder::new(2, 1)?;
         let q = b.qubit(0)?;
         let r = b.qubit(1)?;
         b.gate(Gate::H, &[q], &[])?;
@@ -56,7 +58,7 @@ fn dependency_cancellation_crosses_proven_commuting_gates_only() -> Result<()> {
 
 #[gtest]
 fn exact_rotation_merging_is_phase_correct_and_idempotent() -> Result<()> {
-    let mut b = ProgramBuilder::new(1, 0)?;
+    let mut b = QuantumRegionBuilder::new(1, 0)?;
     let q = b.qubit(0)?;
     b.gate(Gate::Rz(Angle::pi(1, 1)?), &[q], &[])?;
     b.gate(Gate::Rz(Angle::pi(1, 1)?), &[q], &[])?;
@@ -77,7 +79,7 @@ fn exact_rotation_merging_is_phase_correct_and_idempotent() -> Result<()> {
 
 #[gtest]
 fn opaque_float_rotations_are_not_merged() -> Result<()> {
-    let mut b = ProgramBuilder::new(1, 0)?;
+    let mut b = QuantumRegionBuilder::new(1, 0)?;
     let q = b.qubit(0)?;
     b.gate(Gate::Rx(Angle::radians(0.1)?), &[q], &[])?;
     b.gate(Gate::Rx(Angle::radians(-0.1)?), &[q], &[])?;
@@ -87,7 +89,7 @@ fn opaque_float_rotations_are_not_merged() -> Result<()> {
 
 #[gtest]
 fn fusion_preserves_multiplication_order_and_provenance() -> Result<()> {
-    let mut b = ProgramBuilder::new(1, 0)?;
+    let mut b = QuantumRegionBuilder::new(1, 0)?;
     let q = b.qubit(0)?;
     let a = b.gate(Gate::X, &[q], &[])?;
     let z = b.gate(Gate::Z, &[q], &[])?;
@@ -111,7 +113,7 @@ fn fusion_preserves_multiplication_order_and_provenance() -> Result<()> {
 
 #[gtest]
 fn cycles_and_classical_read_write_hazards_are_checked() -> Result<()> {
-    let mut b = ProgramBuilder::new(2, 1)?;
+    let mut b = QuantumRegionBuilder::new(2, 1)?;
     let q = b.qubit(0)?;
     let other = b.qubit(1)?;
     let c = b.bit(0)?;
@@ -121,7 +123,7 @@ fn cycles_and_classical_read_write_hazards_are_checked() -> Result<()> {
     let p = b.finish()?;
     expect_true!(p.has_dependency(write, read)?);
     expect_true!(p.has_dependency(read, overwrite)?);
-    let mut b = ProgramBuilder::new(1, 0)?;
+    let mut b = QuantumRegionBuilder::new(1, 0)?;
     let q = b.qubit(0)?;
     let a = b.gate(Gate::X, &[q], &[])?;
     let z = b.gate(Gate::Z, &[q], &[])?;
@@ -132,7 +134,7 @@ fn cycles_and_classical_read_write_hazards_are_checked() -> Result<()> {
 
 #[gtest]
 fn symbolic_merging_preserves_all_finite_bindings() -> Result<()> {
-    let mut b = ProgramBuilder::new(1, 0)?;
+    let mut b = QuantumRegionBuilder::new(1, 0)?;
     let q = b.qubit(0)?;
     let p = b.parameter("large")?;
     b.gate(Gate::Rx(Angle::parameter(p)?), &[q], &[])?;
@@ -150,7 +152,7 @@ fn fusion_skips_blocks_when_retained_matrices_exhaust_program_budget() -> Result
         max_matrix_bytes: 384,
         ..ProgramLimits::default()
     };
-    let mut b = ProgramBuilder::with_limits(4, 0, limits)?;
+    let mut b = QuantumRegionBuilder::with_limits(4, 0, limits)?;
     for index in 0..4 {
         let q = b.qubit(index)?;
         b.gate(Gate::H, &[q], &[])?;
@@ -169,7 +171,7 @@ fn rational_merging_preserves_finite_lowering() -> Result<()> {
     let angle = Angle::rational_pi(quest_circuit::BigRational::from_integer(
         num_bigint::BigInt::from(10).pow(307),
     ))?;
-    let mut b = ProgramBuilder::new(1, 0)?;
+    let mut b = QuantumRegionBuilder::new(1, 0)?;
     let q = b.qubit(0)?;
     for _ in 0..10 {
         b.gate(Gate::Rz(angle.clone()), &[q], &[])?;
@@ -182,7 +184,7 @@ fn rational_merging_preserves_finite_lowering() -> Result<()> {
 
 #[gtest]
 fn reports_dependency_depth_before_and_after_exact_rewrites_and_fusion() -> Result<()> {
-    let mut b = ProgramBuilder::new(2, 0)?;
+    let mut b = QuantumRegionBuilder::new(2, 0)?;
     let q = b.qubit(0)?;
     let r = b.qubit(1)?;
     b.gate(Gate::H, &[q], &[])?;
@@ -194,7 +196,7 @@ fn reports_dependency_depth_before_and_after_exact_rewrites_and_fusion() -> Resu
     expect_eq!(report.before_depth, 2);
     expect_eq!(report.after_depth, 1);
 
-    let mut b = ProgramBuilder::new(2, 0)?;
+    let mut b = QuantumRegionBuilder::new(2, 0)?;
     let first = b.gate(Gate::H, &[b.qubit(0)?], &[])?;
     b.gate(Gate::X, &[b.qubit(0)?], &[])?;
     let last = b.gate(Gate::Z, &[b.qubit(1)?], &[])?;

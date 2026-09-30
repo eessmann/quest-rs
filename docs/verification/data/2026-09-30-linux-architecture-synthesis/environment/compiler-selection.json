@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-30",
+  "source": "devenv.nix",
+  "source_sha256": "8aca0b698874d840ba710e0cf029e8ac51cd16dce31fc395424ad4f70200512a",
+  "source_snapshot": "devenv-selected.nix",
+  "previous_source_snapshot": "devenv-before.nix",
+  "previous_source_sha256": "8265b1b67cd2d01afd08eee52abf1a5c3114da7ddde3ab6ee708742f06169d8f",
+  "selection": {
+    "stdenv": "nativeStdenv: llvmPackages.stdenv on Darwin, pkgs.stdenv on Linux",
+    "rust_clang_linker": false,
+    "explicit_env": [
+      "CC",
+      "CXX"
+    ],
+    "compiler_package": "nativeStdenv.cc",
+    "enter_shell_override": false
+  },
+  "stages": [
+    {
+      "name": "pre-candidate pinned options",
+      "command": "devenv eval languages.rust.clangLinker.enable stdenv.name",
+      "exit_code": 0,
+      "log": "qsp-compiler-options.log.gz",
+      "result": "Rust Clang linker enabled on Linux; stdenv-linux."
+    },
+    {
+      "name": "pre-candidate mixed compiler diagnostic",
+      "log": "qsp-compiler-review.log.gz",
+      "result": "The earlier enterShell workaround restored CC/CXX to GCC while NIX_CC still pointed to Clang and Rust selected devenv-rust-linker. This is a successful diagnostic probe, not a recorded failing build."
+    },
+    {
+      "name": "Linux fresh selected environment",
+      "script": "qsp-compiler-candidate.sh",
+      "exit_code": 0,
+      "logs": [
+        "qsp-compiler-candidate-env.log.gz",
+        "qsp-compiler-candidate-selected.log.gz"
+      ],
+      "result": "CC/CXX resolve to gcc-wrapper 15.3.0; NIX_CC and NIX_CC_FOR_BUILD agree. No Cargo target Clang linker override."
+    },
+    {
+      "name": "Linux native consumers",
+      "command": "devenv shell -- cargo run --locked -p xtask -- check-native-consumers --backends cpu,omp --work-dir /home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/receipts/qsp-compiler-consumers",
+      "exit_code": 0,
+      "log": "qsp-compiler-candidate-consumers.log.gz",
+      "result": "Direct, facade, wrapped, renamed CPU/OpenMP numerical/deployment checks and RUNPATH/native closure passed."
+    },
+    {
+      "name": "Darwin fresh selected environment",
+      "exit_code": 0,
+      "logs": [
+        "quest-compiler-candidate-darwin-env.log.gz",
+        "quest-compiler-candidate-darwin-selected.log.gz"
+      ],
+      "result": "CC/CXX resolve to clang-wrapper 21.1.8; NIX_CC and NIX_CC_FOR_BUILD agree. No Cargo target linker override."
+    },
+    {
+      "name": "Darwin native consumers",
+      "command": "env -u CC -u CXX -u NIX_CC -u NIX_CC_FOR_BUILD -u CARGO_TARGET_AARCH64_APPLE_DARWIN_LINKER devenv shell -- cargo run --locked -p xtask -- check-native-consumers --backends cpu,omp --work-dir /tmp/quest-compiler-candidate-darwin-consumers",
+      "exit_code": 0,
+      "log": "quest-compiler-candidate-darwin-consumers.log.gz",
+      "result": "Direct, facade, wrapped, renamed CPU/OpenMP numerical/deployment checks and LC_RPATH/native closure passed."
+    }
+  ],
+  "notes": [
+    "Fresh shell probes removed inherited CC, CXX, NIX_CC, NIX_CC_FOR_BUILD and platform Cargo linker override before entering devenv.",
+    "Shell setup normalizes CC/CXX to short compiler names; separate command-v probes verify they resolve to selected Nix wrappers. Explicit project env.CC/CXX remain declared.",
+    "The supported Rust clangLinker setting disables the competing Linux Clang setup; separate CLANG/LIBCLANG_PATH for bindgen remain.",
+    "This receipt covers CPU/OpenMP consumers and environment selection, not MPI acceptance or full-workspace acceptance under the candidate. Those have separate receipts.",
+    "Pre-candidate logs are diagnostic observations. Actual prior MPI/CMake red-stage evidence is maintained by the central Linux/MPI validation owners."
+  ],
+  "sources": [
+    "https://devenv.sh/reference/options/#stdenv",
+    "https://devenv.sh/languages/rust/",
+    "https://raw.githubusercontent.com/cachix/devenv/main/src/modules/languages/rust.nix"
+  ],
+  "logs": [
+    {
+      "file": "quest-compiler-candidate-darwin-consumers.log.gz",
+      "sha256_compressed": "ca9993835cc8c93b7975b5cac4f7af8308a5585187b6f0ee554f69ffa5cb34ab",
+      "sha256_uncompressed": "e4c39ad6e028db0b5d18514b6d4273a95a5214f8c672f5a887938badfbc7c881"
+    },
+    {
+      "file": "quest-compiler-candidate-darwin-env.log.gz",
+      "sha256_compressed": "d0be30f4be0bd2bbfe7141f360f15e12edd86f090917f1b0af284bf1b1c64fb2",
+      "sha256_uncompressed": "1d6dfb4d25fe2b6017a09d9855d6f9435fd36b3374ecfd1696c531959c969ee4"
+    },
+    {
+      "file": "quest-compiler-candidate-darwin-selected.log.gz",
+      "sha256_compressed": "5ef1fe2c82dd175c437a00b111d0a485ff1b41d502675847d8f105e9ec78a9c1",
+      "sha256_uncompressed": "3fbb8ba8e8caa355376315c058090e87ec76464d081d1c11cef0b851c82ca9ef"
+    },
+    {
+      "file": "qsp-compiler-candidate-consumers.log.gz",
+      "sha256_compressed": "613bf82de566ccc3909bc00d7238685660ddcc553447c147fa8e3dc1ecf1c46b",
+      "sha256_uncompressed": "3e222fa3592fd095bb471a0e1dd0c585530f43cf4aa17a841faa5e9c8b269c92"
+    },
+    {
+      "file": "qsp-compiler-candidate-env.log.gz",
+      "sha256_compressed": "977f59036b4e0e8ac0a57e2a8222bf34cc7f2c8d2ee80ad0ffe52847df2cede5",
+      "sha256_uncompressed": "823de8e07881bc8c353784735d3b2f671ec6046e3e71cd0f6e1e15e49c1bc138"
+    },
+    {
+      "file": "qsp-compiler-candidate-selected.log.gz",
+      "sha256_compressed": "086a9e10540618cc40d0a135dd53419e83d07cb40ac3ec6c3a54e91de7870c46",
+      "sha256_uncompressed": "4f13bc490927f988967fb6a8574e2f6285d6d3cd1f803fa9c48500d8fe0d4b32"
+    },
+    {
+      "file": "qsp-compiler-options.log.gz",
+      "sha256_compressed": "955e284bce498bb0280281d9d1cb4262c3f5ad084f72194c6e39660ae7a6c6d5",
+      "sha256_uncompressed": "42c7acf2147829e2b31914dc7f506a501665771f318cd32560f0a76d1f31eddf"
+    },
+    {
+      "file": "qsp-compiler-review.log.gz",
+      "sha256_compressed": "f6887173aca2ee89d0da96f0aff18afc538b6935cf5840ca0da60327790148eb",
+      "sha256_uncompressed": "99ee1b01700c51d927eb51cfad268b7d5cca500ad754621caf56c88f51243318"
+    }
+  ],
+  "prior_failure_reference": {
+    "owner": "MPI validation",
+    "log": "../mpi/initial-unwrapped-compiler/collective.log",
+    "sha256": "048fe67a5ee2958d173ef734299e24ade0d270683897f1a4bdddc56f541bd62c",
+    "exit_code": 101,
+    "observed_failure": "Native MPI ABI witness exit 127: libstdc++.so.6 unavailable; build selected unwrapped clang++.",
+    "commands": "../mpi/initial-unwrapped-compiler/commands.log"
+  }
+}

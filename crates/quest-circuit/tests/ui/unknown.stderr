@@ -1,5 +1,5 @@
-error: unknown circuit wire
- --> tests/ui/unknown.rs:2:37
+error: unknown symbol other
+ --> tests/ui/unknown.rs:2:35
   |
 2 | fn main(){let _=circuit!{qubit q; x other;};}
-  |                                     ^^^^^
+  |                                   ^

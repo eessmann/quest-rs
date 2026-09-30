@@ -2,7 +2,7 @@
 use googletest::prelude::*;
 use quest::{Complex64 as C, Environment, QubitCount};
 use quest_circuit::{
-    Angle, Control, ControlState, Gate, NumericalOperator, OracleFragment, ProgramBuilder,
+    Angle, Control, ControlState, Gate, NumericalOperator, OracleFragment, QuantumRegionBuilder,
 };
 use quest_qsp::{PhaseSequence, WxSymmetric};
 use quest_qsvt::{
@@ -13,7 +13,7 @@ use quest_qsvt::{
 #[gtest]
 fn successful_run_counts_native_decompositions_and_hadamard_readout() -> Result<()> {
     let policy = NumericalPolicy::default();
-    let mut body = ProgramBuilder::new(2, 0)?;
+    let mut body = QuantumRegionBuilder::new(2, 0)?;
     let a = body.qubit(0)?;
     let b = body.qubit(1)?;
     body.gate(

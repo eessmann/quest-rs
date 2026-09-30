@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "compiler": "Clang 22.1.8 / libc++",
+  "dependencies": {
+    "boost": "1.90",
+    "hpx": "1.11",
+    "fft": "pocketfft"
+  },
+  "execution": "CPU sequential",
+  "verification": "129-point all-four-complex-entry Frobenius comparisons, no global-phase alignment; Rust actual exports independently certified",
+  "limitations": [
+    "Sampled cross-language differences are not uniform certificates",
+    "No Linux, native QSVT execution, distributed/GPU, or performance parity claim"
+  ],
+  "branches": {
+    "main": {
+      "revision": "a932e7e081ac3766cad19ad6f8f4b920c8fa7fcf",
+      "archive_sha256": "8555d357c8e66d414cae3c0f558e76221b668b9329b4e16a0f39c4081f200cec",
+      "fixtures_requested": 7,
+      "fixtures_exported": 5,
+      "unavailable": [
+        "wx_constant",
+        "circle_constant"
+      ],
+      "certificate_scope": {
+        "wx": "none",
+        "unit_circle": "none"
+      },
+      "normalization": 1,
+      "projection_probe": "accepted; Rust exact admission rejects",
+      "max_full_matrix_sample_difference": 1.5404051436272765e-15,
+      "rust_algorithms": [
+        "rhw-half-cholesky",
+        "inverse-nlft-divide-conquer"
+      ]
+    },
+    "develop": {
+      "revision": "4fc35983138d07a990862a4d83ad16f2b737c98f",
+      "archive_sha256": "bb1905be1bc5a12f743104bf000c371f0e567169ba3f1df9e3672d248651241e",
+      "fixtures_requested": 7,
+      "fixtures_exported": 7,
+      "unavailable": [],
+      "certificate_scope": {
+        "wx": "exported_phase",
+        "unit_circle": "pre_lowering_reflection"
+      },
+      "normalization": 1,
+      "projection_probe": "accepted; Rust exact admission rejects",
+      "max_full_matrix_sample_difference": 1.6528628800471014e-15,
+      "rust_algorithms": [
+        "rhw-half-cholesky",
+        "inverse-nlft-divide-conquer"
+      ]
+    }
+  },
+  "sha256": {
+    "CMakeLists.txt": "01899b29c5d3d7090008339bc1d01f076e679b83456eeec293bd355064ecd7f2",
+    "README.md": "c8e81cfc83d6e86ef172a3481c8e92efee771fea21165f0d0109c6101030226f",
+    "common.hpp": "87f300fc057fd00a0410b7c974311ff2a5e8a0505a9a77eb9380147c3ac80642",
+    "data/develop-comparison.txt": "46362add76453934e101ede52f3733ca8f91cdc3b79bceeaa5874827de261edb",
+    "data/develop.txt": "bb119d07942c654969ee1a8a6b902e63c8098854c478ebb6abb1c1f42359f9bb",
+    "data/main-comparison.txt": "44f64118ddb3374cbb9d3eda5b5429c407be034be5c6ec4e62ab1c9fa69a0798",
+    "data/main.txt": "e7072f3c8dc821cfe3241e333c8694d82108e478f29138f2cd350627f1c749cb",
+    "develop.cpp": "923c35cf249e696a469897b7674eaadfd11496ab8645820f9b4d3a62435d7ddb",
+    "main.cpp": "0cb1ecd2dd989d82860b50a24646d1c652d282e65d5e5529a72512ea46d90fe7"
+  },
+  "rust_consumer_sha256": "c4db576a5677a336e1a8ff1a6237bad6e133c8e58cb9ce882ef7d2960be2b850"
+}

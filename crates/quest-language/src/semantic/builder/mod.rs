@@ -17,6 +17,18 @@
 //! let mut b=Builder::new().unwrap(); let n=b.integer::<32>(1).unwrap();
 //! b.while_loop(&n,|_|Ok(())).unwrap();
 //! ```
+mod arrays;
+mod ranked;
+pub use ranked::RankedArray;
+mod signature;
+pub use signature::{
+    ArrayRef, ArraySubroutine, Procedure, QubitArrayParameter, QubitParameter, RankedArrayRef,
+    Signature, Subroutine, ValueParameter,
+};
+mod fragment;
+pub use arrays::{Array, ArrayFunction, Function};
+mod effects;
+pub use effects::{GateDefinition, Modifier};
 mod expressions;
 mod shared;
 mod types;

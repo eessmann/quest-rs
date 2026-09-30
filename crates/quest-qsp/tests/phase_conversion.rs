@@ -1,5 +1,5 @@
 use googletest::prelude::*;
-use quest_qsp::{CanonicalWxImag, Complex64, Control, PhaseSequence, WxLaurent};
+use quest_qsp::{Complex64, Control, PhaseSequence, WxImaginaryU00, WxLaurent};
 use std::ops::{Add, Mul, Sub};
 
 fn phase(value: f64) -> Control {
@@ -47,7 +47,7 @@ fn huge_phase_conversion_preserves_full_matrices_without_period_reduction() -> R
     for huge in [1e20, -1e20, f64::MAX, -f64::MAX] {
         let original = [huge, 0.37, -huge];
         let sequence = PhaseSequence::<WxLaurent>::builder(original.to_vec()).build()?;
-        let canonical = sequence.canonical();
+        let real_parity_wx = sequence.real_parity_wx();
         let expected = original.into_iter().enumerate().map(|(index, value)| {
             let rotation = phase(value);
             if index == 0 {
@@ -57,13 +57,13 @@ fn huge_phase_conversion_preserves_full_matrices_without_period_reduction() -> R
             }
         });
         close(
-            product(canonical.values().iter().copied().map(phase)),
+            product(real_parity_wx.values().iter().copied().map(phase)),
             product(expected),
         );
-        expect_that!(canonical.values().get(1), some(eq(&original[1])));
-        expect_that!(canonical.values().get(2), some(eq(&original[2])));
-        let canonical = PhaseSequence::<CanonicalWxImag>::builder(original.to_vec()).build()?;
-        let converted = canonical.projector_phases_with_diagnostics();
+        expect_that!(real_parity_wx.values().get(1), some(eq(&original[1])));
+        expect_that!(real_parity_wx.values().get(2), some(eq(&original[2])));
+        let real_parity_wx = PhaseSequence::<WxImaginaryU00>::builder(original.to_vec()).build()?;
+        let converted = real_parity_wx.projector_phases_with_diagnostics();
         let expected = original.into_iter().enumerate().map(|(index, value)| {
             multiply(
                 phase(value),
@@ -88,16 +88,16 @@ fn huge_phase_conversion_preserves_full_matrices_without_period_reduction() -> R
 fn ordinary_phase_shifts_keep_existing_bits_and_accumulate_diagnostics() -> Result<()> {
     let values = [0.2, -0.4, 0.7];
     let sequence = PhaseSequence::<WxLaurent>::builder(values.to_vec()).build()?;
-    let canonical = sequence.canonical();
+    let real_parity_wx = sequence.real_parity_wx();
     let expected = [
         values[0] + std::f64::consts::FRAC_PI_2,
         values[1],
         values[2],
     ];
-    for (actual, expected) in canonical.values().iter().zip(expected) {
+    for (actual, expected) in real_parity_wx.values().iter().zip(expected) {
         expect_that!(actual.to_bits(), eq(expected.to_bits()));
     }
-    let projector = canonical.projector_phases_with_diagnostics();
+    let projector = real_parity_wx.projector_phases_with_diagnostics();
     for ((actual, value), offset) in projector.values().iter().zip(expected).zip([
         std::f64::consts::FRAC_PI_4,
         std::f64::consts::FRAC_PI_2,
@@ -107,7 +107,7 @@ fn ordinary_phase_shifts_keep_existing_bits_and_accumulate_diagnostics() -> Resu
     }
     expect_that!(
         projector.roundoff_estimate(),
-        gt(canonical.conversion_roundoff_estimate())
+        gt(real_parity_wx.conversion_roundoff_estimate())
     );
     expect_that!(projector.roundoff_estimate(), lt(1e-13));
     Ok(())

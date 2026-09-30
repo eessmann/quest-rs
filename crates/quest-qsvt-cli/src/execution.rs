@@ -5,7 +5,7 @@ use faer::{
 };
 use num_complex::Complex64 as C;
 use quest::{Environment, QubitCount};
-use quest_circuit::{NumericalOperator, OracleFragment, ProgramBuilder};
+use quest_circuit::{NumericalOperator, OracleFragment, QuantumRegionBuilder};
 use quest_qsvt::{
     DenseEncodingBuilder, EncodingBuilder, Left, LogicalSpace, NumericalPolicy, ProjectedEncoding,
     Right, TransformBuilder, ValidatedTransform,
@@ -21,12 +21,13 @@ pub fn encoding(block: &StoredBlockEncoding) -> Result<ProjectedEncoding> {
     let policy = NumericalPolicy::default();
     let width =
         usize::try_from(block.u().nrows().ilog2()).map_err(|_| Error::Budget("oracle width"))?;
-    let mut builder = ProgramBuilder::new(width, 0)?;
+    let mut builder = QuantumRegionBuilder::new(width, 0)?;
     let targets = (0..width)
         .map(|index| builder.qubit(index))
         .collect::<quest_circuit::Result<Vec<_>>>()?;
     builder.numerical(
-        NumericalOperator::from_view(block.u(), policy.matrix_policy())?,
+        NumericalOperator::from_view(block.u(), policy.matrix_policy())
+            .map_err(quest_qsvt::Error::from)?,
         &targets,
         &[],
     )?;
@@ -49,6 +50,84 @@ pub fn encoding(block: &StoredBlockEncoding) -> Result<ProjectedEncoding> {
         .policy(policy)
         .build()?)
 }
+#[cfg(feature = "certification")]
+fn certified_response<V: quest_qsvt::ResponseArgument>(
+    certificate: quest_qsp::certification::Certified<quest_qsp::UnitCircleResponse>,
+) -> Result<quest_qsvt::RouteResponse<V>> {
+    // The explicitly chosen CLI route assigns Hermitian x or Gram y meaning to
+    // this coefficient transfer. It is not a Laurent variable substitution.
+    let (offset, length) = certificate.candidate().source_storage();
+    let start =
+        usize::try_from(offset).map_err(|_| Error::Input("negative compiled source support"))?;
+    let end = start
+        .checked_add(length)
+        .ok_or(Error::Input("compiled source span overflow"))?;
+    let coefficients = certificate
+        .candidate()
+        .target()
+        .get(start..end)
+        .ok_or(Error::Input("compiled route source span"))?
+        .to_vec();
+    let polynomial = quest_polynomial::Polynomial::new(
+        quest_polynomial::Laurent::new(offset),
+        coefficients,
+        quest_polynomial::Limits::default(),
+    )
+    .map_err(quest_qsvt_io::Error::from)?;
+    Ok(
+        quest_qsvt::RouteTarget::<V>::from_unit_circle_coefficients(polynomial)?
+            .bind_certified(certificate)?,
+    )
+}
+#[cfg(feature = "certification")]
+fn compiled_transform(
+    builder: TransformBuilder<quest_qsvt::SuppliedEncoding>,
+    route: TransformRoute,
+    compiled: quest_qsvt_io::CompiledInput,
+) -> Result<ValidatedTransform> {
+    use quest_qsp::artifact::LoadedCertified;
+    use quest_qsvt::{GramArgument, HermitianArgument};
+    match compiled.into_certified() {
+        LoadedCertified::RealParityWx(certificate) => {
+            if !matches!(route, TransformRoute::Standard) {
+                return Err(Error::Input(
+                    "compiled Wx phases require the standard route",
+                ));
+            }
+            let converted = certificate.certify_projector_phases(certificate.report().policy())?;
+            Ok(builder.certified_standard(converted).build()?)
+        }
+        LoadedCertified::UnitCircleResponse(certificate) => Ok(match route {
+            TransformRoute::Standard => {
+                return Err(Error::Input(
+                    "compiled unit-circle controls require a generalized route",
+                ));
+            }
+            TransformRoute::Direct => builder
+                .direct(certified_response::<HermitianArgument>(certificate)?)
+                .build()?,
+            TransformRoute::HermitianizedFull => builder
+                .hermitianized_full(certified_response::<HermitianArgument>(certificate)?)
+                .build()?,
+            TransformRoute::HermitianizedEven => builder
+                .hermitianized_even(
+                    certified_response::<HermitianArgument>(certificate)?.even_component(),
+                )
+                .build()?,
+            TransformRoute::HermitianizedOdd => builder
+                .hermitianized_odd(
+                    certified_response::<HermitianArgument>(certificate)?.odd_component(),
+                )
+                .build()?,
+            TransformRoute::MultiplicationEven => builder
+                .multiplication_even(certified_response::<GramArgument>(certificate)?)
+                .build()?,
+            TransformRoute::MultiplicationOdd => builder
+                .multiplication_odd(certified_response::<GramArgument>(certificate)?)
+                .build()?,
+        }),
+    }
+}
 pub fn transform(
     source: ProjectedEncoding,
     route: TransformRoute,
@@ -59,6 +138,10 @@ pub fn transform(
     let layout = quest_qsvt::OperandLayout::canonical(source.num_qubits(), auxiliary)?
         .with_idle_high_qubits(idle)?;
     let builder = TransformBuilder::new().encoding(source).operands(layout);
+    #[cfg(feature = "certification")]
+    if let QspInput::Compiled(compiled) = input {
+        return compiled_transform(builder, route, compiled);
+    }
     match (route, input) {
         (TransformRoute::Standard, QspInput::Symmetric(phases)) => {
             Ok(builder.standard(phases).build()?)
@@ -76,20 +159,46 @@ pub fn transform(
                 TransformRoute::Standard => {
                     return Err(Error::Input("standard route requires tagged Wx phases"));
                 }
-                TransformRoute::Direct => builder.direct(controls).build()?,
+                TransformRoute::Direct => builder
+                    .direct(
+                        quest_qsvt::RouteResponse::<quest_qsvt::HermitianArgument>::imported(
+                            controls,
+                        ),
+                    )
+                    .build()?,
                 TransformRoute::HermitianizedFull => {
-                    builder.hermitianized_full(controls).build()?
+                    builder
+                        .hermitianized_full(quest_qsvt::RouteResponse::<
+                            quest_qsvt::HermitianArgument,
+                        >::imported(controls))
+                        .build()?
                 }
-                TransformRoute::HermitianizedEven => {
-                    builder.hermitianized_even(controls).build()?
-                }
-                TransformRoute::HermitianizedOdd => builder.hermitianized_odd(controls).build()?,
-                TransformRoute::MultiplicationEven => {
-                    builder.multiplication_even(controls).build()?
-                }
-                TransformRoute::MultiplicationOdd => {
-                    builder.multiplication_odd(controls).build()?
-                }
+                TransformRoute::HermitianizedEven => builder
+                    .hermitianized_even(
+                        quest_qsvt::RouteResponse::<quest_qsvt::HermitianArgument>::imported(
+                            controls,
+                        )
+                        .even_component(),
+                    )
+                    .build()?,
+                TransformRoute::HermitianizedOdd => builder
+                    .hermitianized_odd(
+                        quest_qsvt::RouteResponse::<quest_qsvt::HermitianArgument>::imported(
+                            controls,
+                        )
+                        .odd_component(),
+                    )
+                    .build()?,
+                TransformRoute::MultiplicationEven => builder
+                    .multiplication_even(
+                        quest_qsvt::RouteResponse::<quest_qsvt::GramArgument>::imported(controls),
+                    )
+                    .build()?,
+                TransformRoute::MultiplicationOdd => builder
+                    .multiplication_odd(
+                        quest_qsvt::RouteResponse::<quest_qsvt::GramArgument>::imported(controls),
+                    )
+                    .build()?,
             })
         }
         _ => Err(Error::Input(
@@ -98,8 +207,21 @@ pub fn transform(
     }
 }
 pub fn transform_report(transform: &ValidatedTransform) -> Value {
+    #[cfg(feature = "certification")]
+    let certified_projector = transform.projector_certificate().is_some();
+    #[cfg(not(feature = "certification"))]
+    let certified_projector = false;
+    let response_evidence =
+        transform
+            .route_meaning()
+            .map_or("none", |meaning| match meaning.evidence() {
+                quest_qsvt::ResponseEvidence::Imported => "imported",
+                quest_qsvt::ResponseEvidence::Candidate(_) => "candidate",
+                #[cfg(feature = "certification")]
+                quest_qsvt::ResponseEvidence::Certified(_) => "certified",
+            });
     let counts = transform.query_counts();
-    json!({"route":format!("{:?}",transform.route()),"degree":transform.degree(),
+    json!({"certified_projector_payload":certified_projector,"response_evidence":response_evidence,"route":format!("{:?}",transform.route()),"degree":transform.degree(),
         "normalization":transform.normalization().get(), "qubits":transform.operands().num_qubits(),
         "source_convention":transform.convention(),
         "phase_conversion_roundoff_estimate":transform.evidence().phase_conversion_roundoff_estimate,
@@ -547,4 +669,78 @@ fn solve_transform(
         ));
     }
     Ok(transform)
+}
+
+#[cfg(all(test, feature = "certification"))]
+mod compiled_tests {
+    use super::*;
+    use quest_polynomial::Basis;
+    fn certificate(
+        offset: i32,
+        coefficients: Vec<C>,
+    ) -> googletest::Result<quest_qsp::certification::Certified<quest_qsp::UnitCircleResponse>>
+    {
+        let source = quest_polynomial::Polynomial::new(
+            quest_polynomial::Laurent::new(offset),
+            coefficients,
+            quest_polynomial::Limits::default(),
+        )?;
+        let candidate = quest_qsp::SynthesisBuilder::new()
+            .unit_circle_response(&source)?
+            .admit()?
+            .complete()?
+            .synthesize()?;
+        Ok(quest_qsp::certification::CertificationBuilder::new()
+            .candidate(candidate)
+            .policy(quest_qsp::certification::CertificationPolicy::default())?
+            .certify()?)
+    }
+    #[test]
+    fn route_binding_preserves_empty_source_identity_and_absolute_support() -> googletest::Result<()>
+    {
+        let empty = certified_response::<quest_qsvt::HermitianArgument>(certificate(0, vec![])?)?;
+        googletest::verify_eq!(
+            empty
+                .meaning()
+                .unit_circle_source()
+                .ok_or_else(|| std::io::Error::other("missing source"))?
+                .coefficients(),
+            []
+        )?;
+        let zero = certified_response::<quest_qsvt::GramArgument>(certificate(
+            0,
+            vec![C::new(0.0, 0.0)],
+        )?)?;
+        googletest::verify_eq!(
+            zero.meaning()
+                .target()
+                .ok_or_else(|| std::io::Error::other("missing target"))?
+                .coefficients()
+                .len(),
+            1
+        )?;
+        let offset = certified_response::<quest_qsvt::HermitianArgument>(certificate(
+            2,
+            vec![C::new(0.2, 0.0)],
+        )?)?;
+        googletest::verify_eq!(
+            offset
+                .meaning()
+                .target()
+                .ok_or_else(|| std::io::Error::other("missing target"))?
+                .coefficients(),
+            &[C::new(0.0, 0.0), C::new(0.0, 0.0), C::new(0.2, 0.0)]
+        )?;
+        googletest::verify_eq!(
+            offset
+                .meaning()
+                .unit_circle_source()
+                .ok_or_else(|| std::io::Error::other("missing source"))?
+                .basis()
+                .offset(),
+            2
+        )?;
+
+        Ok(())
+    }
 }

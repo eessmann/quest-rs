@@ -3,9 +3,9 @@ use crate::{
     materialize_program, matrix,
 };
 use faer::Mat;
-use quest_circuit::BoundProgram;
+use quest_circuit::BoundRegion;
 use quest_qsp::{
-    CanonicalWxImag, ControlSequence, ConvertedProjectorPhases, PhaseConvention, PhaseSequence,
+    ControlSequence, ConvertedProjectorPhases, PhaseConvention, PhaseSequence, WxImaginaryU00,
     WxLaurent, WxSymmetric,
 };
 
@@ -68,14 +68,14 @@ pub enum TransformContinuation {
     Direct,
     Projected {
         bridge: Box<Projection>,
-        program: BoundProgram,
+        program: BoundRegion,
     },
 }
 /// Owned staged transform. Projection and continuation cannot be implicitly
 /// discarded to obtain an oracle. All matrices and circuit bodies are immutable.
 /// ```compile_fail
 /// fn invalid(transform: quest_qsvt::ValidatedTransform) -> quest_circuit::Result<()> {
-///     let mut body = quest_circuit::ProgramBuilder::new(3, 0)?;
+///     let mut body = quest_circuit::QuantumRegionBuilder::new(3, 0)?;
 ///     body.oracle(&transform, &[], &[])?;
 ///     Ok(())
 /// }
@@ -84,17 +84,37 @@ pub enum TransformContinuation {
 pub struct ValidatedTransform {
     pub(super) encoding: ProjectedEncoding,
     pub(super) route: Route,
+    pub(super) meaning: Option<crate::RouteMeaning>,
     pub(super) convention: &'static str,
     pub(super) degree: usize,
     pub(super) layout: OperandLayout,
-    pub(super) main: BoundProgram,
+    pub(super) main: BoundRegion,
     pub(super) input: Projection,
     pub(super) continuation_stage: TransformContinuation,
     pub(super) output: Projection,
     pub(super) queries: QueryCounts,
     pub(super) evidence: TransformEvidence,
+    #[cfg(feature = "certification")]
+    pub(super) projector_certificate:
+        Option<std::sync::Arc<quest_qsp::certification::CertifiedProjectorPhases>>,
 }
 impl ValidatedTransform {
+    /// Immutable generalized target, variable, component selection and evidence.
+    #[must_use]
+    pub const fn route_meaning(&self) -> Option<&crate::RouteMeaning> {
+        self.meaning.as_ref()
+    }
+
+    /// Evidence for the exact projector rotations and readout stored in this transform.
+    /// Imported phase sequences carry no such evidence.
+    #[cfg(feature = "certification")]
+    #[must_use]
+    pub fn projector_certificate(
+        &self,
+    ) -> Option<&quest_qsp::certification::CertifiedProjectorPhases> {
+        self.projector_certificate.as_deref()
+    }
+
     /// The owned source encoding, including its original physical normalization.
     #[must_use]
     pub const fn encoding(&self) -> &ProjectedEncoding {
@@ -122,7 +142,7 @@ impl ValidatedTransform {
     }
     /// Coherent main circuit, excluding projections and any continuation.
     #[must_use]
-    pub const fn main(&self) -> &BoundProgram {
+    pub const fn main(&self) -> &BoundRegion {
         &self.main
     }
     /// Input embedding and its fixed ancillary controls.
@@ -140,7 +160,7 @@ impl ValidatedTransform {
     }
     /// Final coherent source application for odd multiplication, even at degree zero.
     #[must_use]
-    pub const fn continuation(&self) -> Option<&BoundProgram> {
+    pub const fn continuation(&self) -> Option<&BoundRegion> {
         match &self.continuation_stage {
             TransformContinuation::Direct => None,
             TransformContinuation::Projected { program, .. } => Some(program),
@@ -170,14 +190,6 @@ impl ValidatedTransform {
     #[must_use]
     pub const fn evidence(&self) -> TransformEvidence {
         self.evidence
-    }
-    /// Always `None`: construction supplies no theorem premises.
-    ///
-    /// Use [`Self::analysis`] with explicit assumptions for conditional standard
-    /// bounds, or [`Self::diagnostics`] for finite observations.
-    #[must_use]
-    pub const fn theorem_error_bound(&self) -> Option<f64> {
-        None
     }
     /// Independently form the subnormalized logical block in execution order.
     /// This includes the bridge projector and final continuation when present.
@@ -228,15 +240,19 @@ pub trait StandardConvention: PhaseConvention + Sized {
 }
 impl StandardConvention for WxSymmetric {
     fn projector_phases(sequence: &PhaseSequence<Self>) -> ConvertedProjectorPhases {
-        sequence.canonical().projector_phases_with_diagnostics()
+        sequence
+            .real_parity_wx()
+            .projector_phases_with_diagnostics()
     }
 }
 impl StandardConvention for WxLaurent {
     fn projector_phases(sequence: &PhaseSequence<Self>) -> ConvertedProjectorPhases {
-        sequence.canonical().projector_phases_with_diagnostics()
+        sequence
+            .real_parity_wx()
+            .projector_phases_with_diagnostics()
     }
 }
-impl StandardConvention for CanonicalWxImag {
+impl StandardConvention for WxImaginaryU00 {
     fn projector_phases(sequence: &PhaseSequence<Self>) -> ConvertedProjectorPhases {
         sequence.projector_phases_with_diagnostics()
     }
@@ -248,10 +264,17 @@ pub struct SuppliedEncoding(ProjectedEncoding);
 /// Builder state retaining a typed standard phase sequence.
 #[derive(Debug)]
 pub struct StandardRecipe<C: StandardConvention>(PhaseSequence<C>);
+/// Builder state holding independently certified, already converted projector phases.
+#[cfg(feature = "certification")]
+#[derive(Debug)]
+pub struct CertifiedStandardRecipe(
+    std::sync::Arc<quest_qsp::certification::CertifiedProjectorPhases>,
+);
 /// Builder state retaining generalized controls and an explicit route.
 #[derive(Debug)]
 pub struct GeneralizedRecipe {
     controls: ControlSequence,
+    meaning: crate::RouteMeaning,
     route: Route,
 }
 
@@ -303,6 +326,21 @@ impl<E, R> TransformBuilder<E, R> {
     }
 }
 impl<E> TransformBuilder<E, Missing> {
+    /// Use the actual converted payload certified against its original real polynomial.
+    /// This factory retains the immutable evidence and emits its readout angle unchanged.
+    #[cfg(feature = "certification")]
+    #[must_use]
+    pub fn certified_standard(
+        self,
+        certificate: quest_qsp::certification::CertifiedProjectorPhases,
+    ) -> TransformBuilder<E, CertifiedStandardRecipe> {
+        TransformBuilder {
+            encoding: self.encoding,
+            recipe: CertifiedStandardRecipe(std::sync::Arc::new(certificate)),
+            layout: self.layout,
+        }
+    }
+
     /// Select a standard route with an admitted, convention-typed QSP sequence.
     ///
     /// Even degree extracts on the right space; odd degree maps right to left.
@@ -319,14 +357,21 @@ impl<E> TransformBuilder<E, Missing> {
             layout: self.layout,
         }
     }
-    fn generalized(
+    fn generalized<V: crate::ResponseArgument, P: crate::ResponseComponent>(
         self,
-        controls: ControlSequence,
+        response: crate::RouteResponse<V, P>,
         route: Route,
     ) -> TransformBuilder<E, GeneralizedRecipe> {
         TransformBuilder {
             encoding: self.encoding,
-            recipe: GeneralizedRecipe { controls, route },
+            recipe: {
+                let (controls, meaning) = response.into_parts();
+                GeneralizedRecipe {
+                    controls,
+                    meaning,
+                    route,
+                }
+            },
             layout: self.layout,
         }
     }
@@ -335,14 +380,17 @@ impl<E> TransformBuilder<E, Missing> {
     /// Building requires numerical whole-oracle Hermiticity, projector
     /// agreement, and ordered left/right basis agreement at fixed `1e-12`.
     #[must_use]
-    pub fn direct(self, controls: ControlSequence) -> TransformBuilder<E, GeneralizedRecipe> {
+    pub fn direct(
+        self,
+        controls: crate::RouteResponse<crate::HermitianArgument>,
+    ) -> TransformBuilder<E, GeneralizedRecipe> {
         self.generalized(controls, Route::DirectHermitian)
     }
     /// Select `p([[0, B], [B†, 0]])` on the joint left-then-right logical space.
     #[must_use]
     pub fn hermitianized_full(
         self,
-        controls: ControlSequence,
+        controls: crate::RouteResponse<crate::HermitianArgument>,
     ) -> TransformBuilder<E, GeneralizedRecipe> {
         self.generalized(controls, Route::HermitianizedFull)
     }
@@ -350,7 +398,7 @@ impl<E> TransformBuilder<E, Missing> {
     #[must_use]
     pub fn hermitianized_even(
         self,
-        controls: ControlSequence,
+        controls: crate::RouteResponse<crate::HermitianArgument, crate::EvenResponse>,
     ) -> TransformBuilder<E, GeneralizedRecipe> {
         self.generalized(controls, Route::HermitianizedEven)
     }
@@ -358,7 +406,7 @@ impl<E> TransformBuilder<E, Missing> {
     #[must_use]
     pub fn hermitianized_odd(
         self,
-        controls: ControlSequence,
+        controls: crate::RouteResponse<crate::HermitianArgument, crate::OddResponse>,
     ) -> TransformBuilder<E, GeneralizedRecipe> {
         self.generalized(controls, Route::HermitianizedOdd)
     }
@@ -367,7 +415,7 @@ impl<E> TransformBuilder<E, Missing> {
     #[must_use]
     pub fn multiplication_even(
         self,
-        controls: ControlSequence,
+        controls: crate::RouteResponse<crate::GramArgument>,
     ) -> TransformBuilder<E, GeneralizedRecipe> {
         self.generalized(controls, Route::MultiplicationEven)
     }
@@ -378,7 +426,7 @@ impl<E> TransformBuilder<E, Missing> {
     #[must_use]
     pub fn multiplication_odd(
         self,
-        controls: ControlSequence,
+        controls: crate::RouteResponse<crate::GramArgument>,
     ) -> TransformBuilder<E, GeneralizedRecipe> {
         self.generalized(controls, Route::MultiplicationOdd)
     }
@@ -398,7 +446,10 @@ impl TransformBuilder<SuppliedEncoding, GeneralizedRecipe> {
     pub fn build(self) -> Result<ValidatedTransform> {
         let encoding = self.encoding.0;
         let layout = checked_layout(self.layout, &encoding, self.recipe.route)?;
-        crate::routes::generalized(encoding, &self.recipe.controls, self.recipe.route, layout)
+        let mut result =
+            crate::routes::generalized(encoding, &self.recipe.controls, self.recipe.route, layout)?;
+        result.meaning = Some(self.recipe.meaning);
+        Ok(result)
     }
 }
 fn checked_layout(
@@ -416,4 +467,25 @@ fn checked_layout(
         return Err(Error::Encoding("operand layout does not match route"));
     }
     Ok(layout)
+}
+
+#[cfg(feature = "certification")]
+impl TransformBuilder<SuppliedEncoding, CertifiedStandardRecipe> {
+    /// # Errors
+    /// Rejects invalid operand layouts or numerical construction resources.
+    pub fn build(self) -> Result<ValidatedTransform> {
+        let encoding = self.encoding.0;
+        let layout = checked_layout(self.layout, &encoding, Route::Standard)?;
+        let certificate = self.recipe.0;
+        let mut result = crate::routes::standard_projector(
+            encoding,
+            certificate.values(),
+            certificate.readout_phase(),
+            "reflection-signal-real-readout",
+            0.0,
+            layout,
+        )?;
+        result.projector_certificate = Some(certificate);
+        Ok(result)
+    }
 }

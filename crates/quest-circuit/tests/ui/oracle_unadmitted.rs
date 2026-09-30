@@ -1,5 +1,5 @@
-use quest_circuit::{BoundProgram, OracleFragment};
-fn forbidden(program: BoundProgram) {
+use quest_circuit::{BoundRegion, OracleFragment};
+fn forbidden(program: BoundRegion) {
     let _ = OracleFragment::builder(program).build();
 }
 fn main() {}

@@ -1,6 +1,6 @@
 use faer::mat;
 use googletest::prelude::*;
-use quest_circuit::{NumericalOperator, OracleFragment, ProgramBuilder};
+use quest_circuit::{NumericalOperator, OracleFragment, QuantumRegionBuilder};
 use quest_qsp::{ControlSequence, PhaseSequence, WxSymmetric};
 use quest_qsvt::{
     Complex64, EncodingBuilder, Left, LogicalSpace, NumericalPolicy, ProjectedEncoding, Right,
@@ -13,7 +13,7 @@ fn scalar_encoding(value: f64) -> quest_qsvt::Result<ProjectedEncoding> {
     let remainder = value.mul_add(-value, 1.0).sqrt();
     let c = |v| Complex64::new(v, 0.0);
     let matrix = mat![[c(value), c(remainder)], [c(remainder), c(-value)]];
-    let mut body = ProgramBuilder::new(1, 0)?;
+    let mut body = QuantumRegionBuilder::new(1, 0)?;
     body.numerical(
         NumericalOperator::from_view(matrix.as_ref(), policy.matrix_policy())?,
         &[body.qubit(0)?],
@@ -72,7 +72,9 @@ fn odd_multiplication_retains_bridge_and_source_at_reduced_degree_zero() -> Resu
     let expected = Complex64::from_polar(0.3 * 0.31_f64.sin(), 0.47);
     let transform = TransformBuilder::new()
         .encoding(scalar_encoding(0.3)?)
-        .multiplication_odd(controls)
+        .multiplication_odd(
+            quest_qsvt::RouteResponse::<quest_qsvt::GramArgument>::imported(controls),
+        )
         .build()?;
     expect_true!(transform.bridge().is_some());
     expect_true!(transform.continuation().is_some());
@@ -194,7 +196,11 @@ fn generalized_routes_preserve_complex_control_polynomials_and_query_counts() ->
         let degree = count.saturating_sub(1);
         let direct = TransformBuilder::new()
             .encoding(scalar_encoding(0.3)?)
-            .direct(controls.clone())
+            .direct(
+                quest_qsvt::RouteResponse::<quest_qsvt::HermitianArgument>::imported(
+                    controls.clone(),
+                ),
+            )
             .build()?;
         expect_that!(
             direct.materialize_block()?[(0, 0)]
@@ -206,11 +212,21 @@ fn generalized_routes_preserve_complex_control_polynomials_and_query_counts() ->
         expect_that!(direct.query_counts().source_adjoint, eq(0));
         let even = TransformBuilder::new()
             .encoding(scalar_encoding(0.3)?)
-            .hermitianized_even(controls.clone())
+            .hermitianized_even(
+                quest_qsvt::RouteResponse::<quest_qsvt::HermitianArgument>::imported(
+                    controls.clone(),
+                )
+                .even_component(),
+            )
             .build()?;
         let odd = TransformBuilder::new()
             .encoding(scalar_encoding(0.3)?)
-            .hermitianized_odd(controls.clone())
+            .hermitianized_odd(
+                quest_qsvt::RouteResponse::<quest_qsvt::HermitianArgument>::imported(
+                    controls.clone(),
+                )
+                .odd_component(),
+            )
             .build()?;
         expect_that!(
             even.materialize_block()?[(0, 0)]
@@ -228,7 +244,11 @@ fn generalized_routes_preserve_complex_control_polynomials_and_query_counts() ->
         expect_that!(odd.query_counts().source_adjoint, eq(degree));
         let full = TransformBuilder::new()
             .encoding(scalar_encoding(0.3)?)
-            .hermitianized_full(controls.clone())
+            .hermitianized_full(
+                quest_qsvt::RouteResponse::<quest_qsvt::HermitianArgument>::imported(
+                    controls.clone(),
+                ),
+            )
             .build()?;
         let full_block = full.materialize_block()?;
         expect_that!(
@@ -245,11 +265,15 @@ fn generalized_routes_preserve_complex_control_polynomials_and_query_counts() ->
         );
         let reduced_even = TransformBuilder::new()
             .encoding(scalar_encoding(0.3)?)
-            .multiplication_even(controls.clone())
+            .multiplication_even(
+                quest_qsvt::RouteResponse::<quest_qsvt::GramArgument>::imported(controls.clone()),
+            )
             .build()?;
         let reduced_odd = TransformBuilder::new()
             .encoding(scalar_encoding(0.3)?)
-            .multiplication_odd(controls)
+            .multiplication_odd(
+                quest_qsvt::RouteResponse::<quest_qsvt::GramArgument>::imported(controls),
+            )
             .build()?;
         let reduced = evaluate(&polynomial, 0.09, None);
         expect_that!(
@@ -280,7 +304,7 @@ fn direct_route_rejects_full_oracle_nonhermiticity_and_projector_mismatch() -> R
         [Complex64::new(1.0, 0.0), Complex64::new(0.0, 0.0)],
         [Complex64::new(0.0, 0.0), Complex64::new(0.0, 1.0)]
     ];
-    let mut body = ProgramBuilder::new(1, 0)?;
+    let mut body = QuantumRegionBuilder::new(1, 0)?;
     body.numerical(
         NumericalOperator::from_view(matrix.as_ref(), policy.matrix_policy())?,
         &[body.qubit(0)?],
@@ -306,7 +330,11 @@ fn direct_route_rejects_full_oracle_nonhermiticity_and_projector_mismatch() -> R
     expect_true!(matches!(
         TransformBuilder::new()
             .encoding(encoding)
-            .direct(controls.clone())
+            .direct(
+                quest_qsvt::RouteResponse::<quest_qsvt::HermitianArgument>::imported(
+                    controls.clone()
+                )
+            )
             .build(),
         Err(quest_qsvt::Error::Residual {
             operation: "full oracle Hermiticity",
@@ -323,7 +351,7 @@ fn direct_route_rejects_full_oracle_nonhermiticity_and_projector_mismatch() -> R
     expect_true!(
         TransformBuilder::new()
             .encoding(mismatch)
-            .direct(controls)
+            .direct(quest_qsvt::RouteResponse::<quest_qsvt::HermitianArgument>::imported(controls))
             .build()
             .is_err()
     );
@@ -338,7 +366,9 @@ fn explicit_idle_high_qubits_preserve_block_and_fix_every_projection_to_zero() -
         .build()?;
     let ordinary = TransformBuilder::new()
         .encoding(encoding.clone())
-        .hermitianized_full(controls.clone())
+        .hermitianized_full(
+            quest_qsvt::RouteResponse::<quest_qsvt::HermitianArgument>::imported(controls.clone()),
+        )
         .build()?;
     let layout =
         quest_qsvt::OperandLayout::new(3, vec![0], 2, Some(1))?.with_idle_high_qubits(2)?;
@@ -348,7 +378,9 @@ fn explicit_idle_high_qubits_preserve_block_and_fix_every_projection_to_zero() -
     let extended = TransformBuilder::new()
         .encoding(encoding)
         .operands(layout)
-        .hermitianized_full(controls)
+        .hermitianized_full(
+            quest_qsvt::RouteResponse::<quest_qsvt::HermitianArgument>::imported(controls),
+        )
         .build()?;
     expect_eq!(extended.query_counts(), ordinary.query_counts());
     let expected = ordinary.materialize_block()?;

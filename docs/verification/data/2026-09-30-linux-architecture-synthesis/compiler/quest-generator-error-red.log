@@ -1,0 +1,47 @@
+• Running devenv:files:cleanup
+✓ Running devenv:files:cleanup in 20.3ms
+• Running devenv:enterShell
+✓ Running devenv:enterShell in 24.7ms
+• Running devenv:enterTest
+✓ Running devenv:enterTest in 667ns (no command)
+   Compiling quest-synthesis v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-synthesis)
+   Compiling quest-optimizer-client v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-optimizer-client)
+   Compiling quest-compile v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-compile)
+   Compiling quest-circuit v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-circuit)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.87s
+     Running tests/generator_error_contract.rs (target/debug/build/quest-circuit/eb87138843fdbf3f/out/generator_error_contract-eb87138843fdbf3f)
+
+running 1 test
+test rotation_generation_preserves_process_classification_and_native_failures ... FAILED
+
+failures:
+
+---- rotation_generation_preserves_process_classification_and_native_failures stdout ----
+Value of: correct
+Expected: is equal to true
+Actual: false,
+  which isn't equal to true
+  at crates/quest-circuit/tests/generator_error_contract.rs:51:9
+
+Value of: correct
+Expected: is equal to true
+Actual: false,
+  which isn't equal to true
+  at crates/quest-circuit/tests/generator_error_contract.rs:51:9
+
+Value of: correct
+Expected: is equal to true
+Actual: false,
+  which isn't equal to true
+  at crates/quest-circuit/tests/generator_error_contract.rs:51:9
+
+Error: See failure output above
+
+
+
+failures:
+    rotation_generation_preserves_process_classification_and_native_failures
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p quest-circuit --test generator_error_contract`

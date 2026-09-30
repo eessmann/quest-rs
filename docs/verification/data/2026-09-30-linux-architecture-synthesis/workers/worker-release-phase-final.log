@@ -1,0 +1,243 @@
+• Validating lock
+✓ Validating lock in 5.95ms
+  evaluating file '«nix-internal»/derivation-internal.nix'
+• Configuring shell
+• Configuring cachix
+✓ Configuring cachix in 1.79ms
+• Evaluating shell
+✓ Evaluating shell in 4.13ms (cached)
+✓ Configuring shell in 7.98ms
+• Loading tasks
+• Evaluating devenv.config.task.config
+✓ Evaluating devenv.config.task.config in 296µs (cached)
+✓ Loading tasks in 889µs
+• Running tasks
+• Running devenv:files:cleanup
+✓ Running devenv:files:cleanup in 21.0ms
+• Running devenv:enterShell
+✓ Running devenv:enterShell in 6.59ms
+• Running devenv:enterTest
+✓ Running devenv:enterTest in 370ns (no command)
+✓ Running tasks in 27.7ms
+   Compiling autocfg v1.5.1
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.24
+   Compiling quote v1.0.47
+   Compiling libm v0.2.16
+   Compiling libc v0.2.189
+   Compiling nano-gemm-codegen v0.2.1
+   Compiling version_check v0.9.5
+   Compiling num-traits v0.2.19
+   Compiling paste v1.0.15
+   Compiling pulp v0.22.3
+   Compiling cfg-if v1.0.4
+   Compiling serde_core v1.0.229
+   Compiling dyn-stack-macros v0.1.3
+   Compiling bytemuck v1.25.2
+   Compiling syn v3.0.3
+   Compiling syn v2.0.119
+   Compiling syn v1.0.109
+   Compiling memchr v2.8.3
+   Compiling seq-macro v0.3.6
+   Compiling bitflags v2.13.1
+   Compiling num-complex v0.4.6
+   Compiling num-integer v0.1.47
+   Compiling equivalent v1.0.2
+   Compiling serde v1.0.229
+   Compiling hashbrown v0.17.1
+   Compiling zmij v1.0.23
+   Compiling indexmap v2.14.0
+   Compiling thiserror v2.0.20
+   Compiling serde_derive v1.0.229
+   Compiling once_cell v1.21.4
+   Compiling raw-cpuid v11.6.0
+   Compiling nano-gemm-c32 v0.2.1
+   Compiling nano-gemm-f64 v0.2.1
+   Compiling nano-gemm-c64 v0.2.1
+   Compiling nano-gemm-f32 v0.2.1
+   Compiling serde_json v1.0.151
+   Compiling interpol v0.2.1
+   Compiling thiserror-impl v2.0.20
+   Compiling num-bigint v0.4.8
+   Compiling reborrow v0.5.5
+   Compiling pulp-wasm-simd-flag v0.1.1
+   Compiling defer v0.2.1
+   Compiling private-gemm-x86 v0.1.20
+   Compiling equator-macro v0.2.1
+   Compiling dyn-stack v0.13.2
+   Compiling num-rational v0.4.2
+   Compiling aho-corasick v1.1.5
+   Compiling regex-syntax v0.8.11
+   Compiling equator-macro v0.6.0
+   Compiling num-bigint v0.5.1
+   Compiling nano-gemm-core v0.2.1
+   Compiling semver v1.0.28
+   Compiling parking_lot_core v0.9.12
+   Compiling gemm-common v0.19.0
+   Compiling rustc_version v0.4.1
+   Compiling dirs-sys-next v0.1.2
+   Compiling regex-automata v0.4.18
+   Compiling winnow v1.0.4
+   Compiling crunchy v0.2.4
+   Compiling itoa v1.0.18
+   Compiling crossbeam-utils v0.8.23
+   Compiling scopeguard v1.2.0
+   Compiling smallvec v1.16.0
+   Compiling lock_api v0.4.14
+   Compiling dirs-next v2.0.0
+   Compiling tiny-keccak v2.0.2
+   Compiling crossbeam-epoch v0.9.21
+   Compiling rustix v1.1.4
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling toml_parser v1.1.3+spec-1.1.0
+   Compiling unicode-xid v0.2.6
+   Compiling regex-syntax v0.6.29
+   Compiling siphasher v1.0.3
+   Compiling phf_shared v0.11.3
+   Compiling term v0.7.0
+   Compiling toml_edit v0.25.13+spec-1.1.0
+   Compiling parking_lot v0.12.5
+   Compiling regex v1.13.1
+   Compiling crossbeam-deque v0.8.8
+   Compiling log v0.4.34
+   Compiling linux-raw-sys v0.12.1
+   Compiling fixedbitset v0.4.2
+   Compiling zerocopy v0.8.57
+   Compiling new_debug_unreachable v1.0.6
+   Compiling either v1.18.0
+   Compiling bit-vec v0.6.3
+   Compiling typenum v1.20.1
+   Compiling futures-core v0.3.34
+   Compiling utf8parse v0.2.2
+   Compiling precomputed-hash v0.1.1
+   Compiling futures-sink v0.3.34
+   Compiling string_cache v0.8.9
+   Compiling anstyle-parse v1.0.0
+   Compiling futures-channel v0.3.34
+   Compiling bit-set v0.5.3
+   Compiling itertools v0.10.5
+   Compiling petgraph v0.6.5
+   Compiling hybrid-array v0.4.15
+   Compiling ena v0.14.4
+   Compiling lalrpop-util v0.19.12
+   Compiling proc-macro-crate v3.5.0
+   Compiling ascii-canvas v3.0.0
+   Compiling quest-math v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-math)
+   Compiling gemm-c64 v0.19.0
+   Compiling gemm-c32 v0.19.0
+   Compiling gemm-f64 v0.19.0
+   Compiling gemm-f32 v0.19.0
+   Compiling qd v0.8.0
+   Compiling equator v0.2.2
+   Compiling futures-macro v0.3.34
+   Compiling num_cpus v1.17.0
+   Compiling is-terminal v0.4.17
+   Compiling futures-io v0.3.34
+   Compiling is_terminal_polyfill v1.70.2
+   Compiling slab v0.4.12
+   Compiling foldhash v0.1.5
+   Compiling anstyle v1.0.14
+   Compiling anstyle-query v1.1.5
+   Compiling generativity v1.2.1
+   Compiling rustversion v1.0.23
+   Compiling colorchoice v1.0.5
+   Compiling pin-project-lite v0.2.17
+   Compiling diff v0.1.13
+   Compiling futures-task v0.3.34
+   Compiling rayon-core v1.13.0
+   Compiling hashbrown v0.15.5
+   Compiling futures-util v0.3.34
+   Compiling lalrpop v0.19.12
+   Compiling faer-traits v0.24.0
+   Compiling anstream v1.0.0
+   Compiling nano-gemm v0.2.2
+   Compiling gemm v0.19.0
+   Compiling rstest_macros v0.23.0
+   Compiling equator v0.6.0
+   Compiling getrandom v0.2.17
+   Compiling matrixmultiply v0.3.11
+   Compiling fixedbitset v0.5.7
+   Compiling object v0.37.3
+   Compiling thiserror v1.0.69
+   Compiling fnv v1.0.7
+   Compiling beef v0.5.2
+   Compiling getrandom v0.4.3
+   Compiling logos-derive v0.12.1
+   Compiling quest-symbolic v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-symbolic)
+   Compiling petgraph v0.8.3
+   Compiling rand_core v0.6.4
+   Compiling faer v0.24.4
+   Compiling ppv-lite86 v0.2.21
+   Compiling futures-executor v0.3.34
+   Compiling quest-synthesis v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-synthesis)
+   Compiling quest-optimizer-protocol v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-protocol)
+   Compiling crypto-common v0.2.2
+   Compiling block-buffer v0.12.1
+   Compiling openqasm v0.1.2
+   Compiling thiserror-impl v1.0.69
+   Compiling num-iter v0.1.46
+   Compiling owo-colors v4.3.0
+   Compiling relative-path v1.9.3
+   Compiling heck v0.5.0
+   Compiling adler2 v2.0.1
+   Compiling rawpointer v0.2.1
+   Compiling const-oid v0.10.2
+   Compiling gimli v0.32.3
+   Compiling jiff-core v0.1.0
+   Compiling glob v0.3.4
+   Compiling clap_lex v1.1.0
+   Compiling eyre v0.6.12
+   Compiling strsim v0.11.1
+   Compiling clap_builder v4.6.6
+   Compiling jiff v0.2.35
+   Compiling addr2line v0.25.1
+   Compiling digest v0.11.3
+   Compiling env_filter v2.0.0
+   Compiling miniz_oxide v0.8.9
+   Compiling clap_derive v4.6.4
+   Compiling num v0.4.3
+   Compiling rayon v1.12.0
+   Compiling futures v0.3.34
+   Compiling rand_chacha v0.3.1
+   Compiling logos v0.12.1
+   Compiling derive_more-impl v1.0.0
+   Compiling heck v0.4.1
+   Compiling fastrand v2.5.0
+   Compiling futures-timer v3.0.4
+   Compiling indenter v0.3.4
+   Compiling rustc-demangle v0.1.28
+   Compiling cpufeatures v0.3.1
+   Compiling sha2 v0.11.0
+   Compiling derive_more v1.0.0
+   Compiling ndarray v0.16.1
+   Compiling rstest v0.23.0
+   Compiling tempfile v3.27.0
+   Compiling strum_macros v0.25.3
+   Compiling backtrace v0.3.76
+   Compiling clap v4.6.6
+   Compiling rand v0.8.8
+   Compiling env_logger v0.11.11
+   Compiling quest-optimizer-client v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-client)
+   Compiling itertools v0.13.0
+   Compiling approx v0.5.1
+   Compiling rustc-hash v2.1.3
+   Compiling roots v0.0.8
+   Compiling strum v0.25.0
+   Compiling color-eyre v0.6.5
+   Compiling googletest_macro v0.14.3
+   Compiling quizx v0.3.0
+   Compiling googletest v0.14.3
+   Compiling quest-language v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-language)
+   Compiling quest-optimizer-worker v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-worker)
+   Compiling quest-qasm v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-qasm)
+   Compiling quest-macros v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-macros)
+   Compiling quest-compile v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-compile)
+   Compiling quest-circuit v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-circuit)
+    Finished `release` profile [optimized] target(s) in 48.40s
+     Running tests/synthesis_process.rs (target/release/build/quest-optimizer-worker/1cb7aa300bac3ab7/out/synthesis_process-1cb7aa300bac3ab7)
+
+running 1 test
+test fixed_exact_phase_sequence_survives_the_bounded_process ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.22s
+

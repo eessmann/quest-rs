@@ -1,5 +1,7 @@
 #![cfg(all(feature = "workers", target_os = "linux"))]
 use googletest::{Result, prelude::*};
+#[allow(unused_imports)]
+use quest_circuit::prelude::*;
 use quest_circuit::*;
 use std::{os::unix::fs::PermissionsExt, time::Duration};
 
@@ -23,7 +25,7 @@ fn worker_timeout_discards_request_and_preserves_prior_exact_improvement() -> Re
             ..optimizer::WorkerLimits::default()
         },
     )?;
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     let q = builder.qubit(0)?;
     builder.gate(Gate::H, &[q], &[])?;
     builder.gate(Gate::H, &[q], &[])?;
@@ -37,7 +39,7 @@ fn worker_timeout_discards_request_and_preserves_prior_exact_improvement() -> Re
         OptimizationLimits::default(),
         ApproximationMode::Disabled,
     )?;
-    let outcome = Optimizer::from_ideal(program, &[], options)?.search_with_workers(
+    let outcome = Optimizer::from_region(program, &[], options)?.search_with_workers(
         BeamOptions::new(1, 1, 16, 1)?,
         &client,
         0,
@@ -47,7 +49,7 @@ fn worker_timeout_discards_request_and_preserves_prior_exact_improvement() -> Re
     expect_eq!(outcome.evidence(), OptimizationEvidence::ExactVerified);
     let report = outcome.search_report().ok_or(Error::InvalidId)?;
     expect_true!(report.exact_regions().is_empty());
-    let OptimizerInput::Ideal { source, bound } = outcome.into_input() else {
+    let OptimizerInput::Region { source, bound } = outcome.into_input() else {
         return fail!("expected ideal input");
     };
     expect_eq!(source.snapshot_id(), original);

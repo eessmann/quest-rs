@@ -57,7 +57,6 @@ fn standard_bounds_are_conditional_outward_and_bound_to_actual_transform() -> go
     expect_true!(report.total().unwrap().contains(0.462));
     expect_eq!(report.theorem_assumptions().len(), 3);
     expect_eq!(report.encoding().assumptions().len(), 2);
-    expect_true!(transform.theorem_error_bound().is_none());
     expect_true!(report.observations().unitarity_residual().is_some());
     let changed_phase = self::transform(0.3)?;
     expect_true!(
@@ -137,9 +136,11 @@ fn generalized_reports_use_physical_queries_without_standard_theorem_privileges(
     let t = TransformBuilder::new()
         .encoding(source.encoding().clone())
         .hermitianized_full(
-            ControlSequence::builder()
-                .angles(&[0.2, 0.3], &[0.4, 0.5])?
-                .build()?,
+            quest_qsvt::RouteResponse::<quest_qsvt::HermitianArgument>::imported(
+                ControlSequence::builder()
+                    .angles(&[0.2, 0.3], &[0.4, 0.5])?
+                    .build()?,
+            ),
         )
         .build()?;
     expect_true!(StandardPremises::for_transform(&t).is_err());
@@ -315,7 +316,7 @@ fn diagnostic_budget_covers_oracle_decomposition_metadata_before_materializing()
 -> googletest::Result<()> {
     use quest_qsvt::{EncodingBuilder, Left, LogicalSpace, Right};
     let policy = NumericalPolicy::default();
-    let mut body = quest_circuit::ProgramBuilder::new(1, 0)?;
+    let mut body = quest_circuit::QuantumRegionBuilder::new(1, 0)?;
     for _ in 0..200 {
         body.global_phase(quest_circuit::Angle::radians(0.)?, &[])?;
     }

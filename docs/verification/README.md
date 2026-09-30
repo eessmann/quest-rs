@@ -8,6 +8,8 @@ and [tutorial validation guide](../book/src/validation.md) for current commands.
 
 | Record | Scope |
 | --- | --- |
+| [Linux architecture and synthesis, 2026-09-30](2026-09-30-linux-architecture-synthesis.md) | Linux workspace, bounded processes, CPU/OpenMP/MPI, large QSP fixtures and portability corrections |
+| [Architecture and synthesis, 2026-09-29](2026-09-29-architecture-synthesis.md) | Unified program lifecycle, bounded Rust synthesis, RHW/NLFT, payload-bound QSVT evidence and pinned reference comparisons |
 | [Grace Hopper, 2026-09-29](2026-09-29-grace-hopper.md) | Manual/Spack setup, CPU/OpenMP/GPU execution, dependency closure and workspace checks |
 | [Optimization, 2026-09-28](2026-09-28-optimization-roadmap-results.md) | Compiler and native measurements, feature coverage and cost-model limits |
 | [Consolidation, 2026-09-28](2026-09-28-consolidation-review.md) | Correctness regressions, allocation measurements and validation |

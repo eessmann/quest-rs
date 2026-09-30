@@ -6,13 +6,14 @@
 //!
 //! A result exclusively borrows its register. Copying its mass observations
 //! cannot authorize conditioning after the register has been released.
+use crate::execution::PreparedRegion;
 #[cfg(all(feature = "mpi", quest_native_mpi))]
 pub mod collective;
 mod continuation;
 mod hadamard;
 mod projection;
 mod reporting;
-use crate::{Complex64, Environment, PreparedProgram, Register, StateVector};
+use crate::{Complex64, Environment, Register, StateVector};
 use crate::{environment::Reservation, error::BackendResult, values::bytes_for};
 use continuation::{AdmittedContinuation, PreparedContinuation};
 use faer::Mat;
@@ -184,7 +185,7 @@ fn dispatch_schedule(
         continuation.bridge().is_some(),
     )
 }
-fn plan(program: &quest_circuit::BoundProgram) -> crate::Result<quest_circuit::ExecutablePlan> {
+fn plan(program: &quest_circuit::BoundRegion) -> crate::Result<quest_circuit::RegionPlan> {
     Ok(program.clone().plan()?)
 }
 type RunAdmission = (Vec<bool>, Option<Vec<bool>>);
@@ -199,7 +200,7 @@ type RunAdmission = (Vec<bool>, Option<Vec<bool>>);
 /// # Ok(()) }
 /// ```
 pub struct PreparedTransform<'env> {
-    main: PreparedProgram<'env>,
+    main: PreparedRegion<'env>,
     continuation: PreparedContinuation<'env>,
     input: PreparedProjection<'env>,
     output: PreparedProjection<'env>,

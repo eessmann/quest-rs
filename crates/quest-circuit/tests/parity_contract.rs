@@ -1,4 +1,6 @@
 use googletest::{Result, prelude::*};
+#[allow(unused_imports)]
+use quest_circuit::prelude::*;
 use quest_circuit::{
     AffinePhaseOperation as A, BigRational, Cnot, ParityOptions, fold_parity, fold_parity_candidate,
 };
@@ -126,8 +128,8 @@ fn parity_candidate_can_be_longer_while_the_existing_pass_retains_input() -> Res
 
 #[gtest]
 fn program_candidate_expands_a_window_after_a_fence_with_fresh_ids() -> Result<()> {
-    use quest_circuit::{Gate, ProgramBuilder};
-    let mut builder = ProgramBuilder::new(2, 0)?;
+    use quest_circuit::{Gate, QuantumRegionBuilder};
+    let mut builder = QuantumRegionBuilder::new(2, 0)?;
     let q = builder.qubit(0)?;
     let r = builder.qubit(1)?;
     builder.gate(Gate::H, &[q], &[])?;
@@ -161,8 +163,8 @@ fn program_candidate_expands_a_window_after_a_fence_with_fresh_ids() -> Result<(
 
 #[gtest]
 fn program_candidate_can_start_after_an_earlier_affine_window() -> Result<()> {
-    use quest_circuit::{Gate, ProgramBuilder};
-    let mut builder = ProgramBuilder::new(2, 0)?;
+    use quest_circuit::{Gate, QuantumRegionBuilder};
+    let mut builder = QuantumRegionBuilder::new(2, 0)?;
     let q = builder.qubit(0)?;
     let r = builder.qubit(1)?;
     builder.gate(Gate::T, &[q], &[])?;
@@ -191,8 +193,8 @@ fn program_candidate_can_start_after_an_earlier_affine_window() -> Result<()> {
 #[gtest]
 fn bound_symbolic_parity_cancels_only_after_original_binding_and_keeps_source_identity()
 -> Result<()> {
-    use quest_circuit::{Angle, Gate, ProgramBuilder};
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    use quest_circuit::{Angle, Gate, QuantumRegionBuilder};
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     let p = builder.parameter("p")?;
     let q = builder.qubit(0)?;
     let angle = Angle::parameter(p)?;
@@ -212,8 +214,8 @@ fn bound_symbolic_parity_cancels_only_after_original_binding_and_keeps_source_id
 #[gtest]
 fn bound_symbolic_parity_falls_back_on_new_overflow_and_rejects_foreign_bound_input() -> Result<()>
 {
-    use quest_circuit::{Angle, Gate, ProgramBuilder};
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    use quest_circuit::{Angle, Gate, QuantumRegionBuilder};
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     let p = builder.parameter("p")?;
     let q = builder.qubit(0)?;
     let angle = Angle::parameter(p)?;
@@ -225,7 +227,7 @@ fn bound_symbolic_parity_falls_back_on_new_overflow_and_rejects_foreign_bound_in
         ideal.parity_bound_candidate_from(&bound, 0, ParityOptions::default(), 2)?;
     expect_eq!(report.accepted_windows, 0);
     expect_eq!(candidate.snapshot_id(), bound.snapshot_id());
-    let mut foreign_builder = ProgramBuilder::new(1, 0)?;
+    let mut foreign_builder = QuantumRegionBuilder::new(1, 0)?;
     foreign_builder.gate(Gate::X, &[foreign_builder.qubit(0)?], &[])?;
     let foreign = foreign_builder.finish()?.bind(&[])?;
     expect_true!(
@@ -238,8 +240,8 @@ fn bound_symbolic_parity_falls_back_on_new_overflow_and_rejects_foreign_bound_in
 
 #[gtest]
 fn bound_parity_keeps_rz_two_pi_scalar_and_signed_zero_source() -> Result<()> {
-    use quest_circuit::{Angle, Gate, Operation, ProgramBuilder};
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    use quest_circuit::{Angle, Gate, Operation, QuantumRegionBuilder};
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     let q = builder.qubit(0)?;
     builder.gate(Gate::Rz(Angle::pi(2, 1)?), &[q], &[])?;
     let ideal = builder.finish()?;
@@ -255,7 +257,7 @@ fn bound_parity_keeps_rz_two_pi_scalar_and_signed_zero_source() -> Result<()> {
         if radians.to_bits() == std::f64::consts::PI.to_bits() && controls.is_empty())
     );
 
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     let p = builder.parameter("p")?;
     let q = builder.qubit(0)?;
     builder.gate(Gate::Phase(Angle::parameter(p)?), &[q], &[])?;
@@ -270,8 +272,8 @@ fn bound_parity_keeps_rz_two_pi_scalar_and_signed_zero_source() -> Result<()> {
 
 #[gtest]
 fn bound_parity_precharges_original_binding_and_independent_affine_replay() -> Result<()> {
-    use quest_circuit::{Angle, Gate, LinearOptions, ProgramBuilder};
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    use quest_circuit::{Angle, Gate, LinearOptions, QuantumRegionBuilder};
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     let p = builder.parameter("p")?;
     let q = builder.qubit(0)?;
     let mixed = Angle::parameter(p)?.added(&Angle::affine(
@@ -403,8 +405,8 @@ fn seeded_affine_phase_windows_preserve_every_basis_column_and_scalar_phase() ->
 
 #[gtest]
 fn program_folding_retains_rz_scalar_phase_and_stops_at_effects_and_opaque_angles() -> Result<()> {
-    use quest_circuit::{Angle, Gate, Operation, ProgramBuilder};
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    use quest_circuit::{Angle, Gate, Operation, QuantumRegionBuilder};
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     let q = builder.qubit(0)?;
     for _ in 0..2 {
         builder.gate(Gate::Rz(Angle::pi(1, 1)?), &[q], &[])?;
@@ -420,7 +422,7 @@ fn program_folding_retains_rz_scalar_phase_and_stops_at_effects_and_opaque_angle
     expect_true!(
         matches!(instruction.operation(), Operation::GlobalPhase { radians, controls } if radians.to_bits() == std::f64::consts::PI.to_bits() && controls.is_empty())
     );
-    let mut builder = ProgramBuilder::new(1, 1)?;
+    let mut builder = QuantumRegionBuilder::new(1, 1)?;
     let q = builder.qubit(0)?;
     let b = builder.bit(0)?;
     builder.gate(Gate::Rz(Angle::pi(1, 1)?), &[q], &[])?;
@@ -439,8 +441,8 @@ fn program_folding_retains_rz_scalar_phase_and_stops_at_effects_and_opaque_angle
 
 #[gtest]
 fn negative_controls_and_explicit_edges_guard_parity_replacements() -> Result<()> {
-    use quest_circuit::{Control, ControlState, Gate, ProgramBuilder};
-    let mut builder = ProgramBuilder::new(2, 0)?;
+    use quest_circuit::{Control, ControlState, Gate, QuantumRegionBuilder};
+    let mut builder = QuantumRegionBuilder::new(2, 0)?;
     let target = builder.qubit(0)?;
     let controls = [Control::new(builder.qubit(1)?, ControlState::Zero)];
     for _ in 0..2 {
@@ -451,7 +453,7 @@ fn negative_controls_and_explicit_edges_guard_parity_replacements() -> Result<()
         .optimize_parity(ParityOptions::default())?;
     expect_eq!(unchanged.schedule().len(), 2);
     expect_eq!(report.considered_windows, 0);
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     let target = builder.qubit(0)?;
     let first = builder.gate(Gate::T, &[target], &[])?;
     let second = builder.gate(Gate::Tdg, &[target], &[])?;

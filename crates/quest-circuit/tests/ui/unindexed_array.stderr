@@ -1,5 +1,0 @@
-error: array operands require an explicit index; broadcast operations are not supported
- --> tests/ui/unindexed_array.rs:2:40
-  |
-2 | fn main(){let _=circuit!{qubit[2] q; h q;};}
-  |                                        ^

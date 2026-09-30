@@ -4,22 +4,72 @@ use crate::{
 };
 use quest_polynomial::{Chebyshev, Laurent, Polynomial};
 use quest_qsp::{
-    AdmittedTarget, Canonical, CompletedPolynomial, FrozenCandidate, Generalized, Policy,
-    SynthesisBuilder,
+    AdmittedTarget, CompletedPolynomial, FrozenCandidate, Policy, RealParityWx, SynthesisAlgorithm,
+    SynthesisBuilder, UnitCircleResponse,
 };
 use quest_qsvt_io::{CatalogFamily, IoPolicy, QspInput};
 use serde_json::{Value, json};
 use std::time::Instant;
 
 enum Candidate {
-    Canonical(FrozenCandidate<Canonical>),
-    Generalized(FrozenCandidate<Generalized>),
+    RealParityWx(FrozenCandidate<RealParityWx>),
+    UnitCircleResponse(FrozenCandidate<UnitCircleResponse>),
+    #[cfg(feature = "certification")]
+    CertifiedWx(quest_qsp::certification::Certified<RealParityWx>),
+    #[cfg(feature = "certification")]
+    CertifiedCircle(quest_qsp::certification::Certified<UnitCircleResponse>),
 }
 impl Candidate {
     fn payload(&self) -> QspInput {
         match self {
-            Self::Canonical(value) => QspInput::Symmetric(value.phase_sequence()),
-            Self::Generalized(value) => QspInput::GeneralizedMatrices(value.control_sequence()),
+            #[cfg(feature = "certification")]
+            Self::CertifiedWx(value) => QspInput::Symmetric(value.candidate().phase_sequence()),
+            #[cfg(feature = "certification")]
+            Self::CertifiedCircle(value) => {
+                QspInput::GeneralizedMatrices(value.candidate().control_sequence())
+            }
+            Self::RealParityWx(value) => QspInput::Symmetric(value.phase_sequence()),
+            Self::UnitCircleResponse(value) => {
+                QspInput::GeneralizedMatrices(value.control_sequence())
+            }
+        }
+    }
+    fn export(&self, format: crate::ExportFormat) -> Result<Vec<u8>> {
+        if format == crate::ExportFormat::Sequence {
+            return Ok(quest_qsvt_io::write_qsp_json(&self.payload())?.into_bytes());
+        }
+        #[cfg(feature = "certification")]
+        {
+            use quest_qsp::artifact::{ArtifactLimits, export_certified, export_compiled};
+            Ok(match self {
+                Self::RealParityWx(c) => export_compiled(c, ArtifactLimits::default())?,
+                Self::UnitCircleResponse(c) => export_compiled(c, ArtifactLimits::default())?,
+                Self::CertifiedWx(c) => export_certified(c, ArtifactLimits::default())?,
+                Self::CertifiedCircle(c) => export_certified(c, ArtifactLimits::default())?,
+            })
+        }
+        #[cfg(not(feature = "certification"))]
+        {
+            Err(Error::Feature("certification (compiled artifacts)"))
+        }
+    }
+    #[cfg(feature = "native")]
+    fn into_execution(self) -> Result<QspInput> {
+        #[cfg(feature = "certification")]
+        {
+            use quest_qsp::artifact::{ArtifactLimits, LoadedCertified};
+            let certified = match self {
+                Self::CertifiedWx(c) => LoadedCertified::RealParityWx(c),
+                Self::CertifiedCircle(c) => LoadedCertified::UnitCircleResponse(c),
+                other => return Ok(other.payload()),
+            };
+            Ok(QspInput::Compiled(
+                quest_qsvt_io::CompiledInput::from_certified(certified, ArtifactLimits::default())?,
+            ))
+        }
+        #[cfg(not(feature = "certification"))]
+        {
+            Ok(self.payload())
         }
     }
     fn report(&self) -> Result<Value> {
@@ -29,18 +79,31 @@ impl Candidate {
                 "completion_grid":value.completion_grid()})
         }
         let (degree, mut report) = match self {
-            Self::Canonical(value) => (value.phase_sequence().degree(), diagnostics(value)),
-            Self::Generalized(value) => (value.control_sequence().degree(), diagnostics(value)),
+            #[cfg(feature = "certification")]
+            Self::CertifiedWx(value) => (
+                value.candidate().phase_sequence().degree(),
+                diagnostics(value.candidate()),
+            ),
+            #[cfg(feature = "certification")]
+            Self::CertifiedCircle(value) => (
+                value.candidate().control_sequence().degree(),
+                diagnostics(value.candidate()),
+            ),
+            Self::RealParityWx(value) => (value.phase_sequence().degree(), diagnostics(value)),
+            Self::UnitCircleResponse(value) => {
+                (value.control_sequence().degree(), diagnostics(value))
+            }
         };
         crate::set(&mut report, "degree", json!(degree))?;
         Ok(report)
     }
 }
-fn policy(tolerance: f64) -> Result<Policy> {
+fn policy(tolerance: f64, algorithm: SynthesisAlgorithm) -> Result<Policy> {
     if !tolerance.is_finite() || tolerance <= 0.0 {
         return Err(Error::Input("positive finite tolerance required"));
     }
     Ok(Policy {
+        algorithm,
         response_tolerance: tolerance,
         ..Policy::default()
     })
@@ -54,40 +117,44 @@ fn complete<M>(
         Ok(admitted.complete_with(execution)?)
     })
 }
-fn canonical(
+fn real_parity_wx(
     target: &Polynomial<Chebyshev>,
     tolerance: f64,
+    algorithm: SynthesisAlgorithm,
     context: &mut Context<'_>,
 ) -> Result<Candidate> {
-    let policy = policy(tolerance)?;
+    let policy = policy(tolerance, algorithm)?;
     let admitted = context.measure("admission", Stage::Construction, || {
         Ok(SynthesisBuilder::new()
             .policy(policy)
-            .canonical(target)?
+            .real_parity_wx(target)?
             .admit()?)
     })?;
     let completed = complete(admitted, context)?;
     let execution = context.execution;
     context.measure("synthesis", Stage::Synthesis, || {
-        Ok(Candidate::Canonical(completed.synthesize_with(execution)?))
+        Ok(Candidate::RealParityWx(
+            completed.synthesize_with(execution)?,
+        ))
     })
 }
-fn generalized(
+fn unit_circle_response(
     target: &Polynomial<Laurent>,
     tolerance: f64,
+    algorithm: SynthesisAlgorithm,
     context: &mut Context<'_>,
 ) -> Result<Candidate> {
-    let policy = policy(tolerance)?;
+    let policy = policy(tolerance, algorithm)?;
     let admitted = context.measure("admission", Stage::Construction, || {
         Ok(SynthesisBuilder::new()
             .policy(policy)
-            .generalized(target)?
+            .unit_circle_response(target)?
             .admit()?)
     })?;
     let completed = complete(admitted, context)?;
     let execution = context.execution;
     context.measure("synthesis", Stage::Synthesis, || {
-        Ok(Candidate::Generalized(
+        Ok(Candidate::UnitCircleResponse(
             completed.synthesize_with(execution)?,
         ))
     })
@@ -126,20 +193,28 @@ fn certify(
         fn check<M: CertificationMode>(
             value: FrozenCandidate<M>,
             tolerance: f64,
-        ) -> Result<(FrozenCandidate<M>, Value)> {
+        ) -> Result<(quest_qsp::certification::Certified<M>, Value)> {
             let certified = CertificationBuilder::new()
                 .candidate(value)
                 .policy(certificate_policy(tolerance))?
                 .certify()?;
             let report = certificate_report(certified.report());
-            Ok((certified.into_candidate(), report))
+            Ok((certified, report))
         }
         context.measure("certification", Stage::Certification, || match candidate {
-            Candidate::Canonical(value) => {
-                check(value, tolerance).map(|(c, r)| (Candidate::Canonical(c), r))
+            Candidate::CertifiedWx(c) => {
+                let r = certificate_report(c.report());
+                Ok((Candidate::CertifiedWx(c), r))
             }
-            Candidate::Generalized(value) => {
-                check(value, tolerance).map(|(c, r)| (Candidate::Generalized(c), r))
+            Candidate::CertifiedCircle(c) => {
+                let r = certificate_report(c.report());
+                Ok((Candidate::CertifiedCircle(c), r))
+            }
+            Candidate::RealParityWx(value) => {
+                check(value, tolerance).map(|(c, r)| (Candidate::CertifiedWx(c), r))
+            }
+            Candidate::UnitCircleResponse(value) => {
+                check(value, tolerance).map(|(c, r)| (Candidate::CertifiedCircle(c), r))
             }
         })
     }
@@ -167,32 +242,52 @@ fn finish(
     Ok((candidate, report))
 }
 pub fn run(args: &SynthesisArgs, context: &mut Context<'_>, offline: bool) -> Result<Value> {
+    if args.certify && args.export == crate::ExportFormat::Sequence {
+        return Err(Error::Input(
+            "--certify requires --export compiled to retain evidence",
+        ));
+    }
+    #[cfg(not(feature = "certification"))]
+    if args.export == crate::ExportFormat::Compiled {
+        return Err(Error::Feature("certification (compiled artifacts)"));
+    }
     let input = context.measure("read", Stage::Construction, || read_qsp(&args.input))?;
     let QspInput::Polynomial(input) = input else {
         return Err(Error::Input("synthesis requires a polynomial target"));
     };
     let mut conversion = 0.0;
     let (candidate, mut report) = match args.mode {
-        SynthesisMode::Canonical => {
+        SynthesisMode::RealParityWx => {
             let converted = context.measure("basis_conversion", Stage::Approximation, || {
                 Ok(input.to_chebyshev()?)
             })?;
-            conversion = converted.coefficient_error_bound;
+            conversion = converted.coefficient_error_bound();
             if offline {
-                offline_canonical(&converted.polynomial, args.tolerance, context)?
+                offline_canonical(
+                    converted.polynomial(),
+                    args.tolerance,
+                    args.algorithm.solver(),
+                    context,
+                )?
             } else {
-                let candidate = canonical(&converted.polynomial, args.tolerance, context)?;
+                let candidate = real_parity_wx(
+                    converted.polynomial(),
+                    args.tolerance,
+                    args.algorithm.solver(),
+                    context,
+                )?;
                 finish(candidate, args.tolerance, args.certify, context)?
             }
         }
-        SynthesisMode::Generalized => {
+        SynthesisMode::UnitCircleResponse => {
             let target = input.laurent().ok_or(Error::Input(
                 "generalized synthesis requires an explicit nonnegative Laurent target",
             ))?;
             if offline {
-                offline_generalized(target, args.tolerance, context)?
+                offline_generalized(target, args.tolerance, args.algorithm.solver(), context)?
             } else {
-                let candidate = generalized(target, args.tolerance, context)?;
+                let candidate =
+                    unit_circle_response(target, args.tolerance, args.algorithm.solver(), context)?;
                 finish(candidate, args.tolerance, args.certify, context)?
             }
         }
@@ -210,12 +305,19 @@ pub fn run(args: &SynthesisArgs, context: &mut Context<'_>, offline: bool) -> Re
         ),
     )?;
     context.measure("write", Stage::Construction, || {
-        std::fs::write(
-            &args.output,
-            quest_qsvt_io::write_qsp_json(&candidate.payload())?,
-        )?;
+        std::fs::write(&args.output, candidate.export(args.export)?)?;
         Ok(())
     })?;
+    crate::set(&mut report, "algorithm", json!(args.algorithm.name()))?;
+    crate::set(
+        &mut report,
+        "export",
+        json!(if args.export == crate::ExportFormat::Compiled {
+            "compiled"
+        } else {
+            "sequence"
+        }),
+    )?;
     Ok(report)
 }
 fn selected(selection: &FamilySelection) -> Result<Vec<&'static CatalogFamily>> {
@@ -244,7 +346,7 @@ pub fn catalog(command: CatalogCommand, context: &mut Context<'_>) -> Result<Val
             certify: requested,
             tolerance,
         } => {
-            policy(tolerance)?;
+            policy(tolerance, SynthesisAlgorithm::default())?;
             check_families(&selected(&family)?, requested, tolerance, context)
         }
     }
@@ -274,7 +376,12 @@ fn family_job(
     let mut report = family_report(family);
     let result = (|| {
         let polynomial = family.polynomial(IoPolicy::default())?;
-        let candidate = canonical(&polynomial, tolerance, &mut context)?;
+        let candidate = real_parity_wx(
+            &polynomial,
+            tolerance,
+            SynthesisAlgorithm::default(),
+            &mut context,
+        )?;
         finish(candidate, tolerance, requested, &mut context).map(|(_, report)| report)
     })();
     match result {
@@ -360,10 +467,10 @@ fn offline_report<M>(solution: &quest_qsp::offline::OfflineSolution<M>) -> Value
 #[cfg(feature = "offline-synthesis")]
 fn finish_offline<M>(
     solution: quest_qsp::offline::OfflineSolution<M>,
-    wrap: impl FnOnce(FrozenCandidate<M>) -> Candidate,
+    wrap: impl FnOnce(quest_qsp::certification::Certified<M>) -> Candidate,
 ) -> Result<(Candidate, Value)> {
     let mut report = offline_report(&solution);
-    let candidate = wrap(solution.into_certified().into_candidate());
+    let candidate = wrap(solution.into_certified());
     crate::set(
         &mut report,
         "degree",
@@ -378,6 +485,7 @@ fn finish_offline<M>(
 fn offline_canonical(
     target: &Polynomial<Chebyshev>,
     tolerance: f64,
+    algorithm: SynthesisAlgorithm,
     context: &mut Context<'_>,
 ) -> Result<(Candidate, Value)> {
     #[cfg(feature = "offline-synthesis")]
@@ -387,20 +495,21 @@ fn offline_canonical(
             Stage::Offline,
             || {
                 let policy = quest_qsp::offline::OfflinePolicy {
+                    algorithm,
                     certification: certificate_policy(tolerance),
                     ..quest_qsp::offline::OfflinePolicy::default()
                 };
                 let solution = quest_qsp::offline::OfflineBuilder::new()
-                    .canonical(target)?
+                    .real_parity_wx(target)?
                     .policy(policy)?
                     .solve()?;
-                finish_offline(solution, Candidate::Canonical)
+                finish_offline(solution, Candidate::CertifiedWx)
             },
         )
     }
     #[cfg(not(feature = "offline-synthesis"))]
     {
-        let _ = (target, tolerance);
+        let _ = (target, tolerance, algorithm);
         context.measure("offline_unavailable", Stage::Offline, || {
             Err(Error::Feature("offline-synthesis"))
         })
@@ -409,6 +518,7 @@ fn offline_canonical(
 fn offline_generalized(
     target: &Polynomial<Laurent>,
     tolerance: f64,
+    algorithm: SynthesisAlgorithm,
     context: &mut Context<'_>,
 ) -> Result<(Candidate, Value)> {
     #[cfg(feature = "offline-synthesis")]
@@ -418,20 +528,21 @@ fn offline_generalized(
             Stage::Offline,
             || {
                 let policy = quest_qsp::offline::OfflinePolicy {
+                    algorithm,
                     certification: certificate_policy(tolerance),
                     ..quest_qsp::offline::OfflinePolicy::default()
                 };
                 let solution = quest_qsp::offline::OfflineBuilder::new()
-                    .generalized(target)?
+                    .unit_circle_response(target)?
                     .policy(policy)?
                     .solve()?;
-                finish_offline(solution, Candidate::Generalized)
+                finish_offline(solution, Candidate::CertifiedCircle)
             },
         )
     }
     #[cfg(not(feature = "offline-synthesis"))]
     {
-        let _ = (target, tolerance);
+        let _ = (target, tolerance, algorithm);
         context.measure("offline_unavailable", Stage::Offline, || {
             Err(Error::Feature("offline-synthesis"))
         })
@@ -485,7 +596,25 @@ pub fn freeze_input(
     args: &crate::TransformArgs,
     context: &mut Context<'_>,
 ) -> Result<(QspInput, Value)> {
-    let input = context.measure("qsp_read", Stage::Construction, || read_qsp(&args.qsp))?;
+    let input = context.measure("qsp_read", Stage::Construction, || {
+        crate::read_qsp_with_tolerance(&args.qsp, args.input_tolerance)
+    })?;
+    #[cfg(feature = "certification")]
+    if let QspInput::Compiled(compiled) = input {
+        if args.synthesize_input {
+            return Err(Error::Input("compiled payload must not be resynthesized"));
+        }
+        let certificate = match compiled.certified() {
+            quest_qsp::artifact::LoadedCertified::RealParityWx(c) => certificate_report(c.report()),
+            quest_qsp::artifact::LoadedCertified::UnitCircleResponse(c) => {
+                certificate_report(c.report())
+            }
+        };
+        return Ok((
+            QspInput::Compiled(compiled),
+            json!({"construction":"compiled-recertified","certified":true,"certificate":certificate}),
+        ));
+    }
     let QspInput::Polynomial(polynomial) = input else {
         if args.synthesize_input || args.certify_input {
             return Err(Error::Input("input synthesis requires a polynomial target"));
@@ -505,16 +634,22 @@ pub fn freeze_input(
             Ok(polynomial.to_chebyshev()?)
         })?;
         (
-            canonical(&converted.polynomial, args.input_tolerance, context)?,
-            converted.coefficient_error_bound,
+            real_parity_wx(
+                converted.polynomial(),
+                args.input_tolerance,
+                args.algorithm.solver(),
+                context,
+            )?,
+            converted.coefficient_error_bound(),
         )
     } else {
         (
-            generalized(
+            unit_circle_response(
                 polynomial.laurent().ok_or(Error::Input(
                     "generalized synthesis requires a nonnegative Laurent target",
                 ))?,
                 args.input_tolerance,
+                args.algorithm.solver(),
                 context,
             )?,
             0.0,
@@ -534,5 +669,5 @@ pub fn freeze_input(
             "frozen export against the synthesis target; input basis conversion is reported separately"
         ),
     )?;
-    Ok((candidate.payload(), report))
+    Ok((candidate.into_execution()?, report))
 }

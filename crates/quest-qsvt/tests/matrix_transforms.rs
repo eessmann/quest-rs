@@ -141,13 +141,18 @@ fn rectangular_complex_generalized_routes_match_independent_matrix_polynomials()
     let layout = OperandLayout::new(5, vec![4, 1, 3], 2, Some(0))?;
     let full = TransformBuilder::new()
         .encoding(encoding.clone())
-        .hermitianized_full(controls.clone())
+        .hermitianized_full(
+            quest_qsvt::RouteResponse::<quest_qsvt::HermitianArgument>::imported(controls.clone()),
+        )
         .operands(layout.clone())
         .build()?;
     expect_matrix(full.materialize_block()?.as_ref(), expected.as_ref());
     let even = TransformBuilder::new()
         .encoding(encoding.clone())
-        .hermitianized_even(controls.clone())
+        .hermitianized_even(
+            quest_qsvt::RouteResponse::<quest_qsvt::HermitianArgument>::imported(controls.clone())
+                .even_component(),
+        )
         .operands(layout.clone())
         .build()?;
     expect_matrix(
@@ -156,7 +161,10 @@ fn rectangular_complex_generalized_routes_match_independent_matrix_polynomials()
     );
     let odd = TransformBuilder::new()
         .encoding(encoding.clone())
-        .hermitianized_odd(controls.clone())
+        .hermitianized_odd(
+            quest_qsvt::RouteResponse::<quest_qsvt::HermitianArgument>::imported(controls.clone())
+                .odd_component(),
+        )
         .operands(layout.clone())
         .build()?;
     expect_matrix(
@@ -167,13 +175,17 @@ fn rectangular_complex_generalized_routes_match_independent_matrix_polynomials()
     let reduced = chebyshev(&coefficients, gram.as_ref());
     let even = TransformBuilder::new()
         .encoding(encoding.clone())
-        .multiplication_even(controls.clone())
+        .multiplication_even(
+            quest_qsvt::RouteResponse::<quest_qsvt::GramArgument>::imported(controls.clone()),
+        )
         .operands(layout.clone())
         .build()?;
     expect_matrix(even.materialize_block()?.as_ref(), reduced.as_ref());
     let odd = TransformBuilder::new()
         .encoding(encoding)
-        .multiplication_odd(controls)
+        .multiplication_odd(
+            quest_qsvt::RouteResponse::<quest_qsvt::GramArgument>::imported(controls),
+        )
         .operands(layout)
         .build()?;
     expect_matrix(
@@ -252,7 +264,7 @@ fn standard_degree_three_preserves_wx_conventions_on_rectangular_complex_inputs(
 
 #[gtest]
 fn complex_isometry_and_dense_projector_routes_preserve_ordered_logical_bases() -> Result<()> {
-    use quest_circuit::{Gate, OracleFragment, ProgramBuilder};
+    use quest_circuit::{Gate, OracleFragment, QuantumRegionBuilder};
     use quest_qsvt::{EncodingBuilder, Left, LogicalSpace, Right};
     let policy = NumericalPolicy::default();
     let scale = std::f64::consts::FRAC_1_SQRT_2;
@@ -276,7 +288,7 @@ fn complex_isometry_and_dense_projector_routes_preserve_ordered_logical_bases() 
         policy,
     )?;
     let right = LogicalSpace::<Right>::from_isometry(right_basis.as_ref(), policy)?;
-    let mut body = ProgramBuilder::new(2, 0)?;
+    let mut body = QuantumRegionBuilder::new(2, 0)?;
     body.gate(Gate::H, &[body.qubit(0)?], &[])?;
     body.gate(Gate::S, &[body.qubit(1)?], &[])?;
     let oracle = OracleFragment::builder(body.finish()?.bind(&[])?)
@@ -315,7 +327,9 @@ fn complex_isometry_and_dense_projector_routes_preserve_ordered_logical_bases() 
     );
     let transform = TransformBuilder::new()
         .encoding(encoding)
-        .multiplication_odd(controls)
+        .multiplication_odd(
+            quest_qsvt::RouteResponse::<quest_qsvt::GramArgument>::imported(controls),
+        )
         .build()?;
     expect_matrix(transform.materialize_block()?.as_ref(), expected.as_ref());
     Ok(())

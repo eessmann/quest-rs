@@ -7,17 +7,24 @@ license.workspace = true
 repository.workspace = true
 
 [dependencies]
+faer = { workspace = true, features = ["std", "linalg"] }
+num-complex.workspace = true
+quest-symbolic.workspace = true
+num-bigint.workspace = true
+num-rational = { workspace = true, features = ["std"] }
 thiserror.workspace = true
+serde_json = { workspace = true, optional = true }
 serde = { workspace = true, optional = true, features = ["derive", "std", "rc"] }
 codespan-reporting = { workspace = true, optional = true }
 num-traits.workspace = true
-petgraph.workspace = true
+petgraph = { workspace = true, features = ["stable_graph"] }
 
 [dev-dependencies]
 serde_json.workspace = true
 googletest.workspace = true
 
 [features]
+templates = ["serde", "dep:serde_json"]
 serde = ["dep:serde"]
 codespan-reporting = ["dep:codespan-reporting"]
 

@@ -1,0 +1,97 @@
+• Validating lock
+✓ Validating lock in 5.87ms
+  evaluating file '«nix-internal»/derivation-internal.nix'
+• Configuring shell
+• Configuring cachix
+✓ Configuring cachix in 1.66ms
+• Evaluating shell
+✓ Evaluating shell in 4.08ms (cached)
+✓ Configuring shell in 7.87ms
+• Loading tasks
+• Evaluating devenv.config.task.config
+✓ Evaluating devenv.config.task.config in 330µs (cached)
+✓ Loading tasks in 1.05ms
+• Running tasks
+• Running devenv:files:cleanup
+✓ Running devenv:files:cleanup in 6.52ms
+• Running devenv:enterShell
+✓ Running devenv:enterShell in 6.02ms
+• Running devenv:enterTest
+✓ Running devenv:enterTest in 460ns (no command)
+✓ Running tasks in 12.6ms
+   Compiling serde_core v1.0.229
+   Compiling serde v1.0.229
+   Compiling memchr v2.8.3
+   Compiling num-traits v0.2.19
+   Compiling syn v3.0.3
+   Compiling libc v0.2.189
+   Compiling syn v2.0.119
+   Compiling aho-corasick v1.1.5
+   Compiling num-integer v0.1.47
+   Compiling once_cell v1.21.4
+   Compiling getrandom v0.4.3
+   Compiling tempfile v3.27.0
+   Compiling regex-automata v0.4.18
+   Compiling serde_derive v1.0.229
+   Compiling thiserror-impl v2.0.20
+   Compiling serde_json v1.0.151
+   Compiling thiserror v2.0.20
+   Compiling googletest_macro v0.14.3
+   Compiling regex v1.13.1
+   Compiling googletest v0.14.3
+   Compiling num-bigint v0.5.1
+   Compiling num-rational v0.4.2
+   Compiling quest-math v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-math)
+   Compiling quest-optimizer-protocol v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-protocol)
+   Compiling quest-synthesis v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-synthesis)
+   Compiling quest-optimizer-client v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-client)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.84s
+     Running unittests src/lib.rs (/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/worker-target/debug/build/quest-optimizer-client/d8a8d98425d73452/out/quest_optimizer_client-d8a8d98425d73452)
+
+running 1 test
+test process::review_tests::exit_observation_keeps_pid_owned_until_group_cleanup_and_reap ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/capability.rs (/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/worker-target/debug/build/quest-optimizer-client/d7561c7067714823/out/capability-d7561c7067714823)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/direct.rs (/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/worker-target/debug/build/quest-optimizer-client/1466ae5f6c7a9f82/out/direct-1466ae5f6c7a9f82)
+
+running 1 test
+test direct_engine_works_without_any_process_capability ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.38s
+
+     Running tests/mitm_parent.rs (/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/worker-target/debug/build/quest-optimizer-client/2b374589024955e9/out/mitm_parent-2b374589024955e9)
+
+running 2 tests
+test parent_approx_certificate_uses_original_target ... ok
+test parent_rejects_forged_exact_candidate_and_preserves_incomplete ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/process_contract.rs (/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/worker-target/debug/build/quest-optimizer-client/e031e62e1752a51d/out/process_contract-e031e62e1752a51d)
+
+running 9 tests
+test affine_byte_budget_rejects_before_worker_process_starts ... ok
+test affine_target_is_certified_against_original_identity_after_untrusted_response ... ok
+test bounded_valid_response_and_capability_rejection ... ok
+test exited_leader_with_inherited_pipes_keeps_cleanup_ownership ... ok
+test expanded_zx_request_is_distinct_and_parent_certifies_its_response ... ok
+test memory_limit_is_applied_before_worker_execution ... ok
+test rejects_malformed_output_and_wrong_seed ... ok
+test timeout_and_output_limit_kill_the_process_group ... ok
+test well_formed_candidates_still_need_independent_mathematical_admission ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.63s
+
+   Doc-tests quest_optimizer_client
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

@@ -229,6 +229,7 @@ impl OracleInventory {
             .position(|body| body.shares_storage_with(fragment))
             .ok_or(Error::Value("missing oracle body"))
     }
+    #[cfg(any(feature = "qsvt", all(feature = "mpi", quest_native_mpi)))]
     pub(crate) fn include_operation(&mut self, operation: &Operation, width: usize) -> Result<()> {
         match operation {
             Operation::Oracle {
@@ -710,7 +711,7 @@ fn execute_body<K: RegisterKind>(
 
 impl OracleInventory {
     pub(crate) fn from_structured(
-        plan: &quest_circuit::StructuredPlan,
+        plan: &quest_circuit::Program<quest_circuit::Executable>,
         budget: usize,
     ) -> Result<Self> {
         let mut inventory = Self::with_budget(budget);
@@ -723,7 +724,7 @@ impl OracleInventory {
     }
     fn structured_region(
         &mut self,
-        plan: &quest_circuit::StructuredPlan,
+        plan: &quest_circuit::Program<quest_circuit::Executable>,
         region: quest_circuit::language::ssa::RegionId,
         inherited: &[bool],
         depth: usize,
@@ -799,9 +800,9 @@ impl OracleInventory {
 mod tests {
     use super::*;
     use googletest::prelude::*;
-    use quest_circuit::{Gate, ProgramBuilder};
+    use quest_circuit::{Gate, QuantumRegionBuilder};
     fn body() -> crate::Result<OracleFragment> {
-        let mut builder = ProgramBuilder::new(1, 0)?;
+        let mut builder = QuantumRegionBuilder::new(1, 0)?;
         builder.gate(Gate::X, &[builder.qubit(0)?], &[])?;
         Ok(OracleFragment::builder(builder.finish()?.bind(&[])?)
             .matrix_tolerance(1e-12)?
@@ -829,7 +830,7 @@ mod tests {
     #[gtest]
     fn inventory_keeps_distinct_profiles_and_deepest_shared_path() -> googletest::Result<()> {
         let leaf = body()?;
-        let mut builder = ProgramBuilder::new(1, 0)?;
+        let mut builder = QuantumRegionBuilder::new(1, 0)?;
         builder.oracle(&leaf, &[builder.qubit(0)?], &[])?;
         let outer = OracleFragment::builder(builder.finish()?.bind(&[])?)
             .matrix_tolerance(1e-12)?

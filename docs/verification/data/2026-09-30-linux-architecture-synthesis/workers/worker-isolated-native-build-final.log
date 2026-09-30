@@ -1,0 +1,54 @@
+• Validating lock
+✓ Validating lock in 6.14ms
+  evaluating file '«nix-internal»/derivation-internal.nix'
+• Configuring shell
+• Configuring cachix
+✓ Configuring cachix in 1.76ms
+• Evaluating shell
+✓ Evaluating shell in 3.99ms (cached)
+✓ Configuring shell in 7.96ms
+• Loading tasks
+• Evaluating devenv.config.task.config
+✓ Evaluating devenv.config.task.config in 240µs (cached)
+✓ Loading tasks in 895µs
+• Running tasks
+• Running devenv:files:cleanup
+✓ Running devenv:files:cleanup in 7.16ms
+• Running devenv:enterShell
+✓ Running devenv:enterShell in 7.62ms
+• Running devenv:enterTest
+✓ Running devenv:enterTest in 410ns (no command)
+✓ Running tasks in 14.9ms
+   Compiling libc v0.2.189
+   Compiling serde v1.0.229
+   Compiling getrandom v0.2.17
+   Compiling num-complex v0.4.6
+   Compiling rustix v1.1.4
+   Compiling linux-raw-sys v0.12.1
+   Compiling rand_core v0.6.4
+   Compiling rand_chacha v0.3.1
+   Compiling serde_json v1.0.151
+   Compiling backtrace v0.3.76
+   Compiling rand v0.8.8
+   Compiling num-rational v0.4.2
+   Compiling dirs-sys-next v0.1.2
+   Compiling dirs-next v2.0.0
+   Compiling parking_lot_core v0.9.12
+   Compiling term v0.7.0
+   Compiling parking_lot v0.12.5
+   Compiling is-terminal v0.4.17
+   Compiling num-bigint v0.5.1
+   Compiling num v0.4.3
+   Compiling string_cache v0.8.9
+   Compiling ascii-canvas v3.0.0
+   Compiling ndarray v0.16.1
+   Compiling color-eyre v0.6.5
+   Compiling lalrpop v0.19.12
+   Compiling tempfile v3.27.0
+   Compiling quest-math v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-math)
+   Compiling quest-optimizer-protocol v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-protocol)
+   Compiling quest-synthesis v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-synthesis)
+   Compiling openqasm v0.1.2
+   Compiling quizx v0.3.0
+   Compiling quest-optimizer-worker v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-worker)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 5.46s

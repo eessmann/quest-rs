@@ -1,0 +1,689 @@
+   Compiling link-cplusplus v1.0.12
+   Compiling cxx v1.0.198
+   Compiling quest-sys v0.2.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-sys)
+warning: quest-sys@0.2.0: Using QuEST 4.3.0 from /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0 with /nix/store/0skhb15j2szcq05929gs9m1dbpiydhb7-clang-21.1.8/bin/clang++
+error: failed to run custom build command for `quest-sys v0.2.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-sys)`
+
+Caused by:
+  process didn't exit successfully: `/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/../target-mpi/debug/build/quest-sys/20cbaabbc7cf91ed/out/build_script_build` (exit status: 1)
+  --- stdout
+  cargo:rerun-if-changed=build.rs
+  cargo:rerun-if-changed=src/lib.rs
+  cargo:rerun-if-changed=src/mpi.rs
+  cargo:rerun-if-changed=src/generated_api.rs
+  cargo:rerun-if-env-changed=QUEST_DIR
+  cargo:rerun-if-env-changed=QUEST_ROOT
+  cargo:rerun-if-env-changed=QuEST_DIR
+  cargo:rerun-if-env-changed=QuEST_ROOT
+  cargo:rerun-if-env-changed=QUEST_NATIVE_CONFIG
+  cargo:rerun-if-env-changed=QUEST_RUNTIME_LIBRARY_PATH
+  cargo:rerun-if-env-changed=CMAKE_PREFIX_PATH
+  cargo:rerun-if-env-changed=CMAKE
+  cargo:rerun-if-env-changed=CMAKE_GENERATOR
+  cargo:rerun-if-env-changed=CMAKE_TOOLCHAIN_FILE
+  cargo:rerun-if-env-changed=CUDAToolkit_ROOT
+  cargo:rerun-if-env-changed=CUDATOOLKIT_ROOT
+  cargo:rerun-if-env-changed=CUDA_PATH
+  cargo:rerun-if-env-changed=CUQUANTUM_ROOT
+  cargo:rerun-if-env-changed=PATH
+  cargo:rerun-if-env-changed=CXX
+  cargo:rerun-if-env-changed=CXXFLAGS
+  cargo:rerun-if-env-changed=CC
+  cargo:rerun-if-env-changed=CFLAGS
+  cargo:rerun-if-env-changed=LD_LIBRARY_PATH
+  cargo:rerun-if-env-changed=LD_PRELOAD
+  cargo:rerun-if-env-changed=LD_AUDIT
+  cargo:rerun-if-env-changed=SDKROOT
+  cargo:rerun-if-env-changed=DYLD_LIBRARY_PATH
+  cargo:rerun-if-env-changed=DYLD_FALLBACK_LIBRARY_PATH
+  cargo:rerun-if-env-changed=DYLD_INSERT_LIBRARIES
+  cargo:rerun-if-env-changed=CXX_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=CXX_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_CXX
+  cargo:rerun-if-env-changed=TARGET_CXX
+  cargo:rerun-if-env-changed=CXXFLAGS_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=CXXFLAGS_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_CXXFLAGS
+  cargo:rerun-if-env-changed=TARGET_CXXFLAGS
+  cargo:rerun-if-env-changed=CXXFLAGS
+  cargo:rerun-if-env-changed=CXXSTDLIB_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=CXXSTDLIB_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_CXXSTDLIB
+  cargo:rerun-if-env-changed=TARGET_CXXSTDLIB
+  cargo:rerun-if-env-changed=CXXSTDLIB
+  cargo:rerun-if-env-changed=CMAKE_TOOLCHAIN_FILE_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=CMAKE_TOOLCHAIN_FILE_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_CMAKE_TOOLCHAIN_FILE
+  cargo:rerun-if-env-changed=TARGET_CMAKE_TOOLCHAIN_FILE
+  cargo:rerun-if-env-changed=CMAKE_TOOLCHAIN_FILE
+  cargo:rerun-if-env-changed=CMAKE_PREFIX_PATH_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=CMAKE_PREFIX_PATH_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_CMAKE_PREFIX_PATH
+  cargo:rerun-if-env-changed=TARGET_CMAKE_PREFIX_PATH
+  cargo:rerun-if-env-changed=CPATH
+  cargo:rerun-if-env-changed=CPLUS_INCLUDE_PATH
+  cargo:rerun-if-env-changed=C_INCLUDE_PATH
+  cargo:rerun-if-env-changed=OBJC_INCLUDE_PATH
+  cargo:rerun-if-env-changed=GCC_EXEC_PREFIX
+  cargo:rerun-if-env-changed=COMPILER_PATH
+  cargo:rerun-if-env-changed=LIBRARY_PATH
+  cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+  cargo:rerun-if-env-changed=SDKROOT
+  CMAKE_TOOLCHAIN_FILE_x86_64-unknown-linux-gnu = None
+  CMAKE_TOOLCHAIN_FILE_x86_64_unknown_linux_gnu = None
+  HOST_CMAKE_TOOLCHAIN_FILE = None
+  CMAKE_TOOLCHAIN_FILE = None
+  CMAKE_GENERATOR_x86_64-unknown-linux-gnu = None
+  CMAKE_GENERATOR_x86_64_unknown_linux_gnu = None
+  HOST_CMAKE_GENERATOR = None
+  CMAKE_GENERATOR = None
+  CMAKE_PREFIX_PATH_x86_64-unknown-linux-gnu = None
+  CMAKE_PREFIX_PATH_x86_64_unknown_linux_gnu = None
+  HOST_CMAKE_PREFIX_PATH = None
+  CMAKE_PREFIX_PATH = Some("/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev")
+  CMAKE_x86_64-unknown-linux-gnu = None
+  CMAKE_x86_64_unknown_linux_gnu = None
+  HOST_CMAKE = None
+  CMAKE = None
+  -- The CXX compiler identification is Clang 21.1.8
+  -- Detecting CXX compiler ABI info
+  -- Detecting CXX compiler ABI info - done
+  -- Check for working CXX compiler: /nix/store/0skhb15j2szcq05929gs9m1dbpiydhb7-clang-21.1.8/bin/clang++ - skipped
+  -- Detecting CXX compile features
+  -- Detecting CXX compile features - done
+  -- Found MPI_CXX: /nix/store/x5afc4dcy2qg43fa1ww84rk00gvx2zfk-openmpi-5.0.10/lib/libmpi.so (found version "3.1")
+  -- Found MPI: TRUE (found version "3.1") found components: CXX
+  -- Configuring done (0.8s)
+  -- Generating done (0.0s)
+  -- Build files have been written to: /var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/quest-native/build
+  [ 50%] Building CXX object CMakeFiles/quest_bridge.dir/abi.cpp.o
+  [100%] Linking CXX static library libquest_bridge.a
+  [100%] Built target quest_bridge
+  cargo:root=/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/../target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/quest-native
+  cargo:rerun-if-env-changed=CXX_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=CXX_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_CXX
+  cargo:rerun-if-env-changed=TARGET_CXX
+  cargo:rerun-if-env-changed=CXXFLAGS_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=CXXFLAGS_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_CXXFLAGS
+  cargo:rerun-if-env-changed=TARGET_CXXFLAGS
+  cargo:rerun-if-env-changed=CXXFLAGS
+  cargo:rerun-if-env-changed=CXXSTDLIB_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=CXXSTDLIB_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_CXXSTDLIB
+  cargo:rerun-if-env-changed=TARGET_CXXSTDLIB
+  cargo:rerun-if-env-changed=CXXSTDLIB
+  cargo:rerun-if-env-changed=CMAKE_TOOLCHAIN_FILE_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=CMAKE_TOOLCHAIN_FILE_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_CMAKE_TOOLCHAIN_FILE
+  cargo:rerun-if-env-changed=TARGET_CMAKE_TOOLCHAIN_FILE
+  cargo:rerun-if-env-changed=CMAKE_TOOLCHAIN_FILE
+  cargo:rerun-if-env-changed=CMAKE_PREFIX_PATH_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=CMAKE_PREFIX_PATH_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_CMAKE_PREFIX_PATH
+  cargo:rerun-if-env-changed=TARGET_CMAKE_PREFIX_PATH
+  cargo:rerun-if-env-changed=CPATH
+  cargo:rerun-if-env-changed=CPLUS_INCLUDE_PATH
+  cargo:rerun-if-env-changed=C_INCLUDE_PATH
+  cargo:rerun-if-env-changed=OBJC_INCLUDE_PATH
+  cargo:rerun-if-env-changed=GCC_EXEC_PREFIX
+  cargo:rerun-if-env-changed=COMPILER_PATH
+  cargo:rerun-if-env-changed=LIBRARY_PATH
+  cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+  cargo:rerun-if-env-changed=SDKROOT
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/calculations.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/channels.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/config.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/debug.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/decoherence.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/deprecated.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/environment.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/experimental.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/initialisations.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/matrices.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/modes.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/multiplication.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/operations.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/paulis.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/precision.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/qureg.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/trotterisation.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/types.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/wrappers.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib/cmake/QuEST/QuESTConfig.cmake
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib/cmake/QuEST/QuESTConfigDependencies.cmake
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib/cmake/QuEST/QuESTConfigVersion.cmake
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib/cmake/QuEST/QuESTTargets-release.cmake
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib/cmake/QuEST/QuESTTargets.cmake
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib/libQuEST.so.4.3.0
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeCXXCompiler.cmake.in
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeCXXCompilerABI.cpp
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeCXXInformation.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeCommonLanguageInclude.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeCompilerIdDetection.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeDetermineCXXCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeDetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeDetermineCompilerABI.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeDetermineCompilerId.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeDetermineCompilerSupport.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeDetermineSystem.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeFindBinUtils.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeFindDependencyMacro.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeGenericSystem.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeInitializeConfigs.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeLanguageInformation.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeParseImplicitIncludeInfo.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeParseImplicitLinkInfo.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeParseLibraryArchitecture.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeSystem.cmake.in
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeSystemSpecificInformation.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeSystemSpecificInitialize.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeTestCXXCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeTestCompilerCommon.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeUnixFindMake.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/ADSP-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/ARMCC-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/ARMClang-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/AppleClang-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Borland-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/CMakeCommonCompilerMacros.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Clang-CXX.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Clang-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Clang-DetermineCompilerInternal.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Clang-FindBinUtils.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Clang.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Compaq-CXX-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Cray-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/CrayClang-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Diab-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Embarcadero-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Fujitsu-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/GHS-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/GNU-CXX-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/GNU.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/HP-CXX-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/IAR-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/IBMClang-CXX-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Intel-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/LCC-CXX-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/MSVC-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/NVHPC-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/NVIDIA-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/OrangeC-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/PGI-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/PathScale-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/PellesC-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Renesas-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/SCO-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/SunPro-CXX-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/TI-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/TIClang-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Tasking-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/VisualAge-CXX-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Watcom-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/XL-CXX-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/XLClang-CXX-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/zOS-CXX-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/FindMPI.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/FindPackageHandleStandardArgs.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/FindPackageMessage.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/FindPkgConfig.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Internal/CMakeCXXLinkerInformation.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Internal/CMakeCommonLinkerInformation.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Internal/CMakeDetermineLinkerId.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Internal/CMakeInspectCXXLinker.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Internal/FeatureTesting.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Linker/GNU-CXX.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Linker/GNU.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Platform/Linker/GNU.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Platform/Linker/Linux-GNU-CXX.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Platform/Linker/Linux-GNU.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Platform/Linux-Clang-CXX.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Platform/Linux-Determine-CXX.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Platform/Linux-GNU-CXX.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Platform/Linux-GNU.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Platform/Linux-Initialize.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Platform/Linux.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Platform/UnixPaths.cmake
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpi-ext.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpi.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpi_portable_platform.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpif-c-constants-decl.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpif-config.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpif-constants.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpif-ext.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpif-externals.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpif-handles.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpif-io-constants.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpif-io-handles.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpif-sentinels.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpif-sizeof.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpif.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpp
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpp/shmem.fh
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpp/shmem.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openmpi
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openmpi/mpiext
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openmpi/mpiext/mpiext_affinity_c.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openmpi/mpiext/mpiext_cuda_c.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openmpi/mpiext/mpiext_ftmpi_c.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openmpi/mpiext/mpiext_ftmpi_mpifh.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openmpi/mpiext/mpiext_rocm_c.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openmpi/mpiext/mpiext_shortfloat_c.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openmpi/mpiext/mpiext_shortfloat_mpifh.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openshmem
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openshmem/oshmem
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openshmem/oshmem/constants.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openshmem/oshmem/frameworks.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openshmem/oshmem/types.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openshmem/oshmem/version.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openshmem/oshmem_config.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/pshmem.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/pshmemx.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/shmem-compat.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/shmem.fh
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/shmem.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/shmemx.h
+  cargo:rerun-if-changed=/nix/store/x5afc4dcy2qg43fa1ww84rk00gvx2zfk-openmpi-5.0.10/lib/libmpi.so
+  cargo:rerun-if-changed=/nix/store/x5afc4dcy2qg43fa1ww84rk00gvx2zfk-openmpi-5.0.10/lib/libmpi.so.40.40.7
+  cargo:rerun-if-changed=/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/quest-native/build/CMakeFiles/4.4.2/CMakeCXXCompiler.cmake
+  cargo:rerun-if-changed=/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/quest-native/build/CMakeFiles/4.4.2/CMakeSystem.cmake
+  cargo:rerun-if-changed=src/lib.rs
+  cargo:rerun-if-changed=src/generated_api.rs
+  cargo:rerun-if-changed=src/mpi.rs
+  cargo:CXXBRIDGE_PREFIX=quest-sys
+  cargo:CXXBRIDGE_LINKS=QuEST
+  cargo:CXXBRIDGE_DIR0=/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/../target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/cxxbridge/include
+  cargo:CXXBRIDGE_DIR1=/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/../target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/cxxbridge/crate
+  cargo:rerun-if-changed=src/cxx_bindings
+  cargo:rerun-if-changed=src/cxx_bindings/quest_bindings.cpp
+  cargo:rerun-if-changed=src/cxx_bindings/quest_generated_bindings.cpp
+  cargo:rerun-if-changed=src/cxx_bindings/quest_mpi.cpp
+  cargo:rerun-if-changed=src/cxx_bindings/include
+  cargo:rerun-if-changed=src/cxx_bindings/include/quest_bindings.hpp
+  cargo:rerun-if-changed=src/cxx_bindings/include/quest_generated_bindings.hpp
+  cargo:rerun-if-changed=src/cxx_bindings/include/quest_mpi.hpp
+  cargo:rerun-if-env-changed=QUEST_DIR
+  cargo:rerun-if-env-changed=QUEST_ROOT
+  cargo:rerun-if-env-changed=QuEST_DIR
+  cargo:rerun-if-env-changed=QuEST_ROOT
+  cargo:rerun-if-env-changed=QUEST_NATIVE_CONFIG
+  cargo:rerun-if-env-changed=QUEST_RUNTIME_LIBRARY_PATH
+  cargo:rerun-if-env-changed=CMAKE_PREFIX_PATH
+  cargo:rerun-if-env-changed=CMAKE
+  cargo:rerun-if-env-changed=CMAKE_GENERATOR
+  cargo:rerun-if-env-changed=CMAKE_TOOLCHAIN_FILE
+  cargo:rerun-if-env-changed=CUDAToolkit_ROOT
+  cargo:rerun-if-env-changed=CUDATOOLKIT_ROOT
+  cargo:rerun-if-env-changed=CUDA_PATH
+  cargo:rerun-if-env-changed=CUQUANTUM_ROOT
+  cargo:rerun-if-env-changed=PATH
+  cargo:rerun-if-env-changed=CXX
+  cargo:rerun-if-env-changed=CXXFLAGS
+  cargo:rerun-if-env-changed=CC
+  cargo:rerun-if-env-changed=CFLAGS
+  cargo:rerun-if-env-changed=LD_LIBRARY_PATH
+  cargo:rerun-if-env-changed=LD_PRELOAD
+  cargo:rerun-if-env-changed=LD_AUDIT
+  cargo:rerun-if-env-changed=SDKROOT
+  cargo:rerun-if-env-changed=DYLD_LIBRARY_PATH
+  cargo:rerun-if-env-changed=DYLD_FALLBACK_LIBRARY_PATH
+  cargo:rerun-if-env-changed=DYLD_INSERT_LIBRARIES
+  cargo:rerun-if-env-changed=CXX_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=CXX_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_CXX
+  cargo:rerun-if-env-changed=TARGET_CXX
+  cargo:rerun-if-env-changed=CXXFLAGS_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=CXXFLAGS_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_CXXFLAGS
+  cargo:rerun-if-env-changed=TARGET_CXXFLAGS
+  cargo:rerun-if-env-changed=CXXFLAGS
+  cargo:rerun-if-env-changed=CXXSTDLIB_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=CXXSTDLIB_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_CXXSTDLIB
+  cargo:rerun-if-env-changed=TARGET_CXXSTDLIB
+  cargo:rerun-if-env-changed=CXXSTDLIB
+  cargo:rerun-if-env-changed=CMAKE_TOOLCHAIN_FILE_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=CMAKE_TOOLCHAIN_FILE_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_CMAKE_TOOLCHAIN_FILE
+  cargo:rerun-if-env-changed=TARGET_CMAKE_TOOLCHAIN_FILE
+  cargo:rerun-if-env-changed=CMAKE_TOOLCHAIN_FILE
+  cargo:rerun-if-env-changed=CMAKE_PREFIX_PATH_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=CMAKE_PREFIX_PATH_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_CMAKE_PREFIX_PATH
+  cargo:rerun-if-env-changed=TARGET_CMAKE_PREFIX_PATH
+  cargo:rerun-if-env-changed=CPATH
+  cargo:rerun-if-env-changed=CPLUS_INCLUDE_PATH
+  cargo:rerun-if-env-changed=C_INCLUDE_PATH
+  cargo:rerun-if-env-changed=OBJC_INCLUDE_PATH
+  cargo:rerun-if-env-changed=GCC_EXEC_PREFIX
+  cargo:rerun-if-env-changed=COMPILER_PATH
+  cargo:rerun-if-env-changed=LIBRARY_PATH
+  cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+  cargo:rerun-if-env-changed=SDKROOT
+  cargo:rerun-if-changed=/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/../target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/cxxbridge/sources/quest-sys/src/generated_api.rs.cc
+  cargo:rerun-if-changed=/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/../target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/cxxbridge/sources/quest-sys/src/lib.rs.cc
+  cargo:rerun-if-changed=/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/../target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/cxxbridge/sources/quest-sys/src/mpi.rs.cc
+  cargo:rerun-if-changed=/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-sys/src/cxx_bindings/quest_bindings.cpp
+  cargo:rerun-if-changed=/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-sys/src/cxx_bindings/quest_generated_bindings.cpp
+  cargo:rerun-if-changed=/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-sys/src/cxx_bindings/quest_mpi.cpp
+  cargo:rerun-if-changed=/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/../target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out
+  cargo:rerun-if-changed=/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/../target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/cxxbridge/include
+  cargo:rerun-if-changed=/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/../target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/cxxbridge/crate
+  cargo:rerun-if-changed=/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-sys/src/cxx_bindings/include
+  CMAKE_TOOLCHAIN_FILE_x86_64-unknown-linux-gnu = None
+  CMAKE_TOOLCHAIN_FILE_x86_64_unknown_linux_gnu = None
+  HOST_CMAKE_TOOLCHAIN_FILE = None
+  CMAKE_TOOLCHAIN_FILE = None
+  CMAKE_GENERATOR_x86_64-unknown-linux-gnu = None
+  CMAKE_GENERATOR_x86_64_unknown_linux_gnu = None
+  HOST_CMAKE_GENERATOR = None
+  CMAKE_GENERATOR = None
+  CMAKE_PREFIX_PATH_x86_64-unknown-linux-gnu = None
+  CMAKE_PREFIX_PATH_x86_64_unknown_linux_gnu = None
+  HOST_CMAKE_PREFIX_PATH = None
+  CMAKE_PREFIX_PATH = Some("/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev")
+  CMAKE_x86_64-unknown-linux-gnu = None
+  CMAKE_x86_64_unknown_linux_gnu = None
+  HOST_CMAKE = None
+  CMAKE = None
+  -- The CXX compiler identification is Clang 21.1.8
+  -- Detecting CXX compiler ABI info
+  -- Detecting CXX compiler ABI info - done
+  -- Check for working CXX compiler: /nix/store/0skhb15j2szcq05929gs9m1dbpiydhb7-clang-21.1.8/bin/clang++ - skipped
+  -- Detecting CXX compile features
+  -- Detecting CXX compile features - done
+  -- Found MPI_CXX: /nix/store/x5afc4dcy2qg43fa1ww84rk00gvx2zfk-openmpi-5.0.10/lib/libmpi.so (found version "3.1")
+  -- Found MPI: TRUE (found version "3.1") found components: CXX
+  -- Configuring done (0.8s)
+  -- Generating done (0.0s)
+  -- Build files have been written to: /var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/quest-native/build
+  [ 25%] Building CXX object CMakeFiles/quest_bridge.dir/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/cxxbridge/sources/quest-sys/src/generated_api.rs.cc.o
+  [ 25%] Building CXX object CMakeFiles/quest_bridge.dir/abi.cpp.o
+  [ 37%] Building CXX object CMakeFiles/quest_bridge.dir/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/cxxbridge/sources/quest-sys/src/lib.rs.cc.o
+  [ 50%] Building CXX object CMakeFiles/quest_bridge.dir/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/cxxbridge/sources/quest-sys/src/mpi.rs.cc.o
+  [ 62%] Building CXX object CMakeFiles/quest_bridge.dir/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-sys/src/cxx_bindings/quest_bindings.cpp.o
+  [ 75%] Building CXX object CMakeFiles/quest_bridge.dir/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-sys/src/cxx_bindings/quest_generated_bindings.cpp.o
+  [ 87%] Building CXX object CMakeFiles/quest_bridge.dir/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-sys/src/cxx_bindings/quest_mpi.cpp.o
+  [100%] Linking CXX static library libquest_bridge.a
+  [100%] Built target quest_bridge
+  cargo:root=/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/../target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/quest-native
+  cargo:rerun-if-env-changed=CXX_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=CXX_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_CXX
+  cargo:rerun-if-env-changed=TARGET_CXX
+  cargo:rerun-if-env-changed=CXXFLAGS_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=CXXFLAGS_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_CXXFLAGS
+  cargo:rerun-if-env-changed=TARGET_CXXFLAGS
+  cargo:rerun-if-env-changed=CXXFLAGS
+  cargo:rerun-if-env-changed=CXXSTDLIB_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=CXXSTDLIB_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_CXXSTDLIB
+  cargo:rerun-if-env-changed=TARGET_CXXSTDLIB
+  cargo:rerun-if-env-changed=CXXSTDLIB
+  cargo:rerun-if-env-changed=CMAKE_TOOLCHAIN_FILE_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=CMAKE_TOOLCHAIN_FILE_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_CMAKE_TOOLCHAIN_FILE
+  cargo:rerun-if-env-changed=TARGET_CMAKE_TOOLCHAIN_FILE
+  cargo:rerun-if-env-changed=CMAKE_TOOLCHAIN_FILE
+  cargo:rerun-if-env-changed=CMAKE_PREFIX_PATH_x86_64-unknown-linux-gnu
+  cargo:rerun-if-env-changed=CMAKE_PREFIX_PATH_x86_64_unknown_linux_gnu
+  cargo:rerun-if-env-changed=HOST_CMAKE_PREFIX_PATH
+  cargo:rerun-if-env-changed=TARGET_CMAKE_PREFIX_PATH
+  cargo:rerun-if-env-changed=CPATH
+  cargo:rerun-if-env-changed=CPLUS_INCLUDE_PATH
+  cargo:rerun-if-env-changed=C_INCLUDE_PATH
+  cargo:rerun-if-env-changed=OBJC_INCLUDE_PATH
+  cargo:rerun-if-env-changed=GCC_EXEC_PREFIX
+  cargo:rerun-if-env-changed=COMPILER_PATH
+  cargo:rerun-if-env-changed=LIBRARY_PATH
+  cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+  cargo:rerun-if-env-changed=SDKROOT
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/calculations.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/channels.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/config.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/debug.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/decoherence.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/deprecated.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/environment.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/experimental.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/initialisations.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/matrices.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/modes.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/multiplication.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/operations.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/paulis.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/precision.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/qureg.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/trotterisation.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/types.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/wrappers.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest.h
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib/cmake/QuEST/QuESTConfig.cmake
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib/cmake/QuEST/QuESTConfigDependencies.cmake
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib/cmake/QuEST/QuESTConfigVersion.cmake
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib/cmake/QuEST/QuESTTargets-release.cmake
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib/cmake/QuEST/QuESTTargets.cmake
+  cargo:rerun-if-changed=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib/libQuEST.so.4.3.0
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeCXXCompiler.cmake.in
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeCXXCompilerABI.cpp
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeCXXInformation.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeCommonLanguageInclude.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeCompilerIdDetection.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeDetermineCXXCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeDetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeDetermineCompilerABI.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeDetermineCompilerId.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeDetermineCompilerSupport.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeDetermineSystem.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeFindBinUtils.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeFindDependencyMacro.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeGenericSystem.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeInitializeConfigs.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeLanguageInformation.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeParseImplicitIncludeInfo.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeParseImplicitLinkInfo.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeParseLibraryArchitecture.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeSystem.cmake.in
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeSystemSpecificInformation.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeSystemSpecificInitialize.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeTestCXXCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeTestCompilerCommon.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/CMakeUnixFindMake.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/ADSP-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/ARMCC-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/ARMClang-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/AppleClang-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Borland-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/CMakeCommonCompilerMacros.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Clang-CXX.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Clang-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Clang-DetermineCompilerInternal.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Clang-FindBinUtils.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Clang.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Compaq-CXX-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Cray-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/CrayClang-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Diab-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Embarcadero-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Fujitsu-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/GHS-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/GNU-CXX-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/GNU.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/HP-CXX-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/IAR-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/IBMClang-CXX-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Intel-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/LCC-CXX-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/MSVC-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/NVHPC-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/NVIDIA-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/OrangeC-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/PGI-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/PathScale-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/PellesC-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Renesas-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/SCO-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/SunPro-CXX-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/TI-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/TIClang-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Tasking-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/VisualAge-CXX-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/Watcom-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/XL-CXX-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/XLClang-CXX-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Compiler/zOS-CXX-DetermineCompiler.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/FindMPI.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/FindPackageHandleStandardArgs.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/FindPackageMessage.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/FindPkgConfig.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Internal/CMakeCXXLinkerInformation.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Internal/CMakeCommonLinkerInformation.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Internal/CMakeDetermineLinkerId.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Internal/CMakeInspectCXXLinker.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Internal/FeatureTesting.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Linker/GNU-CXX.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Linker/GNU.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Platform/Linker/GNU.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Platform/Linker/Linux-GNU-CXX.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Platform/Linker/Linux-GNU.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Platform/Linux-Clang-CXX.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Platform/Linux-Determine-CXX.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Platform/Linux-GNU-CXX.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Platform/Linux-GNU.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Platform/Linux-Initialize.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Platform/Linux.cmake
+  cargo:rerun-if-changed=/nix/store/c3bm9h7k398cmg00d4rss6hcxkl2zbl2-cmake-4.4.2/share/cmake-4.4/Modules/Platform/UnixPaths.cmake
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpi-ext.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpi.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpi_portable_platform.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpif-c-constants-decl.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpif-config.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpif-constants.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpif-ext.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpif-externals.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpif-handles.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpif-io-constants.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpif-io-handles.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpif-sentinels.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpif-sizeof.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpif.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpp
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpp/shmem.fh
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/mpp/shmem.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openmpi
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openmpi/mpiext
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openmpi/mpiext/mpiext_affinity_c.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openmpi/mpiext/mpiext_cuda_c.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openmpi/mpiext/mpiext_ftmpi_c.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openmpi/mpiext/mpiext_ftmpi_mpifh.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openmpi/mpiext/mpiext_rocm_c.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openmpi/mpiext/mpiext_shortfloat_c.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openmpi/mpiext/mpiext_shortfloat_mpifh.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openshmem
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openshmem/oshmem
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openshmem/oshmem/constants.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openshmem/oshmem/frameworks.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openshmem/oshmem/types.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openshmem/oshmem/version.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/openshmem/oshmem_config.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/pshmem.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/pshmemx.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/shmem-compat.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/shmem.fh
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/shmem.h
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include/shmemx.h
+  cargo:rerun-if-changed=/nix/store/x5afc4dcy2qg43fa1ww84rk00gvx2zfk-openmpi-5.0.10/lib/libmpi.so
+  cargo:rerun-if-changed=/nix/store/x5afc4dcy2qg43fa1ww84rk00gvx2zfk-openmpi-5.0.10/lib/libmpi.so.40.40.7
+  cargo:rerun-if-changed=/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/quest-native/build/CMakeFiles/4.4.2/CMakeCXXCompiler.cmake
+  cargo:rerun-if-changed=/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/quest-native/build/CMakeFiles/4.4.2/CMakeSystem.cmake
+  cargo:warning=Using QuEST 4.3.0 from /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0 with /nix/store/0skhb15j2szcq05929gs9m1dbpiydhb7-clang-21.1.8/bin/clang++
+  cargo:rustc-check-cfg=cfg(quest_native_mpi)
+  cargo:rustc-cfg=quest_native_mpi
+  cargo::metadata=mpi_enabled=1
+  cargo::metadata=subcommunicators_enabled=1
+  cargo:rerun-if-env-changed=MPICH_CC
+  cargo:rerun-if-env-changed=MPICC
+  cargo:rerun-if-env-changed=MPI_PKG_CONFIG
+  cargo:rerun-if-env-changed=CRAY_MPICH_DIR
+  cargo:rerun-if-env-changed=CFLAGS
+  cargo:rerun-if-env-changed=CPPFLAGS
+  cargo:rerun-if-env-changed=BINDGEN_EXTRA_CLANG_ARGS
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/bin/opal_wrapper
+  cargo:rerun-if-changed=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/bin/mpicc
+
+  --- stderr
+  running: cd "/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/../target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/quest-native/build" && CMAKE_PREFIX_PATH="/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev" LC_ALL="C" "cmake" "/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/../target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/quest-native/source" "-B" "/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/../target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/quest-native/build" "-DCMAKE_CXX_COMPILER=clang++" "-DCMAKE_CXX_FLAGS=" "-DCMAKE_PREFIX_PATH=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev" "-DQuEST_DIR=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib/cmake/QuEST" "-DCMAKE_INSTALL_PREFIX=/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/../target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/quest-native" "-DCMAKE_C_FLAGS= -w" "-DCMAKE_C_COMPILER=/nix/store/0skhb15j2szcq05929gs9m1dbpiydhb7-clang-21.1.8/bin/clang" "-DCMAKE_ASM_FLAGS= -w" "-DCMAKE_ASM_COMPILER=/nix/store/0skhb15j2szcq05929gs9m1dbpiydhb7-clang-21.1.8/bin/clang" "-DCMAKE_BUILD_TYPE=Debug" "--fresh"
+  CMake Warning (policy) at CMakeLists.txt:4 (find_package):
+    Policy CMP0144 is not set: find_package uses upper-case <PACKAGENAME>_ROOT
+    variables.  Run "cmake --help-policy CMP0144" for policy details.  Use the
+    cmake_policy command to set the policy and suppress this warning.
+
+    Environment variable QUEST_ROOT is set to:
+
+      /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0
+
+    For compatibility, find_package is ignoring the variable, but code in a
+    .cmake module might still use it.
+  This warning is for project developers.  Use -Wno-author or -Wno-policy to
+  suppress it.
+
+  CMake Warning (unused-cli):
+    Manually-specified variables were not used by the project:
+
+      CMAKE_ASM_COMPILER
+      CMAKE_ASM_FLAGS
+      CMAKE_C_COMPILER
+      CMAKE_C_FLAGS
+
+
+  running: cd "/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/../target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/quest-native/build" && LC_ALL="C" MAKEFLAGS="-j --jobserver-fds=3,5 --jobserver-auth=3,5" "cmake" "--build" "/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/../target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/quest-native/build" "--target" "quest_bridge" "--config" "Debug"
+
+  CXX include path:
+    /var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/../target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/cxxbridge/include
+    /var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/../target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/cxxbridge/crate
+  running: cd "/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/../target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/quest-native/build" && CMAKE_PREFIX_PATH="/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev" LC_ALL="C" "cmake" "/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/../target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/quest-native/source" "-B" "/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/../target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/quest-native/build" "-DCMAKE_CXX_COMPILER=clang++" "-DCMAKE_CXX_FLAGS=" "-DCMAKE_PREFIX_PATH=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev" "-DQuEST_DIR=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib/cmake/QuEST" "-DCMAKE_INSTALL_PREFIX=/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/../target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/quest-native" "-DCMAKE_C_FLAGS= -w" "-DCMAKE_C_COMPILER=/nix/store/0skhb15j2szcq05929gs9m1dbpiydhb7-clang-21.1.8/bin/clang" "-DCMAKE_ASM_FLAGS= -w" "-DCMAKE_ASM_COMPILER=/nix/store/0skhb15j2szcq05929gs9m1dbpiydhb7-clang-21.1.8/bin/clang" "-DCMAKE_BUILD_TYPE=Debug" "--fresh"
+  CMake Warning (policy) at CMakeLists.txt:4 (find_package):
+    Policy CMP0144 is not set: find_package uses upper-case <PACKAGENAME>_ROOT
+    variables.  Run "cmake --help-policy CMP0144" for policy details.  Use the
+    cmake_policy command to set the policy and suppress this warning.
+
+    Environment variable QUEST_ROOT is set to:
+
+      /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0
+
+    For compatibility, find_package is ignoring the variable, but code in a
+    .cmake module might still use it.
+  This warning is for project developers.  Use -Wno-author or -Wno-policy to
+  suppress it.
+
+  CMake Warning (unused-cli):
+    Manually-specified variables were not used by the project:
+
+      CMAKE_ASM_COMPILER
+      CMAKE_ASM_FLAGS
+      CMAKE_C_COMPILER
+      CMAKE_C_FLAGS
+
+
+  running: cd "/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/../target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/quest-native/build" && LC_ALL="C" MAKEFLAGS="-j --jobserver-fds=3,5 --jobserver-auth=3,5" "cmake" "--build" "/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/../target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/quest-native/build" "--target" "quest_bridge" "--config" "Debug"
+  Error: Command { program: "/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/../target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/quest-native/build/quest_mpi_abi", status: "exit status: 127", output: "/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/../target-mpi/debug/build/quest-sys/f2c227d3e28c2bb7/out/quest-native/build/quest_mpi_abi: error while loading shared libraries: libstdc++.so.6: cannot open shared object file: No such file or directory\n" }

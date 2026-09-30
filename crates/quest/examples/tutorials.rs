@@ -13,7 +13,7 @@ pub fn bell(environment: &Environment) -> TutorialResult<(f64, f64)> {
         h q[0];
         cx q[0], q[1];
     }?;
-    let mut prepared = environment.prepare_structured(program)?;
+    let mut prepared = environment.prepare((program).verify()?.lower()?.plan()?)?;
     let mut state = environment.state_vector(QubitCount::new(2)?)?;
     prepared.run(&mut state, &RunInputs::default())?;
     Ok((
@@ -46,7 +46,7 @@ pub fn teleportation(environment: &Environment) -> TutorialResult<f64> {
         reset q[0];
         reset q[1];
     }?;
-    let mut prepared = environment.prepare_structured(program)?;
+    let mut prepared = environment.prepare((program).verify()?.lower()?.plan()?)?;
     let mut state = environment.state_vector(QubitCount::new(3)?)?;
     prepared.run(&mut state, &RunInputs::default())?;
     let overlap = std::ops::Add::add(
@@ -68,7 +68,7 @@ pub fn feedback(environment: &Environment) -> TutorialResult<f64> {
         observed = measure q;
         if (bool(observed)) { x q; }
     }?;
-    let mut prepared = environment.prepare_structured(program)?;
+    let mut prepared = environment.prepare((program).verify()?.lower()?.plan()?)?;
     let mut state = environment.state_vector(QubitCount::new(1)?)?;
     let output = prepared.run(&mut state, &RunInputs::default())?;
     if !output.outputs.contains_key("observed") {
@@ -93,7 +93,7 @@ pub fn repeat_until_success(environment: &Environment) -> TutorialResult<(bool, 
             attempts += 1;
         }
     }?;
-    let mut prepared = environment.prepare_structured(program)?;
+    let mut prepared = environment.prepare((program).verify()?.lower()?.plan()?)?;
     let mut state = environment.state_vector(QubitCount::new(1)?)?;
     let output = prepared.run(&mut state, &RunInputs::default())?;
     let succeeded = output
@@ -121,7 +121,7 @@ pub fn captures_once(environment: &Environment) -> TutorialResult<(usize, i128)>
             iterations += 1;
         }
     }?;
-    let mut prepared = environment.prepare_structured(program)?;
+    let mut prepared = environment.prepare((program).verify()?.lower()?.plan()?)?;
     let mut state = environment.state_vector(QubitCount::new(1)?)?;
     let result = prepared.run(&mut state, &RunInputs::default())?;
     Ok((captured.len(), integer_output(&result, "iterations")?))
@@ -144,7 +144,7 @@ pub fn array_arguments(environment: &Environment) -> TutorialResult<i128> {
         increment(values);
         output int result = total(values);
     }?;
-    let mut prepared = environment.prepare_structured(program)?;
+    let mut prepared = environment.prepare((program).verify()?.lower()?.plan()?)?;
     let mut state = environment.state_vector(QubitCount::new(1)?)?;
     let result = prepared.run(&mut state, &RunInputs::default())?;
     integer_output(&result, "result")

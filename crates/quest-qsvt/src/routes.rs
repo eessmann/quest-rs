@@ -5,14 +5,14 @@ use crate::{
 };
 use faer::MatRef;
 use quest_circuit::{
-    Angle, BoundProgram, Control, ControlState, Gate, NumericalOperator, ProgramBuilder,
-    ProgramLimits, QubitId,
+    Angle, BoundRegion, Control, ControlState, Gate, NumericalOperator, ProgramLimits,
+    QuantumRegionBuilder, QubitId,
 };
 use quest_qsp::{ControlSequence, PhaseSequence};
 use std::ops::{Add, Mul, Sub};
 
 struct Circuit {
-    builder: ProgramBuilder,
+    builder: QuantumRegionBuilder,
     policy: NumericalPolicy,
     retained_bytes: usize,
     fragments: Vec<OracleFragment>,
@@ -25,7 +25,7 @@ impl Circuit {
             ..ProgramLimits::default()
         };
         Ok(Self {
-            builder: ProgramBuilder::with_limits(qubits, 0, limits)?,
+            builder: QuantumRegionBuilder::with_limits(qubits, 0, limits)?,
             policy,
             retained_bytes: 0,
             fragments: Vec::new(),
@@ -183,7 +183,7 @@ impl Circuit {
         })?;
         self.numerical(matrix.as_ref(), &[response], &[])
     }
-    fn finish(self) -> Result<BoundProgram> {
+    fn finish(self) -> Result<BoundRegion> {
         Ok(self.builder.finish()?.bind(&[])?)
     }
 }
@@ -194,11 +194,39 @@ pub fn standard<C: StandardConvention>(
     layout: OperandLayout,
 ) -> Result<ValidatedTransform> {
     let converted = C::projector_phases(sequence);
-    let phases = converted.values();
-    if phases.iter().any(|value| !value.is_finite()) {
+    let degree = sequence.degree();
+    let reduced = if degree == 0 {
+        0
+    } else {
+        degree.saturating_sub(1) % 4
+    };
+    let readout = -f64::from(u32::try_from(reduced).map_err(|_| Error::Budget("readout angle"))?)
+        * std::f64::consts::PI;
+    standard_projector(
+        encoding,
+        converted.values(),
+        readout,
+        C::TAG,
+        converted.roundoff_estimate(),
+        layout,
+    )
+}
+
+pub fn standard_projector(
+    encoding: ProjectedEncoding,
+    phases: &[f64],
+    readout: f64,
+    convention: &'static str,
+    conversion_roundoff: f64,
+    layout: OperandLayout,
+) -> Result<ValidatedTransform> {
+    if phases.iter().any(|value| !value.is_finite()) || !readout.is_finite() {
         return Err(Error::NonFinite);
     }
-    let degree = sequence.degree();
+    let degree = phases
+        .len()
+        .checked_sub(1)
+        .ok_or(Error::Encoding("empty projector sequence"))?;
     let mut circuit = Circuit::new(layout.num_qubits(), encoding.policy())?;
     circuit.gate(Gate::H, layout.response(), &[])?;
     // Open positive branch equals the C++ X / closed-control / X construction.
@@ -246,14 +274,7 @@ pub fn standard<C: StandardConvention>(
             )?;
         }
     }
-    let reduced = if degree == 0 {
-        0
-    } else {
-        degree.saturating_sub(1) % 4
-    };
-    let angle = -f64::from(u32::try_from(reduced).map_err(|_| Error::Budget("readout angle"))?)
-        * std::f64::consts::PI;
-    circuit.gate(Gate::Rz(Angle::radians(angle)?), layout.response(), &[])?;
+    circuit.gate(Gate::Rz(Angle::radians(readout)?), layout.response(), &[])?;
     circuit.gate(Gate::H, layout.response(), &[])?;
     let main = circuit.finish()?;
     let forward = degree
@@ -269,7 +290,7 @@ pub fn standard<C: StandardConvention>(
         retained_oracle_calls: retained_counts(&main)?,
     };
     let evidence = TransformEvidence {
-        phase_conversion_roundoff_estimate: converted.roundoff_estimate(),
+        phase_conversion_roundoff_estimate: conversion_roundoff,
         ..TransformEvidence::default()
     };
     Ok(ValidatedTransform {
@@ -277,13 +298,16 @@ pub fn standard<C: StandardConvention>(
         output: Projection::source(&encoding, &layout, !degree.is_multiple_of(2), None),
         encoding,
         route: Route::Standard,
-        convention: C::TAG,
+        meaning: None,
+        convention,
         degree,
         layout,
         main,
         continuation_stage: TransformContinuation::Direct,
         queries,
         evidence,
+        #[cfg(feature = "certification")]
+        projector_certificate: None,
     })
 }
 fn phase(phases: &[f64], index: usize, conjugate: bool) -> Result<f64> {
@@ -350,6 +374,7 @@ pub fn generalized(
     Ok(ValidatedTransform {
         encoding,
         route,
+        meaning: None,
         convention: "ni-generalized-upper-left-final-k",
         degree,
         layout,
@@ -359,6 +384,8 @@ pub fn generalized(
         continuation_stage,
         queries,
         evidence,
+        #[cfg(feature = "certification")]
+        projector_certificate: None,
     })
 }
 fn barred_oracle(encoding: &ProjectedEncoding) -> Result<OracleFragment> {
@@ -450,7 +477,7 @@ fn admit(operation: &'static str, residual: f64) -> Result<()> {
         Ok(())
     }
 }
-fn retained_counts(program: &BoundProgram) -> Result<usize> {
+fn retained_counts(program: &BoundRegion) -> Result<usize> {
     program
         .instructions()
         .iter()

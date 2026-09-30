@@ -11,7 +11,7 @@ fn frozen_complex_export_is_checked_independently_with_both_convolutions() -> Re
         Limits::default(),
     )?;
     let candidate = SynthesisBuilder::new()
-        .generalized(&target)?
+        .unit_circle_response(&target)?
         .admit()?
         .complete()?
         .synthesize()?;
@@ -36,14 +36,14 @@ fn frozen_complex_export_is_checked_independently_with_both_convolutions() -> Re
     Ok(())
 }
 #[gtest]
-fn canonical_certification_reconstructs_exported_phases_and_source_conversion() -> Result<()> {
+fn wx_certification_reconstructs_exported_phases_and_source_conversion() -> Result<()> {
     let target = Polynomial::new(
         Chebyshev,
         vec![Complex64::new(0.0, 0.0), Complex64::new(0.6, 0.0)],
         Limits::default(),
     )?;
     let candidate = SynthesisBuilder::new()
-        .canonical(&target)?
+        .real_parity_wx(&target)?
         .admit()?
         .complete()?
         .synthesize()?;
@@ -70,7 +70,7 @@ fn near_contractivity_boundary_is_verified_without_normalizing_export() -> Resul
             contractivity_margin: 1e-14,
             ..quest_qsp::Policy::default()
         })
-        .generalized(&target)?
+        .unit_circle_response(&target)?
         .admit()?
         .complete()?
         .synthesize()?;
@@ -100,7 +100,7 @@ fn dense_complex_product_tree_overlaps_direct_all_four_coefficients() -> Result<
         .collect();
     let target = Polynomial::new(Laurent::new(0), coefficients, Limits::default())?;
     let candidate = SynthesisBuilder::new()
-        .generalized(&target)?
+        .unit_circle_response(&target)?
         .admit()?
         .complete()?
         .synthesize()?;
@@ -135,7 +135,7 @@ fn dense_complex_product_tree_overlaps_direct_all_four_coefficients() -> Result<
     Ok(())
 }
 #[gtest]
-fn higher_degree_symmetric_phases_certify_the_canonical_wx_response() -> Result<()> {
+fn higher_degree_symmetric_phases_certify_the_real_parity_wx_response() -> Result<()> {
     let target = Polynomial::new(
         Chebyshev,
         vec![
@@ -149,7 +149,7 @@ fn higher_degree_symmetric_phases_certify_the_canonical_wx_response() -> Result<
         Limits::default(),
     )?;
     let candidate = SynthesisBuilder::new()
-        .canonical(&target)?
+        .real_parity_wx(&target)?
         .admit()?
         .complete()?
         .synthesize()?;
@@ -199,7 +199,7 @@ fn cancellation_heavy_complex_degree64_direct_and_fft_enclosures_overlap() -> Re
     // cancellation at z=1 and dense nontrivial complex controls.
     let target = Polynomial::new(Laurent::new(0), coefficients, Limits::default())?;
     let candidate = SynthesisBuilder::new()
-        .generalized(&target)?
+        .unit_circle_response(&target)?
         .admit()?
         .complete()?
         .synthesize()?;

@@ -1,5 +1,5 @@
-error: circuit wire index is out of range
- --> tests/ui/index.rs:2:40
+error: index 2 is outside a collection of length 2
+ --> tests/ui/index.rs:2:38
   |
 2 | fn main(){let _=circuit!{qubit[2] q; x q[2];};}
-  |                                        ^
+  |                                      ^

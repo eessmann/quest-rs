@@ -6,6 +6,18 @@ use quest_optimizer_protocol::{
 };
 use std::{path::PathBuf, time::Duration};
 
+/// Direct request-bounded Rust synthesis, available on macOS and Linux without
+/// starting a worker process. External workers remain optional.
+/// # Errors
+/// Preserves typed synthesis, resource, cancellation and certificate failures.
+pub fn synthesize_direct(
+    target: &Target,
+    epsilon_bits: u64,
+    options: quest_synthesis::SynthesisOptions,
+) -> quest_synthesis::Result<quest_synthesis::Approximation> {
+    quest_synthesis::approximate_rotation(target, epsilon_bits, options)
+}
+
 #[cfg(target_os = "linux")]
 mod process;
 

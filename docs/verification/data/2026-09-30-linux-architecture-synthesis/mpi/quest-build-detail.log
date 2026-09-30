@@ -1,0 +1,158 @@
+got build log for '/nix/store/nqfb9icw2qajf6c7dwwg940yjyzh6h7m-quest-mpi-validation-4.3.0.drv' from 'daemon'
+Running phase: unpackPhase
+@nix { "action": "setPhase", "phase": "unpackPhase" }
+unpacking source archive /nix/store/nsna8snld3k97vzqgnp2jwc3b0xn93a3-source
+source root is source
+Running phase: patchPhase
+@nix { "action": "setPhase", "phase": "patchPhase" }
+Running phase: updateAutotoolsGnuConfigScriptsPhase
+@nix { "action": "setPhase", "phase": "updateAutotoolsGnuConfigScriptsPhase" }
+Running phase: configurePhase
+@nix { "action": "setPhase", "phase": "configurePhase" }
+cmake flags: -GNinja -DCMAKE_FIND_USE_SYSTEM_PACKAGE_REGISTRY=OFF -DCMAKE_FIND_USE_PACKAGE_REGISTRY=OFF -DCMAKE_EXPORT_NO_PACKAGE_REGISTRY=ON -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DCMAKE_INSTALL_LOCALEDIR=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/share/locale -DCMAKE_INSTALL_LIBEXECDIR=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/libexec -DCMAKE_INSTALL_LIBDIR=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib -DCMAKE_INSTALL_DOCDIR=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/share/doc/QuEST -DCMAKE_INSTALL_INFODIR=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/share/info -DCMAKE_INSTALL_MANDIR=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/share/man -DCMAKE_INSTALL_INCLUDEDIR=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include -DCMAKE_INSTALL_SBINDIR=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/sbin -DCMAKE_INSTALL_BINDIR=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/bin -DCMAKE_INSTALL_NAME_DIR=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib -DCMAKE_STRIP=/nix/store/z4c6k0mrlkwl3s4w9ysxc8vq1wylm3ms-gcc-wrapper-15.3.0/bin/strip -DCMAKE_RANLIB=/nix/store/z4c6k0mrlkwl3s4w9ysxc8vq1wylm3ms-gcc-wrapper-15.3.0/bin/ranlib -DCMAKE_AR=/nix/store/z4c6k0mrlkwl3s4w9ysxc8vq1wylm3ms-gcc-wrapper-15.3.0/bin/ar -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_INSTALL_PREFIX=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0 -DBUILD_SHARED_LIBS=ON -DQUEST_FLOAT_PRECISION=2 -DQUEST_ENABLE_DEPRECATED_API=OFF -DQUEST_ENABLE_OMP=ON -DQUEST_ENABLE_CUDA=OFF -DQUEST_ENABLE_HIP=OFF -DQUEST_ENABLE_CUQUANTUM=OFF -DQUEST_ENABLE_ADIOS2=OFF -DQUEST_DOWNLOAD_ADIOS2=OFF -DQUEST_ENABLE_NUMA=OFF -DQUEST_ENABLE_BMI2=OFF -DQUEST_ENABLE_INSTALL=ON -DQUEST_ENABLE_PACKAGING=OFF -DQUEST_BUILD_MIN_EXAMPLE=OFF -DQUEST_BUILD_EXAMPLES=OFF -DQUEST_BUILD_TESTS=OFF -DQUEST_TESTS_DOWNLOAD_CATCH2=OFF -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON -DQUEST_ENABLE_MPI=ON -DQUEST_ENABLE_SUBCOMM=ON
+-- The CXX compiler identification is GNU 15.3.0
+-- The C compiler identification is GNU 15.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /nix/store/z4c6k0mrlkwl3s4w9ysxc8vq1wylm3ms-gcc-wrapper-15.3.0/bin/g++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /nix/store/z4c6k0mrlkwl3s4w9ysxc8vq1wylm3ms-gcc-wrapper-15.3.0/bin/gcc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Shared library is turned ON. Set BUILD_SHARED_LIBS to modify.
+-- Library will be named libQuEST. Set QUEST_OUTPUT_LIB_NAME to modify.
+-- Verbose library naming is turned OFF. Set QUEST_APPEND_CONFIG_TO_LIB_NAME to modify.
+-- Precision set to 2. Set QUEST_FLOAT_PRECISION to modify.
+-- Examples are turned OFF. Set QUEST_BUILD_EXAMPLES to modify.
+-- Testing is turned OFF. Set QUEST_BUILD_TESTS to modify.
+-- Multithreading is turned ON. Set QUEST_ENABLE_OMP to modify.
+-- NUMA awareness is turned OFF. Set QUEST_ENABLE_NUMA to modify.
+-- BMI2 bitwise acceleration is turned OFF. Set QUEST_ENABLE_BMI2 to modify.
+-- Distribution is turned ON. Set QUEST_ENABLE_MPI to modify.
+-- Custom communicator support is turned ON. Set QUEST_ENABLE_SUBCOMM to modify.
+-- NVIDIA GPU acceleration is turned OFF. Set QUEST_ENABLE_CUDA to modify.
+-- CuQuantum support is turned OFF. Set QUEST_ENABLE_CUQUANTUM to modify.
+-- AMD GPU acceleration is turned OFF. Set QUEST_ENABLE_HIP to modify.
+-- ADIOS2 integration is turned OFF. Set QUEST_ENABLE_ADIOS2 to modify.
+-- Deprecated API support is turned OFF. Set QUEST_ENABLE_DEPRECATED_API to modify.
+-- Disabling of deprecated API warnings is turned OFF. Set QUEST_DISABLE_DEPRECATION_WARNINGS to modify.
+-- Found MPI_CXX: /nix/store/x5afc4dcy2qg43fa1ww84rk00gvx2zfk-openmpi-5.0.10/lib/libmpi.so (found version "3.1")
+-- Found MPI: TRUE (found version "3.1") found components: CXX
+-- Configuring done (1.1s)
+-- Generating done (0.0s)
+[33mCMake Warning (unused-cli):
+  Manually-specified variables were not used by the project:
+
+    BUILD_TESTING
+    CMAKE_EXPORT_NO_PACKAGE_REGISTRY
+
+[0m
+-- Build files have been written to: /build/source/build
+cmake: enabled parallel building
+cmake: enabled parallel installing
+Running phase: buildPhase
+@nix { "action": "setPhase", "phase": "buildPhase" }
+build flags: -j3
+[1/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/api/debug.cpp.o
+[2/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/api/calculations.cpp.o
+[3/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/api/channels.cpp.o
+[4/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/api/decoherence.cpp.o
+[5/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/api/experimental.cpp.o
+[6/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/api/initialisations.cpp.o
+[7/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/api/modes.cpp.o
+[8/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/api/environment.cpp.o
+[9/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/api/matrices.cpp.o
+[10/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/api/multiplication.cpp.o
+[11/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/api/paulis.cpp.o
+[12/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/api/operations.cpp.o
+[13/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/api/trotterisation.cpp.o
+[14/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/api/qureg.cpp.o
+[15/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/api/types.cpp.o
+[16/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/comm/comm_config.cpp.o
+[17/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/core/autodeployer.cpp.o
+[18/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/comm/comm_routines.cpp.o
+[19/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/core/accelerator.cpp.o
+[20/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/core/envvars.cpp.o
+[21/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/core/memory.cpp.o
+[22/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/core/errors.cpp.o
+[23/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/core/localiser.cpp.o
+[24/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/core/paulilogic.cpp.o
+[25/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/core/randomiser.cpp.o
+[26/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/core/utilities.cpp.o
+[27/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/core/printer.cpp.o
+[28/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/core/parser.cpp.o
+[29/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/cpu/cpu_config.cpp.o
+[30/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/gpu/gpu_config.cpp.o
+[31/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/gpu/gpu_subroutines.cpp.o
+[32/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/core/validation.cpp.o
+[33/35] Building CXX object CMakeFiles/QuEST.dir/quest/src/cpu/cpu_subroutines.cpp.o
+[34/35] Linking CXX shared library libQuEST.so.4.3.0
+[35/35] Creating library symlink libQuEST.so.4 libQuEST.so
+Running phase: installPhase
+@nix { "action": "setPhase", "phase": "installPhase" }
+install flags: -j3 install
+[0/1] Install the project...
+-- Install configuration: "Release"
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib/libQuEST.so.4.3.0
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib/libQuEST.so.4
+-- Set non-toolchain portion of runtime path of "/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib/libQuEST.so.4.3.0" to "$ORIGIN/"
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib/libQuEST.so
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest.h
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/calculations.h
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/channels.h
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/debug.h
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/decoherence.h
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/deprecated.h
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/environment.h
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/experimental.h
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/initialisations.h
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/matrices.h
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/modes.h
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/multiplication.h
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/operations.h
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/paulis.h
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/precision.h
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/qureg.h
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/trotterisation.h
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/types.h
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/wrappers.h
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/include/quest/include/config.h
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib/cmake/QuEST/QuESTConfig.cmake
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib/cmake/QuEST/QuESTConfigDependencies.cmake
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib/cmake/QuEST/QuESTConfigVersion.cmake
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib/cmake/QuEST/modules/FindNUMA.cmake
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib/cmake/QuEST/modules/FindCUQUANTUM.cmake
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib/cmake/QuEST/modules/FindCUTENSOR.cmake
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib/cmake/QuEST/QuESTTargets.cmake
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib/cmake/QuEST/QuESTTargets-release.cmake
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/share/licenses/QuEST/Development/LICENCE.txt
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/share/licenses/QuEST/Development/AUTHORS.txt
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/share/licenses/QuEST/Runtime/LICENCE.txt
+-- Installing: /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/share/licenses/QuEST/Runtime/AUTHORS.txt
+Running phase: fixupPhase
+@nix { "action": "setPhase", "phase": "fixupPhase" }
+shrinking RPATHs of ELF executables and libraries in /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0
+shrinking /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib/libQuEST.so.4.3.0
+checking for references to /build/ in /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0...
+patching script interpreter paths in /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0
+stripping (with command strip and flags -S -p) in /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0/lib
+Running phase: installCheckPhase
+@nix { "action": "setPhase", "phase": "installCheckPhase" }
+-- The CXX compiler identification is GNU 15.3.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /nix/store/z4c6k0mrlkwl3s4w9ysxc8vq1wylm3ms-gcc-wrapper-15.3.0/bin/g++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found MPI_CXX: /nix/store/x5afc4dcy2qg43fa1ww84rk00gvx2zfk-openmpi-5.0.10/lib/libmpi.so (found version "3.1")
+-- Found MPI: TRUE (found version "3.1") found components: CXX
+-- Configuring done (0.5s)
+-- Generating done (0.0s)
+-- Build files have been written to: /build/source/build/installed-consumer/build
+[0/2] Building CXX object CMakeFiles/consumer.dir/main.cpp.o[K[1/2] Building CXX object CMakeFiles/consumer.dir/main.cpp.o[K[1/2] Linking CXX executable consumer[K[2/2] Linking CXX executable consumer[K
+hwloc/linux: failed to find sysfs cpu topology directory, aborting linux discovery.
+hwloc/linux: failed to find sysfs cpu topology directory, aborting linux discovery.
+[1790723576.058348] [localhost:845  :0]       tcp_iface.c:991  UCX  ERROR scandir(/sys/class/net) failed: No such file or directory

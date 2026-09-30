@@ -1,6 +1,6 @@
 use criterion::Criterion;
 use quest_polynomial::{Chebyshev, Limits, Polynomial};
-use quest_qsp::{Canonical, Complex64, FrozenCandidate, SynthesisBuilder};
+use quest_qsp::{Complex64, FrozenCandidate, RealParityWx, SynthesisBuilder};
 use std::hint::black_box;
 #[expect(
     clippy::panic,
@@ -23,9 +23,9 @@ fn fixture() -> Result<Polynomial<Chebyshev>, Box<dyn std::error::Error>> {
 }
 fn synthesize(
     target: &Polynomial<Chebyshev>,
-) -> Result<FrozenCandidate<Canonical>, quest_qsp::Error> {
+) -> Result<FrozenCandidate<RealParityWx>, quest_qsp::Error> {
     SynthesisBuilder::new()
-        .canonical(target)?
+        .real_parity_wx(target)?
         .admit()?
         .complete()?
         .synthesize()
@@ -62,14 +62,14 @@ fn pipeline(criterion: &mut Criterion) -> Result<(), Box<dyn std::error::Error>>
     {
         use quest_qsp::offline::{OfflineBuilder, OfflinePolicy};
         OfflineBuilder::new()
-            .canonical(&target)?
+            .real_parity_wx(&target)?
             .policy(OfflinePolicy::default())?
             .solve()?;
         criterion.bench_function("cold/offline_including_certification_degree1", |bench| {
             bench.iter(|| {
                 black_box(require_success(
                     OfflineBuilder::new()
-                        .canonical(black_box(&target))
+                        .real_parity_wx(black_box(&target))
                         .and_then(|builder| builder.policy(OfflinePolicy::default()))
                         .and_then(quest_qsp::offline::OfflineBuilder::solve),
                 ))
@@ -95,13 +95,15 @@ fn parallel_pipeline(criterion: &mut Criterion) -> Result<(), Box<dyn std::error
             .collect(),
         Limits::default(),
     )?;
-    let admitted = SynthesisBuilder::new().generalized(&target)?.admit()?;
+    let admitted = SynthesisBuilder::new()
+        .unit_circle_response(&target)?
+        .admit()?;
     criterion.bench_function(
         "binary64/complete_synthesize_degree256/sequential",
         |bench| {
             bench.iter(|| {
                 black_box(require_success(admitted.clone().complete().and_then(
-                    quest_qsp::CompletedPolynomial::<quest_qsp::Generalized>::synthesize,
+                    quest_qsp::CompletedPolynomial::<quest_qsp::UnitCircleResponse>::synthesize,
                 )))
             });
         },

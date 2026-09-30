@@ -20,11 +20,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     criterion.bench_function("runtime/preparation", |b| {
         b.iter_batched(
             || plan.clone(),
-            |plan| black_box(checked(environment.prepare_structured_plan(plan))),
+            |plan| black_box(checked(environment.prepare(plan))),
             BatchSize::PerIteration,
         );
     });
-    let mut prepared = environment.prepare_structured_plan(plan)?;
+    let mut prepared = environment.prepare(plan)?;
     let mut register = environment.state_vector(QubitCount::new(10)?)?;
     let inputs = RunInputs::default();
     criterion.bench_function("runtime/repeated_state_vector_execution", |b| {

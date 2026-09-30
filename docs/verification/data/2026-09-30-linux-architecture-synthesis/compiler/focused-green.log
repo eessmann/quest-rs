@@ -1,0 +1,204 @@
+• Validating lock
+✓ Validating lock in 5.89ms
+  evaluating file '«nix-internal»/derivation-internal.nix'
+• Configuring shell
+• Configuring cachix
+✓ Configuring cachix in 1.86ms
+• Evaluating shell
+✓ Evaluating shell in 4.07ms (cached)
+✓ Configuring shell in 8.39ms
+• Loading tasks
+• Evaluating devenv.config.task.config
+✓ Evaluating devenv.config.task.config in 240µs (cached)
+✓ Loading tasks in 886µs
+• Running tasks
+• Running devenv:files:cleanup
+✓ Running devenv:files:cleanup in 7.23ms
+• Running devenv:enterShell
+✓ Running devenv:enterShell in 7.36ms
+• Running devenv:enterTest
+✓ Running devenv:enterTest in 330ns (no command)
+✓ Running tasks in 14.7ms
+   Compiling autocfg v1.5.1
+   Compiling bytemuck v1.25.2
+   Compiling paste v1.0.15
+   Compiling version_check v0.9.5
+   Compiling libm v0.2.16
+   Compiling num-traits v0.2.19
+   Compiling pulp v0.22.3
+   Compiling reborrow v0.5.5
+   Compiling pulp-wasm-simd-flag v0.1.1
+   Compiling dyn-stack-macros v0.1.3
+   Compiling num-complex v0.4.6
+   Compiling once_cell v1.21.4
+   Compiling dyn-stack v0.13.2
+   Compiling syn v3.0.3
+   Compiling syn v2.0.119
+   Compiling nano-gemm-codegen v0.2.1
+   Compiling serde_core v1.0.229
+   Compiling seq-macro v0.3.6
+   Compiling serde_derive v1.0.229
+   Compiling num-integer v0.1.47
+   Compiling serde v1.0.229
+   Compiling bitflags v2.13.1
+   Compiling syn v1.0.109
+   Compiling raw-cpuid v11.6.0
+   Compiling nano-gemm-core v0.2.1
+   Compiling interpol v0.2.1
+   Compiling hashbrown v0.17.1
+   Compiling defer v0.2.1
+   Compiling equivalent v1.0.2
+   Compiling thiserror-impl v2.0.20
+   Compiling private-gemm-x86 v0.1.20
+   Compiling nano-gemm-f64 v0.2.1
+   Compiling nano-gemm-f32 v0.2.1
+   Compiling nano-gemm-c32 v0.2.1
+   Compiling nano-gemm-c64 v0.2.1
+   Compiling thiserror v2.0.20
+   Compiling equator-macro v0.2.1
+   Compiling num_cpus v1.17.0
+   Compiling generativity v1.2.1
+   Compiling equator v0.2.2
+   Compiling gemm-common v0.19.0
+   Compiling equator-macro v0.6.0
+   Compiling foldhash v0.1.5
+   Compiling equator v0.6.0
+   Compiling hashbrown v0.15.5
+   Compiling num-bigint v0.5.1
+   Compiling num-rational v0.4.2
+   Compiling serde_json v1.0.151
+   Compiling zerocopy v0.8.57
+   Compiling fixedbitset v0.5.7
+   Compiling zerocopy-derive v0.8.57
+   Compiling rustix v1.1.4
+   Compiling indexmap v2.14.0
+   Compiling nano-gemm v0.2.2
+   Compiling typenum v1.20.1
+   Compiling getrandom v0.3.4
+   Compiling linux-raw-sys v0.12.1
+   Compiling hybrid-array v0.4.15
+   Compiling gemm-c32 v0.19.0
+   Compiling gemm-f64 v0.19.0
+   Compiling gemm-f32 v0.19.0
+   Compiling gemm-c64 v0.19.0
+   Compiling qd v0.8.0
+   Compiling termcolor v1.4.1
+   Compiling gemm v0.19.0
+   Compiling faer-traits v0.24.0
+   Compiling quest-math v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-math)
+   Compiling winnow v1.0.4
+   Compiling unicode-width v0.2.2
+   Compiling shlex v2.0.1
+   Compiling regex-syntax v0.8.11
+   Compiling find-msvc-tools v0.1.10
+   Compiling cc v1.4.2
+   Compiling toml_parser v1.1.3+spec-1.1.0
+   Compiling quest-symbolic v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-symbolic)
+   Compiling codespan-reporting v0.13.1
+   Compiling petgraph v0.8.3
+   Compiling faer v0.24.4
+   Compiling rand_core v0.9.5
+   Compiling crypto-common v0.2.2
+   Compiling block-buffer v0.12.1
+   Compiling aho-corasick v1.1.5
+   Compiling const-oid v0.10.2
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling toml_edit v0.25.13+spec-1.1.0
+   Compiling digest v0.11.3
+   Compiling regex-automata v0.4.18
+   Compiling alloca v0.4.0
+   Compiling quest-synthesis v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-synthesis)
+   Compiling quest-optimizer-protocol v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-protocol)
+   Compiling half v2.7.1
+   Compiling anstyle v1.0.14
+   Compiling rustversion v1.0.23
+   Compiling ciborium-io v0.2.2
+   Compiling either v1.18.0
+   Compiling cpufeatures v0.3.1
+   Compiling clap_lex v1.1.0
+   Compiling target-tuple v1.0.2
+   Compiling tempfile v3.27.0
+   Compiling clap_builder v4.6.6
+   Compiling quest-language v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-language)
+   Compiling sha2 v0.11.0
+   Compiling itertools v0.13.0
+   Compiling quest-qasm v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-qasm)
+   Compiling ciborium-ll v0.2.2
+   Compiling quest-optimizer-client v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-client)
+   Compiling regex v1.13.1
+   Compiling proc-macro-crate v3.5.0
+   Compiling ppv-lite86 v0.2.21
+   Compiling serde_spanned v1.1.1
+   Compiling wait-timeout v0.2.1
+   Compiling same-file v1.0.6
+   Compiling fnv v1.0.7
+   Compiling toml_writer v1.1.2+spec-1.1.0
+   Compiling quick-error v1.2.3
+   Compiling bit-vec v0.8.0
+   Compiling cast v0.3.0
+   Compiling toml v1.1.5+spec-1.1.0
+   Compiling criterion-plot v0.8.2
+   Compiling bit-set v0.8.0
+   Compiling rusty-fork v0.3.1
+   Compiling walkdir v2.5.0
+   Compiling quest-macros v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-macros)
+   Compiling rand_chacha v0.9.0
+   Compiling quest-compile v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-compile)
+   Compiling ciborium v0.2.2
+   Compiling clap v4.6.6
+   Compiling rand_xorshift v0.4.0
+   Compiling rand v0.9.5
+   Compiling tinytemplate v1.2.1
+   Compiling googletest_macro v0.14.3
+   Compiling page_size v0.6.0
+   Compiling unarray v0.1.4
+   Compiling anes v0.1.6
+   Compiling oorandom v11.1.5
+   Compiling criterion v0.8.2
+   Compiling googletest v0.14.3
+   Compiling trybuild v1.0.121
+   Compiling proptest v1.11.0
+   Compiling quest-circuit v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-circuit)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 32.67s
+────────────
+ Nextest run ID 6d5d14f8-0353-4969-bcd4-8ec17e523f78 with nextest profile: default
+    Starting 37 tests across 4 binaries (27 binaries skipped)
+        PASS [   0.004s] ( 1/37) quest-circuit::beam_approx_contract approximate_mitm_admits_request_limits_before_any_worker_call
+        PASS [   0.010s] ( 2/37) quest-circuit::beam_approx_contract approximate_mitm_classifies_certified_overlimit_output_as_worker_rejection
+        PASS [   0.007s] ( 3/37) quest-circuit::beam_approx_contract approximate_mitm_large_output_ceiling_reserves_only_reachable_depth
+        PASS [   0.007s] ( 4/37) quest-circuit::beam_approx_contract approximate_mitm_lifts_full_phase_through_negative_control_after_effect_fence
+        PASS [   0.010s] ( 5/37) quest-circuit::beam_approx_contract approximate_mitm_rejects_forged_worker_and_preserves_terminal_status
+        PASS [   0.012s] ( 6/37) quest-circuit::beam_approx_contract approximate_mitm_retains_other_typed_terminal_outcomes_without_publication
+        PASS [   0.022s] ( 7/37) quest-circuit::beam_contract approximation_across_rounds_spends_one_exact_budget_against_original
+        PASS [   0.005s] ( 8/37) quest-circuit::beam_contract beam_admits_replayed_longer_linear_candidate_before_scoring
+        PASS [   0.010s] ( 9/37) quest-circuit::beam_contract beam_keeps_parent_certified_approx_mitm_region_and_rational_budget
+        PASS [   0.010s] (10/37) quest-circuit::beam_contract beam_keeps_parent_certified_exact_mitm_region
+        PASS [   0.004s] (11/37) quest-circuit::beam_contract beam_reports_round_and_candidate_caps_without_losing_best
+        PASS [   0.004s] (12/37) quest-circuit::beam_contract bound_entry_rewrites_discrete_clifford_window
+        PASS [   0.005s] (13/37) quest-circuit::beam_contract bound_entry_uses_exact_phase_targets
+        PASS [   0.004s] (14/37) quest-circuit::beam_contract bound_work_exhaustion_keeps_original_snapshot
+        PASS [   0.007s] (15/37) quest-circuit::beam_contract bound_worker_search_uses_discrete_source_and_preserves_bound_authority
+        PASS [   0.008s] (16/37) quest-circuit::beam_contract budget_after_zx_worker_proof_returns_a_complete_prior_publication
+        PASS [   0.004s] (17/37) quest-circuit::beam_contract deterministic_beam_publishes_verified_exact_improvement
+        PASS [   0.007s] (18/37) quest-circuit::beam_contract forged_worker_envelope_is_a_typed_error
+        PASS [   0.004s] (19/37) quest-circuit::beam_contract ideal_source_remains_original_binding_authority
+        PASS [   0.010s] (20/37) quest-circuit::beam_contract mitm_shortlist_exhaustion_is_incomplete_even_with_original_best
+        PASS [   0.011s] (21/37) quest-circuit::beam_contract pure_phase_window_reaches_exact_mitm_after_zx
+        PASS [   0.008s] (22/37) quest-circuit::beam_contract rational_pi_rotation_does_not_spend_exact_mitm_slot_before_synthesis
+        PASS [   0.008s] (23/37) quest-circuit::beam_contract synthesis_keeps_local_certificate_and_exact_cumulative_allowance
+        PASS [   0.004s] (24/37) quest-circuit::beam_contract tied_rewrites_deduplicate_and_search_terminates_deterministically
+        PASS [   0.007s] (25/37) quest-circuit::beam_contract worker_search_retains_exact_certificate_and_original_authority
+        PASS [   0.007s] (26/37) quest-circuit::beam_mitm_contract exact_mitm_candidate_keeps_effect_fence_and_certified_longer_region
+        PASS [   0.003s] (27/37) quest-circuit::beam_mitm_contract exact_mitm_charges_source_phase_replay_before_visiting_window
+        PASS [   0.004s] (28/37) quest-circuit::beam_mitm_contract exact_mitm_charges_wide_operand_scan_before_visiting_window
+        PASS [   0.006s] (29/37) quest-circuit::beam_mitm_contract exact_mitm_large_output_ceiling_reserves_only_reachable_depth
+        PASS [   0.006s] (30/37) quest-circuit::beam_mitm_contract exact_mitm_preserves_signed_controls_and_preflights_work
+        PASS [   0.014s] (31/37) quest-circuit::beam_mitm_contract exact_mitm_preserves_typed_terminal_status_and_original_program
+        PASS [   0.006s] (32/37) quest-circuit::beam_mitm_contract exact_mitm_rejects_a_certified_worker_result_beyond_requested_depth
+        PASS [   0.006s] (33/37) quest-circuit::beam_mitm_contract exact_mitm_rejects_a_worker_candidate_without_parent_certificate
+        PASS [   0.003s] (34/37) quest-circuit::beam_mitm_contract exact_mitm_rejects_malformed_limits_even_without_an_eligible_window
+        PASS [   0.006s] (35/37) quest-circuit::beam_mitm_contract exact_mitm_reports_post_request_output_cap_separately_from_preflight
+        PASS [   0.006s] (36/37) quest-circuit::beam_mitm_contract exact_mitm_retains_symbolic_binding_obligations_across_a_fenced_region
+        PASS [   0.003s] (37/37) quest-circuit::generator_error_contract rotation_generation_preserves_process_classification_and_native_failures
+────────────
+     Summary [   0.268s] 37 tests run: 37 passed, 0 skipped

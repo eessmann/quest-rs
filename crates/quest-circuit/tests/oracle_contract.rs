@@ -1,11 +1,13 @@
 use googletest::prelude::*;
+#[allow(unused_imports)]
+use quest_circuit::prelude::*;
 use quest_circuit::{
     Angle, BoundGate, Control, ControlState, Gate, MatrixPolicy, Operation, OracleFragment,
-    ProgramBuilder,
+    QuantumRegionBuilder,
 };
 
 fn fragment() -> quest_circuit::Result<OracleFragment> {
-    let mut body = ProgramBuilder::new(2, 0)?;
+    let mut body = QuantumRegionBuilder::new(2, 0)?;
     body.gate(Gate::X, &[body.qubit(0)?], &[])?;
     body.gate(Gate::S, &[body.qubit(1)?], &[])?;
     body.global_phase(Angle::radians(0.25)?, &[])?;
@@ -17,7 +19,7 @@ fn fragment() -> quest_circuit::Result<OracleFragment> {
 #[gtest]
 fn retained_calls_share_storage_but_keep_distinct_occurrences() -> googletest::Result<()> {
     let fragment = fragment()?;
-    let mut builder = ProgramBuilder::new(3, 0)?;
+    let mut builder = QuantumRegionBuilder::new(3, 0)?;
     let targets = [builder.qubit(2)?, builder.qubit(0)?];
     let first = builder.oracle(&fragment, &targets, &[])?;
     let second = builder.oracle(&fragment, &targets, &[])?;
@@ -40,7 +42,7 @@ fn retained_calls_share_storage_but_keep_distinct_occurrences() -> googletest::R
 #[gtest]
 fn adjoint_reverses_operations_and_controls_global_phase() -> googletest::Result<()> {
     let fragment = fragment()?;
-    let builder = ProgramBuilder::new(3, 0)?;
+    let builder = QuantumRegionBuilder::new(3, 0)?;
     let targets = [builder.qubit(2)?, builder.qubit(0)?];
     let control = Control::new(builder.qubit(1)?, ControlState::Zero);
     let adjoint = fragment.adjoint();
@@ -134,13 +136,13 @@ fn numerical_adjoint_is_conjugate_transpose_without_exact_admission() -> googlet
         ]
     ];
     let matrix = quest_circuit::NumericalOperator::from_view(&matrix, MatrixPolicy::default())?;
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     builder.numerical(matrix.clone(), &[builder.qubit(0)?], &[])?;
     let program = builder.finish()?;
     expect_true!(program.clone().into_unitary().is_err());
     let fragment =
         OracleFragment::from_program(program.bind(&[])?, 1e-12, MatrixPolicy::default())?;
-    let target = ProgramBuilder::new(1, 0)?;
+    let target = QuantumRegionBuilder::new(1, 0)?;
     let operations =
         fragment
             .adjoint()
@@ -324,7 +326,7 @@ fn storage_accounting_deduplicates_shared_bodies_without_deduplicating_queries()
         OracleFragment::shared_storage_bytes([&body])?,
         OracleFragment::shared_storage_bytes([&body, &adjoint])?
     );
-    let mut builder = ProgramBuilder::new(2, 0)?;
+    let mut builder = QuantumRegionBuilder::new(2, 0)?;
     let targets = [builder.qubit(0)?, builder.qubit(1)?];
     builder.oracle(&body, &targets, &[])?;
     builder.oracle(&body, &targets, &[])?;

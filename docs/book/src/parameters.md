@@ -2,7 +2,7 @@
 
 ## Captures are evaluated once
 
-A `${ ... }` expression captures a Rust `f64` when `circuit!` constructs the program. It is evaluated once per lexical capture, even if its gate occurs in a runtime loop or a called region. Captures are finite floating values, not symbolic exact π expressions. A capture is not a callback into Rust during interpretation.
+A `${ ... }` expression captures a Rust `f64` or an explicit exact `Angle` when `circuit!` constructs the program. It is evaluated once per lexical capture, even if its gate occurs in a runtime loop or a called region. `f64` captures remain finite floating values. `${Angle::pi(1,4)?}` retains the exact mathematical target alongside its native floating realization; QASM `pi/4` retains ordinary floating language semantics. A capture is not a callback into Rust during interpretation.
 
 ```rust
 {{#include ../../../crates/quest/examples/tutorials.rs:captures_once}}

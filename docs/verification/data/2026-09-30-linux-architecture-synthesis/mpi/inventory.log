@@ -1,0 +1,36 @@
+Tue Sep 29 23:31:09 UTC 2026
+Linux CU-05 7.2.4-ogc3.1.fc44.x86_64 #1 SMP PREEMPT_DYNAMIC Sun Sep 13 01:41:06 UTC 2026 x86_64 GNU/Linux
+rustc 1.100.0-nightly (6bb1652a0 2026-09-22)
+binary: rustc
+commit-hash: 6bb1652a020e80cef79332741d89e996d71933c9
+commit-date: 2026-09-22
+host: x86_64-unknown-linux-gnu
+release: 1.100.0-nightly
+LLVM version: 23.1.1
+cargo 1.100.0-nightly (495c385d0 2026-09-16)
+mpiexec (Open MPI) 5.0.10
+
+Report bugs to https://www.open-mpi.org/community/help/
+
+/nix/store/z4c6k0mrlkwl3s4w9ysxc8vq1wylm3ms-gcc-wrapper-15.3.0/bin/gcc -I/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/include -L/nix/store/x5afc4dcy2qg43fa1ww84rk00gvx2zfk-openmpi-5.0.10/lib -Wl,-rpath -Wl,/nix/store/x5afc4dcy2qg43fa1ww84rk00gvx2zfk-openmpi-5.0.10/lib -Wl,--enable-new-dtags -lmpi
+CXX=g++
+QUEST_ROOT=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0
+MPICC=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/bin/mpicc
+CARGO_TARGET_DIR=../target-mpi
+CARGO_BUILD_JOBS=3
+CARGO_BUILD_JOBS=3
+CARGO_TARGET_DIR=../target-mpi
+CMAKE_INCLUDE_PATH=/nix/store/l472345nc50yyj2sds4qwk45hdrcrmrf-bash-interactive-5.3p15-dev/include:/nix/store/did4j5wk64y2g930gp8f2bppn7z5kggg-clang-21.1.8-dev/include
+CMAKE_LIBRARY_PATH=/nix/store/7jyzh8sbm1h140bdya4kvi01hndnzfac-rust-default-1.100.0-nightly-2026-09-23/lib:/nix/store/a3kjvvlm7f8abcmxh6f8dndiwc4vp726-clang-21.1.8-lib/lib
+CMAKE_PREFIX_PATH=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev
+MPICC=/nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/bin/mpicc
+QUEST_ROOT=/nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0
+35ae2cd5c86d9352124f2be3b557d79a0fd2be9d53cda0608235e99f503fefaa  ../source-manifest.json
+8aca0b698874d840ba710e0cf029e8ac51cd16dce31fc395424ad4f70200512a  devenv.nix
+ce9d4031cccb23e69c38ba9ec06513f59209eafc99f256e777798841836067da  Cargo.toml
+fdcfa7bce1782024d13e2c712e5ecbee0f72276365e604c007740f21b4405df0  Cargo.lock
+96bb175d88896f38ac5145edff541f8128d13d364d8a2f5ef5e0881b3dc53958  nix/quest.nix
+d582f998fcf4b142ecc0b0acea36f5275cca34f58b03b89b87dfd5369983aaef  crates/quest/tests/collective_runtime.rs
+91ac67452b95ecc1f84e93b74fd81256fbe5c247253f10855543a7ff5e29667f  crates/quest/src/collective.rs
+137378f7115e81b1928ad7a3efcd530291f5260f512849fa7907129cdacfa750  crates/quest-build/src/rsmpi.rs
+987f02050c7612ce63b95c0215e360696df733ef9591fa45ac95d7872a895a8d  crates/quest-build/native/mpi_abi.c

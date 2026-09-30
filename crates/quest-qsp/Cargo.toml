@@ -8,6 +8,9 @@ description = "Canonical and generalized quantum signal processing"
 
 [dependencies]
 thiserror.workspace = true
+serde = { workspace = true, features = ["derive", "std"], optional = true }
+serde_json = { workspace = true, optional = true }
+sha2 = { workspace = true, optional = true }
 num-complex.workspace = true
 quest-numerics.workspace = true
 quest-polynomial.workspace = true
@@ -22,6 +25,7 @@ googletest.workspace = true
 workspace = true
 
 [features]
+artifact = ["certification", "dep:serde", "dep:serde_json", "dep:sha2"]
 certification = ["dep:astro-float"]
 offline-synthesis = ["certification"]
 rayon = ["dep:rayon", "quest-numerics/rayon"]

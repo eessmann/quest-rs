@@ -1,4 +1,6 @@
 use googletest::{Result, prelude::*};
+#[allow(unused_imports)]
+use quest_circuit::prelude::*;
 use quest_circuit::{language::GateKind, *};
 use std::sync::Arc;
 
@@ -43,7 +45,7 @@ fn bound_plan_checks_native_indices_without_an_empty_intermediate_stage() -> Res
     let count = usize::try_from(i32::MAX)?
         .checked_add(1)
         .ok_or_else(|| std::io::Error::other("index overflow"))?;
-    let builder = ProgramBuilder::with_limits(
+    let builder = QuantumRegionBuilder::with_limits(
         count,
         0,
         ProgramLimits {
@@ -55,14 +57,17 @@ fn bound_plan_checks_native_indices_without_an_empty_intermediate_stage() -> Res
         builder.finish()?.bind(&[])?.plan(),
         Err(Error::NativeIndex)
     ));
-    let plan = ProgramBuilder::new(1, 0)?.finish()?.bind(&[])?.plan()?;
+    let plan = QuantumRegionBuilder::new(1, 0)?
+        .finish()?
+        .bind(&[])?
+        .plan()?;
     expect_eq!(plan.num_qubits(), 1);
     Ok(())
 }
 
 #[gtest]
 fn bindings_share_frozen_operands_without_merging_occurrences() -> Result<()> {
-    let mut builder = ProgramBuilder::new(3, 0)?;
+    let mut builder = QuantumRegionBuilder::new(3, 0)?;
     let targets = [builder.qubit(2)?];
     let controls = [Control::new(builder.qubit(0)?, ControlState::Zero)];
     let first = builder.gate(Gate::H, &targets, &controls)?;

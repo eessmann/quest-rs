@@ -1,10 +1,12 @@
 #![cfg(all(feature = "workers", target_os = "linux"))]
 use googletest::{Result, prelude::*};
+use quest_circuit::optimizer::{Client, MitmResult, WorkerLimits};
+#[allow(unused_imports)]
+use quest_circuit::prelude::*;
 use quest_circuit::{
-    Angle, BoundAngleTarget, Control, ControlState, Gate, ProgramBuilder, WorkerError,
+    Angle, BoundAngleTarget, Control, ControlState, Gate, QuantumRegionBuilder, WorkerError,
 };
 use quest_math::Limits;
-use quest_optimizer_client::{Client, MitmResult, WorkerLimits};
 use quest_optimizer_protocol::MitmLimits;
 use std::os::unix::fs::PermissionsExt;
 
@@ -29,8 +31,8 @@ fn client_for(label: &str, outcome: &str) -> Result<(Remove, Client)> {
     let client = Client::new(path.clone(), WorkerLimits::default())?;
     Ok((Remove(path), client))
 }
-fn controlled_rotation() -> Result<quest_circuit::ValidatedProgram> {
-    let mut builder = ProgramBuilder::new(2, 1)?;
+fn controlled_rotation() -> Result<quest_circuit::QuantumRegion> {
+    let mut builder = QuantumRegionBuilder::new(2, 1)?;
     let target = builder.qubit(0)?;
     let control = builder.qubit(1)?;
     let bit = builder.bit(0)?;

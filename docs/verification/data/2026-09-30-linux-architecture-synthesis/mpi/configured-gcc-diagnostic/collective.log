@@ -1,0 +1,29 @@
+   Compiling link-cplusplus v1.0.12
+   Compiling target-tuple v1.0.2
+   Compiling tinytemplate v1.2.1
+   Compiling page_size v0.6.0
+   Compiling anes v0.1.6
+   Compiling cxx v1.0.198
+   Compiling oorandom v11.1.5
+   Compiling criterion v0.8.2
+   Compiling googletest v0.14.3
+   Compiling trybuild v1.0.121
+   Compiling quest-sys v0.2.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-sys)
+   Compiling quest-qsp v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-qsp)
+warning: quest-sys@0.2.0: Using QuEST 4.3.0 from /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0 with /nix/store/z4c6k0mrlkwl3s4w9ysxc8vq1wylm3ms-gcc-wrapper-15.3.0/bin/g++
+warning: quest-sys@0.2.0: Verified rsmpi MPICC /nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/bin/mpicc matches QuEST MPI ABI and loaded library
+   Compiling quest-rs v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.92s
+     Running tests/collective_runtime.rs (../target-mpi/debug/build/quest-rs/1cf4eaa29a3ff88a/out/collective_runtime-1cf4eaa29a3ff88a)
+
+running 7 tests
+test collective_budget_failure_on_one_rank_precedes_native_allocation ... ok
+test collective_compares_full_semantics_and_prepared_identity ... ok
+test collective_mismatched_payload_and_preflight_recover_together ... ok
+test collective_prepared_bell_oracle_and_projection_preserve_mpi ... ok
+test collective_rejects_different_cache_sharing_before_materialization ... ok
+test collective_rejects_different_classical_results_and_step_counts ... ok
+test collective_subgroups_execute_independent_schedules ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.26s
+

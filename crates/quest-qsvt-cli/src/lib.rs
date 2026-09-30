@@ -44,6 +44,9 @@ pub enum Error {
     #[cfg(feature = "certification")]
     #[error(transparent)]
     Certification(#[from] quest_qsp::certification::CertificationError),
+    #[cfg(feature = "certification")]
+    #[error(transparent)]
+    Artifact(#[from] quest_qsp::artifact::ArtifactError),
     #[cfg(feature = "offline-synthesis")]
     #[error(transparent)]
     Offline(#[from] quest_qsp::offline::OfflineError),
@@ -105,8 +108,36 @@ pub enum Command {
 #[derive(Debug, Clone, Copy, Default, ValueEnum)]
 pub enum SynthesisMode {
     #[default]
-    Canonical,
-    Generalized,
+    RealParityWx,
+    UnitCircleResponse,
+}
+/// Numerical solver, independently selectable from response convention and precision.
+#[derive(Debug, Clone, Copy, Default, ValueEnum)]
+pub enum Algorithm {
+    #[default]
+    Rhw,
+    InverseNlft,
+}
+impl Algorithm {
+    const fn solver(self) -> quest_qsp::SynthesisAlgorithm {
+        match self {
+            Self::Rhw => quest_qsp::SynthesisAlgorithm::RhwHalfCholesky,
+            Self::InverseNlft => quest_qsp::SynthesisAlgorithm::InverseNlftDivideConquer,
+        }
+    }
+    const fn name(self) -> &'static str {
+        match self {
+            Self::Rhw => "rhw",
+            Self::InverseNlft => "inverse-nlft",
+        }
+    }
+}
+/// Compiled exports retain target/evidence; sequence exports are explicitly weaker.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, ValueEnum)]
+pub enum ExportFormat {
+    #[default]
+    Compiled,
+    Sequence,
 }
 #[derive(Debug, Clone, Args)]
 pub struct SynthesisArgs {
@@ -114,8 +145,12 @@ pub struct SynthesisArgs {
     pub input: PathBuf,
     #[arg(long)]
     pub output: PathBuf,
-    #[arg(long, value_enum, default_value = "canonical")]
+    #[arg(long, value_enum, default_value = "real-parity-wx")]
     pub mode: SynthesisMode,
+    #[arg(long, value_enum, default_value = "rhw")]
+    pub algorithm: Algorithm,
+    #[arg(long = "export", value_enum, default_value = "compiled")]
+    pub export: ExportFormat,
     #[arg(long)]
     pub certify: bool,
     #[arg(long, default_value_t = 1e-11)]
@@ -158,6 +193,8 @@ pub struct TransformArgs {
     /// Explicitly synthesize a polynomial input in binary64 before preparation.
     #[arg(long)]
     pub synthesize_input: bool,
+    #[arg(long, value_enum, default_value = "rhw")]
+    pub algorithm: Algorithm,
     #[arg(long, requires = "synthesize_input")]
     pub certify_input: bool,
     #[arg(long, default_value_t = 1e-11)]
@@ -358,13 +395,18 @@ fn dispatch(command: Command, context: &mut Context<'_>) -> Result<Value> {
     }
 }
 fn read_qsp(path: &Path) -> Result<QspInput> {
+    read_qsp_with_tolerance(path, 1e-11)
+}
+fn read_qsp_with_tolerance(path: &Path, tolerance: f64) -> Result<QspInput> {
     let policy = IoPolicy::default();
     let limit = u64::try_from(policy.max_bytes).map_err(|_| Error::Budget("JSON length"))?;
     let mut text = String::new();
     std::fs::File::open(path)?
         .take(limit.saturating_add(1))
         .read_to_string(&mut text)?;
-    Ok(quest_qsvt_io::read_qsp_json(&text, policy)?)
+    Ok(quest_qsvt_io::read_qsp_json_with_tolerance(
+        &text, policy, tolerance,
+    )?)
 }
 
 fn set(object: &mut Value, key: &str, value: Value) -> Result<()> {

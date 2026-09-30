@@ -1,11 +1,11 @@
 use googletest::prelude::*;
-use quest_circuit::{Angle, Control, ControlState, Gate, OracleFragment, ProgramBuilder};
+use quest_circuit::{Angle, Control, ControlState, Gate, OracleFragment, QuantumRegionBuilder};
 use quest_qsvt::{Complex64, NumericalPolicy, materialize_oracle};
 use std::ops::Sub;
 
 #[gtest]
 fn independent_materialization_keeps_controlled_phase_and_adjoint_order() -> Result<()> {
-    let mut body = ProgramBuilder::new(2, 0)?;
+    let mut body = QuantumRegionBuilder::new(2, 0)?;
     let q0 = body.qubit(0)?;
     let q1 = body.qubit(1)?;
     body.gate(Gate::H, &[q0], &[])?;

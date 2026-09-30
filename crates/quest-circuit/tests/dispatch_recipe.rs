@@ -1,8 +1,10 @@
 use faer::Mat;
 use num_complex::Complex64;
+#[allow(unused_imports)]
+use quest_circuit::prelude::*;
 use quest_circuit::{
     BoundGate, Control, ControlState, MatrixPolicy, NumericalOperator, OracleFragment,
-    ProgramBuilder,
+    QuantumRegionBuilder,
     dispatch_recipe::{
         DispatchStep, MatrixRecipe, PreparedRecipeInventory, RecipeLimits,
         discover_oracle_profiles, discover_oracle_profiles_with_limits, gate_recipe,
@@ -109,7 +111,7 @@ fn preparation_shares_storage_and_ordered_profile_but_counts_occurrences() -> go
     let source = Mat::from_fn(2, 2, |r, c| Complex64::new(f64::from(r == c), 0.0));
     let shared = NumericalOperator::from_view(source.as_ref(), MatrixPolicy::default())?;
     let distinct = NumericalOperator::from_view(source.as_ref(), MatrixPolicy::default())?;
-    let mut builder = ProgramBuilder::new(3, 0)?;
+    let mut builder = QuantumRegionBuilder::new(3, 0)?;
     let target = builder.qubit(0)?;
     let first = Control::new(builder.qubit(1)?, ControlState::Zero);
     let second = Control::new(builder.qubit(2)?, ControlState::One);
@@ -151,12 +153,12 @@ fn nested_adjoint_oracles_share_payload_per_full_signed_profile() -> googletest:
         )
     });
     let matrix = NumericalOperator::from_view(source.as_ref(), MatrixPolicy::default())?;
-    let mut leaf = ProgramBuilder::new(1, 0)?;
+    let mut leaf = QuantumRegionBuilder::new(1, 0)?;
     leaf.numerical(matrix, &[leaf.qubit(0)?], &[])?;
     let leaf = OracleFragment::builder(leaf.finish()?.bind(&[])?)
         .matrix_tolerance(1e-12)?
         .build()?;
-    let mut middle = ProgramBuilder::new(1, 0)?;
+    let mut middle = QuantumRegionBuilder::new(1, 0)?;
     middle.oracle(&leaf, &[middle.qubit(0)?], &[])?;
     let middle = OracleFragment::builder(middle.finish()?.bind(&[])?)
         .matrix_tolerance(1e-12)?
@@ -174,7 +176,7 @@ fn nested_adjoint_oracles_share_payload_per_full_signed_profile() -> googletest:
         )
         .is_err()
     );
-    let mut caller = ProgramBuilder::new(2, 0)?;
+    let mut caller = QuantumRegionBuilder::new(2, 0)?;
     let t = caller.qubit(0)?;
     let c = caller.qubit(1)?;
     caller.oracle(&middle, &[t], &[Control::new(c, ControlState::Zero)])?;

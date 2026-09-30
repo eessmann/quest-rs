@@ -1,0 +1,12 @@
+• Validating lock
+✓ Validating lock in 6.08ms
+  evaluating file '«nix-internal»/derivation-internal.nix'
+• Configuring cachix
+✓ Configuring cachix in 1.87ms
+• Evaluating
+• Evaluating Nix
+✓ Evaluating Nix in 221ms
+✓ Evaluating in 221ms
+{
+  "env.CXX": "/nix/store/z4c6k0mrlkwl3s4w9ysxc8vq1wylm3ms-gcc-wrapper-15.3.0/bin/c++"
+}

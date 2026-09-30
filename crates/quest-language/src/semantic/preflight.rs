@@ -147,7 +147,10 @@ impl<'a> Scan<'a> {
                 }
                 self.body(body, depth)?;
             }
-            S::Barrier(values) => self.expressions(values, depth)?,
+            S::Barrier(values)
+            | S::Payload {
+                operands: values, ..
+            } => self.expressions(values, depth)?,
             S::Return(value) => self.optional(value.as_ref(), depth)?,
             S::Include(_) | S::Break | S::Continue | S::End => {}
             _ => self.control(statement, depth)?,

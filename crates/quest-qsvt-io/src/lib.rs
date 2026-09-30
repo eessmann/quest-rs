@@ -6,6 +6,10 @@
 //! distributed applications call these APIs on the coordinating root only.
 
 mod catalog;
+#[cfg(feature = "certification")]
+mod compiled;
+#[cfg(feature = "certification")]
+pub use compiled::{CompiledInput, read_compiled_qsp_json};
 #[cfg(feature = "hdf5")]
 pub mod hdf5;
 mod json;
@@ -14,8 +18,9 @@ mod sparse;
 mod catalog_data;
 pub use catalog::{CatalogFamily, catalog_families, find_catalog_family};
 pub use json::{
-    GeneralizedAngleInput, PolynomialInput, QspInput, read_qsp_execution_json, read_qsp_json,
-    write_qsp_execution_json, write_qsp_json,
+    GeneralizedAngleInput, PolynomialConversion, PolynomialInput, QspInput,
+    read_qsp_execution_json, read_qsp_execution_json_with_tolerance, read_qsp_json,
+    read_qsp_json_with_tolerance, write_qsp_execution_json, write_qsp_json,
 };
 pub use num_complex::Complex64;
 pub use sparse::{
@@ -26,6 +31,9 @@ pub type Result<T> = std::result::Result<T, Error>;
 #[derive(Debug, thiserror::Error)]
 #[non_exhaustive]
 pub enum Error {
+    #[cfg(feature = "certification")]
+    #[error(transparent)]
+    Artifact(#[from] quest_qsp::artifact::ArtifactError),
     #[cfg(feature = "hdf5")]
     #[error(transparent)]
     Hdf5(#[from] hdf5_metno::Error),

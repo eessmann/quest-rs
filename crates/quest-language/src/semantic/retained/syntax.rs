@@ -78,7 +78,10 @@ impl Heap for S {
             } => sum([name.heap()?, ty.heap()?, iterable.heap()?, body.heap()?]),
             Self::While { condition, body } => sum([condition.heap()?, body.heap()?]),
             Self::Reset(value) | Self::Expression(value) => value.heap(),
-            Self::Barrier(values) => values.heap(),
+            Self::Barrier(values)
+            | Self::Payload {
+                operands: values, ..
+            } => values.heap(),
             Self::Return(value) => value.heap(),
             Self::Break | Self::Continue | Self::End => Ok(0),
         }

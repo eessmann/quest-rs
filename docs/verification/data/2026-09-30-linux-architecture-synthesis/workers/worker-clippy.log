@@ -1,0 +1,217 @@
+• Validating lock
+✓ Validating lock in 5.86ms
+  evaluating file '«nix-internal»/derivation-internal.nix'
+• Configuring shell
+• Configuring cachix
+✓ Configuring cachix in 1.94ms
+• Evaluating shell
+✓ Evaluating shell in 4.20ms (cached)
+✓ Configuring shell in 8.17ms
+• Loading tasks
+• Evaluating devenv.config.task.config
+✓ Evaluating devenv.config.task.config in 318µs (cached)
+✓ Loading tasks in 1.04ms
+• Running tasks
+• Running devenv:files:cleanup
+✓ Running devenv:files:cleanup in 6.10ms
+• Running devenv:enterShell
+✓ Running devenv:enterShell in 7.13ms
+• Running devenv:enterTest
+✓ Running devenv:enterTest in 510ns (no command)
+✓ Running tasks in 13.3ms
+    Checking num-traits v0.2.19
+    Checking memchr v2.8.3
+    Checking serde_core v1.0.229
+   Compiling num-complex v0.4.6
+   Compiling raw-cpuid v11.6.0
+    Checking thiserror v2.0.20
+   Compiling dirs-sys-next v0.1.2
+   Compiling parking_lot_core v0.9.12
+   Compiling dirs-next v2.0.0
+    Checking aho-corasick v1.1.5
+   Compiling term v0.7.0
+   Compiling parking_lot v0.12.5
+    Checking num-integer v0.1.47
+    Checking num-bigint v0.4.8
+    Checking crossbeam-utils v0.8.23
+    Checking pulp v0.22.3
+    Checking regex-automata v0.4.18
+   Compiling either v1.18.0
+    Checking futures-core v0.3.34
+    Checking futures-sink v0.3.34
+    Checking utf8parse v0.2.2
+   Compiling fixedbitset v0.4.2
+    Checking anstyle-parse v1.0.0
+    Checking serde v1.0.229
+    Checking serde_json v1.0.151
+   Compiling petgraph v0.6.5
+    Checking num-rational v0.4.2
+    Checking num-bigint v0.5.1
+    Checking futures-channel v0.3.34
+   Compiling string_cache v0.8.9
+    Checking regex v1.13.1
+   Compiling itertools v0.10.5
+    Checking crossbeam-epoch v0.9.21
+    Checking nano-gemm-c32 v0.2.1
+    Checking nano-gemm-c64 v0.2.1
+    Checking quest-math v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-math)
+    Checking gemm-common v0.19.0
+    Checking gemm-f64 v0.19.0
+    Checking gemm-f32 v0.19.0
+    Checking gemm-c64 v0.19.0
+    Checking quest-synthesis v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-synthesis)
+    Checking quest-optimizer-protocol v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-protocol)
+    Checking quest-optimizer-client v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-client)
+   Compiling gemm-c32 v0.19.0
+   Compiling qd v0.8.0
+   Compiling ascii-canvas v3.0.0
+   Compiling lalrpop-util v0.19.12
+    Checking equator v0.2.2
+   Compiling is-terminal v0.4.17
+    Checking pin-project-lite v0.2.17
+    Checking anstyle-query v1.1.5
+    Checking futures-task v0.3.34
+    Checking colorchoice v1.0.5
+    Checking futures-io v0.3.34
+    Checking slab v0.4.12
+    Checking is_terminal_polyfill v1.70.2
+   Compiling faer-traits v0.24.0
+    Checking futures-util v0.3.34
+    Checking nano-gemm v0.2.2
+    Checking anstream v1.0.0
+   Compiling lalrpop v0.19.12
+    Checking googletest v0.14.3
+    Checking private-gemm-x86 v0.1.20
+    Checking gemm v0.19.0
+    Checking crossbeam-deque v0.8.8
+    Checking zerocopy v0.8.57
+    Checking getrandom v0.2.17
+    Checking rand_core v0.6.4
+   Compiling faer v0.24.4
+   Compiling quest-symbolic v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-symbolic)
+    Checking rayon-core v1.13.0
+    Checking futures-executor v0.3.34
+    Checking num-iter v0.1.46
+    Checking ppv-lite86 v0.2.21
+    Checking strsim v0.11.1
+    Checking log v0.4.34
+    Checking jiff-core v0.1.0
+   Compiling rstest_macros v0.23.0
+    Checking env_filter v2.0.0
+    Checking rand_chacha v0.3.1
+    Checking jiff v0.2.35
+    Checking clap_builder v4.6.6
+    Checking thiserror v1.0.69
+    Checking num v0.4.3
+    Checking futures v0.3.34
+    Checking rayon v1.12.0
+   Compiling openqasm v0.1.2
+    Checking logos v0.12.1
+    Checking object v0.37.3
+    Checking futures-timer v3.0.4
+    Checking rstest v0.23.0
+    Checking derive_more v1.0.0
+    Checking clap v4.6.6
+    Checking env_logger v0.11.11
+    Checking rand v0.8.8
+    Checking approx v0.5.1
+    Checking roots v0.0.8
+    Checking strum v0.25.0
+    Checking rustc-hash v2.1.3
+    Checking ndarray v0.16.1
+    Checking backtrace v0.3.76
+    Checking color-eyre v0.6.5
+    Checking quizx v0.3.0
+    Checking quest-optimizer-worker v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-worker)
+    Checking quest-language v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-language)
+    Checking quest-qasm v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-qasm)
+    Checking quest-compile v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-compile)
+   Compiling quest-macros v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-macros)
+    Checking quest-circuit v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-circuit)
+error[E0599]: no method named `synthesize_rotations` found for struct `quest_circuit::QuantumRegion` in the current scope
+   --> crates/quest-optimizer-worker/tests/circuit_contract.rs:29:14
+    |
+ 27 |         builder
+ 28 |             .finish()?
+ 29 |             .synthesize_rotations(&worker()?, 1e-12, 42, Limits::default())?;
+    |              ^^^^^^^^^^^^^^^^^^^^ method not found in `quest_circuit::QuantumRegion`
+    |
+   ::: crates/quest-compile/src/workers.rs:364:8
+    |
+364 |     fn synthesize_rotations(
+    |        -------------------- the method is available for `quest_circuit::QuantumRegion` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: trait `RotationSynthesisPasses` which provides `synthesize_rotations` is implemented but not in scope; perhaps you want to import it
+    |
+  2 + use quest_circuit::RotationSynthesisPasses;
+    |
+
+error[E0599]: no method named `synthesize_rotations` found for struct `quest_circuit::QuantumRegion` in the current scope
+   --> crates/quest-optimizer-worker/tests/circuit_contract.rs:70:14
+    |
+ 68 |         builder
+ 69 |             .finish()?
+ 70 |             .synthesize_rotations(&worker()?, 1e-12, 43, Limits::default())?;
+    |              ^^^^^^^^^^^^^^^^^^^^ method not found in `quest_circuit::QuantumRegion`
+    |
+   ::: crates/quest-compile/src/workers.rs:364:8
+    |
+364 |     fn synthesize_rotations(
+    |        -------------------- the method is available for `quest_circuit::QuantumRegion` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: trait `RotationSynthesisPasses` which provides `synthesize_rotations` is implemented but not in scope; perhaps you want to import it
+    |
+  2 + use quest_circuit::RotationSynthesisPasses;
+    |
+
+error[E0599]: no method named `optimize_zx` found for struct `quest_circuit::QuantumRegion` in the current scope
+   --> crates/quest-optimizer-worker/tests/circuit_contract.rs:90:10
+    |
+ 88 |     let (retained, skipped) = original
+ 89 |         .clone()
+ 90 |         .optimize_zx(&missing, 3, Limits::default())?;
+    |          ^^^^^^^^^^^
+    |
+   ::: crates/quest-compile/src/workers.rs:709:8
+    |
+709 |     fn optimize_zx(
+    |        ----------- the method is available for `quest_circuit::QuantumRegion` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: there is a method `optimize_exact` with a similar name, but with different arguments
+   --> crates/quest-compile/src/optimize.rs:242:5
+    |
+242 |     fn optimize_exact(self) -> Result<(Self, OptimizationReport)>;
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: trait `ZxPasses` which provides `optimize_zx` is implemented but not in scope; perhaps you want to import it
+    |
+  2 + use quest_circuit::ZxPasses;
+    |
+
+error[E0599]: no method named `optimize_zx` found for struct `quest_circuit::QuantumRegion` in the current scope
+   --> crates/quest-optimizer-worker/tests/circuit_contract.rs:93:40
+    |
+ 93 |     let (optimized, report) = original.optimize_zx(&worker()?, 3, Limits::default())?;
+    |                                        ^^^^^^^^^^^
+    |
+   ::: crates/quest-compile/src/workers.rs:709:8
+    |
+709 |     fn optimize_zx(
+    |        ----------- the method is available for `quest_circuit::QuantumRegion` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: there is a method `optimize_exact` with a similar name, but with different arguments
+   --> crates/quest-compile/src/optimize.rs:242:5
+    |
+242 |     fn optimize_exact(self) -> Result<(Self, OptimizationReport)>;
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: trait `ZxPasses` which provides `optimize_zx` is implemented but not in scope; perhaps you want to import it
+    |
+  2 + use quest_circuit::ZxPasses;
+    |
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `quest-optimizer-worker` (test "circuit_contract") due to 4 previous errors
+warning: build failed, waiting for other jobs to finish...

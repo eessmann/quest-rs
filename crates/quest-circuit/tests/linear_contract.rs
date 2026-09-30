@@ -1,9 +1,13 @@
 use googletest::{Result, prelude::*};
+#[allow(unused_imports)]
+use quest_circuit::prelude::*;
 use quest_circuit::{Cnot, LinearOptions, synthesize_cnot};
 
 #[gtest]
 fn candidate_generation_is_independent_of_local_shortening() -> Result<()> {
-    use quest_circuit::{Control, ControlState, Gate, LinearCandidateStrategy, ProgramBuilder};
+    use quest_circuit::{
+        Control, ControlState, Gate, LinearCandidateStrategy, QuantumRegionBuilder,
+    };
     let input = [
         Cnot {
             control: 0,
@@ -18,7 +22,7 @@ fn candidate_generation_is_independent_of_local_shortening() -> Result<()> {
             target: 0,
         },
     ];
-    let mut b = ProgramBuilder::new(3, 0)?;
+    let mut b = QuantumRegionBuilder::new(3, 0)?;
     for gate in &input {
         b.gate(
             Gate::X,
@@ -193,8 +197,8 @@ fn seeded_binary_matrices_verify_both_algorithms_through_sixty_four_wires() -> R
 
 #[gtest]
 fn program_linear_windows_preserve_barriers_and_explicit_dependencies() -> Result<()> {
-    use quest_circuit::{Control, ControlState, Gate, ProgramBuilder};
-    let mut builder = ProgramBuilder::new(2, 0)?;
+    use quest_circuit::{Control, ControlState, Gate, QuantumRegionBuilder};
+    let mut builder = QuantumRegionBuilder::new(2, 0)?;
     let zero = builder.qubit(0)?;
     let one = builder.qubit(1)?;
     let controls = [Control::new(one, ControlState::One)];
@@ -211,7 +215,7 @@ fn program_linear_windows_preserve_barriers_and_explicit_dependencies() -> Resul
     expect_eq!(report.accepted_windows, 2);
     expect_eq!(optimized.schedule().len(), 1);
     expect_eq!(report.rewrites.len(), 2);
-    let mut builder = ProgramBuilder::new(2, 0)?;
+    let mut builder = QuantumRegionBuilder::new(2, 0)?;
     let target = builder.qubit(0)?;
     let control = [Control::new(builder.qubit(1)?, ControlState::One)];
     let first = builder.gate(Gate::X, &[target], &control)?;
@@ -227,8 +231,8 @@ fn program_linear_windows_preserve_barriers_and_explicit_dependencies() -> Resul
 
 #[gtest]
 fn whole_program_scan_and_output_copy_are_in_the_pass_budget() -> Result<()> {
-    use quest_circuit::ProgramBuilder;
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    use quest_circuit::QuantumRegionBuilder;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     let q = builder.qubit(0)?;
     for _ in 0..100 {
         builder.barrier(&[q])?;

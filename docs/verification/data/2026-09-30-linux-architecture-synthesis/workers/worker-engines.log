@@ -1,0 +1,110 @@
+• Validating lock
+✓ Validating lock in 5.99ms
+  evaluating file '«nix-internal»/derivation-internal.nix'
+• Configuring shell
+• Configuring cachix
+✓ Configuring cachix in 1.63ms
+• Evaluating shell
+✓ Evaluating shell in 3.98ms (cached)
+✓ Configuring shell in 8.18ms
+• Loading tasks
+• Evaluating devenv.config.task.config
+✓ Evaluating devenv.config.task.config in 332µs (cached)
+✓ Loading tasks in 990µs
+• Running tasks
+• Running devenv:files:cleanup
+✓ Running devenv:files:cleanup in 8.88ms
+• Running devenv:enterShell
+✓ Running devenv:enterShell in 8.49ms
+• Running devenv:enterTest
+✓ Running devenv:enterTest in 230ns (no command)
+✓ Running tasks in 17.5ms
+    Blocking waiting for file lock on build directory
+   Compiling quest-optimizer-worker v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-worker)
+error[E0599]: no method named `synthesize_rotations` found for struct `QuantumRegion` in the current scope
+   --> crates/quest-optimizer-worker/tests/circuit_contract.rs:29:14
+    |
+ 27 |         builder
+ 28 |             .finish()?
+ 29 |             .synthesize_rotations(&worker()?, 1e-12, 42, Limits::default())?;
+    |              ^^^^^^^^^^^^^^^^^^^^ method not found in `QuantumRegion`
+    |
+   ::: crates/quest-compile/src/workers.rs:364:8
+    |
+364 |     fn synthesize_rotations(
+    |        -------------------- the method is available for `QuantumRegion` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: trait `RotationSynthesisPasses` which provides `synthesize_rotations` is implemented but not in scope; perhaps you want to import it
+    |
+  2 + use quest_circuit::RotationSynthesisPasses;
+    |
+
+error[E0599]: no method named `synthesize_rotations` found for struct `QuantumRegion` in the current scope
+   --> crates/quest-optimizer-worker/tests/circuit_contract.rs:70:14
+    |
+ 68 |         builder
+ 69 |             .finish()?
+ 70 |             .synthesize_rotations(&worker()?, 1e-12, 43, Limits::default())?;
+    |              ^^^^^^^^^^^^^^^^^^^^ method not found in `QuantumRegion`
+    |
+   ::: crates/quest-compile/src/workers.rs:364:8
+    |
+364 |     fn synthesize_rotations(
+    |        -------------------- the method is available for `QuantumRegion` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: trait `RotationSynthesisPasses` which provides `synthesize_rotations` is implemented but not in scope; perhaps you want to import it
+    |
+  2 + use quest_circuit::RotationSynthesisPasses;
+    |
+
+error[E0599]: no method named `optimize_zx` found for struct `QuantumRegion` in the current scope
+   --> crates/quest-optimizer-worker/tests/circuit_contract.rs:90:10
+    |
+ 88 |     let (retained, skipped) = original
+ 89 |         .clone()
+ 90 |         .optimize_zx(&missing, 3, Limits::default())?;
+    |          ^^^^^^^^^^^
+    |
+   ::: crates/quest-compile/src/workers.rs:709:8
+    |
+709 |     fn optimize_zx(
+    |        ----------- the method is available for `QuantumRegion` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: there is a method `optimize_exact` with a similar name, but with different arguments
+   --> crates/quest-compile/src/optimize.rs:242:5
+    |
+242 |     fn optimize_exact(self) -> Result<(Self, OptimizationReport)>;
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: trait `ZxPasses` which provides `optimize_zx` is implemented but not in scope; perhaps you want to import it
+    |
+  2 + use quest_circuit::ZxPasses;
+    |
+
+error[E0599]: no method named `optimize_zx` found for struct `QuantumRegion` in the current scope
+   --> crates/quest-optimizer-worker/tests/circuit_contract.rs:93:40
+    |
+ 93 |     let (optimized, report) = original.optimize_zx(&worker()?, 3, Limits::default())?;
+    |                                        ^^^^^^^^^^^
+    |
+   ::: crates/quest-compile/src/workers.rs:709:8
+    |
+709 |     fn optimize_zx(
+    |        ----------- the method is available for `QuantumRegion` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: there is a method `optimize_exact` with a similar name, but with different arguments
+   --> crates/quest-compile/src/optimize.rs:242:5
+    |
+242 |     fn optimize_exact(self) -> Result<(Self, OptimizationReport)>;
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: trait `ZxPasses` which provides `optimize_zx` is implemented but not in scope; perhaps you want to import it
+    |
+  2 + use quest_circuit::ZxPasses;
+    |
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `quest-optimizer-worker` (test "circuit_contract") due to 4 previous errors
+warning: build failed, waiting for other jobs to finish...

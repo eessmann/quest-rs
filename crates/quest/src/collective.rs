@@ -32,9 +32,10 @@
 //! let runtime = MpiRuntime::initialize().unwrap();
 //! let comm = runtime.world().unwrap();
 //! let env = CollectiveEnvironment::builder(&comm).unwrap().build().unwrap();
-//! let plan = quest::ProgramBuilder::new(2, 0).unwrap().finish().unwrap()
-//!     .bind(&[]).unwrap().plan().unwrap();
-//! let prepared = env.prepare_plan(plan).unwrap();
+//! let region = quest::QuantumRegionBuilder::new(2, 0).unwrap().finish().unwrap();
+//! let plan = quest::Program::from_region(region, &[]).unwrap()
+//!     .verify().unwrap().lower().unwrap().plan().unwrap();
+//! let prepared = env.prepare(plan).unwrap();
 //! drop(env);
 //! let _ = prepared.plan();
 //! ```
@@ -47,9 +48,9 @@
 //! std::thread::scope(|scope| { scope.spawn(move || drop(env)); });
 //! ```
 use crate::{
-    Complex64, EnvironmentView, Error, ExecutablePlan, MemoryBudget, Outcome, PreparedProgram,
-    Probability, QubitCount, Register, Result, RunResult, StateVector, ValidatedProgram,
-    environment::RuntimeResources, error::BackendResult, values::reserve_vec,
+    Complex64, EnvironmentView, Error, Executable, MemoryBudget, Outcome, Probability, Program,
+    QubitCount, Register, Result, RunOutput, StateVector, environment::RuntimeResources,
+    error::BackendResult, values::reserve_vec,
 };
 use quest_sys::mpi::{MpiCollectiveLane, MpiQuestEnvironment, MpiQuestEnvironmentBuilder};
 pub use quest_sys::mpi::{MpiCommunicator, MpiMessageStatus, MpiRuntime, MpiThreadView};
@@ -197,47 +198,93 @@ impl<'comm, 'runtime> CollectiveEnvironment<'comm, 'runtime> {
             id: self.identifier(),
         })
     }
-    /// Bind and lower the same coherent program on every rank, then prepare it.
+    /// Prepare a common executable program with a static coherent MPI schedule.
+    /// Runtime inputs, branching and irreversible quantum effects are rejected
+    /// collectively before native allocation.
     /// # Errors
-    /// Rejects invalid bindings, unsupported effects, differing plans, or any rank's admission failure.
+    /// Rejects unsupported effects, unequal payloads and any rank's admission failure.
     pub fn prepare(
         &self,
-        program: ValidatedProgram,
-    ) -> Result<CollectivePreparedProgram<'_, 'comm, 'runtime>> {
-        let mut lane = self.begin(1, self.next_id.get(), 0, 0)?;
-        let plan = program
-            .bind(&[])
-            .and_then(quest_circuit::BoundProgram::plan)
-            .map_err(Error::from);
-        let plan = agree_result(&mut lane, plan)?;
-        drop(lane);
-        self.prepare_plan(plan)
-    }
-    /// Compare the complete coherent semantic payload before native materialization.
-    /// Numerical entries use exact IEEE-754 bytes; targets and signed controls
-    /// remain ordered, and oracle bodies and adjoints are compared recursively.
-    /// # Errors
-    /// Rejects noncoherent effects, unequal payloads, and resource admission failure on any rank.
-    pub fn prepare_plan(
-        &self,
-        plan: ExecutablePlan,
+        program: Program<Executable>,
     ) -> Result<CollectivePreparedProgram<'_, 'comm, 'runtime>> {
         let mut lane = self.begin(2, self.next_id.get(), 0, 0)?;
+        let output_bytes = agree_result(
+            &mut lane,
+            crate::output_storage::estimated_bytes(program.ssa()),
+        )?;
+        let program_bytes = agree_result(
+            &mut lane,
+            program
+                .resources()
+                .ir_bytes
+                .checked_add(program.resources().source_bytes)
+                .and_then(|n| n.checked_add(output_bytes))
+                .ok_or(Error::Overflow),
+        )?;
+        let program_storage = agree_result(&mut lane, self.resources.reserve(program_bytes))?;
         let remaining = self
             .resources
             .memory_budget()
             .bytes()
             .saturating_sub(self.resources.allocated_bytes());
-        let payload = agree_result(
+        // Reserve all simultaneous scratch before either VM replay. Region storage
+        // includes its bind/plan copies; both encoders enforce their own slice.
+        let slice = remaining / 4;
+        let (vm_storage, region_storage, payload_storage, output_storage) = agree_result(
             &mut lane,
-            crate::collective_payload::encode(&plan, remaining),
+            (|| {
+                Ok((
+                    self.resources.reserve(slice)?,
+                    self.resources.reserve(slice)?,
+                    self.resources.reserve(slice)?,
+                    self.resources.reserve(slice)?,
+                ))
+            })(),
         )?;
-        let _payload_storage = agree_result(&mut lane, self.resources.reserve(payload.len()))?;
+        let limits = crate::InterpreterLimits {
+            storage_bytes: slice.min(crate::InterpreterLimits::default().storage_bytes),
+            ..crate::InterpreterLimits::default()
+        };
+        let plan = agree_result(
+            &mut lane,
+            (|| {
+                Ok(program
+                    .try_coherent_region_with_limits(
+                        limits,
+                        crate::ProgramLimits::default(),
+                        slice,
+                    )?
+                    .plan()?)
+            })(),
+        )?;
+        agree_result(
+            &mut lane,
+            crate::collective_admission::admit(
+                &plan,
+                usize::try_from(self.size()?).map_err(|_| Error::Overflow)?,
+                slice,
+            ),
+        )?;
+        let output = agree_result(&mut lane, coherent_output(&program, limits))?;
+        let payload = agree_result(&mut lane, crate::collective_payload::encode(&plan, slice))?;
+        let output_payload =
+            agree_result(&mut lane, crate::output_storage::encode(&output, slice))?;
         equal(&mut lane, &payload)?;
+        equal(&mut lane, &output_payload)?;
+        drop(output_payload);
+        drop(output_storage);
+        drop(payload);
+        drop(payload_storage);
+        drop(vm_storage);
         let admission = agree_result(&mut lane, self.resources.admit_plan(plan))?;
         let inner = fatal(|| admission.materialize());
+        drop(region_storage);
         Ok(CollectivePreparedProgram {
             inner,
+            program,
+            output,
+            output_bytes,
+            _program_storage: program_storage,
             environment: self,
             id: self.identifier(),
         })
@@ -390,14 +437,18 @@ impl CollectiveRegister<'_, '_, '_> {
 
 /// Immutable coherent plan and native caches borrowing their collective owner.
 pub struct CollectivePreparedProgram<'env, 'comm, 'runtime> {
-    inner: PreparedProgram<'env>,
+    inner: crate::execution::PreparedRegion<'env>,
+    program: Program<Executable>,
+    output: RunOutput,
+    output_bytes: usize,
+    _program_storage: crate::environment::Reservation<'env>,
     pub(crate) environment: &'env CollectiveEnvironment<'comm, 'runtime>,
     pub(crate) id: u64,
 }
 impl CollectivePreparedProgram<'_, '_, '_> {
     #[must_use]
-    pub const fn plan(&self) -> &ExecutablePlan {
-        self.inner.plan()
+    pub const fn plan(&self) -> &Program<Executable> {
+        &self.program
     }
     #[must_use]
     pub const fn prepared_oracle_bodies(&self) -> usize {
@@ -405,18 +456,66 @@ impl CollectivePreparedProgram<'_, '_, '_> {
     }
     /// # Errors
     /// Rejects different prepared/register identities or changed execution admission on any rank.
-    pub fn run(&mut self, register: &mut CollectiveRegister<'_, '_, '_>) -> Result<RunResult> {
+    pub fn run(&mut self, register: &mut CollectiveRegister<'_, '_, '_>) -> Result<RunOutput> {
         let mut lane = self.environment.begin(9, self.id, register.id, 0)?;
         let bits = agree_result(&mut lane, self.inner.admit_run(&register.inner))?;
-        Ok(fatal(|| self.inner.run_admitted(&mut register.inner, bits)))
+        let _output_storage = agree_result(
+            &mut lane,
+            self.environment.resources.reserve(self.output_bytes),
+        )?;
+        let output = self.output.clone();
+        fatal(|| self.inner.run_admitted(&mut register.inner, bits));
+        Ok(output)
     }
+}
+/// Static coherent admission has already rejected every outcome-dependent effect.
+/// Replay classical instructions to retain the common output and step accounting.
+fn coherent_output(
+    program: &Program<Executable>,
+    limits: crate::InterpreterLimits,
+) -> Result<RunOutput> {
+    use crate::language::vm::{self, QuantumBackend};
+    struct Transcript;
+    impl QuantumBackend for Transcript {
+        type Error = Error;
+        fn apply_gate(&mut self, _: vm::GateRequest<'_>) -> Result<()> {
+            Ok(())
+        }
+        fn apply_oracle(&mut self, _: vm::OracleRequest<'_>) -> Option<Result<()>> {
+            Some(Ok(()))
+        }
+        fn apply_payload(&mut self, _: usize, _: &[usize]) -> Option<Result<()>> {
+            Some(Ok(()))
+        }
+        fn measure(&mut self, _: usize) -> Result<bool> {
+            Err(Error::Unsupported("collective measurement"))
+        }
+        fn reset(&mut self, _: usize) -> Result<()> {
+            Err(Error::Unsupported("collective reset"))
+        }
+        fn barrier(&mut self, _: &[usize]) -> Result<()> {
+            Ok(())
+        }
+    }
+    vm::Interpreter::new(limits)
+        .run_prepared(
+            program.ssa(),
+            program.dispatch(),
+            &mut Transcript,
+            &vm::RunInputs::default(),
+            program.captures(),
+        )
+        .map_err(|_| Error::Value("static collective program failed classical admission"))
 }
 fn fatal<T>(operation: impl FnOnce() -> Result<T>) -> T {
     // Any unwind after native entry would leave peers in a different collective
     // schedule. Contain it here, before owner unwinding can finalize QuEST.
     std::panic::catch_unwind(std::panic::AssertUnwindSafe(operation))
         .unwrap_or_else(|_| quest_sys::mpi::abort_job())
-        .unwrap_or_else(|_| quest_sys::mpi::abort_job())
+        .unwrap_or_else(|error| {
+            eprintln!("collective native operation failed: {error}");
+            quest_sys::mpi::abort_job()
+        })
 }
 fn agree_result<T>(lane: &mut MpiCollectiveLane<'_>, value: Result<T>) -> Result<T> {
     if !lane

@@ -5,7 +5,9 @@ pub use types::{
     AngleTarget, Axis, Control, Error, Gate, Limits, Operation, Rational, Result, Sequence, Target,
 };
 mod ring;
-pub use ring::Cyclotomic;
+pub use ring::{
+    Cyclotomic, EighthRootPhase, OmegaInteger, OmegaResidue, PowerOfTwoExponent, Sqrt2Exponent,
+};
 mod matrix;
 pub use matrix::{
     ExactCertificate, ExactMatrix, MatrixKey, PhaseRecovery, reconstruct,
@@ -19,3 +21,8 @@ pub use approx::{
 mod controlled;
 pub use controlled::{ControlledApproxCertificate, lift_controlled_rotation};
 mod interval;
+mod synthesis;
+pub use synthesis::{
+    BasisIndex, RowOperation, SynthesisCertificate, SynthesisProof, admit_synthesis_storage,
+    verify_synthesis,
+};

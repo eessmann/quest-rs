@@ -8,7 +8,10 @@ is **`quest-rs`**, with Rust library name **`quest`**.
 | --- | --- |
 | `crates/quest` | Typed runtime, faer snapshots, native preparation and execution |
 | `crates/quest-sys` | Audited CXX bridge and native RAII resources |
-| `crates/quest-circuit` | Pure circuit construction, exact angles, dependency DAG, compiler stages and transformations |
+| `crates/quest-language` | Checked semantics, exact angles, effects, SSA and immutable quantum payloads |
+| `crates/quest-compile` | Optimization, specialization, portable lowering and compiled artifacts |
+| `crates/quest-circuit` | Public program API over the semantic core and compiler |
+| `crates/quest-synthesis` | Bounded Rust Clifford+T candidate generation; independent certificates belong to `quest-math` |
 | `crates/quest-macros` | Rust token-tree frontend, without native dependencies |
 | `crates/quest-build` | Installed `CMake` target discovery, bridge compilation and final-executable linking |
 | `crates/xtask` | Binding generation and independent native consumer checks |
@@ -17,7 +20,7 @@ is **`quest-rs`**, with Rust library name **`quest`**.
 
 The workspace uses rolling `nightly` with rustfmt and Clippy. Install `QuEST`
 **4.3.x**, binary64 precision, deprecated APIs disabled, plus `CMake` and a C++20
-compiler. Native recipes target Linux GNU and aarch64/x86_64 Darwin; each
+compiler. Native recipes target Linux GNU and `aarch64/x86_64` Darwin; each
 architecture needs its own build and runtime validation.
 Pure circuit and macro builds need neither `QuEST` nor libclang nor external BLAS.
 
@@ -84,7 +87,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 `Environment` uniquely owns a runtime whose native initialization may be entered
 only once per process. It is restricted to its creating thread. Registers and
-both kinds of prepared program borrow it and cannot cross threads. Scope exit,
+prepared programs borrow it and cannot cross threads. Scope exit,
 including an early `?` return, destroys borrowing resources before `Environment`
 automatically finalizes the native runtime. There is no high-level explicit
 shutdown method and no restart: `QuEST` may own an MPI world that cannot be
@@ -126,7 +129,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         c[1] = measure q[1];
     }?;
     let env = Environment::builder().build()?;
-    let mut prepared = env.prepare_structured(bell)?;
+    let mut prepared = env.prepare(bell.verify()?.lower()?.plan()?)?;
     let mut state = env.state_vector(QubitCount::new(2)?)?;
     let result = prepared.run(&mut state, &RunInputs::default())?;
     println!("{:?}", result.outputs);
@@ -139,29 +142,31 @@ text frontend in `quest::qasm`. It supports typed classical control, user gates,
 nonrecursive subroutines, signed controls, integer powers and once-evaluated
 `${rust_expression}` captures. Pure consumers use `quest-circuit`; its default
 `macros` feature reexports `circuit!`. Optional `codespan-reporting` and `serde`
-render or serialize shared owned diagnostics. `legacy_circuit!` retains the
-earlier ideal-angle static frontend.
+render or serialize shared owned diagnostics. Macro expansion emits a checked reusable
+template; captures run once in source order. Typed `${Angle::pi(1, 4)?}` captures
+retain exact angles alongside ordinary floating captures.
 See [the circuit profile](https://github.com/eessmann/quest-rs/blob/main/crates/quest-circuit/README.md) for supported syntax.
 
 ## Circuit semantics
 
-`ProgramBuilder` allocates program-owned logical qubits and classical bits.
-Operations preserve caller target order: target zero is the least-significant
-local matrix bit. The private DAG orders shared quantum wires, classical hazards,
-barriers and stochastic effects; public occurrence IDs are independent of graph
-storage slots. Scheduling is deterministic and native execution is serial.
-
-Compilation consumes owners:
+Builder, macro and text frontends enter one checked representation. The typed
+`ProgramBuilder` supports inputs/outputs, arrays and references, definitions,
+calls, signed controls, adjoints, powers, measurement/reset and immutable
+matrix/oracle insertion. `QuantumRegion` is a finite compiler capability; import
+it with `Program::from_region` to use the same public execution lifecycle.
 
 ```text
-ProgramBuilder -> ValidatedProgram -> BoundProgram
-               -> ExecutablePlan -> PreparedProgram<'env>
+construct -> Program<Constructed> -> verify -> Program<Verified>
+          -> specialize / compile -> lower -> Program<Executable>
+          -> Environment::prepare -> PreparedProgram -> run -> RunOutput
 ```
 
-Exact rational multiples of pi and declared parameters are distinct from finite
-floating angles. `UnitaryCircuit` provides coherent control and adjoint only for
-exact symbolic operations. Global phase is explicit; controlling a phase makes
-it relative, and `Rz(2*pi)` remains `-I`.
+Native arbitrary-angle simulation is the default. Discrete synthesis is an
+explicit cold operation. Exact rational and affine angles, ordinary floats and
+runtime expressions remain distinct; no float is inferred to be exact π.
+Binding obligations survive cancellation. Checked exact-unitary capabilities
+permit adjoints and controls. Global phase is preserved: `Rz(2*pi)` is `-I`.
+Numerically admitted matrices never gain exact-unitary privileges.
 
 Numerical operators own immutable faer matrices. Their semantics are `A|psi>` or
 `A rho A†`; approximate unitarity evidence does not grant an exact inverse.
@@ -170,9 +175,11 @@ no cross-platform bitwise or certified approximation guarantee is implied.
 Gate buffers are packed row-major; density state storage is column-major;
 rectangular view adapters preserve logical values, including conjugation.
 
-Preparation builds native caches transactionally. `run` can partially modify a
+Preparation resolves static gate operands and parameters once and builds native
+caches transactionally. `run` can partially modify a
 register on failure and reports its completed prefix. It checks ambient rounding,
-underflow and native numerical policy before mutation. Sampling uses explicit
+underflow and native numerical policy before mutation. `sample_zeroed(shots, seeds, inputs)` returns one ordinary `RunOutput` per shot,
+including named outputs and execution counts. Sampling uses explicit
 1–16 seeds for `QuEST`'s process-wide RNG and initializes a fresh zero state on every
 shot. The first batch retains a 4096-byte native RNG allowance in the environment
 budget; transient seed copies are charged separately. Direct `quest-sys` calls
@@ -211,8 +218,7 @@ boundaries. The [contributor guide](../../CONTRIBUTING.md) covers development;
 the [verification index](../../docs/verification/README.md) records tested
 configurations and results.
 
-Shared `OracleFragment` calls remain retained in both ordinary and structured
-plans. Preparation builds each shared body once and caches numerical matrices by
+Shared `OracleFragment` calls remain retained in the common program. Preparation builds each shared body once and caches numerical matrices by
 payload identity and the signed control profiles needed by reachable calls.
 Forward and adjoint native matrices belong to one cached variant. Targets and
 orientation are applied during execution using preallocated remapping buffers;
@@ -255,14 +261,16 @@ MPICH installation additionally needs `MPICH_CC=/usr/bin/gcc` because its saved
 `gcc-13` executable is absent.
 
 Every rank in one subgroup calls collective operations in matching order.
-`state_vector`, `prepare_plan`, and `CollectivePreparedProgram::run` share the
+`state_vector`, `prepare`, and `CollectivePreparedProgram::run` share the
 local facade's resource accounting and execution implementation. Preparation
 compares complete canonical semantic bytes, including all complex matrix entries,
 ordered targets, signed controls, phases, nested oracle bodies and adjoints.
 Recoverable validation and budget failures are agreed before native work;
 a native failure after entry aborts the job when ordered cleanup is uncertain.
 Different subgroups can execute independent coherent schedules. Measurement,
-noise, reset, structured SSA and distributed solve are not exposed here.
+noise, reset, runtime inputs, dynamic control and distributed solve are rejected
+by this coherent collective interface. It accepts `Program<Executable>` and
+returns `RunOutput`.
 
 `CollectiveRegister::init_pure_from_root` broadcasts admitted input storage from
 one subgroup root. `probability`, `total_probability`, and the unnormalized

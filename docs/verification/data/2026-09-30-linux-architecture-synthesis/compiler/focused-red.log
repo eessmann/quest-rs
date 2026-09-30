@@ -1,0 +1,124 @@
+• Validating lock
+✓ Validating lock in 5.76ms
+  evaluating file '«nix-internal»/derivation-internal.nix'
+• Configuring shell
+• Configuring cachix
+✓ Configuring cachix in 1.69ms
+• Evaluating shell
+✓ Evaluating shell in 4.04ms (cached)
+✓ Configuring shell in 8.02ms
+• Loading tasks
+• Evaluating devenv.config.task.config
+✓ Evaluating devenv.config.task.config in 247µs (cached)
+✓ Loading tasks in 954µs
+• Running tasks
+• Running devenv:files:cleanup
+✓ Running devenv:files:cleanup in 7.56ms
+• Running devenv:enterShell
+✓ Running devenv:enterShell in 7.02ms
+• Running devenv:enterTest
+✓ Running devenv:enterTest in 6.86µs (no command)
+✓ Running tasks in 15.1ms
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s
+────────────
+ Nextest run ID d7d01f87-af49-4729-81e5-98d0a61fcb03 with nextest profile: default
+    Starting 36 tests across 3 binaries (27 binaries skipped)
+        PASS [   0.004s] ( 1/36) quest-circuit::beam_approx_contract approximate_mitm_admits_request_limits_before_any_worker_call
+        PASS [   0.010s] ( 2/36) quest-circuit::beam_approx_contract approximate_mitm_classifies_certified_overlimit_output_as_worker_rejection
+        PASS [   0.007s] ( 3/36) quest-circuit::beam_approx_contract approximate_mitm_large_output_ceiling_reserves_only_reachable_depth
+        PASS [   0.007s] ( 4/36) quest-circuit::beam_approx_contract approximate_mitm_lifts_full_phase_through_negative_control_after_effect_fence
+        PASS [   0.009s] ( 5/36) quest-circuit::beam_approx_contract approximate_mitm_rejects_forged_worker_and_preserves_terminal_status
+        PASS [   0.012s] ( 6/36) quest-circuit::beam_approx_contract approximate_mitm_retains_other_typed_terminal_outcomes_without_publication
+        FAIL [   0.017s] ( 7/36) quest-circuit::beam_contract approximation_across_rounds_spends_one_exact_budget_against_original
+  stdout ───
+
+    running 1 test
+    worker optimization: optimizer declined candidate: declined: use MITM
+      at crates/quest-circuit/tests/beam_contract.rs:504:19
+
+    test approximation_across_rounds_spends_one_exact_budget_against_original ... FAILED
+
+    failures:
+
+    failures:
+        approximation_across_rounds_spends_one_exact_budget_against_original
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.01s
+
+  stderr ───
+    Error: See failure output above
+
+
+        PASS [   0.005s] ( 8/36) quest-circuit::beam_contract beam_admits_replayed_longer_linear_candidate_before_scoring
+        FAIL [   0.007s] ( 9/36) quest-circuit::beam_contract beam_keeps_parent_certified_approx_mitm_region_and_rational_budget
+  stdout ───
+
+    running 1 test
+    worker optimization: optimizer declined candidate: declined: use MITM
+      at crates/quest-circuit/tests/beam_contract.rs:455:19
+
+    test beam_keeps_parent_certified_approx_mitm_region_and_rational_budget ... FAILED
+
+    failures:
+
+    failures:
+        beam_keeps_parent_certified_approx_mitm_region_and_rational_budget
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.00s
+
+  stderr ───
+    Error: See failure output above
+
+
+        PASS [   0.011s] (10/36) quest-circuit::beam_contract beam_keeps_parent_certified_exact_mitm_region
+        PASS [   0.004s] (11/36) quest-circuit::beam_contract beam_reports_round_and_candidate_caps_without_losing_best
+        PASS [   0.004s] (12/36) quest-circuit::beam_contract bound_entry_rewrites_discrete_clifford_window
+        PASS [   0.005s] (13/36) quest-circuit::beam_contract bound_entry_uses_exact_phase_targets
+        PASS [   0.005s] (14/36) quest-circuit::beam_contract bound_work_exhaustion_keeps_original_snapshot
+        PASS [   0.008s] (15/36) quest-circuit::beam_contract bound_worker_search_uses_discrete_source_and_preserves_bound_authority
+        PASS [   0.007s] (16/36) quest-circuit::beam_contract budget_after_zx_worker_proof_returns_a_complete_prior_publication
+        PASS [   0.004s] (17/36) quest-circuit::beam_contract deterministic_beam_publishes_verified_exact_improvement
+        PASS [   0.008s] (18/36) quest-circuit::beam_contract forged_worker_envelope_is_a_typed_error
+        PASS [   0.005s] (19/36) quest-circuit::beam_contract ideal_source_remains_original_binding_authority
+        FAIL [   0.007s] (20/36) quest-circuit::beam_contract mitm_shortlist_exhaustion_is_incomplete_even_with_original_best
+  stdout ───
+
+    running 1 test
+    worker optimization: optimizer declined candidate: declined: use MITM
+      at crates/quest-circuit/tests/beam_contract.rs:544:19
+
+    test mitm_shortlist_exhaustion_is_incomplete_even_with_original_best ... FAILED
+
+    failures:
+
+    failures:
+        mitm_shortlist_exhaustion_is_incomplete_even_with_original_best
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.00s
+
+  stderr ───
+    Error: See failure output above
+
+
+        PASS [   0.011s] (21/36) quest-circuit::beam_contract pure_phase_window_reaches_exact_mitm_after_zx
+        PASS [   0.008s] (22/36) quest-circuit::beam_contract rational_pi_rotation_does_not_spend_exact_mitm_slot_before_synthesis
+        PASS [   0.007s] (23/36) quest-circuit::beam_contract synthesis_keeps_local_certificate_and_exact_cumulative_allowance
+        PASS [   0.004s] (24/36) quest-circuit::beam_contract tied_rewrites_deduplicate_and_search_terminates_deterministically
+        PASS [   0.007s] (25/36) quest-circuit::beam_contract worker_search_retains_exact_certificate_and_original_authority
+        PASS [   0.007s] (26/36) quest-circuit::beam_mitm_contract exact_mitm_candidate_keeps_effect_fence_and_certified_longer_region
+        PASS [   0.004s] (27/36) quest-circuit::beam_mitm_contract exact_mitm_charges_source_phase_replay_before_visiting_window
+        PASS [   0.005s] (28/36) quest-circuit::beam_mitm_contract exact_mitm_charges_wide_operand_scan_before_visiting_window
+        PASS [   0.006s] (29/36) quest-circuit::beam_mitm_contract exact_mitm_large_output_ceiling_reserves_only_reachable_depth
+        PASS [   0.006s] (30/36) quest-circuit::beam_mitm_contract exact_mitm_preserves_signed_controls_and_preflights_work
+        PASS [   0.015s] (31/36) quest-circuit::beam_mitm_contract exact_mitm_preserves_typed_terminal_status_and_original_program
+        PASS [   0.006s] (32/36) quest-circuit::beam_mitm_contract exact_mitm_rejects_a_certified_worker_result_beyond_requested_depth
+        PASS [   0.006s] (33/36) quest-circuit::beam_mitm_contract exact_mitm_rejects_a_worker_candidate_without_parent_certificate
+        PASS [   0.004s] (34/36) quest-circuit::beam_mitm_contract exact_mitm_rejects_malformed_limits_even_without_an_eligible_window
+        PASS [   0.006s] (35/36) quest-circuit::beam_mitm_contract exact_mitm_reports_post_request_output_cap_separately_from_preflight
+        PASS [   0.007s] (36/36) quest-circuit::beam_mitm_contract exact_mitm_retains_symbolic_binding_obligations_across_a_fenced_region
+────────────
+     Summary [   0.255s] 36 tests run: 33 passed, 3 failed, 0 skipped
+        FAIL [   0.017s] ( 7/36) quest-circuit::beam_contract approximation_across_rounds_spends_one_exact_budget_against_original
+        FAIL [   0.007s] ( 9/36) quest-circuit::beam_contract beam_keeps_parent_certified_approx_mitm_region_and_rational_budget
+        FAIL [   0.007s] (20/36) quest-circuit::beam_contract mitm_shortlist_exhaustion_is_incomplete_even_with_original_best
+error: test run failed

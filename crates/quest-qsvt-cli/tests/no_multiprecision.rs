@@ -27,7 +27,7 @@ fn production_failure_and_native_execution_are_independent_of_cold_verification(
         Limits::default(),
     )?;
     let candidate = SynthesisBuilder::new()
-        .canonical(&target)?
+        .real_parity_wx(&target)?
         .admit()?
         .complete()?
         .synthesize()?;
@@ -41,7 +41,7 @@ fn production_failure_and_native_execution_are_independent_of_cold_verification(
             response_tolerance: 1e-18,
             ..Policy::default()
         })
-        .canonical(&difficult)?
+        .real_parity_wx(&difficult)?
         .admit()?
         .complete()?
         .synthesize();

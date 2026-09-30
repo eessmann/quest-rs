@@ -1,7 +1,7 @@
 use googletest::prelude::*;
 use quest::{
     Complex64, Control, ControlState, Environment, Error, Gate, MatrixPolicy, MemoryBudget,
-    NumericalOperator, ProgramBuilder, QubitCount,
+    NumericalOperator, QuantumRegionBuilder, QubitCount,
 };
 
 fn isolated(name: &str, body: impl FnOnce() -> googletest::Result<()>) -> googletest::Result<()> {
@@ -40,7 +40,7 @@ fn cloned_matrices_on_different_targets_share_one_native_budget() -> googletest:
                 .memory_budget(MemoryBudget::new(300_000))
                 .build()?;
             let matrix = dense_swap()?;
-            let mut builder = ProgramBuilder::new(6, 1)?;
+            let mut builder = QuantumRegionBuilder::new(6, 1)?;
             let first = (0..5)
                 .map(|i| builder.qubit(i))
                 .collect::<Result<Vec<_>, _>>()?;
@@ -56,9 +56,14 @@ fn cloned_matrices_on_different_targets_share_one_native_budget() -> googletest:
             for _ in 0..2 {
                 builder.gate_if(bit, false, Gate::X, &[qubit], &[])?;
             }
-            let mut prepared = environment.prepare(builder.finish()?)?;
+            let mut prepared = environment.prepare(
+                quest::Program::from_region(builder.finish()?, &[])?
+                    .verify()?
+                    .lower()?
+                    .plan()?,
+            )?;
             let mut register = environment.state_vector(QubitCount::new(6)?)?;
-            prepared.run(&mut register)?;
+            prepared.run(&mut register, &quest::RunInputs::default())?;
             expect_that!(register.amplitude(0)?, eq(Complex64::new(1.0, 0.0)));
             drop(register);
             drop(prepared);
@@ -77,7 +82,7 @@ fn matching_signed_controls_share_one_native_pair_across_target_orders() -> goog
                 .memory_budget(MemoryBudget::new(1_000_000))
                 .build()?;
             let matrix = dense_swap()?;
-            let mut builder = ProgramBuilder::new(6, 0)?;
+            let mut builder = QuantumRegionBuilder::new(6, 0)?;
             let first = (0..5)
                 .map(|i| builder.qubit(i))
                 .collect::<Result<Vec<_>, _>>()?;
@@ -89,10 +94,15 @@ fn matching_signed_controls_share_one_native_pair_across_target_orders() -> goog
             for targets in [&first, &first, &second, &second] {
                 builder.numerical(matrix.clone(), targets, &[control])?;
             }
-            let mut prepared = environment.prepare(builder.finish()?)?;
+            let mut prepared = environment.prepare(
+                quest::Program::from_region(builder.finish()?, &[])?
+                    .verify()?
+                    .lower()?
+                    .plan()?,
+            )?;
             let mut register = environment.state_vector(QubitCount::new(6)?)?;
             register.x(5)?;
-            prepared.run(&mut register)?;
+            prepared.run(&mut register, &quest::RunInputs::default())?;
             expect_that!(register.amplitude(32)?, eq(Complex64::new(1.0, 0.0)));
             drop(register);
             drop(prepared);
@@ -111,13 +121,18 @@ fn different_signed_profiles_exceed_budget_without_disturbing_prepared_program()
             let environment = Environment::builder()
                 .memory_budget(MemoryBudget::new(1_200_000))
                 .build()?;
-            let mut existing = ProgramBuilder::new(6, 0)?;
+            let mut existing = QuantumRegionBuilder::new(6, 0)?;
             existing.gate(Gate::H, &[existing.qubit(0)?], &[])?;
-            let mut existing = environment.prepare(existing.finish()?)?;
+            let mut existing = environment.prepare(
+                quest::Program::from_region(existing.finish()?, &[])?
+                    .verify()?
+                    .lower()?
+                    .plan()?,
+            )?;
             let before = environment.allocated_bytes();
 
             let matrix = dense_swap()?;
-            let mut builder = ProgramBuilder::new(6, 0)?;
+            let mut builder = QuantumRegionBuilder::new(6, 0)?;
             let targets = (0..5)
                 .map(|i| builder.qubit(i))
                 .collect::<Result<Vec<_>, _>>()?;
@@ -126,13 +141,18 @@ fn different_signed_profiles_exceed_budget_without_disturbing_prepared_program()
                 builder.numerical(matrix.clone(), &targets, &[Control::new(control, state)])?;
             }
             expect_true!(matches!(
-                environment.prepare(builder.finish()?),
+                environment.prepare(
+                    quest::Program::from_region(builder.finish()?, &[])?
+                        .verify()?
+                        .lower()?
+                        .plan()?
+                ),
                 Err(Error::Budget { .. })
             ));
             expect_eq!(environment.allocated_bytes(), before);
 
             let mut register = environment.state_vector(QubitCount::new(6)?)?;
-            existing.run(&mut register)?;
+            existing.run(&mut register, &quest::RunInputs::default())?;
             expect_that!(register.amplitude(0)?.re, near(2f64.sqrt().recip(), 1e-12));
             expect_that!(register.amplitude(1)?.re, near(2f64.sqrt().recip(), 1e-12));
             drop(register);

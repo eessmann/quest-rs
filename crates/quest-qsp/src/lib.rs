@@ -2,6 +2,8 @@
 #![doc = include_str!("../README.md")]
 
 mod admission;
+#[cfg(feature = "artifact")]
+pub mod artifact;
 #[cfg(feature = "certification")]
 pub mod certification;
 #[cfg(feature = "offline-synthesis")]
@@ -13,16 +15,17 @@ mod kernel;
 mod sequence;
 mod stages;
 pub use sequence::{
-    CanonicalWxImag, ControlSequence, ControlSequenceBuilder, ConvertedProjectorPhases,
-    MissingControls, PhaseConvention, PhaseSequence, PhaseSequenceBuilder, SuppliedControls,
+    ControlSequence, ControlSequenceBuilder, ConvertedProjectorPhases, MissingControls,
+    PhaseConvention, PhaseSequence, PhaseSequenceBuilder, SuppliedControls, WxImaginaryU00,
     WxLaurent, WxSymmetric,
 };
 
 pub use num_complex::Complex64;
 pub use quest_numerics::FftBackend;
 pub use stages::{
-    AdmittedTarget, Canonical, CompletedPolynomial, FrozenCandidate, Generalized, MissingTarget,
-    Policy, ReadyTarget, SynthesisBuilder,
+    AdmittedTarget, CompletedPolynomial, FrozenCandidate, MissingTarget, OuterGauge, Policy,
+    ReadyTarget, RealParityWx, SynthesisAlgorithm, SynthesisBuilder, SynthesisPrecision,
+    UnitCircleResponse, WeissRatio,
 };
 
 /// A frozen binary64 two-dimensional matrix, indexed by row then column.
@@ -55,6 +58,16 @@ pub enum Error {
     /// A finite-only operation encountered a nonfinite value.
     #[error("nonfinite value in {0}")]
     NonFinite(&'static str),
+    /// An outward sample lower bound proves the configured margin is violated.
+    #[error(
+        "contractivity margin violated: magnitude lower bound {lower} >= threshold {threshold}"
+    )]
+    ContractivityViolation {
+        /// Outward lower witness at a particular signal.
+        lower: f64,
+        /// Maximum magnitude permitted by the requested margin.
+        threshold: f64,
+    },
     /// Admission could not establish the configured strict contractivity margin.
     #[error("contractivity with positive margin could not be established (upper bound {upper})")]
     Contractivity {

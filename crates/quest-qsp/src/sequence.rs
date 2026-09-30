@@ -1,4 +1,6 @@
-use crate::{Canonical, Complex64, Control, Error, FrozenCandidate, Generalized, Result, finite};
+use crate::{
+    Complex64, Control, Error, FrozenCandidate, RealParityWx, Result, UnitCircleResponse, finite,
+};
 use std::{
     marker::PhantomData,
     ops::{Add, Mul, Neg},
@@ -18,15 +20,15 @@ pub trait PhaseConvention: sealed::Sealed {
 /// `pyqsp-wx-symmetric`: mirrored rotations must agree within `1e-12` at import.
 #[derive(Debug, Clone, Copy)]
 pub struct WxSymmetric;
-/// `pyqsp-wx-laurent`: canonical conversion shifts the first rotation by pi/2.
+/// `pyqsp-wx-laurent`: `real_parity_wx` conversion shifts the first rotation by pi/2.
 #[derive(Debug, Clone, Copy)]
 pub struct WxLaurent;
-/// `canonical-wx-imag-u00`: the real target is the imaginary part of Wx U00.
+/// `wx-imaginary-u00`: the real target is the imaginary part of Wx U00.
 #[derive(Debug, Clone, Copy)]
-pub struct CanonicalWxImag;
+pub struct WxImaginaryU00;
 impl sealed::Sealed for WxSymmetric {}
 impl sealed::Sealed for WxLaurent {}
-impl sealed::Sealed for CanonicalWxImag {}
+impl sealed::Sealed for WxImaginaryU00 {}
 impl PhaseConvention for WxSymmetric {
     const TAG: &'static str = "pyqsp-wx-symmetric";
     const SYMMETRIC: bool = true;
@@ -35,8 +37,8 @@ impl PhaseConvention for WxLaurent {
     const TAG: &'static str = "pyqsp-wx-laurent";
     const SYMMETRIC: bool = false;
 }
-impl PhaseConvention for CanonicalWxImag {
-    const TAG: &'static str = "canonical-wx-imag-u00";
+impl PhaseConvention for WxImaginaryU00 {
+    const TAG: &'static str = "wx-imaginary-u00";
     const SYMMETRIC: bool = false;
 }
 
@@ -50,7 +52,7 @@ impl PhaseConvention for CanonicalWxImag {
 /// ```
 /// use quest_qsp::{PhaseSequence, WxSymmetric};
 /// let phases = PhaseSequence::<WxSymmetric>::builder(vec![0.2, 0.2]).build()?;
-/// let projector = phases.canonical().projector_phases_with_diagnostics();
+/// let projector = phases.real_parity_wx().projector_phases_with_diagnostics();
 /// assert_eq!(projector.values().len(), 2);
 /// assert!(projector.roundoff_estimate().is_finite());
 /// # Ok::<(), quest_qsp::Error>(())
@@ -130,10 +132,10 @@ impl<C: PhaseConvention> PhaseSequenceBuilder<C> {
     }
 }
 impl PhaseSequence<WxSymmetric> {
-    /// Retag the shared symmetric Wx payload as canonical imaginary-U00 phases.
+    /// Retag the shared symmetric Wx payload as `real_parity_wx` imaginary-U00 phases.
     /// This conversion does not change or recompute the stored angles.
     #[must_use]
-    pub fn canonical(&self) -> PhaseSequence<CanonicalWxImag> {
+    pub fn real_parity_wx(&self) -> PhaseSequence<WxImaginaryU00> {
         PhaseSequence {
             values: Arc::clone(&self.values),
             conversion_roundoff_estimate: self.conversion_roundoff_estimate,
@@ -202,7 +204,7 @@ impl PhaseSequence<WxLaurent> {
     /// Numerically compose the first rotation with a positive quarter turn.
     /// Unshifted phases retain their original bits; no rounded-TAU reduction occurs.
     #[must_use]
-    pub fn canonical(&self) -> PhaseSequence<CanonicalWxImag> {
+    pub fn real_parity_wx(&self) -> PhaseSequence<WxImaginaryU00> {
         let mut values = self.values.as_ref().clone();
         let mut estimate = self.conversion_roundoff_estimate;
         if let Some(first) = values.first_mut() {
@@ -217,7 +219,7 @@ impl PhaseSequence<WxLaurent> {
         }
     }
 }
-impl PhaseSequence<CanonicalWxImag> {
+impl PhaseSequence<WxImaginaryU00> {
     /// Numerically convert Wx rotations to exp(i phi (2P-I)) projector rotations.
     /// Use [`Self::projector_phases_with_diagnostics`] to retain conversion evidence.
     #[must_use]
@@ -247,7 +249,7 @@ impl PhaseSequence<CanonicalWxImag> {
         }
     }
 }
-impl FrozenCandidate<Canonical> {
+impl FrozenCandidate<RealParityWx> {
     /// Share the already frozen symmetric phase payload; no numerical work.
     #[must_use]
     pub fn phase_sequence(&self) -> PhaseSequence<WxSymmetric> {
@@ -259,7 +261,7 @@ impl FrozenCandidate<Canonical> {
     }
 }
 
-/// Numerically admitted generalized controls including the terminal K factor.
+/// Numerically admitted `unit_circle_response` controls including the terminal K factor.
 ///
 /// The product convention is `C0 diag(z,1) C1 ... diag(z,1) Cd`. Matrix imports
 /// must already include K; angle imports append it during construction.
@@ -275,7 +277,7 @@ pub struct MissingControls;
 pub struct SuppliedControls {
     matrices: Vec<Control>,
 }
-/// Import generalized matrices or paired angles, then explicitly admit them.
+/// Import `unit_circle_response` matrices or paired angles, then explicitly admit them.
 #[derive(Debug)]
 pub struct ControlSequenceBuilder<S = MissingControls> {
     state: S,
@@ -321,12 +323,14 @@ impl ControlSequenceBuilder {
     ) -> Result<ControlSequenceBuilder<SuppliedControls>> {
         if psi.len() != phi.len() || psi.is_empty() || psi.iter().chain(phi).any(|v| !v.is_finite())
         {
-            return Err(Error::Target("generalized psi/phi lengths or finiteness"));
+            return Err(Error::Target(
+                "unit_circle_response psi/phi lengths or finiteness",
+            ));
         }
         let mut matrices = Vec::new();
         matrices
             .try_reserve_exact(psi.len())
-            .map_err(|_| Error::Budget("generalized control import"))?;
+            .map_err(|_| Error::Budget("unit_circle_response control import"))?;
         for (&magnitude, &phase) in psi.iter().zip(phi) {
             let diagonal = Complex64::new(magnitude.cos(), 0.0);
             let off = Complex64::from_polar(magnitude.sin(), phase);
@@ -370,7 +374,7 @@ impl ControlSequenceBuilder<SuppliedControls> {
         })
     }
 }
-impl FrozenCandidate<Generalized> {
+impl FrozenCandidate<UnitCircleResponse> {
     /// Share the already frozen controls without additional numerical work.
     /// This preserves their values and does not run independent certification.
     #[must_use]

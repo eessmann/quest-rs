@@ -40,7 +40,7 @@ fn phase_convention_import_and_conversion_are_explicit() -> Result<()> {
     );
     let laurent = PhaseSequence::<WxLaurent>::builder(vec![0.0]).build()?;
     expect_that!(
-        laurent.canonical().values()[0],
+        laurent.real_parity_wx().values()[0],
         eq(std::f64::consts::FRAC_PI_2)
     );
     Ok(())

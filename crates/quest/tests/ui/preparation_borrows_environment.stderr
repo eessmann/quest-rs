@@ -3,7 +3,7 @@ error[E0505]: cannot move out of `environment` because it is borrowed
   |
 3 |     let environment = Environment::builder().build().unwrap();
   |         ----------- binding `environment` declared here
-4 |     let prepared = environment.prepare(legacy_circuit! { qubit q; h q; }.unwrap()).unwrap();
+4 |     let prepared = environment.prepare(circuit! { qubit q; h q; }.unwrap().verify().unwrap().lower().unwrap().plan().unwrap()).unwrap();
   |                    ----------- borrow of `environment` occurs here
 5 |     drop(environment);
   |          ^^^^^^^^^^^ move out of `environment` occurs here

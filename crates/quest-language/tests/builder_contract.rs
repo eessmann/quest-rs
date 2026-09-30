@@ -122,3 +122,47 @@ fn boolean_construction_obeys_zero_storage_and_node_budgets() -> Result<()> {
     }
     Ok(())
 }
+
+#[gtest]
+fn array_initializers_admit_aggregate_shared_expression_expansion() -> Result<()> {
+    for limits in [
+        CompileLimits {
+            nodes: 80,
+            ..CompileLimits::default()
+        },
+        CompileLimits {
+            storage_bytes: 32_768,
+            ..CompileLimits::default()
+        },
+    ] {
+        let mut b = Builder::with_limits(limits)?;
+        let mut large = b.integer::<32>(1)?;
+        for _ in 0..4 {
+            large = large.add(&large)?;
+        }
+        let repeated = vec![large.clone(); 16];
+        expect_true!(b.array("repeated", &repeated).is_err());
+        expect_true!(b.ranked_array("ranked", [4, 4], &repeated).is_err());
+        // Rejected aggregate materialization leaves the cheap shared value usable.
+        b.local("accepted", &large)?;
+        b.finish(CompileLimits::default())?.into_ssa()?;
+    }
+    Ok(())
+}
+
+#[gtest]
+fn ranked_indices_admit_combined_base_and_shared_index_expansions() -> Result<()> {
+    let mut b = Builder::with_limits(CompileLimits {
+        nodes: 80,
+        ..CompileLimits::default()
+    })?;
+    let array = b.input_array::<Int<32>, 2>("values", [2, 2])?;
+    let mut index = b.integer::<32>(0)?;
+    for _ in 0..4 {
+        index = index.add(&index)?;
+    }
+    expect_true!(b.ranked_read(&array, &[index.clone(), index]).is_err());
+    let zero = b.integer::<32>(0)?;
+    b.ranked_read(&array, &[zero.clone(), zero])?;
+    Ok(())
+}

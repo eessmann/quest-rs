@@ -7,7 +7,6 @@ repository.workspace = true
 description = "Quest-owned obligations around checked exact affine expressions"
 
 [dependencies]
-mathcore.workspace = true
 num-bigint.workspace = true
 num-rational = { workspace = true, features = ["std"] }
 num-traits.workspace = true

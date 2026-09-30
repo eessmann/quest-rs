@@ -188,3 +188,15 @@ impl<T> BackendResult<T> for quest_sys::QuestResult<T> {
         self.map_err(|source| Error::Backend { operation, source })
     }
 }
+
+impl From<quest_circuit::language::angle::Error> for Error {
+    fn from(value: quest_circuit::language::angle::Error) -> Self {
+        Self::Circuit(value.into())
+    }
+}
+
+impl From<quest_circuit::language::matrix::Error> for Error {
+    fn from(value: quest_circuit::language::matrix::Error) -> Self {
+        Self::Circuit(value.into())
+    }
+}

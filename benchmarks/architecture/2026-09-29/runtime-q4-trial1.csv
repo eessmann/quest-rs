@@ -1,0 +1,2 @@
+qubits,layers,gates,native_prepared_gates,repetitions,compilation_ns,preparation_ns,execution_total_ns,prepare_per_run_total_ns,modeled_plan_bytes,modeled_prepared_bytes,modeled_register_bytes,run_storage_cap_bytes,max_output_difference
+4,8,96,96,100,1204458,174542,45347757,49396295,371816,405608,1024,67108864,0

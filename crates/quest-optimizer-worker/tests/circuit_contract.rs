@@ -1,8 +1,10 @@
 #![cfg(all(target_os = "linux", any(feature = "synthesis", feature = "zx")))]
 use googletest::prelude::*;
+#[cfg(feature = "zx")]
+use quest_circuit::ZxPasses;
 #[cfg(feature = "synthesis")]
-use quest_circuit::{Angle, Control, ControlState};
-use quest_circuit::{Gate, ProgramBuilder};
+use quest_circuit::{Angle, Control, ControlState, ExactPasses, RotationSynthesisPasses};
+use quest_circuit::{Gate, QuantumRegionBuilder};
 use quest_math::Limits;
 use quest_optimizer_client::{Client, WorkerLimits};
 fn worker() -> Result<Client> {
@@ -15,7 +17,7 @@ fn worker() -> Result<Client> {
 #[cfg(feature = "synthesis")]
 #[gtest]
 fn explicit_synthesis_retains_target_identity_control_phase_and_local_certificates() -> Result<()> {
-    let mut builder = ProgramBuilder::new(3, 0)?;
+    let mut builder = QuantumRegionBuilder::new(3, 0)?;
     let q = builder.qubit(2)?;
     let c = builder.qubit(0)?;
     let source = builder.gate(
@@ -61,7 +63,7 @@ fn explicit_synthesis_retains_target_identity_control_phase_and_local_certificat
             _ => fail!("unexpected synthesized effect")?,
         }
     }
-    let mut builder = ProgramBuilder::new(1, 1)?;
+    let mut builder = QuantumRegionBuilder::new(1, 1)?;
     builder.gate(Gate::Rx(Angle::pi(1, 2)?), &[builder.qubit(0)?], &[])?;
     builder.measure(builder.qubit(0)?, builder.bit(0)?)?;
     let (_, report) =
@@ -76,7 +78,7 @@ fn explicit_synthesis_retains_target_identity_control_phase_and_local_certificat
 #[cfg(feature = "zx")]
 #[gtest]
 fn zx_replacements_are_transactional_and_preserve_measurement_occurrences() -> Result<()> {
-    let mut builder = ProgramBuilder::new(1, 1)?;
+    let mut builder = QuantumRegionBuilder::new(1, 1)?;
     let q = builder.qubit(0)?;
     builder.gate(Gate::H, &[q], &[])?;
     builder.gate(Gate::H, &[q], &[])?;

@@ -20,9 +20,12 @@ The root is a virtual Cargo workspace; the [crate table](README.md) describes
 the public packages. Common implementation locations are:
 
 - `crates/quest/src/`: environments, typed registers, preparation and execution.
-- `crates/quest-circuit/`: circuit DAG, matrix model and optimization.
-- `crates/quest-language/`, `crates/quest-qasm/` and `crates/quest-macros/`:
-  language semantics, text interchange and token frontends.
+- `crates/quest-language/`: checked semantics, typed builders, exact angles, SSA and quantum regions.
+- `crates/quest-compile/`: staged programs, specialization, optimization and portable artifacts.
+- `crates/quest-circuit/`, `crates/quest-qasm/` and `crates/quest-macros/`:
+  public construction facade, text interchange and checked token templates.
+- `crates/quest-synthesis/` and `crates/quest-math/`: bounded candidate generation and independent exact verification.
+- `crates/quest-qsp/` and `crates/quest-qsvt/`: response synthesis, frozen numerical certification and typed transformation routes.
 - `crates/quest-build/`: installed native configuration and executable runtime paths.
 - `crates/quest-sys/src/cxx_bindings/`: C++ adapters and the low-level CXX bridge.
 - `crates/xtask/`: binding generator, templates and native consumer validation.

@@ -11,7 +11,9 @@ fn close(actual: Complex64, expected: Complex64) {
 fn empty_generalized_laurent_is_zero_at_zero_and_positive_offset() -> Result<()> {
     for offset in [0, 3] {
         let target = Polynomial::new(Laurent::new(offset), vec![], Limits::default())?;
-        let admitted = SynthesisBuilder::new().generalized(&target)?.admit()?;
+        let admitted = SynthesisBuilder::new()
+            .unit_circle_response(&target)?
+            .admit()?;
         expect_that!(
             admitted.source_coefficients().len(),
             eq(usize::try_from(offset)?.saturating_add(1))
@@ -34,7 +36,7 @@ fn generalized_constant_keeps_complex_phase_and_final_convention_factor() -> Res
         Limits::default(),
     )?;
     let candidate = SynthesisBuilder::new()
-        .generalized(&target)?
+        .unit_circle_response(&target)?
         .admit()?
         .complete()?
         .synthesize()?;
@@ -56,7 +58,7 @@ fn generalized_linear_response_matches_direct_polynomial_on_the_circle() -> Resu
     let coefficients = vec![Complex64::new(0.1, 0.2), Complex64::new(-0.3, 0.1)];
     let target = Polynomial::new(Laurent::new(0), coefficients, Limits::default())?;
     let candidate = SynthesisBuilder::new()
-        .generalized(&target)?
+        .unit_circle_response(&target)?
         .admit()?
         .complete()?
         .synthesize()?;
@@ -80,7 +82,7 @@ fn nonsymmetric_cancellation_heavy_target_and_support_offset_are_retained() -> R
         Limits::default(),
     )?;
     let candidate = SynthesisBuilder::new()
-        .generalized(&target)?
+        .unit_circle_response(&target)?
         .admit()?
         .complete()?
         .synthesize()?;
@@ -100,7 +102,7 @@ fn canonical_degree_one_has_the_wx_imaginary_response_convention() -> Result<()>
         Limits::default(),
     )?;
     let candidate = SynthesisBuilder::new()
-        .canonical(&target)?
+        .real_parity_wx(&target)?
         .admit()?
         .complete()?
         .synthesize()?;
@@ -122,7 +124,11 @@ fn target_admission_rejects_negative_support_and_noncontractivity() -> Result<()
         vec![Complex64::new(0.1, 0.0)],
         Limits::default(),
     )?;
-    expect_true!(SynthesisBuilder::new().generalized(&negative).is_err());
+    expect_true!(
+        SynthesisBuilder::new()
+            .unit_circle_response(&negative)
+            .is_err()
+    );
     let large = Polynomial::new(
         Laurent::new(0),
         vec![Complex64::new(1.0, 0.0)],
@@ -130,7 +136,7 @@ fn target_admission_rejects_negative_support_and_noncontractivity() -> Result<()
     )?;
     expect_true!(
         SynthesisBuilder::new()
-            .generalized(&large)?
+            .unit_circle_response(&large)?
             .admit()
             .is_err()
     );
@@ -146,7 +152,7 @@ fn target_admission_rejects_negative_support_and_noncontractivity() -> Result<()
     expect_true!(
         SynthesisBuilder::new()
             .policy(invalid)
-            .generalized(&small)?
+            .unit_circle_response(&small)?
             .admit()
             .is_err()
     );
@@ -165,7 +171,7 @@ fn frozen_generalized_matrix_product_matches_independent_expansion() -> Result<(
         Limits::default(),
     )?;
     let candidate = SynthesisBuilder::new()
-        .generalized(&target)?
+        .unit_circle_response(&target)?
         .admit()?
         .complete()?
         .synthesize()?;
@@ -214,7 +220,7 @@ fn canonical_freezing_checks_actual_exported_phase_trigonometry() -> Result<()> 
     };
     let completed = SynthesisBuilder::new()
         .policy(policy)
-        .canonical(&target)?
+        .real_parity_wx(&target)?
         .admit()?
         .complete()?;
     expect_true!(matches!(
@@ -235,12 +241,17 @@ fn canonical_freezing_checks_actual_exported_phase_trigonometry() -> Result<()> 
             Limits::default(),
         )?;
         let candidate = SynthesisBuilder::new()
-            .canonical(&target)?
+            .real_parity_wx(&target)?
             .admit()?
             .complete()?
             .synthesize()?;
         let actual = (candidate.response(0.0)? - value).abs();
-        expect_that!(candidate.reconstruction_residual(), ge(actual));
+        expect_that!(
+            candidate
+                .reconstruction_residual()
+                .ok_or(quest_qsp::Error::Target("missing production diagnostic"))?,
+            ge(actual)
+        );
         largest_actual = largest_actual.max(actual);
     }
     expect_that!(largest_actual, gt(0.0));
@@ -259,12 +270,12 @@ fn target_admission_rechecks_retained_storage_after_policy_changes() -> Result<(
     expect_true!(
         SynthesisBuilder::new()
             .policy(policy)
-            .generalized(&target)
+            .unit_circle_response(&target)
             .is_err()
     );
     expect_true!(
         SynthesisBuilder::new()
-            .generalized(&target)?
+            .unit_circle_response(&target)?
             .policy(policy)
             .admit()
             .is_err()
@@ -281,12 +292,12 @@ fn target_admission_rechecks_retained_storage_after_policy_changes() -> Result<(
     expect_true!(
         SynthesisBuilder::new()
             .policy(policy)
-            .generalized(&target)
+            .unit_circle_response(&target)
             .is_err()
     );
     expect_true!(
         SynthesisBuilder::new()
-            .generalized(&target)?
+            .unit_circle_response(&target)?
             .policy(policy)
             .admit()
             .is_err()
@@ -302,14 +313,14 @@ fn completion_accounts_for_live_payload_beside_fft_plan_and_repeated_work() -> g
     policy.limits.max_bytes = 32_768;
     let admitted = SynthesisBuilder::new()
         .policy(policy)
-        .canonical(&target)?
+        .real_parity_wx(&target)?
         .admit()?;
     expect_true!(admitted.complete().is_err());
     let mut policy = Policy::default();
     policy.limits.max_work = 1_280; // One size32 FFT fits; four transforms do not.
     let admitted = SynthesisBuilder::new()
         .policy(policy)
-        .canonical(&target)?
+        .real_parity_wx(&target)?
         .admit()?;
     expect_true!(admitted.complete().is_err());
     Ok(())

@@ -1,8 +1,10 @@
 #![cfg(all(feature = "workers", target_os = "linux"))]
 use googletest::{Result, prelude::*};
-use quest_circuit::{Gate, ProgramBuilder};
+use quest_circuit::optimizer::{Client, WorkerLimits};
+#[allow(unused_imports)]
+use quest_circuit::prelude::*;
+use quest_circuit::{Gate, QuantumRegionBuilder};
 use quest_math::Limits;
-use quest_optimizer_client::{Client, WorkerLimits};
 
 #[cfg(all(target_os = "linux", feature = "macros"))]
 #[gtest]
@@ -28,7 +30,7 @@ fn numerical_oracle_calls_keep_local_certificates_without_a_global_bound() -> Re
     let matrix = faer::Mat::from_fn(2, 2, |row, col| {
         num_complex::Complex64::new(if row == col { 2.0 } else { 0.0 }, 0.0)
     });
-    let mut body = ProgramBuilder::new(1, 0)?;
+    let mut body = QuantumRegionBuilder::new(1, 0)?;
     body.numerical(
         NumericalOperator::from_view(&matrix, MatrixPolicy::default())?,
         &[body.qubit(0)?],
@@ -69,7 +71,7 @@ fn numerical_oracle_calls_keep_local_certificates_without_a_global_bound() -> Re
 }
 #[gtest]
 fn explicit_synthesis_validates_epsilon_even_without_any_rotation() -> Result<()> {
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     builder.gate(Gate::H, &[builder.qubit(0)?], &[])?;
     let program = builder.finish()?;
     let client = Client::new("/nonexistent-worker", WorkerLimits::default())?;
@@ -89,7 +91,7 @@ fn explicit_synthesis_validates_epsilon_even_without_any_rotation() -> Result<()
 
 #[gtest]
 fn unchanged_worker_output_obeys_aggregate_provenance_budget() -> Result<()> {
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     builder.gate(Gate::H, &[builder.qubit(0)?], &[])?;
     let program = builder.finish()?;
     let client = Client::new("/nonexistent-worker", WorkerLimits::default())?;
@@ -103,7 +105,7 @@ fn unchanged_worker_output_obeys_aggregate_provenance_budget() -> Result<()> {
 
 #[gtest]
 fn zx_candidate_propagates_worker_error_after_an_effect_fence() -> Result<()> {
-    let mut builder = ProgramBuilder::new(1, 1)?;
+    let mut builder = QuantumRegionBuilder::new(1, 1)?;
     let q = builder.qubit(0)?;
     let bit = builder.bit(0)?;
     builder.measure(q, bit)?;
@@ -143,7 +145,7 @@ fn zx_candidate_accepts_a_longer_certified_region_with_fresh_identities() -> Res
     )?;
     std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700))?;
     let client = Client::new(path, WorkerLimits::default())?;
-    let mut builder = ProgramBuilder::new(1, 1)?;
+    let mut builder = QuantumRegionBuilder::new(1, 1)?;
     let q = builder.qubit(0)?;
     let bit = builder.bit(0)?;
     builder.gate(Gate::H, &[q], &[])?;
@@ -185,7 +187,7 @@ fn zx_expanded_candidate_uses_its_distinct_request_and_keeps_growth_for_scoring(
     )?;
     std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700))?;
     let client = Client::new(path, WorkerLimits::default())?;
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     let q = builder.qubit(0)?;
     builder.gate(Gate::H, &[q], &[])?;
     let original = builder.finish()?;

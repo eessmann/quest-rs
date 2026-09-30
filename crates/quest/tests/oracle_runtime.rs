@@ -1,7 +1,7 @@
 use googletest::prelude::*;
 use quest::{
     Angle, BoundGate, Complex64, Control, ControlState, Environment, Gate, MatrixPolicy,
-    MemoryBudget, NumericalOperator, Operation, OracleFragment, ProgramBuilder, QubitCount,
+    MemoryBudget, NumericalOperator, Operation, OracleFragment, QuantumRegionBuilder, QubitCount,
     RunInputs, circuit,
 };
 
@@ -23,7 +23,7 @@ fn fragment() -> quest::Result<OracleFragment> {
         _ => Complex64::new(0.0, 0.0),
     });
     let matrix = NumericalOperator::from_view(&matrix, MatrixPolicy::default())?;
-    let mut builder = ProgramBuilder::new(2, 0)?;
+    let mut builder = QuantumRegionBuilder::new(2, 0)?;
     builder.numerical(matrix, &[builder.qubit(0)?], &[])?;
     builder.gate(Gate::H, &[builder.qubit(1)?], &[])?;
     builder.global_phase(Angle::radians(0.37)?, &[])?;
@@ -32,7 +32,7 @@ fn fragment() -> quest::Result<OracleFragment> {
         .build()?)
 }
 fn append_expanded(
-    builder: &mut ProgramBuilder,
+    builder: &mut QuantumRegionBuilder,
     body: &OracleFragment,
     targets: &[quest::QubitId],
     controls: &[Control],
@@ -73,7 +73,7 @@ fn retained_oracles_match_expanded_phase_target_and_density_semantics() -> googl
             let environment = Environment::builder().build()?;
             let body = fragment()?;
             let build = |retained: bool| -> quest::Result<_> {
-                let mut builder = ProgramBuilder::new(3, 0)?;
+                let mut builder = QuantumRegionBuilder::new(3, 0)?;
                 for (adjoint, order, positive) in [
                     (false, [2, 0], false),
                     (true, [0, 2], true),
@@ -101,8 +101,18 @@ fn retained_oracles_match_expanded_phase_target_and_density_semantics() -> googl
                 }
                 Ok(builder.finish()?.bind(&[])?.plan()?)
             };
-            let mut retained = environment.prepare_plan(build(true)?)?;
-            let mut expanded = environment.prepare_plan(build(false)?)?;
+            let mut retained = environment.prepare(
+                quest::Program::from_bound_region((build(true)?).into_region())?
+                    .verify()?
+                    .lower()?
+                    .plan()?,
+            )?;
+            let mut expanded = environment.prepare(
+                quest::Program::from_bound_region((build(false)?).into_region())?
+                    .verify()?
+                    .lower()?
+                    .plan()?,
+            )?;
             expect_eq!(retained.prepared_oracle_bodies(), 1);
             expect_eq!(retained.prepared_oracle_matrix_variants(), 2);
             let mut actual = environment.state_vector(QubitCount::new(3)?)?;
@@ -110,8 +120,8 @@ fn retained_oracles_match_expanded_phase_target_and_density_semantics() -> googl
             actual.init_plus()?;
             expected.init_plus()?;
             let bytes = environment.allocated_bytes();
-            retained.run(&mut actual)?;
-            expanded.run(&mut expected)?;
+            retained.run(&mut actual, &quest::RunInputs::default())?;
+            expanded.run(&mut expected, &quest::RunInputs::default())?;
             expect_eq!(environment.allocated_bytes(), bytes);
             let a = actual.snapshot()?;
             let b = expected.snapshot()?;
@@ -123,8 +133,8 @@ fn retained_oracles_match_expanded_phase_target_and_density_semantics() -> googl
             let mut expected = environment.density_matrix(QubitCount::new(3)?)?;
             actual.init_plus()?;
             expected.init_plus()?;
-            retained.run(&mut actual)?;
-            expanded.run(&mut expected)?;
+            retained.run(&mut actual, &quest::RunInputs::default())?;
+            expanded.run(&mut expected, &quest::RunInputs::default())?;
             let a = actual.snapshot()?;
             let b = expected.snapshot()?;
             for row in 0..8 {
@@ -152,7 +162,7 @@ fn structured_oracle_profiles_and_nested_adjoint_reuse_prepared_bodies() -> goog
                 negctrl @ wrapper q[1],q[2],q[0];
                 adjoint @ negctrl @ wrapper q[1],q[2],q[0];
             }?;
-            let mut prepared = environment.prepare_structured(program)?;
+            let mut prepared = environment.prepare((program).verify()?.lower()?.plan()?)?;
             expect_eq!(prepared.prepared_oracle_bodies(), 1);
             expect_eq!(prepared.prepared_oracle_matrix_variants(), 1);
             let mut state = environment.state_vector(QubitCount::new(3)?)?;
@@ -174,13 +184,22 @@ fn oracle_control_variants_respect_transactional_preparation_budget() -> googlet
                 .memory_budget(MemoryBudget::new(4096))
                 .build()?;
             let body = fragment()?;
-            let mut builder = ProgramBuilder::new(8, 0)?;
+            let mut builder = QuantumRegionBuilder::new(8, 0)?;
             let targets = [builder.qubit(7)?, builder.qubit(6)?];
             let controls = (0..6)
                 .map(|q| Ok(Control::new(builder.qubit(q)?, ControlState::One)))
                 .collect::<quest_circuit::Result<Vec<_>>>()?;
             builder.oracle(&body, &targets, &controls)?;
-            expect_true!(environment.prepare(builder.finish()?).is_err());
+            expect_true!(
+                environment
+                    .prepare(
+                        quest::Program::from_region(builder.finish()?, &[])?
+                            .verify()?
+                            .lower()?
+                            .plan()?
+                    )
+                    .is_err()
+            );
             expect_eq!(environment.allocated_bytes(), 0);
             Ok(())
         },
@@ -193,7 +212,7 @@ fn unused_oracle_capture_needs_no_native_cache() -> googletest::Result<()> {
         let environment = Environment::builder().build()?;
         let body = fragment()?;
         let program = circuit! { oracle unused[2] = ${body}; qubit q; x q; }?;
-        let mut prepared = environment.prepare_structured(program)?;
+        let mut prepared = environment.prepare((program).verify()?.lower()?.plan()?)?;
         expect_eq!(prepared.prepared_oracle_bodies(), 0);
         expect_eq!(prepared.prepared_oracle_matrix_variants(), 0);
         let mut register = environment.state_vector(QubitCount::new(1)?)?;
@@ -210,7 +229,7 @@ fn nested_shared_fragment_orientation_uses_one_native_matrix_pair() -> googletes
         || {
             let environment = Environment::builder().build()?;
             let leaf = fragment()?;
-            let mut builder = ProgramBuilder::new(2, 0)?;
+            let mut builder = QuantumRegionBuilder::new(2, 0)?;
             builder.oracle(
                 &leaf.adjoint(),
                 &[builder.qubit(1)?, builder.qubit(0)?],
@@ -219,18 +238,23 @@ fn nested_shared_fragment_orientation_uses_one_native_matrix_pair() -> googletes
             let nested = OracleFragment::builder(builder.finish()?.bind(&[])?)
                 .matrix_tolerance(1e-12)?
                 .build()?;
-            let mut builder = ProgramBuilder::new(3, 0)?;
+            let mut builder = QuantumRegionBuilder::new(3, 0)?;
             let targets = [builder.qubit(2)?, builder.qubit(0)?];
             let controls = [Control::new(builder.qubit(1)?, ControlState::Zero)];
             builder.oracle(&nested, &targets, &controls)?;
             builder.oracle(&nested.adjoint(), &targets, &controls)?;
-            let mut prepared = environment.prepare(builder.finish()?)?;
+            let mut prepared = environment.prepare(
+                quest::Program::from_region(builder.finish()?, &[])?
+                    .verify()?
+                    .lower()?
+                    .plan()?,
+            )?;
             expect_eq!(prepared.prepared_oracle_bodies(), 2);
             expect_eq!(prepared.prepared_oracle_matrix_variants(), 1);
             let mut register = environment.state_vector(QubitCount::new(3)?)?;
             register.init_plus()?;
             let before = register.snapshot()?;
-            prepared.run(&mut register)?;
+            prepared.run(&mut register, &quest::RunInputs::default())?;
             let after = register.snapshot()?;
             for row in 0..8 {
                 expect_that!(after[(row, 0)].re, near(before[(row, 0)].re, 1e-13));
@@ -246,11 +270,16 @@ fn oracle_snapshot_outlives_cached_native_resources() -> googletest::Result<()> 
     isolated("oracle_snapshot_outlives_cached_native_resources", || {
         let snapshot = {
             let environment = Environment::builder().build()?;
-            let mut builder = ProgramBuilder::new(2, 0)?;
+            let mut builder = QuantumRegionBuilder::new(2, 0)?;
             builder.oracle(&fragment()?, &[builder.qubit(0)?, builder.qubit(1)?], &[])?;
-            let mut prepared = environment.prepare(builder.finish()?)?;
+            let mut prepared = environment.prepare(
+                quest::Program::from_region(builder.finish()?, &[])?
+                    .verify()?
+                    .lower()?
+                    .plan()?,
+            )?;
             let mut state = environment.state_vector(QubitCount::new(2)?)?;
-            prepared.run(&mut state)?;
+            prepared.run(&mut state, &quest::RunInputs::default())?;
             state.snapshot()?
         };
         expect_false!(quest_sys::is_quest_env_init());

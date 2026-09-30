@@ -74,7 +74,12 @@ fn scope_exit_finalizes_and_owned_snapshot_survives() -> Result<()> {
 fn early_error_return_finalizes_borrowing_resources() -> Result<()> {
     fn run() -> quest::Result<()> {
         let environment = Environment::builder().build()?;
-        let _prepared = environment.prepare_structured(quest::circuit! {qubit q; reset q;}?)?;
+        let _prepared = environment.prepare(
+            (quest::circuit! {qubit q; reset q;}?)
+                .verify()?
+                .lower()?
+                .plan()?,
+        )?;
         let mut register = environment.state_vector(QubitCount::new(1)?)?;
         register.h(1)?;
         Ok(())
@@ -152,7 +157,7 @@ fn unwinding_destroys_resources_without_a_second_panic() -> Result<()> {
 
 #[gtest]
 fn all_native_preparation_kinds_drop_before_environment() -> Result<()> {
-    use quest::{Complex64, MatrixPolicy, NumericalOperator, ProgramBuilder, RunInputs};
+    use quest::{Complex64, MatrixPolicy, NumericalOperator, QuantumRegionBuilder, RunInputs};
     isolated(
         "all_native_preparation_kinds_drop_before_environment",
         || {
@@ -177,14 +182,23 @@ fn all_native_preparation_kinds_drop_before_environment() -> Result<()> {
             let snapshot = {
                 let environment = Environment::builder().build()?;
                 let snapshot = {
-                    let mut builder = ProgramBuilder::new(1, 0)?;
+                    let mut builder = QuantumRegionBuilder::new(1, 0)?;
                     let q = builder.qubit(0)?;
                     builder.numerical(dense.clone(), &[q], &[])?;
                     builder.numerical(diagonal.clone(), &[q], &[])?;
                     builder.channel(vec![dense.clone()], &[q], 1e-12)?;
-                    let mut prepared = environment.prepare(builder.finish()?)?;
-                    let mut structured =
-                        environment.prepare_structured(quest::circuit! {qubit q; reset q;}?)?;
+                    let mut prepared = environment.prepare(
+                        quest::Program::from_region(builder.finish()?, &[])?
+                            .verify()?
+                            .lower()?
+                            .plan()?,
+                    )?;
+                    let mut structured = environment.prepare(
+                        (quest::circuit! {qubit q; reset q;}?)
+                            .verify()?
+                            .lower()?
+                            .plan()?,
+                    )?;
                     let _state = environment.state_vector(QubitCount::new(1)?)?;
                     let mut density = environment.density_matrix(QubitCount::new(1)?)?;
                     // Observe actual native allocations, rather than proving only
@@ -196,7 +210,7 @@ fn all_native_preparation_kinds_drop_before_environment() -> Result<()> {
                         verify_true!(message.contains(resource))?;
                     }
                     verify_true!(quest_sys::is_quest_env_init())?;
-                    prepared.run(&mut density)?;
+                    prepared.run(&mut density, &quest::RunInputs::default())?;
                     structured.run(&mut density, &RunInputs::default())?;
                     density.snapshot()?
                 };

@@ -1,5 +1,5 @@
 //! Executable SSA with explicit storage and memory-state block arguments.
-pub mod optimization;
+
 mod quantum;
 mod quantum_flow;
 mod verify;
@@ -18,6 +18,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 
 static NEXT_PROGRAM: AtomicU64 = AtomicU64::new(1);
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ProgramId(u64);
 impl ProgramId {
     pub(crate) fn fresh() -> Result<Self, SemanticError> {
@@ -36,6 +37,7 @@ impl ProgramId {
 macro_rules! identity {
     ($($name:ident),*) => { $(
         #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+        #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
         pub struct $name { owner: ProgramId, index: usize }
         impl $name {
             pub(crate) const fn new(owner: ProgramId, index: usize) -> Self { Self { owner, index } }
@@ -49,10 +51,12 @@ identity!(SlotId, ValueId, BlockId, RegionId);
 
 /// Identity of one immutable verified publication; clones retain this identity.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct SnapshotId(ProgramId);
 
 /// A block position tied to an immutable publication, rather than a mutable edit.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct BlockHandle {
     snapshot: SnapshotId,
     block: BlockId,
@@ -69,6 +73,7 @@ impl BlockHandle {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Type {
     Scalar(ScalarType),
     Array {
@@ -106,11 +111,13 @@ impl Type {
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Value {
     pub id: ValueId,
     pub ty: Type,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Interface {
     Local,
     Input,
@@ -118,6 +125,7 @@ pub enum Interface {
     Parameter,
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Slot {
     pub id: SlotId,
     pub region: RegionId,
@@ -128,11 +136,13 @@ pub struct Slot {
     pub reference: bool,
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Place {
     pub slot: SlotId,
     pub indices: Vec<ValueId>,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Effect {
     Pure,
     Read,
@@ -142,22 +152,26 @@ pub enum Effect {
     Call,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum AccessMode {
     Read,
     Write,
     Quantum,
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Access {
     pub place: Place,
     pub mode: AccessMode,
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum CallArgument {
     Value(ValueId),
     Reference { place: Place, mutable: bool },
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum GateModifier {
     Inverse,
     Adjoint,
@@ -165,6 +179,7 @@ pub enum GateModifier {
     Power(ValueId),
 }
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum InstructionKind {
     Constant(ScalarValue),
     Unary {
@@ -251,6 +266,12 @@ pub enum InstructionKind {
         place: Place,
         memory: ValueId,
     },
+    /// Irreversible quantum effect backed by an immutable checked payload bank.
+    Payload {
+        capture: usize,
+        places: Vec<Place>,
+        memory: ValueId,
+    },
     Reset {
         place: Place,
         memory: ValueId,
@@ -279,6 +300,7 @@ impl InstructionKind {
             | Self::Gate { memory, .. }
             | Self::Measure { memory, .. }
             | Self::Reset { memory, .. }
+            | Self::Payload { memory, .. }
             | Self::Barrier { memory, .. } => Some(*memory),
             _ => None,
         }
@@ -291,7 +313,10 @@ impl InstructionKind {
             | Self::AllocateArray { .. }
             | Self::Allocate { .. }
             | Self::Store { .. } => Effect::Write,
-            Self::Gate { .. } | Self::Reset { .. } | Self::Barrier { .. } => Effect::Quantum,
+            Self::Gate { .. }
+            | Self::Payload { .. }
+            | Self::Reset { .. }
+            | Self::Barrier { .. } => Effect::Quantum,
             Self::Measure { .. } | Self::Assert { .. } => Effect::Observe,
             Self::Call { .. } => Effect::Call,
             _ => Effect::Pure,
@@ -313,7 +338,7 @@ impl InstructionKind {
             Self::Measure { place, .. } | Self::Reset { place, .. } => {
                 vec![access(place, AccessMode::Quantum)]
             }
-            Self::Barrier { places, .. } => places
+            Self::Barrier { places, .. } | Self::Payload { places, .. } => places
                 .iter()
                 .map(|place| access(place, AccessMode::Quantum))
                 .collect(),
@@ -404,6 +429,7 @@ fn append_modifiers(values: &mut Vec<ValueId>, modifiers: &[GateModifier]) {
     }));
 }
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Instruction {
     pub results: Vec<Value>,
     pub kind: InstructionKind,
@@ -412,11 +438,13 @@ pub struct Instruction {
     pub span: Option<SourceSpan>,
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Edge {
     pub target: BlockId,
     pub arguments: Vec<ValueId>,
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Terminator {
     Jump(Edge),
     Branch {
@@ -465,6 +493,7 @@ impl Terminator {
     }
 }
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Block {
     pub id: BlockId,
     pub region: RegionId,
@@ -475,6 +504,7 @@ pub struct Block {
     pub sealed: bool,
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct OracleId(usize);
 impl OracleId {
     #[must_use]
@@ -487,6 +517,7 @@ impl OracleId {
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Region {
     pub id: RegionId,
     pub name: String,
@@ -498,6 +529,7 @@ pub struct Region {
 }
 /// Mutable candidate representation. No executor should accept it directly.
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Program {
     pub id: ProgramId,
     pub entry: RegionId,

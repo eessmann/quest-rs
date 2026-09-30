@@ -121,7 +121,7 @@ impl Heap for K {
                 modifiers,
                 ..
             } => sum([arguments.heap()?, operands.heap()?, modifiers.heap()?]),
-            Self::Barrier { places, .. } => places.heap(),
+            Self::Barrier { places, .. } | Self::Payload { places, .. } => places.heap(),
             Self::Constant(_)
             | Self::Unary { .. }
             | Self::Binary { .. }

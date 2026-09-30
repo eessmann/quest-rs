@@ -29,8 +29,8 @@ fn certified_ssa_synthesis_preserves_native_state_and_density() -> Result<()> {
         quest::certified::Limits::default(),
     )?;
     expect_eq!(report.rotations.len(), 1);
-    let mut before = environment.prepare_structured_plan(original.lower()?.plan()?)?;
-    let mut after = environment.prepare_structured_plan(candidate.lower()?.plan()?)?;
+    let mut before = environment.prepare(original.lower()?.plan()?)?;
+    let mut after = environment.prepare(candidate.lower()?.plan()?)?;
     let mut state_before = environment.state_vector(QubitCount::new(2)?)?;
     let mut state_after = environment.state_vector(QubitCount::new(2)?)?;
     let mut density_before = environment.density_matrix(QubitCount::new(2)?)?;

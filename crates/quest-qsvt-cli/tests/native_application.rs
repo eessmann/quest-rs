@@ -287,3 +287,91 @@ fn solve_rejects_rank_deficiency_before_publishing_output() -> googletest::Resul
     expect_false!(output.exists());
     Ok(())
 }
+
+#[cfg(feature = "certification")]
+#[gtest]
+fn compiled_qsp_load_recertifies_and_retains_native_response_evidence() -> googletest::Result<()> {
+    let _guard = FIXTURES
+        .lock()
+        .map_err(|_| std::io::Error::other("fixture lock"))?;
+    let dir = tempfile::tempdir()?;
+    let encoding = dir.path().join("encoding.h5");
+    let input = dir.path().join("input.h5");
+    let output = dir.path().join("output.h5");
+    let source = dir.path().join("source.json");
+    let compiled = dir.path().join("compiled.json");
+    let z = C::new(0.3, 0.4);
+    let u = faer::Mat::from_fn(2, 2, |r, c| {
+        if r == c {
+            if r == 0 { z } else { z.conj().neg() }
+        } else {
+            C::new(0.75f64.sqrt(), 0.0)
+        }
+    });
+    let basis = faer::Mat::from_fn(2, 1, |r, _| C::new(if r == 0 { 1.0 } else { 0.0 }, 0.0));
+    let block = StoredBlockEncoding::builder(u, basis.clone(), basis)
+        .metadata(1.0, [1, 1], [1, 1])
+        .build(IoPolicy::default())?;
+    write_block_encoding(&encoding, &block, IoPolicy::default())?;
+    write_state_vector(&input, &[C::new(1.0, 0.0)], IoPolicy::default())?;
+    for (mode, route, basis, offset, coefficients) in [
+        ("real-parity-wx", "standard", "Chebyshev", 0, "[0.0,0.3]"),
+        (
+            "unit-circle-response",
+            "hermitianized-odd",
+            "Laurent",
+            0,
+            "[0.0,0.3]",
+        ),
+        (
+            "unit-circle-response",
+            "hermitianized-odd",
+            "Laurent",
+            1,
+            "[0.3]",
+        ),
+    ] {
+        for algorithm in ["rhw", "inverse-nlft"] {
+            std::fs::write(
+                &source,
+                format!(
+                    r#"{{"basis":"{basis}","minimum_order":{offset},"coefficients":{coefficients}}}"#
+                ),
+            )?;
+            command(&[
+                "synthesize",
+                "--input",
+                path(&source)?,
+                "--output",
+                path(&compiled)?,
+                "--mode",
+                mode,
+                "--algorithm",
+                algorithm,
+                "--certify",
+            ])?;
+            let report = command(&[
+                "embedded",
+                "--encoding",
+                path(&encoding)?,
+                "--qsp",
+                path(&compiled)?,
+                "--route",
+                route,
+                "--input-state",
+                path(&input)?,
+                "--output-state",
+                path(&output)?,
+            ])?;
+            if route == "standard" {
+                expect_eq!(report["certified_projector_payload"], true);
+            } else {
+                expect_eq!(report["response_evidence"], "certified");
+            }
+            let values = read_state_vector(&output, IoPolicy::default())?;
+            expect_that!(values[0].re, near(0.09, 1e-11));
+            expect_that!(values[0].im, near(0.12, 1e-11));
+        }
+    }
+    Ok(())
+}

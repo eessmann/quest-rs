@@ -1,0 +1,7 @@
+# Linux facade/compiler regression validation
+
+The original facade Linux run stopped on a worker-decline scheduling failure. `run-focused.sh` reran all beam, approximate-MITM and exact-MITM fixtures without fail-fast: 33 passed and three failed. Each failure was the same typed-error regression: generic `RotationGenerator` wrapped a process `Candidate` decline in `WorkerError::Generator(GenerationError::Process(...))`, bypassing the scheduler's `WorkerError::Worker` handling.
+
+`WorkerError::from(GenerationError)` now preserves the process error as `WorkerError::Worker`; native synthesis and independent certificate failures retain the `Generator` classification. This restores decline fallback and timeout stopping without weakening invalid-envelope/certificate failures or changing certification/budget logic. No fixture assertions were changed.
+
+A portable pass-level test exercises decline payload, timeout, envelope, native cancellation and certificate rejection. Darwin red and green logs are retained here. Final Linux focused run: 37/37 passed. Full facade all-feature nextest run with no fail-fast: 249/249 passed, no skipped tests. Strict `quest-compile`/`quest-circuit` all-feature/all-target Clippy passed. Commands, individual exit statuses, source hashes and reproducible runners accompany each result. The parent environment/matrix receipts record subsequent final environment settings independently; compiler source hashes identify this semantic fix.

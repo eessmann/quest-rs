@@ -3,7 +3,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::Arc;
 
-use mathcore::exact::Limits;
+use crate::affine::Limits;
 use num_bigint::BigInt;
 use num_rational::Ratio;
 use num_traits::Zero;

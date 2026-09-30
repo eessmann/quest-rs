@@ -6,7 +6,15 @@ use num_traits::ToPrimitive;
 
 /// An admitted fixed width, including the 64-bit boundary.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(try_from = "u8"))]
 pub struct Width(u8);
+impl TryFrom<u8> for Width {
+    type Error = ValueError;
+    fn try_from(value: u8) -> Result<Self, Self::Error> {
+        Self::new(value)
+    }
+}
 impl Width {
     /// # Errors
     /// Rejects widths outside 1 through 64.
@@ -29,11 +37,13 @@ impl Width {
     }
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum FloatWidth {
     F32,
     F64,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum ScalarType {
     Bool,
     Bit(Width),
@@ -61,11 +71,14 @@ impl ScalarType {
 }
 /// Scalar payloads cannot contain an invalid bit width or nonfinite float.
 #[derive(Debug, Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(try_from = "SerializedScalar"))]
 pub struct ScalarValue {
     ty: ScalarType,
     data: Data,
 }
 #[derive(Debug, Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 enum Data {
     Bool(bool),
     Bits(u64),
@@ -407,5 +420,39 @@ impl ScalarValue {
     /// Rejects an unknown function, wrong arity, domain errors and nonfinite output.
     pub fn function(name: &str, arguments: &[Self]) -> Result<Self, ValueError> {
         operations::function(name, arguments)
+    }
+}
+
+#[cfg(feature = "serde")]
+#[derive(serde::Deserialize)]
+struct SerializedScalar {
+    ty: ScalarType,
+    data: Data,
+}
+#[cfg(feature = "serde")]
+impl TryFrom<SerializedScalar> for ScalarValue {
+    type Error = ValueError;
+    fn try_from(raw: SerializedScalar) -> Result<Self, Self::Error> {
+        match (raw.ty, raw.data) {
+            (ScalarType::Bool, Data::Bool(value)) => Ok(Self::boolean(value)),
+            (ScalarType::Float(width), Data::Float(value)) => {
+                let checked = Self::floating(width, value)?;
+                if checked.data != raw.data {
+                    return Err(ValueError::Type);
+                }
+                Ok(checked)
+            }
+            (
+                ScalarType::Bit(width)
+                | ScalarType::Int(width)
+                | ScalarType::Uint(width)
+                | ScalarType::Angle(width),
+                Data::Bits(value),
+            ) if value <= width.mask() => Ok(Self {
+                ty: raw.ty,
+                data: raw.data,
+            }),
+            _ => Err(ValueError::Type),
+        }
     }
 }

@@ -1,4 +1,4 @@
-error: angle literal must be finite
+error: nonfinite floating value
  --> tests/ui/nonfinite_literal.rs:2:44
   |
 2 | fn main() { let _ = circuit! { qubit q; rx(1e999) q; }; }

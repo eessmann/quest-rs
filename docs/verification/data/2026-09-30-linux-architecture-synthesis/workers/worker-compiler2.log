@@ -1,0 +1,35 @@
+• Validating lock
+✓ Validating lock in 5.91ms
+  evaluating file '«nix-internal»/derivation-internal.nix'
+• Configuring shell
+• Configuring cachix
+✓ Configuring cachix in 1.74ms
+• Evaluating shell
+✓ Evaluating shell in 3.97ms (cached)
+✓ Configuring shell in 13.9ms
+• Loading tasks
+• Evaluating devenv.config.task.config
+✓ Evaluating devenv.config.task.config in 249µs (cached)
+✓ Loading tasks in 972µs
+• Running tasks
+• Running devenv:files:cleanup
+✓ Running devenv:files:cleanup in 6.09ms
+• Running devenv:enterShell
+✓ Running devenv:enterShell in 5.86ms
+• Running devenv:enterTest
+✓ Running devenv:enterTest in 260ns (no command)
+✓ Running tasks in 12.0ms
+   Compiling quest-circuit v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-circuit)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.60s
+     Running tests/worker_contract.rs (target/debug/build/quest-circuit/757144207655faa8/out/worker_contract-757144207655faa8)
+
+running 6 tests
+test explicit_synthesis_validates_epsilon_even_without_any_rotation ... ok
+test numerical_oracle_calls_keep_local_certificates_without_a_global_bound ... ok
+test unchanged_worker_output_obeys_aggregate_provenance_budget ... ok
+test zx_candidate_accepts_a_longer_certified_region_with_fresh_identities ... ok
+test zx_candidate_propagates_worker_error_after_an_effect_fence ... ok
+test zx_expanded_candidate_uses_its_distinct_request_and_keeps_growth_for_scoring ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+

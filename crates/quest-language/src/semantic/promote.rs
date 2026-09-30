@@ -304,7 +304,7 @@ pub fn rewrite_kind(
             rewrite_modifiers(modifiers, replacements)?;
             *memory = resolve(*memory, replacements)?;
         }
-        K::Barrier { places, memory } => {
+        K::Barrier { places, memory } | K::Payload { places, memory, .. } => {
             for place in places {
                 rewrite_place(place, replacements)?;
             }

@@ -20,3 +20,6 @@ googletest.workspace = true
 
 [lints]
 workspace = true
+
+[features]
+certification = ["quest-qsp/certification"]

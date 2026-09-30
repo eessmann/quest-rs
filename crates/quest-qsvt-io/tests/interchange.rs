@@ -21,8 +21,8 @@ fn canonical_phase_and_polynomial_json_round_trip() -> Result<()> {
         return fail!("wrong payload");
     };
     let converted = polynomial.to_chebyshev()?;
-    expect_that!(converted.polynomial.coefficients().len(), eq(4));
-    expect_that!(converted.polynomial.coefficients()[3].re, eq(0.5));
+    expect_that!(converted.polynomial().coefficients().len(), eq(4));
+    expect_that!(converted.polynomial().coefficients()[3].re, eq(0.5));
     Ok(())
 }
 

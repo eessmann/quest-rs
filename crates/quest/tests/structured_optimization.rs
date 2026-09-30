@@ -1,7 +1,5 @@
 use googletest::{Result, prelude::*};
-use quest::{
-    Complex64, Environment, QubitCount, RunInputs, StructuredProgram, StructuredQuantumOptions,
-};
+use quest::{Complex64, Environment, Program, QubitCount, RunInputs, StructuredQuantumOptions};
 
 fn isolated(name: &str, body: impl FnOnce() -> Result<()>) -> Result<()> {
     if std::env::var("QUEST_STRUCTURED_OPT_TEST").as_deref() == Ok(name) {
@@ -40,13 +38,13 @@ fn initial(width: usize, input: usize) -> Result<Vec<Complex64>> {
     reason = "Independent finite complex residuals are explicitly bounded at2e-13"
 )]
 fn compare(environment: &Environment, width: usize, source: &str, count: usize) -> Result<()> {
-    let original = StructuredProgram::parse(source, "native-differential.qasm")?.verify()?;
+    let original = Program::parse(source, "native-differential.qasm")?.verify()?;
     let (optimized, report) = original
         .clone()
         .optimize_quantum(StructuredQuantumOptions::default())?;
     expect_gt!(report.before_gates, report.after_gates);
-    let mut before = environment.prepare_structured_plan(original.lower()?.plan()?)?;
-    let mut after = environment.prepare_structured_plan(optimized.lower()?.plan()?)?;
+    let mut before = environment.prepare(original.lower()?.plan()?)?;
+    let mut after = environment.prepare(optimized.lower()?.plan()?)?;
     let mut state_before = environment.state_vector(QubitCount::new(width)?)?;
     let mut state_after = environment.state_vector(QubitCount::new(width)?)?;
     let mut density_before = environment.density_matrix(QubitCount::new(width)?)?;
@@ -122,7 +120,7 @@ fn terminal_structured_fusion_preserves_full_native_state_and_density_operators(
             let mut da = environment.density_matrix(QubitCount::new(2)?)?;
             let mut db = environment.density_matrix(QubitCount::new(2)?)?;
             let source = "def mixed(qubit a, qubit b) { h a; negctrl @ x a,b; t b; } gate pair a { h a; t a; } qubit[2] q; mixed(q[1],q[0]); inv @ pair q[0]; pow(-2) @ pair q[1]; h q[0]; x q[0];";
-            let original = StructuredProgram::parse(source, "terminal-native.qasm")?.verify()?;
+            let original = Program::parse(source, "terminal-native.qasm")?.verify()?;
             let options = OptimizationOptions::new(
                 OptimizationTarget::once(
                     a.deployment().compiler_snapshot()?,
@@ -137,9 +135,8 @@ fn terminal_structured_fusion_preserves_full_native_state_and_density_operators(
                 &BudgetLedger::new(OptimizationLimits::default()),
             )?;
             expect_ge!(outcome.report().fused_windows(), 2);
-            let mut before = environment.prepare_structured_plan(original.lower()?.plan()?)?;
-            let mut after =
-                environment.prepare_structured_plan(outcome.into_program().lower()?.plan()?)?;
+            let mut before = environment.prepare(original.lower()?.plan()?)?;
+            let mut after = environment.prepare(outcome.into_program().lower()?.plan()?)?;
             for input in 0..5 {
                 let values = initial(2, input)?;
                 a.init_pure(&values)?;

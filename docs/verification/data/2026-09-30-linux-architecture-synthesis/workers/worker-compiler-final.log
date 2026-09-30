@@ -1,0 +1,42 @@
+• Validating lock
+✓ Validating lock in 6.12ms
+  evaluating file '«nix-internal»/derivation-internal.nix'
+• Configuring shell
+• Configuring cachix
+✓ Configuring cachix in 1.94ms
+• Evaluating shell
+✓ Evaluating shell in 4.26ms (cached)
+✓ Configuring shell in 8.14ms
+• Loading tasks
+• Evaluating devenv.config.task.config
+✓ Evaluating devenv.config.task.config in 346µs (cached)
+✓ Loading tasks in 1.08ms
+• Running tasks
+• Running devenv:files:cleanup
+✓ Running devenv:files:cleanup in 6.38ms
+• Running devenv:enterShell
+✓ Running devenv:enterShell in 6.50ms
+• Running devenv:enterTest
+✓ Running devenv:enterTest in 2.79µs (no command)
+✓ Running tasks in 13.0ms
+    Blocking waiting for file lock on build directory
+   Compiling quest-language v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-language)
+   Compiling quest-synthesis v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-synthesis)
+   Compiling quest-optimizer-client v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-client)
+   Compiling quest-qasm v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-qasm)
+   Compiling quest-compile v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-compile)
+   Compiling quest-macros v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-macros)
+   Compiling quest-circuit v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-circuit)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 24.20s
+     Running tests/worker_contract.rs (target/debug/build/quest-circuit/e163d60b7367daca/out/worker_contract-e163d60b7367daca)
+
+running 6 tests
+test explicit_synthesis_validates_epsilon_even_without_any_rotation ... ok
+test numerical_oracle_calls_keep_local_certificates_without_a_global_bound ... ok
+test unchanged_worker_output_obeys_aggregate_provenance_budget ... ok
+test zx_candidate_accepts_a_longer_certified_region_with_fresh_identities ... ok
+test zx_candidate_propagates_worker_error_after_an_effect_fence ... ok
+test zx_expanded_candidate_uses_its_distinct_request_and_keeps_growth_for_scoring ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+

@@ -1,0 +1,1 @@
+cargo test --release --locked -p quest-optimizer-worker --features synthesis\,zx\,mitm --test synthesis_process fixed_exact_phase_sequence_survives_the_bounded_process -- --exact --nocapture --test-threads=1 

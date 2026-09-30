@@ -4,6 +4,8 @@ use proptest::{
     prelude::*,
     test_runner::{Config, RngAlgorithm, TestRng, TestRunner},
 };
+#[allow(unused_imports)]
+use quest_circuit::prelude::*;
 use quest_circuit::*;
 
 // Independent scalar oracle. The tested faer realization/product code is never
@@ -43,7 +45,7 @@ fn scalar_gate(gate: &BoundGate) -> quest_circuit::Result<Vec<Vec<C>>> {
     clippy::arithmetic_side_effects,
     reason = "Independent floating point fixtures and bounded test indices cannot overflow integers"
 )]
-fn scalar_run(plan: &ExecutablePlan, mut state: Vec<C>) -> quest_circuit::Result<Vec<C>> {
+fn scalar_run(plan: &RegionPlan, mut state: Vec<C>) -> quest_circuit::Result<Vec<C>> {
     for instruction in plan.instructions() {
         let (targets, controls, matrix) = match instruction.operation() {
             Operation::Gate {
@@ -134,7 +136,7 @@ fn randomized_exact_pass_and_fusion_preserve_complex_state_including_phase() -> 
     );
     let cases = proptest::collection::vec((0u8..9, -8i16..9, 0usize..3, any::<bool>()), 0..40);
     let result = runner.run(&cases, |gates| {
-        let mut builder = ProgramBuilder::new(3, 0).unwrap();
+        let mut builder = QuantumRegionBuilder::new(3, 0).unwrap();
         for (kind, n, target, controlled) in gates {
             let gate = match kind {
                 0 => Gate::X,
@@ -191,7 +193,7 @@ fn randomized_exact_pass_and_fusion_preserve_complex_state_including_phase() -> 
     reason = "Independent floating point fixtures and bounded test indices cannot overflow integers"
 )]
 fn controlling_a_global_phase_changes_only_the_active_branch() -> Result<()> {
-    let mut builder = ProgramBuilder::new(2, 0)?;
+    let mut builder = QuantumRegionBuilder::new(2, 0)?;
     let control = builder.qubit(1)?;
     builder.global_phase(Angle::pi(1, 2)?, &[])?;
     let plan = builder
@@ -220,7 +222,7 @@ fn numerical_approximate_unitarity_does_not_grant_exact_capability() -> Result<(
         MatrixPolicy::default(),
     )?;
     expect_true!(matrix.check_unitary(1e-7, MatrixPolicy::default()).is_ok());
-    let mut b = ProgramBuilder::new(1, 0)?;
+    let mut b = QuantumRegionBuilder::new(1, 0)?;
     b.numerical(matrix, &[b.qubit(0)?], &[])?;
     expect_true!(b.finish()?.into_unitary().is_err());
     Ok(())
@@ -229,7 +231,7 @@ fn numerical_approximate_unitarity_does_not_grant_exact_capability() -> Result<(
 #[gtest]
 fn channels_are_effectful_and_completeness_is_checked() -> Result<()> {
     let identity = BoundGate::Id.matrix(MatrixPolicy::default())?;
-    let mut b = ProgramBuilder::new(1, 0)?;
+    let mut b = QuantumRegionBuilder::new(1, 0)?;
     let q = b.qubit(0)?;
     expect_true!(
         b.channel(vec![identity.clone(), identity.clone()], &[q], 1e-12)
@@ -252,7 +254,7 @@ fn channels_are_effectful_and_completeness_is_checked() -> Result<()> {
     reason = "Independent bounded scalar fixture arithmetic"
 )]
 fn union_fusion_preserves_ordered_operands_and_signed_controls() -> Result<()> {
-    let mut builder = ProgramBuilder::new(4, 0)?;
+    let mut builder = QuantumRegionBuilder::new(4, 0)?;
     let q0 = builder.qubit(0)?;
     let q1 = builder.qubit(1)?;
     let q2 = builder.qubit(2)?;

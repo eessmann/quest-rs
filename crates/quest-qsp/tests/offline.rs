@@ -7,7 +7,7 @@ use quest_qsp::offline::{OfflineBuilder, OfflineError, OfflinePolicy};
 fn empty_offline_generalized_laurent_preserves_zero_and_positive_offset() -> Result<()> {
     for offset in [0, 3] {
         let target = Polynomial::new(Laurent::new(offset), vec![], Limits::default())?;
-        let original = OfflineBuilder::new().generalized(&target)?;
+        let original = OfflineBuilder::new().unit_circle_response(&target)?;
         expect_true!(original.policy(OfflinePolicy::default()).is_ok());
     }
     Ok(())
@@ -75,7 +75,7 @@ fn explicit_offline_complex_synthesis_exports_then_independently_certifies() -> 
         Limits::default(),
     )?;
     let solved = OfflineBuilder::new()
-        .generalized(&target)?
+        .unit_circle_response(&target)?
         .policy(OfflinePolicy::default())?
         .solve()?;
     expect_that!(
@@ -105,7 +105,7 @@ fn offline_canonical_phases_keep_the_wx_convention() -> Result<()> {
         Limits::default(),
     )?;
     let solved = OfflineBuilder::new()
-        .canonical(&target)?
+        .real_parity_wx(&target)?
         .policy(OfflinePolicy::default())?
         .solve()?;
     for x in [-1.0, -0.3, 0.0, 0.4, 1.0] {
@@ -124,7 +124,7 @@ fn offline_rejects_work_budgets_and_does_not_hide_export_rounding_failure() -> R
         Limits::default(),
     )?;
     let result = OfflineBuilder::new()
-        .generalized(&target)?
+        .unit_circle_response(&target)?
         .policy(OfflinePolicy {
             max_work: 1,
             ..OfflinePolicy::default()
@@ -139,7 +139,7 @@ fn offline_rejects_work_budgets_and_does_not_hide_export_rounding_failure() -> R
     policy.certification.reconstruction_tolerance = 1e-50;
     policy.certification.unitarity_tolerance = 1e-50;
     let result = OfflineBuilder::new()
-        .generalized(&target)?
+        .unit_circle_response(&target)?
         .policy(policy)?
         .solve();
     expect_true!(matches!(result, Err(OfflineError::Certification { .. })));
@@ -235,7 +235,7 @@ fn explicit_offline_near_boundary_retains_original_input() -> Result<()> {
         Limits::default(),
     )?;
     let solved = OfflineBuilder::new()
-        .generalized(&target)?
+        .unit_circle_response(&target)?
         .policy(OfflinePolicy {
             contractivity_margin: 1e-14,
             ..OfflinePolicy::default()
@@ -263,7 +263,7 @@ fn offline_original_degree_8105_catalog_exports_and_certifies() -> Result<()> {
         .collect::<Vec<_>>();
     let target = Polynomial::new(Chebyshev, coefficients, Limits::default())?;
     let solved = OfflineBuilder::new()
-        .canonical(&target)?
+        .real_parity_wx(&target)?
         .policy(OfflinePolicy::default())?
         .solve()?;
     expect_that!(solved.certified().candidate().target().len(), eq(8106));
@@ -294,8 +294,11 @@ fn offline_divide_inverse_handles_dense_complex_degree_sixteen() -> Result<()> {
         .collect();
     let target = Polynomial::new(Laurent::new(0), coefficients, Limits::default())?;
     let solved = OfflineBuilder::new()
-        .generalized(&target)?
-        .policy(OfflinePolicy::default())?
+        .unit_circle_response(&target)?
+        .policy(OfflinePolicy {
+            algorithm: quest_qsp::SynthesisAlgorithm::InverseNlftDivideConquer,
+            ..OfflinePolicy::default()
+        })?
         .solve()?;
     expect_that!(
         solved.certified().report().reconstruction().upper_f64(),
@@ -317,7 +320,7 @@ fn offline_interval_fft_admits_contractivity_beyond_coefficient_l1() -> Result<(
         Limits::default(),
     )?;
     let solved = OfflineBuilder::new()
-        .canonical(&target)?
+        .real_parity_wx(&target)?
         .policy(OfflinePolicy::default())?
         .solve()?;
     expect_that!(
@@ -365,7 +368,7 @@ fn offline_subnormal_canonical_conversion_retains_original_and_certifies_roundin
         Limits::default(),
     )?;
     let solved = OfflineBuilder::new()
-        .canonical(&target)?
+        .real_parity_wx(&target)?
         .policy(OfflinePolicy::default())?
         .solve()?;
     expect_that!(
@@ -426,7 +429,7 @@ fn offline_rejects_precision_that_would_be_silently_rounded_to_a_backend_word() 
         Limits::default(),
     )?;
     let result = OfflineBuilder::new()
-        .generalized(&target)?
+        .unit_circle_response(&target)?
         .policy(OfflinePolicy {
             initial_precision: 65,
             ..OfflinePolicy::default()

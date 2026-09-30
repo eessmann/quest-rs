@@ -1,0 +1,82 @@
+• Validating lock
+✓ Validating lock in 5.93ms
+  evaluating file '«nix-internal»/derivation-internal.nix'
+• Configuring shell
+• Configuring cachix
+✓ Configuring cachix in 1.87ms
+• Evaluating shell
+✓ Evaluating shell in 3.80ms (cached)
+✓ Configuring shell in 7.64ms
+• Loading tasks
+• Evaluating devenv.config.task.config
+✓ Evaluating devenv.config.task.config in 251µs (cached)
+✓ Loading tasks in 987µs
+• Running tasks
+• Running devenv:files:cleanup
+✓ Running devenv:files:cleanup in 6.17ms
+• Running devenv:enterShell
+✓ Running devenv:enterShell in 6.69ms
+• Running devenv:enterTest
+✓ Running devenv:enterTest in 430ns (no command)
+✓ Running tasks in 12.9ms
+    Blocking waiting for file lock on build directory
+   Compiling serde v1.0.229
+   Compiling libc v0.2.189
+   Compiling num-rational v0.4.2
+   Compiling num-bigint v0.5.1
+   Compiling getrandom v0.4.3
+   Compiling tempfile v3.27.0
+   Compiling quest-math v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-math)
+   Compiling quest-synthesis v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-synthesis)
+   Compiling quest-optimizer-protocol v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-protocol)
+   Compiling quest-optimizer-client v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-client)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.00s
+     Running unittests src/lib.rs (target/debug/build/quest-optimizer-client/d8a8d98425d73452/out/quest_optimizer_client-d8a8d98425d73452)
+
+running 1 test
+test process::review_tests::exit_observation_keeps_pid_owned_until_group_cleanup_and_reap ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/capability.rs (target/debug/build/quest-optimizer-client/d7561c7067714823/out/capability-d7561c7067714823)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/direct.rs (target/debug/build/quest-optimizer-client/1466ae5f6c7a9f82/out/direct-1466ae5f6c7a9f82)
+
+running 1 test
+test direct_engine_works_without_any_process_capability ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.25s
+
+     Running tests/mitm_parent.rs (target/debug/build/quest-optimizer-client/2b374589024955e9/out/mitm_parent-2b374589024955e9)
+
+running 2 tests
+test parent_approx_certificate_uses_original_target ... ok
+test parent_rejects_forged_exact_candidate_and_preserves_incomplete ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/process_contract.rs (target/debug/build/quest-optimizer-client/e031e62e1752a51d/out/process_contract-e031e62e1752a51d)
+
+running 9 tests
+test affine_byte_budget_rejects_before_worker_process_starts ... ok
+test affine_target_is_certified_against_original_identity_after_untrusted_response ... ok
+test bounded_valid_response_and_capability_rejection ... ok
+test exited_leader_with_inherited_pipes_keeps_cleanup_ownership ... ok
+test expanded_zx_request_is_distinct_and_parent_certifies_its_response ... ok
+test memory_limit_is_applied_before_worker_execution ... ok
+test rejects_malformed_output_and_wrong_seed ... ok
+test timeout_and_output_limit_kill_the_process_group ... ok
+test well_formed_candidates_still_need_independent_mathematical_admission ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.63s
+
+   Doc-tests quest_optimizer_client
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

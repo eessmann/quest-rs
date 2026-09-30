@@ -1,7 +1,7 @@
 //! Executable QSP/numerical book companion, requiring no native `QuEST` installation.
 // ANCHOR: numerical_prelude
 use quest_polynomial::{Chebyshev, Interval, Laurent, Limits, Polynomial, RemezBuilder, function};
-use quest_qsp::{Canonical, Complex64, FrozenCandidate, Generalized, SynthesisBuilder};
+use quest_qsp::{Complex64, FrozenCandidate, RealParityWx, SynthesisBuilder, UnitCircleResponse};
 pub type TutorialResult<T> = Result<T, Box<dyn std::error::Error>>;
 // ANCHOR_END: numerical_prelude
 
@@ -57,13 +57,13 @@ pub fn function_and_remez() -> TutorialResult<f64> {
 // ANCHOR: canonical_synthesis
 /// # Errors
 /// Reports invalid parity, insufficient contractivity, budgets or failed numerics.
-pub fn canonical_synthesis() -> TutorialResult<FrozenCandidate<Canonical>> {
+pub fn canonical_synthesis() -> TutorialResult<FrozenCandidate<RealParityWx>> {
     let target = Polynomial::new(
         Chebyshev,
         vec![Complex64::new(0.0, 0.0), Complex64::new(0.6, 0.0)],
         Limits::default(),
     )?;
-    let admitted = SynthesisBuilder::new().canonical(&target)?.admit()?;
+    let admitted = SynthesisBuilder::new().real_parity_wx(&target)?.admit()?;
     let completed = admitted.complete()?;
     let frozen = completed.synthesize()?;
     // These are immutable binary64 Wx phases for p(x)=0.6*x.
@@ -75,14 +75,14 @@ pub fn canonical_synthesis() -> TutorialResult<FrozenCandidate<Canonical>> {
 // ANCHOR: generalized_synthesis
 /// # Errors
 /// Reports invalid support, insufficient contractivity, budgets or failed numerics.
-pub fn generalized_synthesis() -> TutorialResult<FrozenCandidate<Generalized>> {
+pub fn generalized_synthesis() -> TutorialResult<FrozenCandidate<UnitCircleResponse>> {
     let target = Polynomial::new(
         Laurent::new(0),
         vec![Complex64::new(0.1, 0.2), Complex64::new(-0.3, 0.1)],
         Limits::default(),
     )?;
     let frozen = SynthesisBuilder::new()
-        .generalized(&target)?
+        .unit_circle_response(&target)?
         .admit()?
         .complete()?
         .synthesize()?;
@@ -123,7 +123,7 @@ pub fn explicit_offline_synthesis() -> TutorialResult<f64> {
         Limits::default(),
     )?;
     let solved = OfflineBuilder::new()
-        .generalized(&original)?
+        .unit_circle_response(&original)?
         .policy(OfflinePolicy::default())?
         .solve()?;
     // Every retry starts from original coefficients. Computation and certification
@@ -172,11 +172,11 @@ fn main() -> TutorialResult<()> {
     println!("polynomial value: {}", polynomial_and_interval()?);
     println!("exp approximation bound: {}", function_and_remez()?);
     println!(
-        "canonical response at 0.3: {}",
+        "real_parity_wx response at 0.3: {}",
         canonical_synthesis()?.response(0.3)?
     );
     println!(
-        "generalized matrices: {}",
+        "unit_circle_response matrices: {}",
         generalized_synthesis()?.controls().len()
     );
     println!("recorded stages: {}", stage_observation()?);
@@ -200,7 +200,7 @@ fn main() -> TutorialResult<()> {
 #[cfg(feature = "rayon")]
 /// # Errors
 /// Reports pool construction, target admission or numerical stage failures.
-pub fn parallel_synthesis() -> TutorialResult<FrozenCandidate<Canonical>> {
+pub fn parallel_synthesis() -> TutorialResult<FrozenCandidate<RealParityWx>> {
     use quest_numerics::ExecutionPolicy;
     let target = Polynomial::new(
         Chebyshev,
@@ -210,7 +210,7 @@ pub fn parallel_synthesis() -> TutorialResult<FrozenCandidate<Canonical>> {
     let pool = rayon::ThreadPoolBuilder::new().num_threads(4).build()?;
     let execution = ExecutionPolicy::Rayon(&pool);
     let candidate = SynthesisBuilder::new()
-        .canonical(&target)?
+        .real_parity_wx(&target)?
         .admit()?
         .complete_with(execution)?
         .synthesize_with(execution)?;

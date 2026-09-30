@@ -102,11 +102,41 @@ fn rectangular_generalized_routes_match_full_subnormalized_references() -> googl
                     .operands(OperandLayout::new(5, vec![4, 1, 3], 2, Some(0)).unwrap())
             };
             let transforms = [
-                build().hermitianized_full(controls.clone()).build()?,
-                build().hermitianized_even(controls.clone()).build()?,
-                build().hermitianized_odd(controls.clone()).build()?,
-                build().multiplication_even(controls.clone()).build()?,
-                build().multiplication_odd(controls).build()?,
+                build()
+                    .hermitianized_full(
+                        quest_qsvt::RouteResponse::<quest_qsvt::HermitianArgument>::imported(
+                            controls.clone(),
+                        ),
+                    )
+                    .build()?,
+                build()
+                    .hermitianized_even(
+                        quest_qsvt::RouteResponse::<quest_qsvt::HermitianArgument>::imported(
+                            controls.clone(),
+                        )
+                        .even_component(),
+                    )
+                    .build()?,
+                build()
+                    .hermitianized_odd(
+                        quest_qsvt::RouteResponse::<quest_qsvt::HermitianArgument>::imported(
+                            controls.clone(),
+                        )
+                        .odd_component(),
+                    )
+                    .build()?,
+                build()
+                    .multiplication_even(
+                        quest_qsvt::RouteResponse::<quest_qsvt::GramArgument>::imported(
+                            controls.clone(),
+                        ),
+                    )
+                    .build()?,
+                build()
+                    .multiplication_odd(
+                        quest_qsvt::RouteResponse::<quest_qsvt::GramArgument>::imported(controls),
+                    )
+                    .build()?,
             ];
             for transform in transforms {
                 let expected = transform.materialize_block()?;
@@ -180,9 +210,11 @@ fn hadamard_overlap_retains_complex_phase_and_probability_ledger() -> googletest
             let transform = TransformBuilder::new()
                 .encoding(encoding)
                 .multiplication_odd(
-                    quest_qsp::ControlSequence::builder()
-                        .angles(&[std::f64::consts::FRAC_PI_2], &[0.0])?
-                        .build()?,
+                    quest_qsvt::RouteResponse::<quest_qsvt::GramArgument>::imported(
+                        quest_qsp::ControlSequence::builder()
+                            .angles(&[std::f64::consts::FRAC_PI_2], &[0.0])?
+                            .build()?,
+                    ),
                 )
                 .build()?;
             let expected = transform.materialize_block()?[(0, 0)];

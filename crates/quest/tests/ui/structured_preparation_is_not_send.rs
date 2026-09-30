@@ -1,5 +1,5 @@
-use quest::PreparedStructuredProgram;
+use quest::PreparedProgram;
 fn require_send<T: Send>() {}
 fn main() {
-    require_send::<PreparedStructuredProgram<'static>>();
+    require_send::<PreparedProgram<'static>>();
 }

@@ -30,6 +30,7 @@ impl Block {
                     | InstructionKind::Call { .. }
                     | InstructionKind::Measure { .. }
                     | InstructionKind::Reset { .. }
+                    | InstructionKind::Payload { .. }
                     | InstructionKind::Barrier { .. }
             ) {
                 continue;

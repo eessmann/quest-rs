@@ -36,9 +36,11 @@ fn transform(value: Complex64) -> googletest::Result<quest_qsvt::ValidatedTransf
     Ok(TransformBuilder::new()
         .encoding(encoding)
         .multiplication_odd(
-            quest_qsp::ControlSequence::builder()
-                .angles(&[std::f64::consts::FRAC_PI_2], &[0.0])?
-                .build()?,
+            quest_qsvt::RouteResponse::<quest_qsvt::GramArgument>::imported(
+                quest_qsp::ControlSequence::builder()
+                    .angles(&[std::f64::consts::FRAC_PI_2], &[0.0])?
+                    .build()?,
+            ),
         )
         .build()?)
 }
@@ -134,9 +136,11 @@ fn collective_qsvt_rejects_transform_vector_and_budget_disagreement() -> googlet
                     .encoding(t.encoding().clone())
                     .operands(t.operands().clone().with_idle_high_qubits(5)?)
                     .multiplication_odd(
-                        quest_qsp::ControlSequence::builder()
-                            .angles(&[std::f64::consts::FRAC_PI_2], &[0.0])?
-                            .build()?,
+                        quest_qsvt::RouteResponse::<quest_qsvt::GramArgument>::imported(
+                            quest_qsp::ControlSequence::builder()
+                                .angles(&[std::f64::consts::FRAC_PI_2], &[0.0])?
+                                .build()?,
+                        ),
                     )
                     .build()?;
                 expect_true!(

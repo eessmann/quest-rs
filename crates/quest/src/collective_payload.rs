@@ -1,10 +1,10 @@
 //! Full semantic values and canonical cache-sharing graph; addresses are never serialized.
 use crate::{Error, Result};
 use quest_circuit::{
-    BoundGate, Control, ControlState, ExecutablePlan, Operation, OracleFragment, QubitId,
+    BoundGate, Control, ControlState, Operation, OracleFragment, QubitId, RegionPlan,
 };
 
-pub fn encode(plan: &ExecutablePlan, limit: usize) -> Result<Vec<u8>> {
+pub fn encode(plan: &RegionPlan, limit: usize) -> Result<Vec<u8>> {
     let mut out = Encoder {
         bytes: Vec::new(),
         limit,

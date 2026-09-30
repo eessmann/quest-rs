@@ -1,12 +1,27 @@
-# Staged binary64 QSP synthesis
+# QSP conventions, algorithms and stages
 
 The examples use the [shared numerical prelude](numerical-polynomials.md).
 
 `quest-qsp` separates numerical input admission, outer-factor completion, control synthesis and independent certification. Each construction stage consumes its input and publishes its result only after that stage's checks. A completed polynomial and a frozen candidate are not interchangeable with an independently certified export.
 
-## Canonical real polynomials
+## Explicit algorithm choice
 
-A canonical target is a real Chebyshev polynomial with definite parity and an established strict contractivity margin. The example uses the odd polynomial (p(x)=0.6x):
+`Policy::algorithm` selects `RhwHalfCholesky` (the production default) or
+`InverseNlftDivideConquer`. Both support real-parity Wx phases and complex
+unit-circle generalized QSP controls. Inverse NLFT remains supported for
+generalized phases. A bounded dense RHW factorization is retained as an internal test oracle.
+
+RHW completion publishes Fourier coefficients of `b/a` with target identity,
+positive-real-constant gauge, grid and contractivity evidence. The structured
+Half-Cholesky recurrence uses complex rank-two generator rotations and shifted
+rows; it is distinct from dense factorization. Algorithm, precision, FFT backend
+and execution policy are separate choices with no silent fallback. See
+[Laneve §5](https://arxiv.org/html/2503.03026v2) and
+[Ni–Ying](https://arxiv.org/html/2410.06409v2).
+
+## Real-parity Wx response
+
+A `RealParityWx` target is a real Chebyshev polynomial with definite parity and an established strict contractivity margin. The example uses the odd polynomial (p(x)=0.6x):
 
 ```rust
 {{#include ../../../crates/quest-qsp/examples/qsp_tutorials.rs:canonical_synthesis}}
@@ -16,9 +31,9 @@ The frozen candidate exposes immutable binary64 phases in the stated Wx conventi
 
 Use `SynthesisBuilder::policy` to choose response tolerance, contractivity margin, backend and numerical limits. Limits are checked before admitting workspaces. Byte accounting includes retained payloads, working buffers and a declared allowance for opaque FFT plans; it is not an allocator-enforced physical-memory cap. A failed budget or enclosure is reported rather than repaired by an automatic precision change.
 
-## Generalized complex polynomials
+## Generalized unit-circle response
 
-The generalized builder accepts complex power coefficients with nonnegative support. Signed Laurent polynomials remain available in the polynomial layer, but negative support requires a separate explicit mathematical transformation before this synthesis interface can accept it.
+The `unit_circle_response` builder accepts complex power coefficients with nonnegative support. Signed Laurent polynomials remain available in the polynomial layer, but negative support requires a separate explicit mathematical transformation before this synthesis interface can accept it.
 
 ```rust
 {{#include ../../../crates/quest-qsp/examples/qsp_tutorials.rs:generalized_synthesis}}
@@ -43,7 +58,7 @@ Enable `quest-qsp/rayon` to borrow a caller-owned pool for each consuming numeri
 {{#include ../../../crates/quest-qsp/examples/qsp_tutorials.rs:parallel_synthesis}}
 ```
 
-The ordinary `complete()` and `synthesize()` methods select sequential execution. Explicit pool execution preserves each reduction and the inverse dependency order: first half, midpoint, second half. Independent forward FFTs use separate prepared scratch, pointwise operations use fixed index semantics, and sufficiently large forward reconstruction subtrees can run concurrently. Small work stays serial. No global pool or pool lifetime enters the frozen payload, and failures never dispatch to another precision or backend.
+The ordinary `complete()` and `synthesize()` methods select sequential execution. For inverse NLFT, explicit pool execution preserves each reduction and the inverse dependency order: first half, midpoint, second half. Independent forward FFTs use separate prepared scratch, pointwise operations use fixed index semantics, and sufficiently large forward reconstruction subtrees can run concurrently. Small work stays serial. No global pool or pool lifetime enters the frozen payload, and failures never dispatch to another precision or backend.
 
 Parallel subtrees receive deterministic partitions of the remaining byte and work budgets; their work is counted back into the parent before reconstruction continues. This can reject a tight budget that fits serial execution because concurrent branches require separate FFT plans and scratch. Errors are selected in the original left-before-right order. Opaque plan storage remains an explicitly modeled allowance rather than an allocator hard cap. Certification and offline Astro Float stages remain separate from this binary64 execution policy.
 

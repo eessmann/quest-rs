@@ -80,7 +80,11 @@ pub struct Sequence {
     pub qubits: usize,
     pub operations: Vec<Operation>,
 }
-/// Caller resource bounds, in addition to the hard four-qubit and 4096-bit precision caps.
+/// Caller resource bounds.
+///
+/// Dense sequence reconstruction additionally caps width
+/// at four qubits and interval arithmetic caps precision at 4096 bits. The
+/// compositional synthesis verifier uses the caller's width and storage limits.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Limits {

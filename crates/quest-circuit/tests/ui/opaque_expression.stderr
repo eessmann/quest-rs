@@ -1,4 +1,4 @@
-error: expected a rational pi angle or finite literal; use ${...} for a Rust expression
+error: unknown symbol theta
  --> tests/ui/opaque_expression.rs:2:52
   |
 2 | fn main(){let theta=0.2;let _=circuit!{qubit q; rx(theta) q;};}

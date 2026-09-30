@@ -1,0 +1,694 @@
+• Validating lock
+✓ Validating lock in 5.74ms
+  evaluating file '«nix-internal»/derivation-internal.nix'
+• Configuring shell
+• Configuring cachix
+✓ Configuring cachix in 1.59ms
+• Evaluating shell
+✓ Evaluating shell in 4.50ms (cached)
+✓ Configuring shell in 8.43ms
+• Loading tasks
+• Evaluating devenv.config.task.config
+✓ Evaluating devenv.config.task.config in 235µs (cached)
+✓ Loading tasks in 885µs
+• Running tasks
+• Running devenv:files:cleanup
+✓ Running devenv:files:cleanup in 6.96ms
+• Running devenv:enterShell
+✓ Running devenv:enterShell in 7.49ms
+• Running devenv:enterTest
+✓ Running devenv:enterTest in 300ns (no command)
+✓ Running tasks in 14.6ms
+   Compiling autocfg v1.5.1
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.24
+   Compiling libm v0.2.16
+   Compiling cfg-if v1.0.4
+   Compiling bytemuck v1.25.2
+   Compiling libc v0.2.189
+   Compiling paste v1.0.15
+   Compiling num-traits v0.2.19
+   Compiling version_check v0.9.5
+   Compiling reborrow v0.5.5
+   Compiling pulp-wasm-simd-flag v0.1.1
+   Compiling nano-gemm-codegen v0.2.1
+   Compiling pulp v0.22.3
+   Compiling dyn-stack-macros v0.1.3
+   Compiling serde_core v1.0.229
+   Compiling syn v3.0.3
+   Compiling syn v2.0.119
+   Compiling dyn-stack v0.13.2
+   Compiling memchr v2.8.3
+   Compiling num-complex v0.4.6
+   Compiling equivalent v1.0.2
+   Compiling hashbrown v0.17.1
+   Compiling syn v1.0.109
+   Compiling bitflags v2.13.1
+   Compiling seq-macro v0.3.6
+   Compiling indexmap v2.14.0
+   Compiling num-integer v0.1.47
+   Compiling serde v1.0.229
+   Compiling nano-gemm-core v0.2.1
+   Compiling regex-syntax v0.8.11
+   Compiling once_cell v1.21.4
+   Compiling raw-cpuid v11.6.0
+   Compiling serde_derive v1.0.229
+   Compiling zmij v1.0.23
+   Compiling num-bigint v0.4.8
+   Compiling nano-gemm-c32 v0.2.1
+   Compiling nano-gemm-c64 v0.2.1
+   Compiling serde_json v1.0.151
+   Compiling thiserror v2.0.20
+   Compiling interpol v0.2.1
+   Compiling thiserror-impl v2.0.20
+   Compiling nano-gemm-f32 v0.2.1
+   Compiling nano-gemm-f64 v0.2.1
+   Compiling itoa v1.0.18
+   Compiling defer v0.2.1
+   Compiling private-gemm-x86 v0.1.20
+   Compiling equator-macro v0.2.1
+   Compiling num-rational v0.4.2
+   Compiling equator v0.2.2
+   Compiling aho-corasick v1.1.5
+   Compiling num_cpus v1.17.0
+   Compiling generativity v1.2.1
+   Compiling gemm-common v0.19.0
+   Compiling regex-automata v0.4.18
+   Compiling num-bigint v0.5.1
+   Compiling semver v1.0.28
+   Compiling equator-macro v0.6.0
+   Compiling parking_lot_core v0.9.12
+   Compiling foldhash v0.1.5
+   Compiling either v1.18.0
+   Compiling equator v0.6.0
+   Compiling hashbrown v0.15.5
+   Compiling rustc_version v0.4.1
+   Compiling dirs-sys-next v0.1.2
+   Compiling fixedbitset v0.5.7
+   Compiling crossbeam-utils v0.8.23
+   Compiling crunchy v0.2.4
+   Compiling regex v1.13.1
+   Compiling winnow v1.0.4
+   Compiling scopeguard v1.2.0
+   Compiling smallvec v1.16.0
+   Compiling lock_api v0.4.14
+   Compiling dirs-next v2.0.0
+   Compiling regex-syntax v0.6.29
+   Compiling crossbeam-epoch v0.9.21
+   Compiling toml_parser v1.1.3+spec-1.1.0
+   Compiling tiny-keccak v2.0.2
+   Compiling fixedbitset v0.4.2
+   Compiling rustix v1.1.4
+   Compiling unicode-xid v0.2.6
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling siphasher v1.0.3
+   Compiling phf_shared v0.11.3
+   Compiling toml_edit v0.25.13+spec-1.1.0
+   Compiling term v0.7.0
+   Compiling parking_lot v0.12.5
+   Compiling bit-vec v0.6.3
+   Compiling precomputed-hash v0.1.1
+   Compiling crossbeam-deque v0.8.8
+   Compiling zerocopy v0.8.57
+   Compiling utf8parse v0.2.2
+   Compiling typenum v1.20.1
+   Compiling log v0.4.34
+   Compiling futures-core v0.3.34
+   Compiling new_debug_unreachable v1.0.6
+   Compiling futures-sink v0.3.34
+   Compiling linux-raw-sys v0.12.1
+   Compiling futures-channel v0.3.34
+   Compiling string_cache v0.8.9
+   Compiling ena v0.14.4
+   Compiling anstyle-parse v1.0.0
+   Compiling bit-set v0.5.3
+   Compiling proc-macro-crate v3.5.0
+   Compiling ascii-canvas v3.0.0
+   Compiling petgraph v0.6.5
+   Compiling lalrpop-util v0.19.12
+   Compiling hybrid-array v0.4.15
+   Compiling quest-math v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-math)
+   Compiling itertools v0.10.5
+   Compiling gemm-c32 v0.19.0
+   Compiling gemm-f64 v0.19.0
+   Compiling gemm-f32 v0.19.0
+   Compiling gemm-c64 v0.19.0
+   Compiling qd v0.8.0
+   Compiling futures-macro v0.3.34
+   Compiling is-terminal v0.4.17
+   Compiling diff v0.1.13
+   Compiling anstyle-query v1.1.5
+   Compiling colorchoice v1.0.5
+   Compiling pin-project-lite v0.2.17
+   Compiling futures-task v0.3.34
+   Compiling rayon-core v1.13.0
+   Compiling is_terminal_polyfill v1.70.2
+   Compiling futures-io v0.3.34
+   Compiling anstyle v1.0.14
+   Compiling rustversion v1.0.23
+   Compiling slab v0.4.12
+   Compiling futures-util v0.3.34
+   Compiling anstream v1.0.0
+   Compiling lalrpop v0.19.12
+   Compiling nano-gemm v0.2.2
+   Compiling faer-traits v0.24.0
+   Compiling gemm v0.19.0
+   Compiling rstest_macros v0.23.0
+   Compiling getrandom v0.2.17
+   Compiling matrixmultiply v0.3.11
+   Compiling fnv v1.0.7
+   Compiling beef v0.5.2
+   Compiling thiserror v1.0.69
+   Compiling getrandom v0.4.3
+   Compiling object v0.37.3
+   Compiling faer v0.24.4
+   Compiling logos-derive v0.12.1
+   Compiling rand_core v0.6.4
+   Compiling quest-symbolic v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-symbolic)
+   Compiling ppv-lite86 v0.2.21
+   Compiling openqasm v0.1.2
+   Compiling futures-executor v0.3.34
+   Compiling quest-synthesis v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-synthesis)
+   Compiling quest-optimizer-protocol v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-protocol)
+   Compiling crypto-common v0.2.2
+   Compiling block-buffer v0.12.1
+   Compiling petgraph v0.8.3
+   Compiling thiserror-impl v1.0.69
+   Compiling num-iter v0.1.46
+   Compiling clap_lex v1.1.0
+   Compiling eyre v0.6.12
+   Compiling strsim v0.11.1
+   Compiling glob v0.3.4
+   Compiling rawpointer v0.2.1
+   Compiling jiff-core v0.1.0
+   Compiling gimli v0.32.3
+   Compiling owo-colors v4.3.0
+   Compiling heck v0.5.0
+   Compiling const-oid v0.10.2
+   Compiling relative-path v1.9.3
+   Compiling adler2 v2.0.1
+   Compiling miniz_oxide v0.8.9
+   Compiling jiff v0.2.35
+   Compiling digest v0.11.3
+   Compiling clap_derive v4.6.4
+   Compiling addr2line v0.25.1
+   Compiling env_filter v2.0.0
+   Compiling clap_builder v4.6.6
+   Compiling num v0.4.3
+   Compiling futures v0.3.34
+   Compiling rayon v1.12.0
+   Compiling logos v0.12.1
+   Compiling rand_chacha v0.3.1
+   Compiling derive_more-impl v1.0.0
+   Compiling indenter v0.3.4
+   Compiling futures-timer v3.0.4
+   Compiling rustc-demangle v0.1.28
+   Compiling cpufeatures v0.3.1
+   Compiling heck v0.4.1
+   Compiling fastrand v2.5.0
+   Compiling strum_macros v0.25.3
+   Compiling tempfile v3.27.0
+   Compiling backtrace v0.3.76
+   Compiling sha2 v0.11.0
+   Compiling derive_more v1.0.0
+   Compiling rstest v0.23.0
+   Compiling ndarray v0.16.1
+   Compiling clap v4.6.6
+   Compiling rand v0.8.8
+   Compiling env_logger v0.11.11
+   Compiling quest-optimizer-client v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-client)
+   Compiling itertools v0.13.0
+   Compiling approx v0.5.1
+   Compiling strum v0.25.0
+   Compiling roots v0.0.8
+   Compiling rustc-hash v2.1.3
+   Compiling color-eyre v0.6.5
+   Compiling googletest_macro v0.14.3
+   Compiling googletest v0.14.3
+   Compiling quizx v0.3.0
+   Compiling quest-language v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-language)
+   Compiling quest-optimizer-worker v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-worker)
+   Compiling quest-qasm v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-qasm)
+   Compiling quest-compile v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-compile)
+   Compiling quest-macros v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-macros)
+   Compiling quest-circuit v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-circuit)
+error[E0061]: this function takes 0 arguments but 2 arguments were supplied
+  --> crates/quest-optimizer-worker/tests/circuit_contract.rs:18:23
+   |
+18 |     let mut builder = ProgramBuilder::new(3, 0)?;
+   |                       ^^^^^^^^^^^^^^^^^^^ -  - unexpected argument #2 of type `{integer}`
+   |                                           |
+   |                                           unexpected argument #1 of type `{integer}`
+   |
+note: associated function defined here
+  --> crates/quest-compile/src/builder.rs:34:12
+   |
+34 |     pub fn new() -> Result<Self, LanguageError> {
+   |            ^^^
+help: remove the extra arguments
+   |
+18 -     let mut builder = ProgramBuilder::new(3, 0)?;
+18 +     let mut builder = ProgramBuilder::new()?;
+   |
+
+error[E0061]: this method takes 2 arguments but 1 argument was supplied
+   --> crates/quest-optimizer-worker/tests/circuit_contract.rs:19:21
+    |
+ 19 |     let q = builder.qubit(2)?;
+    |                     ^^^^^ - argument #1 of type `&str` is missing
+    |
+note: method defined here
+   --> crates/quest-language/src/semantic/builder/mod.rs:231:12
+    |
+231 |     pub fn qubit(&mut self, name: &str, count: usize) -> Result<Qubit, SemanticError> {
+    |            ^^^^^
+help: provide the argument
+    |
+ 19 |     let q = builder.qubit(/* &str */, 2)?;
+    |                           +++++++++++
+
+error[E0061]: this method takes 2 arguments but 1 argument was supplied
+   --> crates/quest-optimizer-worker/tests/circuit_contract.rs:20:21
+    |
+ 20 |     let c = builder.qubit(0)?;
+    |                     ^^^^^ - argument #1 of type `&str` is missing
+    |
+note: method defined here
+   --> crates/quest-language/src/semantic/builder/mod.rs:231:12
+    |
+231 |     pub fn qubit(&mut self, name: &str, count: usize) -> Result<Qubit, SemanticError> {
+    |            ^^^^^
+help: provide the argument
+    |
+ 20 |     let c = builder.qubit(/* &str */, 0)?;
+    |                           +++++++++++
+
+error[E0308]: mismatched types
+  --> crates/quest-optimizer-worker/tests/circuit_contract.rs:23:11
+   |
+23 |         &[q],
+   |           ^ expected `Expr<Float<64>>`, found `Qubit`
+   |
+   = note: expected struct `Expr<quest_circuit::Float<64>>`
+              found struct `quest_circuit::Qubit`
+
+error[E0308]: mismatched types
+  --> crates/quest-optimizer-worker/tests/circuit_contract.rs:24:24
+   |
+24 |         &[Control::new(c, ControlState::Zero)],
+   |           ------------ ^ expected `QubitId`, found `Qubit`
+   |           |
+   |           arguments to this function are incorrect
+   |
+note: associated function defined here
+  --> crates/quest-language/src/quantum/model.rs:40:18
+   |
+40 |     pub const fn new(qubit: QubitId, state: ControlState) -> Self {
+   |                  ^^^
+
+error[E0308]: mismatched types
+  --> crates/quest-optimizer-worker/tests/circuit_contract.rs:24:11
+   |
+24 |         &[Control::new(c, ControlState::Zero)],
+   |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `Qubit`, found `Control`
+
+error[E0308]: mismatched types
+   --> crates/quest-optimizer-worker/tests/circuit_contract.rs:22:9
+    |
+ 21 |     let source = builder.gate(
+    |                          ---- arguments to this method are incorrect
+ 22 |         Gate::Rz(Angle::pi(1, 7)?),
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `GateKind`, found `Gate`
+    |
+note: method defined here
+   --> crates/quest-language/src/semantic/builder/mod.rs:274:12
+    |
+274 |     pub fn gate(
+    |            ^^^^
+
+error[E0599]: no method named `synthesize_rotations` found for struct `quest_circuit::Program<Constructed>` in the current scope
+  --> crates/quest-optimizer-worker/tests/circuit_contract.rs:29:14
+   |
+27 |         builder
+28 |             .finish()?
+29 |             .synthesize_rotations(&worker()?, 1e-12, 42, Limits::default())?;
+   |              ^^^^^^^^^^^^^^^^^^^^ method not found in `quest_circuit::Program<Constructed>`
+   |
+   = note: the method was found for `quest_circuit::Program<Verified>`
+
+error[E0277]: can't compare `QubitId` with `quest_circuit::Qubit`
+    --> crates/quest-optimizer-worker/tests/circuit_contract.rs:55:17
+     |
+  55 |                 expect_eq!(targets.as_ref(), &[q]);
+     |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     |                 |
+     |                 no implementation for `QubitId == quest_circuit::Qubit`
+     |                 required by a bound introduced by this call
+     |
+help: the trait `PartialEq<quest_circuit::Qubit>` is not implemented for `QubitId`
+      but trait `PartialEq<QubitId>` is implemented for it
+    --> crates/quest-language/src/quantum/model.rs:9:38
+     |
+   9 |         #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+     |                                      ^^^^^^^^^
+...
+  21 | owned_id!(QubitId);
+     | ------------------ in this macro invocation
+     = help: for that trait implementation, expected `QubitId`, found `quest_circuit::Qubit`
+     = note: required for `[QubitId]` to implement `PartialEq<[quest_circuit::Qubit; 1]>`
+     = note: 2 redundant requirements hidden
+     = note: required for `&&[QubitId]` to implement `PartialEq<&&[quest_circuit::Qubit; 1]>`
+     = note: required for `EqMatcher<&&[quest_circuit::Qubit; 1]>` to implement `Matcher<&&[QubitId]>`
+note: required by a bound in `googletest::assertions::internal::Subject::check`
+    --> /home/erich/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/googletest-0.14.3/src/assertions.rs:1807:28
+     |
+1795 |     pub trait Subject: Copy + Debug {
+...
+1805 |         fn check(
+1806 |             self,
+1807 |             expected: impl Matcher<Self>,
+     |                            ^^^^^^^^^^^^^ required by this bound in `Subject::check`
+     = note: this error originates in the macro `$crate::verify_eq` which comes from the expansion of the macro `owned_id` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0308]: mismatched types
+  --> crates/quest-optimizer-worker/tests/circuit_contract.rs:56:62
+   |
+56 |                 expect_eq!(controls.as_ref(), &[Control::new(c, ControlState::Zero)]);
+   |                                                 ------------ ^ expected `QubitId`, found `Qubit`
+   |                                                 |
+   |                                                 arguments to this function are incorrect
+   |
+note: associated function defined here
+  --> crates/quest-language/src/quantum/model.rs:40:18
+   |
+40 |     pub const fn new(qubit: QubitId, state: ControlState) -> Self {
+   |                  ^^^
+
+error[E0308]: mismatched types
+  --> crates/quest-optimizer-worker/tests/circuit_contract.rs:59:62
+   |
+59 |                 expect_eq!(controls.as_ref(), &[Control::new(c, ControlState::Zero)]);
+   |                                                 ------------ ^ expected `QubitId`, found `Qubit`
+   |                                                 |
+   |                                                 arguments to this function are incorrect
+   |
+note: associated function defined here
+  --> crates/quest-language/src/quantum/model.rs:40:18
+   |
+40 |     pub const fn new(qubit: QubitId, state: ControlState) -> Self {
+   |                  ^^^
+
+error[E0061]: this function takes 0 arguments but 2 arguments were supplied
+  --> crates/quest-optimizer-worker/tests/circuit_contract.rs:64:23
+   |
+64 |     let mut builder = ProgramBuilder::new(1, 1)?;
+   |                       ^^^^^^^^^^^^^^^^^^^ -  - unexpected argument #2 of type `{integer}`
+   |                                           |
+   |                                           unexpected argument #1 of type `{integer}`
+   |
+note: associated function defined here
+  --> crates/quest-compile/src/builder.rs:34:12
+   |
+34 |     pub fn new() -> Result<Self, LanguageError> {
+   |            ^^^
+help: remove the extra arguments
+   |
+64 -     let mut builder = ProgramBuilder::new(1, 1)?;
+64 +     let mut builder = ProgramBuilder::new()?;
+   |
+
+error[E0061]: this method takes 2 arguments but 1 argument was supplied
+   --> crates/quest-optimizer-worker/tests/circuit_contract.rs:65:56
+    |
+ 65 |     builder.gate(Gate::Rx(Angle::pi(1, 2)?), &[builder.qubit(0)?], &[])?;
+    |                                                        ^^^^^ - argument #1 of type `&str` is missing
+    |
+note: method defined here
+   --> crates/quest-language/src/semantic/builder/mod.rs:231:12
+    |
+231 |     pub fn qubit(&mut self, name: &str, count: usize) -> Result<Qubit, SemanticError> {
+    |            ^^^^^
+help: provide the argument
+    |
+ 65 |     builder.gate(Gate::Rx(Angle::pi(1, 2)?), &[builder.qubit(/* &str */, 0)?], &[])?;
+    |                                                              +++++++++++
+
+error[E0308]: `?` operator has incompatible types
+  --> crates/quest-optimizer-worker/tests/circuit_contract.rs:65:48
+   |
+65 |     builder.gate(Gate::Rx(Angle::pi(1, 2)?), &[builder.qubit(0)?], &[])?;
+   |                                                ^^^^^^^^^^^^^^^^^ expected `Expr<Float<64>>`, found `Qubit`
+   |
+   = note: `?` operator cannot convert from `quest_circuit::Qubit` to `Expr<quest_circuit::Float<64>>`
+   = note: expected struct `Expr<quest_circuit::Float<64>>`
+              found struct `quest_circuit::Qubit`
+
+error[E0308]: mismatched types
+   --> crates/quest-optimizer-worker/tests/circuit_contract.rs:65:18
+    |
+ 65 |     builder.gate(Gate::Rx(Angle::pi(1, 2)?), &[builder.qubit(0)?], &[])?;
+    |             ---- ^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `GateKind`, found `Gate`
+    |             |
+    |             arguments to this method are incorrect
+    |
+note: method defined here
+   --> crates/quest-language/src/semantic/builder/mod.rs:274:12
+    |
+274 |     pub fn gate(
+    |            ^^^^
+
+error[E0061]: this method takes 2 arguments but 1 argument was supplied
+   --> crates/quest-optimizer-worker/tests/circuit_contract.rs:66:29
+    |
+ 66 |     builder.measure(builder.qubit(0)?, builder.bit(0)?)?;
+    |                             ^^^^^ - argument #1 of type `&str` is missing
+    |
+note: method defined here
+   --> crates/quest-language/src/semantic/builder/mod.rs:231:12
+    |
+231 |     pub fn qubit(&mut self, name: &str, count: usize) -> Result<Qubit, SemanticError> {
+    |            ^^^^^
+help: provide the argument
+    |
+ 66 |     builder.measure(builder.qubit(/* &str */, 0)?, builder.bit(0)?)?;
+    |                                   +++++++++++
+
+error[E0308]: `?` operator has incompatible types
+  --> crates/quest-optimizer-worker/tests/circuit_contract.rs:66:21
+   |
+66 |     builder.measure(builder.qubit(0)?, builder.bit(0)?)?;
+   |                     ^^^^^^^^^^^^^^^^^ expected `&Qubit`, found `Qubit`
+   |
+   = note: `?` operator cannot convert from `Qubit` to `&Qubit`
+help: consider borrowing here
+   |
+66 |     builder.measure(&builder.qubit(0)?, builder.bit(0)?)?;
+   |                     +
+
+error[E0599]: no method named `bit` found for struct `ProgramBuilder` in the current scope
+   --> crates/quest-optimizer-worker/tests/circuit_contract.rs:66:48
+    |
+ 66 |     builder.measure(builder.qubit(0)?, builder.bit(0)?)?;
+    |                                                ^^^
+    |
+help: there is a method `qubit` with a similar name, but with different arguments
+   --> crates/quest-language/src/semantic/builder/mod.rs:231:5
+    |
+231 |     pub fn qubit(&mut self, name: &str, count: usize) -> Result<Qubit, SemanticError> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no method named `synthesize_rotations` found for struct `quest_circuit::Program<Constructed>` in the current scope
+  --> crates/quest-optimizer-worker/tests/circuit_contract.rs:70:14
+   |
+68 |         builder
+69 |             .finish()?
+70 |             .synthesize_rotations(&worker()?, 1e-12, 43, Limits::default())?;
+   |              ^^^^^^^^^^^^^^^^^^^^ method not found in `quest_circuit::Program<Constructed>`
+   |
+   = note: the method was found for `quest_circuit::Program<Verified>`
+
+error[E0061]: this function takes 0 arguments but 2 arguments were supplied
+  --> crates/quest-optimizer-worker/tests/circuit_contract.rs:79:23
+   |
+79 |     let mut builder = ProgramBuilder::new(1, 1)?;
+   |                       ^^^^^^^^^^^^^^^^^^^ -  - unexpected argument #2 of type `{integer}`
+   |                                           |
+   |                                           unexpected argument #1 of type `{integer}`
+   |
+note: associated function defined here
+  --> crates/quest-compile/src/builder.rs:34:12
+   |
+34 |     pub fn new() -> Result<Self, LanguageError> {
+   |            ^^^
+help: remove the extra arguments
+   |
+79 -     let mut builder = ProgramBuilder::new(1, 1)?;
+79 +     let mut builder = ProgramBuilder::new()?;
+   |
+
+error[E0061]: this method takes 2 arguments but 1 argument was supplied
+   --> crates/quest-optimizer-worker/tests/circuit_contract.rs:80:21
+    |
+ 80 |     let q = builder.qubit(0)?;
+    |                     ^^^^^ - argument #1 of type `&str` is missing
+    |
+note: method defined here
+   --> crates/quest-language/src/semantic/builder/mod.rs:231:12
+    |
+231 |     pub fn qubit(&mut self, name: &str, count: usize) -> Result<Qubit, SemanticError> {
+    |            ^^^^^
+help: provide the argument
+    |
+ 80 |     let q = builder.qubit(/* &str */, 0)?;
+    |                           +++++++++++
+
+error[E0308]: mismatched types
+  --> crates/quest-optimizer-worker/tests/circuit_contract.rs:81:29
+   |
+81 |     builder.gate(Gate::H, &[q], &[])?;
+   |                             ^ expected `Expr<Float<64>>`, found `Qubit`
+   |
+   = note: expected struct `Expr<quest_circuit::Float<64>>`
+              found struct `quest_circuit::Qubit`
+
+error[E0308]: mismatched types
+   --> crates/quest-optimizer-worker/tests/circuit_contract.rs:81:18
+    |
+ 81 |     builder.gate(Gate::H, &[q], &[])?;
+    |             ---- ^^^^^^^ expected `GateKind`, found `Gate`
+    |             |
+    |             arguments to this method are incorrect
+    |
+note: method defined here
+   --> crates/quest-language/src/semantic/builder/mod.rs:274:12
+    |
+274 |     pub fn gate(
+    |            ^^^^
+
+error[E0308]: mismatched types
+  --> crates/quest-optimizer-worker/tests/circuit_contract.rs:82:29
+   |
+82 |     builder.gate(Gate::H, &[q], &[])?;
+   |                             ^ expected `Expr<Float<64>>`, found `Qubit`
+   |
+   = note: expected struct `Expr<quest_circuit::Float<64>>`
+              found struct `quest_circuit::Qubit`
+
+error[E0308]: mismatched types
+   --> crates/quest-optimizer-worker/tests/circuit_contract.rs:82:18
+    |
+ 82 |     builder.gate(Gate::H, &[q], &[])?;
+    |             ---- ^^^^^^^ expected `GateKind`, found `Gate`
+    |             |
+    |             arguments to this method are incorrect
+    |
+note: method defined here
+   --> crates/quest-language/src/semantic/builder/mod.rs:274:12
+    |
+274 |     pub fn gate(
+    |            ^^^^
+
+error[E0599]: no method named `bit` found for struct `ProgramBuilder` in the current scope
+   --> crates/quest-optimizer-worker/tests/circuit_contract.rs:83:46
+    |
+ 83 |     let measure = builder.measure(q, builder.bit(0)?)?;
+    |                                              ^^^
+    |
+help: there is a method `qubit` with a similar name, but with different arguments
+   --> crates/quest-language/src/semantic/builder/mod.rs:231:5
+    |
+231 |     pub fn qubit(&mut self, name: &str, count: usize) -> Result<Qubit, SemanticError> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0308]: mismatched types
+  --> crates/quest-optimizer-worker/tests/circuit_contract.rs:83:35
+   |
+83 |     let measure = builder.measure(q, builder.bit(0)?)?;
+   |                           ------- ^ expected `&Qubit`, found `Qubit`
+   |                           |
+   |                           arguments to this method are incorrect
+   |
+note: method defined here
+  --> crates/quest-language/src/semantic/builder/effects.rs:76:12
+   |
+76 |     pub fn measure(&mut self, qubit: &Qubit, result: &Local<Bit<1>>) -> Result<(), SemanticError> {
+   |            ^^^^^^^
+help: consider borrowing here
+   |
+83 |     let measure = builder.measure(&q, builder.bit(0)?)?;
+   |                                   +
+
+error[E0308]: mismatched types
+  --> crates/quest-optimizer-worker/tests/circuit_contract.rs:84:29
+   |
+84 |     builder.gate(Gate::X, &[q], &[])?;
+   |                             ^ expected `Expr<Float<64>>`, found `Qubit`
+   |
+   = note: expected struct `Expr<quest_circuit::Float<64>>`
+              found struct `quest_circuit::Qubit`
+
+error[E0308]: mismatched types
+   --> crates/quest-optimizer-worker/tests/circuit_contract.rs:84:18
+    |
+ 84 |     builder.gate(Gate::X, &[q], &[])?;
+    |             ---- ^^^^^^^ expected `GateKind`, found `Gate`
+    |             |
+    |             arguments to this method are incorrect
+    |
+note: method defined here
+   --> crates/quest-language/src/semantic/builder/mod.rs:274:12
+    |
+274 |     pub fn gate(
+    |            ^^^^
+
+error[E0308]: mismatched types
+  --> crates/quest-optimizer-worker/tests/circuit_contract.rs:85:29
+   |
+85 |     builder.gate(Gate::X, &[q], &[])?;
+   |                             ^ expected `Expr<Float<64>>`, found `Qubit`
+   |
+   = note: expected struct `Expr<quest_circuit::Float<64>>`
+              found struct `quest_circuit::Qubit`
+
+error[E0308]: mismatched types
+   --> crates/quest-optimizer-worker/tests/circuit_contract.rs:85:18
+    |
+ 85 |     builder.gate(Gate::X, &[q], &[])?;
+    |             ---- ^^^^^^^ expected `GateKind`, found `Gate`
+    |             |
+    |             arguments to this method are incorrect
+    |
+note: method defined here
+   --> crates/quest-language/src/semantic/builder/mod.rs:274:12
+    |
+274 |     pub fn gate(
+    |            ^^^^
+
+error[E0599]: no method named `optimize_zx` found for struct `quest_circuit::Program<Constructed>` in the current scope
+  --> crates/quest-optimizer-worker/tests/circuit_contract.rs:90:10
+   |
+88 |     let (retained, skipped) = original
+89 |         .clone()
+90 |         .optimize_zx(&missing, 3, Limits::default())?;
+   |          ^^^^^^^^^^^ method not found in `quest_circuit::Program<Constructed>`
+   |
+   = note: the method was found for `quest_circuit::Program<Verified>`
+
+error[E0599]: no method named `schedule` found for struct `quest_circuit::Program<S>` in the current scope
+  --> crates/quest-optimizer-worker/tests/circuit_contract.rs:91:46
+   |
+91 |     expect_eq!(retained.schedule(), original.schedule());
+   |                                              ^^^^^^^^ method not found in `quest_circuit::Program<Constructed>`
+
+error[E0599]: no method named `optimize_zx` found for struct `quest_circuit::Program<Constructed>` in the current scope
+  --> crates/quest-optimizer-worker/tests/circuit_contract.rs:93:40
+   |
+93 |     let (optimized, report) = original.optimize_zx(&worker()?, 3, Limits::default())?;
+   |                                        ^^^^^^^^^^^ method not found in `quest_circuit::Program<Constructed>`
+   |
+   = note: the method was found for `quest_circuit::Program<Verified>`
+
+Some errors have detailed explanations: E0061, E0277, E0308, E0599.
+For more information about an error, try `rustc --explain E0061`.
+error: could not compile `quest-optimizer-worker` (test "circuit_contract") due to 34 previous errors

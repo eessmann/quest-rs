@@ -1,0 +1,174 @@
+• Running devenv:files:cleanup
+✓ Running devenv:files:cleanup in 16.8ms
+• Running devenv:enterShell
+✓ Running devenv:enterShell in 22.1ms
+• Running devenv:enterTest
+✓ Running devenv:enterTest in 583ns (no command)
+   Compiling quest-synthesis v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-synthesis)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.97s
+     Running unittests src/lib.rs (target/debug/build/quest-math/2e5eb1c38deb3991/out/quest_math-2e5eb1c38deb3991)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/approximation.rs (target/debug/build/quest-math/4fcbe2c263e84bdb/out/approximation-4fcbe2c263e84bdb)
+
+running 11 tests
+test affine_pi_rejects_bad_denominators_and_input_budget ... ok
+test exact_dyadic_decoding_preserves_subnormals_and_rejects_nonfinite_payloads ... ok
+test tiny_dyadic_angles_have_proved_pass_fail_tolerance_boundaries ... ok
+test golden_frobenius_bound_for_t_minus_identity_is_two_minus_sqrt_two ... ok
+test affine_pi_certifies_both_exact_terms_and_retains_target ... ok
+test rotation_two_pi_phase_is_not_reduced_away ... ok
+test affine_pi_reduction_keeps_full_four_pi_phase ... ok
+test basis_conjugation_orientations_are_certified_independently ... ok
+test mathematical_rotation_certificates_keep_phase_and_input_identity ... ok
+test large_nondyadic_affine_radians_require_refinement_and_respect_budget ... ok
+test huge_finite_dyadic_angles_use_certified_range_reduction ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/controlled.rs (target/debug/build/quest-math/9d4d46dbfa21467f/out/controlled-9d4d46dbfa21467f)
+
+running 5 tests
+test controlled_lift_rechecks_affine_target_identity_budget ... ok
+test affine_two_pi_scalar_phase_survives_negative_control_lift ... ok
+test existing_base_scalar_control_is_remapped_to_the_new_target ... ok
+test controlled_lift_rejects_incomplete_overlapping_and_over_budget_interfaces ... ok
+test exact_controlled_rotation_matches_signed_nonsorted_full_matrix ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/exact.rs (target/debug/build/quest-math/ace56a930f9ce74a/out/exact-ace56a930f9ce74a)
+
+running 6 tests
+test sequence_and_matrix_allocations_share_one_budget ... ok
+test bounds_and_duplicate_operands_are_checked_before_matrix_work ... ok
+test hadamard_then_t_has_independent_exact_coefficients ... ok
+test signed_controls_and_nonsorted_targets_match_independent_basis_maps ... ok
+test exact_matrices_preserve_product_order_and_scalar_phase ... ok
+test all_primitive_inverses_and_controlled_scalar_phases_are_exact ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/mitm_enclosure.rs (target/debug/build/quest-math/ef397eab36a9f5fa/out/mitm_enclosure-ef397eab36a9f5fa)
+
+running 3 tests
+test box_gap_is_closed_at_the_boundary ... ok
+test exact_identity_and_zero_rotation_boxes_overlap ... ok
+test angle_input_kinds_share_certified_enclosure_path ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/mitm_matrix.rs (target/debug/build/quest-math/4199a1b7d6dbe644/out/mitm_matrix-4199a1b7d6dbe644)
+
+running 2 tests
+test checked_small_matrix_product_matches_chronological_reconstruction ... ok
+test exact_matrix_key_preserves_global_phase ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/oracle.rs (target/debug/build/quest-math/f09274aa16470676/out/oracle-f09274aa16470676)
+
+running 2 tests
+test pinned_nonclifford_pi_over_seven_sequence_is_certified_at_one_e_minus_twelve ... ok
+test independent_decimal_full_matrix_oracles_bracket_every_axis_and_angle_kind ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/ring.rs (target/debug/build/quest-math/219904dbdca1daa2/out/ring-219904dbdca1daa2)
+
+running 2 tests
+test eighth_roots_and_sqrt_two_retain_exact_phase ... ok
+test conjugation_and_admission_respect_exact_resource_bounds ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/synthesis_proof.rs (target/debug/build/quest-math/cc1c8455ecc9e86f/out/synthesis_proof-cc1c8455ecc9e86f)
+
+running 4 tests
+test combined_synthesis_storage_is_admitted_before_proof_and_output_allocation ... ok
+test empty_identity_proof_still_charges_dense_replay_work ... ok
+test clean_contract_does_not_require_an_identity_action_on_occupied_ancilla ... ok
+test independent_trace_checker_rejects_word_and_trace_corruption ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/synthesis_ring.rs (target/debug/build/quest-math/b570d5a338d45951/out/synthesis_ring-b570d5a338d45951)
+
+running 3 tests
+test denominator_exponents_are_distinct_and_residues_are_exact ... ok
+test eighth_root_phase_admission_and_extraction_are_typed ... ok
+test residue_norm_classes_and_reducibility_match_the_ring ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/build/quest-synthesis/2d93ceac50d8c84c/out/quest_synthesis-2d93ceac50d8c84c)
+
+running 6 tests
+test budget_tests::byte_reservation_restores_limits_on_success_and_failure ... ok
+test grid::tests::orthogonal_rational_storage_obeys_coefficient_bounds ... ok
+test norm_equation::tests::unresolved_is_not_impossible_and_work_is_bounded ... ok
+test norm_equation::tests::prime_norms_and_unit_associates ... ok
+test grid::tests::reduced_lattice_finds_exact_diagonal_at_twelve_digits ... ok
+test grid::tests::intersection_pruning_preserves_every_feasible_small_grid_point ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 18.81s
+
+     Running tests/approximation.rs (target/debug/build/quest-synthesis/c4761d1563e857d8/out/approximation-c4761d1563e857d8)
+
+running 5 tests
+test pi_over_four_is_not_exactly_t_and_work_is_request_owned ... ok
+test affine_and_dyadic_candidates_are_independently_certified ... ok
+test quarter_pi_full_phase_candidate_at_twelve_digits ... ok
+test twelve_digit_basis_changes_and_signed_control_lift_preserve_the_certificate ... ok
+test twelve_digit_rational_pi_and_affine_rotations_are_certified ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 22.80s
+
+     Running tests/exact.rs (target/debug/build/quest-synthesis/4436ba33d43349b9/out/exact-4436ba33d43349b9)
+
+running 6 tests
+test bad_unitaries_and_work_exhaustion_are_distinct ... ok
+test exact_one_qubit_matrix_synthesis_retains_all_scalar_phases ... ok
+test matsumoto_amano_is_canonical_across_cancelling_words ... ok
+test nonadjacent_basis_rows_preserve_gray_path_phases ... ok
+test controlled_h_and_phase_lower_to_elementary_gates_with_one_clean_wire ... ok
+test no_ancilla_obeys_determinant_conditions_and_synthesizes_admitted_gates ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 18.28s
+
+     Running tests/newsynth.rs (target/debug/build/quest-synthesis/e897f8a0db290de9/out/newsynth-e897f8a0db290de9)
+
+running 2 tests
+test pinned_newsynth_outputs_pass_independent_full_phase_certification ... ok
+test oracle_exact_matrices_resynthesize_and_normalize_with_all_phase_retained ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.33s
+
+     Running tests/resources.rs (target/debug/build/quest-synthesis/8b2970aec9bf13a9/out/resources-8b2970aec9bf13a9)
+
+running 5 tests
+test cancellation_precision_and_resource_exhaustion_are_distinct ... ok
+test exact_work_limits_are_never_reported_as_rejected_evidence ... ok
+test normalization_accounts_for_retained_clifford_search_storage ... ok
+test concurrent_requests_keep_rng_and_precision_owned_by_the_request ... ok
+test live_grid_storage_is_unavailable_to_candidate_callbacks ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.85s
+
+   Doc-tests quest_math
+
+running 1 test
+test crates/quest-math/src/../README.md - (line 8) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.40s
+
+all doctests ran in 0.46s; merged doctests compilation took 0.06s
+   Doc-tests quest_synthesis
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

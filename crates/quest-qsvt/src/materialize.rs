@@ -1,6 +1,6 @@
 use crate::{Complex64, Error, NumericalPolicy, OracleFragment, Result, matrix};
 use faer::{Mat, MatRef};
-use quest_circuit::{BoundProgram, Control, ControlState, Operation, ProgramBuilder, QubitId};
+use quest_circuit::{BoundRegion, Control, ControlState, Operation, QuantumRegionBuilder, QubitId};
 use std::ops::{Add, Mul};
 
 /// Independently materialize a coherent circuit using column-state matrix products.
@@ -9,7 +9,7 @@ use std::ops::{Add, Mul};
 /// # Errors
 /// Rejects noncoherent operations, size overflow, and allocation limits.
 pub fn materialize_program(
-    program: &BoundProgram,
+    program: &BoundRegion,
     policy: NumericalPolicy,
 ) -> Result<Mat<Complex64>> {
     let mut output = identity(program.num_qubits(), policy)?;
@@ -27,7 +27,7 @@ pub fn materialize_oracle(
     oracle: &OracleFragment,
     policy: NumericalPolicy,
 ) -> Result<Mat<Complex64>> {
-    let mut builder = ProgramBuilder::new(oracle.num_qubits(), 0)?;
+    let mut builder = QuantumRegionBuilder::new(oracle.num_qubits(), 0)?;
     let targets = (0..oracle.num_qubits())
         .map(|index| builder.qubit(index))
         .collect::<quest_circuit::Result<Vec<_>>>()?;

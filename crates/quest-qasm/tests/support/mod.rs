@@ -164,7 +164,10 @@ fn statements(body: &mut [Statement]) {
                 expression(condition);
                 statements(body);
             }
-            StatementKind::Barrier(values) => expressions(values),
+            StatementKind::Barrier(values)
+            | StatementKind::Payload {
+                operands: values, ..
+            } => expressions(values),
         }
     }
 }

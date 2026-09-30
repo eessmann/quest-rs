@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "platform": "aarch64-darwin",
+  "date": "2026-09-29",
+  "source_snapshot_sha256": "2e3edc17206ef3b02de6aa511dbdfe4b75b3ee00a97a9d340d7da113fc7db326",
+  "source_snapshot_definition": "SHA256 of sorted path + NUL + file SHA256 + LF for rg --files crates plus Cargo.toml/Cargo.lock, captured after final commands and before durable receipt write; excludes documentation and generated build outputs. Final formatting may change this byte identity without changing behavior.",
+  "results": [
+    {
+      "command": "devenv shell -- cargo test --workspace --locked",
+      "exit_code": 0,
+      "scope": "pre-final-audit historical pass",
+      "log": "historical-workspace-tests.log.gz",
+      "sha256_gzip": "231fcbaf6692ad2d071b1ab823974fa2855c8ee71c6d89b50c3f3b831b430ff2",
+      "sha256_uncompressed": "687acd4fe548f19302a0bc6d9fefcad67deb657276bc234443babcfd2a62ed64",
+      "counts": {
+        "doctests": {
+          "passed": 49,
+          "failed": 0,
+          "ignored": 1,
+          "suites": 23
+        },
+        "exit": 0,
+        "reported_result_totals_including_child_processes": {
+          "passed": 814,
+          "failed": 0,
+          "ignored": 1,
+          "suites": 184
+        },
+        "tests": {
+          "passed": 776,
+          "failed": 0,
+          "ignored": 1,
+          "binaries": 146
+        },
+        "counting_note": "Use the last test result before the next top-level Running line; native subprocess summaries otherwise double-count child executions."
+      }
+    },
+    {
+      "command": "devenv shell -- cargo build --workspace --locked",
+      "exit_code": 0,
+      "scope": "latest stable tree",
+      "log": "final-build.log.gz",
+      "sha256_gzip": "6415c06c0dcfa50e0a885675f16427f4490ee98b8912cdacad86f2285323443b",
+      "sha256_uncompressed": "5400c1c81791ff15e94fbd54d74d95afc2d9298a3c749182de8df9a4af0beee2"
+    },
+    {
+      "command": "devenv shell -- cargo clippy --workspace --all-targets --locked -- -D warnings",
+      "exit_code": 0,
+      "scope": "latest stable tree",
+      "log": "final-workspace-clippy.log.gz",
+      "sha256_gzip": "3f738a31fedce4bf4fc19bc831bab50e2afb4ac011af25592cb74427658f7082",
+      "sha256_uncompressed": "aaf5cac469df084cbb791157d40f23a56c23c992a7e832ab1b739808392149c6"
+    },
+    {
+      "command": "devenv shell -- cargo clippy -p quest-qsp --all-features --all-targets --locked -- -D warnings",
+      "exit_code": 0,
+      "scope": "latest stable tree",
+      "log": "final-qsp-clippy.log.gz",
+      "sha256_gzip": "15c8407dfa019ad18544c93404b86cdd440697dea3bdc938430fdf427766a7a4",
+      "sha256_uncompressed": "cfed873be7e84b59bf72bf564f3c448523816fc9e8771677626e3ac8865848ef"
+    },
+    {
+      "command": "devenv shell -- cargo test --workspace --doc --locked",
+      "exit_code": 0,
+      "scope": "latest stable tree",
+      "log": "final-doctests.log.gz",
+      "sha256_gzip": "d83407db8cfe518e656ea7a90ab16bad8e83037e163fb7e6e4316d79d54adf8a",
+      "sha256_uncompressed": "a25c47de1dc7a433bd4d49c836a924ea560e0e17fa2a377bfd2a4bab91edc893",
+      "counts": {
+        "passed": 49,
+        "failed": 0,
+        "ignored": 1,
+        "result_groups": 23
+      }
+    },
+    {
+      "command": "devenv shell -- cargo nextest run --workspace --locked",
+      "exit_code": 0,
+      "scope": "primary latest-tree broad test run",
+      "log": "final-nextest.log.gz",
+      "sha256_gzip": "d975868abafcf1e5797e848fc1e61e661afd0b783b3c8aac502e8e382c7a8a28",
+      "sha256_uncompressed": "91f885e7fa6cff000488fbf020a44f3cca9b557156c8028bd9e2ce36d4300264",
+      "summary": "Summary [  51.756s] 787 tests run: 787 passed, 1 skipped"
+    }
+  ],
+  "limitations": [
+    "Default workspace features for broad build/test runs; explicit all-feature QSP lint recorded separately.",
+    "Historical cargo-test pass predates final typed-array, payload-admission and synthesis-resource audits. Latest nextest and doctests are the final behavioral evidence.",
+    "Performance and MPI evidence are recorded separately by their owners."
+  ]
+}

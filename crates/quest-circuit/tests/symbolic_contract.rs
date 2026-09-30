@@ -1,12 +1,14 @@
 use googletest::{Result, prelude::*};
 use num_bigint::BigInt;
+#[allow(unused_imports)]
+use quest_circuit::prelude::*;
 use quest_circuit::{
-    Angle, BigRational, BoundAngleTarget, Error, Gate, ParityOptions, ProgramBuilder,
+    Angle, BigRational, BoundAngleTarget, Error, Gate, ParityOptions, QuantumRegionBuilder,
 };
 
 #[gtest]
 fn bound_affine_angle_retains_exact_target_after_parameter_substitution() -> Result<()> {
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     let parameter = builder.parameter("theta")?;
     let angle = Angle::parameter(parameter)?.added(&Angle::pi(1, 3)?)?;
     builder.gate(Gate::Rz(angle), &[builder.qubit(0)?], &[])?;
@@ -26,7 +28,7 @@ fn bound_affine_angle_retains_exact_target_after_parameter_substitution() -> Res
 
 #[gtest]
 fn ideal_binding_work_forecast_is_stable_after_shared_angle_conversion() -> Result<()> {
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     builder.gate(Gate::Rz(Angle::pi(1, 7)?), &[builder.qubit(0)?], &[])?;
     let ideal = builder.finish()?;
     let cold = ideal.binding_work_estimate()?;
@@ -38,7 +40,7 @@ fn ideal_binding_work_forecast_is_stable_after_shared_angle_conversion() -> Resu
 
 #[gtest]
 fn binding_with_unrelated_declared_parameter_preserves_angle_target() -> Result<()> {
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     let used = builder.parameter("used")?;
     let unused = builder.parameter("unused")?;
     builder.gate(Gate::Rz(Angle::parameter(used)?), &[builder.qubit(0)?], &[])?;
@@ -54,7 +56,7 @@ fn binding_with_unrelated_declared_parameter_preserves_angle_target() -> Result<
 
 #[gtest]
 fn finite_exact_zero_merge_can_be_removed() -> Result<()> {
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     let positive = Angle::pi(1, 3)?;
     let negative = Angle::pi(-1, 3)?;
     builder.gate(Gate::Rz(positive), &[builder.qubit(0)?], &[])?;
@@ -66,7 +68,7 @@ fn finite_exact_zero_merge_can_be_removed() -> Result<()> {
 
 #[gtest]
 fn inverse_parameter_leaf_pair_is_removed_with_retained_bindings() -> Result<()> {
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     let parameter = builder.parameter("theta")?;
     let angle = Angle::parameter(parameter)?;
     builder.gate(Gate::Rx(angle.clone()), &[builder.qubit(0)?], &[])?;
@@ -80,10 +82,10 @@ fn inverse_parameter_leaf_pair_is_removed_with_retained_bindings() -> Result<()>
 
 #[gtest]
 fn cancelled_foreign_parameter_is_still_rejected() -> Result<()> {
-    let mut foreign = ProgramBuilder::new(1, 0)?;
+    let mut foreign = QuantumRegionBuilder::new(1, 0)?;
     let p = foreign.parameter("foreign")?;
     let angle = Angle::parameter(p)?.added(&Angle::parameter(p)?.negated()?)?;
-    let mut local = ProgramBuilder::new(1, 0)?;
+    let mut local = QuantumRegionBuilder::new(1, 0)?;
     expect_true!(
         local
             .gate(Gate::Rz(angle), &[local.qubit(0)?], &[])
@@ -94,7 +96,7 @@ fn cancelled_foreign_parameter_is_still_rejected() -> Result<()> {
 
 #[gtest]
 fn bound_parameter_leaf_preserves_negative_zero_bits() -> Result<()> {
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     let p = builder.parameter("p")?;
     builder.gate(Gate::Rx(Angle::parameter(p)?), &[builder.qubit(0)?], &[])?;
     let program = builder.finish()?.bind(&[(p, -0.0)])?;
@@ -113,7 +115,7 @@ fn affine_constant_binds_without_rounding_terms_separately() -> Result<()> {
         BigRational::new(BigInt::from(1), BigInt::from(3)),
         BigRational::new(BigInt::from(-1), BigInt::from(10)),
     )?;
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     builder.gate(Gate::Rz(angle), &[builder.qubit(0)?], &[])?;
     let program = builder.finish()?.bind(&[])?;
     expect_eq!(
@@ -133,7 +135,7 @@ fn cancelled_pi_leaves_keep_original_finite_conversion_obligations() -> Result<(
     let huge = BigInt::from(10).pow(400);
     let positive = Angle::rational_pi(BigRational::from_integer(huge.clone()))?;
     let negative = Angle::rational_pi(BigRational::from_integer(std::ops::Neg::neg(huge)))?;
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     builder.gate(
         Gate::Rz(positive.added(&negative)?),
         &[builder.qubit(0)?],
@@ -149,7 +151,7 @@ fn cancelled_pi_leaves_keep_original_finite_conversion_obligations() -> Result<(
 #[gtest]
 fn parity_rewrite_preserves_unbindable_pi_leaf() -> Result<()> {
     let huge = BigInt::from(10).pow(400);
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     builder.gate(
         Gate::Rz(Angle::rational_pi(BigRational::from_integer(huge))?),
         &[builder.qubit(0)?],
@@ -167,7 +169,7 @@ fn parity_rewrite_preserves_unbindable_pi_leaf() -> Result<()> {
 fn direct_affine_leaf_and_derived_scaling_keep_original_conversion_obligations() -> Result<()> {
     let huge = BigRational::from_integer(BigInt::from(10).pow(400));
     let bad = Angle::affine(huge, BigRational::from_integer(0.into()))?;
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     builder.gate(
         Gate::Rz(bad.added(&bad.negated()?)?),
         &[builder.qubit(0)?],
@@ -176,7 +178,7 @@ fn direct_affine_leaf_and_derived_scaling_keep_original_conversion_obligations()
     expect_true!(matches!(builder.finish()?.bind(&[]), Err(Error::NonFinite)));
 
     let scaled = Angle::pi(1, 1)?.scaled_ratio(BigInt::from(10).pow(400), 1.into())?;
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     builder.gate(
         Gate::Rz(scaled.added(&scaled.negated()?)?),
         &[builder.qubit(0)?],
@@ -188,7 +190,7 @@ fn direct_affine_leaf_and_derived_scaling_keep_original_conversion_obligations()
 
 #[gtest]
 fn definition_parameter_substitution_preserves_opaque_signed_zero() -> Result<()> {
-    let mut body = ProgramBuilder::new(1, 0)?;
+    let mut body = QuantumRegionBuilder::new(1, 0)?;
     let p = body.parameter("formal")?;
     body.gate(
         Gate::Rx(Angle::parameter(p)?.negated()?),
@@ -196,7 +198,7 @@ fn definition_parameter_substitution_preserves_opaque_signed_zero() -> Result<()
         &[],
     )?;
     let body = body.finish()?.into_unitary()?;
-    let mut caller = ProgramBuilder::new(1, 0)?;
+    let mut caller = QuantumRegionBuilder::new(1, 0)?;
     let definition = caller.define("negative", body)?;
     caller.call(
         definition,
@@ -216,11 +218,11 @@ fn definition_parameter_substitution_preserves_opaque_signed_zero() -> Result<()
 
 #[gtest]
 fn compound_exact_definition_rejects_opaque_argument() -> Result<()> {
-    let mut body = ProgramBuilder::new(1, 0)?;
+    let mut body = QuantumRegionBuilder::new(1, 0)?;
     let p = body.parameter("formal")?;
     let angle = Angle::parameter(p)?.added(&Angle::pi(1, 3)?)?;
     body.gate(Gate::Rx(angle), &[body.qubit(0)?], &[])?;
-    let mut caller = ProgramBuilder::new(1, 0)?;
+    let mut caller = QuantumRegionBuilder::new(1, 0)?;
     let definition = caller.define("compound", body.finish()?.into_unitary()?)?;
     expect_true!(matches!(
         caller.call(

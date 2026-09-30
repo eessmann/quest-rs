@@ -11,7 +11,7 @@ fn interval_exact_dyadics_preserve_cancellation_and_complex_products() -> Result
     Ok(())
 }
 
-fn analytic(degree: usize) -> CertificationResult<FrozenCandidate<Generalized>> {
+fn analytic(degree: usize) -> CertificationResult<FrozenCandidate<UnitCircleResponse>> {
     let count = degree
         .checked_add(1)
         .ok_or(CertificationError::Budget("fixture"))?;
@@ -43,6 +43,8 @@ fn analytic(degree: usize) -> CertificationResult<FrozenCandidate<Generalized>> 
         .ok_or(CertificationError::Export("fixture"))? =
         [[zero, crate::Complex64::new(-1.0, 0.0)], [one, zero]];
     let admitted = crate::AdmittedTarget {
+        source_offset: 0,
+        source_length: target.len(),
         source: Arc::new(target.clone()),
         target: Arc::new(target),
         norm_upper: 0.8,
@@ -50,12 +52,13 @@ fn analytic(degree: usize) -> CertificationResult<FrozenCandidate<Generalized>> 
         _mode: std::marker::PhantomData,
     };
     Ok(FrozenCandidate {
+        synthesis_precision: crate::SynthesisPrecision::Binary64,
         admitted,
         controls: Arc::new(controls),
         a_star: Arc::new(astar),
         phases: Arc::new(Vec::new()),
         completion_residual: f64::NAN,
-        reconstruction_residual: f64::NAN,
+        reconstruction_residual: Some(f64::NAN),
         completion_grid: 0,
     })
 }
@@ -182,12 +185,15 @@ fn degree_8192_analytic_product_is_certified_by_interval_fft() -> Result<()> {
     Ok(())
 }
 
-fn tiny_phase() -> FrozenCandidate<Canonical> {
+fn tiny_phase() -> FrozenCandidate<RealParityWx> {
     let tiny = 2.0_f64.powi(-100);
     let value = crate::Complex64::new(tiny, 0.0);
     let zero = crate::Complex64::new(0.0, 0.0);
     FrozenCandidate {
+        synthesis_precision: crate::SynthesisPrecision::Binary64,
         admitted: crate::AdmittedTarget {
+            source_offset: 0,
+            source_length: 1,
             target: Arc::new(vec![value]),
             source: Arc::new(vec![value]),
             norm_upper: tiny,
@@ -199,7 +205,7 @@ fn tiny_phase() -> FrozenCandidate<Canonical> {
         phases: Arc::new(vec![tiny]),
         a_star: Arc::new(vec![crate::Complex64::new(1.0, 0.0)]),
         completion_residual: f64::NAN,
-        reconstruction_residual: f64::NAN,
+        reconstruction_residual: Some(f64::NAN),
         completion_grid: 0,
     }
 }
@@ -275,7 +281,7 @@ fn source_precision_memory_and_work_budgets_fail_explicitly() -> Result<()> {
 }
 
 #[gtest]
-fn canonical_conversion_is_checked_against_original_source_independently() -> Result<()> {
+fn wx_conversion_is_checked_against_original_source_independently() -> Result<()> {
     let mut candidate = tiny_phase();
     candidate.admitted.target = Arc::new(vec![crate::Complex64::new(0.1, 0.0)]);
     let policy = CertificationPolicy {
@@ -358,7 +364,7 @@ fn exact_admission_and_outward_summary_keep_the_smallest_subnormal() -> Result<(
 }
 
 #[gtest]
-fn canonical_large_phase_uses_the_exact_export_without_period_reduction() -> Result<()> {
+fn wx_large_phase_uses_the_exact_export_without_period_reduction() -> Result<()> {
     let phase = 1e20_f64;
     // Fixed independent binary64 reference; do not obtain it from the verifier.
     let response = -0.645_251_285_265_780_8;

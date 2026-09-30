@@ -24,3 +24,20 @@ pub mod ssa;
 
 /// Bounded interpreter for independently verified SSA.
 pub mod vm;
+
+/// Exact mathematical angle semantics shared by every frontend.
+pub mod angle;
+/// Project-wide exact rational storage and checked conversion.
+pub mod rational;
+pub use angle::{Angle, BoundAngleTarget, ParameterId};
+
+/// Immutable matrix storage and numerical admission.
+pub mod matrix;
+pub use matrix::{MatrixPolicy, NumericalOperator};
+
+/// Immutable quantum effect payloads retained in checked programs.
+pub mod payload;
+pub use payload::QuantumPayload;
+
+/// Shared finite-region semantics and checked capability data.
+pub mod quantum;

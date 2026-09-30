@@ -28,13 +28,14 @@ impl SharedExpression {
         let retained = Self::retained_node_bytes()
             .checked_add(value.heap()?)
             .ok_or_else(|| SemanticError::budget("builder retained storage overflow"))?;
-        Self::check(1, Self::working_bytes(bytes, retained)?, 1, limits)?;
+        let (nodes, depth) = syntax_shape(&value)?;
+        Self::check(nodes, Self::working_bytes(bytes, retained)?, depth, limits)?;
         Ok(Self {
             node: Arc::new(Node::Leaf(value)),
-            nodes: 1,
+            nodes,
             bytes,
             retained,
-            depth: 1,
+            depth,
         })
     }
     // Two reference counts and one conservative alignment allowance cover Arc's
@@ -150,6 +151,49 @@ impl SharedExpression {
         }
         Ok(())
     }
+    // Admit the simultaneous retained DAGs and expanded syntax before any clone.
+    // Repeated DAG identities are conservatively charged repeatedly: each occurrence
+    // becomes a separate owned AST, regardless of cheap Arc sharing at construction.
+    pub fn admit_expansion<'a>(
+        values: impl IntoIterator<Item = &'a Self>,
+        wrappers: usize,
+        nesting: usize,
+        base: Option<&Expression>,
+        limits: CompileLimits,
+    ) -> Result<(), SemanticError> {
+        let mut nodes = wrappers;
+        let mut bytes = wrappers
+            .checked_mul(size_of::<Expression>())
+            .ok_or_else(|| SemanticError::budget("aggregate expression storage overflow"))?;
+        let mut depth = nesting;
+        if let Some(base) = base {
+            let (base_nodes, base_depth) = syntax_shape(base)?;
+            nodes = nodes
+                .checked_add(base_nodes)
+                .ok_or_else(|| SemanticError::budget("aggregate expression nodes"))?;
+            bytes = bytes
+                .checked_add(
+                    size_of::<Expression>()
+                        .checked_add(base.heap()?)
+                        .and_then(|n| n.checked_mul(2))
+                        .ok_or_else(|| SemanticError::budget("aggregate expression storage"))?,
+                )
+                .ok_or_else(|| SemanticError::budget("aggregate expression storage"))?;
+            depth = depth.max(base_depth.saturating_add(nesting));
+        }
+        Self::check(nodes, bytes, depth, limits)?;
+        for value in values {
+            nodes = nodes
+                .checked_add(value.nodes)
+                .ok_or_else(|| SemanticError::budget("aggregate expression nodes"))?;
+            bytes = bytes
+                .checked_add(Self::working_bytes(value.bytes, value.retained)?)
+                .ok_or_else(|| SemanticError::budget("aggregate expression storage"))?;
+            depth = depth.max(value.depth.saturating_add(nesting));
+            Self::check(nodes, bytes, depth, limits)?;
+        }
+        Ok(())
+    }
     pub fn materialize(&self, limits: CompileLimits) -> Result<Expression, SemanticError> {
         Self::check(
             self.nodes,
@@ -170,6 +214,72 @@ impl SharedExpression {
             Node::Cast(ty, value) => expression(E::Cast(ty.clone(), Box::new(value.expand()))),
         }
     }
+}
+
+// Borrowed traversal: no AST clone or heap work list is needed. Builder syntax is
+// depth-bounded at each construction boundary before it can become a shared leaf.
+fn syntax_shape(value: &Expression) -> Result<(usize, usize), SemanticError> {
+    fn merge(total: &mut (usize, usize), child: (usize, usize)) -> Result<(), SemanticError> {
+        total.0 = total
+            .0
+            .checked_add(child.0)
+            .ok_or_else(|| SemanticError::budget("expression node overflow"))?;
+        total.1 = total.1.max(child.1.saturating_add(1));
+        Ok(())
+    }
+    let mut total = (1, 1);
+    match &value.kind {
+        E::Unary(_, v) | E::Measure(v) => merge(&mut total, syntax_shape(v)?)?,
+        E::Binary(_, l, r) | E::Index(l, r) => {
+            merge(&mut total, syntax_shape(l)?)?;
+            merge(&mut total, syntax_shape(r)?)?;
+        }
+        E::Array(values) | E::Call(_, values) => {
+            for v in values {
+                merge(&mut total, syntax_shape(v)?)?;
+            }
+        }
+        E::Cast(ty, v) => {
+            merge(&mut total, syntax_shape(v)?)?;
+            merge(&mut total, type_shape(ty)?)?;
+        }
+        E::Bool(_) | E::Number(_) | E::BitString(_) | E::Name(_) | E::Capture(_) => {}
+    }
+    Ok(total)
+}
+fn type_shape(ty: &syntax::Type) -> Result<(usize, usize), SemanticError> {
+    let mut nodes = 1usize;
+    let mut depth = 1usize;
+    let mut add = |value: &Expression| -> Result<(), SemanticError> {
+        let (n, d) = syntax_shape(value)?;
+        nodes = nodes
+            .checked_add(n)
+            .ok_or_else(|| SemanticError::budget("expression type nodes"))?;
+        depth = depth.max(d.saturating_add(1));
+        Ok(())
+    };
+    match ty {
+        syntax::Type::Scalar(_, width) | syntax::Type::Qubit(width) => {
+            if let Some(w) = width {
+                add(w)?;
+            }
+        }
+        syntax::Type::Array {
+            element,
+            dimensions,
+            ..
+        } => {
+            for d in dimensions {
+                add(d)?;
+            }
+            let (n, d) = type_shape(element)?;
+            nodes = nodes
+                .checked_add(n)
+                .ok_or_else(|| SemanticError::budget("expression type nodes"))?;
+            depth = depth.max(d.saturating_add(1));
+        }
+    }
+    Ok((nodes, depth))
 }
 
 #[cfg(test)]

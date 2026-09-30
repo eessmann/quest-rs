@@ -1,5 +1,6 @@
 //! Bounded execution of independently verified SSA.
 
+mod prepared;
 use crate::{
     GateKind, SourceSpan,
     classical::{FloatWidth, ScalarType, ScalarValue, ValueError},
@@ -8,6 +9,7 @@ use crate::{
         RegionId, SlotId, Terminator, Type, ValueId, VerifiedProgram,
     },
 };
+pub use prepared::{DispatchId, PreparedDispatch, prepare_dispatch};
 use std::{
     cell::RefCell,
     collections::{BTreeMap, BTreeSet, btree_map::Entry},
@@ -46,6 +48,24 @@ pub struct OracleRequest<'a> {
 pub trait QuantumBackend {
     type Error: StdError + Send + Sync + 'static;
 
+    /// Dispatch a prevalidated static gate; native backends can reuse lowered resources by id.
+    /// # Errors
+    /// Returns the backend error without rolling back previously completed effects.
+    fn apply_prepared_gate(
+        &mut self,
+        _id: DispatchId,
+        request: GateRequest<'_>,
+    ) -> Result<(), Self::Error> {
+        self.apply_gate(request)
+    }
+    /// Apply an irreversible immutable channel payload on ordered target wires.
+    fn apply_payload(
+        &mut self,
+        _capture: usize,
+        _targets: &[usize],
+    ) -> Option<Result<(), Self::Error>> {
+        None
+    }
     /// # Errors
     /// Returns a backend-specific error without rolling back prior requests.
     /// Return `None` when oracle execution is unsupported. The interpreter then
@@ -69,11 +89,18 @@ pub trait QuantumBackend {
 
 /// Owned classical input or output, including nested fixed arrays.
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum ClassicalValue {
     Scalar(ScalarValue),
     Array(Vec<Self>),
 }
 impl ClassicalValue {
+    /// Check the complete scalar type or nested fixed array shape without allocation.
+    #[must_use]
+    pub fn matches_type(&self, ty: &ssa::Type) -> bool {
+        classical_matches(self, ty)
+    }
+
     #[must_use]
     pub const fn as_scalar(&self) -> Option<&ScalarValue> {
         if let Self::Scalar(value) = self {
@@ -98,6 +125,12 @@ pub struct RunInputs {
     values: BTreeMap<String, ClassicalValue>,
 }
 impl RunInputs {
+    /// Borrow all named inputs in deterministic name order.
+    pub fn iter(&self) -> impl Iterator<Item = (&str, &ClassicalValue)> {
+        self.values
+            .iter()
+            .map(|(name, value)| (name.as_str(), value))
+    }
     /// Add one input without replacing an existing value.
     ///
     /// # Errors
@@ -315,6 +348,30 @@ impl Interpreter {
         Self { limits }
     }
 
+    /// Execute with a checked reusable static-dispatch publication.
+    /// # Errors
+    /// Rejects a mismatched snapshot/capture set and all ordinary runtime failures.
+    pub fn run_prepared<B: QuantumBackend>(
+        self,
+        program: &VerifiedProgram,
+        prepared: &PreparedDispatch,
+        backend: &mut B,
+        inputs: &RunInputs,
+        captures: &[ScalarValue],
+    ) -> Result<RunOutput, RuntimeError<B::Error>> {
+        if prepared.snapshot != program.snapshot() || !prepared.captures_match(captures) {
+            return Err((*Fault::bare(RuntimeCause::InvalidVerifiedProgram(
+                "prepared dispatch publication mismatch",
+            )))
+            .finish());
+        }
+        Engine::new(program, backend, inputs, captures, self.limits)
+            .and_then(|mut engine| {
+                engine.prepared = Some(prepared);
+                engine.run()
+            })
+            .map_err(|fault| (*fault).finish())
+    }
     /// Execute one independently verified program.
     ///
     /// # Errors
@@ -368,12 +425,12 @@ struct Frame {
     values: Vec<Option<RuntimeValue>>,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 enum QuantumKind {
     Builtin(GateKind),
     Oracle(usize),
 }
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 struct OwnedGate {
     kind: QuantumKind,
     parameters: Vec<f64>,
@@ -427,6 +484,7 @@ impl<E> Fault<E> {
 type VmResult<T, E> = Result<T, Box<Fault<E>>>;
 
 struct Engine<'a, B: QuantumBackend> {
+    prepared: Option<&'a PreparedDispatch>,
     program: &'a ssa::Program,
     backend: &'a mut B,
     inputs: &'a RunInputs,
@@ -506,6 +564,7 @@ impl<'a, B: QuantumBackend> Engine<'a, B> {
             }
         }
         Ok(Self {
+            prepared: None,
             program,
             backend,
             inputs,
@@ -934,7 +993,17 @@ impl<'a, B: QuantumBackend> Engine<'a, B> {
                 modifiers,
                 ..
             } => {
-                self.execute_gate(frame, *gate, arguments, operands, modifiers, sink)?;
+                if let Some((occurrence, requests)) =
+                    instruction.results.first().and_then(|result| {
+                        self.prepared
+                            .and_then(|p| p.requests.get(&result.id))
+                            .map(|requests| (result.id, requests.clone()))
+                    })
+                {
+                    self.replay_prepared(occurrence, &requests, sink)?;
+                } else {
+                    self.execute_gate(frame, *gate, arguments, operands, modifiers, sink)?;
+                }
                 vec![RuntimeValue::Memory]
             }
             K::Measure { place, .. } => {
@@ -964,6 +1033,35 @@ impl<'a, B: QuantumBackend> Engine<'a, B> {
                     )),
                     RuntimeValue::Memory,
                 ]
+            }
+            K::Payload {
+                capture, places, ..
+            } => {
+                let mut qubits = Vec::new();
+                for place in places {
+                    qubits.extend(self.place_qubits(frame, place)?);
+                }
+                unique_qubits(&qubits).map_err(|cause| self.fault(cause))?;
+                self.charge(1)?;
+                match sink {
+                    Sink::Backend => self
+                        .backend
+                        .apply_payload(*capture, &qubits)
+                        .ok_or_else(|| {
+                            self.fault(RuntimeCause::Unsupported("quantum payload execution"))
+                        })?
+                        .map_err(|error| self.fault(RuntimeCause::Backend(error)))?,
+                    Sink::Buffer(_) => {
+                        return Err(self.fault(RuntimeCause::InvalidVerifiedProgram(
+                            "payload inside unitary gate",
+                        )));
+                    }
+                }
+                self.completed_quantum = self
+                    .completed_quantum
+                    .checked_add(1)
+                    .ok_or_else(|| self.fault(RuntimeCause::StepLimit))?;
+                vec![RuntimeValue::Memory]
             }
             K::Reset { place, .. } => {
                 for qubit in self.place_qubits(frame, place)? {
@@ -1219,6 +1317,7 @@ impl<'a, B: QuantumBackend> Engine<'a, B> {
                         inverse: false,
                     },
                     &mut Sink::Buffer(&mut buffer),
+                    None,
                 )?;
                 None
             } else {
@@ -1350,7 +1449,7 @@ impl<'a, B: QuantumBackend> Engine<'a, B> {
                     controls,
                     inverse: modifier.inverse,
                 };
-                self.dispatch(request, sink)?;
+                self.dispatch(request, sink, None)?;
             }
         }
         Ok(())
@@ -1479,13 +1578,30 @@ impl<'a, B: QuantumBackend> Engine<'a, B> {
         self.charge(dispatches)?;
         for _ in 0..repetitions {
             for request in buffer {
-                self.dispatch(request.clone(), sink)?;
+                self.dispatch(request.clone(), sink, None)?;
             }
         }
         Ok(())
     }
 
-    fn dispatch(&mut self, request: OwnedGate, sink: &mut Sink<'_>) -> VmResult<(), B::Error> {
+    fn replay_prepared(
+        &mut self,
+        occurrence: ValueId,
+        requests: &[OwnedGate],
+        sink: &mut Sink<'_>,
+    ) -> VmResult<(), B::Error> {
+        self.charge(requests.len())?;
+        for (lane, request) in requests.iter().enumerate() {
+            self.dispatch(request.clone(), sink, Some(DispatchId { occurrence, lane }))?;
+        }
+        Ok(())
+    }
+    fn dispatch(
+        &mut self,
+        request: OwnedGate,
+        sink: &mut Sink<'_>,
+        prepared: Option<DispatchId>,
+    ) -> VmResult<(), B::Error> {
         match sink {
             Sink::Backend => {
                 if let QuantumKind::Oracle(capture) = request.kind {
@@ -1499,15 +1615,19 @@ impl<'a, B: QuantumBackend> Engine<'a, B> {
                         .ok_or_else(|| self.fault(RuntimeCause::Unsupported("oracle execution")))?
                         .map_err(|error| self.fault(RuntimeCause::Backend(error)))?;
                 } else if let QuantumKind::Builtin(gate) = request.kind {
-                    self.backend
-                        .apply_gate(GateRequest {
-                            gate,
-                            parameters: &request.parameters,
-                            targets: &request.targets,
-                            controls: &request.controls,
-                            inverse: request.inverse,
-                        })
-                        .map_err(|error| self.fault(RuntimeCause::Backend(error)))?;
+                    let request = GateRequest {
+                        gate,
+                        parameters: &request.parameters,
+                        targets: &request.targets,
+                        controls: &request.controls,
+                        inverse: request.inverse,
+                    };
+                    if let Some(id) = prepared {
+                        self.backend.apply_prepared_gate(id, request)
+                    } else {
+                        self.backend.apply_gate(request)
+                    }
+                    .map_err(|error| self.fault(RuntimeCause::Backend(error)))?;
                 }
                 self.completed_quantum = self
                     .completed_quantum
@@ -1559,6 +1679,47 @@ struct ModifierValues {
     controls: Vec<bool>,
 }
 
+/// Conservative VM frame/storage reservation for explicit runtime frame limits.
+///
+/// Includes scalar/array payloads, slot cells, SSA values and returned outputs.
+/// Returns `None` for arithmetic overflow. The runtime applies this same estimate.
+#[must_use]
+pub fn runtime_storage(program: &VerifiedProgram, call_frames: usize) -> Option<usize> {
+    let values = program
+        .blocks()
+        .iter()
+        .flat_map(|block| {
+            block
+                .arguments
+                .iter()
+                .chain(block.instructions.iter().flat_map(|i| &i.results))
+        })
+        .map(|value| value.id.index())
+        .max()
+        .map_or(Some(0), |index| index.checked_add(1))?;
+    estimate_storage(program.program(), values, call_frames)
+}
+/// Conservative owned result storage, including map nodes, names and nested arrays.
+/// Returns `None` if the declared output shapes overflow storage arithmetic.
+#[must_use]
+pub fn output_storage(program: &VerifiedProgram) -> Option<usize> {
+    output_storage_inner(program.program())
+}
+fn output_storage_inner(program: &ssa::Program) -> Option<usize> {
+    // A full B-tree node per entry overcounts sparse nodes and internal edges.
+    const NODE: usize =
+        16 * (size_of::<String>() + size_of::<ClassicalValue>() + size_of::<usize>());
+    program
+        .slots
+        .iter()
+        .filter(|slot| slot.interface == Interface::Output)
+        .try_fold(size_of::<RunOutput>(), |total, slot| {
+            total
+                .checked_add(NODE)?
+                .checked_add(slot.name.len())?
+                .checked_add(type_bytes(&slot.ty)?)
+        })
+}
 fn estimate_storage(program: &ssa::Program, values: usize, frames: usize) -> Option<usize> {
     let slot_bytes = program.slots.iter().try_fold(0usize, |total, slot| {
         total.checked_add(type_bytes(&slot.ty)?)
@@ -1590,15 +1751,9 @@ fn estimate_storage(program: &ssa::Program, values: usize, frames: usize) -> Opt
         .checked_add(value_payload_bytes)?
         .checked_add(cell_bytes)?
         .checked_add(slot_bytes)?;
-    frame_bytes.checked_mul(frames)?.checked_add(
-        program
-            .slots
-            .iter()
-            .filter(|slot| slot.interface == Interface::Output)
-            .try_fold(0usize, |total, slot| {
-                total.checked_add(type_bytes(&slot.ty)?)
-            })?,
-    )
+    frame_bytes
+        .checked_mul(frames)?
+        .checked_add(output_storage_inner(program)?)
 }
 
 fn type_bytes(ty: &Type) -> Option<usize> {

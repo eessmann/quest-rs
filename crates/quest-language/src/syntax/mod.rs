@@ -132,15 +132,18 @@ impl ParseError {
 }
 /// Structured syntax remains available after admission for canonical export.
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Module {
     pub statements: Vec<Statement>,
 }
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Statement {
     pub kind: StatementKind,
     pub span: Option<SourceSpan>,
 }
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum StatementKind {
     Include(String),
     /// Rust payload identity and checked local arity; no captured data lives here.
@@ -206,6 +209,11 @@ pub enum StatementKind {
         condition: Expression,
         body: Vec<Statement>,
     },
+    /// Immutable channel bank identity; constructed by typed frontends, never inferred from QASM.
+    Payload {
+        capture: usize,
+        operands: Vec<Expression>,
+    },
     Reset(Expression),
     Barrier(Vec<Expression>),
     Expression(Expression),
@@ -215,6 +223,7 @@ pub enum StatementKind {
     End,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Qualifier {
     Local,
     Const,
@@ -222,12 +231,14 @@ pub enum Qualifier {
     Output,
 }
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Parameter {
     pub name: String,
     pub ty: Type,
     pub mutable: bool,
 }
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Type {
     Scalar(ScalarKind, Option<Box<Expression>>),
     Qubit(Option<Box<Expression>>),
@@ -238,6 +249,7 @@ pub enum Type {
     },
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum ScalarKind {
     Bool,
     Bit,
@@ -247,6 +259,7 @@ pub enum ScalarKind {
     Float,
 }
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Iterable {
     Range {
         start: Expression,
@@ -257,6 +270,7 @@ pub enum Iterable {
     Expression(Expression),
 }
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Modifier {
     Inverse,
     Adjoint,
@@ -267,11 +281,13 @@ pub enum Modifier {
     Power(Expression),
 }
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Expression {
     pub kind: ExpressionKind,
     pub span: Option<SourceSpan>,
 }
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum ExpressionKind {
     Number(String),
     BitString(String),
@@ -287,6 +303,7 @@ pub enum ExpressionKind {
     Array(Vec<Expression>),
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum UnaryOperator {
     Negate,
     Not,
@@ -294,6 +311,7 @@ pub enum UnaryOperator {
     Positive,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum BinaryOperator {
     Add,
     Subtract,

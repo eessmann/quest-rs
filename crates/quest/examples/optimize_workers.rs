@@ -1,8 +1,8 @@
 //! Run bounded optional workers with independent parent certificates.
 use quest::{
     ApproximationMode, BeamOptions, CostProfile, Environment, Gate, OptimizationLimits,
-    OptimizationOptions, OptimizationTarget, Optimizer, OptimizerInput, ProgramBuilder, QubitCount,
-    certified, optimizer,
+    OptimizationOptions, OptimizationTarget, Optimizer, OptimizerInput, QuantumRegionBuilder,
+    QubitCount, certified, optimizer,
 };
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -12,7 +12,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = optimizer::Client::new(path, optimizer::WorkerLimits::default())?;
     let environment = Environment::builder().build()?;
     let mut register = environment.state_vector(QubitCount::new(1)?)?;
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     let q = builder.qubit(0)?;
     for gate in [Gate::H, Gate::X, Gate::H] {
         builder.gate(gate, &[q], &[])?;
@@ -25,7 +25,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         OptimizationLimits::default(),
         ApproximationMode::Disabled,
     )?;
-    let outcome = Optimizer::from_ideal(builder.finish()?, &[], options)?.search_with_workers(
+    let outcome = Optimizer::from_region(builder.finish()?, &[], options)?.search_with_workers(
         BeamOptions::new(1, 1, 8, 2)?,
         &client,
         0,
@@ -45,12 +45,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             report.exact_mitm_statuses()
         );
     }
-    let OptimizerInput::Ideal { bound, .. } = outcome.into_input() else {
+    let OptimizerInput::Region { bound, .. } = outcome.into_input() else {
         return Err("unexpected optimizer input kind".into());
     };
-    let mut prepared = environment.prepare_plan(bound.plan()?)?;
+    let mut prepared = environment.prepare(
+        quest::Program::from_bound_region((bound.plan()?).into_region())?
+            .verify()?
+            .lower()?
+            .plan()?,
+    )?;
     register.init_plus()?;
-    prepared.run(&mut register)?;
+    prepared.run(&mut register, &quest::RunInputs::default())?;
     println!(
         "amplitudes: {:?}, {:?}",
         register.amplitude(0)?,

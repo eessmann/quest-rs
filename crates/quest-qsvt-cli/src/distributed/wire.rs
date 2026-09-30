@@ -6,7 +6,7 @@ use faer::{Mat, MatRef};
 use num_complex::Complex64 as C;
 use quest_qsvt_io::{IoPolicy, hdf5::StoredBlockEncoding};
 
-const MAGIC: &[u8; 8] = b"QSVTCLI1";
+const MAGIC: &[u8; 8] = b"QSVTCLI2";
 fn word(value: usize) -> Result<[u8; 8]> {
     Ok(u64::try_from(value)
         .map_err(|_| Error::Budget("wire integer"))?
@@ -55,6 +55,7 @@ pub fn encode(input: &FrozenInput) -> Result<Vec<u8>> {
         Workflow::Overlap => 1,
     })?);
     bytes.extend_from_slice(&word(route_word(input.route))?);
+    bytes.extend_from_slice(&input.verification_tolerance.to_le_bytes());
     bytes.extend_from_slice(&input.block.alpha().to_le_bytes());
     for n in input
         .block
@@ -207,6 +208,7 @@ pub fn decode(bytes: &[u8]) -> Result<FrozenInput> {
         _ => return Err(Error::Input("wire workflow")),
     };
     let route = route(reader.integer()?)?;
+    let verification_tolerance = reader.real()?;
     let alpha = reader.real()?;
     let original = [reader.integer()?, reader.integer()?];
     let padded = [reader.integer()?, reader.integer()?];
@@ -218,7 +220,11 @@ pub fn decode(bytes: &[u8]) -> Result<FrozenInput> {
         .build(IoPolicy::default())?;
     let input = reader.vector()?;
     let reference = reader.vector()?;
-    let qsp = quest_qsvt_io::read_qsp_execution_json(reader.text()?, IoPolicy::default())?;
+    let qsp = quest_qsvt_io::read_qsp_execution_json_with_tolerance(
+        reader.text()?,
+        IoPolicy::default(),
+        verification_tolerance,
+    )?;
     if matches!(qsp, quest_qsvt_io::QspInput::Polynomial(_)) {
         return Err(Error::Input("distributed payload must already be frozen"));
     }
@@ -227,6 +233,7 @@ pub fn decode(bytes: &[u8]) -> Result<FrozenInput> {
         return Err(Error::Input("trailing application wire data"));
     }
     Ok(FrozenInput {
+        verification_tolerance,
         workflow,
         route,
         block,
@@ -261,6 +268,7 @@ mod tests {
                 .build()?,
         );
         let input = FrozenInput {
+            verification_tolerance: 1e-11,
             workflow: Workflow::Overlap,
             route: TransformRoute::MultiplicationOdd,
             block,
@@ -290,6 +298,7 @@ mod tests {
             IoPolicy::default(),
         )?;
         let input = FrozenInput {
+            verification_tolerance: 1e-11,
             workflow: Workflow::Embedded,
             route: TransformRoute::Direct,
             block,

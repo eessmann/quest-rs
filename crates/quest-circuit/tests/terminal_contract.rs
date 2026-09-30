@@ -1,4 +1,6 @@
 use googletest::{Result, prelude::*};
+#[allow(unused_imports)]
+use quest_circuit::prelude::*;
 use quest_circuit::*;
 
 fn ledger() -> BudgetLedger {
@@ -22,7 +24,7 @@ fn target(width: usize) -> quest_circuit::Result<OptimizationTarget> {
 
 #[gtest]
 fn all_pair_precedence_prevents_nontransitive_commutation() -> Result<()> {
-    let mut b = ProgramBuilder::new(2, 0)?;
+    let mut b = QuantumRegionBuilder::new(2, 0)?;
     let a = b.gate(Gate::Rx(Angle::pi(1, 7)?), &[b.qubit(0)?], &[])?;
     let middle = b.gate(Gate::Rz(Angle::pi(1, 5)?), &[b.qubit(1)?], &[])?;
     let c = b.gate(Gate::Rz(Angle::pi(1, 3)?), &[b.qubit(0)?], &[])?;
@@ -40,7 +42,7 @@ fn all_pair_precedence_prevents_nontransitive_commutation() -> Result<()> {
 
 #[gtest]
 fn mandatory_edges_remain_ordered_and_prevent_contraction() -> Result<()> {
-    let mut b = ProgramBuilder::new(2, 0)?;
+    let mut b = QuantumRegionBuilder::new(2, 0)?;
     let a = b.gate(Gate::H, &[b.qubit(0)?], &[])?;
     let middle = b.gate(Gate::H, &[b.qubit(1)?], &[])?;
     let c = b.gate(Gate::H, &[b.qubit(0)?], &[])?;
@@ -57,7 +59,7 @@ fn mandatory_edges_remain_ordered_and_prevent_contraction() -> Result<()> {
 
 #[gtest]
 fn terminal_fusion_improves_native_score_and_marks_rounding() -> Result<()> {
-    let mut b = ProgramBuilder::new(1, 0)?;
+    let mut b = QuantumRegionBuilder::new(1, 0)?;
     let q = b.qubit(0)?;
     b.gate(Gate::X, &[q], &[])?;
     b.gate(Gate::Z, &[q], &[])?;
@@ -79,7 +81,7 @@ fn terminal_fusion_improves_native_score_and_marks_rounding() -> Result<()> {
 
 #[gtest]
 fn scheduling_is_stable_and_favors_compatible_ready_gates() -> Result<()> {
-    let mut b = ProgramBuilder::new(2, 0)?;
+    let mut b = QuantumRegionBuilder::new(2, 0)?;
     let a = b.gate(Gate::H, &[b.qubit(0)?], &[])?;
     let middle = b.gate(Gate::H, &[b.qubit(1)?], &[])?;
     let c = b.gate(Gate::X, &[b.qubit(0)?], &[])?;
@@ -94,7 +96,7 @@ fn scheduling_is_stable_and_favors_compatible_ready_gates() -> Result<()> {
 
 #[gtest]
 fn negative_control_cross_target_is_not_a_commutation_proof() -> Result<()> {
-    let mut b = ProgramBuilder::new(2, 0)?;
+    let mut b = QuantumRegionBuilder::new(2, 0)?;
     let q = b.qubit(0)?;
     let r = b.qubit(1)?;
     let a = b.gate(Gate::X, &[q], &[Control::new(r, ControlState::Zero)])?;
@@ -111,7 +113,7 @@ fn negative_control_cross_target_is_not_a_commutation_proof() -> Result<()> {
 
 #[gtest]
 fn matrix_limit_includes_external_controls() -> Result<()> {
-    let mut b = ProgramBuilder::new(5, 0)?;
+    let mut b = QuantumRegionBuilder::new(5, 0)?;
     let controls = (1..5)
         .map(|i| Ok(Control::new(b.qubit(i)?, ControlState::Zero)))
         .collect::<quest_circuit::Result<Vec<_>>>()?;
@@ -130,7 +132,7 @@ fn matrix_limit_includes_external_controls() -> Result<()> {
 
 #[gtest]
 fn opaque_matrices_are_schedule_and_fusion_boundaries() -> Result<()> {
-    let mut b = ProgramBuilder::new(2, 0)?;
+    let mut b = QuantumRegionBuilder::new(2, 0)?;
     let q = b.qubit(0)?;
     let r = b.qubit(1)?;
     let a = b.gate(Gate::H, &[q], &[])?;
@@ -150,7 +152,7 @@ fn opaque_matrices_are_schedule_and_fusion_boundaries() -> Result<()> {
 
 #[gtest]
 fn unknown_mpi_cost_cannot_authorize_changed_dispatches() -> Result<()> {
-    let mut b = ProgramBuilder::new(2, 0)?;
+    let mut b = QuantumRegionBuilder::new(2, 0)?;
     let q = b.qubit(0)?;
     b.gate(Gate::H, &[q], &[])?;
     b.gate(Gate::X, &[q], &[])?;
@@ -169,7 +171,7 @@ fn unknown_mpi_cost_cannot_authorize_changed_dispatches() -> Result<()> {
 
 #[gtest]
 fn deterministic_exhaustion_returns_original_valid_snapshot() -> Result<()> {
-    let mut b = ProgramBuilder::new(1, 0)?;
+    let mut b = QuantumRegionBuilder::new(1, 0)?;
     let q = b.qubit(0)?;
     b.gate(Gate::H, &[q], &[])?;
     b.gate(Gate::X, &[q], &[])?;
@@ -186,7 +188,7 @@ fn deterministic_exhaustion_returns_original_valid_snapshot() -> Result<()> {
 
 #[gtest]
 fn only_strict_improvement_over_identical_terminal_baseline_is_published() -> Result<()> {
-    let mut b = ProgramBuilder::new(2, 0)?;
+    let mut b = QuantumRegionBuilder::new(2, 0)?;
     b.gate(Gate::H, &[b.qubit(0)?], &[])?;
     b.gate(Gate::H, &[b.qubit(1)?], &[])?;
     b.gate(Gate::X, &[b.qubit(0)?], &[])?;
@@ -211,7 +213,7 @@ fn only_strict_improvement_over_identical_terminal_baseline_is_published() -> Re
 
 #[gtest]
 fn reuse_and_preparation_cost_can_reject_a_shorter_matrix_program() -> Result<()> {
-    let mut b = ProgramBuilder::new(1, 0)?;
+    let mut b = QuantumRegionBuilder::new(1, 0)?;
     b.gate(Gate::H, &[b.qubit(0)?], &[])?;
     b.gate(Gate::X, &[b.qubit(0)?], &[])?;
     let once = target(1)?;
@@ -237,7 +239,7 @@ fn reuse_and_preparation_cost_can_reject_a_shorter_matrix_program() -> Result<()
     clippy::arithmetic_side_effects,
     reason = "Test-only fixed three-wire exhaustive matrix witness"
 )]
-fn full_operator(program: &BoundProgram) -> quest_circuit::Result<Vec<num_complex::Complex64>> {
+fn full_operator(program: &BoundRegion) -> quest_circuit::Result<Vec<num_complex::Complex64>> {
     use num_complex::Complex64 as C;
     let width = program.num_qubits();
     if width > 3 {
@@ -313,7 +315,7 @@ fn full_operator(program: &BoundProgram) -> quest_circuit::Result<Vec<num_comple
 
 #[gtest]
 fn fusion_preserves_ordered_targets_signed_controls_and_relative_global_phase() -> Result<()> {
-    let mut b = ProgramBuilder::new(3, 0)?;
+    let mut b = QuantumRegionBuilder::new(3, 0)?;
     let q = b.qubit(0)?;
     let r = b.qubit(1)?;
     let s = b.qubit(2)?;

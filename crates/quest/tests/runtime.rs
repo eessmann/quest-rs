@@ -1,5 +1,6 @@
 use googletest::prelude::*;
 use quest::{Complex64, Environment, Error, MemoryBudget, QubitCount};
+use quest_circuit::prelude::*;
 
 fn isolated(name: &str, body: impl FnOnce() -> googletest::Result<()>) -> googletest::Result<()> {
     if std::env::var("QUEST_RUNTIME_TEST").as_deref() == Ok(name) {
@@ -33,12 +34,40 @@ fn facade_reports_preserve_exact_resource_usage() {
 }
 
 #[gtest]
+fn sample_output_graph_is_admitted_before_seeding() -> googletest::Result<()> {
+    isolated("sample_output_graph_is_admitted_before_seeding", || {
+        let program = quest::Program::parse("qubit q; output int result=42;", "batch storage")?
+            .verify()?
+            .lower()?
+            .plan()?;
+        let env = Environment::builder()
+            .memory_budget(MemoryBudget::new(512 * 1024))
+            .build()?;
+        let mut prepared = env.prepare(program)?;
+        quest_sys::set_qu_est_seeds(&[31, 47]).or_fail()?;
+        let original_seeds = quest_sys::get_qu_est_seeds().or_fail()?;
+        let allocated = env.allocated_bytes();
+        expect_true!(matches!(
+            prepared.sample_zeroed(
+                quest::Shots::new(1000)?,
+                &[99],
+                &quest::RunInputs::default()
+            ),
+            Err(Error::Budget { .. })
+        ));
+        expect_eq!(env.allocated_bytes(), allocated);
+        expect_eq!(quest_sys::get_qu_est_seeds().or_fail()?, original_seeds);
+        Ok(())
+    })
+}
+
+#[gtest]
 fn preparation_accounts_for_retained_exact_angle_coefficients() -> googletest::Result<()> {
     isolated(
         "preparation_accounts_for_retained_exact_angle_coefficients",
         || {
-            let plan = |angle| -> quest::Result<quest::ExecutablePlan> {
-                let mut builder = quest::ProgramBuilder::new(1, 0)?;
+            let plan = |angle| -> quest::Result<quest::RegionPlan> {
+                let mut builder = quest::QuantumRegionBuilder::new(1, 0)?;
                 builder.gate(quest::Gate::Rz(angle), &[builder.qubit(0)?], &[])?;
                 Ok(builder.finish()?.bind(&[])?.plan()?)
             };
@@ -52,11 +81,21 @@ fn preparation_accounts_for_retained_exact_angle_coefficients() -> googletest::R
                 denominator,
             ))?)?;
             let env = Environment::builder().build()?;
-            let prepared = env.prepare_plan(small)?;
+            let prepared = env.prepare(
+                quest::Program::from_bound_region((small).into_region())?
+                    .verify()?
+                    .lower()?
+                    .plan()?,
+            )?;
             let small_bytes = env.allocated_bytes();
             drop(prepared);
             expect_eq!(env.allocated_bytes(), 0);
-            let prepared = env.prepare_plan(large)?;
+            let prepared = env.prepare(
+                quest::Program::from_bound_region((large).into_region())?
+                    .verify()?
+                    .lower()?
+                    .plan()?,
+            )?;
             verify_that!(env.allocated_bytes().saturating_sub(small_bytes), gt(500))?;
             drop(prepared);
             expect_eq!(env.allocated_bytes(), 0);
@@ -139,18 +178,32 @@ fn density_imaginary_entries_and_rectangular_blocks_keep_layout() -> googletest:
 #[gtest]
 fn builder_execution_samples_each_shot_from_zero() -> googletest::Result<()> {
     isolated("builder_execution_samples_each_shot_from_zero", || {
-        use quest::{Gate, ProgramBuilder, Shots};
-        let mut builder = ProgramBuilder::new(1, 1).or_fail()?;
+        use quest::{Gate, QuantumRegionBuilder, Shots};
+        let mut builder = QuantumRegionBuilder::new(1, 1).or_fail()?;
         let q = builder.qubit(0).or_fail()?;
         let c = builder.bit(0).or_fail()?;
         builder.gate(Gate::X, &[q], &[]).or_fail()?;
         builder.measure(q, c).or_fail()?;
         let env = Environment::builder().build().or_fail()?;
-        let mut prepared = env.prepare(builder.finish().or_fail()?).or_fail()?;
-        let samples = prepared
-            .sample_zeroed(Shots::new(16).or_fail()?, &[17, 23])
+        let mut prepared = env
+            .prepare(
+                quest::Program::from_region(builder.finish()?, &[])?
+                    .verify()?
+                    .lower()?
+                    .plan()?,
+            )
             .or_fail()?;
-        expect_that!(samples.counts.get(&vec![true]), some(eq(&16)));
+        let samples = prepared
+            .sample_zeroed(
+                Shots::new(16).or_fail()?,
+                &[17, 23],
+                &quest::RunInputs::default(),
+            )
+            .or_fail()?;
+        expect_eq!(samples.runs.len(), 16);
+        for run in samples.runs {
+            expect_eq!(run.outputs["c0"].as_scalar().or_fail()?.raw_bits()?, 1);
+        }
         Ok(())
     })
 }
@@ -164,7 +217,7 @@ fn nonsorted_numerical_targets_preserve_complex_operator_order() -> googletest::
     isolated(
         "nonsorted_numerical_targets_preserve_complex_operator_order",
         || {
-            use quest::{MatrixPolicy, NumericalOperator, ProgramBuilder};
+            use quest::{MatrixPolicy, NumericalOperator, QuantumRegionBuilder};
             let env = Environment::builder().build().or_fail()?;
             let input: Vec<_> = (0..8)
                 .map(|i| Complex64::new(fixture_index(i + 1), fixture_index(7 - i)))
@@ -179,10 +232,17 @@ fn nonsorted_numerical_targets_preserve_complex_operator_order() -> googletest::
             });
             let operator =
                 NumericalOperator::from_view(matrix.as_ref(), MatrixPolicy::default()).or_fail()?;
-            let mut builder = ProgramBuilder::new(3, 0).or_fail()?;
+            let mut builder = QuantumRegionBuilder::new(3, 0).or_fail()?;
             let targets = [builder.qubit(2).or_fail()?, builder.qubit(0).or_fail()?];
             builder.numerical(operator, &targets, &[]).or_fail()?;
-            let mut prepared = env.prepare(builder.finish().or_fail()?).or_fail()?;
+            let mut prepared = env
+                .prepare(
+                    quest::Program::from_region(builder.finish()?, &[])?
+                        .verify()?
+                        .lower()?
+                        .plan()?,
+                )
+                .or_fail()?;
             let mut register = env.state_vector(QubitCount::new(3).or_fail()?).or_fail()?;
             register.init_pure(&input).or_fail()?;
             let expected: Vec<_> = (0..8)
@@ -197,7 +257,9 @@ fn nonsorted_numerical_targets_preserve_complex_operator_order() -> googletest::
                 })
                 .collect();
             matrix.fill(Complex64::new(0., 0.));
-            prepared.run(&mut register).or_fail()?;
+            prepared
+                .run(&mut register, &quest::RunInputs::default())
+                .or_fail()?;
             let snapshot = register.snapshot().or_fail()?;
             for (i, expect) in expected.into_iter().enumerate() {
                 expect_that!((snapshot[(i, 0)] - expect).norm(), le(1e-12));
@@ -216,7 +278,9 @@ fn numerical_density_evolution_uses_adjoint_and_signed_control() -> googletest::
     isolated(
         "numerical_density_evolution_uses_adjoint_and_signed_control",
         || {
-            use quest::{Control, ControlState, MatrixPolicy, NumericalOperator, ProgramBuilder};
+            use quest::{
+                Control, ControlState, MatrixPolicy, NumericalOperator, QuantumRegionBuilder,
+            };
             let env = Environment::builder().build().or_fail()?;
             let mut density = env
                 .density_matrix(QubitCount::new(2).or_fail()?)
@@ -233,7 +297,7 @@ fn numerical_density_evolution_uses_adjoint_and_signed_control() -> googletest::
                 [Complex64::new(-0.1, 0.4), Complex64::new(0.9, 0.2)],
             ];
             let matrix = faer::Mat::from_fn(2, 2, |r, c| values[r][c]);
-            let mut builder = ProgramBuilder::new(2, 0).or_fail()?;
+            let mut builder = QuantumRegionBuilder::new(2, 0).or_fail()?;
             let target = builder.qubit(1).or_fail()?;
             let control = builder.qubit(0).or_fail()?;
             builder
@@ -244,8 +308,17 @@ fn numerical_density_evolution_uses_adjoint_and_signed_control() -> googletest::
                     &[Control::new(control, ControlState::Zero)],
                 )
                 .or_fail()?;
-            let mut prepared = env.prepare(builder.finish().or_fail()?).or_fail()?;
-            prepared.run(&mut density).or_fail()?;
+            let mut prepared = env
+                .prepare(
+                    quest::Program::from_region(builder.finish()?, &[])?
+                        .verify()?
+                        .lower()?
+                        .plan()?,
+                )
+                .or_fail()?;
+            prepared
+                .run(&mut density, &quest::RunInputs::default())
+                .or_fail()?;
             let evolved: Vec<_> = (0..4)
                 .map(|i| {
                     if i & 1 == 1 {
@@ -274,7 +347,7 @@ fn density_channel_reset_and_classical_branch_are_effectful() -> googletest::Res
     isolated(
         "density_channel_reset_and_classical_branch_are_effectful",
         || {
-            use quest::{Gate, MatrixPolicy, NumericalOperator, ProgramBuilder};
+            use quest::{Gate, MatrixPolicy, NumericalOperator, QuantumRegionBuilder};
             let env = Environment::builder().build().or_fail()?;
             let mut density = env
                 .density_matrix(QubitCount::new(1).or_fail()?)
@@ -292,7 +365,7 @@ fn density_channel_reset_and_classical_branch_are_effectful() -> googletest::Res
             let k1 = faer::Mat::from_fn(2, 2, |r, c| {
                 Complex64::new(if r == 0 && c == 1 { 0.5 } else { 0. }, 0.)
             });
-            let mut builder = ProgramBuilder::new(1, 0).or_fail()?;
+            let mut builder = QuantumRegionBuilder::new(1, 0).or_fail()?;
             let q = builder.qubit(0).or_fail()?;
             builder.gate(Gate::X, &[q], &[]).or_fail()?;
             builder
@@ -307,20 +380,38 @@ fn density_channel_reset_and_classical_branch_are_effectful() -> googletest::Res
                     1e-12,
                 )
                 .or_fail()?;
-            let mut prepared = env.prepare(builder.finish().or_fail()?).or_fail()?;
-            prepared.run(&mut density).or_fail()?;
+            let mut prepared = env
+                .prepare(
+                    quest::Program::from_region(builder.finish()?, &[])?
+                        .verify()?
+                        .lower()?
+                        .plan()?,
+                )
+                .or_fail()?;
+            prepared
+                .run(&mut density, &quest::RunInputs::default())
+                .or_fail()?;
             expect_that!(density.entry(0, 0).or_fail()?.re, near(0.25, 1e-12));
             expect_that!(density.entry(1, 1).or_fail()?.re, near(0.75, 1e-12));
             drop(prepared);
-            let mut reset = ProgramBuilder::new(1, 1).or_fail()?;
+            let mut reset = QuantumRegionBuilder::new(1, 1).or_fail()?;
             let q = reset.qubit(0).or_fail()?;
             let bit = reset.bit(0).or_fail()?;
             reset.reset(q).or_fail()?;
             reset.measure(q, bit).or_fail()?;
             reset.gate_if(bit, false, Gate::X, &[q], &[]).or_fail()?;
-            let mut prepared = env.prepare(reset.finish().or_fail()?).or_fail()?;
-            let result = prepared.run(&mut density).or_fail()?;
-            expect_false!(result.bits[0]);
+            let mut prepared = env
+                .prepare(
+                    quest::Program::from_region(reset.finish()?, &[])?
+                        .verify()?
+                        .lower()?
+                        .plan()?,
+                )
+                .or_fail()?;
+            let result = prepared
+                .run(&mut density, &quest::RunInputs::default())
+                .or_fail()?;
+            expect_eq!(result.outputs["c0"].as_scalar().or_fail()?.raw_bits()?, 0);
             expect_that!(density.entry(1, 1).or_fail()?.re, near(1., 1e-12));
             Ok(())
         },
@@ -336,9 +427,9 @@ fn controlled_rotation_phase_matches_fused_and_unfused_execution() -> googletest
     isolated(
         "controlled_rotation_phase_matches_fused_and_unfused_execution",
         || {
-            use quest::{Angle, Control, ControlState, FusionOptions, Gate, ProgramBuilder};
+            use quest::{Angle, Control, ControlState, FusionOptions, Gate, QuantumRegionBuilder};
             let env = Environment::builder().build().or_fail()?;
-            let mut builder = ProgramBuilder::new(2, 0).or_fail()?;
+            let mut builder = QuantumRegionBuilder::new(2, 0).or_fail()?;
             let q = builder.qubit(1).or_fail()?;
             let c = builder.qubit(0).or_fail()?;
             let controls = [Control::new(c, ControlState::One)];
@@ -353,13 +444,31 @@ fn controlled_rotation_phase_matches_fused_and_unfused_execution() -> googletest
                 .or_fail()?
                 .fuse(FusionOptions::default())
                 .or_fail()?;
-            let mut direct = env.prepare(validated).or_fail()?;
-            let mut optimized = env.prepare_plan(fused.plan().or_fail()?).or_fail()?;
+            let mut direct = env
+                .prepare(
+                    quest::Program::from_region(validated, &[])?
+                        .verify()?
+                        .lower()?
+                        .plan()?,
+                )
+                .or_fail()?;
+            let mut optimized = env
+                .prepare(
+                    quest::Program::from_bound_region((fused.plan().or_fail()?).into_region())?
+                        .verify()?
+                        .lower()?
+                        .plan()?,
+                )
+                .or_fail()?;
             let mut left = env.state_vector(QubitCount::new(2).or_fail()?).or_fail()?;
             left.init_plus().or_fail()?;
             let mut right = left.try_clone().or_fail()?;
-            direct.run(&mut left).or_fail()?;
-            optimized.run(&mut right).or_fail()?;
+            direct
+                .run(&mut left, &quest::RunInputs::default())
+                .or_fail()?;
+            optimized
+                .run(&mut right, &quest::RunInputs::default())
+                .or_fail()?;
             for i in 0..4 {
                 expect_that!(
                     (left.amplitude(i).or_fail()? - right.amplitude(i).or_fail()?).norm(),
@@ -379,10 +488,10 @@ fn execution_failure_reports_completed_prefix_and_keeps_partial_state() -> googl
     isolated(
         "execution_failure_reports_completed_prefix_and_keeps_partial_state",
         || {
-            use quest::{Error, MatrixPolicy, NumericalOperator, ProgramBuilder};
+            use quest::{Error, MatrixPolicy, NumericalOperator, QuantumRegionBuilder};
             let env = Environment::builder().build().or_fail()?;
             let matrix = faer::Mat::<Complex64>::zeros(2, 2);
-            let mut builder = ProgramBuilder::new(1, 1).or_fail()?;
+            let mut builder = QuantumRegionBuilder::new(1, 1).or_fail()?;
             let q = builder.qubit(0).or_fail()?;
             let c = builder.bit(0).or_fail()?;
             builder
@@ -394,18 +503,23 @@ fn execution_failure_reports_completed_prefix_and_keeps_partial_state() -> googl
                 )
                 .or_fail()?;
             builder.measure(q, c).or_fail()?;
-            let mut prepared = env.prepare(builder.finish().or_fail()?).or_fail()?;
+            let mut prepared = env
+                .prepare(
+                    quest::Program::from_region(builder.finish()?, &[])?
+                        .verify()?
+                        .lower()?
+                        .plan()?,
+                )
+                .or_fail()?;
             let mut register = env.state_vector(QubitCount::new(1).or_fail()?).or_fail()?;
             let error = prepared
-                .run(&mut register)
+                .run(&mut register, &quest::RunInputs::default())
                 .expect_err("zero-probability measurement must fail");
             expect_true!(matches!(
                 error,
-                Error::Execution {
-                    instruction: 1,
-                    completed: 1,
-                    ..
-                }
+                Error::StructuredExecution(ref detail)
+                    if detail.runtime().completed_quantum == 1
+                    && matches!(detail.runtime().cause, quest::language::vm::RuntimeCause::Backend(_))
             ));
             expect_that!(register.total_probability().or_fail()?, eq(0.));
             drop(register);
@@ -422,14 +536,14 @@ fn scalar_numerical_operator_and_preparation_budget_have_checked_admission()
     isolated(
         "scalar_numerical_operator_and_preparation_budget_have_checked_admission",
         || {
-            use quest::{MatrixPolicy, NumericalOperator, ProgramBuilder};
+            use quest::{MatrixPolicy, NumericalOperator, QuantumRegionBuilder};
             let env = Environment::builder()
                 .memory_budget(MemoryBudget::new(16384))
                 .build()
                 .or_fail()?;
             let scalar = Complex64::new(0.25, -0.5);
             let matrix = faer::Mat::from_fn(1, 1, |_, _| scalar);
-            let mut builder = ProgramBuilder::new(1, 0).or_fail()?;
+            let mut builder = QuantumRegionBuilder::new(1, 0).or_fail()?;
             builder
                 .numerical(
                     NumericalOperator::from_view(matrix.as_ref(), MatrixPolicy::default())
@@ -438,15 +552,24 @@ fn scalar_numerical_operator_and_preparation_budget_have_checked_admission()
                     &[],
                 )
                 .or_fail()?;
-            let mut prepared = env.prepare(builder.finish().or_fail()?).or_fail()?;
+            let mut prepared = env
+                .prepare(
+                    quest::Program::from_region(builder.finish()?, &[])?
+                        .verify()?
+                        .lower()?
+                        .plan()?,
+                )
+                .or_fail()?;
             let mut register = env.state_vector(QubitCount::new(1).or_fail()?).or_fail()?;
-            prepared.run(&mut register).or_fail()?;
+            prepared
+                .run(&mut register, &quest::RunInputs::default())
+                .or_fail()?;
             expect_that!(register.amplitude(0).or_fail()?, eq(scalar));
             drop(register);
             drop(prepared);
             expect_that!(env.allocated_bytes(), eq(0));
             let matrix = faer::Mat::<Complex64>::identity(32, 32);
-            let mut builder = ProgramBuilder::new(5, 0).or_fail()?;
+            let mut builder = QuantumRegionBuilder::new(5, 0).or_fail()?;
             let targets = (0..5)
                 .map(|i| builder.qubit(i))
                 .collect::<std::result::Result<Vec<_>, _>>()
@@ -459,7 +582,15 @@ fn scalar_numerical_operator_and_preparation_budget_have_checked_admission()
                     &[],
                 )
                 .or_fail()?;
-            expect_true!(env.prepare(builder.finish().or_fail()?).is_err());
+            expect_true!(
+                env.prepare(
+                    quest::Program::from_region(builder.finish()?, &[])?
+                        .verify()?
+                        .lower()?
+                        .plan()?
+                )
+                .is_err()
+            );
             expect_that!(env.allocated_bytes(), eq(0));
             Ok(())
         },
@@ -471,24 +602,35 @@ fn changed_numerical_policy_is_rejected_before_mutation_or_seeding() -> googlete
     isolated(
         "changed_numerical_policy_is_rejected_before_mutation_or_seeding",
         || {
-            use quest::{Error, Gate, ProgramBuilder, Shots};
+            use quest::{Error, Gate, QuantumRegionBuilder, Shots};
             let env = Environment::builder().build().or_fail()?;
-            let mut builder = ProgramBuilder::new(1, 0).or_fail()?;
+            let mut builder = QuantumRegionBuilder::new(1, 0).or_fail()?;
             let q = builder.qubit(0).or_fail()?;
             builder.gate(Gate::X, &[q], &[]).or_fail()?;
-            let mut prepared = env.prepare(builder.finish().or_fail()?).or_fail()?;
+            let mut prepared = env
+                .prepare(
+                    quest::Program::from_region(builder.finish()?, &[])?
+                        .verify()?
+                        .lower()?
+                        .plan()?,
+                )
+                .or_fail()?;
             let mut register = env.state_vector(QubitCount::new(1).or_fail()?).or_fail()?;
             let epsilon = quest_sys::get_qu_est_validation_epsilon().or_fail()?;
             quest_sys::set_qu_est_validation_epsilon(epsilon * 2.).or_fail()?;
             quest_sys::set_qu_est_seeds(&[31, 47]).or_fail()?;
             let original_seeds = quest_sys::get_qu_est_seeds().or_fail()?;
             expect_true!(matches!(
-                prepared.run(&mut register),
+                prepared.run(&mut register, &quest::RunInputs::default()),
                 Err(Error::ConfigurationChanged)
             ));
             expect_that!(register.amplitude(0).or_fail()?, eq(Complex64::new(1., 0.)));
             expect_true!(matches!(
-                prepared.sample_zeroed(Shots::new(2).or_fail()?, &[99]),
+                prepared.sample_zeroed(
+                    Shots::new(2).or_fail()?,
+                    &[99],
+                    &quest::RunInputs::default()
+                ),
                 Err(Error::ConfigurationChanged)
             ));
             expect_that!(
@@ -529,14 +671,14 @@ fn openqasm31_u_phase_survives_native_adjoint_signed_controls_and_fusion() -> go
     isolated(
         "openqasm31_u_phase_survives_native_adjoint_signed_controls_and_fusion",
         || {
-            use quest::{Angle, Control, ControlState, FusionOptions, Gate, ProgramBuilder};
+            use quest::{Angle, Control, ControlState, FusionOptions, Gate, QuantumRegionBuilder};
             let env = Environment::builder().build().or_fail()?;
             // U(pi/2, 0, pi) = exp(i*pi/4) H, so |0> maps to
             // (1+i)/2 on both target states. The adjoint conjugates that phase.
             for inverse in [false, true] {
                 for polarity in [None, Some(ControlState::Zero), Some(ControlState::One)] {
                     for fuse in [false, true] {
-                        let mut builder = ProgramBuilder::new(3, 0).or_fail()?;
+                        let mut builder = QuantumRegionBuilder::new(3, 0).or_fail()?;
                         let target = builder.qubit(1).or_fail()?;
                         let controls = match polarity {
                             None => vec![],
@@ -572,7 +714,16 @@ fn openqasm31_u_phase_survives_native_adjoint_signed_controls_and_fusion() -> go
                         } else {
                             bound
                         };
-                        let mut prepared = env.prepare_plan(bound.plan().or_fail()?).or_fail()?;
+                        let mut prepared = env
+                            .prepare(
+                                quest::Program::from_bound_region(
+                                    (bound.plan().or_fail()?).into_region(),
+                                )?
+                                .verify()?
+                                .lower()?
+                                .plan()?,
+                            )
+                            .or_fail()?;
                         let mut register =
                             env.state_vector(QubitCount::new(3).or_fail()?).or_fail()?;
                         let input = [
@@ -586,7 +737,9 @@ fn openqasm31_u_phase_survives_native_adjoint_signed_controls_and_fusion() -> go
                             Complex64::new(0.0, 0.0),
                         ];
                         register.init_pure(&input).or_fail()?;
-                        prepared.run(&mut register).or_fail()?;
+                        prepared
+                            .run(&mut register, &quest::RunInputs::default())
+                            .or_fail()?;
                         let snapshot = register.snapshot().or_fail()?;
                         for (basis, initial) in input.into_iter().enumerate() {
                             let selected = polarity.is_none_or(|state| {
@@ -622,7 +775,7 @@ fn diagonal_preparation_retains_structure_under_a_small_native_budget() -> googl
         "diagonal_preparation_retains_structure_under_a_small_native_budget",
         || {
             let env = Environment::builder()
-                .memory_budget(MemoryBudget::new(98_304))
+                .memory_budget(MemoryBudget::new(131_072))
                 .build()?;
             let values = faer::Mat::from_fn(32, 32, |row, col| {
                 if row == col {
@@ -636,19 +789,27 @@ fn diagonal_preparation_retains_structure_under_a_small_native_budget() -> googl
                 quest::MatrixPolicy::default(),
             )?;
             expect_true!(operator.is_diagonal());
-            let mut builder = quest::ProgramBuilder::new(5, 0)?;
+            let mut builder = quest::QuantumRegionBuilder::new(5, 0)?;
             let targets = (0..5)
                 .rev()
                 .map(|index| builder.qubit(index))
-                .collect::<std::result::Result<Vec<_>, quest::CircuitError>>()?;
+                .collect::<std::result::Result<Vec<_>, quest_circuit::Error>>()?;
             builder.numerical(operator, &targets, &[])?;
-            let mut prepared = env.prepare(builder.finish()?)?;
+            let mut prepared = env.prepare(
+                quest::Program::from_region(builder.finish()?, &[])?
+                    .verify()?
+                    .lower()?
+                    .plan()?,
+            )?;
+            // Include the common checked IR and provenance, while remaining
+            // below even one dense native matrix cache (196,608 bytes).
+            expect_lt!(env.allocated_bytes(), 65_536);
             let mut state = env.state_vector(QubitCount::new(5)?)?;
-            prepared.run(&mut state)?;
+            prepared.run(&mut state, &quest::RunInputs::default())?;
             expect_eq!(state.snapshot()?[(0, 0)], Complex64::new(0.0, 1.0));
             drop(state);
             let mut density = env.density_matrix(QubitCount::new(5)?)?;
-            prepared.run(&mut density)?;
+            prepared.run(&mut density, &quest::RunInputs::default())?;
             expect_eq!(density.entry(0, 0)?, Complex64::new(1.0, 0.0));
             Ok(())
         },

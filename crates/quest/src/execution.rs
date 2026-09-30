@@ -1,16 +1,21 @@
+#[cfg(any(feature = "qsvt", all(feature = "mpi", quest_native_mpi)))]
 use crate::oracle_execution::{OracleCache, OracleInventory};
-use crate::{Complex64, Environment, Error, Outcome, QubitCount, Result, Shots};
+use crate::{Complex64, Error, Result};
+#[cfg(any(feature = "qsvt", all(feature = "mpi", quest_native_mpi)))]
+use crate::{Outcome, QubitCount, environment::Reservation, values::bytes_for};
 use crate::{
-    environment::Reservation,
     error::BackendResult,
     register::{Register, RegisterKind, matrix},
-    values::{bytes_for, reserve_vec},
+    values::reserve_vec,
 };
 use cxx::UniquePtr;
 use quest_circuit::{
-    BoundGate, Control, ControlState, ExecutablePlan, Operation, ValidatedProgram,
+    BoundGate,
     dispatch_recipe::{self, DispatchStep, MatrixRecipe, PrimitiveGate},
 };
+#[cfg(any(feature = "qsvt", all(feature = "mpi", quest_native_mpi)))]
+use quest_circuit::{Control, ControlState, Operation, RegionPlan};
+#[cfg(any(feature = "qsvt", all(feature = "mpi", quest_native_mpi)))]
 use std::collections::{BTreeMap, BTreeSet};
 
 pub type MatrixCacheKey = (usize, Vec<bool>);
@@ -42,6 +47,7 @@ pub struct NativeControls {
     pub(crate) phase_targets: Vec<i32>,
 }
 impl NativeControls {
+    #[cfg(any(feature = "qsvt", all(feature = "mpi", quest_native_mpi)))]
     fn new(controls: &[Control], target: Option<i32>) -> Result<Self> {
         let mut result = Self::with_capacity(controls.len(), target.is_some())?;
         result.load(
@@ -103,6 +109,7 @@ impl NativeControls {
         Ok(())
     }
 }
+#[cfg(any(feature = "qsvt", all(feature = "mpi", quest_native_mpi)))]
 enum PreparedOp {
     Oracle {
         body: usize,
@@ -145,47 +152,19 @@ enum PreparedOp {
 
 /// Native resources prepared transactionally. Execution can modify a register
 /// before an error; errors identify the completed instruction prefix.
-pub struct PreparedProgram<'env> {
+#[cfg(any(feature = "qsvt", all(feature = "mpi", quest_native_mpi)))]
+pub struct PreparedRegion<'env> {
     matrices: Vec<NativeMatrix>,
     oracles: OracleCache,
     channels: Vec<UniquePtr<quest_sys::KrausMap>>,
     reservation: Reservation<'env>,
-    plan: ExecutablePlan,
+    plan: RegionPlan,
     operations: Vec<PreparedOp>,
     fingerprint: quest_sys::NumericalFingerprint,
 }
-#[derive(Debug)]
-pub struct RunResult {
-    pub bits: Vec<bool>,
-    pub completed_instructions: usize,
-}
-#[derive(Debug)]
-pub struct SampleResult {
-    pub counts: BTreeMap<Vec<bool>, usize>,
-    pub shots: usize,
-    pub seeds: Vec<u32>,
-}
-
-impl Environment {
-    /// Convenience path for programs with no unbound symbolic parameters.
-    /// # Errors
-    /// Rejects invalid bindings, unsupported numerical configuration, resource limits, or native preparation failure.
-    pub fn prepare(&self, program: ValidatedProgram) -> Result<PreparedProgram<'_>> {
-        self.prepare_plan(program.bind(&[])?.plan()?)
-    }
-    /// # Errors
-    /// Rejects unsupported numerical configuration, resource limits, or native preparation failure.
-    pub fn prepare_plan(&self, plan: ExecutablePlan) -> Result<PreparedProgram<'_>> {
-        self.resources.prepare_plan(plan)
-    }
-}
+#[cfg(any(feature = "qsvt", all(feature = "mpi", quest_native_mpi)))]
 impl crate::environment::RuntimeResources {
-    /// # Errors
-    /// Rejects unsupported numerical configuration, resource limits, or native preparation failure.
-    pub fn prepare_plan(&self, plan: ExecutablePlan) -> Result<PreparedProgram<'_>> {
-        self.admit_plan(plan)?.materialize()
-    }
-    pub(crate) fn admit_plan(&self, plan: ExecutablePlan) -> Result<AdmittedPlan<'_>> {
+    pub(crate) fn admit_plan(&self, plan: RegionPlan) -> Result<AdmittedPlan<'_>> {
         QubitCount::new(plan.num_qubits())?;
         let fingerprint =
             quest_sys::get_numerical_fingerprint().context("checking numerical environment")?;
@@ -248,12 +227,14 @@ impl crate::environment::RuntimeResources {
         })
     }
 }
+#[cfg(any(feature = "qsvt", all(feature = "mpi", quest_native_mpi)))]
 pub struct AdmittedPlan<'env> {
-    plan: ExecutablePlan,
+    plan: RegionPlan,
     fingerprint: quest_sys::NumericalFingerprint,
     inventory: OracleInventory,
     reservation: Reservation<'env>,
 }
+#[cfg(any(feature = "qsvt", all(feature = "mpi", quest_native_mpi)))]
 impl<'env> AdmittedPlan<'env> {
     #[cfg(feature = "qsvt")]
     pub(crate) fn dispatch_scratch(&self) -> Result<Reservation<'_>> {
@@ -262,11 +243,11 @@ impl<'env> AdmittedPlan<'env> {
             .reserve(self.inventory.dispatch_scratch_bytes()?)
     }
     #[cfg(feature = "qsvt")]
-    pub(crate) const fn plan(&self) -> &ExecutablePlan {
+    pub(crate) const fn plan(&self) -> &RegionPlan {
         &self.plan
     }
 
-    pub(crate) fn materialize(self) -> Result<PreparedProgram<'env>> {
+    pub(crate) fn materialize(self) -> Result<PreparedRegion<'env>> {
         let Self {
             plan,
             fingerprint,
@@ -288,7 +269,7 @@ impl<'env> AdmittedPlan<'env> {
             )?);
         }
         // Locals release native handles on any error before the prepared owner is published.
-        Ok(PreparedProgram {
+        Ok(PreparedRegion {
             matrices,
             oracles,
             channels,
@@ -299,26 +280,13 @@ impl<'env> AdmittedPlan<'env> {
         })
     }
 }
-impl PreparedProgram<'_> {
+#[cfg(any(feature = "qsvt", all(feature = "mpi", quest_native_mpi)))]
+impl PreparedRegion<'_> {
     /// Distinct shared canonical oracle bodies retained in native preparation.
     #[must_use]
+    #[cfg(all(feature = "mpi", quest_native_mpi))]
     pub const fn prepared_oracle_bodies(&self) -> usize {
         self.oracles.body_count()
-    }
-    /// Numerical payload/control variants; each owns a forward/adjoint pair.
-    #[must_use]
-    pub const fn prepared_oracle_matrix_variants(&self) -> usize {
-        self.oracles.matrix_count()
-    }
-    #[must_use]
-    pub const fn plan(&self) -> &ExecutablePlan {
-        &self.plan
-    }
-    /// # Errors
-    /// Rejects register or configuration mismatch and reports the completed instruction prefix on execution failure.
-    pub fn run<K: RegisterKind>(&mut self, register: &mut Register<'_, K>) -> Result<RunResult> {
-        let bits = self.admit_run(register)?;
-        self.run_admitted(register, bits)
     }
     pub(crate) fn admit_run<K: RegisterKind>(
         &self,
@@ -345,7 +313,7 @@ impl PreparedProgram<'_> {
         &mut self,
         register: &mut Register<'_, K>,
         mut bits: Vec<bool>,
-    ) -> Result<RunResult> {
+    ) -> Result<()> {
         for (index, operation) in self.operations.iter().enumerate() {
             execute(
                 operation,
@@ -361,67 +329,7 @@ impl PreparedProgram<'_> {
                 source: Box::new(source),
             })?;
         }
-        Ok(RunResult {
-            bits,
-            completed_instructions: self.operations.len(),
-        })
-    }
-    /// Seeds `QuEST`'s process RNG once per batch and restores |0...0> for every shot.
-    /// Supply 1–16 seeds; native RNG storage retains a 4096-byte budget allowance.
-    /// Density channels use exact density evolution; state vectors use reset trajectories.
-    /// # Errors
-    /// Rejects invalid seed counts, changed numerical configuration, resource limits, or native execution failure.
-    pub fn sample_zeroed(&mut self, shots: Shots, seeds: &[u32]) -> Result<SampleResult> {
-        if seeds.is_empty() || seeds.len() > 16 {
-            return Err(Error::Value(
-                "sampling requires between 1 and 16 explicit RNG seeds",
-            ));
-        }
-        // Worst-case every shot produces a distinct bit string; bound result storage first.
-        let fingerprint =
-            quest_sys::get_numerical_fingerprint().context("checking sample environment")?;
-        if fingerprint != self.fingerprint {
-            return Err(Error::ConfigurationChanged);
-        }
-        let seed_bytes = seeds
-            .len()
-            .checked_mul(const { std::mem::size_of::<u32>() * 8 })
-            .ok_or(Error::Overflow)?;
-        let sample_bytes = self
-            .plan
-            .num_bits()
-            .checked_add(128)
-            .and_then(|n| n.checked_mul(shots.get()))
-            .and_then(|n| n.checked_add(seed_bytes))
-            .ok_or(Error::Overflow)?;
-        let environment = self.reservation.environment;
-        let _results = environment.reserve(sample_bytes)?;
-        environment.admit_seed_storage()?;
-        quest_sys::set_qu_est_seeds(seeds).context("seeding sample batch")?;
-        let mut counts = BTreeMap::<Vec<bool>, usize>::new();
-        let count = QubitCount::new(self.plan.num_qubits())?;
-        if self.operations.iter().any(requires_density) {
-            let mut register = environment.density_matrix(count)?;
-            for _ in 0..shots.get() {
-                register.init_zero()?;
-                let count = counts.entry(self.run(&mut register)?.bits).or_default();
-                *count = count.checked_add(1).ok_or(Error::Overflow)?;
-            }
-        } else {
-            let mut register = environment.state_vector(count)?;
-            for _ in 0..shots.get() {
-                register.init_zero()?;
-                let count = counts.entry(self.run(&mut register)?.bits).or_default();
-                *count = count.checked_add(1).ok_or(Error::Overflow)?;
-            }
-        }
-        let mut recorded_seeds = reserve_vec(seeds.len())?;
-        recorded_seeds.extend_from_slice(seeds);
-        Ok(SampleResult {
-            counts,
-            shots: shots.get(),
-            seeds: recorded_seeds,
-        })
+        Ok(())
     }
 }
 pub const fn admit_fingerprint(fp: &quest_sys::NumericalFingerprint) -> Result<()> {
@@ -436,6 +344,7 @@ pub const fn admit_fingerprint(fp: &quest_sys::NumericalFingerprint) -> Result<(
     }
     Ok(())
 }
+#[cfg(any(feature = "qsvt", all(feature = "mpi", quest_native_mpi)))]
 fn requires_density(op: &PreparedOp) -> bool {
     match op {
         PreparedOp::Channel { .. } => true,
@@ -443,6 +352,7 @@ fn requires_density(op: &PreparedOp) -> bool {
         _ => false,
     }
 }
+#[cfg(any(feature = "qsvt", all(feature = "mpi", quest_native_mpi)))]
 fn estimate(
     op: &Operation,
     gpu: bool,
@@ -452,6 +362,7 @@ fn estimate(
         .checked_add(estimate_native(op, gpu, seen_matrices)?)
         .ok_or(Error::Overflow)
 }
+#[cfg(any(feature = "qsvt", all(feature = "mpi", quest_native_mpi)))]
 fn estimate_native(
     op: &Operation,
     gpu: bool,
@@ -554,6 +465,7 @@ fn estimate_native(
     clippy::too_many_lines,
     reason = "Preparation owns the transactional native allocation and cache publication for every operation"
 )]
+#[cfg(any(feature = "qsvt", all(feature = "mpi", quest_native_mpi)))]
 fn prepare_operation(
     op: &Operation,
     matrices: &mut Vec<NativeMatrix>,
@@ -613,44 +525,7 @@ fn prepare_operation(
             })
         }
         Operation::Channel { kraus, targets } => {
-            let dim = kraus
-                .first()
-                .ok_or(Error::Value("empty Kraus channel"))?
-                .dimension()
-                .max(2);
-            let mut values = reserve_vec(
-                dim.checked_mul(dim)
-                    .and_then(|n| n.checked_mul(kraus.len()))
-                    .ok_or(Error::Overflow)?,
-            )?;
-            for matrix in kraus.iter() {
-                for r in 0..dim {
-                    for c in 0..dim {
-                        let v = if matrix.dimension() == 1 {
-                            if r == c {
-                                matrix.view()[(0, 0)]
-                            } else {
-                                Complex64::new(0., 0.)
-                            }
-                        } else {
-                            matrix.view()[(r, c)]
-                        };
-                        values.push(quest_sys::QuestComplex { re: v.re, im: v.im });
-                    }
-                }
-            }
-            let mut map = quest_sys::create_kraus_map(
-                i32::try_from(dim.ilog2()).map_err(|_| Error::Overflow)?,
-                i32::try_from(kraus.len()).map_err(|_| Error::Overflow)?,
-            )
-            .context("allocating Kraus channel")?;
-            quest_sys::set_kraus_map_flat(
-                map.pin_mut(),
-                &values,
-                i32::try_from(kraus.len()).map_err(|_| Error::Overflow)?,
-                i64::try_from(dim).map_err(|_| Error::Overflow)?,
-            )
-            .context("transferring Kraus channel")?;
+            let map = prepare_kraus(kraus)?;
             let index = channels.len();
             channels.push(map);
             Ok(PreparedOp::Channel {
@@ -712,6 +587,50 @@ fn prepare_operation(
         Operation::Barrier { .. } => Ok(PreparedOp::Barrier),
     }
 }
+pub fn prepare_kraus(
+    kraus: &[quest_circuit::NumericalOperator],
+) -> Result<UniquePtr<quest_sys::KrausMap>> {
+    let dim = kraus
+        .first()
+        .ok_or(Error::Value("empty Kraus channel"))?
+        .dimension()
+        .max(2);
+    let mut values = reserve_vec(
+        dim.checked_mul(dim)
+            .and_then(|n| n.checked_mul(kraus.len()))
+            .ok_or(Error::Overflow)?,
+    )?;
+    for matrix in kraus {
+        for r in 0..dim {
+            for c in 0..dim {
+                let v = if matrix.dimension() == 1 {
+                    if r == c {
+                        matrix.view()[(0, 0)]
+                    } else {
+                        Complex64::new(0., 0.)
+                    }
+                } else {
+                    matrix.view()[(r, c)]
+                };
+                values.push(quest_sys::QuestComplex { re: v.re, im: v.im });
+            }
+        }
+    }
+    let mut map = quest_sys::create_kraus_map(
+        i32::try_from(dim.ilog2()).map_err(|_| Error::Overflow)?,
+        i32::try_from(kraus.len()).map_err(|_| Error::Overflow)?,
+    )
+    .context("allocating Kraus channel")?;
+    quest_sys::set_kraus_map_flat(
+        map.pin_mut(),
+        &values,
+        i32::try_from(kraus.len()).map_err(|_| Error::Overflow)?,
+        i64::try_from(dim).map_err(|_| Error::Overflow)?,
+    )
+    .context("transferring Kraus channel")?;
+    Ok(map)
+}
+
 pub fn prepare_numerical(
     numerical: &quest_circuit::NumericalOperator,
     controls: &[bool],
@@ -818,6 +737,7 @@ pub fn native_matrix<T: faer::traits::Conjugate<Canonical = Complex64>>(
     .context("transferring row-major matrix")?;
     Ok(native)
 }
+#[cfg(any(feature = "qsvt", all(feature = "mpi", quest_native_mpi)))]
 fn execute<K: RegisterKind>(
     op: &PreparedOp,
     register: &mut Register<'_, K>,
@@ -940,7 +860,7 @@ pub fn apply_gate<K: RegisterKind>(
     Ok(())
 }
 
-fn execute_step<K: RegisterKind>(
+pub fn execute_step<K: RegisterKind>(
     register: &mut Register<'_, K>,
     step: DispatchStep,
     targets: &[i32],
@@ -1021,19 +941,19 @@ fn apply_primitive<K: RegisterKind>(
     result.context("applying standard gate")
 }
 
-#[cfg(test)]
+#[cfg(all(test, any(feature = "qsvt", all(feature = "mpi", quest_native_mpi))))]
 mod matrix_budget_tests {
     use super::{MatrixCacheKey, estimate};
     use googletest::prelude::*;
     use quest_circuit::{
-        Control, ControlState, MatrixPolicy, NumericalOperator, Operation, ProgramBuilder,
+        Control, ControlState, MatrixPolicy, NumericalOperator, Operation, QuantumRegionBuilder,
     };
     use std::collections::BTreeSet;
 
     #[gtest]
     fn conditional_numerical_occurrences_reuse_only_matching_control_profile()
     -> googletest::Result<()> {
-        let builder = ProgramBuilder::new(6, 1)?;
+        let builder = QuantumRegionBuilder::new(6, 1)?;
         let targets = (0..5)
             .map(|index| builder.qubit(index))
             .collect::<Result<Vec<_>, _>>()?;

@@ -12,6 +12,8 @@ pub enum QspInput {
     GeneralizedAngles(GeneralizedAngleInput),
     GeneralizedMatrices(ControlSequence),
     Polynomial(PolynomialInput),
+    #[cfg(feature = "certification")]
+    Compiled(crate::CompiledInput),
 }
 /// Immutable source angles and their admitted execution matrices.
 /// The matrices are the execution authority; angles are source provenance.
@@ -89,22 +91,51 @@ pub struct PolynomialInput {
     polynomial: AdmittedPolynomial,
     original: Value,
 }
+/// Immutable conversion retaining the admitted original interchange source.
+#[derive(Debug, Clone)]
+pub struct PolynomialConversion {
+    source: PolynomialInput,
+    polynomial: Polynomial<Chebyshev>,
+    bound: f64,
+}
+impl PolynomialConversion {
+    #[must_use]
+    pub const fn source(&self) -> &PolynomialInput {
+        &self.source
+    }
+    #[must_use]
+    pub const fn polynomial(&self) -> &Polynomial<Chebyshev> {
+        &self.polynomial
+    }
+    #[must_use]
+    pub const fn coefficient_error_bound(&self) -> f64 {
+        self.bound
+    }
+}
 impl PolynomialInput {
     /// Convert while retaining outward coefficient conversion error evidence.
     ///
     /// # Errors
     /// Rejects unsupported support, numerical failures or conversion budgets.
-    pub fn to_chebyshev(&self) -> Result<Conversion<Chebyshev>> {
-        Ok(match &self.polynomial {
-            AdmittedPolynomial::Chebyshev(p) => Conversion {
-                polynomial: p.clone(),
-                coefficient_error_bound: 0.0,
-            },
-            AdmittedPolynomial::Monomial(p) => p.to_basis(Chebyshev)?,
-            AdmittedPolynomial::Laurent(p) => p.to_basis(Chebyshev)?,
-            AdmittedPolynomial::Hermite(p) => p.to_basis(Chebyshev)?,
-            AdmittedPolynomial::Laguerre(p) => p.to_basis(Chebyshev)?,
-            AdmittedPolynomial::Jacobi(p) => p.to_basis(Chebyshev)?,
+    pub fn to_chebyshev(&self) -> Result<PolynomialConversion> {
+        fn parts<S: quest_polynomial::Basis>(
+            c: Conversion<Chebyshev, S>,
+        ) -> (Polynomial<Chebyshev>, f64) {
+            let bound = c.coefficient_error_bound();
+            (c.into_polynomial(), bound)
+        }
+        let (polynomial, bound) = match &self.polynomial {
+            AdmittedPolynomial::Chebyshev(p) => (p.clone(), 0.0),
+            AdmittedPolynomial::Monomial(p) => parts(p.to_basis(Chebyshev)?),
+            AdmittedPolynomial::Laurent(p) => parts(p.to_basis(Chebyshev)?),
+            AdmittedPolynomial::Hermite(p) => parts(p.to_basis(Chebyshev)?),
+            AdmittedPolynomial::Laguerre(p) => parts(p.to_basis(Chebyshev)?),
+            AdmittedPolynomial::Jacobi(p) => parts(p.to_basis(Chebyshev)?),
+        };
+        Ok(PolynomialConversion {
+            source: self.clone(),
+            polynomial,
+            bound,
         })
     }
     /// Nonnegative Laurent payload when already supplied in that basis.
@@ -205,7 +236,23 @@ fn bounded(values: &[Value], policy: IoPolicy) -> Result<()> {
 /// # Errors
 /// Rejects invalid types, conventions, finite/shape admission and storage limits.
 pub fn read_qsp_json(source: &str, policy: IoPolicy) -> Result<QspInput> {
-    read_qsp_json_impl(source, policy, false)
+    read_qsp_json_impl(source, policy, false, None)
+}
+
+/// Read source/sequence JSON or independently recertify compiled JSON at the requested tolerance.
+/// # Errors
+/// Rejects invalid tolerances, payloads, budgets or independent certification failure.
+pub fn read_qsp_json_with_tolerance(
+    source: &str,
+    policy: IoPolicy,
+    tolerance: f64,
+) -> Result<QspInput> {
+    if !tolerance.is_finite() || tolerance <= 0.0 {
+        return Err(Error::Format(
+            "positive finite verification tolerance required",
+        ));
+    }
+    read_qsp_json_impl(source, policy, false, Some(tolerance))
 }
 
 /// Read an execution payload. Imported generalized angles must carry admitted
@@ -214,14 +261,72 @@ pub fn read_qsp_json(source: &str, policy: IoPolicy) -> Result<QspInput> {
 /// # Errors
 /// Rejects source-only generalized angles and invalid interchange payloads.
 pub fn read_qsp_execution_json(source: &str, policy: IoPolicy) -> Result<QspInput> {
-    read_qsp_json_impl(source, policy, true)
+    read_qsp_json_impl(source, policy, true, None)
 }
 
-fn read_qsp_json_impl(source: &str, policy: IoPolicy, execution: bool) -> Result<QspInput> {
+/// Read a frozen execution wire with an explicitly selected verification tolerance.
+/// # Errors
+/// Rejects malformed execution authority, invalid tolerances or failed recertification.
+pub fn read_qsp_execution_json_with_tolerance(
+    source: &str,
+    policy: IoPolicy,
+    tolerance: f64,
+) -> Result<QspInput> {
+    if !tolerance.is_finite() || tolerance <= 0.0 {
+        return Err(Error::Format(
+            "positive finite verification tolerance required",
+        ));
+    }
+    read_qsp_json_impl(source, policy, true, Some(tolerance))
+}
+#[cfg(not(feature = "certification"))]
+const fn compiled_at_tolerance(
+    _source: &str,
+    _policy: IoPolicy,
+    _tolerance: Option<f64>,
+) -> Result<QspInput> {
+    Err(Error::Format(
+        "compiled QSP artifacts require the certification feature",
+    ))
+}
+#[cfg(feature = "certification")]
+fn compiled_at_tolerance(
+    source: &str,
+    policy: IoPolicy,
+    tolerance: Option<f64>,
+) -> Result<QspInput> {
+    let tolerance = tolerance.unwrap_or(1e-11);
+    let verification = quest_qsp::certification::CertificationPolicy {
+        response_tolerance: tolerance,
+        completion_tolerance: tolerance,
+        conversion_tolerance: tolerance,
+        reconstruction_tolerance: tolerance,
+        unitarity_tolerance: tolerance,
+        ..quest_qsp::certification::CertificationPolicy::default()
+    };
+    crate::read_compiled_qsp_json(source, policy, verification).map(QspInput::Compiled)
+}
+fn read_qsp_json_impl(
+    source: &str,
+    policy: IoPolicy,
+    execution: bool,
+    verification_tolerance: Option<f64>,
+) -> Result<QspInput> {
     if source.len() > policy.max_bytes {
         return Err(Error::Budget("JSON source"));
     }
+    if source
+        .len()
+        .checked_mul(32)
+        .is_none_or(|bytes| bytes > policy.max_bytes)
+    {
+        return Err(Error::Budget("JSON decoded storage"));
+    }
     let value: Value = serde_json::from_str(source)?;
+    if value.get("payload").is_some() || value.get("sha256").is_some() {
+        drop(value);
+        return compiled_at_tolerance(source, policy, verification_tolerance);
+    }
     if value.get("control_words").is_some() && value.get("controls").is_some() {
         return Err(Error::Format("competing frozen matrix representations"));
     }
@@ -423,6 +528,8 @@ fn read_polynomial(value: Value, policy: IoPolicy) -> Result<PolynomialInput> {
 /// Returns JSON serialization errors.
 pub fn write_qsp_json(input: &QspInput) -> Result<String> {
     let value = match input {
+        #[cfg(feature = "certification")]
+        QspInput::Compiled(p) => return Ok(p.json().to_owned()),
         QspInput::Symmetric(p) => json!({"convention":p.convention(),"angles":p.values()}),
         QspInput::Laurent(p) => json!({"convention":p.convention(),"angles":p.values()}),
         QspInput::GeneralizedAngles(angles) => json!({"psi":angles.psi,"phi":angles.phi}),

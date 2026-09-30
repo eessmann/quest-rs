@@ -1,2 +1,2 @@
-use quest_circuit::ProgramBuilder;
-fn main(){let program=ProgramBuilder::new(1,0).unwrap().finish().unwrap();let _=program.adjoint();}
+use quest_circuit::QuantumRegionBuilder;
+fn main(){let program=QuantumRegionBuilder::new(1,0).unwrap().finish().unwrap();let _=program.adjoint();}

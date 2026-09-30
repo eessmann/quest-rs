@@ -1,6 +1,6 @@
 //! Counts the fixed successful state-vector dispatch schedule before execution.
 use crate::{Error, Result};
-use quest_circuit::{BoundGate, ControlState, ExecutablePlan, Operation, dispatch_recipe};
+use quest_circuit::{BoundGate, ControlState, Operation, RegionPlan, dispatch_recipe};
 use std::collections::BTreeMap;
 
 /// Successful QSVT run calls into the native register API, per process/rank.
@@ -96,7 +96,7 @@ fn gate(gate: &BoundGate, zeros: usize) -> Result<usize> {
         .map_err(|_| Error::Overflow)
 }
 
-pub(super) fn circuit(plan: &ExecutablePlan) -> Result<usize> {
+pub(super) fn circuit(plan: &RegionPlan) -> Result<usize> {
     let mut memo = BTreeMap::new();
     plan.instructions()
         .iter()
@@ -158,7 +158,7 @@ fn operation(
 mod tests {
     use super::*;
     use googletest::prelude::*;
-    use quest_circuit::{Control, Gate, OracleFragment, ProgramBuilder};
+    use quest_circuit::{Control, Gate, OracleFragment, QuantumRegionBuilder};
 
     #[gtest]
     fn unrepresentable_dispatch_totals_fail_before_execution() {
@@ -176,7 +176,7 @@ mod tests {
     #[gtest]
     fn nested_shared_adjoint_calls_count_decomposition_and_signed_controls()
     -> googletest::Result<()> {
-        let mut body = ProgramBuilder::new(2, 0)?;
+        let mut body = QuantumRegionBuilder::new(2, 0)?;
         let a = body.qubit(0)?;
         let b = body.qubit(1)?;
         body.gate(
@@ -196,7 +196,7 @@ mod tests {
         let fragment = OracleFragment::builder(body.finish()?.bind(&[])?)
             .matrix_tolerance(1e-12)?
             .build()?;
-        let mut caller = ProgramBuilder::new(4, 0)?;
+        let mut caller = QuantumRegionBuilder::new(4, 0)?;
         let targets = [caller.qubit(2)?, caller.qubit(0)?];
         caller.oracle(
             &fragment,

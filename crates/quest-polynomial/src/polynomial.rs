@@ -11,6 +11,7 @@ pub struct Polynomial<B: Basis> {
     coefficients: Arc<Vec<Complex64>>,
     limits: Limits,
     last_order: i32,
+    effective_support: Option<(i32, i32)>,
 }
 impl<B: Basis> Polynomial<B> {
     /// # Errors
@@ -26,11 +27,27 @@ impl<B: Basis> Polynomial<B> {
             .offset()
             .checked_add(last)
             .ok_or(Error::SupportOverflow)?;
+        let nonzero = |value: &Complex64| *value != Complex64::new(0.0, 0.0);
+        let effective_support = coefficients
+            .iter()
+            .position(nonzero)
+            .zip(coefficients.iter().rposition(nonzero))
+            .map(|(first, last)| {
+                let order = |index| {
+                    i32::try_from(index)
+                        .map_err(|_| Error::SupportOverflow)?
+                        .checked_add(basis.offset())
+                        .ok_or(Error::SupportOverflow)
+                };
+                Ok::<_, Error>((order(first)?, order(last)?))
+            })
+            .transpose()?;
         Ok(Self {
             basis,
             coefficients: Arc::new(coefficients),
             limits,
             last_order,
+            effective_support,
         })
     }
     #[must_use]
@@ -42,18 +59,30 @@ impl<B: Basis> Polynomial<B> {
         &self.basis
     }
     #[must_use]
-    pub fn support(&self) -> (i32, i32) {
-        (self.basis.offset(), self.last_order)
+    /// Inclusive orders represented by storage, including zero coefficients.
+    /// Empty storage has no span.
+    pub fn stored_support(&self) -> Option<(i32, i32)> {
+        (!self.coefficients.is_empty()).then(|| (self.basis.offset(), self.last_order))
     }
+    /// First and last nonzero orders; the zero polynomial has no support.
     #[must_use]
-    pub fn degree(&self) -> usize {
+    pub const fn effective_support(&self) -> Option<(i32, i32)> {
+        self.effective_support
+    }
+    /// Highest nonzero basis order. Laurent degree may be negative; zero has no degree.
+    #[must_use]
+    pub fn degree(&self) -> Option<i32> {
+        self.effective_support.map(|(_, last)| last)
+    }
+    /// Last coefficient index, saturating to zero for empty storage.
+    /// This is an allocation/recurrence parameter, not mathematical degree.
+    #[must_use]
+    pub fn stored_order(&self) -> usize {
         self.coefficients.len().saturating_sub(1)
     }
     #[must_use]
-    pub fn is_zero(&self) -> bool {
-        self.coefficients
-            .iter()
-            .all(|x| *x == Complex64::new(0.0, 0.0))
+    pub const fn is_zero(&self) -> bool {
+        self.effective_support.is_none()
     }
     #[must_use]
     pub const fn limits(&self) -> Limits {
@@ -65,11 +94,16 @@ impl<B: Basis> Polynomial<B> {
     /// Rejects nonfinite arithmetic and Laurent poles at zero.
     pub fn evaluate(&self, argument: Complex64) -> Result<Complex64> {
         finite(argument)?;
-        if self.coefficients.is_empty() {
+        if self.is_zero() {
             return Ok(Complex64::new(0.0, 0.0));
         }
         if argument == Complex64::new(0.0, 0.0) && self.basis.offset() < 0 {
-            return Err(Error::Domain);
+            if self.effective_support.is_some_and(|(first, _)| first < 0) {
+                return Err(Error::Domain);
+            }
+            let index = usize::try_from(self.basis.offset().unsigned_abs())
+                .map_err(|_| Error::SupportOverflow)?;
+            return Ok(self.coefficients.get(index).copied().unwrap_or_default());
         }
         if self.coefficients.len() == 1 {
             return finite(
@@ -117,7 +151,7 @@ impl Polynomial<Chebyshev> {
     /// Rejects support/allocation overflow, insufficient storage, or subnormal
     /// coefficients whose exact halving is not representable in binary64.
     pub fn on_cosine_circle(&self) -> Result<Polynomial<Laurent>> {
-        let degree = self.degree();
+        let degree = self.stored_order();
         let count = degree
             .checked_mul(2)
             .and_then(|x| x.checked_add(1))

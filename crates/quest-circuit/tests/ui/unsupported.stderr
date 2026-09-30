@@ -1,4 +1,4 @@
-error: unsupported circuit construct or gate in the initial DSL profile
+error: unknown gate opaque_operation
  --> tests/ui/unsupported.rs:2:35
   |
 2 | fn main(){let _=circuit!{qubit q; opaque_operation q;};}

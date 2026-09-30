@@ -1,0 +1,103 @@
+• Validating lock
+✓ Validating lock in 5.71ms
+  evaluating file '«nix-internal»/derivation-internal.nix'
+• Configuring shell
+• Configuring cachix
+✓ Configuring cachix in 1.75ms
+• Evaluating shell
+✓ Evaluating shell in 3.99ms (cached)
+✓ Configuring shell in 8.08ms
+• Loading tasks
+• Evaluating devenv.config.task.config
+✓ Evaluating devenv.config.task.config in 305µs (cached)
+✓ Loading tasks in 980µs
+• Running tasks
+• Running devenv:files:cleanup
+✓ Running devenv:files:cleanup in 7.31ms
+• Running devenv:enterShell
+✓ Running devenv:enterShell in 7.60ms
+• Running devenv:enterTest
+✓ Running devenv:enterTest in 910ns (no command)
+✓ Running tasks in 15.0ms
+   Compiling proc-macro2 v1.0.107
+   Compiling jobserver v0.1.35
+   Compiling num-integer v0.1.47
+   Compiling serde v1.0.229
+   Compiling thiserror v1.0.69
+   Compiling shlex v1.3.0
+   Compiling scratch v1.0.9
+   Compiling unicode-width v0.2.2
+   Compiling cc v1.4.2
+   Compiling cxxbridge-flags v1.0.198
+   Compiling num-bigint v0.5.1
+   Compiling codespan-reporting v0.13.1
+   Compiling num-rational v0.4.2
+   Compiling rustix v1.1.4
+   Compiling strength_reduce v0.2.4
+   Compiling quote v1.0.47
+   Compiling syn v3.0.3
+   Compiling syn v2.0.119
+   Compiling syn v1.0.109
+   Compiling cmake v0.1.58
+   Compiling link-cplusplus v1.0.12
+   Compiling cxx v1.0.198
+   Compiling quest-symbolic v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-symbolic)
+   Compiling transpose v0.2.3
+   Compiling primal-check v0.3.4
+   Compiling rustfft v6.4.1
+   Compiling cxx-build v1.0.198
+   Compiling alloca v0.4.0
+   Compiling maryada v0.2.1
+   Compiling serde_derive v1.0.229
+   Compiling thiserror-impl v2.0.20
+   Compiling interpol v0.2.1
+   Compiling private-gemm-x86 v0.1.20
+   Compiling equator-macro v0.2.1
+   Compiling thiserror-impl v1.0.69
+   Compiling thiserror v2.0.20
+   Compiling zerocopy-derive v0.8.57
+   Compiling equator v0.2.2
+   Compiling nano-gemm v0.2.2
+   Compiling cxxbridge-macro v1.0.198
+   Compiling foldhash v0.2.0
+   Compiling quest-numerics v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-numerics)
+   Compiling googletest_macro v0.14.3
+   Compiling zerocopy v0.8.57
+   Compiling cmake-file-api v0.1.2
+   Compiling faer v0.24.4
+   Compiling quest-math v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-math)
+   Compiling quest-build v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-build)
+   Compiling quest-synthesis v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-synthesis)
+   Compiling quest-sys v0.2.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-sys)
+   Compiling quest-optimizer-protocol v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-protocol)
+   Compiling half v2.7.1
+   Compiling quest-optimizer-client v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-client)
+   Compiling ciborium-ll v0.2.2
+   Compiling quest-rs v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest)
+   Compiling ciborium v0.2.2
+   Compiling tinytemplate v1.2.1
+   Compiling trybuild v1.0.121
+   Compiling criterion v0.8.2
+   Compiling googletest v0.14.3
+warning: quest-sys@0.2.0: Using QuEST 4.3.0 from /nix/store/0d389wpw7ikhv5cdg5x8xg9pi184cr77-quest-4.3.0 with /nix/store/z4c6k0mrlkwl3s4w9ysxc8vq1wylm3ms-gcc-wrapper-15.3.0/bin/g++
+   Compiling quest-language v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-language)
+   Compiling quest-polynomial v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-polynomial)
+   Compiling quest-qsp v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-qsp)
+   Compiling quest-qasm v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-qasm)
+   Compiling quest-compile v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-compile)
+   Compiling quest-macros v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-macros)
+   Compiling quest-circuit v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-circuit)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 18.66s
+     Running tests/structured_workers.rs (/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/worker-target/debug/build/quest-rs/a821a8acdd4d9834/out/structured_workers-a821a8acdd4d9834)
+
+running 1 test
+test certified_ssa_synthesis_preserves_native_state_and_density ... 
+running 1 test
+test certified_ssa_synthesis_preserves_native_state_and_density ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.14s
+
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.15s
+

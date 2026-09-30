@@ -1,5 +1,7 @@
 #![cfg(feature = "codespan-reporting")]
 use googletest::{Result, prelude::*};
+#[allow(unused_imports)]
+use quest_circuit::prelude::*;
 use quest_circuit::{Error, SourceSpan};
 
 #[gtest]

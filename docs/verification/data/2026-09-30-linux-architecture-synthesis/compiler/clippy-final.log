@@ -1,0 +1,149 @@
+• Validating lock
+✓ Validating lock in 5.83ms
+  evaluating file '«nix-internal»/derivation-internal.nix'
+• Configuring shell
+• Configuring cachix
+✓ Configuring cachix in 1.81ms
+• Evaluating shell
+✓ Evaluating shell in 4.44ms (cached)
+✓ Configuring shell in 8.40ms
+• Loading tasks
+• Evaluating devenv.config.task.config
+✓ Evaluating devenv.config.task.config in 245µs (cached)
+✓ Loading tasks in 925µs
+• Running tasks
+• Running devenv:files:cleanup
+✓ Running devenv:files:cleanup in 8.45ms
+• Running devenv:enterShell
+✓ Running devenv:enterShell in 6.77ms
+• Running devenv:enterTest
+✓ Running devenv:enterTest in 250ns (no command)
+✓ Running tasks in 15.3ms
+    Checking num-traits v0.2.19
+    Checking cfg-if v1.0.4
+    Checking bitflags v2.13.1
+    Checking serde_core v1.0.229
+    Checking libc v0.2.189
+    Checking bytemuck v1.25.2
+    Checking num-complex v0.4.6
+    Checking raw-cpuid v11.6.0
+    Checking libm v0.2.16
+    Checking serde v1.0.229
+    Checking memchr v2.8.3
+    Checking pulp-wasm-simd-flag v0.1.1
+    Checking once_cell v1.21.4
+    Checking reborrow v0.5.5
+    Checking dyn-stack v0.13.2
+    Checking pulp v0.22.3
+    Checking num-integer v0.1.47
+    Checking zmij v1.0.23
+    Checking nano-gemm-core v0.2.1
+    Checking itoa v1.0.18
+    Checking serde_json v1.0.151
+    Checking gemm-common v0.19.0
+    Checking num-rational v0.4.2
+    Checking num-bigint v0.5.1
+    Checking thiserror v2.0.20
+    Checking zerocopy v0.8.57
+    Checking linux-raw-sys v0.12.1
+    Checking typenum v1.20.1
+    Checking rustix v1.1.4
+    Checking hybrid-array v0.4.15
+    Checking gemm-c64 v0.19.0
+    Checking gemm-f64 v0.19.0
+    Checking gemm-c32 v0.19.0
+    Checking gemm-f32 v0.19.0
+    Checking qd v0.8.0
+    Checking nano-gemm-c64 v0.2.1
+    Checking nano-gemm-c32 v0.2.1
+    Checking nano-gemm-f32 v0.2.1
+    Checking nano-gemm-f64 v0.2.1
+    Checking equator v0.2.2
+    Checking num_cpus v1.17.0
+   Compiling hashbrown v0.17.1
+    Checking equivalent v1.0.2
+    Checking foldhash v0.1.5
+    Checking termcolor v1.4.1
+    Checking generativity v1.2.1
+    Checking faer-traits v0.24.0
+    Checking indexmap v2.14.0
+    Checking hashbrown v0.15.5
+    Checking private-gemm-x86 v0.1.20
+    Checking gemm v0.19.0
+    Checking getrandom v0.3.4
+    Checking quest-math v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-math)
+    Checking nano-gemm v0.2.2
+    Checking equator v0.6.0
+    Checking fixedbitset v0.5.7
+    Checking regex-syntax v0.8.11
+    Checking unicode-width v0.2.2
+    Checking codespan-reporting v0.13.1
+    Checking petgraph v0.8.3
+    Checking faer v0.24.4
+    Checking rand_core v0.9.5
+    Checking block-buffer v0.12.1
+    Checking crypto-common v0.2.2
+    Checking quest-symbolic v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-symbolic)
+    Checking aho-corasick v1.1.5
+    Checking const-oid v0.10.2
+    Checking regex-automata v0.4.18
+    Checking digest v0.11.3
+    Checking quest-language v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-language)
+    Checking getrandom v0.4.3
+    Checking quest-synthesis v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-synthesis)
+    Checking quest-optimizer-protocol v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-protocol)
+    Checking half v2.7.1
+    Checking ciborium-io v0.2.2
+    Checking fastrand v2.5.0
+    Checking winnow v1.0.4
+    Checking anstyle v1.0.14
+    Checking either v1.18.0
+    Checking clap_lex v1.1.0
+    Checking cpufeatures v0.3.1
+    Checking sha2 v0.11.0
+    Checking clap_builder v4.6.6
+    Checking itertools v0.13.0
+    Checking quest-qasm v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-qasm)
+    Checking toml_parser v1.1.3+spec-1.1.0
+    Checking tempfile v3.27.0
+    Checking ciborium-ll v0.2.2
+    Checking quest-optimizer-client v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-client)
+    Checking regex v1.13.1
+    Checking ppv-lite86 v0.2.21
+    Checking serde_spanned v1.1.1
+    Checking toml_datetime v1.1.1+spec-1.1.0
+    Checking wait-timeout v0.2.1
+    Checking bit-vec v0.8.0
+    Checking fnv v1.0.7
+    Checking cast v0.3.0
+    Checking quick-error v1.2.3
+    Checking toml_writer v1.1.2+spec-1.1.0
+    Checking same-file v1.0.6
+    Checking walkdir v2.5.0
+    Checking toml v1.1.5+spec-1.1.0
+    Checking rusty-fork v0.3.1
+    Checking criterion-plot v0.8.2
+    Checking bit-set v0.8.0
+   Compiling toml_edit v0.25.13+spec-1.1.0
+    Checking rand_chacha v0.9.0
+    Checking alloca v0.4.0
+    Checking ciborium v0.2.2
+    Checking target-tuple v1.0.2
+    Checking clap v4.6.6
+    Checking rand_xorshift v0.4.0
+    Checking rand v0.9.5
+    Checking tinytemplate v1.2.1
+    Checking page_size v0.6.0
+    Checking anes v0.1.6
+    Checking unarray v0.1.4
+    Checking oorandom v11.1.5
+    Checking glob v0.3.4
+    Checking criterion v0.8.2
+    Checking trybuild v1.0.121
+    Checking proptest v1.11.0
+    Checking googletest v0.14.3
+   Compiling proc-macro-crate v3.5.0
+    Checking quest-compile v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-compile)
+   Compiling quest-macros v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-macros)
+    Checking quest-circuit v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-circuit)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 31.08s

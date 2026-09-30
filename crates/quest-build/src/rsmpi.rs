@@ -30,12 +30,7 @@ pub fn verify_rsmpi_compatibility(native: &NativePackage) -> Result<()> {
         }
     }
     let requested = env::var_os("MPICC").ok_or_else(|| invalid("quest-sys mpi feature requires an explicit absolute MPICC path matching QuEST; set it before Cargo builds mpi-sys"))?;
-    let wrapper = Path::new(&requested);
-    if !wrapper.is_absolute() {
-        return Err(invalid("MPICC must be an absolute compiler-wrapper path"));
-    }
-    let wrapper = fs::canonicalize(wrapper).map_err(|error| io(wrapper, error))?;
-    println!("cargo:rerun-if-changed={}", wrapper.display());
+    let wrapper = verified_wrapper(Path::new(&requested))?;
     // rsmpi's build-probe-mpi uses this exact discovery query. Ensure it
     // succeeded instead of allowing its pkg-config fallback recipe.
     let shown = run(Command::new(&wrapper).arg("-show"))?;
@@ -77,6 +72,18 @@ pub fn verify_rsmpi_compatibility(native: &NativePackage) -> Result<()> {
     Ok(())
 }
 
+fn verified_wrapper(wrapper: &Path) -> Result<std::path::PathBuf> {
+    if !wrapper.is_absolute() {
+        return Err(invalid("MPICC must be an absolute compiler-wrapper path"));
+    }
+    let canonical = fs::canonicalize(wrapper).map_err(|error| io(wrapper, error))?;
+    println!("cargo:rerun-if-changed={}", canonical.display());
+    println!("cargo:rerun-if-changed={}", wrapper.display());
+    // OpenMPI dispatches through the invoked basename (mpicc -> opal_wrapper).
+    // Validate the real target, but execute the exact path selected by rsmpi.
+    Ok(wrapper.to_path_buf())
+}
+
 fn compare_witnesses(reference: &[u8], selected: &[u8]) -> Result<std::path::PathBuf> {
     let parse = |bytes: &[u8]| -> Result<(std::path::PathBuf, String)> {
         let text =
@@ -105,6 +112,21 @@ fn compare_witnesses(reference: &[u8], selected: &[u8]) -> Result<std::path::Pat
 mod tests {
     use super::*;
     use googletest::prelude::*;
+
+    #[cfg(unix)]
+    #[gtest]
+    fn mpi_wrapper_preserves_symlink_dispatch_name() -> googletest::Result<()> {
+        use std::os::unix::fs::{PermissionsExt, symlink};
+        let fixture = tempfile::tempdir()?;
+        let executable = fixture.path().join("opal_wrapper");
+        let wrapper = fixture.path().join("mpicc");
+        fs::write(&executable, "#!/bin/sh\nprintf '%s' \"${0##*/}\"\n")?;
+        fs::set_permissions(&executable, fs::Permissions::from_mode(0o755))?;
+        symlink(&executable, &wrapper)?;
+        let output = run(&mut Command::new(verified_wrapper(&wrapper)?))?;
+        verify_that!(output.stdout, eq(b"mpicc"))?;
+        Ok(())
+    }
 
     #[gtest]
     fn mpi_witness_rejects_same_name_different_library_or_layout() -> googletest::Result<()> {

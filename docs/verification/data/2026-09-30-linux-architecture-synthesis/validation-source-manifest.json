@@ -1,0 +1,5046 @@
+{
+  "base_revision": "7148ccaa47e9e39506d62ba1e441d657040b83f8",
+  "branch": "codex/circuit-synthesis",
+  "files": [
+    {
+      "bytes": 279,
+      "kind": "file",
+      "path": ".config/nextest.toml",
+      "sha256": "4aa148cb872aad923d6938d1b543bcfa97b4b64644b53fdef80fe0a19a04c11b"
+    },
+    {
+      "bytes": 772,
+      "kind": "file",
+      "path": ".gitignore",
+      "sha256": "8937446651662ba86be6ed09f2973aac25efd7b9865fcc456589f5125dfbb729"
+    },
+    {
+      "bytes": 4540,
+      "kind": "file",
+      "path": "CONTRIBUTING.md",
+      "sha256": "5f90559b4e9624902c69e080f5b328d48387cb0ed445a98a67fdcffc26b65d29"
+    },
+    {
+      "bytes": 79810,
+      "kind": "file",
+      "path": "Cargo.lock",
+      "sha256": "fdcfa7bce1782024d13e2c712e5ecbee0f72276365e604c007740f21b4405df0"
+    },
+    {
+      "bytes": 3979,
+      "kind": "file",
+      "path": "Cargo.toml",
+      "sha256": "ce9d4031cccb23e69c38ba9ec06513f59209eafc99f256e777798841836067da"
+    },
+    {
+      "bytes": 1070,
+      "kind": "file",
+      "path": "LICENSE",
+      "sha256": "670b5966adb424e1576187262e12063e041861861a7c4f913705b211a5cbce7c"
+    },
+    {
+      "bytes": 15225,
+      "kind": "file",
+      "path": "README.md",
+      "sha256": "f3cd6572c80a9840373324c30dcc789fec3468e5e23c98743b3ef03134e14d50"
+    },
+    {
+      "bytes": 4184,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/SHA256SUMS",
+      "sha256": "d2fa1303d7d33256abe2d99449a9e459525a07340b27beddb9550e2f15c6e743"
+    },
+    {
+      "bytes": 2019,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/build.log",
+      "sha256": "684bbeb32574380d80ccf0de166a7420c8bfad684f4ff29307a614340dd16c99"
+    },
+    {
+      "bytes": 558,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/environment.txt",
+      "sha256": "bc7d6c79370c03683b8c53e9188382d8e1b26ab6430dfe06532437104ef809f0"
+    },
+    {
+      "bytes": 224,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/executables.sha256",
+      "sha256": "3e4e9fad302bb2589427dd90661bae151b8812f890f197931277748ed68ae42d"
+    },
+    {
+      "bytes": 313,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/inputs.sha256",
+      "sha256": "3fd0fa82d79e47dcd269f15a13c67a8276f1fba0c1b9247262e920e05dd0d337"
+    },
+    {
+      "bytes": 324,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/runtime-q12-trial1.csv",
+      "sha256": "191c7f2eb314b7caba1f223e524098bbe0f837cff0925994fa05124716930076"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/runtime-q12-trial1.time.txt",
+      "sha256": "6fd90b6aefe1d97542d668c76dbfc9dd00d6c52f93f96857962c16f2b2075c3b"
+    },
+    {
+      "bytes": 325,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/runtime-q12-trial2.csv",
+      "sha256": "ce585eac9c78bf415239be8aa83031e0b4b68016c43ca47fd1c705588839e5e6"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/runtime-q12-trial2.time.txt",
+      "sha256": "d785253ccac99586103912c798b5f9ef6b7678051b29f6c78774e1caad70665a"
+    },
+    {
+      "bytes": 324,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/runtime-q12-trial3.csv",
+      "sha256": "9fe561eb571b40b9ffe34584cfd57300ac243c2239f3da47fed73d0689040dd3"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/runtime-q12-trial3.time.txt",
+      "sha256": "c9c107a63476d961936e286fbc4f563cfdec04031329b614de56620884a68e75"
+    },
+    {
+      "bytes": 314,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/runtime-q4-trial1.csv",
+      "sha256": "49f8a4537d934407f7923e6a964a4fbb6e875edf96efa677303a994f6920c92e"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/runtime-q4-trial1.time.txt",
+      "sha256": "cf662a479deefcd79620450a7cd7dc6236fb16b9e17300b60eac865ff914a5a0"
+    },
+    {
+      "bytes": 312,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/runtime-q4-trial2.csv",
+      "sha256": "84c7b33253c6acef3f3112edda48560e55a6d3e1d12e02098d2a7b60369a5486"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/runtime-q4-trial2.time.txt",
+      "sha256": "ad7b118df44489341529f2bd43442d2782059eda71df0403785f7410b960be01"
+    },
+    {
+      "bytes": 312,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/runtime-q4-trial3.csv",
+      "sha256": "9dab9c5890a6663119766a5efbfc357d99e9715f90ecda761dd9a64d8000a882"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/runtime-q4-trial3.time.txt",
+      "sha256": "ec7c8afdbba8287c3f3e82ab9e32b0e7b412c497b217036ec8e2de4c417a85ff"
+    },
+    {
+      "bytes": 322,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/runtime-q8-trial1.csv",
+      "sha256": "1669574340addd189f78e2b41d3c5ef8a88710a5c31c16ba905648922bcc9d39"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/runtime-q8-trial1.time.txt",
+      "sha256": "42f0911899b6c05c892c5f1b814d7246257cf10af47db1a9d4004bc01dc29237"
+    },
+    {
+      "bytes": 322,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/runtime-q8-trial2.csv",
+      "sha256": "11a34d18b48c2fe9f3930fc40c72930beb9ec3399a64b00f9f2abbe22aafbd98"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/runtime-q8-trial2.time.txt",
+      "sha256": "5f5f7d4bc7afc44c6c970c08dca847c0e8ad48d5c8c75aed2934fa32db2fb5b2"
+    },
+    {
+      "bytes": 322,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/runtime-q8-trial3.csv",
+      "sha256": "f9398772105180f20f79214b80e37224297ed80b76a2cdf5b3ec151d51950640"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/runtime-q8-trial3.time.txt",
+      "sha256": "9d07cb48488ac83bff5a71a48333a91791e8e2b16b97deab821d53deecbaa432"
+    },
+    {
+      "bytes": 279,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/synthesis-d12-trial1.csv",
+      "sha256": "dcf03ebe8e1c4b84c8109bd9934f9c8ad79aa4131818fd63c4abdc30338e2128"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/synthesis-d12-trial1.time.txt",
+      "sha256": "70095ab7286f94b312f3adb65c4737ea628ef8b805fcc503ad63921557a70504"
+    },
+    {
+      "bytes": 279,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/synthesis-d12-trial2.csv",
+      "sha256": "66820363dc080a6b5a90bc04e1c299724f18e4e89856c90d4901951d6c0bd4cf"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/synthesis-d12-trial2.time.txt",
+      "sha256": "178d7f551706e776f514905fe6fb4a504c4306b74e07f30fb885c3eafd267ec4"
+    },
+    {
+      "bytes": 280,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/synthesis-d12-trial3.csv",
+      "sha256": "d598b97aeb2a28497e09d705a1126d5a2591db6cb65061c7d246abaca1ea8933"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/synthesis-d12-trial3.time.txt",
+      "sha256": "481e455ae4c16a8abdcb9b8739264720247f19b15ec78bc6665243b8a8ecfe33"
+    },
+    {
+      "bytes": 275,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/synthesis-d3-trial1.csv",
+      "sha256": "48e90fdd5ced83c64c1e868cb498ce408912abd239a5e56debfd8a1885ffc834"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/synthesis-d3-trial1.time.txt",
+      "sha256": "0cf3b6f468825166098543ed5eea69e6ad9c947e200213b20f4116596694f374"
+    },
+    {
+      "bytes": 275,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/synthesis-d3-trial2.csv",
+      "sha256": "3b867d759939f3dab67e47b8fe4138a8ac2c5cef3eebae1b9fe131096c841ef1"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/synthesis-d3-trial2.time.txt",
+      "sha256": "ddcdcd2d7794c04090f8e1102ecfbb6e971caa11a0d9eaa00dcc809ec8ee53fd"
+    },
+    {
+      "bytes": 275,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/synthesis-d3-trial3.csv",
+      "sha256": "ee8aa1e9c064f7af8e6293e846d92875ff7965e645859c76ae6ad46588e4aa43"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/synthesis-d3-trial3.time.txt",
+      "sha256": "46c93f41f65c0b569ac7e64a61940f078f139730d8bf0fa0f283d2c3f8da2221"
+    },
+    {
+      "bytes": 276,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/synthesis-d6-trial1.csv",
+      "sha256": "3419625c27e6d76f8b73f179038f1c191cddacad08672cbb546198aa5fe64f7a"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/synthesis-d6-trial1.time.txt",
+      "sha256": "d03bc6cda1958111adcaf22776b4aaa7e4af5857e0ff5b78893c9a9813255f5a"
+    },
+    {
+      "bytes": 276,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/synthesis-d6-trial2.csv",
+      "sha256": "e9ac7844c490b9c56b44098cb839667984f37bf4ee983f9f8657a7ddd2aaa535"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/synthesis-d6-trial2.time.txt",
+      "sha256": "11831fb7860ef0c2b7dc3a847bc7a236b135dc1bea9659a61fd121fd10c4134b"
+    },
+    {
+      "bytes": 276,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/synthesis-d6-trial3.csv",
+      "sha256": "b432064018e8e216e3fe5248eff36d3c4dcd8de17f547884df5435c7375846b8"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/synthesis-d6-trial3.time.txt",
+      "sha256": "6a8395ef9409408297be62d15550b17b321c126a97dd1375a0c552ae74fb74a4"
+    },
+    {
+      "bytes": 276,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/synthesis-d9-trial1.csv",
+      "sha256": "074f9e57bdc9f433e35afd90b17c78b3f8dfcd8042c7808a9c5e511354c655c4"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/synthesis-d9-trial1.time.txt",
+      "sha256": "913f0fd4e13d34a0acf5f6675118fab3381c0f666517228b63d2e07d6d6b7269"
+    },
+    {
+      "bytes": 276,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/synthesis-d9-trial2.csv",
+      "sha256": "4935acbfa8071ddb33355b08252ae6b198bade3a319225c9efb67fb8b8d1236d"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/synthesis-d9-trial2.time.txt",
+      "sha256": "0ab68584bf2c4f5c963562a53c28cf859d0edeb32e8ac735a816ed6e9af90b3e"
+    },
+    {
+      "bytes": 276,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/synthesis-d9-trial3.csv",
+      "sha256": "79328f512dc9fc5596a92f4b205d8b5f658b7bdcfe07c4db987fd8fb4df4adb0"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29-final/synthesis-d9-trial3.time.txt",
+      "sha256": "e42a1e6a9df22e3ee1ff93bd3043c71a8f047c3639e1ef71289045b6f665832c"
+    },
+    {
+      "bytes": 4588,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/build.log",
+      "sha256": "34a1c81c52cb9a215b18b08817c7bed1032b73fb08fb714b71fedb14b4fc50e0"
+    },
+    {
+      "bytes": 558,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/environment.txt",
+      "sha256": "1aa70eb6cb3f2a2bb22459f44fcfe309896e4b1d0812e82692f9206a648e0a78"
+    },
+    {
+      "bytes": 224,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/executables.sha256",
+      "sha256": "bfa8688c1c84fb5d21936227a4f15cb858f646963e0bca8704377f61b0aeee53"
+    },
+    {
+      "bytes": 313,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/inputs.sha256",
+      "sha256": "d79562ff28158611eb844553abd2e94d35dca2afbd030c098a127e5aa40c8304"
+    },
+    {
+      "bytes": 324,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/runtime-q12-trial1.csv",
+      "sha256": "280da5cfdb34aaa57ca08a1493e7ba158ab22b9851c04f55838f4e4d4f32ab22"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/runtime-q12-trial1.time.txt",
+      "sha256": "8b86aabff157c6a3df8fd5cb475a426806a7261c9c2c18950237a86ba05fa5b8"
+    },
+    {
+      "bytes": 324,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/runtime-q12-trial2.csv",
+      "sha256": "a404fd1680dc32f5132aa3ec582b1d45cb87c691fe2747ed6eaf3cbd93fdea87"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/runtime-q12-trial2.time.txt",
+      "sha256": "c34f273da7c3f61be3757d12d6286001355c5f127f807190efca11bdc03197f0"
+    },
+    {
+      "bytes": 324,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/runtime-q12-trial3.csv",
+      "sha256": "085c5f23ba3b7ce6712c39d6f96520bf3ca83f610e74ca65e23581464eb630aa"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/runtime-q12-trial3.time.txt",
+      "sha256": "c4f0b16312fba41e9ce0cafe5c5f3e2fb5de523e0ab5369400f8fc06fd06fa4d"
+    },
+    {
+      "bytes": 314,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/runtime-q4-trial1.csv",
+      "sha256": "2923d28acb0b30ff74e61a94e548b8ee3aed40b08587f9e637c7cdabdffceaf4"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/runtime-q4-trial1.time.txt",
+      "sha256": "73dae2995729e9c66cc7e7cfeeb896b4c9bc8bbbe8be69cf3d8fffc0b8096372"
+    },
+    {
+      "bytes": 312,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/runtime-q4-trial2.csv",
+      "sha256": "70c0876ef641499dcd3c8301f7c2e88f73fb97cac403811c07be4cb0e44c7f41"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/runtime-q4-trial2.time.txt",
+      "sha256": "1d61bac5eeb1ca6a078c337d2ec6f69af80b96c03e110df3b979944ca44270dd"
+    },
+    {
+      "bytes": 313,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/runtime-q4-trial3.csv",
+      "sha256": "15be6f565a05f2b457fd8a4fad4dc52e78a8fa3febbb7f2e347592b007494a3e"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/runtime-q4-trial3.time.txt",
+      "sha256": "288eb9ee9e5293cbcb2bcab4e023f12a503974dfcd8e506495d24ff8b2dd5ae4"
+    },
+    {
+      "bytes": 322,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/runtime-q8-trial1.csv",
+      "sha256": "7c2aade3219d899ca783f57eaf0237f51039d279209c247cf4f02bea4cb48ce8"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/runtime-q8-trial1.time.txt",
+      "sha256": "1ef98ef43bc0c9c2977ffd00f671e2360313aff5a9ac2bc24df707215d9c2b13"
+    },
+    {
+      "bytes": 322,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/runtime-q8-trial2.csv",
+      "sha256": "d7051aafa01723ad3d29903a4c5a4b27812446103b42dff3b4bb6ca7ede635e1"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/runtime-q8-trial2.time.txt",
+      "sha256": "78f559b22866c8ed4c0520144d81f19bbf83e2768aae15625d76f4ec01def87c"
+    },
+    {
+      "bytes": 322,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/runtime-q8-trial3.csv",
+      "sha256": "e39badca8787d2eedd96600ca7d0b43560f7e060f3d9c8713d97ab3a2ea88844"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/runtime-q8-trial3.time.txt",
+      "sha256": "807346bc7b86e69d63aa1a6df7736d82175eef05ca33781900b8023f1e9f117d"
+    },
+    {
+      "bytes": 279,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/synthesis-d12-trial1.csv",
+      "sha256": "aacd1cc03c15399606feeca336cadd087d8dbd14df6ba598f04f2d39eb3edffc"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/synthesis-d12-trial1.time.txt",
+      "sha256": "fd86954b26d81f0ea6ef4032d6f6b71fbeb657c9aae729a73ddc26d728649407"
+    },
+    {
+      "bytes": 279,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/synthesis-d12-trial2.csv",
+      "sha256": "e70e8bdb9ec27f3e071df9de3877cad684c1f29a567481e8c75dd7b22e78b1e3"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/synthesis-d12-trial2.time.txt",
+      "sha256": "971a65642b7e566ad3003626a4782636133ac44855a083b14685800a86ddece0"
+    },
+    {
+      "bytes": 279,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/synthesis-d12-trial3.csv",
+      "sha256": "7380f2da26331c0eb5cec9fa48ef59d50b5d4adecd36a96729440491c4ae90aa"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/synthesis-d12-trial3.time.txt",
+      "sha256": "ab024d1594a196e1663d31df1cafda4a8f0cb1a89c0bf274b63677ae3badd7bc"
+    },
+    {
+      "bytes": 275,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/synthesis-d3-trial1.csv",
+      "sha256": "1c362212273dfda84f78e2207b1ef1876e58e10aa0f72bf8104bf1419a2f0769"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/synthesis-d3-trial1.time.txt",
+      "sha256": "a7fcb3d078742e0435f45262905e637c80f97e561a105bc571c0e4e2d038b9a3"
+    },
+    {
+      "bytes": 275,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/synthesis-d3-trial2.csv",
+      "sha256": "0b2bd4c6b0413c9902f0bee96a94674b0f9570b89670313929168c4c3e0d4c72"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/synthesis-d3-trial2.time.txt",
+      "sha256": "388d5d4c8ac37e24b1ab67b7bbd900afbc8a3725a27b15d5fb83d0aea260d63d"
+    },
+    {
+      "bytes": 275,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/synthesis-d3-trial3.csv",
+      "sha256": "530f7a3fdc0a8db9e77d18e7a0aeac467055d2019ec13943125185d1dabe9374"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/synthesis-d3-trial3.time.txt",
+      "sha256": "bc5c3a0d9879e58df0bdba053a9ad6a2a7ad888e1b6802754ff2bb8e84c4acf6"
+    },
+    {
+      "bytes": 276,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/synthesis-d6-trial1.csv",
+      "sha256": "9d9b2da2da76b3f4f6bee15679b7f141d4a4d319cceff99f32a826e05e626281"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/synthesis-d6-trial1.time.txt",
+      "sha256": "bddcae118dccd5581fc262789f08b1c6276737ee57e85ca4c1fec0c8178284a3"
+    },
+    {
+      "bytes": 276,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/synthesis-d6-trial2.csv",
+      "sha256": "91976e3f2914ac14e142c87a62e287c6e4635bef0c77cac7c14b013511945b4b"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/synthesis-d6-trial2.time.txt",
+      "sha256": "ed19d64dccf9627257fc4db56231ee608ec182eff5a9ae37408c6a2e0788470c"
+    },
+    {
+      "bytes": 276,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/synthesis-d6-trial3.csv",
+      "sha256": "dadd37f0494fd26c2a0bdd23cf46f7909b2c93d850f96243e00fd93def667379"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/synthesis-d6-trial3.time.txt",
+      "sha256": "c9108a8022b86d4fe205e019718b7b6ca806d857727207b90b1f0d5bbc741446"
+    },
+    {
+      "bytes": 276,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/synthesis-d9-trial1.csv",
+      "sha256": "77b8189dea533885a7b1d53b4098ac412be7582873e46de28752f8759c44f466"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/synthesis-d9-trial1.time.txt",
+      "sha256": "918fcddd1d639528261f8e75f05c25ddf952c6e21283c9711a5dc07f09a636ab"
+    },
+    {
+      "bytes": 276,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/synthesis-d9-trial2.csv",
+      "sha256": "159a8cde7148440faafcefd6fd5c76bfb521be2998c21aa04c6304ee4bca6b20"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/synthesis-d9-trial2.time.txt",
+      "sha256": "a6b52ff6ef1ea786fa79a1821b5bfab13e43ee03bffa26f85c61c211d5a5207a"
+    },
+    {
+      "bytes": 276,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/synthesis-d9-trial3.csv",
+      "sha256": "96a503113c3fbaa19b89e61807a7e7653f39748993b6ee6e37fe8adb0548e296"
+    },
+    {
+      "bytes": 777,
+      "kind": "file",
+      "path": "benchmarks/architecture/2026-09-29/synthesis-d9-trial3.time.txt",
+      "sha256": "be0d03a1f907eb73dabb6ab04bb22c25116fa62ade9a95a0ac5666d4b55c84c0"
+    },
+    {
+      "bytes": 5658,
+      "kind": "file",
+      "path": "benchmarks/architecture/README.md",
+      "sha256": "3a601dd4172cfc8e98f38891f58a8fea5848f43924c30a97a0b504174c713cb3"
+    },
+    {
+      "bytes": 1313,
+      "kind": "file",
+      "path": "benchmarks/architecture/run-local.sh",
+      "sha256": "562d514a17f8d56b3c19e30306a9a7801cf3e7c63ee87d9075f9fb4b2c759af1"
+    },
+    {
+      "bytes": 2189,
+      "kind": "file",
+      "path": "benchmarks/reference/CMakeLists.txt",
+      "sha256": "578074577ece99fac765afb5c21b7734e9094bfe04a9a0129008f18e549b937f"
+    },
+    {
+      "bytes": 4934,
+      "kind": "file",
+      "path": "benchmarks/reference/README.md",
+      "sha256": "ab88a621e541729d70ae7d2ec951737678eaa6202767295f200d9570eb9e3d10"
+    },
+    {
+      "bytes": 2771,
+      "kind": "file",
+      "path": "benchmarks/reference/branches/CMakeLists.txt",
+      "sha256": "01899b29c5d3d7090008339bc1d01f076e679b83456eeec293bd355064ecd7f2"
+    },
+    {
+      "bytes": 3984,
+      "kind": "file",
+      "path": "benchmarks/reference/branches/README.md",
+      "sha256": "c8e81cfc83d6e86ef172a3481c8e92efee771fea21165f0d0109c6101030226f"
+    },
+    {
+      "bytes": 2821,
+      "kind": "file",
+      "path": "benchmarks/reference/branches/capabilities.json",
+      "sha256": "e7cb2e1141a8527713dd61ed04e22234c7a01073363e5a446967238a0acd5d3b"
+    },
+    {
+      "bytes": 1615,
+      "kind": "file",
+      "path": "benchmarks/reference/branches/common.hpp",
+      "sha256": "87f300fc057fd00a0410b7c974311ff2a5e8a0505a9a77eb9380147c3ac80642"
+    },
+    {
+      "bytes": 4371,
+      "kind": "file",
+      "path": "benchmarks/reference/branches/data/develop-comparison.txt",
+      "sha256": "46362add76453934e101ede52f3733ca8f91cdc3b79bceeaa5874827de261edb"
+    },
+    {
+      "bytes": 2327,
+      "kind": "file",
+      "path": "benchmarks/reference/branches/data/develop.txt",
+      "sha256": "bb119d07942c654969ee1a8a6b902e63c8098854c478ebb6abb1c1f42359f9bb"
+    },
+    {
+      "bytes": 3004,
+      "kind": "file",
+      "path": "benchmarks/reference/branches/data/main-comparison.txt",
+      "sha256": "44f64118ddb3374cbb9d3eda5b5429c407be034be5c6ec4e62ab1c9fa69a0798"
+    },
+    {
+      "bytes": 1953,
+      "kind": "file",
+      "path": "benchmarks/reference/branches/data/main.txt",
+      "sha256": "e7072f3c8dc821cfe3241e333c8694d82108e478f29138f2cd350627f1c749cb"
+    },
+    {
+      "bytes": 2191,
+      "kind": "file",
+      "path": "benchmarks/reference/branches/develop.cpp",
+      "sha256": "923c35cf249e696a469897b7674eaadfd11496ab8645820f9b4d3a62435d7ddb"
+    },
+    {
+      "bytes": 1115,
+      "kind": "file",
+      "path": "benchmarks/reference/branches/main.cpp",
+      "sha256": "0cb1ecd2dd989d82860b50a24646d1c652d282e65d5e5529a72512ea46d90fe7"
+    },
+    {
+      "bytes": 7740,
+      "kind": "file",
+      "path": "benchmarks/reference/cpp_execution.cpp",
+      "sha256": "dda65bfe27b0947c54215dcc2bd2f27c5cd3444041b74f35644711ae986b72fe"
+    },
+    {
+      "bytes": 1642,
+      "kind": "file",
+      "path": "benchmarks/reference/cpp_gqsp.cpp",
+      "sha256": "970170bed651a8f0c96ab27fcea50c7de2a4cd415a12129f61f6e3874e0ee4a4"
+    },
+    {
+      "bytes": 4761,
+      "kind": "file",
+      "path": "benchmarks/reference/cpp_qsp.cpp",
+      "sha256": "cb79a37cee163f85e9bc0784fb7f598e894a8f442861b7a1a94245f24e372827"
+    },
+    {
+      "bytes": 125,
+      "kind": "file",
+      "path": "clippy.toml",
+      "sha256": "32aec157b63c9e16340558b52291d6f6b767c8e9e3daa0315f555c19dc040e6c"
+    },
+    {
+      "bytes": 458,
+      "kind": "file",
+      "path": "crates/quest-build/Cargo.toml",
+      "sha256": "93860901318485a8bcf802e790d3c00a420fd0811b02734b72c4bc0012a0cba1"
+    },
+    {
+      "bytes": 1070,
+      "kind": "file",
+      "path": "crates/quest-build/LICENSE",
+      "sha256": "670b5966adb424e1576187262e12063e041861861a7c4f913705b211a5cbce7c"
+    },
+    {
+      "bytes": 5601,
+      "kind": "file",
+      "path": "crates/quest-build/README.md",
+      "sha256": "5c0a552f34ff9338365afb2e58972a56c25a7f3f70ebfc42f0957f4f1db80b37"
+    },
+    {
+      "bytes": 2272,
+      "kind": "file",
+      "path": "crates/quest-build/native/CMakeLists.txt",
+      "sha256": "9368d490cbb768bab34c7412a8b5df460bdf65190447001609c39244fc88d0d3"
+    },
+    {
+      "bytes": 305,
+      "kind": "file",
+      "path": "crates/quest-build/native/abi.cpp",
+      "sha256": "482b5b699567e19bf5918d8bf692bc727010ece16c2de40b41613ad9ce6e797f"
+    },
+    {
+      "bytes": 969,
+      "kind": "file",
+      "path": "crates/quest-build/native/mpi_abi.c",
+      "sha256": "987f02050c7612ce63b95c0215e360696df733ef9591fa45ac95d7872a895a8d"
+    },
+    {
+      "bytes": 67,
+      "kind": "file",
+      "path": "crates/quest-build/native/query.cpp",
+      "sha256": "2b9d8d3dac7ad333266c5ceda1c09f6e202f2d643a45c86d14412a46aebf5be6"
+    },
+    {
+      "bytes": 9544,
+      "kind": "file",
+      "path": "crates/quest-build/src/hdf5.rs",
+      "sha256": "0841ec18984a9eaefd9354c0776f1fd7ee3df188a0f5f2140af9829af46028b6"
+    },
+    {
+      "bytes": 21016,
+      "kind": "file",
+      "path": "crates/quest-build/src/lib.rs",
+      "sha256": "56fbca1fc04f0f658bb632ddd41a7f3a0ddde14dbac6ce8025b2b904f676e835"
+    },
+    {
+      "bytes": 10971,
+      "kind": "file",
+      "path": "crates/quest-build/src/package.rs",
+      "sha256": "9cf746f4de6a9aa7a2a1c5c1cb6fb40a578f44116c0531ad76540cce6e3162ca"
+    },
+    {
+      "bytes": 63471,
+      "kind": "file",
+      "path": "crates/quest-build/src/probe.rs",
+      "sha256": "abff42b0779a82d52942bdee774bb53aa0afdcad03d176a4475525dd65ecfcc7"
+    },
+    {
+      "bytes": 6695,
+      "kind": "file",
+      "path": "crates/quest-build/src/rsmpi.rs",
+      "sha256": "137378f7115e81b1928ad7a3efcd530291f5260f512849fa7907129cdacfa750"
+    },
+    {
+      "bytes": 1118,
+      "kind": "file",
+      "path": "crates/quest-circuit/Cargo.toml",
+      "sha256": "3f01e450cf599e5370b5146879a26ffcb02704bddb207e4e3f35757e4f328144"
+    },
+    {
+      "bytes": 1070,
+      "kind": "file",
+      "path": "crates/quest-circuit/LICENSE",
+      "sha256": "670b5966adb424e1576187262e12063e041861861a7c4f913705b211a5cbce7c"
+    },
+    {
+      "bytes": 2226,
+      "kind": "file",
+      "path": "crates/quest-circuit/README.md",
+      "sha256": "ca5bb6f583fd320ab1421a7ff70012314a6d448337241c3343e313b71c815d7e"
+    },
+    {
+      "bytes": 3089,
+      "kind": "file",
+      "path": "crates/quest-circuit/benches/compiler.rs",
+      "sha256": "6aea44e01e03e1b8f4b009938528352a0dc0d31c7f8f73d8ddd8be63c50d61bd"
+    },
+    {
+      "bytes": 384,
+      "kind": "file",
+      "path": "crates/quest-circuit/src/lib.rs",
+      "sha256": "d2c9f70d0ce2440b5549f7735de85e6100756f410c1c372e3eb7356cc1ddfc05"
+    },
+    {
+      "bytes": 3468,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/adapters_contract.rs",
+      "sha256": "f4cd77d95b9d6820f5627f607ceeac8b13cf20de93ed383c9b885bf4d4b5e713"
+    },
+    {
+      "bytes": 12271,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/artifact_contract.rs",
+      "sha256": "227f30954e25c64052da956b9ed5534aa4c1eb7cd82819bfd4750cbf33ffd426"
+    },
+    {
+      "bytes": 9521,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/beam_approx_contract.rs",
+      "sha256": "9b48c705045d6f9f439b102fff38cc7c6e82f05f9daaef423ed1cb09abe6b7c3"
+    },
+    {
+      "bytes": 26418,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/beam_contract.rs",
+      "sha256": "12247f48e1bb576b7ba0307b1085e772e7335b08733baeea313dbffe7f2a33f0"
+    },
+    {
+      "bytes": 14936,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/beam_mitm_contract.rs",
+      "sha256": "d59abf22b06fc9f7725b04dcfe9f315043ff063496007dba8ca4cf203e730d55"
+    },
+    {
+      "bytes": 2240,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/beam_timeout_contract.rs",
+      "sha256": "b465006e4f03639e98917c86097a6589ba199429343caa0f294559a28864d092"
+    },
+    {
+      "bytes": 276,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/compile_fail.rs",
+      "sha256": "0b8b1b62ddd6a94d59a273abce2a7d27d3f2ba0a28ddffd4ec98b252441b7983"
+    },
+    {
+      "bytes": 4380,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/core_contract.rs",
+      "sha256": "97e17c93716f9873a7a2ba023b3d93936aceda8b4a0c301533cdc47d610ed76f"
+    },
+    {
+      "bytes": 2938,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/definitions_contract.rs",
+      "sha256": "fc58aba1357307b38b34d55c5f48175c149e4c82504ef7cf0c47b5c7b5fe3793"
+    },
+    {
+      "bytes": 804,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/diagnostics.rs",
+      "sha256": "3b7e03a34f0c575b0f25eab98150f315812a6185587f178d8c4fa24f6dbbea63"
+    },
+    {
+      "bytes": 10665,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/differential.rs",
+      "sha256": "ca679f82b7760155a90ac6df92030fdc416367622370fb87ee7aab45ac519008"
+    },
+    {
+      "bytes": 7337,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/dispatch_recipe.rs",
+      "sha256": "bb72638f0f6480e9bc8a8eceb187433c49aadbcc3c221eb85310f08e96180c20"
+    },
+    {
+      "bytes": 97,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/fixtures/structured.qasm",
+      "sha256": "a558ddc3a1459e595b9de8f53fd8c59d1d7c7ab49537f6312b239d359c572456"
+    },
+    {
+      "bytes": 2685,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/generator_error_contract.rs",
+      "sha256": "423265342a058fb071f0baa9025a6ae931971e141592361056926ac2a1e9c42b"
+    },
+    {
+      "bytes": 7905,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/linear_contract.rs",
+      "sha256": "a373c245959bc32aabf6bb4f689f987fc1aedeca9c927717b184a4d2204e7197"
+    },
+    {
+      "bytes": 7298,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/macro_contract.rs",
+      "sha256": "09a2265902122e1e64cc4aed96deae6b1fdf499f4a55f72b7ff7b66d2b7cda3c"
+    },
+    {
+      "bytes": 8845,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/matrix_contract.rs",
+      "sha256": "30212939f32d1da6db6c3f0163bb004d678750acfdb44b9d0b44e2b31e95cf8c"
+    },
+    {
+      "bytes": 7266,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/optimization_contract.rs",
+      "sha256": "34399fa3fd0b6f8c08df4ef9a335a5b6857e44cbaf55c58c29fc132105a24d1d"
+    },
+    {
+      "bytes": 21825,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/optimizer_contract.rs",
+      "sha256": "6abfd600daa4c0eeadf178b325f65f7fff516f07b332619026c00ebc2db58089"
+    },
+    {
+      "bytes": 11279,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/oracle_contract.rs",
+      "sha256": "697c893e8a1cd74356438f3f2364ff2ea9286256bb14b91a21798ef1ac001ce2"
+    },
+    {
+      "bytes": 16643,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/parity_contract.rs",
+      "sha256": "03706710ad9b94904c7a867af154951b8d05ee9b1babf8f3ebe301508cde7cd5"
+    },
+    {
+      "bytes": 8175,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/provenance_contract.rs",
+      "sha256": "11343d2d1a6340c1847dd321f1e81d70c85dd346a01f7cb7c2b85a4ebbfb0ce8"
+    },
+    {
+      "bytes": 2802,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/structured_contract.rs",
+      "sha256": "d5122d7754c4582d3d8b45937707d5e302cd3ba2a46ed64a2435fa8b406f97f7"
+    },
+    {
+      "bytes": 2791,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/structured_macro.rs",
+      "sha256": "9f8421ddb4336c039edd2a60eddfbb0496876d987c127d23701c618c1068cd10"
+    },
+    {
+      "bytes": 12496,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/structured_optimization.rs",
+      "sha256": "4bc1a5aae1c62c7c39a998e0dcd8a8ac6915468474a70f0da95684c25a168648"
+    },
+    {
+      "bytes": 11987,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/structured_terminal.rs",
+      "sha256": "cc673c541595fa1892d6fed3896b2e19fcc108990736c5a335c4374945ccbfd2"
+    },
+    {
+      "bytes": 8459,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/symbolic_contract.rs",
+      "sha256": "88ccd0585c10be5b969c8c278194e8c7d55e75613ae7ba482ed7e265102af5af"
+    },
+    {
+      "bytes": 12576,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/terminal_contract.rs",
+      "sha256": "1505e07f906950c15312f1825f86aa92ce4cbb5a0a0fbd197561f037650663c9"
+    },
+    {
+      "bytes": 7614,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/tutorials.rs",
+      "sha256": "9d6bdd0c0bdc3d5747da7393951b7c66bde03c5370ebd1a61479652f89232cad"
+    },
+    {
+      "bytes": 93,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui-pass/measurement_index_expression.rs",
+      "sha256": "00c14a4baf42b5f0965aad8e172a5b4108c4d10dad9e977ad30bcbdb1b899dec"
+    },
+    {
+      "bytes": 73,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui-pass/unindexed_array.rs",
+      "sha256": "ef23c0ec364bb7c198bd71d5f0b113b152957a9151b85a39c3eb4662050b6b23"
+    },
+    {
+      "bytes": 77,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui-pass/zero_denominator.rs",
+      "sha256": "2ba47f457c5b405ce8e9b71d144f5d0693dcc594b79037ae5810623ed060944c"
+    },
+    {
+      "bytes": 77,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/arity.rs",
+      "sha256": "2742c93de98a3d9893eb65221ef49f0dc8a96737e4d4a6a7a025135071a8d920"
+    },
+    {
+      "bytes": 164,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/arity.stderr",
+      "sha256": "82d5b7589e27aa80a7f3e5c6563b00a9cddc35108c1f516ecc7c884e1716b5bd"
+    },
+    {
+      "bytes": 88,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/duplicate.rs",
+      "sha256": "d2714af0bb6eb926b102cb85b651ad19435a544334e25f37c97643cb9c29b101"
+    },
+    {
+      "bytes": 179,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/duplicate.stderr",
+      "sha256": "782ad0451404421256d842ff077ee231641eff2b46d9a0c0421f8d0e1ed327b2"
+    },
+    {
+      "bytes": 76,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/index.rs",
+      "sha256": "1a5dbabcc2c8b7980e5df6bea10ae8cc80574698a3e7516b46727b82dfcf9100"
+    },
+    {
+      "bytes": 178,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/index.stderr",
+      "sha256": "23383a8fb7e0d4f4988425072d3e66bd996f53c05a97a26310e774252c997fe6"
+    },
+    {
+      "bytes": 86,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/nonfinite_literal.rs",
+      "sha256": "fda0f593a31bc45bea28f293aec45132b6d3dd8a5f521835e2f1737aa728bbdc"
+    },
+    {
+      "bytes": 191,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/nonfinite_literal.stderr",
+      "sha256": "276b79f9eec913102330f96080a1f86f40c7619dc8d4880d489789db53af0b7e"
+    },
+    {
+      "bytes": 116,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/numerical_inverse.rs",
+      "sha256": "b5ef370ceef94fc4a9e25cdc6cd843cd094353bb8b47f726ee1d9020aebf691e"
+    },
+    {
+      "bytes": 318,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/numerical_inverse.stderr",
+      "sha256": "ed301f2d59a6c05ff5bd86bf765331a0f075383b014d8c23c76ef65d25e56475"
+    },
+    {
+      "bytes": 92,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/opaque_expression.rs",
+      "sha256": "5358dc860eaefc4407f83f40eb41c78c244ddf74f2ce4806abacc5a7020c8156"
+    },
+    {
+      "bytes": 201,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/opaque_expression.stderr",
+      "sha256": "e05e9c6fdf0017bebeba3864bc1b0d6caf12b921fbdbf6fe96f01855a57a1c36"
+    },
+    {
+      "bytes": 140,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/oracle_capture_type.rs",
+      "sha256": "41c49817f823ad6a4d217991dd05779c97acd1fc314d68ca8fae2a734796373c"
+    },
+    {
+      "bytes": 351,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/oracle_capture_type.stderr",
+      "sha256": "5377b18a7058721273b37f8e08e21de5afc5002fe85dd19750a77ebac6089b6d"
+    },
+    {
+      "bytes": 211,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/oracle_inverse.rs",
+      "sha256": "5fa0be017c6ce7c5dbafe8e3523c9f1f44ab8a8289cfd6135523eecc63e894c5"
+    },
+    {
+      "bytes": 177,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/oracle_inverse.stderr",
+      "sha256": "e109ac0cffaf507a614e95800e7729be534136d0008dba91c3b1650862008c94"
+    },
+    {
+      "bytes": 156,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/oracle_unadmitted.rs",
+      "sha256": "c99235172e6481445d46e683e0aca6490b26643c55417ee399d7044cd4fed0bf"
+    },
+    {
+      "bytes": 357,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/oracle_unadmitted.stderr",
+      "sha256": "26f629b704016888c2b07ce091b90805415d6aa9f4aec517c808f776b976f2d1"
+    },
+    {
+      "bytes": 147,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/program_adjoint.rs",
+      "sha256": "8306b55bd054868f43fa24875a3726db00e95220d4395e32004459041863724a"
+    },
+    {
+      "bytes": 388,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/program_adjoint.stderr",
+      "sha256": "044fdd5bf02424be9047b33958737803baf9fdafa53775adc7c4113ff747ede8"
+    },
+    {
+      "bytes": 213,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/structured_alias.rs",
+      "sha256": "971b3e0798279646920748ca713eab99f70e7fa48fff4fc37e54dcf8e932504b"
+    },
+    {
+      "bytes": 189,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/structured_alias.stderr",
+      "sha256": "d977b253d7682e109cd26cdb19cc3f0db22c9c62d788acf6221ed6f5e1a49485"
+    },
+    {
+      "bytes": 92,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/structured_capture_type.rs",
+      "sha256": "5efbe5e283d53207a103826522fea9458e7da70543cb194a8cb07c7ed6ca6ec2"
+    },
+    {
+      "bytes": 994,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/structured_capture_type.stderr",
+      "sha256": "a954761c4e1362eec0d4256855f2dd2089b416a1370a94cac4108f4df8f519eb"
+    },
+    {
+      "bytes": 108,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/structured_gate_effect.rs",
+      "sha256": "20bed415dfd6884d707dd4ebb3fe28ff0d5b8559a22386bd5c6d63a30753a551"
+    },
+    {
+      "bytes": 210,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/structured_gate_effect.stderr",
+      "sha256": "a62fb0275054fbc1e3f45d64b7f3525964bfabbc9d769eff4b424aeadf7d4082"
+    },
+    {
+      "bytes": 148,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/structured_recursion.rs",
+      "sha256": "14cdd099bb1fc48f38a4647e0d6692f4a383ba6fa0d68cb3219832b24498c974"
+    },
+    {
+      "bytes": 427,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/structured_recursion.stderr",
+      "sha256": "9ac28de2b4c2c9d904b7b71263ee54f5074fa3ac54b1c1c0eb8248ef59cce1b6"
+    },
+    {
+      "bytes": 141,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/structured_uninitialized.rs",
+      "sha256": "a9128a0933db927e4b6b60f6eb0c0be4f2ccffabcd537bc5842b62e67bb262dc"
+    },
+    {
+      "bytes": 314,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/structured_uninitialized.stderr",
+      "sha256": "87c40cbb9bc123b689d1358f5c96ca5c76534019042256a2853b516a92ec4cb5"
+    },
+    {
+      "bytes": 74,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/unknown.rs",
+      "sha256": "5cff574e090adffce4682fe7324561a7b07b1d50c42be5d6356f640f8b73a095"
+    },
+    {
+      "bytes": 152,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/unknown.stderr",
+      "sha256": "39ff59868659718ae6fa97f85c8c0e065851f1e8dca39cea11104a1de8cadf09"
+    },
+    {
+      "bytes": 85,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/unsupported.rs",
+      "sha256": "cf7ea9728f7bfb783e57235d4689118ed4855c453e4dbef2382ba69d2a497bea"
+    },
+    {
+      "bytes": 191,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/ui/unsupported.stderr",
+      "sha256": "dc662e2fc1bf85f37a7f237c8e1eab7c4dbf5f2d787fa7322045e3399f9f219a"
+    },
+    {
+      "bytes": 22923,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/unified_program.rs",
+      "sha256": "cdb3bba801ba5ccd3601f430910b2aa886767bdbcccbed9dc7c630485c15da99"
+    },
+    {
+      "bytes": 8823,
+      "kind": "file",
+      "path": "crates/quest-circuit/tests/worker_contract.rs",
+      "sha256": "7edc03b85e11eb1cdb62e962c1aa33c181ff83751186524beb5a89047869b357"
+    },
+    {
+      "bytes": 1712,
+      "kind": "file",
+      "path": "crates/quest-compile/Cargo.toml",
+      "sha256": "75f16543903cc9d52d9c6cc24f85a3c61154a18271e40045c5b701c150e9d499"
+    },
+    {
+      "bytes": 1070,
+      "kind": "file",
+      "path": "crates/quest-compile/LICENSE",
+      "sha256": "670b5966adb424e1576187262e12063e041861861a7c4f913705b211a5cbce7c"
+    },
+    {
+      "bytes": 129048,
+      "kind": "file",
+      "path": "crates/quest-compile/src/beam.rs",
+      "sha256": "49a0ff3255f73e0a8f0ea57271404e77e1137b8d36a21bcb0282a880e71284cd"
+    },
+    {
+      "bytes": 16054,
+      "kind": "file",
+      "path": "crates/quest-compile/src/beam_approx.rs",
+      "sha256": "8d96644a5ba40583a167cf9d131401429e1b7da30674bcb5a10d8bc3aa9326f3"
+    },
+    {
+      "bytes": 14322,
+      "kind": "file",
+      "path": "crates/quest-compile/src/beam_mitm.rs",
+      "sha256": "df14aa69c926274eed0a4d9f5c95b9720dd4a06de745acdca755b7efa5c117e7"
+    },
+    {
+      "bytes": 7125,
+      "kind": "file",
+      "path": "crates/quest-compile/src/builder.rs",
+      "sha256": "d354d8b14f1d5e7b2f76f0ef7763d40fb50fce0fe3dc8726cd943df0d1ef4b7a"
+    },
+    {
+      "bytes": 1875,
+      "kind": "file",
+      "path": "crates/quest-compile/src/capture.rs",
+      "sha256": "1488186b67fab6a316b0b2b1be0adc262a39ecdba07f7343d1be936c09a6e339"
+    },
+    {
+      "bytes": 6579,
+      "kind": "file",
+      "path": "crates/quest-compile/src/classical/cleanup.rs",
+      "sha256": "908845fbe3e73bac2b2ef2a35fc4b1735866d92eb0dea4b4bf6b8895989895b3"
+    },
+    {
+      "bytes": 6862,
+      "kind": "file",
+      "path": "crates/quest-compile/src/classical/constants.rs",
+      "sha256": "1c8e43bf362aa1c80f51f2c47732b4794c53f1f18c8d81e088d30ed4d8258256"
+    },
+    {
+      "bytes": 5258,
+      "kind": "file",
+      "path": "crates/quest-compile/src/classical/mod.rs",
+      "sha256": "8cfb8763ede1c9df7845547e84adc4500ea1b60e2bd6f726cf5e54050dd512b9"
+    },
+    {
+      "bytes": 11192,
+      "kind": "file",
+      "path": "crates/quest-compile/src/coherent.rs",
+      "sha256": "b11d71c10616b5ca414a895ac232c2614957862caabc38ed317b92a1ca1cee75"
+    },
+    {
+      "bytes": 31339,
+      "kind": "file",
+      "path": "crates/quest-compile/src/dispatch_recipe.rs",
+      "sha256": "93fa17cdb777b92b4363694e1c163ed1219e7481fa09f700579a7b3cc3929024"
+    },
+    {
+      "bytes": 3508,
+      "kind": "file",
+      "path": "crates/quest-compile/src/generator.rs",
+      "sha256": "7df4cb059310603858fc94609a724440b45c8342e64c47be566ae3882810a1f2"
+    },
+    {
+      "bytes": 9390,
+      "kind": "file",
+      "path": "crates/quest-compile/src/import.rs",
+      "sha256": "bc974b92c36a825e97aac70c9cba9f813392a8c6c4d575f42db928424cfa1224"
+    },
+    {
+      "bytes": 5026,
+      "kind": "file",
+      "path": "crates/quest-compile/src/lib.rs",
+      "sha256": "1408b95b76d23db3f3ab4be11496713d54cbfc97741ab320c7f21dd654bf7de7"
+    },
+    {
+      "bytes": 23161,
+      "kind": "file",
+      "path": "crates/quest-compile/src/linear.rs",
+      "sha256": "b4992c689b81cf24a6c0155eaa3063eb3787c8b974e8cde299b21dcc656e5ce2"
+    },
+    {
+      "bytes": 571,
+      "kind": "file",
+      "path": "crates/quest-compile/src/matrix.rs",
+      "sha256": "f9177bf6512d16fbf3ce73e86912eb731cc6d2d4804f09a543947aa5e48f60ab"
+    },
+    {
+      "bytes": 199,
+      "kind": "file",
+      "path": "crates/quest-compile/src/model.rs",
+      "sha256": "2f20dee3e9f0a181de8929b657c510640bb09d2e86214bf29c4dc3416bd7ce63"
+    },
+    {
+      "bytes": 31899,
+      "kind": "file",
+      "path": "crates/quest-compile/src/optimize.rs",
+      "sha256": "28364198eff26157e021cb377c75fec9b942dfa0228feca26ac049c29d244bea"
+    },
+    {
+      "bytes": 61203,
+      "kind": "file",
+      "path": "crates/quest-compile/src/optimizer_contracts.rs",
+      "sha256": "63266dee6164624d50ec3839156906760073ed24a1ed25832309b10c5e2d59e7"
+    },
+    {
+      "bytes": 6390,
+      "kind": "file",
+      "path": "crates/quest-compile/src/oracle.rs",
+      "sha256": "22c8313db26999cd5711bec38373f1acb22451a3fedbb3d13b216467600b2b79"
+    },
+    {
+      "bytes": 30644,
+      "kind": "file",
+      "path": "crates/quest-compile/src/parity.rs",
+      "sha256": "c115a5434f13289e72610ad77c6e4e9449fd05bab33202290621732b234e686a"
+    },
+    {
+      "bytes": 33092,
+      "kind": "file",
+      "path": "crates/quest-compile/src/parity/bound.rs",
+      "sha256": "23bf421786630920ab48bfbf728d2e90c4a12639f6afec0e0fff20c2061d48dc"
+    },
+    {
+      "bytes": 205,
+      "kind": "file",
+      "path": "crates/quest-compile/src/payload.rs",
+      "sha256": "5c32b27f026779f37ff2343d91ca4e5e3688bebe6c571e3a2bb4038aab08a426"
+    },
+    {
+      "bytes": 1595,
+      "kind": "file",
+      "path": "crates/quest-compile/src/program.rs",
+      "sha256": "8321220e8d332339aa9d9d63b6562a3f45183cffc8b8f177e9f4f04f0e02837d"
+    },
+    {
+      "bytes": 204,
+      "kind": "file",
+      "path": "crates/quest-compile/src/provenance.rs",
+      "sha256": "c467dcc2b05c5b5f09f185c8e38513ce8a8bde5d7b6adaed2f9482ca1a6055f0"
+    },
+    {
+      "bytes": 193,
+      "kind": "file",
+      "path": "crates/quest-compile/src/rational.rs",
+      "sha256": "1f19adeca1f1528d2a8000f0a82392f242a733c857233cf5c9d5ce593332cbef"
+    },
+    {
+      "bytes": 42063,
+      "kind": "file",
+      "path": "crates/quest-compile/src/structured.rs",
+      "sha256": "c586fcf55bf16a1c82a37d80a000d8cc848881cd42dfcde0cb0fc431caaeaee8"
+    },
+    {
+      "bytes": 37771,
+      "kind": "file",
+      "path": "crates/quest-compile/src/structured/artifact.rs",
+      "sha256": "713c4afe678dec009344cbd505dc92b717b3a58e5515c9a755ca0d24f1fd7b0f"
+    },
+    {
+      "bytes": 10612,
+      "kind": "file",
+      "path": "crates/quest-compile/src/structured/specialize.rs",
+      "sha256": "c05a22888625500334b9d99cadc28bd0300ac52b758390c291bc819598089c8d"
+    },
+    {
+      "bytes": 32727,
+      "kind": "file",
+      "path": "crates/quest-compile/src/structured_optimize.rs",
+      "sha256": "a3e3a985426e533fd3d4b805514c65f48cdf834c02712ad4eb7f754c7212eb2b"
+    },
+    {
+      "bytes": 21747,
+      "kind": "file",
+      "path": "crates/quest-compile/src/structured_pipeline.rs",
+      "sha256": "f85ab3ee5c2591522121a2e50a15027ec7d09e5f6bc783fdf2011a458bed6ac6"
+    },
+    {
+      "bytes": 20550,
+      "kind": "file",
+      "path": "crates/quest-compile/src/structured_terminal.rs",
+      "sha256": "1a727423059f9bda00af60a4b73e3c752a6af83c40fd6b97f63d9911edf63559"
+    },
+    {
+      "bytes": 35486,
+      "kind": "file",
+      "path": "crates/quest-compile/src/structured_workers.rs",
+      "sha256": "d4ef14dc7a0b07878fcab887f7fde416645e779976f4bdf676ebb8259c5cb161"
+    },
+    {
+      "bytes": 31038,
+      "kind": "file",
+      "path": "crates/quest-compile/src/terminal.rs",
+      "sha256": "4b31b821721ae411b44e5a6b6198fc44f76ac0d861e11f229f14705abf36d0ad"
+    },
+    {
+      "bytes": 39254,
+      "kind": "file",
+      "path": "crates/quest-compile/src/workers.rs",
+      "sha256": "d111cd468297c0ee2e6ae0135ed8285f95b713f34a96bc8f6591127291fb455e"
+    },
+    {
+      "bytes": 9119,
+      "kind": "file",
+      "path": "crates/quest-compile/tests/classical_contract.rs",
+      "sha256": "f60fcb78fe5e82dc007d6d32bdaa553a1e508cbc29fc02e8e1858b7d786ce216"
+    },
+    {
+      "bytes": 971,
+      "kind": "file",
+      "path": "crates/quest-language/Cargo.toml",
+      "sha256": "00414f629d781d93c6dc8bc53e12e75676a80c2706adb932ae69184445cbed58"
+    },
+    {
+      "bytes": 1070,
+      "kind": "file",
+      "path": "crates/quest-language/LICENSE",
+      "sha256": "670b5966adb424e1576187262e12063e041861861a7c4f913705b211a5cbce7c"
+    },
+    {
+      "bytes": 6931,
+      "kind": "file",
+      "path": "crates/quest-language/README.md",
+      "sha256": "d5db0c02fcb668ca70da847ac82534fec5f8e9f2d63bac3907e2511c1210ecb2"
+    },
+    {
+      "bytes": 19902,
+      "kind": "file",
+      "path": "crates/quest-language/src/angle.rs",
+      "sha256": "1fac86dcafe1d73f9d930ee942c076cfc828de47e8a8078d77798c13c260dca1"
+    },
+    {
+      "bytes": 16825,
+      "kind": "file",
+      "path": "crates/quest-language/src/classical/mod.rs",
+      "sha256": "d6790f5472c5201eb44a6f89642793255c7088651b2802b3ed1f1885f686a6ed"
+    },
+    {
+      "bytes": 11524,
+      "kind": "file",
+      "path": "crates/quest-language/src/classical/operations.rs",
+      "sha256": "332a1bc80905e3aec6d8c38a74515b199bf8e627720c537a876df8bdbb474872"
+    },
+    {
+      "bytes": 8888,
+      "kind": "file",
+      "path": "crates/quest-language/src/classical/typing.rs",
+      "sha256": "3f374817dba8a915f9a5e1f3c9b6d46e289f4c996484bdec5371a35818190c36"
+    },
+    {
+      "bytes": 10419,
+      "kind": "file",
+      "path": "crates/quest-language/src/diagnostic.rs",
+      "sha256": "1b4b68a5cba891d0ec5f7177475baf38df4ce8717113a732cdc0c0b8b3787cde"
+    },
+    {
+      "bytes": 8577,
+      "kind": "file",
+      "path": "crates/quest-language/src/gates.rs",
+      "sha256": "db1bb046be8c9b78d01e8b128b707a093c4243e4be1c656b8f42b56719c4f976"
+    },
+    {
+      "bytes": 1196,
+      "kind": "file",
+      "path": "crates/quest-language/src/lib.rs",
+      "sha256": "93271eb0b69d46e280a0c1070ae06efaed2a5d2fa7aa1996046be2ef0db6637a"
+    },
+    {
+      "bytes": 12947,
+      "kind": "file",
+      "path": "crates/quest-language/src/matrix.rs",
+      "sha256": "db5eb3ec762d12c210db5d0c60c648c69dd7f5f17138fec6c1d657b5f022cfe9"
+    },
+    {
+      "bytes": 1853,
+      "kind": "file",
+      "path": "crates/quest-language/src/payload.rs",
+      "sha256": "90b02b80a84c9d0e0e485b569f03b389a2f7676ec12a863ff466ed820b842470"
+    },
+    {
+      "bytes": 4803,
+      "kind": "file",
+      "path": "crates/quest-language/src/quantum/error.rs",
+      "sha256": "cfc919897d4f9d5fcdd4409b6e6fefe56c040d9830de548f4e21b504ccd53e62"
+    },
+    {
+      "bytes": 4204,
+      "kind": "file",
+      "path": "crates/quest-language/src/quantum/gate_matrix.rs",
+      "sha256": "278803027df6d3c5b4a86020c370fdfb93850edf46ac76f5373ae9aed469b7f3"
+    },
+    {
+      "bytes": 533,
+      "kind": "file",
+      "path": "crates/quest-language/src/quantum/mod.rs",
+      "sha256": "31a114f19d86f442e933baf006711e2b40d3f7f36f82cc6632ea0d76c79ed80d"
+    },
+    {
+      "bytes": 29530,
+      "kind": "file",
+      "path": "crates/quest-language/src/quantum/model.rs",
+      "sha256": "b7d96cabc616ebf067409f5c2453002e51d81e92b8e5ddf627775447fdaba150"
+    },
+    {
+      "bytes": 13027,
+      "kind": "file",
+      "path": "crates/quest-language/src/quantum/oracle.rs",
+      "sha256": "a839af9fa802dddb40651700fe120387b581a889de0e8ee95296b7bc2e025280"
+    },
+    {
+      "bytes": 57429,
+      "kind": "file",
+      "path": "crates/quest-language/src/quantum/program.rs",
+      "sha256": "d6d661a9b36432f38bc5a4f816637258595e9d3034dfe25faec5e5761824c9f9"
+    },
+    {
+      "bytes": 15138,
+      "kind": "file",
+      "path": "crates/quest-language/src/quantum/provenance.rs",
+      "sha256": "0fe3087d1ca857c98677f066521ca94bd0cc863cbefe21553f8dbd95ab63e96e"
+    },
+    {
+      "bytes": 1570,
+      "kind": "file",
+      "path": "crates/quest-language/src/quantum/storage.rs",
+      "sha256": "5c2d10d82acaed171f097c20cb027519d4cd75e1f0319ed03c6be81a7f07e76d"
+    },
+    {
+      "bytes": 13673,
+      "kind": "file",
+      "path": "crates/quest-language/src/rational.rs",
+      "sha256": "1497c23fe0c34d827acf83133aeb6386b478a5e16db579bbf9130c425566dc21"
+    },
+    {
+      "bytes": 2756,
+      "kind": "file",
+      "path": "crates/quest-language/src/render.rs",
+      "sha256": "3312aa4a10e82cb6c32a172a95f98177e94b6a2f59f49a9c7f839fe9feb1dc90"
+    },
+    {
+      "bytes": 2893,
+      "kind": "file",
+      "path": "crates/quest-language/src/semantic/allocation.rs",
+      "sha256": "54ed005eadf6f95c72f2a37ab30213986adbb64df87c1689290169b0c2a6b091"
+    },
+    {
+      "bytes": 9131,
+      "kind": "file",
+      "path": "crates/quest-language/src/semantic/builder/arrays.rs",
+      "sha256": "5af8400d940829d3369686c5eb9a3f95b12a79d7952b4d646a383cc4bf460a0c"
+    },
+    {
+      "bytes": 9867,
+      "kind": "file",
+      "path": "crates/quest-language/src/semantic/builder/effects.rs",
+      "sha256": "00667a19dbeb592fd2ed86d4344db5e8c36c11417626a53135cb42956b1a21c5"
+    },
+    {
+      "bytes": 5584,
+      "kind": "file",
+      "path": "crates/quest-language/src/semantic/builder/expressions.rs",
+      "sha256": "ca4c9a2161015a094fb2260b1a9250cb30f65590b4a748f5b4704404b670f1e0"
+    },
+    {
+      "bytes": 4527,
+      "kind": "file",
+      "path": "crates/quest-language/src/semantic/builder/fragment.rs",
+      "sha256": "a02036e535fe93c57c29cfc821906b718631848487488e1ba2182b89ee5f5b59"
+    },
+    {
+      "bytes": 10773,
+      "kind": "file",
+      "path": "crates/quest-language/src/semantic/builder/mod.rs",
+      "sha256": "dc52897c1ce59600952124c43b29c372f4a92e5410e4293fb4b4ca99d3856e46"
+    },
+    {
+      "bytes": 10617,
+      "kind": "file",
+      "path": "crates/quest-language/src/semantic/builder/ranked.rs",
+      "sha256": "172af8dfa3be73e9659b0e01845468e0285f8b3499c2ac3cc33adae4df6db269"
+    },
+    {
+      "bytes": 11301,
+      "kind": "file",
+      "path": "crates/quest-language/src/semantic/builder/shared.rs",
+      "sha256": "cdacfcbe87d2f1d8b63d0616532ba36ab737de98444f600a00d6938a4e34cc5d"
+    },
+    {
+      "bytes": 16169,
+      "kind": "file",
+      "path": "crates/quest-language/src/semantic/builder/signature.rs",
+      "sha256": "96ed363cc660c9a7523450a9f11a286354b4b8ae8cb6dacbc77092dc807cc4aa"
+    },
+    {
+      "bytes": 3188,
+      "kind": "file",
+      "path": "crates/quest-language/src/semantic/builder/types.rs",
+      "sha256": "3189298f64965a748d72cb97791432e29b891731a1f6466d7647e89474e340f4"
+    },
+    {
+      "bytes": 2250,
+      "kind": "file",
+      "path": "crates/quest-language/src/semantic/cfg.rs",
+      "sha256": "d1303edea1a6cc36b9891ecff62c31fd512a360f69299d0474470162668bb569"
+    },
+    {
+      "bytes": 21434,
+      "kind": "file",
+      "path": "crates/quest-language/src/semantic/compile.rs",
+      "sha256": "bf81e13059b5d7193994aa522b07d9bdeb66d246bdf6bc05ec205943030faa08"
+    },
+    {
+      "bytes": 26086,
+      "kind": "file",
+      "path": "crates/quest-language/src/semantic/expressions.rs",
+      "sha256": "a36340200ec87891e904a4ebae25b303868b4f97a358b4dcef604e653d0faef1"
+    },
+    {
+      "bytes": 9592,
+      "kind": "file",
+      "path": "crates/quest-language/src/semantic/mod.rs",
+      "sha256": "a0c9cb251b83d401538c3cf293c4b081115c1e162b6f791524a3432652d5ee7e"
+    },
+    {
+      "bytes": 8765,
+      "kind": "file",
+      "path": "crates/quest-language/src/semantic/preflight.rs",
+      "sha256": "9054aaff816819f502e948b1bd8d359d8bb57af422ba403c1ab10300ffb4decc"
+    },
+    {
+      "bytes": 12887,
+      "kind": "file",
+      "path": "crates/quest-language/src/semantic/promote.rs",
+      "sha256": "fa65b04d1af1478707c2d4b70d30c451c9051a77b7e463122b802db5731bbcca"
+    },
+    {
+      "bytes": 4505,
+      "kind": "file",
+      "path": "crates/quest-language/src/semantic/retained.rs",
+      "sha256": "14e87cb4b243283c02c1989b82c60c52cf38c9c6c4bbe4b8950fbf754a754898"
+    },
+    {
+      "bytes": 4633,
+      "kind": "file",
+      "path": "crates/quest-language/src/semantic/retained/syntax.rs",
+      "sha256": "787d442df9cbd18299bad4a0c99fb6ba56f8d1344e113026f3dcca345bf300f6"
+    },
+    {
+      "bytes": 23071,
+      "kind": "file",
+      "path": "crates/quest-language/src/semantic/statements.rs",
+      "sha256": "7f94ab64f300b9193cf9f64d1cb4fc4eb82e45c4b187f6d168b6b2a23585b16e"
+    },
+    {
+      "bytes": 11115,
+      "kind": "file",
+      "path": "crates/quest-language/src/semantic/statements/loops.rs",
+      "sha256": "13a6cafb7aa003e4554428af095ef5d8dc748695afd8d0eb269db6940f0ac804"
+    },
+    {
+      "bytes": 2200,
+      "kind": "file",
+      "path": "crates/quest-language/src/semantic/template.rs",
+      "sha256": "16b5808824d477fe4cda5001aea54c1af2be3b840c34c1991a30b59293778622"
+    },
+    {
+      "bytes": 1969,
+      "kind": "file",
+      "path": "crates/quest-language/src/semantic/types.rs",
+      "sha256": "b722215a0614b9d495b7e4787cda80025821c2bf8d3b336454ddb88154b75422"
+    },
+    {
+      "bytes": 6845,
+      "kind": "file",
+      "path": "crates/quest-language/src/source.rs",
+      "sha256": "e91d071c7a5389d849d90917f9acdd91f0da0b021341c3b2917503ca3658867c"
+    },
+    {
+      "bytes": 7475,
+      "kind": "file",
+      "path": "crates/quest-language/src/ssa/edit.rs",
+      "sha256": "97dcc036e29dacc45781b478023be6d92e41b1e392cdf992f4c876ae17fa2a78"
+    },
+    {
+      "bytes": 19227,
+      "kind": "file",
+      "path": "crates/quest-language/src/ssa/mod.rs",
+      "sha256": "262c4aa8cd9ed1e36204ce65159d0b12688cfcc355a7c95bc7efa65b4028ad93"
+    },
+    {
+      "bytes": 2337,
+      "kind": "file",
+      "path": "crates/quest-language/src/ssa/quantum.rs",
+      "sha256": "c11ef650fd94e6a32bf84666823d30cbafbafcb2ac82a2ac9d7df0caeca2b4f7"
+    },
+    {
+      "bytes": 25156,
+      "kind": "file",
+      "path": "crates/quest-language/src/ssa/quantum_flow.rs",
+      "sha256": "66c4a8afbb18f5d2f3b2a8db2bbbf7656be35ef9a1db4be4b87dcbde2b7df3df"
+    },
+    {
+      "bytes": 18863,
+      "kind": "file",
+      "path": "crates/quest-language/src/ssa/verify.rs",
+      "sha256": "e5c8953b2f2f34563e92260eb20c2351ef92a8dbc9b250ac9748d99463f94c8d"
+    },
+    {
+      "bytes": 9451,
+      "kind": "file",
+      "path": "crates/quest-language/src/ssa/verify/assignment.rs",
+      "sha256": "6f901ccf67b369a04fbfc47f47b83ba8e1edbf3fb8d754541d7ca3c44edd8fec"
+    },
+    {
+      "bytes": 2886,
+      "kind": "file",
+      "path": "crates/quest-language/src/ssa/verify/dominance.rs",
+      "sha256": "1055bd7d8082d949551e97548692d6f5260707c3dcce3a7ad87f290b9b14541e"
+    },
+    {
+      "bytes": 20833,
+      "kind": "file",
+      "path": "crates/quest-language/src/ssa/verify/instruction.rs",
+      "sha256": "c46b6a6b4c50805ec69da882a12ab50b17474beb1d4d4a9fe4a851217f19f099"
+    },
+    {
+      "bytes": 6477,
+      "kind": "file",
+      "path": "crates/quest-language/src/ssa/verify/interfaces.rs",
+      "sha256": "3c4bd5bf4db8fc61211a4e018d3f2c74bcf83f0726fb6a0e3f7a846d12fe3ca9"
+    },
+    {
+      "bytes": 6770,
+      "kind": "file",
+      "path": "crates/quest-language/src/syntax/lexer.rs",
+      "sha256": "19dbe9f91f1e281fa5b8bd87a4e7f293773d45a8d7fa25309cd53a658f86b02c"
+    },
+    {
+      "bytes": 9066,
+      "kind": "file",
+      "path": "crates/quest-language/src/syntax/mod.rs",
+      "sha256": "892beb14743b288a2df5f2bdaabf9c33b5190bcf6f6f5e01011d9705cc54799a"
+    },
+    {
+      "bytes": 24849,
+      "kind": "file",
+      "path": "crates/quest-language/src/syntax/parser.rs",
+      "sha256": "ad61076fe139b14da761ae0c858379b13d3a74c284387efecf241a73fc8c2b36"
+    },
+    {
+      "bytes": 86730,
+      "kind": "file",
+      "path": "crates/quest-language/src/vm/mod.rs",
+      "sha256": "7667d204fc5cb6226607db0405baa72a6ca6505f7b963be7344265e54631fba8"
+    },
+    {
+      "bytes": 6697,
+      "kind": "file",
+      "path": "crates/quest-language/src/vm/prepared.rs",
+      "sha256": "6cb8e9f85a1275d7fe0ae826396c15a474a1dc124581cc2dce3affc08577ad2e"
+    },
+    {
+      "bytes": 5635,
+      "kind": "file",
+      "path": "crates/quest-language/tests/builder_contract.rs",
+      "sha256": "c84fb59f6d755303d64155ad45e6e9cfef304230fe439593cb1f3d795b980539"
+    },
+    {
+      "bytes": 5244,
+      "kind": "file",
+      "path": "crates/quest-language/tests/classical_contract.rs",
+      "sha256": "90be7fd666a881a9b6b97297c8029c15b312959b7a40aa9e52244d86ed4923ef"
+    },
+    {
+      "bytes": 14908,
+      "kind": "file",
+      "path": "crates/quest-language/tests/contracts.rs",
+      "sha256": "52bdb470ab8438661aa658b63cbe00cc1fa24ed5f87d2ba756aec80734ad94fb"
+    },
+    {
+      "bytes": 4858,
+      "kind": "file",
+      "path": "crates/quest-language/tests/edit_contract.rs",
+      "sha256": "d755df873c37a08626585805a02394d30729bb2c042aa4caf8c7bbf2903b2427"
+    },
+    {
+      "bytes": 8447,
+      "kind": "file",
+      "path": "crates/quest-language/tests/quantum_flow.rs",
+      "sha256": "15684870b5cf6b890b6841a5b8a2a7f46ca9cbc72647ee75ca48b3937b3db56a"
+    },
+    {
+      "bytes": 26012,
+      "kind": "file",
+      "path": "crates/quest-language/tests/ssa_contract.rs",
+      "sha256": "4acbd9a813bc0213769cc98dac5ac9bc434132f42f702d5a8ffef4f39339acb7"
+    },
+    {
+      "bytes": 2870,
+      "kind": "file",
+      "path": "crates/quest-language/tests/syntax_contract.rs",
+      "sha256": "f4267ff1c34358e8de0a3c875f1b04de60007577339af35e233f162fd10a133e"
+    },
+    {
+      "bytes": 1335,
+      "kind": "file",
+      "path": "crates/quest-language/tests/template_contract.rs",
+      "sha256": "6824a1bc719bd067e48698d1f00b7eaa12108ab6425eea45a6e0c2a34baf9e58"
+    },
+    {
+      "bytes": 19856,
+      "kind": "file",
+      "path": "crates/quest-language/tests/vm_contract.rs",
+      "sha256": "95da3bf9756b10453a85a61419f79e29c5923149e313d0bb3e9a711936ccad15"
+    },
+    {
+      "bytes": 590,
+      "kind": "file",
+      "path": "crates/quest-macros/Cargo.toml",
+      "sha256": "286a4c24c587f3fcaf53f5d6a7696212ffde9200e676850d2b88927711d8672a"
+    },
+    {
+      "bytes": 1070,
+      "kind": "file",
+      "path": "crates/quest-macros/LICENSE",
+      "sha256": "670b5966adb424e1576187262e12063e041861861a7c4f913705b211a5cbce7c"
+    },
+    {
+      "bytes": 1081,
+      "kind": "file",
+      "path": "crates/quest-macros/README.md",
+      "sha256": "defd928a079081cb6f6fd70f0af00b4030b77b39d9403cd4e0f576dace5c8a1c"
+    },
+    {
+      "bytes": 8218,
+      "kind": "file",
+      "path": "crates/quest-macros/src/adapter.rs",
+      "sha256": "7c7f04ff450d68436641532ce20f784d7bc2b49f2249e4167f4578a610dc7bce"
+    },
+    {
+      "bytes": 12949,
+      "kind": "file",
+      "path": "crates/quest-macros/src/frontend.rs",
+      "sha256": "c955140085ea32c1e5f0ecb6d62c8ef04f33c9684808250352bd1f00b24e2b43"
+    },
+    {
+      "bytes": 1266,
+      "kind": "file",
+      "path": "crates/quest-macros/src/lib.rs",
+      "sha256": "56d1c2f971a7fcf25b18ddbb7c84854dba09e7c334a3080e7255ebf8a7370a78"
+    },
+    {
+      "bytes": 593,
+      "kind": "file",
+      "path": "crates/quest-math/Cargo.toml",
+      "sha256": "b6b73c23bcc1860f69695c1483c7ef2b83f2eaf3b1508a6210140be6b6e73f08"
+    },
+    {
+      "bytes": 1070,
+      "kind": "file",
+      "path": "crates/quest-math/LICENSE",
+      "sha256": "670b5966adb424e1576187262e12063e041861861a7c4f913705b211a5cbce7c"
+    },
+    {
+      "bytes": 8153,
+      "kind": "file",
+      "path": "crates/quest-math/README.md",
+      "sha256": "82b65fdd02a37a968731b6f396b8b29dca62618381939cf0f3cd423abdb53c4b"
+    },
+    {
+      "bytes": 23648,
+      "kind": "file",
+      "path": "crates/quest-math/src/approx.rs",
+      "sha256": "3ba493e6d0b56a16dcbeee9e2d59bc14c35eda776d4170208f310278f416921e"
+    },
+    {
+      "bytes": 8161,
+      "kind": "file",
+      "path": "crates/quest-math/src/controlled.rs",
+      "sha256": "1543a2365eac2e9d298961bf1bc879d3b184bcfe9ccc18aa6eb5b5eeafbe6b81"
+    },
+    {
+      "bytes": 9570,
+      "kind": "file",
+      "path": "crates/quest-math/src/interval.rs",
+      "sha256": "e5210148d85a89ce17a9a9d56d48de11bb04feb0f57659e25a113d6ea78d0b72"
+    },
+    {
+      "bytes": 917,
+      "kind": "file",
+      "path": "crates/quest-math/src/lib.rs",
+      "sha256": "d75f73322e2ff4c4c4f82d8db086ba181e9960d560e690dccc89a37f804c5519"
+    },
+    {
+      "bytes": 20533,
+      "kind": "file",
+      "path": "crates/quest-math/src/matrix.rs",
+      "sha256": "f5666f30b077a5b9d89e398b36e17aec594b7e0ccbc534515e8e0615e7cdaaa8"
+    },
+    {
+      "bytes": 12521,
+      "kind": "file",
+      "path": "crates/quest-math/src/ring.rs",
+      "sha256": "79161b88e7a024860093367b30b97290e742137fda7b270eb8be7bc3ebd523ba"
+    },
+    {
+      "bytes": 17988,
+      "kind": "file",
+      "path": "crates/quest-math/src/synthesis.rs",
+      "sha256": "6e385bfacf55027c88b0aefb9262da6af63e09a94124ea1ff7142e8d7adc0b3c"
+    },
+    {
+      "bytes": 4983,
+      "kind": "file",
+      "path": "crates/quest-math/src/types.rs",
+      "sha256": "fbed7dfa4dae8d3bd5f345569e0a1cf55d57a8f2b488a1656296378ffc69f03b"
+    },
+    {
+      "bytes": 11089,
+      "kind": "file",
+      "path": "crates/quest-math/tests/approximation.rs",
+      "sha256": "6d05f4f1201c0fd98742fa824ea7e0694431564349fee4dde5b59160025ab3bc"
+    },
+    {
+      "bytes": 8050,
+      "kind": "file",
+      "path": "crates/quest-math/tests/controlled.rs",
+      "sha256": "2919141e67e0b578f03902e02105a4964479af6f3283048f5a228b2104f6ea01"
+    },
+    {
+      "bytes": 5421,
+      "kind": "file",
+      "path": "crates/quest-math/tests/exact.rs",
+      "sha256": "a49d4bf6ff98c7a3b4654f972e5c963045bf4456f6d3600e5a5947b39a690204"
+    },
+    {
+      "bytes": 3515,
+      "kind": "file",
+      "path": "crates/quest-math/tests/fixtures/generate_oracle.py",
+      "sha256": "988ec99b723700cc63a68724413e44e7fdca3d5af5eef78e8514e07ecda70ba9"
+    },
+    {
+      "bytes": 4283,
+      "kind": "file",
+      "path": "crates/quest-math/tests/fixtures/rotation_oracle.txt",
+      "sha256": "22444c2d81518bc09d1a3038fdfce0be94b89b2023820d4b8620deb55dfe3353"
+    },
+    {
+      "bytes": 2885,
+      "kind": "file",
+      "path": "crates/quest-math/tests/mitm_enclosure.rs",
+      "sha256": "2bacbe2b37c02b21bc2af5dae43f8e6bf88c81a5a9c22cbe6785344767410f18"
+    },
+    {
+      "bytes": 1834,
+      "kind": "file",
+      "path": "crates/quest-math/tests/mitm_matrix.rs",
+      "sha256": "b6d8da85169ea2d18d927c9701c77c2ee9411a8bb2d8234fd3a38cc87af7781e"
+    },
+    {
+      "bytes": 4391,
+      "kind": "file",
+      "path": "crates/quest-math/tests/oracle.rs",
+      "sha256": "5279066909152e981673f662a617c71130968e10e5806958d6b3d1903c929009"
+    },
+    {
+      "bytes": 1964,
+      "kind": "file",
+      "path": "crates/quest-math/tests/ring.rs",
+      "sha256": "088b58c09fcdb1fd329fde6a5e11753663d701bec6adc7de08b79ea730d215f1"
+    },
+    {
+      "bytes": 3469,
+      "kind": "file",
+      "path": "crates/quest-math/tests/synthesis_proof.rs",
+      "sha256": "8cc9d93a522b7a03965102883188d414303c901bc08366e5c401f2878f2bfbbc"
+    },
+    {
+      "bytes": 1907,
+      "kind": "file",
+      "path": "crates/quest-math/tests/synthesis_ring.rs",
+      "sha256": "b2cb9d414c9eb47a991e3e9d5129150a24e097a461870e5bf16ed99efc480e6b"
+    },
+    {
+      "bytes": 623,
+      "kind": "file",
+      "path": "crates/quest-numerics/Cargo.toml",
+      "sha256": "134ea358235624e25d6e176a0097f4da78f69e9ffa56f9904e02fb1e9aae04c3"
+    },
+    {
+      "bytes": 1070,
+      "kind": "file",
+      "path": "crates/quest-numerics/LICENSE",
+      "sha256": "670b5966adb424e1576187262e12063e041861861a7c4f913705b211a5cbce7c"
+    },
+    {
+      "bytes": 1055,
+      "kind": "file",
+      "path": "crates/quest-numerics/LICENSE-quest-qsvt",
+      "sha256": "3bed3331b7048bac17cf50e249d560ccc9508c970da8d7b9283bf4f2e633a91d"
+    },
+    {
+      "bytes": 353,
+      "kind": "file",
+      "path": "crates/quest-numerics/README.md",
+      "sha256": "dc3f0f76443eed8e053e105ebaa2ffe2559fa4348edf85d291f7b89da5862fa0"
+    },
+    {
+      "bytes": 15183,
+      "kind": "file",
+      "path": "crates/quest-numerics/src/fft.rs",
+      "sha256": "899b19c25a2efba8152d50c8ab8ab80de46e5e4024ad2e84fe3dae92534d0d0b"
+    },
+    {
+      "bytes": 5191,
+      "kind": "file",
+      "path": "crates/quest-numerics/src/interval.rs",
+      "sha256": "6f664b20186617790c12c9595fdc32ec4db9cfa0abc8cdf2843a66b8d1478be2"
+    },
+    {
+      "bytes": 601,
+      "kind": "file",
+      "path": "crates/quest-numerics/src/lib.rs",
+      "sha256": "b1aa3c5597df67d117d1bb2086788134c5fad183f15faf85d66bb73f0f63a7f4"
+    },
+    {
+      "bytes": 7775,
+      "kind": "file",
+      "path": "crates/quest-numerics/src/observer.rs",
+      "sha256": "2a5fe5e75e76ae9810e29e910c9d7eeebc16cd7592a3e4581f2b1631b84b5458"
+    },
+    {
+      "bytes": 4554,
+      "kind": "file",
+      "path": "crates/quest-numerics/src/policy.rs",
+      "sha256": "d61d13bda5c3c528406052213142558d99d4bedce9349bf99c8cf5ae789cdac4"
+    },
+    {
+      "bytes": 16907,
+      "kind": "file",
+      "path": "crates/quest-numerics/tests/kernels.rs",
+      "sha256": "b290fb0c461757b531e98e35d8186de5bc07db0dca0a26ac1208ec873db3a60f"
+    },
+    {
+      "bytes": 5788,
+      "kind": "file",
+      "path": "crates/quest-numerics/tests/observer.rs",
+      "sha256": "081bf31c1f964423450825c8bff862f21003d0f16ee893309786f2b00766ae9f"
+    },
+    {
+      "bytes": 2112,
+      "kind": "file",
+      "path": "crates/quest-numerics/tests/warm_parallel.rs",
+      "sha256": "5d772685a4e60e3518398713439e71685900cbae5a91232e0bb2279d2fcb5878"
+    },
+    {
+      "bytes": 646,
+      "kind": "file",
+      "path": "crates/quest-optimizer-client/Cargo.toml",
+      "sha256": "2f256a9cceb18e7707e6f3a0d7d142016af96b8a4bba49d7923498f8be645a64"
+    },
+    {
+      "bytes": 1070,
+      "kind": "file",
+      "path": "crates/quest-optimizer-client/LICENSE",
+      "sha256": "670b5966adb424e1576187262e12063e041861861a7c4f913705b211a5cbce7c"
+    },
+    {
+      "bytes": 2023,
+      "kind": "file",
+      "path": "crates/quest-optimizer-client/README.md",
+      "sha256": "64ba2503c9e5f5239f2851b78eeaacdcc58aa5db5c7df2270398ea9655acfbeb"
+    },
+    {
+      "bytes": 12477,
+      "kind": "file",
+      "path": "crates/quest-optimizer-client/src/lib.rs",
+      "sha256": "37dce36dcda5c1305ac1686af339a71daaffb5a479966ef64ceec310cd43682d"
+    },
+    {
+      "bytes": 7879,
+      "kind": "file",
+      "path": "crates/quest-optimizer-client/src/process.rs",
+      "sha256": "870debc10d9f37f4c6e709b5b4d69b5875e611818e7213c4f720ca3ee2c3c86a"
+    },
+    {
+      "bytes": 360,
+      "kind": "file",
+      "path": "crates/quest-optimizer-client/tests/capability.rs",
+      "sha256": "242971d8ee83a915a7ccdc747b11e29e87f194d901ae6f3ba252da3600a96d41"
+    },
+    {
+      "bytes": 635,
+      "kind": "file",
+      "path": "crates/quest-optimizer-client/tests/direct.rs",
+      "sha256": "13cefb36e778b010e0f2283140205266d48bcf07bcf288e07a65438c497542c7"
+    },
+    {
+      "bytes": 2267,
+      "kind": "file",
+      "path": "crates/quest-optimizer-client/tests/mitm_parent.rs",
+      "sha256": "79e38b8af4df51d15b16f9d695316ce7a69de9149e1ed273077b19b5493cdaa3"
+    },
+    {
+      "bytes": 8964,
+      "kind": "file",
+      "path": "crates/quest-optimizer-client/tests/process_contract.rs",
+      "sha256": "4ee263f2ce2300de7fac5c4aa6fe4b44ba8d6ab46050512780548c45aec1cdb0"
+    },
+    {
+      "bytes": 480,
+      "kind": "file",
+      "path": "crates/quest-optimizer-protocol/Cargo.toml",
+      "sha256": "3f3b4667310841c4288599b96604057e7817ad37f65aae4b7bb8a362a56313eb"
+    },
+    {
+      "bytes": 1070,
+      "kind": "file",
+      "path": "crates/quest-optimizer-protocol/LICENSE",
+      "sha256": "670b5966adb424e1576187262e12063e041861861a7c4f913705b211a5cbce7c"
+    },
+    {
+      "bytes": 1239,
+      "kind": "file",
+      "path": "crates/quest-optimizer-protocol/README.md",
+      "sha256": "2c44348749a6b8fe66e034d80b49f8a456b301b47ef336856503cde60e2c9d8c"
+    },
+    {
+      "bytes": 5725,
+      "kind": "file",
+      "path": "crates/quest-optimizer-protocol/src/lib.rs",
+      "sha256": "e59ea40a28f9fa7640180525b44bd453ae6a75c2db6e937cbd673393f4cb9ade"
+    },
+    {
+      "bytes": 1833,
+      "kind": "file",
+      "path": "crates/quest-optimizer-protocol/tests/mitm_wire.rs",
+      "sha256": "fab18e20ce5b638a75ae2b43afc3364a89514a0c84b44a9a168eb0b0917e3af4"
+    },
+    {
+      "bytes": 827,
+      "kind": "file",
+      "path": "crates/quest-optimizer-worker/Cargo.toml",
+      "sha256": "6e11a4e918e57462343d9846c536425f201cc2f8bafd46b188c7ecefcf8af9c3"
+    },
+    {
+      "bytes": 1070,
+      "kind": "file",
+      "path": "crates/quest-optimizer-worker/LICENSE",
+      "sha256": "670b5966adb424e1576187262e12063e041861861a7c4f913705b211a5cbce7c"
+    },
+    {
+      "bytes": 1874,
+      "kind": "file",
+      "path": "crates/quest-optimizer-worker/README.md",
+      "sha256": "31feca3132703368a90418aa82fb767b868345db80223fa04b10242806d5d51c"
+    },
+    {
+      "bytes": 5986,
+      "kind": "file",
+      "path": "crates/quest-optimizer-worker/src/main.rs",
+      "sha256": "0d6160b8f480a6100abc380c4fd7f6932674db4eace941f98f1fde168625b357"
+    },
+    {
+      "bytes": 33787,
+      "kind": "file",
+      "path": "crates/quest-optimizer-worker/src/mitm/approx.rs",
+      "sha256": "a1c8cef75c66e281cffc4dec61b87a5bc7c8a07193e18733896e8a3d9aa15d86"
+    },
+    {
+      "bytes": 20607,
+      "kind": "file",
+      "path": "crates/quest-optimizer-worker/src/mitm/exact.rs",
+      "sha256": "06c874c17ea434e46d964fb14c2614c04d69fd4f26f1705037c30be9b13249bb"
+    },
+    {
+      "bytes": 52,
+      "kind": "file",
+      "path": "crates/quest-optimizer-worker/src/mitm/mod.rs",
+      "sha256": "b751aec8232f7a81176af7775c78088c7e2453418321f6b1a7ab464aabf12fe7"
+    },
+    {
+      "bytes": 11448,
+      "kind": "file",
+      "path": "crates/quest-optimizer-worker/src/mitm/representatives.rs",
+      "sha256": "0de401586921acbace4a1169272d9466111c05f8a21702bbeac998c7724b1cd8"
+    },
+    {
+      "bytes": 2262,
+      "kind": "file",
+      "path": "crates/quest-optimizer-worker/src/synthesis.rs",
+      "sha256": "b04fc9e9c7041072d91a854bbbdf06174b74e4f919f696463ae2d12d7b250e0f"
+    },
+    {
+      "bytes": 35443,
+      "kind": "file",
+      "path": "crates/quest-optimizer-worker/src/zx.rs",
+      "sha256": "3c33f04638d48543a8b773dee2cd080dbc7fbb5455844887bd55897cb02c2801"
+    },
+    {
+      "bytes": 4469,
+      "kind": "file",
+      "path": "crates/quest-optimizer-worker/tests/circuit_contract.rs",
+      "sha256": "f75c3d42659eab58e13cb286d6bee96ae6184234d4e180ff2f4553211d36cee3"
+    },
+    {
+      "bytes": 10175,
+      "kind": "file",
+      "path": "crates/quest-optimizer-worker/tests/structured_contract.rs",
+      "sha256": "58850269395e5e3aa8bbb984d7e74d8b226691e6de1610a26adba2199c5dbe74"
+    },
+    {
+      "bytes": 3183,
+      "kind": "file",
+      "path": "crates/quest-optimizer-worker/tests/synthesis_process.rs",
+      "sha256": "dd7df37cb317088ddf081ca6d5494522b68ec09749564889ebee26ebb48a806c"
+    },
+    {
+      "bytes": 1962,
+      "kind": "file",
+      "path": "crates/quest-optimizer-worker/tests/zx_process.rs",
+      "sha256": "5337ce0703fc6775c653480da4cbb8be18fd70843ea433a66746ef7ad3dd722b"
+    },
+    {
+      "bytes": 471,
+      "kind": "file",
+      "path": "crates/quest-polynomial/Cargo.toml",
+      "sha256": "88a38c9a1a7365d5d5137edd58498d225de4a788568ecd6e0cc028ed0f8ad8b7"
+    },
+    {
+      "bytes": 1070,
+      "kind": "file",
+      "path": "crates/quest-polynomial/LICENSE",
+      "sha256": "670b5966adb424e1576187262e12063e041861861a7c4f913705b211a5cbce7c"
+    },
+    {
+      "bytes": 1055,
+      "kind": "file",
+      "path": "crates/quest-polynomial/LICENSE-quest-qsvt",
+      "sha256": "3bed3331b7048bac17cf50e249d560ccc9508c970da8d7b9283bf4f2e633a91d"
+    },
+    {
+      "bytes": 346,
+      "kind": "file",
+      "path": "crates/quest-polynomial/README.md",
+      "sha256": "5bfc837d237a7367989ad719437d6abbeb78244ac05b5183d4e403c8d2b3fc23"
+    },
+    {
+      "bytes": 21735,
+      "kind": "file",
+      "path": "crates/quest-polynomial/src/analysis.rs",
+      "sha256": "165c22b4f08e5190afa6e512c518fbaa64a05e4b455abc334f6f5ac9a473ff9b"
+    },
+    {
+      "bytes": 6672,
+      "kind": "file",
+      "path": "crates/quest-polynomial/src/basis.rs",
+      "sha256": "919de6d62ff17c17c4f835d28859064cda8175709872ca2cbc3599eb67382a36"
+    },
+    {
+      "bytes": 13227,
+      "kind": "file",
+      "path": "crates/quest-polynomial/src/function.rs",
+      "sha256": "3ca90b7243ba0ada800590e8eff885fa532cd5e78e82942ab291654de3acf457"
+    },
+    {
+      "bytes": 3297,
+      "kind": "file",
+      "path": "crates/quest-polynomial/src/lib.rs",
+      "sha256": "635ab9d64f4cbd35a9540fc22d681cdf6026c7fd27a59d2ce8a248adb6a8c1f7"
+    },
+    {
+      "bytes": 8028,
+      "kind": "file",
+      "path": "crates/quest-polynomial/src/polynomial.rs",
+      "sha256": "c9abcf5bd46e31f3d5af161c95a864cc01f6c5820a24d8bc631140708c353471"
+    },
+    {
+      "bytes": 16588,
+      "kind": "file",
+      "path": "crates/quest-polynomial/src/remez.rs",
+      "sha256": "36bf18b225b5ed13003b701aa8c53cf7050d574d36f5064b274835d59bb4029e"
+    },
+    {
+      "bytes": 9461,
+      "kind": "file",
+      "path": "crates/quest-polynomial/tests/analysis.rs",
+      "sha256": "ad3a87dfb12d107410a834f80da80fb56dc4e14feb3ee932d3f9b44953f0b50b"
+    },
+    {
+      "bytes": 4512,
+      "kind": "file",
+      "path": "crates/quest-polynomial/tests/bases.rs",
+      "sha256": "18f1dab064de34657ae11c877ef49d1b12dc75c3df4ef29ab954a7cc1d6e7f89"
+    },
+    {
+      "bytes": 2279,
+      "kind": "file",
+      "path": "crates/quest-polynomial/tests/warm_evaluation.rs",
+      "sha256": "8539488331dcdc20df4aadde9c7130c7032ee7c61b5a16f7c8b67fa5f9282e11"
+    },
+    {
+      "bytes": 476,
+      "kind": "file",
+      "path": "crates/quest-qasm/Cargo.toml",
+      "sha256": "1c870883e496ac66b33433cfe037b78046443c54abefb254a1160bafa2af5a84"
+    },
+    {
+      "bytes": 1070,
+      "kind": "file",
+      "path": "crates/quest-qasm/LICENSE",
+      "sha256": "670b5966adb424e1576187262e12063e041861861a7c4f913705b211a5cbce7c"
+    },
+    {
+      "bytes": 3431,
+      "kind": "file",
+      "path": "crates/quest-qasm/README.md",
+      "sha256": "2b47f803920fc29da343dde70d1aa0120cf6c951b2304ba0cd74500b5b54337d"
+    },
+    {
+      "bytes": 4410,
+      "kind": "file",
+      "path": "crates/quest-qasm/src/admit.rs",
+      "sha256": "5ab728ea15abdf1284a1da85e01debd4788d0d59711e6af1d2c8c6010cf83770"
+    },
+    {
+      "bytes": 24809,
+      "kind": "file",
+      "path": "crates/quest-qasm/src/export.rs",
+      "sha256": "9d520ff2b3a790deb569e119200349739b645c6bb05a7d23cd211e7ce965d254"
+    },
+    {
+      "bytes": 857,
+      "kind": "file",
+      "path": "crates/quest-qasm/src/lib.rs",
+      "sha256": "df08f93f309949a8e1051c4810712fdf8e7c845fbe4fe0fff7fd855091faf41a"
+    },
+    {
+      "bytes": 3361,
+      "kind": "file",
+      "path": "crates/quest-qasm/src/registry.rs",
+      "sha256": "855f0b73aef5faa2ee797922deb6732fb2f989933ab706bc529fde7062567198"
+    },
+    {
+      "bytes": 11882,
+      "kind": "file",
+      "path": "crates/quest-qasm/src/resolve.rs",
+      "sha256": "f8074494504f9334e139a04778b3ef4acc5d96e3f29918cb93798c4af73ac013"
+    },
+    {
+      "bytes": 1304,
+      "kind": "file",
+      "path": "crates/quest-qasm/src/stdlib.rs",
+      "sha256": "bd807e465a6a476442de44638d8ebe7422093d50fcd4bcc0f910bd27f3835128"
+    },
+    {
+      "bytes": 11357,
+      "kind": "file",
+      "path": "crates/quest-qasm/src/stdlib/LICENSE",
+      "sha256": "8b166516cb0a44ca51b9bb450f23d4367393282f7f46ca258d86526c8efbb218"
+    },
+    {
+      "bytes": 2540,
+      "kind": "file",
+      "path": "crates/quest-qasm/src/stdlib/stdgates.inc",
+      "sha256": "c27f21a4c72cfe36dfceee47d9812041c9cbaf309568173507b581bf7d74b534"
+    },
+    {
+      "bytes": 2413,
+      "kind": "file",
+      "path": "crates/quest-qasm/src/stdlib/stdgates.upstream.inc",
+      "sha256": "b2b60afcbc0c2195bd3cb3ec0347c4c9f7447fd22efb28b36b5ab7ee721c11c0"
+    },
+    {
+      "bytes": 4567,
+      "kind": "file",
+      "path": "crates/quest-qasm/tests/admission.rs",
+      "sha256": "c72e834d74e0f3203f8c70e23317d255a5c30f7a127a8f3509e78e20fc6a88ea"
+    },
+    {
+      "bytes": 5132,
+      "kind": "file",
+      "path": "crates/quest-qasm/tests/includes.rs",
+      "sha256": "1d6c22822cb08d564a96f005eb5f2ae8a19f65eb5a3c87ddb388b2a5033a854a"
+    },
+    {
+      "bytes": 6457,
+      "kind": "file",
+      "path": "crates/quest-qasm/tests/roundtrip.rs",
+      "sha256": "82160e4297fb2f667098ddbea9f51df2f3f1dd9f38a4eb824024076dc3ec90f6"
+    },
+    {
+      "bytes": 4834,
+      "kind": "file",
+      "path": "crates/quest-qasm/tests/stdlib.rs",
+      "sha256": "720f8a9681e64158aa81fdc812823a8a3b279e423813bb1d416049293e959e01"
+    },
+    {
+      "bytes": 5599,
+      "kind": "file",
+      "path": "crates/quest-qasm/tests/support/mod.rs",
+      "sha256": "9101909425ed97e128fba740653d2331861352781e756721c9dabe4bb02bd610"
+    },
+    {
+      "bytes": 1002,
+      "kind": "file",
+      "path": "crates/quest-qsp/Cargo.toml",
+      "sha256": "7b3598035e3f0f85ef97c7bcc9b7b0e1d11a3dd26ef9e8ba9e49ca5944dfc572"
+    },
+    {
+      "bytes": 1070,
+      "kind": "file",
+      "path": "crates/quest-qsp/LICENSE",
+      "sha256": "670b5966adb424e1576187262e12063e041861861a7c4f913705b211a5cbce7c"
+    },
+    {
+      "bytes": 1055,
+      "kind": "file",
+      "path": "crates/quest-qsp/LICENSE-quest-qsvt",
+      "sha256": "3bed3331b7048bac17cf50e249d560ccc9508c970da8d7b9283bf4f2e633a91d"
+    },
+    {
+      "bytes": 14265,
+      "kind": "file",
+      "path": "crates/quest-qsp/README.md",
+      "sha256": "eb00967b845cef5590f281c906369d29359b549b3cbba2b96ec523ffdfc0c65f"
+    },
+    {
+      "bytes": 5093,
+      "kind": "file",
+      "path": "crates/quest-qsp/benches/pipeline.rs",
+      "sha256": "93f88511e12d7383449a39ffb7ef7bf2a770b5f5add63cc4a671efa284483632"
+    },
+    {
+      "bytes": 10744,
+      "kind": "file",
+      "path": "crates/quest-qsp/examples/compare_cpp_branches.rs",
+      "sha256": "c4db576a5677a336e1a8ff1a6237bad6e133c8e58cb9ce882ef7d2960be2b850"
+    },
+    {
+      "bytes": 8446,
+      "kind": "file",
+      "path": "crates/quest-qsp/examples/qsp_tutorials.rs",
+      "sha256": "2c11b2a80c3aba02b9ba3d24bb77f575b05b2f3ec35ee55d6bc98b8ff6135fc5"
+    },
+    {
+      "bytes": 8329,
+      "kind": "file",
+      "path": "crates/quest-qsp/src/admission.rs",
+      "sha256": "e911dbfdbb5722384f4ed6ffc2843cd3e68d3e7d632ff2661cb011c9f7ff99cc"
+    },
+    {
+      "bytes": 27728,
+      "kind": "file",
+      "path": "crates/quest-qsp/src/artifact.rs",
+      "sha256": "42cf12697f3cb76f330a56a8e6df015bf530692bf32310b5f8c77c63d94a384f"
+    },
+    {
+      "bytes": 14743,
+      "kind": "file",
+      "path": "crates/quest-qsp/src/certification/interval.rs",
+      "sha256": "dd4e78825ce36244da289c0e6df011b30677cd1c8e21d88c08b69c4306c1f376"
+    },
+    {
+      "bytes": 31238,
+      "kind": "file",
+      "path": "crates/quest-qsp/src/certification/mod.rs",
+      "sha256": "f0f3a08e1bf0a1104cda61eb1f423c4b390819c58babbedf3c503e13710aaed3"
+    },
+    {
+      "bytes": 12675,
+      "kind": "file",
+      "path": "crates/quest-qsp/src/certification/product.rs",
+      "sha256": "9a4a2cc7e0cf5babf52f3f0baeb75016196eb366cdf73386081ea8ddaffaa0a5"
+    },
+    {
+      "bytes": 15610,
+      "kind": "file",
+      "path": "crates/quest-qsp/src/certification/projector.rs",
+      "sha256": "f10b93cd5408fd2f9d5e0e5bac69ab8386985290b37938bb3d5d39e24a124d6f"
+    },
+    {
+      "bytes": 17983,
+      "kind": "file",
+      "path": "crates/quest-qsp/src/certification/tests.rs",
+      "sha256": "1a2c9446d35ccdf712183916c2967956c47151a76b5777abccdadbeb3975f5e3"
+    },
+    {
+      "bytes": 31491,
+      "kind": "file",
+      "path": "crates/quest-qsp/src/kernel.rs",
+      "sha256": "1858c18d1a355ef724dba3f8786304a58618ab2f142ad6ffedcd93dda44f6f6a"
+    },
+    {
+      "bytes": 4671,
+      "kind": "file",
+      "path": "crates/quest-qsp/src/lib.rs",
+      "sha256": "607493247f0d670bf426bb63d2a8420a2be081067c233877ab7a174cced5c270"
+    },
+    {
+      "bytes": 6615,
+      "kind": "file",
+      "path": "crates/quest-qsp/src/offline/fft.rs",
+      "sha256": "900df827960c1bfb3c5123033a70ddffaf170f19aa7cb0790e2ca3c48d24a083"
+    },
+    {
+      "bytes": 14415,
+      "kind": "file",
+      "path": "crates/quest-qsp/src/offline/kernels.rs",
+      "sha256": "e188f7b2d06a52b0bbace792e49d1d125e7879a0ddfd420ad7353bcee2f5cb0a"
+    },
+    {
+      "bytes": 34509,
+      "kind": "file",
+      "path": "crates/quest-qsp/src/offline/mod.rs",
+      "sha256": "bd2d6cb36429cb6bd3fae59de5f12e62020a42beec04c3e5b02f8fe958cdd53b"
+    },
+    {
+      "bytes": 6622,
+      "kind": "file",
+      "path": "crates/quest-qsp/src/offline/number.rs",
+      "sha256": "d8b806ef6d7453e0a7c6fe21b3c68879ac25630c8e6a0636e8a03fee670c891f"
+    },
+    {
+      "bytes": 39769,
+      "kind": "file",
+      "path": "crates/quest-qsp/src/offline/remez.rs",
+      "sha256": "ce0096d2d9b20c04a0f36ca12c7f4907d92d868885941147c3c75984c01190f5"
+    },
+    {
+      "bytes": 9900,
+      "kind": "file",
+      "path": "crates/quest-qsp/src/precision.rs",
+      "sha256": "b5cf8f0cadb5f76531310cd802d0467ed66e58328edbf271586b912dd8e6cd56"
+    },
+    {
+      "bytes": 14459,
+      "kind": "file",
+      "path": "crates/quest-qsp/src/sequence.rs",
+      "sha256": "a505ad9bdd771db184fb95f444c5b19cb071ed16262eb1d084d514e4cd974215"
+    },
+    {
+      "bytes": 27530,
+      "kind": "file",
+      "path": "crates/quest-qsp/src/stages.rs",
+      "sha256": "b3727ea53d7dedf59fa77c8df5db82a523ad79adcbafebe5afeb236913ddfd19"
+    },
+    {
+      "bytes": 4995,
+      "kind": "file",
+      "path": "crates/quest-qsp/tests/artifact.rs",
+      "sha256": "4f43ce135da91555ffef43e5b7723f58f9cc2ee880e3d65d7144d5a83a0f4e47"
+    },
+    {
+      "bytes": 10360,
+      "kind": "file",
+      "path": "crates/quest-qsp/tests/astro_conversion.rs",
+      "sha256": "1092e4fc4c2f8407f28903e5feca47399ac1d6dd32d42d20b1b958160e4d6229"
+    },
+    {
+      "bytes": 8974,
+      "kind": "file",
+      "path": "crates/quest-qsp/tests/certification.rs",
+      "sha256": "cb35524ca70c9c883040f517fd66b658e08bc201cdd29ff8a389ca76dfa007ed"
+    },
+    {
+      "bytes": 374,
+      "kind": "file",
+      "path": "crates/quest-qsp/tests/data/README.md",
+      "sha256": "e1f522b465c394df6939755ade8dcc2cd810c048281171979617257e606f6ad2"
+    },
+    {
+      "bytes": 64848,
+      "kind": "file",
+      "path": "crates/quest-qsp/tests/data/inverse-degree-8105.bin",
+      "sha256": "485a5a065ec6ab73b668e50066f24f1a2bf697991a7616e83c15ae8f3376bc4e"
+    },
+    {
+      "bytes": 1899,
+      "kind": "file",
+      "path": "crates/quest-qsp/tests/imported.rs",
+      "sha256": "cd5d8a54d87e49c3bdc4061e51b7141dde7bcc0ebccb710839a2359159927abc"
+    },
+    {
+      "bytes": 15238,
+      "kind": "file",
+      "path": "crates/quest-qsp/tests/offline.rs",
+      "sha256": "cc0959bb713ee1a68e3f880789c34b67deda6f1242ca24bd29f22476d6049290"
+    },
+    {
+      "bytes": 6650,
+      "kind": "file",
+      "path": "crates/quest-qsp/tests/parallel.rs",
+      "sha256": "758f1c87f33510199c9e24f6ec88a56220b9f50c944c7061cfb972e7fb3257d0"
+    },
+    {
+      "bytes": 4114,
+      "kind": "file",
+      "path": "crates/quest-qsp/tests/phase_conversion.rs",
+      "sha256": "9725c509077a76fb07a6d6aea3520f2ab14992fca0e16d418ea8a06e2072b5ac"
+    },
+    {
+      "bytes": 963,
+      "kind": "file",
+      "path": "crates/quest-qsp/tests/precision_boundary.rs",
+      "sha256": "03e023f5315b96af69f3c3d68f4f9306c5020365db135a75c04423061ef483a7"
+    },
+    {
+      "bytes": 9993,
+      "kind": "file",
+      "path": "crates/quest-qsp/tests/production.rs",
+      "sha256": "a0ee9cb530ca03db71297681935b2176efbe4103725b0368dd733a11ce674bbb"
+    },
+    {
+      "bytes": 2674,
+      "kind": "file",
+      "path": "crates/quest-qsp/tests/projector_certificate.rs",
+      "sha256": "4c6468a4032a72ae0bb910952cef35a026610e84d5323c5aa15f84eeded96178"
+    },
+    {
+      "bytes": 7653,
+      "kind": "file",
+      "path": "crates/quest-qsp/tests/rhw.rs",
+      "sha256": "8294e74d2f1c5bd0795423e9c1f56161d1728d3db3f92bfdb31ac4908080d2c1"
+    },
+    {
+      "bytes": 1554,
+      "kind": "file",
+      "path": "crates/quest-qsp/tests/tutorials.rs",
+      "sha256": "e4e490c703cbece7dc91ca4500cb8634d8b3d5f36e20d7ca068594d56b1173eb"
+    },
+    {
+      "bytes": 1508,
+      "kind": "file",
+      "path": "crates/quest-qsvt-cli/Cargo.toml",
+      "sha256": "5f760b430a171267a6ba6a6e3271fbc28b6ee9644a0e2dd3410ad5c554778297"
+    },
+    {
+      "bytes": 1070,
+      "kind": "file",
+      "path": "crates/quest-qsvt-cli/LICENSE",
+      "sha256": "670b5966adb424e1576187262e12063e041861861a7c4f913705b211a5cbce7c"
+    },
+    {
+      "bytes": 1055,
+      "kind": "file",
+      "path": "crates/quest-qsvt-cli/LICENSE-quest-qsvt",
+      "sha256": "3bed3331b7048bac17cf50e249d560ccc9508c970da8d7b9283bf4f2e633a91d"
+    },
+    {
+      "bytes": 13007,
+      "kind": "file",
+      "path": "crates/quest-qsvt-cli/README.md",
+      "sha256": "1a0fcaf4ab9c09a118d45b99ba3d719eb881bfe43c545975b29816b2daa5d270"
+    },
+    {
+      "bytes": 451,
+      "kind": "file",
+      "path": "crates/quest-qsvt-cli/build.rs",
+      "sha256": "d65569ab16c0bc091b4d137e5b8e614db4b0e9c76fd4ba3ef1d5563c1e5a652c"
+    },
+    {
+      "bytes": 15530,
+      "kind": "file",
+      "path": "crates/quest-qsvt-cli/src/distributed.rs",
+      "sha256": "3cb296e78eb9e405fba15e22d08d87e3ef1aa800997fae858fefb325c6a6034e"
+    },
+    {
+      "bytes": 11839,
+      "kind": "file",
+      "path": "crates/quest-qsvt-cli/src/distributed/wire.rs",
+      "sha256": "6b31f7688760d1fff5f477c4ba353989e56841f10ece53f960a198c39196811d"
+    },
+    {
+      "bytes": 28696,
+      "kind": "file",
+      "path": "crates/quest-qsvt-cli/src/execution.rs",
+      "sha256": "81442bb94eebde9b64d9c0681a0f23afa124bb57564337464ef455136750b311"
+    },
+    {
+      "bytes": 16121,
+      "kind": "file",
+      "path": "crates/quest-qsvt-cli/src/lib.rs",
+      "sha256": "7da091bc25adfcc8a0ca728ebda155eef606e44a9a2a3ba0efb4324404fc506b"
+    },
+    {
+      "bytes": 661,
+      "kind": "file",
+      "path": "crates/quest-qsvt-cli/src/main.rs",
+      "sha256": "e779bbc8db1c8f9c626aa36cf08a5d66a8291a88b8be4d56819482fe98b78649"
+    },
+    {
+      "bytes": 25272,
+      "kind": "file",
+      "path": "crates/quest-qsvt-cli/src/synthesis.rs",
+      "sha256": "5f2aa3ec2297590cee10de8afd10764d8bdaa700a104f942e60cf206efa92678"
+    },
+    {
+      "bytes": 2172,
+      "kind": "file",
+      "path": "crates/quest-qsvt-cli/src/workers.rs",
+      "sha256": "a8a0fb825d838a75d39121f9a035293cdc9a4be4a1b4e9209b47bb6de7cf8c06"
+    },
+    {
+      "bytes": 16166,
+      "kind": "file",
+      "path": "crates/quest-qsvt-cli/tests/application.rs",
+      "sha256": "7aa45bc0133810812c71633771e3cf3500d66bb20e5a0db663f942a4ac64e569"
+    },
+    {
+      "bytes": 5282,
+      "kind": "file",
+      "path": "crates/quest-qsvt-cli/tests/compiled_artifact.rs",
+      "sha256": "c424c607a7ff64068986e90520f3bc6e4c49f6cd99a14053bb8a9ef89a61ba16"
+    },
+    {
+      "bytes": 8652,
+      "kind": "file",
+      "path": "crates/quest-qsvt-cli/tests/distributed_application.rs",
+      "sha256": "1d35842cef647fe6b62ed662b798555bd19245b177b1af55c6477cde9769af70"
+    },
+    {
+      "bytes": 11889,
+      "kind": "file",
+      "path": "crates/quest-qsvt-cli/tests/native_application.rs",
+      "sha256": "04e8d23a457611880128115e417dd9151cb43eeededa071b741180de32cc200b"
+    },
+    {
+      "bytes": 3147,
+      "kind": "file",
+      "path": "crates/quest-qsvt-cli/tests/no_multiprecision.rs",
+      "sha256": "382e50cf8081d8d3bdc72114e11efd25e8860cbb8b3ccf2c3ef81e3d1f70f122"
+    },
+    {
+      "bytes": 907,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/Cargo.toml",
+      "sha256": "e79c92c9ae5b3633a7f23ed9f609f19a4ada2c4b6a5825a4c426112f4034edd2"
+    },
+    {
+      "bytes": 1070,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/LICENSE",
+      "sha256": "670b5966adb424e1576187262e12063e041861861a7c4f913705b211a5cbce7c"
+    },
+    {
+      "bytes": 1055,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/LICENSE-quest-qsvt",
+      "sha256": "3bed3331b7048bac17cf50e249d560ccc9508c970da8d7b9283bf4f2e633a91d"
+    },
+    {
+      "bytes": 1238,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/README.md",
+      "sha256": "faec80737e918c3acffabd269b3873f2c3003501914f80d73177754e69169f89"
+    },
+    {
+      "bytes": 184,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/build.rs",
+      "sha256": "5711d8cb75764ca1ba9ea4de3b9e297fb1fc69782fa0bd319df01394b49c5e00"
+    },
+    {
+      "bytes": 43520,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/data/inverse/coeffs_kappa_1000_eps_0p001.bin",
+      "sha256": "3917c5eb1836f68e165ec23cf061ed1cd101c1eb2c62b7935db185b053b9ef25"
+    },
+    {
+      "bytes": 31072,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/data/inverse/coeffs_kappa_1000_eps_0p01.bin",
+      "sha256": "b4b56369ebfccbc92f6b9bc0fd3235bfa3ff26a18646361d7a33dac1fa62abf0"
+    },
+    {
+      "bytes": 14272,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/data/inverse/coeffs_kappa_1000_eps_0p1.bin",
+      "sha256": "1606b23b9c744f55c152cbc79781a433cbfc42c28334210e8a3ece08b8743005"
+    },
+    {
+      "bytes": 5040,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/data/inverse/coeffs_kappa_100_eps_0p001.bin",
+      "sha256": "53108b2c0782438e9fff9c345f1259b641c1d6f763e632187b3e361fe12c3f5e"
+    },
+    {
+      "bytes": 3184,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/data/inverse/coeffs_kappa_100_eps_0p01.bin",
+      "sha256": "80c4f621f0e7e93196171e92ed4f6c0b148a084c3abf8e54b138c82f360a28ac"
+    },
+    {
+      "bytes": 1344,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/data/inverse/coeffs_kappa_100_eps_0p1.bin",
+      "sha256": "0e2ae283e6ceb6388680e65f4c299c055ebd92fc4a3ffd258cc183ce20614dd4"
+    },
+    {
+      "bytes": 64848,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/data/inverse/coeffs_kappa_1500_eps_0p001.bin",
+      "sha256": "485a5a065ec6ab73b668e50066f24f1a2bf697991a7616e83c15ae8f3376bc4e"
+    },
+    {
+      "bytes": 48816,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/data/inverse/coeffs_kappa_1500_eps_0p01.bin",
+      "sha256": "45d12828ffc6f61e72e68ee7be56c50ea2540600f61c3d9706e7e5ae2edcc905"
+    },
+    {
+      "bytes": 20112,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/data/inverse/coeffs_kappa_1500_eps_0p1.bin",
+      "sha256": "151f548a02e0196092af78c0f0faeae20173bcba936cbba4faff125bfa7f2557"
+    },
+    {
+      "bytes": 12656,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/data/inverse/coeffs_kappa_250_eps_0p001.bin",
+      "sha256": "46de5762e7142bea19a23e61af23bc8c0ff201f009c7e240674a67de926fb303"
+    },
+    {
+      "bytes": 7776,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/data/inverse/coeffs_kappa_250_eps_0p01.bin",
+      "sha256": "6dd6e6ddd6cf4119c6209f137e9c7c6a92a4eb816a66fc00d257f618bcb6c57c"
+    },
+    {
+      "bytes": 3232,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/data/inverse/coeffs_kappa_250_eps_0p1.bin",
+      "sha256": "320bb628a3776622b88609bcf901440a93c1e172216cd7ab47057f5ec8cf051b"
+    },
+    {
+      "bytes": 21600,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/data/inverse/coeffs_kappa_500_eps_0p001.bin",
+      "sha256": "640cf2d4b1b417b28f73099f016e50ccdc741ca81fed66c9806e136fea76ae90"
+    },
+    {
+      "bytes": 15856,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/data/inverse/coeffs_kappa_500_eps_0p01.bin",
+      "sha256": "26e99513a5086474a40124469d4fc4b5084e74fbdcf5bbdf4996b0801a3b400d"
+    },
+    {
+      "bytes": 6416,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/data/inverse/coeffs_kappa_500_eps_0p1.bin",
+      "sha256": "ef68ed5ee3bfcf0852cfc9515d65c5252d964e500de07a548db163ed6fd53557"
+    },
+    {
+      "bytes": 2496,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/data/inverse/coeffs_kappa_50_eps_0p001.bin",
+      "sha256": "749c65be2e4042ceda1e2675667656750ece9ba0d7a6bbefb803ce38520208d5"
+    },
+    {
+      "bytes": 1584,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/data/inverse/coeffs_kappa_50_eps_0p01.bin",
+      "sha256": "ffbf061ded68b526a540bb952a5d70d256bd6d6504e2e4f24c4b3b5e3d59ac40"
+    },
+    {
+      "bytes": 656,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/data/inverse/coeffs_kappa_50_eps_0p1.bin",
+      "sha256": "4edf9d73f3e4c346c5310900b8208c1c7b9370cdf7a2e04a4a32b0428c9f4566"
+    },
+    {
+      "bytes": 256,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/data/inverse/coeffs_kappa_5_eps_0p001.bin",
+      "sha256": "dd6580db74e48b0005ea537c18ce45e5116d59d45e2c340850fcd608fdcee300"
+    },
+    {
+      "bytes": 176,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/data/inverse/coeffs_kappa_5_eps_0p01.bin",
+      "sha256": "bd95b78da4298ceed086a93ed94f88b470bff343c12e24e7a27cf4e5bb86da8f"
+    },
+    {
+      "bytes": 80,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/data/inverse/coeffs_kappa_5_eps_0p1.bin",
+      "sha256": "389a689cfc133464f9516cc16eed46b0566ee4639601f41aab827371c570b9c3"
+    },
+    {
+      "bytes": 4588,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/examples/catalog_validation.rs",
+      "sha256": "12ed05956c8718a427173605b8b2ccf91f7dbd98f78df1de22f19de311142d73"
+    },
+    {
+      "bytes": 9975,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/examples/generalized_catalog.rs",
+      "sha256": "af83448a105eb78d76f50baf34ef1acbb725dcaeef8635b2bafc8c796251afc2"
+    },
+    {
+      "bytes": 2457,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/src/catalog.rs",
+      "sha256": "2c1406178a696145f8d45a4c3aee2168a33b7ada5ee94f5f7f5d90266a86645c"
+    },
+    {
+      "bytes": 3358,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/src/catalog_data.rs",
+      "sha256": "a56b1b82dbef7cae369cb254897ad1867fb3ff30ddb2726d1591178325cd3f41"
+    },
+    {
+      "bytes": 2694,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/src/compiled.rs",
+      "sha256": "7e7d9f70af081b470a9ca91d678fa58bc7499a1b1acebf12da45f048f6c7c967"
+    },
+    {
+      "bytes": 29933,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/src/hdf5.rs",
+      "sha256": "5f8ea9825c9d84e6074a957a5c43babf3dd98d073f58f2b054c06e6c51a444ca"
+    },
+    {
+      "bytes": 20850,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/src/json.rs",
+      "sha256": "dd0402c68edc2044f0ff6fdee0ded564a268b0fa5f7406782da4aabee62ebde8"
+    },
+    {
+      "bytes": 4366,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/src/lib.rs",
+      "sha256": "3fab368d53b841ba203384a12c4240e9d5f41e96500368fd4013fc04a95c7eb4"
+    },
+    {
+      "bytes": 5661,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/src/sparse.rs",
+      "sha256": "852ccc567b856df5bd7aa30077395ae2a065b5d3f02838408752c009482d4795"
+    },
+    {
+      "bytes": 1037,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/tests/catalog.rs",
+      "sha256": "dc0f7cbb0beb436367cc5ba404286ddaef7935689815b951eebfd900b9233886"
+    },
+    {
+      "bytes": 2062,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/tests/compiled.rs",
+      "sha256": "afdad2b93ed47b5e24e9ef68be32f1efee5bf07464fca580819b785f816315c3"
+    },
+    {
+      "bytes": 4557,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/tests/cpp_reference.rs",
+      "sha256": "29cb1cb64ab532920d6ff2364a9f96339ce98bdda923ca1f83013aaeefe5e177"
+    },
+    {
+      "bytes": 1442,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/tests/data/README.md",
+      "sha256": "73ac8bf637bb7cda3953461dd59576ad62be4113c02a749be2d63e03be55a1fb"
+    },
+    {
+      "bytes": 414,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/tests/data/cpp-complex-controls.json",
+      "sha256": "c2fdce82f9881fb84ac6d97f0f97564aea8fd2eaa4e6d7a14902772f4f40a101"
+    },
+    {
+      "bytes": 64848,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/tests/data/cpp-phases-k1500-e0p001.bin",
+      "sha256": "f0e3ef716754afb3c327b035dcb4b9cd3be4e76d9531e17a457f80fa635f5631"
+    },
+    {
+      "bytes": 12656,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/tests/data/cpp-phases-k250-e0p001.bin",
+      "sha256": "7a4ede7308ad1b37e5461bdd2cc3ada37f3430442f90f724f88b18d1627e13f1"
+    },
+    {
+      "bytes": 80,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/tests/data/cpp-phases-k5-e0p1.bin",
+      "sha256": "f3edcaa7180da9004ed44266e6b4320ccb573b22ac3ca71cc5b0879ffefb9228"
+    },
+    {
+      "bytes": 1584,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/tests/data/cpp-phases-k50-e0p01.bin",
+      "sha256": "8160848a39d0606860c359a92412da1e262c7842b4c90bc3067cbceea7d6c4e4"
+    },
+    {
+      "bytes": 9908,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/tests/hdf5.rs",
+      "sha256": "7ca2b23cda7e3e38ff822fa3cf528b2972b74b4eb00754d54578c45474e6470f"
+    },
+    {
+      "bytes": 8551,
+      "kind": "file",
+      "path": "crates/quest-qsvt-io/tests/interchange.rs",
+      "sha256": "f7accf0dee3f8480d474644d759eb1bf48191071566821d3863b0aa7cb4c2086"
+    },
+    {
+      "bytes": 610,
+      "kind": "file",
+      "path": "crates/quest-qsvt/Cargo.toml",
+      "sha256": "5ef92dfa9b905382f3579e9597c6e38f04f7dd227aa1f001a5a191fd84986ab0"
+    },
+    {
+      "bytes": 1070,
+      "kind": "file",
+      "path": "crates/quest-qsvt/LICENSE",
+      "sha256": "670b5966adb424e1576187262e12063e041861861a7c4f913705b211a5cbce7c"
+    },
+    {
+      "bytes": 1055,
+      "kind": "file",
+      "path": "crates/quest-qsvt/LICENSE-quest-qsvt",
+      "sha256": "3bed3331b7048bac17cf50e249d560ccc9508c970da8d7b9283bf4f2e633a91d"
+    },
+    {
+      "bytes": 16056,
+      "kind": "file",
+      "path": "crates/quest-qsvt/README.md",
+      "sha256": "f9a326662f9c5b4bd3b84f91151501f7067caf2ece52dc7c44143e6f0693a634"
+    },
+    {
+      "bytes": 8711,
+      "kind": "file",
+      "path": "crates/quest-qsvt/docs/analysis.md",
+      "sha256": "17f0245a5b7deb323f047fce28fcd86541cbd9a5a472581d4f99a70de011a043"
+    },
+    {
+      "bytes": 21439,
+      "kind": "file",
+      "path": "crates/quest-qsvt/src/analysis.rs",
+      "sha256": "2e199c7b79436c4009c14bd1307445c124e9bf5999891d66e13c4863c21fe4d9"
+    },
+    {
+      "bytes": 17927,
+      "kind": "file",
+      "path": "crates/quest-qsvt/src/analysis/diagnostics.rs",
+      "sha256": "645cf5a7b308707079054386a71c80f1a352ef8a4efbe9745e1ed8bd523c8b3e"
+    },
+    {
+      "bytes": 7308,
+      "kind": "file",
+      "path": "crates/quest-qsvt/src/dense.rs",
+      "sha256": "3b3001e679c6834807c9bad78a5953dbb4cdf2e147e8aeb39866852450ce33f4"
+    },
+    {
+      "bytes": 12028,
+      "kind": "file",
+      "path": "crates/quest-qsvt/src/encoding.rs",
+      "sha256": "504fa964062528867a83b7331fdf0a8dcc2f1822528465dfb9c3604b48045d8f"
+    },
+    {
+      "bytes": 3700,
+      "kind": "file",
+      "path": "crates/quest-qsvt/src/lib.rs",
+      "sha256": "1a27a7a813e149cc84b7164a8664cd2f1a0e333721d37aca19884f8d787d5b1e"
+    },
+    {
+      "bytes": 5222,
+      "kind": "file",
+      "path": "crates/quest-qsvt/src/materialize.rs",
+      "sha256": "7a4c47144683ce799440c9193e9e6161879adb5c51ac121f53511fbf4d8882df"
+    },
+    {
+      "bytes": 2532,
+      "kind": "file",
+      "path": "crates/quest-qsvt/src/matrix.rs",
+      "sha256": "241a9057618bf5fc1f58d6693d328929260e69397474b6c921bbb569ee1e04d3"
+    },
+    {
+      "bytes": 9362,
+      "kind": "file",
+      "path": "crates/quest-qsvt/src/projection.rs",
+      "sha256": "0ce5ae60c9c3624af6d21dce6bdcfcc61a411bdd72645440d0b32c5106c3d240"
+    },
+    {
+      "bytes": 15086,
+      "kind": "file",
+      "path": "crates/quest-qsvt/src/response.rs",
+      "sha256": "76adc030c5b2769b1a8c070916126ddf2dcc55dba193cf7def4d50b14da6e7c3"
+    },
+    {
+      "bytes": 20583,
+      "kind": "file",
+      "path": "crates/quest-qsvt/src/routes.rs",
+      "sha256": "ce6812945fe417e48ac8775865c89d79138d7fdd475d9cab1f1d3ae43ded17a0"
+    },
+    {
+      "bytes": 10868,
+      "kind": "file",
+      "path": "crates/quest-qsvt/src/space.rs",
+      "sha256": "3f7fe329bc00751ab760dd88b962a329359f2b74bc2e85444188407623fb1bbf"
+    },
+    {
+      "bytes": 19037,
+      "kind": "file",
+      "path": "crates/quest-qsvt/src/transform.rs",
+      "sha256": "793068cd2e9de4c94da75c6673e456369ba3dc1728cfdc98b00d9ae57ac1c6fa"
+    },
+    {
+      "bytes": 12265,
+      "kind": "file",
+      "path": "crates/quest-qsvt/tests/analysis.rs",
+      "sha256": "e9aa89993cc5e511606b72488a38b1cd07b95925d4f653c300783b491eb24875"
+    },
+    {
+      "bytes": 1534,
+      "kind": "file",
+      "path": "crates/quest-qsvt/tests/dense_encoding.rs",
+      "sha256": "13f69b37164167181e30ffc2fb792f0115cd4656bec3b7948aa6cb9e82a8e2d3"
+    },
+    {
+      "bytes": 5989,
+      "kind": "file",
+      "path": "crates/quest-qsvt/tests/encodings.rs",
+      "sha256": "35eef3032e4d09ff5693230a04827e3a1c93f5f4428fff9bc89b168910ed0faf"
+    },
+    {
+      "bytes": 1392,
+      "kind": "file",
+      "path": "crates/quest-qsvt/tests/materialization.rs",
+      "sha256": "fde372c3e6e503300654401c7d1b2c06810a7a421b3caeb470342a69bdc02cf8"
+    },
+    {
+      "bytes": 13123,
+      "kind": "file",
+      "path": "crates/quest-qsvt/tests/matrix_transforms.rs",
+      "sha256": "3fc3baef4e550a692147a4ebf498025931c95a61ea00d166d47721f46e0c4517"
+    },
+    {
+      "bytes": 5305,
+      "kind": "file",
+      "path": "crates/quest-qsvt/tests/phase_conversion.rs",
+      "sha256": "c38526fb8347668bacdd823a456ac1d251b2b98c5d72297953306915ed10b17f"
+    },
+    {
+      "bytes": 5798,
+      "kind": "file",
+      "path": "crates/quest-qsvt/tests/route_meaning.rs",
+      "sha256": "89528efcaf465b9508edac43b89b37cda271a6fce4e8ac856cb39603a112da39"
+    },
+    {
+      "bytes": 15078,
+      "kind": "file",
+      "path": "crates/quest-qsvt/tests/transforms.rs",
+      "sha256": "bdfb120b443c7aee8364b51b0e3b170a904f6e018ffc2f4287735670a44c4850"
+    },
+    {
+      "bytes": 1024,
+      "kind": "file",
+      "path": "crates/quest-symbolic/AFFINE_PROVENANCE.md",
+      "sha256": "bc039126955a8af2c83e311724dd90cc551c6a85493ade38bf5c3e6aa5741089"
+    },
+    {
+      "bytes": 412,
+      "kind": "file",
+      "path": "crates/quest-symbolic/Cargo.toml",
+      "sha256": "45384509d7cfe643c705ac2f23a5f3ac86f3b2b392859e888ea9928c450cd9ee"
+    },
+    {
+      "bytes": 1063,
+      "kind": "file",
+      "path": "crates/quest-symbolic/LICENSE.mathcore",
+      "sha256": "2d1030a42ca717886f14d5326bec37c0490d627b5778fab1b930451317a4a95d"
+    },
+    {
+      "bytes": 26783,
+      "kind": "file",
+      "path": "crates/quest-symbolic/src/affine/mod.rs",
+      "sha256": "d22adbfc75b99714bbd2831cfff32a78ee61dd5278f45246d3a21d5660d913b0"
+    },
+    {
+      "bytes": 10341,
+      "kind": "file",
+      "path": "crates/quest-symbolic/src/affine/tests.rs",
+      "sha256": "a7a2f922a6c490ebdfee56e0a6579b60bb74ad54fc0de81484975326d1f1743e"
+    },
+    {
+      "bytes": 23326,
+      "kind": "file",
+      "path": "crates/quest-symbolic/src/lib.rs",
+      "sha256": "d2af78194f1cdd60285f99e5ddfed40563b5e2145beb27c4c72f64384a0120e8"
+    },
+    {
+      "bytes": 15235,
+      "kind": "file",
+      "path": "crates/quest-symbolic/src/source.rs",
+      "sha256": "0e47af646c850eacb809b51ffebebc50c9a5941e32fb2ac5de7435a05f2df224"
+    },
+    {
+      "bytes": 373,
+      "kind": "file",
+      "path": "crates/quest-synthesis/Cargo.toml",
+      "sha256": "20d29dd077fdaf341b8373ea3be6baac051f657be8d7cebbafbd8a282528c68a"
+    },
+    {
+      "bytes": 1070,
+      "kind": "file",
+      "path": "crates/quest-synthesis/LICENSE",
+      "sha256": "670b5966adb424e1576187262e12063e041861861a7c4f913705b211a5cbce7c"
+    },
+    {
+      "bytes": 5461,
+      "kind": "file",
+      "path": "crates/quest-synthesis/README.md",
+      "sha256": "7732c02752ce1c0ec3679b3104d9efa0cd7f445eb5d4e3de3c025c895b2fe4f8"
+    },
+    {
+      "bytes": 2276,
+      "kind": "file",
+      "path": "crates/quest-synthesis/examples/architecture_synthesis.rs",
+      "sha256": "bd83298222898920978dcf2b65325772e25e610420c5aaca19f7ac3eb8133f93"
+    },
+    {
+      "bytes": 12721,
+      "kind": "file",
+      "path": "crates/quest-synthesis/src/approximation.rs",
+      "sha256": "80047143fccfc3117345c9ec3ef2a0d98737cea6264c80cba2b20ee489e2441e"
+    },
+    {
+      "bytes": 16271,
+      "kind": "file",
+      "path": "crates/quest-synthesis/src/exact.rs",
+      "sha256": "70939ee278be37f6f61252c7fd947649d12b2ed3bb8105a7c05a2f2235fa438d"
+    },
+    {
+      "bytes": 22844,
+      "kind": "file",
+      "path": "crates/quest-synthesis/src/grid.rs",
+      "sha256": "bcfa29fe33bdd8532ffb71dbfc1fa561f2b932f6022d8ab55c49a7c8c49d1a80"
+    },
+    {
+      "bytes": 7206,
+      "kind": "file",
+      "path": "crates/quest-synthesis/src/lib.rs",
+      "sha256": "fa7d86af32606bf1391df531c8431df08339f3c9777938a279cb46be3067681d"
+    },
+    {
+      "bytes": 9945,
+      "kind": "file",
+      "path": "crates/quest-synthesis/src/lowering.rs",
+      "sha256": "597b4d6bad201688850597968e041e0304008a68132417bd07123ebf73d9cf69"
+    },
+    {
+      "bytes": 13843,
+      "kind": "file",
+      "path": "crates/quest-synthesis/src/norm_equation.rs",
+      "sha256": "a80dcfef49c9115d85963d3f8a48589930fb8d7be6ae810404a56507ce93014c"
+    },
+    {
+      "bytes": 9128,
+      "kind": "file",
+      "path": "crates/quest-synthesis/src/normal.rs",
+      "sha256": "ac8c2ed239df7520e4f7ca9e451387d85806cac1e83f7bb9971d7f1950a70f14"
+    },
+    {
+      "bytes": 6375,
+      "kind": "file",
+      "path": "crates/quest-synthesis/tests/approximation.rs",
+      "sha256": "c10f320013457afcfc0de62c957cd0f160dd23ebee6078c048ff9ab28fdbf339"
+    },
+    {
+      "bytes": 6281,
+      "kind": "file",
+      "path": "crates/quest-synthesis/tests/exact.rs",
+      "sha256": "d3dd1597967d9287da868dd3730e23ba6e9cc2f13781bbffec66ab4e2ca8f2d2"
+    },
+    {
+      "bytes": 1958,
+      "kind": "file",
+      "path": "crates/quest-synthesis/tests/fixtures/README.md",
+      "sha256": "a32028569d39641d5e190b3e6061d22a8aad169901dbe3ab6bfa9cee73700785"
+    },
+    {
+      "bytes": 319,
+      "kind": "file",
+      "path": "crates/quest-synthesis/tests/fixtures/newsynth-affine.txt",
+      "sha256": "3d9301c7647ad77fc9624cd71fa2f31c1fb65001e326740c63a29b1a58602bd5"
+    },
+    {
+      "bytes": 325,
+      "kind": "file",
+      "path": "crates/quest-synthesis/tests/fixtures/newsynth-dyadic.txt",
+      "sha256": "6c798c1ebb58fb63704b57cac403fc3e67affc81956a77598fcaed86066c91bc"
+    },
+    {
+      "bytes": 409,
+      "kind": "file",
+      "path": "crates/quest-synthesis/tests/fixtures/newsynth-pi4.txt",
+      "sha256": "548950f0fdc9526c6976d43da767678a14f6314b2409902d7e8b42411f8c0219"
+    },
+    {
+      "bytes": 323,
+      "kind": "file",
+      "path": "crates/quest-synthesis/tests/fixtures/newsynth-pi7.txt",
+      "sha256": "988d33d28c727d69dd3d20fb362b044f753027e634da637f6679fc1999da0219"
+    },
+    {
+      "bytes": 3338,
+      "kind": "file",
+      "path": "crates/quest-synthesis/tests/newsynth.rs",
+      "sha256": "57d802b465a4d68e38b2c0e0a3d4e19fefaa0793013300fa2038494632653cdc"
+    },
+    {
+      "bytes": 5073,
+      "kind": "file",
+      "path": "crates/quest-synthesis/tests/resources.rs",
+      "sha256": "1ddabc7d76d4d5753a5f93c3f13f1b1efe9438bd988b08ec4c3ecbf9a2593339"
+    },
+    {
+      "bytes": 107,
+      "kind": "file",
+      "path": "crates/quest-sys/.clang-format",
+      "sha256": "be9195897550876651bfcf8a7206ab7cbccd994bcedef6649d3a3fa9826d1d0f"
+    },
+    {
+      "bytes": 814,
+      "kind": "file",
+      "path": "crates/quest-sys/Cargo.toml",
+      "sha256": "2bbeb388d35f4ab08e59eb986b8807008817f6074eb18b8d4ca6bb3f6d8be5f5"
+    },
+    {
+      "bytes": 1070,
+      "kind": "file",
+      "path": "crates/quest-sys/LICENSE",
+      "sha256": "670b5966adb424e1576187262e12063e041861861a7c4f913705b211a5cbce7c"
+    },
+    {
+      "bytes": 7474,
+      "kind": "file",
+      "path": "crates/quest-sys/README.md",
+      "sha256": "d21cdc03fcb3bd9c330c02c2d70585267ab2a24d1d1d67f1e9e89902511822c9"
+    },
+    {
+      "bytes": 3210,
+      "kind": "file",
+      "path": "crates/quest-sys/build.rs",
+      "sha256": "9d58d8aeaebe3529c69a373cd0e2472e34f77e7e08106ea009514665305abad8"
+    },
+    {
+      "bytes": 456,
+      "kind": "file",
+      "path": "crates/quest-sys/examples/min_example.rs",
+      "sha256": "9206e052be9e961c6be9ac3b447988fbd42dc96ea29e41072e3c38240672d7db"
+    },
+    {
+      "bytes": 679251,
+      "kind": "file",
+      "path": "crates/quest-sys/generated/api_coverage.json",
+      "sha256": "13168b98dac9d9239069afb183aa212d49e53e9e375ccf5a8e303391660c3716"
+    },
+    {
+      "bytes": 78042,
+      "kind": "file",
+      "path": "crates/quest-sys/generated/generated_adapters.json",
+      "sha256": "6d2a805096834edb8b3f76c6ab1cda4228bb03bc0bf80579d286b3ff84068053"
+    },
+    {
+      "bytes": 6686,
+      "kind": "file",
+      "path": "crates/quest-sys/generated/generated_names.txt",
+      "sha256": "e36eb9e048b3e2beb60fd8e08e537cc35a1d4746f9354cbb767ca7348d8be0d8"
+    },
+    {
+      "bytes": 9944,
+      "kind": "file",
+      "path": "crates/quest-sys/src/cxx_bindings/include/quest_bindings.hpp",
+      "sha256": "0a777d6bebd93ee2d63a4fbba0f363c690e9f92dd7f8661843bb146631ccf154"
+    },
+    {
+      "bytes": 35811,
+      "kind": "file",
+      "path": "crates/quest-sys/src/cxx_bindings/include/quest_generated_bindings.hpp",
+      "sha256": "227f3d852d06eab572e738267a79491838958c53994f6e452bcb729141ac278a"
+    },
+    {
+      "bytes": 1216,
+      "kind": "file",
+      "path": "crates/quest-sys/src/cxx_bindings/include/quest_mpi.hpp",
+      "sha256": "a7a6e1f81f101b36ef61381abc7846acb75c25e500d8d623f69f7eaa4b3be0e5"
+    },
+    {
+      "bytes": 33468,
+      "kind": "file",
+      "path": "crates/quest-sys/src/cxx_bindings/quest_bindings.cpp",
+      "sha256": "7a2f20b92cd0e091718c062a40c93b59aa0e65b8444d5582a6b68aee377dc380"
+    },
+    {
+      "bytes": 79027,
+      "kind": "file",
+      "path": "crates/quest-sys/src/cxx_bindings/quest_generated_bindings.cpp",
+      "sha256": "d752c466a27960ebf9d225b720739dc4177a8f2a2d9e028c038be86478dd7f66"
+    },
+    {
+      "bytes": 2036,
+      "kind": "file",
+      "path": "crates/quest-sys/src/cxx_bindings/quest_mpi.cpp",
+      "sha256": "ef6cb0796533a4c867c7ae54fc738c6865df0d762c354c2cc1a3bcc6685ffc21"
+    },
+    {
+      "bytes": 87512,
+      "kind": "file",
+      "path": "crates/quest-sys/src/generated_api.rs",
+      "sha256": "2d4ff34600302f8b6d87594fccf9a9bb1b49f4727d82b538f9645024ebd6e488"
+    },
+    {
+      "bytes": 19385,
+      "kind": "file",
+      "path": "crates/quest-sys/src/lib.rs",
+      "sha256": "c3f9ed5fe9aeeb39eca1f010c1601724ef55d56ea28246e19cd25f9d5dd44713"
+    },
+    {
+      "bytes": 23054,
+      "kind": "file",
+      "path": "crates/quest-sys/src/mpi.rs",
+      "sha256": "bc761fd97948d18220fb469dbf2687bf8f45f9e5246a015d7cace86ff25a293f"
+    },
+    {
+      "bytes": 10899,
+      "kind": "file",
+      "path": "crates/quest-sys/tests/adapters.rs",
+      "sha256": "1deb9ba4c4fbd61d92cd9b0fcd90bdd778c69ca0313e5b9e77c49e3d544a9b17"
+    },
+    {
+      "bytes": 1552,
+      "kind": "file",
+      "path": "crates/quest-sys/tests/common/mod.rs",
+      "sha256": "6eac8d16211896a6a30828d81e910f38583878b1287130562b573fad5b901555"
+    },
+    {
+      "bytes": 3911,
+      "kind": "file",
+      "path": "crates/quest-sys/tests/drop_cleanup.rs",
+      "sha256": "b8971bd0920fbf03dda856cc5076e9dd169d253b24e312d190b1e574b2643951"
+    },
+    {
+      "bytes": 457,
+      "kind": "file",
+      "path": "crates/quest-sys/tests/finalize.rs",
+      "sha256": "8e8fcd444065f61a632d130cdaebc1ca108cb8127757cfd3fac02d2250b5fa72"
+    },
+    {
+      "bytes": 10193,
+      "kind": "file",
+      "path": "crates/quest-sys/tests/mpi.rs",
+      "sha256": "a2cb3e1d004f898259c5a0e3f463ba6aab0e05ed84522da900acf02560d12048"
+    },
+    {
+      "bytes": 8193,
+      "kind": "file",
+      "path": "crates/quest-sys/tests/safety.rs",
+      "sha256": "91f08d2ef2cfba7bfd1923c90f807fd23f0ad2c7943d5fec1cfdabf3a70830c8"
+    },
+    {
+      "bytes": 14180,
+      "kind": "file",
+      "path": "crates/quest-sys/tests/test.rs",
+      "sha256": "9d6d51c18c4f5117170ab92f3b32a7e3a76c7454739b0a3c39b1ccb194867723"
+    },
+    {
+      "bytes": 1355,
+      "kind": "file",
+      "path": "crates/quest/Cargo.toml",
+      "sha256": "aff526562c32f1c7f87a2e3ab6047b7749384ff568cef934f557550f25318ddf"
+    },
+    {
+      "bytes": 1070,
+      "kind": "file",
+      "path": "crates/quest/LICENSE",
+      "sha256": "670b5966adb424e1576187262e12063e041861861a7c4f913705b211a5cbce7c"
+    },
+    {
+      "bytes": 16134,
+      "kind": "file",
+      "path": "crates/quest/README.md",
+      "sha256": "3efa64e15d9f24fd26c9015cae999a5aaffc2b6569930f86a18f4147237ab194"
+    },
+    {
+      "bytes": 5451,
+      "kind": "file",
+      "path": "crates/quest/benches/qsvt_execution.rs",
+      "sha256": "650b57f8713879c1cc45d6024e976a829052774a491521fe79b1336d8dcda2f8"
+    },
+    {
+      "bytes": 1460,
+      "kind": "file",
+      "path": "crates/quest/benches/runtime.rs",
+      "sha256": "3ba71ff4a7766a616a949b4314bd8ba71b4223fb54e5fbdab5cbcc6fade58452"
+    },
+    {
+      "bytes": 386,
+      "kind": "file",
+      "path": "crates/quest/build.rs",
+      "sha256": "46a019ba3087252765d198c1bbee48de43fa250495ab436d564fcc5cae36e0a1"
+    },
+    {
+      "bytes": 3340,
+      "kind": "file",
+      "path": "crates/quest/examples/architecture_runtime.rs",
+      "sha256": "9172ef6e6e91e50e93468cd1906164a356cedbd23f101ed8c9d4285bed6bf687"
+    },
+    {
+      "bytes": 592,
+      "kind": "file",
+      "path": "crates/quest/examples/bell_circuit.rs",
+      "sha256": "cd53f3c3c88a0855dd89f8e78fce45914161d4cbe83afead51d9b0465a4a7ddd"
+    },
+    {
+      "bytes": 450,
+      "kind": "file",
+      "path": "crates/quest/examples/minimal.rs",
+      "sha256": "d781284d8bf85de3f693de7b34f9a5c7c018bc3187016aec5d01d6abe6d8882d"
+    },
+    {
+      "bytes": 1751,
+      "kind": "file",
+      "path": "crates/quest/examples/optimize.rs",
+      "sha256": "033add1e7435f859fe3660d2b6b68209d77911fd79c745daca355e69ece7e874"
+    },
+    {
+      "bytes": 2331,
+      "kind": "file",
+      "path": "crates/quest/examples/optimize_workers.rs",
+      "sha256": "149cfff364b7e09a3f50ad13c208216427a2a48207e7c7425205d203e2c8e7a5"
+    },
+    {
+      "bytes": 2488,
+      "kind": "file",
+      "path": "crates/quest/examples/qsvt.rs",
+      "sha256": "af64a4a58ae1c2fe3b8e19cd4901be40c46d13ecb996e6fa7d80767c449f77f4"
+    },
+    {
+      "bytes": 8882,
+      "kind": "file",
+      "path": "crates/quest/examples/tutorials.rs",
+      "sha256": "03e0a155cb5abcfd8886a530442649c9f2ba98de136661f74c84133e20371cbb"
+    },
+    {
+      "bytes": 22404,
+      "kind": "file",
+      "path": "crates/quest/src/collective.rs",
+      "sha256": "91ac67452b95ecc1f84e93b74fd81256fbe5c247253f10855543a7ff5e29667f"
+    },
+    {
+      "bytes": 7954,
+      "kind": "file",
+      "path": "crates/quest/src/collective_admission.rs",
+      "sha256": "88bd22dbe5778899f68ac37f6e21991ba7f58f703aadf94c98cd9ace74146f3e"
+    },
+    {
+      "bytes": 7694,
+      "kind": "file",
+      "path": "crates/quest/src/collective_payload.rs",
+      "sha256": "72f2be9313c625794c67536342ae6a6fe7d926b5a6917d9fa90ed6a5f83e0ee4"
+    },
+    {
+      "bytes": 11605,
+      "kind": "file",
+      "path": "crates/quest/src/environment.rs",
+      "sha256": "50ccc77bc78c3517ed95b79d85c5fd7bb454cad04d340985602b9c16ae9f7265"
+    },
+    {
+      "bytes": 6938,
+      "kind": "file",
+      "path": "crates/quest/src/error.rs",
+      "sha256": "d9f1235e90ce92d9a521172350e2d34a41e1612c0c2aa00b8069c0b9752240cc"
+    },
+    {
+      "bytes": 35373,
+      "kind": "file",
+      "path": "crates/quest/src/execution.rs",
+      "sha256": "ac849796e1ef5add0b922350402ec03a253c56f4008b383e692ee424f2d3d1d1"
+    },
+    {
+      "bytes": 1494,
+      "kind": "file",
+      "path": "crates/quest/src/lib.rs",
+      "sha256": "3740dcb0d7d130ab7f490d4ee83bd2e48b66d07321599d11a586a4a9837130da"
+    },
+    {
+      "bytes": 30859,
+      "kind": "file",
+      "path": "crates/quest/src/oracle_execution.rs",
+      "sha256": "255fed85f1c9b5209ef091f67c872686992e3ed21fff161f2b5b9a4de033cb8d"
+    },
+    {
+      "bytes": 4931,
+      "kind": "file",
+      "path": "crates/quest/src/output_storage.rs",
+      "sha256": "c94a6dd45ddace9fd5b6f76e23dde4b5b97f32d54a0c8559c7eeb981e1cda037"
+    },
+    {
+      "bytes": 7172,
+      "kind": "file",
+      "path": "crates/quest/src/payload_execution.rs",
+      "sha256": "0c4955ae3dfaeeca3c1aa82ae39da4db149a4c5c4881cec85b3dc8894fbcaf03"
+    },
+    {
+      "bytes": 15248,
+      "kind": "file",
+      "path": "crates/quest/src/qsvt/collective.rs",
+      "sha256": "b2cb1a9d3c0c13aa7f35ed4bc7b37708d472e365677a6fa7605fa68b56e53830"
+    },
+    {
+      "bytes": 8351,
+      "kind": "file",
+      "path": "crates/quest/src/qsvt/collective/payload.rs",
+      "sha256": "885a2e2e9a7c88f35bfe86ba80c7d5016ddd5da3905edac757458322785cca7d"
+    },
+    {
+      "bytes": 2195,
+      "kind": "file",
+      "path": "crates/quest/src/qsvt/continuation.rs",
+      "sha256": "e41f6bc16ce004f47cb2cd9c30c53f1d4adf053d1ca7120eab99e2611253d883"
+    },
+    {
+      "bytes": 18070,
+      "kind": "file",
+      "path": "crates/quest/src/qsvt/hadamard.rs",
+      "sha256": "e049169cb529d6cc0b3e32f3f8258b39a9cbb7b54b760ff5facdb120d60f82d4"
+    },
+    {
+      "bytes": 17280,
+      "kind": "file",
+      "path": "crates/quest/src/qsvt/mod.rs",
+      "sha256": "13dfa9592a155d17be05e4eae8bffd5595ce89dab758d01e60ec27226c35ddb7"
+    },
+    {
+      "bytes": 10141,
+      "kind": "file",
+      "path": "crates/quest/src/qsvt/projection.rs",
+      "sha256": "83a75188e1f0f37f4485a3d952e36079a519ab08ee70ac0185dc6da1e1a0ca8f"
+    },
+    {
+      "bytes": 7871,
+      "kind": "file",
+      "path": "crates/quest/src/qsvt/reporting.rs",
+      "sha256": "002ff5681ab1f56de246a7caf4d661ea740c279339e552572c6d8fb53a4e2777"
+    },
+    {
+      "bytes": 20419,
+      "kind": "file",
+      "path": "crates/quest/src/register.rs",
+      "sha256": "c73f5b7057bd5207074ddef7c225eca0faad0c8ffd401e8e7800d8e48908fda2"
+    },
+    {
+      "bytes": 18878,
+      "kind": "file",
+      "path": "crates/quest/src/structured_execution.rs",
+      "sha256": "407bf79b2f3bacd503440a6825f42fe67fe669dd718e2427e7a1b550fbe25d90"
+    },
+    {
+      "bytes": 2676,
+      "kind": "file",
+      "path": "crates/quest/src/values.rs",
+      "sha256": "d6fb330dc168bd368bd2cf12dbc18da8e26807c9ed8f58d5cd006c3ace8a2825"
+    },
+    {
+      "bytes": 19947,
+      "kind": "file",
+      "path": "crates/quest/tests/collective_runtime.rs",
+      "sha256": "d582f998fcf4b142ecc0b0acea36f5275cca34f58b03b89b87dfd5369983aaef"
+    },
+    {
+      "bytes": 139,
+      "kind": "file",
+      "path": "crates/quest/tests/compile_fail.rs",
+      "sha256": "f6ba81e2f986ee723f1ff90151e46005d58cd5752e0aaca6b5bc44141e74b36c"
+    },
+    {
+      "bytes": 1245,
+      "kind": "file",
+      "path": "crates/quest/tests/deployment.rs",
+      "sha256": "b3625ab6e038b55f93add2ce5c053d76262d74641002aefde02bad5d71be7138"
+    },
+    {
+      "bytes": 3486,
+      "kind": "file",
+      "path": "crates/quest/tests/diagonal_contract.rs",
+      "sha256": "854cb72e47bd4ec4435e3d512b6a2a52c53eec6ce33cec6020111afffaa25d41"
+    },
+    {
+      "bytes": 10410,
+      "kind": "file",
+      "path": "crates/quest/tests/environment_lifecycle.rs",
+      "sha256": "2e17f2d61f9ed221e8d251518df5dea657eececc803aa27af9a60c95bbfe04dd"
+    },
+    {
+      "bytes": 12403,
+      "kind": "file",
+      "path": "crates/quest/tests/oracle_runtime.rs",
+      "sha256": "1a1d3b07a666fbae0edf1f8578174287cf652193b5747f37f7bb1a4c84280e1b"
+    },
+    {
+      "bytes": 12079,
+      "kind": "file",
+      "path": "crates/quest/tests/qsvt_collective.rs",
+      "sha256": "f5191092aeddd7539996859944c4687310f5181d27c735767d88f642c4b1fe49"
+    },
+    {
+      "bytes": 4054,
+      "kind": "file",
+      "path": "crates/quest/tests/qsvt_native_dispatches.rs",
+      "sha256": "f3a0893e80d4cbea53c61762998ebdc2816830face9516d7d29b2e03133d0031"
+    },
+    {
+      "bytes": 13822,
+      "kind": "file",
+      "path": "crates/quest/tests/qsvt_runtime.rs",
+      "sha256": "44aded89e4898f7e11d9ff232da5991e11447fa51be22950b8906a88a6303f39"
+    },
+    {
+      "bytes": 4691,
+      "kind": "file",
+      "path": "crates/quest/tests/register_modes.rs",
+      "sha256": "1875c86d17b96ccd857863ca0ea5d202a1d29b7a6ff930c77b641b3f61d1d012"
+    },
+    {
+      "bytes": 33867,
+      "kind": "file",
+      "path": "crates/quest/tests/runtime.rs",
+      "sha256": "778fcdf7cd6dce801c32ea5f1aee6f9967892a4140f75d14ab87872852695a0f"
+    },
+    {
+      "bytes": 6493,
+      "kind": "file",
+      "path": "crates/quest/tests/shared_matrix_budget.rs",
+      "sha256": "758b59b3f666acba0a3d824ae9a2d72ff7f5a44f4294e43033d2f2901a1188e9"
+    },
+    {
+      "bytes": 7307,
+      "kind": "file",
+      "path": "crates/quest/tests/structured_optimization.rs",
+      "sha256": "9fb8b687af12fa9fa03250a41187364aa326261c8af2bcbe1e054cbcde30c044"
+    },
+    {
+      "bytes": 14471,
+      "kind": "file",
+      "path": "crates/quest/tests/structured_runtime.rs",
+      "sha256": "e4e87ff584b1c6241ce035a955cc37abd3083d7d59162224d45fea3850e0883d"
+    },
+    {
+      "bytes": 3043,
+      "kind": "file",
+      "path": "crates/quest/tests/structured_workers.rs",
+      "sha256": "34fe513b3088d6568befc279d8a6bfa289392b22dcf193d8879b6aab53ef1c22"
+    },
+    {
+      "bytes": 1946,
+      "kind": "file",
+      "path": "crates/quest/tests/tutorials.rs",
+      "sha256": "9ec2fad607968d662281ae674fdb132a905234bc23dca3def066e19811f3c213"
+    },
+    {
+      "bytes": 236,
+      "kind": "file",
+      "path": "crates/quest/tests/ui/density_has_no_amplitude.rs",
+      "sha256": "2a846b0fe32e15d03dcbafe0bbef4c6cd1bb35055dc2a9cc4cdedaae6b1b794e"
+    },
+    {
+      "bytes": 368,
+      "kind": "file",
+      "path": "crates/quest/tests/ui/density_has_no_amplitude.stderr",
+      "sha256": "02c848caaf852339e53b0ca57cd5bec3cc5edb68134dffc1bafb956c2bbe6b4e"
+    },
+    {
+      "bytes": 152,
+      "kind": "file",
+      "path": "crates/quest/tests/ui/environment_is_not_send.rs",
+      "sha256": "b7395bda86df11ebdb31ceed0f071c7f3fc0115f8801695d3f0919bf22e0053b"
+    },
+    {
+      "bytes": 1550,
+      "kind": "file",
+      "path": "crates/quest/tests/ui/environment_is_not_send.stderr",
+      "sha256": "e605e88cadba55e3f7dfe7699e5ffec28495eda4a2d97c2d5c7118662ae19d00"
+    },
+    {
+      "bytes": 253,
+      "kind": "file",
+      "path": "crates/quest/tests/ui/environment_outlives_register.rs",
+      "sha256": "d41348e0dc47449de77124448717848bc39d35f1055d98685daabcc74989471d"
+    },
+    {
+      "bytes": 581,
+      "kind": "file",
+      "path": "crates/quest/tests/ui/environment_outlives_register.stderr",
+      "sha256": "df21f3a5b57d09cc76fd424487c7d3ed7f518c0ecf7f16fc02a8cb279f7625b6"
+    },
+    {
+      "bytes": 247,
+      "kind": "file",
+      "path": "crates/quest/tests/ui/numerical_operator_has_no_inverse.rs",
+      "sha256": "e3347423a4c249ca1acdc3aed089cf540aa08edc71eab0fa75dfad9ba8f339dd"
+    },
+    {
+      "bytes": 251,
+      "kind": "file",
+      "path": "crates/quest/tests/ui/numerical_operator_has_no_inverse.stderr",
+      "sha256": "55c268b23340188428caf286c7a72c8c5334b6e342e98e856bdc9e140c184d9f"
+    },
+    {
+      "bytes": 292,
+      "kind": "file",
+      "path": "crates/quest/tests/ui/preparation_borrows_environment.rs",
+      "sha256": "372bcb36ade37353b4eb1322811bdccd6346e42a949cda4f9e6cc629bdb153f9"
+    },
+    {
+      "bytes": 626,
+      "kind": "file",
+      "path": "crates/quest/tests/ui/preparation_borrows_environment.stderr",
+      "sha256": "7b3e0831fdf4b040b252acb8171471321d392ad5c699cc3eecca9adf27fb31a8"
+    },
+    {
+      "bytes": 296,
+      "kind": "file",
+      "path": "crates/quest/tests/ui/register_is_not_send.rs",
+      "sha256": "68930c987f60ccc679a270b0bf1c42ff1d40881a3cb5a5570ff1023939e5a07b"
+    },
+    {
+      "bytes": 1747,
+      "kind": "file",
+      "path": "crates/quest/tests/ui/register_is_not_send.stderr",
+      "sha256": "40dfa6bb84ce62e651cf9e86d0fda8f2978e1e4e97a365b1a3756fc10a80d2f1"
+    },
+    {
+      "bytes": 296,
+      "kind": "file",
+      "path": "crates/quest/tests/ui/structured_preparation_borrows_environment.rs",
+      "sha256": "d88fe49f75b00e5bd1005c89fcec2649f733ecd461d20f6704d618e981f4dbeb"
+    },
+    {
+      "bytes": 637,
+      "kind": "file",
+      "path": "crates/quest/tests/ui/structured_preparation_borrows_environment.stderr",
+      "sha256": "7f427956b6e508a3c2d279f1d82fab0692fd5270215711d5f31d243e330f8496"
+    },
+    {
+      "bytes": 120,
+      "kind": "file",
+      "path": "crates/quest/tests/ui/structured_preparation_is_not_send.rs",
+      "sha256": "39b268acdf22784bb7744dcf49acaf298d600a7c631b2d09f89748852770b25c"
+    },
+    {
+      "bytes": 1496,
+      "kind": "file",
+      "path": "crates/quest/tests/ui/structured_preparation_is_not_send.stderr",
+      "sha256": "686d10e79855d725cac08f619d3cc592afffa124ed4272dc5d47bc93db135530"
+    },
+    {
+      "bytes": 536,
+      "kind": "file",
+      "path": "crates/xtask/Cargo.toml",
+      "sha256": "7adabd80e64e4dec2228d23351d063582275dd078cb1b389ecb97e9798d9a615"
+    },
+    {
+      "bytes": 1070,
+      "kind": "file",
+      "path": "crates/xtask/LICENSE",
+      "sha256": "670b5966adb424e1576187262e12063e041861861a7c4f913705b211a5cbce7c"
+    },
+    {
+      "bytes": 19021,
+      "kind": "file",
+      "path": "crates/xtask/src/generate/clang.rs",
+      "sha256": "4ebfa0c464211b85eaaf2da80b7338c23a082f95f55190fffa0f66e4a8e892fa"
+    },
+    {
+      "bytes": 8645,
+      "kind": "file",
+      "path": "crates/xtask/src/generate/classify.rs",
+      "sha256": "990da36e3b5df944ab8e9f3d6a266730e6ce1c904f781ca56bc3d24a229f6983"
+    },
+    {
+      "bytes": 20511,
+      "kind": "file",
+      "path": "crates/xtask/src/generate/emit.rs",
+      "sha256": "12c7fe7095cd5c12dd7b0ca886f16c3ffd2d4a7964c280ac88c46fd1d9c1acf3"
+    },
+    {
+      "bytes": 1606,
+      "kind": "file",
+      "path": "crates/xtask/src/generate/mod.rs",
+      "sha256": "e0409a89950ba53a2137a9cf10b45901bb55200671ba03e8fef45f7417fbc679"
+    },
+    {
+      "bytes": 8823,
+      "kind": "file",
+      "path": "crates/xtask/src/generate/model.rs",
+      "sha256": "9abe5e104f1555e9e090f6522b93e87065586790c5252b9d369f495d00c620dd"
+    },
+    {
+      "bytes": 970,
+      "kind": "file",
+      "path": "crates/xtask/src/generate/type_rules.rs",
+      "sha256": "6b1b3a5102d5fd1c5d1ada2f72ae699d298df2da10711f9bfdd03b4e00b75675"
+    },
+    {
+      "bytes": 8309,
+      "kind": "file",
+      "path": "crates/xtask/src/main.rs",
+      "sha256": "f6766e128ded11265b2ac69df42371d93118fc130d275e1ccf3cbdf610eabd3b"
+    },
+    {
+      "bytes": 45307,
+      "kind": "file",
+      "path": "crates/xtask/src/native_consumers.rs",
+      "sha256": "fd9c2735b06de78045a3683169f7bc481295e57475a63dc7b7c6d0004b1a1077"
+    },
+    {
+      "bytes": 4379,
+      "kind": "file",
+      "path": "crates/xtask/src/qsvt_catalog.rs",
+      "sha256": "8a45232c77a859476ae8f4a111a2db49d9162012cbb23790096f4cad66c259ed"
+    },
+    {
+      "bytes": 85089,
+      "kind": "file",
+      "path": "crates/xtask/templates/generated_api.rs",
+      "sha256": "9b100077561de44b179c9be09abc9f836b3f80a9bc7786e9e656c57b590a016e"
+    },
+    {
+      "bytes": 76740,
+      "kind": "file",
+      "path": "crates/xtask/templates/quest_generated_bindings.cpp",
+      "sha256": "d56b605c6dfdf5dae03f7a8f20664f8e7dfcbf693d108de2c611454126afad5d"
+    },
+    {
+      "bytes": 34770,
+      "kind": "file",
+      "path": "crates/xtask/templates/quest_generated_bindings.hpp",
+      "sha256": "20b58acd84c726d1c94f1d0fb2541155231ba307badc69d5976ccffc45c08b0a"
+    },
+    {
+      "bytes": 1780,
+      "kind": "file",
+      "path": "crates/xtask/tests/precision_boundary.rs",
+      "sha256": "ed9ff2ee3bc02f9ee15e0afe4ff1b95860f6bd0dccee6a97268f31034437ad15"
+    },
+    {
+      "bytes": 2096,
+      "kind": "file",
+      "path": "devenv.lock",
+      "sha256": "d018adfd0f7780e1b4e2506678e0831488b245ab47dc75064d9b9a5ddf015d53"
+    },
+    {
+      "bytes": 1731,
+      "kind": "file",
+      "path": "devenv.nix",
+      "sha256": "8aca0b698874d840ba710e0cf029e8ac51cd16dce31fc395424ad4f70200512a"
+    },
+    {
+      "bytes": 315,
+      "kind": "file",
+      "path": "devenv.yaml",
+      "sha256": "61c513dcf8eb8750ee4f0c91f0936e4d22b2b1279a470e5a7e02aed73fe1759b"
+    },
+    {
+      "bytes": 1483,
+      "kind": "file",
+      "path": "docs/README.md",
+      "sha256": "8fa3e631a7913d63fa435e54ed3cc5de50e6f5f899e5806d9b90ec59b05cd256"
+    },
+    {
+      "bytes": 197,
+      "kind": "file",
+      "path": "docs/book/book.toml",
+      "sha256": "5e995f190440abf619e51f0aa2372b8a100b1f78770107bf41bc57b89088609a"
+    },
+    {
+      "bytes": 1085,
+      "kind": "file",
+      "path": "docs/book/src/SUMMARY.md",
+      "sha256": "534639a9db9d9b1332da59009f21cb783679ce96d6c1357420b527c5d8028f18"
+    },
+    {
+      "bytes": 1498,
+      "kind": "file",
+      "path": "docs/book/src/bell.md",
+      "sha256": "82cf6ff4a5d3ae73bb15215b9d9d15e06e5dbe4e2bd205febfd4ed523af046a1"
+    },
+    {
+      "bytes": 2349,
+      "kind": "file",
+      "path": "docs/book/src/diagnostics.md",
+      "sha256": "e041b0092e338766ffa5bf1a56089fc24745295aa6da929b093db9a3d3a8a3fc"
+    },
+    {
+      "bytes": 49,
+      "kind": "file",
+      "path": "docs/book/src/examples/bell.qasm",
+      "sha256": "63567813eec55c08acee44cbb14ca16a12e1f938603618437b653a3eb1b3dad5"
+    },
+    {
+      "bytes": 1799,
+      "kind": "file",
+      "path": "docs/book/src/feedback.md",
+      "sha256": "0a2d4aa9af7cbb8d523af2322ff81223c3ab5fc44d2eb9fc3d1b69a784d53289"
+    },
+    {
+      "bytes": 3643,
+      "kind": "file",
+      "path": "docs/book/src/gate-synthesis.md",
+      "sha256": "85aba32f90e14be6216ffe1a506b8ae0331e47c50085c87510332f258f537da8"
+    },
+    {
+      "bytes": 2483,
+      "kind": "file",
+      "path": "docs/book/src/imports.md",
+      "sha256": "de24a43db7bd931592d63670a849b535011423862152edb956c95e899447616f"
+    },
+    {
+      "bytes": 2351,
+      "kind": "file",
+      "path": "docs/book/src/index.md",
+      "sha256": "0a10a4bdf9d913f09d2c6375e5bf0121293f76bdc3abc1abb7c0ecf438d4926d"
+    },
+    {
+      "bytes": 4788,
+      "kind": "file",
+      "path": "docs/book/src/interfaces.md",
+      "sha256": "c75cdfc079e84cee46dcff805ee710b3381a1050368090df459c6681db8f1baa"
+    },
+    {
+      "bytes": 6807,
+      "kind": "file",
+      "path": "docs/book/src/language.md",
+      "sha256": "ad3fd8a64c54899d1651dbcd0c7215568a88b0a84fb833ea9c3a91b89d04ba0d"
+    },
+    {
+      "bytes": 4264,
+      "kind": "file",
+      "path": "docs/book/src/numerical-polynomials.md",
+      "sha256": "0ead46462df7cffc2696acfb5c6c7c837e10eba0599e53bde827802f243f8598"
+    },
+    {
+      "bytes": 10799,
+      "kind": "file",
+      "path": "docs/book/src/optimization.md",
+      "sha256": "454e5f3469aaa8a8177d762d5a123cb7b5db4087c31b93257ad8e50a756e1ec2"
+    },
+    {
+      "bytes": 2796,
+      "kind": "file",
+      "path": "docs/book/src/parameters.md",
+      "sha256": "af6435f4c37a25ed7b21fb5eba1ef846692e5c92102d649a33db31daab9ebb5e"
+    },
+    {
+      "bytes": 6064,
+      "kind": "file",
+      "path": "docs/book/src/qsp-certification.md",
+      "sha256": "a65e6e718219e8e7e3c7a3c3be47b42777a40b28b0e016dba97a71da8db8844b"
+    },
+    {
+      "bytes": 5485,
+      "kind": "file",
+      "path": "docs/book/src/qsp-synthesis.md",
+      "sha256": "185019e69d43c1ab7ae21c004ac69644f69bca6f1947afffc2108e6646afbef6"
+    },
+    {
+      "bytes": 57,
+      "kind": "file",
+      "path": "docs/book/src/qsvt-analysis.md",
+      "sha256": "61e07e489e5cf7d1df8cbcc5afb2de49c2cab09de754bfd7adc09261303897db"
+    },
+    {
+      "bytes": 12622,
+      "kind": "file",
+      "path": "docs/book/src/qsvt-applications.md",
+      "sha256": "7d6583234f219e253351c186fe90e53df83926fd378ec2d909e97385c7f6b376"
+    },
+    {
+      "bytes": 7256,
+      "kind": "file",
+      "path": "docs/book/src/qsvt-model.md",
+      "sha256": "f4448a741bcb8cb1354904deb98e972efb2856b32b209e8b211751776250ff8a"
+    },
+    {
+      "bytes": 3406,
+      "kind": "file",
+      "path": "docs/book/src/qsvt-runtime.md",
+      "sha256": "04d5c799f7b129ed312813c2d845ec56c8d09b46e22360210af2b96255170056"
+    },
+    {
+      "bytes": 5310,
+      "kind": "file",
+      "path": "docs/book/src/runtime.md",
+      "sha256": "6114830e878b5bef71017de6feb34f7e2d02e0c2f2311a357fe50a52b090305c"
+    },
+    {
+      "bytes": 3193,
+      "kind": "file",
+      "path": "docs/book/src/ssa.md",
+      "sha256": "9192e3e442d3ac909ab88e57d597eae393e57c099f72cbd24f6e5e18b1ae29ae"
+    },
+    {
+      "bytes": 5555,
+      "kind": "file",
+      "path": "docs/book/src/validation.md",
+      "sha256": "90d3cb0e984975b8d767d774dc47480e0c46ced313f7b3f10622fb234040b0be"
+    },
+    {
+      "bytes": 6343,
+      "kind": "file",
+      "path": "docs/grace-hopper.md",
+      "sha256": "0203db8bb93a9c5892b2ee213897f2676a26e5abd5df34f0c6328e0a8f906a38"
+    },
+    {
+      "bytes": 4167,
+      "kind": "file",
+      "path": "docs/openqasm-provenance.md",
+      "sha256": "28e4fe7a879ab36fbc14b91860dfa7c82f9fb6294bc2adfa0e6ad25c41941cd0"
+    },
+    {
+      "bytes": 2187,
+      "kind": "file",
+      "path": "docs/phase-semantics.md",
+      "sha256": "7166f87e326ee867ebaa1ecd140972a5736c0dd8e71e8fdbecaa033e7462689c"
+    },
+    {
+      "bytes": 9701,
+      "kind": "file",
+      "path": "docs/plans/2026-09-29-architecture-synthesis.md",
+      "sha256": "ebf3b41e2de5473dc29a06b6ac87cea49730ae6e299be70fde769e754819a36e"
+    },
+    {
+      "bytes": 11439,
+      "kind": "file",
+      "path": "docs/verification/2026-09-10-m6-m11.md",
+      "sha256": "410c3acc41f397bb23e4e8fc886bd8194b9068d87577ff8526b51e0e63a5c9e5"
+    },
+    {
+      "bytes": 12594,
+      "kind": "file",
+      "path": "docs/verification/2026-09-10-native-cmake.md",
+      "sha256": "55b5df91434b860d77086cecb94262bb2bcab68dcd9222c89f06ba0dd1a97b20"
+    },
+    {
+      "bytes": 3947,
+      "kind": "file",
+      "path": "docs/verification/2026-09-11-qsp-qsvt-documentation.md",
+      "sha256": "8741417fabe62b03d6917df1b0b6594845cc963183466cc1fbd63f14b692f87e"
+    },
+    {
+      "bytes": 10637,
+      "kind": "file",
+      "path": "docs/verification/2026-09-11-qsvt-port.md",
+      "sha256": "b93ab4e51f1c6d98c9b7a8368a1f7cb3145f46592d62a950287ae77f13e29558"
+    },
+    {
+      "bytes": 6495,
+      "kind": "file",
+      "path": "docs/verification/2026-09-11-raii-environment.md",
+      "sha256": "366ef7979356fdb4e92c0a0f5e05b3189c34ed83b8188321a3c32371c735b6d8"
+    },
+    {
+      "bytes": 6258,
+      "kind": "file",
+      "path": "docs/verification/2026-09-28-consolidation-migration.md",
+      "sha256": "6dbf13295f44bc05d8dbe2319bebbd6c5166d2b3c154654c7e31569e2841072f"
+    },
+    {
+      "bytes": 13254,
+      "kind": "file",
+      "path": "docs/verification/2026-09-28-consolidation-review.md",
+      "sha256": "bbe390089fdb01bae76f1bc63efa096256cdc7dc6251f0c3d6518496ec46bb79"
+    },
+    {
+      "bytes": 9102,
+      "kind": "file",
+      "path": "docs/verification/2026-09-28-optimization-roadmap-implementation.md",
+      "sha256": "edf7ae70e79dedbe42bd5461245642f916dcac0109f1d6a4b7739f94dba0bd6e"
+    },
+    {
+      "bytes": 7070,
+      "kind": "file",
+      "path": "docs/verification/2026-09-28-optimization-roadmap-migration.md",
+      "sha256": "b36c18a0fac235c69b19c604f32c84578fdb01cc55428c984191d00994c6f95c"
+    },
+    {
+      "bytes": 13863,
+      "kind": "file",
+      "path": "docs/verification/2026-09-28-optimization-roadmap-results.md",
+      "sha256": "05d4291983ba25bd949b3dfd83b2a78f7cce7eaa8fa16415023772f009e5a076"
+    },
+    {
+      "bytes": 11300,
+      "kind": "file",
+      "path": "docs/verification/2026-09-28-optimization-roadmap-review.md",
+      "sha256": "3a0c6607ab9fd83f755f4edb9a124d5aa91791772478fe8432f9675ba9f50aaf"
+    },
+    {
+      "bytes": 14445,
+      "kind": "file",
+      "path": "docs/verification/2026-09-29-architecture-synthesis.md",
+      "sha256": "e4df7ab22952b83340b5e4d43d80aaa64e65dc05e6808a0927d5e9f2cd849dc4"
+    },
+    {
+      "bytes": 7275,
+      "kind": "file",
+      "path": "docs/verification/2026-09-29-grace-hopper.md",
+      "sha256": "8d63face89f797bdad2f0761b2795469cb27564bd7fbb8ab9ba3f7b4da2bf57f"
+    },
+    {
+      "bytes": 2865,
+      "kind": "file",
+      "path": "docs/verification/README.md",
+      "sha256": "1df16f99aaafaf5d9c068720922afbd677e0ce3b814ec575412956a272e12f2c"
+    },
+    {
+      "bytes": 3915,
+      "kind": "file",
+      "path": "docs/verification/architecture-mpi/2026-09-29/README.md",
+      "sha256": "335061593ff246169130ec743a0f75a6370b78d8eb528e470cfd8757ea9848cf"
+    },
+    {
+      "bytes": 1234,
+      "kind": "file",
+      "path": "docs/verification/architecture-mpi/2026-09-29/SHA256SUMS",
+      "sha256": "d67369a848dbdb42fffdfcda0cbb144b823714a76875210a3290ae671f173e15"
+    },
+    {
+      "bytes": 198,
+      "kind": "file",
+      "path": "docs/verification/architecture-mpi/2026-09-29/bin/mpiexec",
+      "sha256": "d6d431c3181c58b357dab97d3d8dcd07846bf447fcedb0122d643fc72703434b"
+    },
+    {
+      "bytes": 2329,
+      "kind": "file",
+      "path": "docs/verification/architecture-mpi/2026-09-29/build.log",
+      "sha256": "e3a98c14f5b734b04652d18aa7699a874f5df08c7fd87d03a1d7db9ad58c9ecc"
+    },
+    {
+      "bytes": 772,
+      "kind": "file",
+      "path": "docs/verification/architecture-mpi/2026-09-29/build.nix",
+      "sha256": "d958f2f1884e2f88ad875fe3c03fb527af4ea2d6d2a003c4afcd9d2e4140ac57"
+    },
+    {
+      "bytes": 2035,
+      "kind": "file",
+      "path": "docs/verification/architecture-mpi/2026-09-29/clippy-final.log",
+      "sha256": "499a6c14020c3c223de67136ac46034e0613bdfbb10316f07e6977fbf7232fc9"
+    },
+    {
+      "bytes": 214,
+      "kind": "file",
+      "path": "docs/verification/architecture-mpi/2026-09-29/launcher-no-darwin.log",
+      "sha256": "7030d06c18ad54c62c6f021d2a38c5e36f8bf6ee706a9ab0cb32a35015b270a4"
+    },
+    {
+      "bytes": 967,
+      "kind": "file",
+      "path": "docs/verification/architecture-mpi/2026-09-29/launcher-smoke.log",
+      "sha256": "30d426e45db2734e2b3384c2acccb7d0e543424d9706f133845a139871d8787c"
+    },
+    {
+      "bytes": 0,
+      "kind": "file",
+      "path": "docs/verification/architecture-mpi/2026-09-29/launcher-synthetic.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 817,
+      "kind": "file",
+      "path": "docs/verification/architecture-mpi/2026-09-29/original-build.nix",
+      "sha256": "af7bb11d139025579fd102c3159e51f385861419f0ea0fe6943752592290a37b"
+    },
+    {
+      "bytes": 193,
+      "kind": "file",
+      "path": "docs/verification/architecture-mpi/2026-09-29/paths.txt",
+      "sha256": "c202e91886ccfd2072c6ef05b13c6d39d47fe9af46e7cb3464a98258218a3b47"
+    },
+    {
+      "bytes": 687,
+      "kind": "file",
+      "path": "docs/verification/architecture-mpi/2026-09-29/run.sh",
+      "sha256": "a7ecebb5ccf960d91757e1a4f2c1fe1974a45e61ee4939c9ccb4ac1e05b78a4e"
+    },
+    {
+      "bytes": 2225,
+      "kind": "file",
+      "path": "docs/verification/architecture-mpi/2026-09-29/runtime-final.log",
+      "sha256": "1d202511a0385e910cbec2a10bcf6646a5f05b328a62f9aa85cba5f4bd7a25ca"
+    },
+    {
+      "bytes": 2805,
+      "kind": "file",
+      "path": "docs/verification/architecture-mpi/2026-09-29/runtime-reproduced.log",
+      "sha256": "40ed16db3e279b6768edc9e77230c528b1e2723a9ecab5f202e4ce91e538e835"
+    },
+    {
+      "bytes": 667,
+      "kind": "file",
+      "path": "docs/verification/architecture-mpi/2026-09-29/source-inputs.sha256",
+      "sha256": "2ad1ffea395f7709665e39414f138452acbdbd9322e09fcc1ce0c2253fa99c12"
+    },
+    {
+      "bytes": 14319,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-11-qsvt/astro-canonical-catalog-certification.jsonl",
+      "sha256": "588d3fb9bae3e6908da496a4975d078092f999ade60dd05a0de08a3379c76bda"
+    },
+    {
+      "bytes": 3402,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-11-qsvt/astro-catalog-summary.json",
+      "sha256": "60bb55250ae3b4ad05f47c87102634cf0306c943b189142fe106f33847eb8b6b"
+    },
+    {
+      "bytes": 12359,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-11-qsvt/astro-generalized-catalog-certification.jsonl",
+      "sha256": "04cef673cd53108e76a90fe1e06a1795a89894ee88911e316bbab5e113f9f756"
+    },
+    {
+      "bytes": 10200,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-11-qsvt/cpp-catalog-benchmark.jsonl",
+      "sha256": "154220bce81a05557f7edd039752c26ecef77ea7cb84c8af57158f08c6839d8c"
+    },
+    {
+      "bytes": 3645,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-11-qsvt/cpp-execution-smoke.jsonl",
+      "sha256": "0f8294b250000829410c23be379a1e3551909ceb620ed70ef9bfcbd4af799670"
+    },
+    {
+      "bytes": 1704,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-11-qsvt/cpp-rust-execution-comparison.json",
+      "sha256": "6bf2f11c54b0ca5257c848b22340b660e85752a813f09ff73264cbcaadd071e1"
+    },
+    {
+      "bytes": 5198,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-11-qsvt/hardware.json",
+      "sha256": "7e345c5cd2d911c2006d60c2355a9c740570904d711b035a839a53ea9049150f"
+    },
+    {
+      "bytes": 14313,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-11-qsvt/historical-mpfr-catalog-binary64-certification.jsonl",
+      "sha256": "4c40b43cfbcf8dd6802a7bf6d6f129b9ca71ab247bde7a316ae3d2c9d5d3fa03"
+    },
+    {
+      "bytes": 12344,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-11-qsvt/historical-mpfr-generalized-catalog-certification.jsonl",
+      "sha256": "d4af5f9b3b901eb1d335f8960707fcb2cbe435920b5ae4507e51ca0728d11314"
+    },
+    {
+      "bytes": 214,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-11-qsvt/rustc-version.txt",
+      "sha256": "052f29f89de250a53086a223668ba5738c02fa63ebc80c7ce4a3a363c428b8fe"
+    },
+    {
+      "bytes": 1284,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-consolidation/baseline-allocations.jsonl",
+      "sha256": "fbdd44f0cb7f77e1c79cd5a6bb664a91f57a9fffd86bcb581ee79f5891538f4a"
+    },
+    {
+      "bytes": 1243,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-consolidation/consolidated-allocations.jsonl",
+      "sha256": "ed6910e14416f294e74b509cfd1278c7bb171ebf95d0bbf05beeab538bf55ba2"
+    },
+    {
+      "bytes": 1858,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-consolidation/feature-matrix.json",
+      "sha256": "898d5ef7ecdd4b984308f1f72e87feb2dcbf3b2ba8fb7720d41ee9d19ba13374"
+    },
+    {
+      "bytes": 1352,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-consolidation/final-checks.json",
+      "sha256": "88b201e90ad9312293735be925970ec97a59e5beb5df4f1a42b620fcaa18178b"
+    },
+    {
+      "bytes": 325,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-consolidation/metadata.json",
+      "sha256": "159f1fa62c79757ebaeef55efd71a18962e86e8006803008649dca6a89bf324b"
+    },
+    {
+      "bytes": 144,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-consolidation/native-modes.json",
+      "sha256": "f064a379c3bd0ec2f79bcc872449dc8eb4c749da881a01beb9ad0f04a76428aa"
+    },
+    {
+      "bytes": 187,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-consolidation/probability-native-witness.json",
+      "sha256": "5a292458dc048699cb5061cabcde2afe4c433901c77db8ef2c89d93671ae27a6"
+    },
+    {
+      "bytes": 1956,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/README.md",
+      "sha256": "100af9623faa99e1e73baffe7f479e347d455f98fde72d8fd8b0049f8cd7b14a"
+    },
+    {
+      "bytes": 370,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/compiler-baseline-attempt1/completion.json",
+      "sha256": "913baad3502cff9677accb108624e44e905aed0b53fd3809d7009da0897187ac"
+    },
+    {
+      "bytes": 42119,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/compiler-baseline-attempt1/results.jsonl",
+      "sha256": "af22a5c0c16258541b12a47f2c5f4853d0c25625e1d39d3c79e173cb2a974c96"
+    },
+    {
+      "bytes": 488,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/compiler-current-attempt1/completion.json",
+      "sha256": "8ab2a10d394cbaeb633ce47e61f9e9e815785ac8c98ee157ec7284d7becf06dc"
+    },
+    {
+      "bytes": 45192,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/compiler-current-attempt1/results.jsonl",
+      "sha256": "c03a8fb7ceb268d333d27c7b85d52829b70b7b7208c97dbc2ffffc79432728fd"
+    },
+    {
+      "bytes": 488,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/compiler-current-attempt2/completion.json",
+      "sha256": "1df0a2913bbe9eb92101242502870571dec06f56ac936ec1c0de209c8981af41"
+    },
+    {
+      "bytes": 45190,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/compiler-current-attempt2/results.jsonl",
+      "sha256": "7ace6581cba96fa5c7b6c96eb72b11c2ffc4fc21654aaf87826c35e6258606ca"
+    },
+    {
+      "bytes": 581,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/compiler-roadmap-attempt1/completion.json",
+      "sha256": "9d397f5c3b856a43471f834dc97d12416d0387e81323bf31203821839533743d"
+    },
+    {
+      "bytes": 50308,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/compiler-roadmap-attempt1/results.jsonl",
+      "sha256": "4a24ae1c25cfbd13d794cfe689da837417543129ba21a01e367883da58abe2b5"
+    },
+    {
+      "bytes": 581,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/compiler-roadmap-attempt2/completion.json",
+      "sha256": "305332413160dd4265dfc0af7ce51924c9fcfe2520c315bb9fc89a8eba12d6fd"
+    },
+    {
+      "bytes": 50275,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/compiler-roadmap-attempt2/results.jsonl",
+      "sha256": "7109153ff0afdb3fbf5af8a99260d95530614debe3391df14515058302016c60"
+    },
+    {
+      "bytes": 667,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/compiler-workers-attempt1/completion.json",
+      "sha256": "b889d27aa05e609f02468ce8e10577f5318bec6ef8d67554e2562f81ee59b4d2"
+    },
+    {
+      "bytes": 42923,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/compiler-workers-attempt1/results.jsonl",
+      "sha256": "3c0dfb3e281eeadddae5954fb3b613db725097dd9ada1ea4bc5b2840573a636d"
+    },
+    {
+      "bytes": 667,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/compiler-workers-attempt2/completion.json",
+      "sha256": "bba3ddb0f99622ff86f2543fb8707bf17dc02dd5bc94b098a0394e6d82327e0d"
+    },
+    {
+      "bytes": 42602,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/compiler-workers-attempt2/results.jsonl",
+      "sha256": "f63e5b7de3925f3791299d4a5f3ee08f520e7066578e8dacf357c457db954058"
+    },
+    {
+      "bytes": 3222,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/final-environment.json",
+      "sha256": "ebbe4b24dd2dddc1b34677782f60ff19859c36f6c2bb88f3008f7a0b384e6a08"
+    },
+    {
+      "bytes": 1031854,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/final-measurements-summary-attempt2.json",
+      "sha256": "258fcb17a9d7bde42e8737caf61fe1e85b9b9795d68687ddc76086e01033a922"
+    },
+    {
+      "bytes": 1005692,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/final-measurements-summary.json",
+      "sha256": "b5d4478cd4900a18c8c291a73848470689afb64fcd381076e999dd63d37ff1c0"
+    },
+    {
+      "bytes": 903,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/native-deployment-attempt1/completion.json",
+      "sha256": "ab23a5d9b22b3c440ec90d6ba4eedae411b768475854d77be958c4acbaa307da"
+    },
+    {
+      "bytes": 770,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/native-mpi-deployment-attempt1/completion.json",
+      "sha256": "2fc53f96425584f53095ffbc9840f733968339e75b3205c5649325d5bf07b97a"
+    },
+    {
+      "bytes": 175182,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/native-mpi-optimization-attempt1/completion.json",
+      "sha256": "812a2476e27f880b4fc769b77eeb8d218c85f0c78cb5961d8655ee719508034c"
+    },
+    {
+      "bytes": 52185,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/native-mpi-optimization-attempt1/mpi-sv-2-max-rank.jsonl",
+      "sha256": "682f5fca22f81db0db7d0cc7d80c37d7b968bc435a5e8495610f585cd259a418"
+    },
+    {
+      "bytes": 149146,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/native-mpi-optimization-attempt1/mpi-sv-2.jsonl",
+      "sha256": "e13a5926bdf72d40f9f7ced3d1ed0ad4377f121e7ee80c02c9ab97ffe6b8fcfd"
+    },
+    {
+      "bytes": 53889,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/native-mpi-optimization-attempt1/mpi-sv-4-max-rank.jsonl",
+      "sha256": "7cc390875342f0a6681dc607aeb882ccf575e05c65e5fb7711577aa78f161ff5"
+    },
+    {
+      "bytes": 298501,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/native-mpi-optimization-attempt1/mpi-sv-4.jsonl",
+      "sha256": "80205741249aa729192124646624b98cbb871afc28d6317568cb891026ca78ac"
+    },
+    {
+      "bytes": 175183,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/native-mpi-optimization-attempt2/completion.json",
+      "sha256": "a7bebb1e7a51ec0a758ac33d864fa80408f41de31bcceb34618260f1d723291f"
+    },
+    {
+      "bytes": 52207,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/native-mpi-optimization-attempt2/mpi-sv-2-max-rank.jsonl",
+      "sha256": "18f79ab42c7bec1fe7af4002e332e582a25b29d18418b78bc27947e332afba7d"
+    },
+    {
+      "bytes": 149188,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/native-mpi-optimization-attempt2/mpi-sv-2.jsonl",
+      "sha256": "56127b3f3b4a249bb41b506925d8e9bfc6fb4f4651a261ae9ada0bdaae2214a0"
+    },
+    {
+      "bytes": 53858,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/native-mpi-optimization-attempt2/mpi-sv-4-max-rank.jsonl",
+      "sha256": "0a6afb8cdb42b1b8d28bf12a972516937d1aff047a9bf3a8dad6ec2ea014ef77"
+    },
+    {
+      "bytes": 298371,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/native-mpi-optimization-attempt2/mpi-sv-4.jsonl",
+      "sha256": "cbaa9eeec81c6a98968d3fe55495a4302ffaf795bd6114d95e38fbdb1d24eb4e"
+    },
+    {
+      "bytes": 126570,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/native-optimization-attempt1/completion.json",
+      "sha256": "d7a4165f516dbb5f12e80773291539b9eca04a02e6321d8fc1bf7827e4d57d21"
+    },
+    {
+      "bytes": 91998,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/native-optimization-attempt1/cpu-dm-1.jsonl",
+      "sha256": "d622c26a902a7afcda17d6bb99c0c767653dd5dccb2f6965acbe0e18bbe5cf17"
+    },
+    {
+      "bytes": 91970,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/native-optimization-attempt1/cpu-sv-1.jsonl",
+      "sha256": "ef9092f533e034e5ac86d0cf416642a9a2f9ffcb47109cac710f384212bb5ee7"
+    },
+    {
+      "bytes": 92072,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/native-optimization-attempt1/gpu-dm-1.jsonl",
+      "sha256": "4aed1d5ec7982d8e2c3bf34c74be166d99624a70a425afc393cbb6c0c275b19c"
+    },
+    {
+      "bytes": 91995,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/native-optimization-attempt1/gpu-sv-1.jsonl",
+      "sha256": "23c88470ecb63f30a599a42eefcdd54ba10a88daefe638a6b5db4994eeaf4d10"
+    },
+    {
+      "bytes": 91952,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/native-optimization-attempt1/omp-dm-1.jsonl",
+      "sha256": "ab7ba21b2b7bd49a20e30b5138e65ff2fbd31895f56044d4f7ff857adeae7eec"
+    },
+    {
+      "bytes": 91884,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/native-optimization-attempt1/omp-sv-1.jsonl",
+      "sha256": "93fba22379eed2336e550a639b1ea2be981acfd6d6ef30ade984e01ffc87322e"
+    },
+    {
+      "bytes": 137321,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/native-optimization-attempt2/completion.json",
+      "sha256": "3bf894d06b5078e0055f73add7a121451f6f89048016bf6733648e35ef07df69"
+    },
+    {
+      "bytes": 92064,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/native-optimization-attempt2/cpu-dm-1.jsonl",
+      "sha256": "d020d754fe75096768bf77f91ec310603b9c753e6f2f81ab87ae287ba51725de"
+    },
+    {
+      "bytes": 92036,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/native-optimization-attempt2/cpu-sv-1.jsonl",
+      "sha256": "8cbf3d1fbac6e2b531ed2f502e4877ce5240c55163f7068ca6cf4518a1c34b8c"
+    },
+    {
+      "bytes": 92138,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/native-optimization-attempt2/gpu-dm-1.jsonl",
+      "sha256": "a5dc9ad786ee365f520f42003c6dc2e63627425eaeb11e7549cb23f6c2babfa1"
+    },
+    {
+      "bytes": 92064,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/native-optimization-attempt2/gpu-sv-1.jsonl",
+      "sha256": "ab9b9913217d041e2779be03e739bde4f6c5003f07794be92acdd98a5429d2eb"
+    },
+    {
+      "bytes": 92018,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/native-optimization-attempt2/omp-dm-1.jsonl",
+      "sha256": "b4f64cd7ca0ba058014ef828bd84b6c87a7d97038b52a0afa741886956305628"
+    },
+    {
+      "bytes": 91950,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-28-optimization-roadmap/native-optimization-attempt2/omp-sv-1.jsonl",
+      "sha256": "30cb93fda29ed999c96fc4dcde170a2fc21620390232a80ac0bc81c947c22b3c"
+    },
+    {
+      "bytes": 4050,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-29-architecture-synthesis/default-validation.json",
+      "sha256": "598836359130c3906f1c4bf8e5945e28b187d214903f8b8875dbe7cd084a1e94"
+    },
+    {
+      "bytes": 457,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-29-architecture-synthesis/final-build.log.gz",
+      "sha256": "6415c06c0dcfa50e0a885675f16427f4490ee98b8912cdacad86f2285323443b"
+    },
+    {
+      "bytes": 1520,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-29-architecture-synthesis/final-doctests.log.gz",
+      "sha256": "d83407db8cfe518e656ea7a90ab16bad8e83037e163fb7e6e4316d79d54adf8a"
+    },
+    {
+      "bytes": 23126,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-29-architecture-synthesis/final-nextest.log.gz",
+      "sha256": "d975868abafcf1e5797e848fc1e61e661afd0b783b3c8aac502e8e382c7a8a28"
+    },
+    {
+      "bytes": 188,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-29-architecture-synthesis/final-qsp-clippy.log.gz",
+      "sha256": "15c8407dfa019ad18544c93404b86cdd440697dea3bdc938430fdf427766a7a4"
+    },
+    {
+      "bytes": 512,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-29-architecture-synthesis/final-workspace-clippy.log.gz",
+      "sha256": "3f738a31fedce4bf4fc19bc831bab50e2afb4ac011af25592cb74427658f7082"
+    },
+    {
+      "bytes": 2778,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-29-architecture-synthesis/focused-binding-freshness.log.gz",
+      "sha256": "d727f07006e10babe328b886fc2ea6503689152c551a6e590383216102d1a942"
+    },
+    {
+      "bytes": 156,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-29-architecture-synthesis/focused-book.log.gz",
+      "sha256": "52f4a9d784c9dbd81ea400940cefa2abddd11de706884dfcda5b5d49f8bd01a1"
+    },
+    {
+      "bytes": 127,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-29-architecture-synthesis/focused-format.log.gz",
+      "sha256": "833cbea6b8c3d4fbcae19c283d6dd04bbea47b84248af47085a14eccb9fa1e85"
+    },
+    {
+      "bytes": 3017,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-29-architecture-synthesis/focused-native-consumers.log.gz",
+      "sha256": "0eaf0e42e485ed1c73a35809666fea72c636e15b7b56b031e97c056a87e1cb9f"
+    },
+    {
+      "bytes": 388,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-29-architecture-synthesis/focused-native-minimal-clippy.log.gz",
+      "sha256": "b365fae2c0e6ddb152d1afaa998c10d3a9b404f8bd8825c9476f7d0e9510e535"
+    },
+    {
+      "bytes": 467,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-29-architecture-synthesis/focused-native-worker-final-clippy.log.gz",
+      "sha256": "3d30425ebeb953c28b1edb45ecb2bc354a8503c3a9e42b6f6bdc1b965dc393b1"
+    },
+    {
+      "bytes": 3966,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-29-architecture-synthesis/focused-native-worker-final-nextest.log.gz",
+      "sha256": "331a633ce4fe36024eef0ddc3f82f4f3d102c7ab7e6c9cd30f51023cd4f7b92d"
+    },
+    {
+      "bytes": 3722,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-29-architecture-synthesis/focused-qsp-all-features.log.gz",
+      "sha256": "31df9f78f0823511ea7f58686dedcd64c4ec956291a3eded2e70fdf684c2f5dc"
+    },
+    {
+      "bytes": 2569,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-29-architecture-synthesis/focused-qsp-large-release.log.gz",
+      "sha256": "0d9394558adfaba5b842e52906deab5dfd24a839eddfdb92c8874c955270d9cf"
+    },
+    {
+      "bytes": 5729,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-29-architecture-synthesis/focused-validation.json",
+      "sha256": "aeb96950ce92953a99684eb5178838a5a94e2f5e259d3df46a35a67a5874aab2"
+    },
+    {
+      "bytes": 30501,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-29-architecture-synthesis/historical-workspace-tests.log.gz",
+      "sha256": "231fcbaf6692ad2d071b1ab823974fa2855c8ee71c6d89b50c3f3b831b430ff2"
+    },
+    {
+      "bytes": 6606,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-29-grace-hopper/checks.json",
+      "sha256": "4c46298ab2c8fabff7d2f568d79ac3f8091ba63d6b8bc1e5b2f0456c0fdc167e"
+    },
+    {
+      "bytes": 20935,
+      "kind": "file",
+      "path": "docs/verification/data/2026-09-29-grace-hopper/consumers.json",
+      "sha256": "4f12fe2ebd59d1f8abcc56122d000c3ae58ff246febfa52b0da56e404901e315"
+    },
+    {
+      "bytes": 1702,
+      "kind": "file",
+      "path": "docs/verification/data/README.md",
+      "sha256": "55a66c0d752d36773078817ef727f308380b46c9e1c53ba4fc3f0ec5c2653b98"
+    },
+    {
+      "bytes": 4158,
+      "kind": "file",
+      "path": "docs/verification/fixtures/consolidation/main.rs",
+      "sha256": "1f5a97d7afd111a7144015511ced9c78f86f874fc77e5f7ba9edfc27828a8c6d"
+    },
+    {
+      "bytes": 1840,
+      "kind": "file",
+      "path": "docs/verification/fixtures/consolidation/native_modes.rs",
+      "sha256": "44da253583446cdabd7661ffc7e0208d801a4e3999fb8ff85685b23081e172f8"
+    },
+    {
+      "bytes": 1761,
+      "kind": "file",
+      "path": "docs/verification/fixtures/consolidation/run.py",
+      "sha256": "fd6c53a6d0c7f45d7d43d4a520d2baaff06ed23e1bb60af28e09ab894104ad95"
+    },
+    {
+      "bytes": 942,
+      "kind": "file",
+      "path": "docs/verification/fixtures/native-probability/CMakeLists.txt",
+      "sha256": "b5375c87bf201fa651f86bf73db184830dc2cc9b84155035d6d58b04998118d5"
+    },
+    {
+      "bytes": 728,
+      "kind": "file",
+      "path": "docs/verification/fixtures/native-probability/README.md",
+      "sha256": "ae56a16fa35ff934f9104a8c185fafd7c8a558e49f3e50d83a05204635fdb557"
+    },
+    {
+      "bytes": 550,
+      "kind": "file",
+      "path": "docs/verification/fixtures/native-probability/witness.cpp",
+      "sha256": "38f72e2f54235f55b471f0d375b0524c2036a22df395d78b2fa7532c6ab2326b"
+    },
+    {
+      "bytes": 13,
+      "kind": "file",
+      "path": "docs/verification/fixtures/optimization-roadmap/.gitignore",
+      "sha256": "32dae3052f331ee34d628ef535709b301259a45df7c7522c4d35dcf49873f00b"
+    },
+    {
+      "bytes": 7279,
+      "kind": "file",
+      "path": "docs/verification/fixtures/optimization-roadmap/README.md",
+      "sha256": "fb23618ddef7a010b58e2e4c312b45512f7ba04f84d58fea6a7e49be8f402136"
+    },
+    {
+      "bytes": 12397,
+      "kind": "file",
+      "path": "docs/verification/fixtures/optimization-roadmap/baseline_compiler.rs",
+      "sha256": "c6b3be60789b4e11d59a0d4ee7fe62bba0a5ebec03a34590054eca6211b081a2"
+    },
+    {
+      "bytes": 3478,
+      "kind": "file",
+      "path": "docs/verification/fixtures/optimization-roadmap/native_deployment.rs",
+      "sha256": "04376bdb134f679a4c7012cecf50a29e0d5bf3c1cbdd0d0b362635b1b762273b"
+    },
+    {
+      "bytes": 7107,
+      "kind": "file",
+      "path": "docs/verification/fixtures/optimization-roadmap/native_mpi_optimization.rs",
+      "sha256": "6320771eeb20b7cbbbc0fd9382e0c35368210083a169f48c4f1b77a4fc964bde"
+    },
+    {
+      "bytes": 11706,
+      "kind": "file",
+      "path": "docs/verification/fixtures/optimization-roadmap/native_optimization.rs",
+      "sha256": "db74fbe1bc5175fc10108ea44141ef3ca7618cb1b4d758cefeb02adf10449b05"
+    },
+    {
+      "bytes": 7831,
+      "kind": "file",
+      "path": "docs/verification/fixtures/optimization-roadmap/roadmap_compiler.rs",
+      "sha256": "0a9a624cc6465ae052ad4196539c4e1ca426dbe0aad8e4883090625f16ecd57b"
+    },
+    {
+      "bytes": 6773,
+      "kind": "file",
+      "path": "docs/verification/fixtures/optimization-roadmap/roadmap_workers.rs",
+      "sha256": "45752d2673f83976d6e5d111f62c491a71ac46ab38faf618eb55b7e1b6b805fb"
+    },
+    {
+      "bytes": 6619,
+      "kind": "file",
+      "path": "docs/verification/fixtures/optimization-roadmap/run_baseline.py",
+      "sha256": "d46c4bd335091bffa3d7923618bfe8562db31b5385874325b5861910d066f59f"
+    },
+    {
+      "bytes": 4558,
+      "kind": "file",
+      "path": "docs/verification/fixtures/optimization-roadmap/run_native_deployment.py",
+      "sha256": "9f5c84676f2e5eeacb5401d185bf1bedc4a4557476726051745d47e1b02617da"
+    },
+    {
+      "bytes": 9045,
+      "kind": "file",
+      "path": "docs/verification/fixtures/optimization-roadmap/run_native_optimization.py",
+      "sha256": "dc20d17a2901fd01cfbd3d927b276bed3993a70247fb0ad9845557ab3a92f814"
+    },
+    {
+      "bytes": 6387,
+      "kind": "file",
+      "path": "docs/verification/fixtures/optimization-roadmap/summarize.py",
+      "sha256": "7a963d6233f342becb83bfc6265b3a10dc4cdc3acd06d6d1f7a329426899ed24"
+    },
+    {
+      "bytes": 5996,
+      "kind": "file",
+      "path": "docs/verification/fixtures/optimization-roadmap/test_measurement_harness.py",
+      "sha256": "85c60083a2f1ae298ee3463ee9cdb913bb282b121562c3f8dc47225355b24e67"
+    },
+    {
+      "bytes": 2394,
+      "kind": "file",
+      "path": "nix/quest.nix",
+      "sha256": "96bb175d88896f38ac5145edff541f8128d13d364d8a2f5ef5e0881b3dc53958"
+    },
+    {
+      "bytes": 99,
+      "kind": "file",
+      "path": "rust-toolchain.toml",
+      "sha256": "2fc9033f7ede8305e6496c9d2140f458773627be41ece35f2f383b489e719c83"
+    }
+  ],
+  "initial_manifest_sha256": "35ae2cd5c86d9352124f2be3b557d79a0fd2be9d53cda0608235e99f503fefaa",
+  "overlay": [
+    {
+      "after_sha256": "fdcfa7bce1782024d13e2c712e5ecbee0f72276365e604c007740f21b4405df0",
+      "before_sha256": "3e8852032fb8c92e20d8c2d2282fc36cf28026ca221383a0c4338efbc9f3a3a5",
+      "path": "Cargo.lock"
+    },
+    {
+      "after_sha256": "3f01e450cf599e5370b5146879a26ffcb02704bddb207e4e3f35757e4f328144",
+      "before_sha256": "748a2328b01f59acecb6c04e20d3f0017d998a440700da800e93586f1ffe3007",
+      "path": "crates/quest-circuit/Cargo.toml"
+    },
+    {
+      "after_sha256": "9b48c705045d6f9f439b102fff38cc7c6e82f05f9daaef423ed1cb09abe6b7c3",
+      "before_sha256": "05da644d9283d48be3b1acd713bc300c43896982f52e6ba80895aae81aafb57e",
+      "path": "crates/quest-circuit/tests/beam_approx_contract.rs"
+    },
+    {
+      "after_sha256": "12247f48e1bb576b7ba0307b1085e772e7335b08733baeea313dbffe7f2a33f0",
+      "before_sha256": "e19ce838dbe4adb38ba30e012bf10f64f59c56a57ead4e2230caa39097d77467",
+      "path": "crates/quest-circuit/tests/beam_contract.rs"
+    },
+    {
+      "after_sha256": "d59abf22b06fc9f7725b04dcfe9f315043ff063496007dba8ca4cf203e730d55",
+      "before_sha256": "4fd672dee5937a8fc6217862cecf76466fbf343ae2f0e59da470399ac71527b6",
+      "path": "crates/quest-circuit/tests/beam_mitm_contract.rs"
+    },
+    {
+      "after_sha256": "423265342a058fb071f0baa9025a6ae931971e141592361056926ac2a1e9c42b",
+      "before_sha256": null,
+      "path": "crates/quest-circuit/tests/generator_error_contract.rs"
+    },
+    {
+      "after_sha256": "7edc03b85e11eb1cdb62e962c1aa33c181ff83751186524beb5a89047869b357",
+      "before_sha256": "b094524de2f4d2713c7270746f9123a4a53430d56c973645a88780d95d8ef7f3",
+      "path": "crates/quest-circuit/tests/worker_contract.rs"
+    },
+    {
+      "after_sha256": "d111cd468297c0ee2e6ae0135ed8285f95b713f34a96bc8f6591127291fb455e",
+      "before_sha256": "6a82029ecafc11fc9052e2f77a67ba20aa34906d1bfb99509b5e231ad04915e3",
+      "path": "crates/quest-compile/src/workers.rs"
+    },
+    {
+      "after_sha256": "f75c3d42659eab58e13cb286d6bee96ae6184234d4e180ff2f4553211d36cee3",
+      "before_sha256": "a43222ed8a84c7b0aac7f5a8c315c6625b3a806a6ab7f374d2ec3cfb1bfe78b1",
+      "path": "crates/quest-optimizer-worker/tests/circuit_contract.rs"
+    },
+    {
+      "after_sha256": "7732c02752ce1c0ec3679b3104d9efa0cd7f445eb5d4e3de3c025c895b2fe4f8",
+      "before_sha256": "4841785696912f7cd4752880b2cdcb22796d9e91b7c6bed6d6b94ffa6068e979",
+      "path": "crates/quest-synthesis/README.md"
+    },
+    {
+      "after_sha256": "80047143fccfc3117345c9ec3ef2a0d98737cea6264c80cba2b20ee489e2441e",
+      "before_sha256": "89e62e6e681b43fcb0ef524ecc4708bb453ad4223555631e24681faeb4285fca",
+      "path": "crates/quest-synthesis/src/approximation.rs"
+    },
+    {
+      "after_sha256": "bcfa29fe33bdd8532ffb71dbfc1fa561f2b932f6022d8ab55c49a7c8c49d1a80",
+      "before_sha256": "e56037d1b55f7445d0c997137a5fb69580bc37ea5b2b90c806239df98130a750",
+      "path": "crates/quest-synthesis/src/grid.rs"
+    },
+    {
+      "after_sha256": "fa7d86af32606bf1391df531c8431df08339f3c9777938a279cb46be3067681d",
+      "before_sha256": "f99307f47b8e1ae576bdc6d83947ce06dcbbcc9d321a1e9ab9ddadd57fffc032",
+      "path": "crates/quest-synthesis/src/lib.rs"
+    },
+    {
+      "after_sha256": "c10f320013457afcfc0de62c957cd0f160dd23ebee6078c048ff9ab28fdbf339",
+      "before_sha256": "6a9993c4032dcabcc81f92412b0517154d492445ad3a7b428abde7ed05cb913f",
+      "path": "crates/quest-synthesis/tests/approximation.rs"
+    },
+    {
+      "after_sha256": "1ddabc7d76d4d5753a5f93c3f13f1b1efe9438bd988b08ec4c3ecbf9a2593339",
+      "before_sha256": "b9fa1225e6494be879498cbf518d919cdaacb7ce0b1d53ed4f13140b37010d43",
+      "path": "crates/quest-synthesis/tests/resources.rs"
+    },
+    {
+      "after_sha256": "8aca0b698874d840ba710e0cf029e8ac51cd16dce31fc395424ad4f70200512a",
+      "before_sha256": "a67bd6ee6f94b5b2d87bd662fe9974fc417e9be079c478e453d69d710d8947ef",
+      "path": "devenv.nix"
+    }
+  ],
+  "scope": "Initial immutable export with explicitly synchronized code and environment fixes. Final verification documents written afterward are not part of the execution snapshot."
+}

@@ -52,8 +52,11 @@ fn derivatives_keep_basis_families_and_intervals_enclose_original_parameters() -
 fn conversions_return_enclosed_error_and_parity_is_admitted() -> Result<()> {
     let p = Polynomial::new(Chebyshev, vec![c(1.0), c(0.0), c(2.0)], Limits::default())?;
     let converted = p.to_monomial()?;
-    expect_that!(converted.polynomial.evaluate_real(0.3)?, near(-0.64, 1e-14));
-    expect_true!(converted.coefficient_error_bound >= 0.0);
+    expect_that!(
+        converted.polynomial().evaluate_real(0.3)?,
+        near(-0.64, 1e-14)
+    );
+    expect_true!(converted.coefficient_error_bound() >= 0.0);
     expect_true!(p.clone().admit_parity::<quest_polynomial::Even>().is_ok());
     expect_true!(p.admit_parity::<quest_polynomial::Odd>().is_err());
     let p = Polynomial::new(Monomial, vec![c(0.0), c(0.0), c(1.0)], Limits::default())?;
@@ -166,15 +169,15 @@ fn explicit_conversion_preserves_complex_response_across_parameterized_bases() -
     let x = Complex64::new(0.3, 0.2);
     let expected = p.evaluate(x)?;
     for actual in [
-        cheb.polynomial.evaluate(x)?,
-        lag.polynomial.evaluate(x)?,
-        jac.polynomial.evaluate(x)?,
+        cheb.polynomial().evaluate(x)?,
+        lag.polynomial().evaluate(x)?,
+        jac.polynomial().evaluate(x)?,
     ] {
         expect_that!(std::ops::Sub::sub(actual, expected).norm(), lt(1e-13));
     }
-    expect_true!(cheb.coefficient_error_bound >= 0.0);
-    expect_true!(lag.coefficient_error_bound >= 0.0);
-    expect_true!(jac.coefficient_error_bound >= 0.0);
+    expect_true!(cheb.coefficient_error_bound() >= 0.0);
+    expect_true!(lag.coefficient_error_bound() >= 0.0);
+    expect_true!(jac.coefficient_error_bound() >= 0.0);
     Ok(())
 }
 #[gtest]
@@ -217,5 +220,43 @@ fn expression_views_preserve_the_original_single_expression() -> Result<()> {
         return fail!("expected original exponential node");
     };
     expect_true!(matches!(argument.node(), ExprNode::Variable));
+    Ok(())
+}
+
+#[gtest]
+fn conversion_evidence_retains_both_immutable_polynomials() -> Result<()> {
+    let p = Polynomial::new(Chebyshev, vec![c(0.0), c(0.0), c(1.0)], Limits::default())?;
+    let conversion = p.to_monomial()?;
+    expect_that!(conversion.source().coefficients(), eq(p.coefficients()));
+    expect_that!(conversion.source().evaluate_real(0.0)?, eq(-1.0));
+    expect_that!(
+        conversion.polynomial().coefficients(),
+        eq([c(-1.0), c(0.0), c(2.0)].as_slice())
+    );
+    expect_true!(conversion.coefficient_error_bound().is_finite());
+    expect_that!(conversion.into_polynomial().evaluate_real(0.0)?, eq(-1.0));
+    Ok(())
+}
+
+#[gtest]
+fn basis_conversion_preflights_aggregate_storage_and_work() -> Result<()> {
+    for limits in [
+        Limits {
+            max_bytes: 6_400,
+            ..Limits::default()
+        },
+        Limits {
+            max_work: 1_800,
+            ..Limits::default()
+        },
+    ] {
+        let polynomial = Polynomial::new(Monomial, vec![c(0.001); 20], limits)?;
+        expect_true!(matches!(
+            polynomial.to_basis(Chebyshev),
+            Err(quest_polynomial::Error::Budget(_))
+        ));
+    }
+    let polynomial = Polynomial::new(Monomial, vec![c(0.001); 20], Limits::default())?;
+    expect_true!(polynomial.to_basis(Chebyshev).is_ok());
     Ok(())
 }

@@ -1,11 +1,12 @@
 # quest-qsp
 
-Canonical and generalized quantum signal processing (QSP) in pure Rust. The
-production pipeline uses binary64 FFT Weiss completion and a divide-and-conquer
-inverse nonlinear Fourier transform (NLFT). It produces immutable phases or
+Real-parity Wx and complex unit-circle quantum signal processing (QSP) in pure Rust.
+The production default uses FFT Weiss ratios and structured RHW Half-Cholesky.
+The divide-and-conquer inverse nonlinear Fourier transform (NLFT) is an explicit
+`SynthesisAlgorithm::InverseNlftDivideConquer` alternative. It produces immutable phases or
 two-dimensional controls without requiring an installed native `QuEST` library.
 
-## Canonical quickstart
+## `RealParityWx` quickstart
 
 Supply a real Chebyshev polynomial with exactly one parity. This example
 synthesizes the odd target `p(x) = 0.6*x`:
@@ -19,7 +20,7 @@ let target = Polynomial::new(
     vec![Complex64::new(0.0, 0.0), Complex64::new(0.6, 0.0)],
     Limits::default(),
 )?;
-let admitted = SynthesisBuilder::new().canonical(&target)?.admit()?;
+let admitted = SynthesisBuilder::new().real_parity_wx(&target)?.admit()?;
 let completed = admitted.complete()?;
 let candidate = completed.synthesize()?;
 
@@ -30,19 +31,19 @@ assert_eq!(phases.degree(), 1);
 # Ok::<(), Box<dyn std::error::Error>>(())
 ```
 
-The canonical convention is
+The real-parity Wx convention is
 `U(x) = exp(i*phi_0*Z) Wx(x) ... Wx(x) exp(i*phi_d*Z)`, where
 `Wx(x) = [[x, i*sqrt(1-x*x)], [i*sqrt(1-x*x), x]]` for `x` in `[-1, 1]`.
 The target is **the imaginary part of `U00`**. `response(x)` evaluates this
 sequence, while `phases()` and `phase_sequence()` expose the frozen angles.
 
-Canonical admission rejects mixed parity and imaginary coefficients, including
+`RealParityWx` admission rejects mixed parity and imaginary coefficients, including
 small nonzero values. It does not project parity, chop coefficients, rescale the
 target, or silently discard subnormal coefficients during basis conversion.
 
-## Generalized quickstart
+## `UnitCircleResponse` quickstart
 
-The generalized builder accepts complex Laurent coefficients with nonnegative
+The unit-circle builder accepts complex Laurent coefficients with nonnegative
 support. A positive first exponent is padded explicitly with zero coefficients;
 negative exponents require a separate mathematical transformation by the caller.
 
@@ -57,7 +58,7 @@ let target = Polynomial::new(
     Limits::default(),
 )?;
 let candidate = SynthesisBuilder::new()
-    .generalized(&target)?
+    .unit_circle_response(&target)?
     .admit()?
     .complete()?
     .synthesize()?;
@@ -72,7 +73,7 @@ Here the exported product is `C0 D(z) C1 ... D(z) Cd`, with
 `D(z) = diag(z, 1)` and target `b(z)` in its upper-left entry. The last control
 already contains the right factor `K = [[0, -1], [1, 0]]`; do not append `K`
 again. Unitarity concerns `|z| = 1`; `evaluate(z)` also accepts other finite
-complex values for polynomial evaluation. For a canonical candidate,
+complex values for polynomial evaluation. For a real-parity Wx candidate,
 `evaluate(z)` uses this transformed Laurent representation; use `response(x)`
 for the real Wx response.
 
@@ -80,10 +81,10 @@ for the real Wx response.
 
 | Stage | API | Result and contract |
 | --- | --- | --- |
-| Configure | `SynthesisBuilder::new().canonical(...)` or `.generalized(...)` | Owns copied target data in a mode-specific ready state. |
+| Configure | `SynthesisBuilder::new().real_parity_wx(...)` or `.unit_circle_response(...)` | Owns copied target data in a mode-specific ready state. |
 | Admit | `.admit()` | `AdmittedTarget` with an outward unit-circle contractivity bound and positive margin. |
 | Complete | `.complete()` | `CompletedPolynomial` with a complement, completion grid and binary64 residual. |
-| Freeze | `.synthesize()` | `FrozenCandidate<Canonical>` or `FrozenCandidate<Generalized>` with immutable binary64 exports. |
+| Freeze | `.synthesize()` | `FrozenCandidate<RealParityWx>` or `FrozenCandidate<UnitCircleResponse>` with immutable binary64 exports. |
 | Certify, optionally | `CertificationBuilder::new().candidate(...).policy(...)?.certify()` | `Certified` with independently established bounds on the frozen export. |
 
 Each transition consumes its input. Methods needed by later stages are absent
@@ -92,7 +93,15 @@ not an independent certificate. Completion and reconstruction residuals from
 production synthesis are numerical diagnostics.
 
 Set `Policy` with `SynthesisBuilder::policy` to configure response tolerance,
-strict contractivity margin, FFT backend, maximum grid and numerical `Limits`.
+strict contractivity margin, algorithm, FFT backend, maximum grid and numerical `Limits`.
+`SynthesisAlgorithm::RhwHalfCholesky` is independent of precision, convention and
+execution policy. Both algorithms are available in `OfflinePolicy` too.
+`FrozenCandidate::algorithm()` and `synthesis_precision()` retain these separate
+identities, including the successful offline working precision.
+`CompletedPolynomial::weiss_ratio()` retains coefficients of `b/a`, the exact
+admitted target, positive-real-constant outer gauge, grid and contractivity bound.
+Half-Cholesky uses the complex rank-two displacement recurrence in quadratic
+work and linear storage; the bounded dense block solver is test-only.
 Defaults use tolerance `1e-11`, margin `1e-12` and `FftBackend::Scalar`.
 Contractivity is established using outward coefficient bounds or bounded
 unit-circle subdivision, and must be strictly below `1 - contractivity_margin`.
@@ -138,7 +147,7 @@ let target = Polynomial::new(
     Laurent::new(0), vec![Complex64::new(0.3, 0.4)], Limits::default(),
 )?;
 let frozen = SynthesisBuilder::new()
-    .generalized(&target)?.admit()?.complete()?.synthesize()?;
+    .unit_circle_response(&target)?.admit()?.complete()?.synthesize()?;
 let certified = CertificationBuilder::new()
     .candidate(frozen)
     .policy(CertificationPolicy::default())?
@@ -152,22 +161,22 @@ let _unchanged_candidate = certified.candidate();
 ```
 
 The verifier bounds source conversion, completion, response, all four
-reconstructed matrix entries and unitarity. Generalized matrices are imported
-as exact binary64 dyadics. Canonical verification reconstructs rotations from
+reconstructed matrix entries and unitarity. `UnitCircleResponse` matrices are imported
+as exact binary64 dyadics. `RealParityWx` verification reconstructs rotations from
 the exact exported phase values using directed arbitrary-precision trigonometry.
 Reports retain `astro_float::BigFloat` endpoints; binary64 upper summaries round
 upward. Default verification starts at 256 bits and can retry up to 1024 bits.
 More verifier precision can tighten an enclosure but cannot repair export error.
 
 With `offline-synthesis`, use
-`OfflineBuilder::new().canonical(&original)?` or `.generalized(&original)?`,
+`OfflineBuilder::new().real_parity_wx(&original)?` or `.unit_circle_response(&original)?`,
 then `.policy(OfflinePolicy::default())?.solve()?`. These builders start from
 original binary64 coefficients, compute separate arbitrary-precision candidates,
 export binary64 controls or phases, and independently certify each export.
 Retries rebuild numerical state from the original source. Defaults begin at
 128 bits and allow up to 4096 bits; precision limits must align to backend words.
 Reports separate computation and certification time. The offline candidate's
-production `reconstruction_residual()` is unavailable (`+infinity`); use
+production `reconstruction_residual()` is unavailable (`None`); use
 `solved.certified().report().reconstruction()` for the independent bound.
 
 `OfflineRemezBuilder` provides a separate function-approximation path over a
@@ -176,17 +185,33 @@ polynomial's **total uniform error**. The reported numerical exchange gap is
 empirical and is not a minimax certificate. Admit parity and contractivity
 explicitly before using such a polynomial for QSP.
 
+## Certified projector conversion
+
+`Certified<RealParityWx>::certify_projector_phases(policy)` constructs the actual
+rounded projector angles and readout, then independently reconstructs their
+reflection-signal product with directed arbitrary precision. It certifies
+`Re(exp(-i*readout/2) U00)` against the original real Chebyshev target on `[-1,1]`,
+and separately bounds the full matrix unitarity defect. The result retains the
+immutable actual angles, readout bits, original candidate, domain, norm and
+convention. It does not inherit the source sequence's response certificate.
+Consumers must emit `values()` and `readout_phase()` from this same result.
+
+The recurrence follows [Laneve, section 5](https://arxiv.org/html/2503.03026v2#S5)
+and [Ni and Ying, section 2.4](https://arxiv.org/html/2410.06409v2#S2.SS4).
+Their theoretical stability statements do not substitute for certification of
+an actual floating-point export.
+
 ## Imported sequences and errors
 
 Use `PhaseSequence::<WxSymmetric>::builder(values).build()` for tagged symmetric
 Wx phases, `PhaseSequence::<WxLaurent>` for the Laurent tag, or
-`PhaseSequence::<CanonicalWxImag>` for canonical imaginary-`U00` phases. Imports
+`PhaseSequence::<WxImaginaryU00>` for Wx imaginary-`U00` phases. Imports
 validate nonempty finite values and, for the symmetric tag, compare mirrored
 rotations with a `1e-12` tolerance. Convention conversion is explicit through
-`canonical()` and `projector_phases_with_diagnostics()`. Its roundoff estimate
+`real_parity_wx()` and `projector_phases_with_diagnostics()`. Its roundoff estimate
 is a numerical diagnostic, not an outward bound or a transferable certificate.
 
-`ControlSequence::builder().matrices(values).build()` checks actual generalized
+`ControlSequence::builder().matrices(values).build()` checks actual unit-circle
 matrices at a fixed `1e-10` unitarity tolerance. The caller supplies the complete
 product convention including terminal `K`. The `angles(psi, phi)` alternative
 constructs paper-native rotations and incorporates `K` for the caller. Matrix
@@ -213,3 +238,29 @@ polynomial prelude, caller-owned workers and stage observation. Use
 [`quest-qsvt`](https://github.com/eessmann/quest-rs/blob/main/crates/quest-qsvt/README.md) to build transformations from these sequences.
 
 This Rust port draws on `quest-qsvt` revision `7fe7f740579b03c52a8cf48be6a31268b029c19f`. Its MIT notice is retained in `LICENSE-quest-qsvt`.
+
+## Compiled artifacts
+
+The `artifact` feature exports versioned JSON with exact IEEE-754 bits for the
+original source, transformed target, conjugate complement and every phase/control
+(including terminal K). Original source storage offsets and lengths survive
+Laurent padding. The payload records the solver and algorithm version, explicit
+binary64/arbitrary precision, production policy, FFT backend and diagnostics.
+A SHA256 digest binds the canonical payload; it detects changes but does not
+authenticate the claimed producer or algorithm.
+
+`artifact::export_compiled` saves the immutable candidate;
+`artifact::export_certified` additionally saves a historical receipt with verifier
+policy, outward binary64 bound summaries and attempt accounting. The receipt is
+explicitly untrusted on import. `load_compiled` admits input size before JSON
+parsing, validates finite payloads/shapes/versions, and re-establishes target
+contractivity with caller-owned resources. It returns `LoadedCompiled`, without
+an accuracy certificate. `load_certified` independently reconstructs the actual
+saved payload with the caller's verification policy and returns `LoadedCertified`.
+No load path resynthesizes or repairs values. A loaded Wx certificate still needs
+`certify_projector_phases` to obtain independently certified projector angles and
+readout. Raw imported phase/control sequences remain weaker artifacts.
+
+`ArtifactLimits` separates encoded bytes, conservative decoded storage and array
+length limits. `LoadPolicy::admission` independently bounds contractivity work.
+Historical verification policy never overrides the loader's resource choices.

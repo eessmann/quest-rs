@@ -1,17 +1,22 @@
 //! Scoped semantic admission and typed lowering into executable SSA.
 mod allocation;
 pub mod builder;
-pub(crate) mod cfg;
+#[doc(hidden)]
+pub mod cfg;
 mod compile;
 mod expressions;
 mod preflight;
-pub(crate) mod promote;
+#[doc(hidden)]
+pub mod promote;
 pub(crate) mod retained;
 mod statements;
+#[cfg(feature = "templates")]
+pub mod template;
 mod types;
 use crate::{SourceSpan, ssa, syntax};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CompileLimits {
     pub nodes: usize,
     pub blocks: usize,
@@ -64,10 +69,14 @@ impl SemanticError {
             overflow_resource: None,
         }
     }
-    pub(crate) fn budget(message: &str) -> Self {
+    #[doc(hidden)]
+    #[must_use]
+    pub fn budget(message: &str) -> Self {
         Self::new(ErrorKind::Resource, message)
     }
-    pub(crate) fn limit(
+    #[doc(hidden)]
+    #[must_use]
+    pub fn limit(
         resource: crate::ResourceKind,
         requested: usize,
         limit: usize,
@@ -94,7 +103,8 @@ impl SemanticError {
         }
         self
     }
-    pub(crate) fn invalid(message: impl Into<String>) -> Self {
+    #[doc(hidden)]
+    pub fn invalid(message: impl Into<String>) -> Self {
         Self::new(ErrorKind::InvalidIr, message)
     }
     /// Convert this semantic failure into a self-contained diagnostic snapshot.
@@ -189,6 +199,28 @@ pub struct TypedModule {
     program: ssa::VerifiedProgram,
 }
 impl TypedModule {
+    /// Admit a compiled executable separately from its immutable source-export syntax.
+    /// Source is independently admitted for well-formedness; executable SSA is independently
+    /// verified and retained verbatim, since optimization may change it.
+    /// # Errors
+    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+    pub fn from_compiled_parts(
+        source: syntax::Module,
+        program: ssa::Program,
+        limits: CompileLimits,
+    ) -> Result<Self, SemanticError> {
+        let source = admit(source, limits)?.syntax;
+        let program = program.verify(limits)?;
+        let module = Self {
+            syntax: source,
+            program,
+        };
+        if module.retained_bytes()? > limits.storage_bytes {
+            return Err(SemanticError::budget("compiled artifact storage"));
+        }
+        Ok(module)
+    }
+
     #[must_use]
     pub const fn syntax(&self) -> &syntax::Module {
         &self.syntax

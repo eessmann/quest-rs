@@ -182,6 +182,8 @@ fn canonical_synthesis_exports_reimportable_frozen_phases_with_stage_timings()
     let cli = Cli::try_parse_from([
         "qsvt",
         "synthesize",
+        "--export",
+        "sequence",
         "--input",
         input
             .to_str()
@@ -237,8 +239,10 @@ fn generalized_synthesis_preserves_matrix_export_and_rejects_phase_input() -> go
     let args = [
         "qsvt",
         "synthesize",
+        "--export",
+        "sequence",
         "--mode",
-        "generalized",
+        "unit-circle-response",
         "--input",
         input
             .to_str()
@@ -387,6 +391,8 @@ fn failed_input_admission_still_writes_a_failed_trace_without_output() -> google
     let result = Cli::try_parse_from([
         std::ffi::OsStr::new("qsvt"),
         std::ffi::OsStr::new("synthesize"),
+        std::ffi::OsStr::new("--export"),
+        std::ffi::OsStr::new("sequence"),
         std::ffi::OsStr::new("--input"),
         input.as_os_str(),
         std::ffi::OsStr::new("--output"),
@@ -495,8 +501,10 @@ fn per_synthesis_pool_exports_identical_frozen_words() -> googletest::Result<()>
             std::ffi::OsStr::new("--workers"),
             std::ffi::OsStr::new(workers),
             std::ffi::OsStr::new("synthesize"),
+            std::ffi::OsStr::new("--export"),
+            std::ffi::OsStr::new("sequence"),
             std::ffi::OsStr::new("--mode"),
-            std::ffi::OsStr::new("generalized"),
+            std::ffi::OsStr::new("unit-circle-response"),
             std::ffi::OsStr::new("--input"),
             input.as_os_str(),
             std::ffi::OsStr::new("--output"),

@@ -1,0 +1,77 @@
+• Validating lock
+✓ Validating lock in 6.28ms
+  evaluating file '«nix-internal»/derivation-internal.nix'
+• Configuring shell
+• Configuring cachix
+✓ Configuring cachix in 1.91ms
+• Evaluating shell
+✓ Evaluating shell in 4.12ms (cached)
+✓ Configuring shell in 8.14ms
+• Loading tasks
+• Evaluating devenv.config.task.config
+✓ Evaluating devenv.config.task.config in 338µs (cached)
+✓ Loading tasks in 986µs
+• Running tasks
+• Running devenv:files:cleanup
+✓ Running devenv:files:cleanup in 7.58ms
+• Running devenv:enterShell
+✓ Running devenv:enterShell in 7.39ms
+• Running devenv:enterTest
+✓ Running devenv:enterTest in 540ns (no command)
+✓ Running tasks in 15.1ms
+   Compiling syn v3.0.3
+   Compiling cc v1.4.2
+   Compiling syn v1.0.109
+   Compiling thiserror v1.0.69
+   Compiling rustix v1.1.4
+   Compiling cmake v0.1.58
+   Compiling link-cplusplus v1.0.12
+   Compiling cxx v1.0.198
+   Compiling alloca v0.4.0
+   Compiling cxx-build v1.0.198
+   Compiling interpol v0.2.1
+   Compiling serde_derive v1.0.229
+   Compiling thiserror-impl v2.0.20
+   Compiling cxxbridge-macro v1.0.198
+   Compiling private-gemm-x86 v0.1.20
+   Compiling thiserror v2.0.20
+   Compiling quest-numerics v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-numerics)
+   Compiling serde v1.0.229
+   Compiling cmake-file-api v0.1.2
+   Compiling num-bigint v0.5.1
+   Compiling num-rational v0.4.2
+   Compiling tinytemplate v1.2.1
+   Compiling ciborium v0.2.2
+   Compiling trybuild v1.0.121
+   Compiling faer v0.24.4
+   Compiling quest-math v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-math)
+   Compiling quest-build v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-build)
+   Compiling quest-symbolic v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-symbolic)
+   Compiling quest-synthesis v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-synthesis)
+   Compiling quest-optimizer-protocol v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-protocol)
+   Compiling criterion v0.8.2
+   Compiling quest-optimizer-client v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-client)
+   Compiling quest-sys v0.2.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-sys)
+   Compiling quest-rs v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest)
+warning: quest-sys@0.2.0: Using QuEST 4.3.0 from /nix/store/0d389wpw7ikhv5cdg5x8xg9pi184cr77-quest-4.3.0 with /nix/store/0skhb15j2szcq05929gs9m1dbpiydhb7-clang-21.1.8/bin/clang++
+   Compiling quest-language v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-language)
+   Compiling quest-polynomial v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-polynomial)
+   Compiling quest-qsp v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-qsp)
+   Compiling quest-qasm v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-qasm)
+   Compiling quest-compile v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-compile)
+   Compiling quest-macros v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-macros)
+   Compiling quest-circuit v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-circuit)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 19.91s
+     Running tests/structured_workers.rs (target/debug/build/quest-rs/a821a8acdd4d9834/out/structured_workers-a821a8acdd4d9834)
+
+running 1 test
+test certified_ssa_synthesis_preserves_native_state_and_density ... 
+running 1 test
+test certified_ssa_synthesis_preserves_native_state_and_density ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.38s
+
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.39s
+

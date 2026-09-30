@@ -80,12 +80,12 @@ present. This example retains the caller's left coordinate order `[1, 0]` and a
 one-dimensional right interface:
 
 ```rust
-use quest_circuit::{Gate, OracleFragment, ProgramBuilder};
+use quest_circuit::{Gate, OracleFragment, QuantumRegionBuilder};
 use quest_qsvt::{EncodingBuilder, Left, LogicalSpace, NumericalPolicy, Right};
 
 fn main() -> quest_qsvt::Result<()> {
     let policy = NumericalPolicy::default();
-    let mut body = ProgramBuilder::new(1, 0)?;
+    let mut body = QuantumRegionBuilder::new(1, 0)?;
     body.gate(Gate::H, &[body.qubit(0)?], &[])?;
     let oracle = OracleFragment::builder(body.finish()?.bind(&[])?)
         .matrix_tolerance(1e-12)?
@@ -171,7 +171,7 @@ fn main() -> quest_qsvt::Result<()> {
     let controls = ControlSequence::builder().angles(&[0.31], &[0.47])?.build()?;
     let transform = TransformBuilder::new()
         .encoding(encoding)
-        .multiplication_odd(controls)
+        .multiplication_odd(quest_qsvt::RouteResponse::<quest_qsvt::GramArgument>::imported(controls))
         .build()?;
     assert_eq!(transform.degree(), 0);
     assert!(transform.bridge().is_some());
@@ -261,7 +261,23 @@ absolute error, and a named contraction/encoding assumption. Standard conditiona
 bounds additionally require `StandardPremises` attached to the exact immutable
 transform, covering projected-unitary semantics, the actual frozen phase response,
 and parity/completion. A matching clone is still a different transform for this
-purpose. A transform by itself returns `None` from `theorem_error_bound()`.
+purpose. A transform by itself publishes no theorem error bound.
+
+`RouteTarget<HermitianArgument>` and `RouteTarget<GramArgument>` distinguish
+normalized `x` from `y = x²`. Explicit monomial conversion and even/odd reduction
+retain their source and destination. Bind a frozen QSP candidate with `bind`, or
+its certificate with `bind_certified`; the coefficient bits and original storage
+span must match. The resulting `RouteResponse` carries this immutable meaning
+into the transform. `from_unit_circle_coefficients` explicitly transfers
+absolute-order Laurent coefficients to the selected argument’s Chebyshev
+coefficients while retaining their original offset/span. Imported controls use
+`RouteResponse::imported`.
+
+For standard phases, `Certified::certify_projector_phases` independently verifies
+the actual converted binary64 angles and readout. `certified_standard` retains
+that exact payload. Its `certified_actual_phase_response` analysis premise uses
+the attached response bound, while encoding and completion assumptions remain
+explicit.
 
 Generalized routes retain uncertified reports and may use a separately supplied
 full-oracle error for query telescoping, but do not receive the standard theorem

@@ -1,0 +1,1 @@
+Shared-target worker-engines-final was invalidated by concurrent default workspace build replacing the feature-enabled executable; synthesis returned capability-disabled midway through the tests. All final worker acceptance uses run-worker-isolated.sh and its separate Cargo target directory.

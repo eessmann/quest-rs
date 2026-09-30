@@ -400,7 +400,7 @@ fn facade_library_source(crate_name: &str) -> String {
     assert_eq!(capabilities.gpu, gpu);
     assert_eq!(capabilities.multithreaded, threads);
     println!("cuquantum={{}}", capabilities.cu_quantum);
-    let mut prepared = environment.prepare_structured(program)?;
+    let mut prepared = environment.prepare(program.verify()?.lower()?.plan()?)?;
     let mut register = environment.state_vector({crate_name}::QubitCount::new(2)?)?;
     check_deployment(register.deployment(), false, gpu, threads);
     prepared.run(&mut register, &{crate_name}::RunInputs::default())?;
@@ -957,7 +957,10 @@ mod tests {
         );
         expect_that!(direct, contains_substring("create_clone_qureg"));
         expect_that!(modes, contains_substring("is_multithreaded"));
-        expect_that!(facade, contains_substring("prepare_structured"));
+        expect_that!(
+            facade,
+            contains_substring("environment.prepare(program.verify()?.lower()?.plan()?)")
+        );
         expect_that!(wrapped, contains_substring("quest-consumer-wrapper"));
         verify_that!(renamed, contains_substring("package = \"quest-rs\""))
     }

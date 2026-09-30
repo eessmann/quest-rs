@@ -1,8 +1,8 @@
 //! Stage timings exclude cloning immutable inputs via per-iteration setup.
 use criterion::{BatchSize, Criterion};
-use quest_circuit::{LanguageError, StructuredProgram, circuit};
+use quest_circuit::{Constructed, LanguageError, Lowered, Program, Verified, circuit};
 use std::hint::black_box;
-fn construct() -> Result<StructuredProgram, LanguageError> {
+fn construct() -> Result<Program<Constructed>, LanguageError> {
     circuit! {
         qubit[4] q;
         int count = 4;
@@ -34,8 +34,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             || program.clone(),
             |program| match program
                 .verify()
-                .and_then(quest_circuit::VerifiedStructuredProgram::lower)
-                .and_then(quest_circuit::LoweredStructuredProgram::plan)
+                .and_then(quest_circuit::Program::<Verified>::lower)
+                .and_then(quest_circuit::Program::<Lowered>::plan)
             {
                 Ok(plan) => Some(black_box(plan)),
                 Err(error) => {
@@ -53,9 +53,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     criterion.bench_function("compiler/classical_optimization", |b| {
         b.iter_batched(
             || verified.clone(),
-            |program| match program.optimize_classical(
-                quest_circuit::language::ssa::optimization::OptimizationLimits::default(),
-            ) {
+            |program| match program
+                .optimize_classical(quest_circuit::classical::OptimizationLimits::default())
+            {
                 Ok(value) => Some(black_box(value)),
                 Err(error) => {
                     failure = Some(error);

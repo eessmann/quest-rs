@@ -1,5 +1,5 @@
 //! Emit one measured JSON result per catalog family, retaining unsuccessful cases.
-use quest_qsp::{Canonical, FrozenCandidate, SynthesisBuilder};
+use quest_qsp::{FrozenCandidate, RealParityWx, SynthesisBuilder};
 use quest_qsvt_io::{IoPolicy, catalog_families};
 use std::time::Instant;
 
@@ -14,9 +14,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let mut admission_seconds = 0.0;
         let mut completion_seconds = 0.0;
         let mut inverse_seconds = 0.0;
-        let result = (|| -> quest_qsp::Result<FrozenCandidate<Canonical>> {
+        let result = (|| -> quest_qsp::Result<FrozenCandidate<RealParityWx>> {
             let begin = Instant::now();
-            let admitted = SynthesisBuilder::new().canonical(&polynomial)?.admit()?;
+            let admitted = SynthesisBuilder::new()
+                .real_parity_wx(&polynomial)?
+                .admit()?;
             admission_seconds = begin.elapsed().as_secs_f64();
             let begin = Instant::now();
             let completed = admitted.complete()?;
@@ -49,7 +51,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 #[cfg(feature = "certification")]
-fn certification(candidate: FrozenCandidate<Canonical>) -> serde_json::Value {
+fn certification(candidate: FrozenCandidate<RealParityWx>) -> serde_json::Value {
     use quest_qsp::certification::{CertificationBuilder, CertificationError, CertificationPolicy};
     let begin = Instant::now();
     let result = CertificationBuilder::new()
@@ -76,7 +78,7 @@ fn certification(candidate: FrozenCandidate<Canonical>) -> serde_json::Value {
     }
 }
 #[cfg(not(feature = "certification"))]
-fn certification(_candidate: FrozenCandidate<Canonical>) -> serde_json::Value {
+fn certification(_candidate: FrozenCandidate<RealParityWx>) -> serde_json::Value {
     serde_json::Value::Null
 }
 

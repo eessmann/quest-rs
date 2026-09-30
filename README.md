@@ -1,7 +1,7 @@
 # QuEST for Rust
 
-Structured OpenQASM 3.1 simulator programs, exact ideal circuit graphs, typed
-QSP/QSVT workflows, and native QuEST 4.3 execution. The facade package is **`quest-rs`**; its Rust library
+A unified simulator program API for OpenQASM 3.1, typed builders, exact angles
+and reusable quantum regions, with typed QSP/QSVT workflows and native QuEST 4.3 execution. The facade package is **`quest-rs`**; its Rust library
 name is **`quest`**.
 
 Read the [guide](docs/book/src/index.md) for the
@@ -18,15 +18,17 @@ commands and repository conventions.
 | `quest` (`quest-rs`) | Environment-bound registers, native preparation and execution |
 | `quest-language` | Owned sources/diagnostics, gate semantics, typed language, SSA and interpreter |
 | `quest-qasm` | Explicit include resolution and canonical structured text export |
-| `quest-circuit` | Structured pipeline, ideal DAG, exact transformations and bounded fusion |
-| `quest-macros` | Structured `circuit!` / `circuit_file!`, plus migration `legacy_circuit!` |
+| `quest-compile` | Staged compiler, exact transformations, explicit synthesis and artifacts |
+| `quest-circuit` | Unified program/builder facade and macro reexports |
+| `quest-macros` | Compile-time checked `circuit!` / `circuit_file!` templates |
 | `quest-math` | Exact algebra and independently checked synthesis certificates |
+| `quest-synthesis` | Bounded deterministic Rust Clifford+T candidate generation |
 | `quest-optimizer-client` / `quest-optimizer-worker` | Optional bounded external engine boundary |
 | `quest-sys` | Audited CXX bridge and native RAII resources |
 | `quest-build` / `xtask` | Native configuration, runtime paths and binding generation |
 | [`quest-numerics`](crates/quest-numerics/README.md) | Binary64 kernels, interval arithmetic, reusable workspaces and observers |
 | [`quest-polynomial`](crates/quest-polynomial/README.md) | Typed polynomial bases, function expressions and approximation |
-| [`quest-qsp`](crates/quest-qsp/README.md) | Canonical/generalized QSP, binary64 inverse NLFT and separate certification |
+| [`quest-qsp`](crates/quest-qsp/README.md) | Real-parity Wx and unit-circle QSP, RHW/Half-Cholesky and inverse NLFT, with frozen-export certification |
 | [`quest-qsvt`](crates/quest-qsvt/README.md) | Native-independent encodings, projectors, transforms and analysis |
 | [`quest-qsvt-io`](crates/quest-qsvt-io/README.md) | JSON and optional serial HDF5 interchange |
 | [`quest-qsvt-cli`](crates/quest-qsvt-cli/README.md) | Synthesis, inverse catalogs, solve, embedded and overlap applications |
@@ -109,14 +111,14 @@ fn main() -> Result<(), quest_build::BuildError> {
 
 ## Structured programs
 
-`circuit!` constructs a `StructuredProgram`: typed classical expressions,
+`circuit!` constructs a `Program<Constructed>`: typed classical expressions,
 scoped declarations, nonrecursive gates and subroutines, arrays and references,
 runtime branches/loops, measurement, reset and feedback. Rust `${ ... }`
 captures evaluate once during construction. `circuit_file!` admits text from
 compiler-tracked files. `quest-qasm` provides pure in-memory text import with an
 explicit include resolver and owned source snapshots.
 
-Use `Environment::prepare_structured`, then run against an existing register
+Consume `.verify()?.lower()?.plan()?`, pass the `Program<Executable>` to `Environment::prepare`, then run against an existing register
 with `RunInputs`. The tutorials execute the same functions tested by the
 process-isolated integration test:
 
@@ -129,8 +131,9 @@ cargo test -p quest-circuit --test tutorials --locked
 Structured compilation consumes checked stages:
 
 ```text
-source / circuit! / typed Builder -> TypedModule -> verified SSA
-    -> lower -> plan -> PreparedStructuredProgram<'env> -> bounded run
+source / circuit! / ProgramBuilder -> Program<Constructed>
+    -> verify -> Program<Verified> -> lower -> Program<Lowered>
+    -> plan -> Program<Executable> -> Environment::prepare -> PreparedProgram<'env>
 ```
 
 Scalar joins and loop-carried values use SSA block arguments. Memory tokens and
@@ -147,25 +150,13 @@ a floating constant; integer `1/2` is zero. Stored `angle` values wrap modulo a
 turn. The U gate follows OpenQASM 3.1's scalar phase convention. See
 [the language chapter](docs/book/src/language.md) before migrating old programs.
 
-## Ideal circuits and optimization
+## Quantum regions and optimization
 
-`ProgramBuilder` constructs finite ideal circuits with program-owned qubit/bit
-identities, explicit gate occurrences and a dependency DAG. It retains exact
-rational multiples of π and symbolic parameters before binding. The old static
-macro frontend is available as `legacy_circuit!`; it has different semantics
-from primary `circuit!`.
+`ProgramBuilder` constructs the common typed program, including classical control and finite quantum regions. `QuantumRegionBuilder` constructs a finite capability with owned wire identities, exact rational angles, symbolic parameters, occurrences and provenance. Bind its original parameter obligations, apply compiler extension traits from `quest_circuit::prelude::*`, then embed the result with `ProgramBuilder::region` or `Program::from_bound_region`.
 
-```text
-ProgramBuilder -> ValidatedProgram -> BoundProgram
-    -> ExecutablePlan -> PreparedProgram<'env>
-```
+Explicit passes provide phase-correct local rewrites, bounded CNOT synthesis, exact affine parity folding, and numerical fusion after binding. `NativeSynthesis` is the default in-process Rust rotation generator for explicit `synthesize_rotations` calls. Optional process clients and QuiZX integration retain the same independent candidate checks. Construction and macro expansion never run synthesis.
 
-Explicit passes provide phase-correct local rewrites, bounded CNOT synthesis,
-exact affine parity folding, and numerical fusion after binding. Optional
-`workers` APIs call pinned synthesis/QuiZX engines through a bounded protocol;
-parent-side checks verify candidates and retain certificates. Local rotation
-error bounds, exact operator equality, and numerical fusion rounding changes
-remain distinct claims. See [optimization](docs/book/src/optimization.md).
+`export_source` preserves the immutable original textual program. `export_compiled` persists optimized SSA, captures, payloads and evidence; `load_compiled` validates that artifact without replacing its executable with re-lowered source. Local rotation error bounds, exact operator equality, and numerical fusion rounding changes remain distinct claims. See [optimization](docs/book/src/optimization.md).
 
 Target order is semantic: target zero is the least significant local matrix bit.
 Global phase is explicit, so controlled `Rz(2*pi)` cannot be erased as identity.
@@ -249,7 +240,7 @@ facade accounting. Direct `quest-sys` calls are outside facade memory accounting
 Preparation builds caches transactionally. Execution can partially modify a
 register before failure and reports completed work; it checks numerical policy
 before mutation. Channels require density registers. Reset uses trajectories on
-state vectors and a complete channel on density matrices. Ideal sampling APIs
+state vectors and a complete channel on density matrices. Program sampling APIs
 use explicit seeds and fresh zero initialization for each shot. See
 [runtime limits and ownership](docs/book/src/runtime.md).
 

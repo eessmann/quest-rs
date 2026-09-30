@@ -8,7 +8,7 @@
 //! then call [`CertificationBuilder::certify`]. [`Certified`] owns that same
 //! candidate and the independent [`CertificationReport`].
 //!
-//! Generalized matrices are interpreted as exact binary64 dyadics. Canonical
+//! `UnitCircleResponse` matrices are interpreted as exact binary64 dyadics. `RealParityWx`
 //! controls are reconstructed from the exact binary64 phase payload using
 //! directed arbitrary-precision sine and cosine. All four matrix-polynomial
 //! entries are reconstructed independently of production FFT/NLFT routines.
@@ -24,12 +24,16 @@
 //! properties; it does not certify native execution or an application's oracle.
 pub(crate) mod interval;
 mod product;
+mod projector;
 use crate::precision::{BinaryRounding, checked, exact_from_f64, to_f64};
-use crate::{Canonical, FrozenCandidate, Generalized};
+use crate::{FrozenCandidate, RealParityWx, UnitCircleResponse};
 use astro_float::{BigFloat, Consts, RoundingMode as Round};
 pub use interval::{MpComplex, MpInterval};
 #[cfg(feature = "offline-synthesis")]
 pub(crate) use product::circle_values;
+pub use projector::{
+    CertifiedProjectorPhases, ProjectorConvention, ProjectorDomain, ProjectorNorm,
+};
 use std::{
     collections::BTreeMap,
     sync::Arc,
@@ -42,6 +46,22 @@ pub type CertificationResult<T> = std::result::Result<T, CertificationError>;
 #[derive(Debug, thiserror::Error)]
 #[non_exhaustive]
 pub enum CertificationError {
+    /// Direct reconstruction proved a violation for the actual projector export.
+    #[error("actual projector response or unitarity violates its requested tolerance")]
+    ProjectorViolation {
+        /// Response enclosure for the actual converted payload.
+        response: Box<Bound>,
+        /// Full product unitarity enclosure.
+        unitarity: Box<Bound>,
+    },
+    /// Available precision did not establish converted-export bounds.
+    #[error("actual projector response or unitarity bound was not established")]
+    ProjectorNotEstablished {
+        /// Last response enclosure.
+        response: Box<Bound>,
+        /// Last full product unitarity enclosure.
+        unitarity: Box<Bound>,
+    },
     /// Invalid tolerance, precision alignment or resource configuration.
     #[error("invalid certification policy: {0}")]
     Policy(&'static str),
@@ -132,7 +152,7 @@ impl Default for CertificationPolicy {
     }
 }
 impl CertificationPolicy {
-    fn validate(self) -> CertificationResult<()> {
+    pub(crate) fn validate(self) -> CertificationResult<()> {
         if self.initial_precision < 64
             || self.max_precision < self.initial_precision
             || self.max_precision > 1_048_576
@@ -176,12 +196,12 @@ pub trait CertificationMode: sealed::Sealed {
     #[doc(hidden)]
     const CANONICAL: bool;
 }
-impl sealed::Sealed for Generalized {}
-impl sealed::Sealed for Canonical {}
-impl CertificationMode for Generalized {
+impl sealed::Sealed for UnitCircleResponse {}
+impl sealed::Sealed for RealParityWx {}
+impl CertificationMode for UnitCircleResponse {
     const CANONICAL: bool = false;
 }
-impl CertificationMode for Canonical {
+impl CertificationMode for RealParityWx {
     const CANONICAL: bool = true;
 }
 /// Builder state before ownership of a frozen candidate is supplied.
@@ -206,7 +226,7 @@ pub struct ReadyCertification<M> {
 /// use quest_qsp::{Complex64, SynthesisBuilder};
 /// use quest_qsp::certification::{CertificationBuilder, CertificationPolicy};
 /// let target = Polynomial::new(Laurent::new(0), vec![Complex64::new(0.3, 0.2)], Limits::default())?;
-/// let frozen = SynthesisBuilder::new().generalized(&target)?.admit()?.complete()?.synthesize()?;
+/// let frozen = SynthesisBuilder::new().unit_circle_response(&target)?.admit()?.complete()?.synthesize()?;
 /// let certified = CertificationBuilder::new().candidate(frozen)
 ///     .policy(CertificationPolicy::default())?.certify()?;
 /// assert!(certified.report().response().upper_f64() <= 1e-11);
@@ -274,7 +294,7 @@ impl<M: CertificationMode> CertificationBuilder<ReadyCertification<M>> {
     }
 }
 /// Frozen candidate with independently established, mode-specific numerical bounds.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Certified<M> {
     candidate: FrozenCandidate<M>,
     report: CertificationReport,
@@ -540,7 +560,7 @@ fn check_export<M: CertificationMode>(
         return Err(CertificationError::Export("inconsistent degree/support"));
     }
     if M::CANONICAL && candidate.phases.len() != count {
-        return Err(CertificationError::Export("canonical phase count"));
+        return Err(CertificationError::Export("real_parity_wx phase count"));
     }
     if M::CANONICAL
         && !candidate
@@ -550,7 +570,7 @@ fn check_export<M: CertificationMode>(
             .all(|(a, b)| a.to_bits() == b.to_bits())
     {
         return Err(CertificationError::Export(
-            "canonical phases must be exactly symmetric",
+            "real_parity_wx phases must be exactly symmetric",
         ));
     }
     for coefficient in candidate
@@ -682,7 +702,9 @@ fn expected_source<M: CertificationMode>(
         if coefficient.im != 0.0
             || ((index % 2 != degree % 2 || index > degree) && coefficient.re != 0.0)
         {
-            return Err(CertificationError::Export("canonical source parity/domain"));
+            return Err(CertificationError::Export(
+                "real_parity_wx source parity/domain",
+            ));
         }
         if index > degree || index % 2 != degree % 2 {
             continue;

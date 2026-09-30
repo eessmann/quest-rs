@@ -57,7 +57,7 @@ pub(super) fn controls(gamma: &[Number], context: &mut Context) -> Result<Vec<Ma
 pub(super) fn completion(
     target: &[Number],
     context: &mut Context,
-) -> Result<(Vec<Number>, BigFloat, usize)> {
+) -> Result<(Vec<Number>, Vec<Number>, BigFloat, usize)> {
     let p = context.precision;
     let one = BigFloat::from_i64(1, crate::offline::number::precision_bits(p));
     let half = exact_from_f64(0.5, p)?;
@@ -79,6 +79,7 @@ pub(super) fn completion(
             out.clone_from(value);
         }
         fft::transform(&mut values, true, false, context)?;
+        let mut ratio_samples = values.clone();
         for value in &mut values {
             let remainder = sub(
                 &one,
@@ -106,6 +107,15 @@ pub(super) fn completion(
             }
         }
         fft::transform(&mut values, true, false, context)?;
+        for (sample, exponent) in ratio_samples.iter_mut().zip(&values) {
+            *sample = sample.mul(&exponent.neg().exp(&mut context.constants)?);
+            sample.validate()?;
+        }
+        fft::transform(&mut ratio_samples, false, true, context)?;
+        let ratio = ratio_samples
+            .get(..target.len())
+            .ok_or(Error::Budget("offline ratio support"))?
+            .to_vec();
         for value in &mut values {
             *value = value.exp(&mut context.constants)?;
             if !value.is_finite() {
@@ -129,7 +139,7 @@ pub(super) fn completion(
         first.im = BigFloat::from_i64(0, crate::offline::number::precision_bits(p));
         let residual = completion_residual(&astar, target, context)?;
         if residual <= tolerance {
-            return Ok((astar, residual, grid));
+            return Ok((astar, ratio, residual, grid));
         }
         grid = grid
             .checked_mul(2)
@@ -253,7 +263,7 @@ fn inverse_node(
     }
     Ok(InverseNode { xi, eta })
 }
-pub(super) fn canonical_phases(
+pub(super) fn real_parity_wx_phases(
     gamma: &[Number],
     context: &mut Context,
 ) -> Result<(Vec<BigFloat>, Vec<Matrix>)> {
@@ -333,4 +343,56 @@ pub(super) fn canonical_phases(
         })
         .collect::<Result<_>>()?;
     Ok((phases, matrices))
+}
+
+// Same complex displacement identity, in explicitly requested offline precision.
+#[expect(
+    clippy::many_single_char_names,
+    clippy::indexing_slicing,
+    clippy::arithmetic_side_effects,
+    reason = "Complex rank-two recurrence uses equal-length vectors with 0 <= k < j < n"
+)]
+pub(super) fn half_cholesky(c: &[Number], context: &mut Context) -> Result<Vec<Number>> {
+    let n = c.len();
+    if n == 0 {
+        return Err(Error::Numerical("empty offline Weiss ratio"));
+    }
+    context.charge(
+        n.checked_mul(n)
+            .and_then(|v| v.checked_mul(64))
+            .ok_or(Error::Budget("offline Half-Cholesky work"))?,
+    )?;
+    let p = context.precision;
+    let mut first = vec![Number::zero(p); n];
+    first[0] = Number::one(p);
+    let mut second = reverse(c);
+    let mut solution = second.clone();
+    for k in 0..n {
+        let x = first[k].clone();
+        let y = second[k].clone();
+        let scale = sqrt(&add(&mul(&x.abs(), &x.abs()), &mul(&y.abs(), &y.abs())));
+        validate(&scale)?;
+        if scale.is_zero() {
+            return Err(Error::Numerical("offline Half-Cholesky pivot"));
+        }
+        let inverse = div(&Number::one(p).re, &scale);
+        let alpha = x.scale(&inverse);
+        let beta = y.scale(&inverse);
+        let rhs = solution[k].clone();
+        let mut previous = Number::real(scale);
+        for j in k + 1..n {
+            let u = first[j]
+                .mul(&alpha.conj())
+                .add(&second[j].mul(&beta.conj()));
+            let v = second[j].mul(&alpha).sub(&first[j].mul(&beta));
+            u.validate()?;
+            v.validate()?;
+            solution[j] = solution[j].sub(&u.scale(&inverse).mul(&rhs));
+            solution[j].validate()?;
+            first[j] = previous;
+            second[j] = v;
+            previous = u;
+        }
+    }
+    Ok(reverse(&solution))
 }

@@ -1,7 +1,7 @@
 use googletest::{Result, prelude::*};
 use quest::{
-    Complex64, Control, ControlState, Environment, MatrixPolicy, NumericalOperator, ProgramBuilder,
-    QubitCount,
+    Complex64, Control, ControlState, Environment, MatrixPolicy, NumericalOperator,
+    QuantumRegionBuilder, QubitCount,
 };
 
 #[gtest]
@@ -33,7 +33,7 @@ fn diagonal_cache_preserves_order_signed_controls_and_density_adjoint() -> Resul
         }
     });
     let operator = NumericalOperator::from_view(matrix.as_ref(), MatrixPolicy::default())?;
-    let mut builder = ProgramBuilder::new(4, 0)?;
+    let mut builder = QuantumRegionBuilder::new(4, 0)?;
     builder.numerical(
         operator.clone(),
         &[builder.qubit(2)?, builder.qubit(0)?],
@@ -52,7 +52,12 @@ fn diagonal_cache_preserves_order_signed_controls_and_density_adjoint() -> Resul
         ],
     )?;
     let environment = Environment::builder().build()?;
-    let mut prepared = environment.prepare(builder.finish()?)?;
+    let mut prepared = environment.prepare(
+        quest::Program::from_region(builder.finish()?, &[])?
+            .verify()?
+            .lower()?
+            .plan()?,
+    )?;
     let initial = vec![Complex64::new(0.25, 0.0); 16];
     let mut expected = initial.clone();
     for (basis, value) in expected.iter_mut().enumerate() {
@@ -73,8 +78,8 @@ fn diagonal_cache_preserves_order_signed_controls_and_density_adjoint() -> Resul
     let mut density = environment.density_matrix(QubitCount::new(4)?)?;
     state.init_pure(&initial)?;
     density.init_pure(&initial)?;
-    prepared.run(&mut state)?;
-    prepared.run(&mut density)?;
+    prepared.run(&mut state, &quest::RunInputs::default())?;
+    prepared.run(&mut density, &quest::RunInputs::default())?;
     for (row, left) in expected.iter().enumerate() {
         expect_lt!((state.amplitude(row)? - left).norm(), 1e-14);
         for (column, right) in expected.iter().enumerate() {

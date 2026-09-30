@@ -15,6 +15,22 @@ fn compile(text: &str) -> Result<quest_language::ssa::VerifiedProgram> {
     Ok(admit(parse_source(&source)?, CompileLimits::default())?.into_ssa()?)
 }
 
+#[gtest]
+fn output_map_storage_is_admitted_before_quantum_mutation() -> Result<()> {
+    let name = "a".repeat(1024);
+    let program = compile(&format!("qubit q; h q; output bool {name}=true;"))?;
+    let mut backend = RecordingBackend::default();
+    let result = Interpreter::new(InterpreterLimits {
+        storage_bytes: 1024,
+        call_frames: 1,
+        ..InterpreterLimits::default()
+    })
+    .run(&program, &mut backend, &RunInputs::default(), &[]);
+    expect_true!(matches!(result, Err(error) if matches!(error.cause, RuntimeCause::StorageLimit)));
+    expect_true!(backend.gates.is_empty());
+    Ok(())
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct RecordedGate {
     gate: GateKind,

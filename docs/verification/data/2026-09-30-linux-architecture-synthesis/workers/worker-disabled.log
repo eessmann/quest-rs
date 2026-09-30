@@ -1,0 +1,68 @@
+• Validating lock
+✓ Validating lock in 6.08ms
+  evaluating file '«nix-internal»/derivation-internal.nix'
+• Configuring shell
+• Configuring cachix
+✓ Configuring cachix in 2.00ms
+• Evaluating shell
+✓ Evaluating shell in 4.33ms (cached)
+✓ Configuring shell in 8.58ms
+• Loading tasks
+• Evaluating devenv.config.task.config
+✓ Evaluating devenv.config.task.config in 283µs (cached)
+✓ Loading tasks in 1.01ms
+• Running tasks
+• Running devenv:files:cleanup
+✓ Running devenv:files:cleanup in 6.72ms
+• Running devenv:enterShell
+✓ Running devenv:enterShell in 8.01ms
+• Running devenv:enterTest
+✓ Running devenv:enterTest in 370ns (no command)
+✓ Running tasks in 14.9ms
+   Compiling serde v1.0.229
+   Compiling serde_json v1.0.151
+   Compiling faer v0.24.4
+   Compiling num-bigint v0.5.1
+   Compiling num-rational v0.4.2
+   Compiling quest-math v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-math)
+   Compiling quest-symbolic v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-symbolic)
+   Compiling quest-optimizer-protocol v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-protocol)
+   Compiling quest-synthesis v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-synthesis)
+   Compiling quest-optimizer-worker v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-worker)
+   Compiling quest-optimizer-client v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-client)
+   Compiling quest-language v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-language)
+   Compiling quest-qasm v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-qasm)
+   Compiling quest-compile v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-compile)
+   Compiling quest-macros v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-macros)
+   Compiling quest-circuit v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-circuit)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 15.23s
+     Running unittests src/main.rs (target/debug/build/quest-optimizer-worker/fb6d25e15fa5cd99/out/quest_optimizer_worker-fb6d25e15fa5cd99)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/circuit_contract.rs (target/debug/build/quest-optimizer-worker/6b7f2510b235cb28/out/circuit_contract-6b7f2510b235cb28)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/structured_contract.rs (target/debug/build/quest-optimizer-worker/6e05b1e8f2d45177/out/structured_contract-6e05b1e8f2d45177)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/synthesis_process.rs (target/debug/build/quest-optimizer-worker/c91b77f4526f34a6/out/synthesis_process-c91b77f4526f34a6)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/zx_process.rs (target/debug/build/quest-optimizer-worker/31ade6f8eccf3028/out/zx_process-31ade6f8eccf3028)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

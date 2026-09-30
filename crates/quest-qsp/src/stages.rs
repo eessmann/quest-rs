@@ -1,12 +1,34 @@
 use crate::admission::contractivity;
 use crate::{Complex64, Control, Error, FftBackend, Result, finite, kernel, zeros};
 use quest_numerics::{ExecutionPolicy, Limits};
-use quest_polynomial::{Chebyshev, Laurent, Polynomial};
+use quest_polynomial::{Basis, Chebyshev, Laurent, Polynomial};
 use std::{
     marker::PhantomData,
     ops::{Add, Mul, Neg},
     sync::Arc,
 };
+
+/// Numerical factorization, independent of precision, convention and FFT backend.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum SynthesisAlgorithm {
+    /// Weiss ratio followed by the rank-two structured Half-Cholesky recurrence.
+    #[default]
+    RhwHalfCholesky,
+    /// Explicit divide-and-conquer inverse nonlinear Fourier transform.
+    InverseNlftDivideConquer,
+}
+
+/// Arithmetic used to generate a frozen binary64 payload, independent of solver.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SynthesisPrecision {
+    /// Production arithmetic in binary64.
+    Binary64,
+    /// Explicit offline arithmetic at this many bits before binary64 export.
+    Arbitrary {
+        /// Working precision of the successful offline synthesis attempt.
+        bits: u32,
+    },
+}
 
 /// Production numerical policy, independent of certification precision.
 ///
@@ -16,6 +38,8 @@ use std::{
 /// `RustFFT` planner memory remains an estimate rather than an allocator quota.
 #[derive(Debug, Clone, Copy)]
 pub struct Policy {
+    /// Requested numerical factorization. No automatic fallback occurs.
+    pub algorithm: SynthesisAlgorithm,
     /// Maximum binary64 response-reconstruction diagnostic (default `1e-11`).
     /// Completion uses one eighth of this tolerance; neither check is an
     /// independent certificate of the exported sequence.
@@ -32,6 +56,7 @@ pub struct Policy {
 impl Default for Policy {
     fn default() -> Self {
         Self {
+            algorithm: SynthesisAlgorithm::default(),
             response_tolerance: 1e-11,
             contractivity_margin: 1e-12,
             max_completion_grid: 1_048_576,
@@ -41,7 +66,7 @@ impl Default for Policy {
     }
 }
 impl Policy {
-    fn validate(self) -> Result<()> {
+    pub(crate) fn validate(self) -> Result<()> {
         if !(self.response_tolerance.is_finite()
             && self.response_tolerance > 0.0
             && self.contractivity_margin.is_finite()
@@ -71,25 +96,27 @@ fn admit_target_storage(target: usize, source: usize, policy: Policy) -> Result<
     Ok(())
 }
 
-/// Generalized upper-left polynomial response with the final K factor retained.
+/// `UnitCircleResponse` upper-left polynomial response with the final K factor retained.
 ///
 /// The signal product is `C0 diag(z,1) C1 ... diag(z,1) Cd`; its domain for
 /// unitary interpretation is the complex unit circle.
 #[derive(Debug, Clone, Copy)]
-pub struct Generalized;
-/// Canonical Wx symmetric phases; target is the imaginary part of U00.
+pub struct UnitCircleResponse;
+/// `RealParityWx` Wx symmetric phases; target is the imaginary part of U00.
 ///
 /// The source basis is real Chebyshev with one exact parity. Use
 /// [`FrozenCandidate::response`] for the real signal in `[-1,1]`.
 #[derive(Debug, Clone, Copy)]
-pub struct Canonical;
-/// Builder state before either a canonical or generalized target is supplied.
+pub struct RealParityWx;
+/// Builder state before either a `real_parity_wx` or `unit_circle_response` target is supplied.
 #[derive(Debug)]
 pub struct MissingTarget;
 /// Builder state retaining a copied, structurally validated target in mode `M`.
 /// Strict contractivity is established only by [`SynthesisBuilder::admit`].
 #[derive(Debug)]
 pub struct ReadyTarget<M> {
+    source_offset: i32,
+    source_length: usize,
     target: Vec<Complex64>,
     source: Arc<Vec<Complex64>>,
     _mode: PhantomData<M>,
@@ -97,7 +124,7 @@ pub struct ReadyTarget<M> {
 
 /// Configures a target; no numerical operation exists on the missing-target state.
 ///
-/// Select [`Self::canonical`] or [`Self::generalized`], then consume the builder
+/// Select [`Self::real_parity_wx`] or [`Self::unit_circle_response`], then consume the builder
 /// with [`Self::admit`]. The resulting target can be completed and synthesized.
 /// Each stage owns its data; the input polynomial borrow does not escape target
 /// selection. See the crate quickstarts for both conventions.
@@ -129,14 +156,16 @@ impl SynthesisBuilder<MissingTarget> {
     ///
     /// # Errors
     /// Rejects negative support, overflowing support or insufficient storage.
-    pub fn generalized(
+    pub fn unit_circle_response(
         self,
         target: &Polynomial<Laurent>,
-    ) -> Result<SynthesisBuilder<ReadyTarget<Generalized>>> {
-        let (first, last) = target.support();
+    ) -> Result<SynthesisBuilder<ReadyTarget<UnitCircleResponse>>> {
+        let (first, last) = target
+            .stored_support()
+            .unwrap_or_else(|| (target.basis().offset(), target.basis().offset()));
         if first < 0 {
             return Err(Error::Target(
-                "generalized synthesis requires nonnegative support",
+                "unit_circle_response synthesis requires nonnegative support",
             ));
         }
         let count = usize::try_from(last)
@@ -156,6 +185,8 @@ impl SynthesisBuilder<MissingTarget> {
         let source = Arc::new(values.clone());
         Ok(SynthesisBuilder {
             state: ReadyTarget {
+                source_offset: first,
+                source_length: target.coefficients().len(),
                 target: values,
                 source,
                 _mode: PhantomData,
@@ -170,10 +201,10 @@ impl SynthesisBuilder<MissingTarget> {
     /// # Errors
     /// Rejects complex coefficients, mixed parity, inexact subnormal halving,
     /// support overflow or insufficient storage.
-    pub fn canonical(
+    pub fn real_parity_wx(
         self,
         target: &Polynomial<Chebyshev>,
-    ) -> Result<SynthesisBuilder<ReadyTarget<Canonical>>> {
+    ) -> Result<SynthesisBuilder<ReadyTarget<RealParityWx>>> {
         let source = target.coefficients();
         let degree = source
             .iter()
@@ -185,7 +216,7 @@ impl SynthesisBuilder<MissingTarget> {
             .any(|(i, v)| v.im != 0.0 || (i % 2 != degree % 2 && v.re != 0.0))
         {
             return Err(Error::Target(
-                "canonical target must be real and have one exact parity",
+                "real_parity_wx target must be real and have one exact parity",
             ));
         }
         let count = degree.checked_add(1).ok_or(Error::Budget("degree"))?;
@@ -200,7 +231,7 @@ impl SynthesisBuilder<MissingTarget> {
             let half = coefficient.mul(0.5);
             if half.mul(2.0) != *coefficient {
                 return Err(Error::Target(
-                    "canonical conversion underflows a coefficient",
+                    "real_parity_wx conversion underflows a coefficient",
                 ));
             }
             let entry = values.get_mut(high).ok_or(Error::Budget("support"))?;
@@ -210,6 +241,8 @@ impl SynthesisBuilder<MissingTarget> {
         }
         Ok(SynthesisBuilder {
             state: ReadyTarget {
+                source_offset: 0,
+                source_length: source.len(),
                 target: values,
                 source: Arc::new(source.to_vec()),
                 _mode: PhantomData,
@@ -253,6 +286,8 @@ impl<M> SynthesisBuilder<ReadyTarget<M>> {
         )?;
         let norm_upper = contractivity(&self.state.target, working)?;
         Ok(AdmittedTarget {
+            source_offset: self.state.source_offset,
+            source_length: self.state.source_length,
             target: Arc::new(self.state.target),
             source: self.state.source,
             norm_upper,
@@ -268,6 +303,8 @@ impl<M> SynthesisBuilder<ReadyTarget<M>> {
 /// certificate for controls that have yet to be synthesized.
 #[derive(Debug, Clone)]
 pub struct AdmittedTarget<M> {
+    pub(crate) source_offset: i32,
+    pub(crate) source_length: usize,
     pub(crate) target: Arc<Vec<Complex64>>,
     pub(crate) source: Arc<Vec<Complex64>>,
     pub(crate) norm_upper: f64,
@@ -293,16 +330,24 @@ impl<M> AdmittedTarget<M> {
                 .checked_add(self.source.len())
                 .ok_or(Error::Budget("completion retained storage"))?,
         )?;
-        let (a_star, residual, grid) = kernel::complete(&self.target, working, execution)?;
+        let (a_star, ratio, residual, grid) = kernel::complete(&self.target, working, execution)?;
+        let ratio = WeissRatio {
+            coefficients: ratio,
+            target: Arc::clone(&self.target),
+            norm_upper: self.norm_upper,
+            grid,
+            _mode: PhantomData,
+        };
         Ok(CompletedPolynomial {
             admitted: self,
             a_star,
+            ratio,
             residual,
             grid,
         })
     }
     /// Admitted nonnegative-power coefficients in increasing exponent order.
-    /// Canonical sources have already undergone the mode's Chebyshev conversion.
+    /// `RealParityWx` sources have already undergone the mode's Chebyshev conversion.
     #[must_use]
     pub fn coefficients(&self) -> &[Complex64] {
         &self.target
@@ -319,15 +364,66 @@ impl<M> AdmittedTarget<M> {
     }
 }
 
+/// Gauge fixed by Weiss completion, independent of response convention.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OuterGauge {
+    /// Anti-analytic outer factor a has positive real constant coefficient.
+    PositiveRealConstant,
+}
+/// Fourier coefficients of b/a, bound to the admitted target and Weiss grid.
+/// This is candidate-generation evidence, not a certificate for the final export.
+#[derive(Debug)]
+pub struct WeissRatio<M> {
+    coefficients: Vec<Complex64>,
+    target: Arc<Vec<Complex64>>,
+    norm_upper: f64,
+    grid: usize,
+    _mode: PhantomData<M>,
+}
+impl<M> WeissRatio<M> {
+    /// Nonnegative Fourier coefficients of b exp(-G*) in increasing order.
+    #[must_use]
+    pub fn coefficients(&self) -> &[Complex64] {
+        &self.coefficients
+    }
+    /// Exact admitted binary64 target from which this ratio was computed.
+    #[must_use]
+    pub fn target(&self) -> &[Complex64] {
+        &self.target
+    }
+    /// Outward target norm bound established before completion.
+    #[must_use]
+    pub const fn contractivity_upper_bound(&self) -> f64 {
+        self.norm_upper
+    }
+    /// FFT grid used to compute this ratio and its associated outer factor.
+    #[must_use]
+    pub const fn grid(&self) -> usize {
+        self.grid
+    }
+    /// Explicit outer-factor gauge, separate from the compile-time response mode.
+    #[must_use]
+    pub const fn gauge(&self) -> OuterGauge {
+        OuterGauge::PositiveRealConstant
+    }
+}
+
 /// Completed outer factor; this numerical result is not a final certificate.
 #[derive(Debug)]
 pub struct CompletedPolynomial<M> {
     admitted: AdmittedTarget<M>,
     a_star: Vec<Complex64>,
+    ratio: WeissRatio<M>,
     residual: f64,
     grid: usize,
 }
 impl<M> CompletedPolynomial<M> {
+    /// Typed ratio retaining target, grid, gauge and contractivity provenance.
+    #[must_use]
+    pub const fn weiss_ratio(&self) -> &WeissRatio<M> {
+        &self.ratio
+    }
+
     fn working_policy(&self) -> Result<Policy> {
         // Retained target/source/complement plus the overlapping reflection,
         // phase, control and convention-conversion vectors while freezing.
@@ -361,7 +457,7 @@ impl<M> CompletedPolynomial<M> {
 /// Immutable exported binary64 controls or phases. Certification never changes
 /// these values and higher verifier precision cannot repair their roundoff.
 ///
-/// Generalized candidates expose [`Self::control_sequence`]; canonical
+/// `UnitCircleResponse` candidates expose [`Self::control_sequence`]; `real_parity_wx`
 /// candidates expose [`Self::phase_sequence`] and [`Self::response`]. For both
 /// modes, [`Self::evaluate`] evaluates the transformed Laurent matrix product.
 /// Production residuals are diagnostics. With the `certification` feature,
@@ -369,20 +465,21 @@ impl<M> CompletedPolynomial<M> {
 /// outward verification of the same export.
 #[derive(Debug, Clone)]
 pub struct FrozenCandidate<M> {
+    pub(crate) synthesis_precision: SynthesisPrecision,
     pub(crate) admitted: AdmittedTarget<M>,
     pub(crate) controls: Arc<Vec<Control>>,
     pub(crate) a_star: Arc<Vec<Complex64>>,
     pub(crate) phases: Arc<Vec<f64>>,
     pub(crate) completion_residual: f64,
-    pub(crate) reconstruction_residual: f64,
+    pub(crate) reconstruction_residual: Option<f64>,
     pub(crate) completion_grid: usize,
 }
-impl CompletedPolynomial<Generalized> {
-    /// Freeze generalized matrices from a divide-and-conquer inverse NLFT.
+impl CompletedPolynomial<UnitCircleResponse> {
+    /// Freeze unit-circle matrices with the explicitly selected numerical solver.
     ///
     /// # Errors
     /// Rejects singular pivots, resource limits or excessive reconstruction error.
-    pub fn synthesize(self) -> Result<FrozenCandidate<Generalized>> {
+    pub fn synthesize(self) -> Result<FrozenCandidate<UnitCircleResponse>> {
         self.synthesize_with(ExecutionPolicy::Sequential)
     }
     /// Freeze with caller-owned parallel execution of independent operations.
@@ -392,10 +489,16 @@ impl CompletedPolynomial<Generalized> {
     pub fn synthesize_with(
         self,
         execution: ExecutionPolicy<'_>,
-    ) -> Result<FrozenCandidate<Generalized>> {
+    ) -> Result<FrozenCandidate<UnitCircleResponse>> {
         let mut working = self.working_policy()?;
-        let (gamma, work_used) =
-            kernel::inverse(&self.a_star, &self.admitted.target, working, execution)?;
+        let (gamma, work_used) = match working.algorithm {
+            SynthesisAlgorithm::RhwHalfCholesky => {
+                kernel::half_cholesky(self.ratio.coefficients(), working)?
+            }
+            SynthesisAlgorithm::InverseNlftDivideConquer => {
+                kernel::inverse(&self.a_star, &self.admitted.target, working, execution)?
+            }
+        };
         working.limits.max_work = working
             .limits
             .max_work
@@ -411,22 +514,23 @@ impl CompletedPolynomial<Generalized> {
         let residual =
             kernel::response_residual(&controls, &self.admitted.target, working, execution)?;
         Ok(FrozenCandidate {
+            synthesis_precision: SynthesisPrecision::Binary64,
             admitted: self.admitted,
             a_star: Arc::new(self.a_star),
             controls: Arc::new(controls),
             phases: Arc::new(Vec::new()),
             completion_residual: self.residual,
-            reconstruction_residual: residual,
+            reconstruction_residual: Some(residual),
             completion_grid: self.grid,
         })
     }
 }
-impl CompletedPolynomial<Canonical> {
-    /// Freeze symmetric canonical Wx phases from the inverse NLFT.
+impl CompletedPolynomial<RealParityWx> {
+    /// Freeze symmetric `real_parity_wx` Wx phases from the inverse NLFT.
     ///
     /// # Errors
     /// Rejects singular pivots, resource limits or excessive reconstruction error.
-    pub fn synthesize(self) -> Result<FrozenCandidate<Canonical>> {
+    pub fn synthesize(self) -> Result<FrozenCandidate<RealParityWx>> {
         self.synthesize_with(ExecutionPolicy::Sequential)
     }
     /// Freeze with caller-owned parallel execution of independent operations.
@@ -436,10 +540,16 @@ impl CompletedPolynomial<Canonical> {
     pub fn synthesize_with(
         self,
         execution: ExecutionPolicy<'_>,
-    ) -> Result<FrozenCandidate<Canonical>> {
+    ) -> Result<FrozenCandidate<RealParityWx>> {
         let mut working = self.working_policy()?;
-        let (gamma, work_used) =
-            kernel::inverse(&self.a_star, &self.admitted.target, working, execution)?;
+        let (gamma, work_used) = match working.algorithm {
+            SynthesisAlgorithm::RhwHalfCholesky => {
+                kernel::half_cholesky(self.ratio.coefficients(), working)?
+            }
+            SynthesisAlgorithm::InverseNlftDivideConquer => {
+                kernel::inverse(&self.a_star, &self.admitted.target, working, execution)?
+            }
+        };
         working.limits.max_work = working
             .limits
             .max_work
@@ -471,20 +581,38 @@ impl CompletedPolynomial<Canonical> {
         let residual =
             kernel::response_residual(&controls, &self.admitted.target, working, execution)?;
         Ok(FrozenCandidate {
+            synthesis_precision: SynthesisPrecision::Binary64,
             admitted: self.admitted,
             a_star: Arc::new(self.a_star),
             controls: Arc::new(controls),
             phases: Arc::new(phases),
             completion_residual: self.residual,
-            reconstruction_residual: residual,
+            reconstruction_residual: Some(residual),
             completion_grid: self.grid,
         })
     }
 }
 impl<M> FrozenCandidate<M> {
+    /// Exact original source storage offset and coefficient count, before Laurent padding.
+    #[must_use]
+    pub const fn source_storage(&self) -> (i32, usize) {
+        (self.admitted.source_offset, self.admitted.source_length)
+    }
+
+    /// Computation precision that generated these immutable binary64 exports.
+    #[must_use]
+    pub const fn synthesis_precision(&self) -> SynthesisPrecision {
+        self.synthesis_precision
+    }
+
+    /// Factorization explicitly selected for this frozen payload.
+    #[must_use]
+    pub const fn algorithm(&self) -> SynthesisAlgorithm {
+        self.admitted.policy.algorithm
+    }
     /// Frozen Laurent-product matrices, including the terminal K factor.
-    /// Canonical matrices are diagnostic rotations derived from the phases;
-    /// the phase payload remains the canonical export authority.
+    /// `RealParityWx` matrices are diagnostic rotations derived from the phases;
+    /// the phase payload remains the `real_parity_wx` export authority.
     #[must_use]
     pub fn controls(&self) -> &[Control] {
         &self.controls
@@ -496,10 +624,10 @@ impl<M> FrozenCandidate<M> {
         self.completion_residual
     }
     /// Binary64 upper-left response reconstruction diagnostic.
-    /// Offline synthesis leaves this unavailable (`+infinity`); use its
+    /// Offline synthesis leaves this unavailable (`None`); use its
     /// independent certification report's reconstruction bound instead.
     #[must_use]
-    pub const fn reconstruction_residual(&self) -> f64 {
+    pub const fn reconstruction_residual(&self) -> Option<f64> {
         self.reconstruction_residual
     }
     /// FFT sample count retained from the accepted completion attempt.
@@ -508,7 +636,7 @@ impl<M> FrozenCandidate<M> {
         self.completion_grid
     }
     /// Transformed target coefficients in increasing nonnegative exponents.
-    /// For canonical candidates these are not the original Chebyshev array.
+    /// For `real_parity_wx` candidates these are not the original Chebyshev array.
     #[must_use]
     pub fn target(&self) -> &[Complex64] {
         &self.admitted.target
@@ -543,7 +671,7 @@ impl<M> FrozenCandidate<M> {
     }
 }
 
-impl FrozenCandidate<Canonical> {
+impl FrozenCandidate<RealParityWx> {
     /// Immutable symmetric Wx angles in radians, in product order.
     #[must_use]
     pub fn phases(&self) -> &[f64] {

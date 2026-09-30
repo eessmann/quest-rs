@@ -6,6 +6,36 @@ pub struct ExactMatrix {
     pub(crate) entries: Vec<Cyclotomic>,
 }
 impl ExactMatrix {
+    /// Admit a dense row-major matrix; this checks storage, not unitarity.
+    /// # Errors
+    /// Rejects dimensions, coefficients and storage exceeding request bounds.
+    pub fn from_entries(qubits: usize, entries: Vec<Cyclotomic>, limits: Limits) -> Result<Self> {
+        let result = Self { qubits, entries };
+        result.admit(limits)?;
+        Ok(result)
+    }
+    /// Re-admit existing storage before cloning or arithmetic.
+    /// # Errors
+    /// Rejects dimensions, coefficients and storage exceeding request bounds.
+    pub fn admit(&self, limits: Limits) -> Result<()> {
+        let Self { qubits, entries } = self;
+        let qubits = *qubits;
+        if qubits > limits.qubits {
+            return Err(Error::Invalid("matrix width exceeds limit".into()));
+        }
+        let dimension = mask(qubits)?;
+        let count = dimension
+            .checked_mul(dimension)
+            .ok_or_else(|| Error::Resource("matrix shape".into()))?;
+        if entries.len() != count {
+            return Err(Error::Invalid("matrix shape".into()));
+        }
+        memory(0, dimension, limits)?;
+        for entry in entries {
+            entry.checked_add(&Cyclotomic::zero(), limits)?;
+        }
+        Ok(())
+    }
     #[must_use]
     pub const fn qubits(&self) -> usize {
         self.qubits
@@ -477,7 +507,9 @@ fn replace(mut global: usize, local: usize, targets: &[usize]) -> Result<usize> 
     }
     Ok(global)
 }
-fn local_gate(gate: Gate, limits: Limits) -> Result<(usize, Vec<Cyclotomic>)> {
+// Shared with the independent synthesis verifier, never exposed from the crate.
+#[allow(clippy::redundant_pub_crate)]
+pub(super) fn local_gate(gate: Gate, limits: Limits) -> Result<(usize, Vec<Cyclotomic>)> {
     let one = Cyclotomic::one();
     let zero = Cyclotomic::zero();
     let negative = Cyclotomic::omega(4);

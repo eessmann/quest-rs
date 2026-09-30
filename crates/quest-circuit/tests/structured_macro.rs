@@ -1,5 +1,7 @@
 #![cfg(feature = "macros")]
 use googletest::prelude::*;
+#[allow(unused_imports)]
+use quest_circuit::prelude::*;
 use quest_circuit::{
     circuit, circuit_file,
     language::{ssa, syntax},

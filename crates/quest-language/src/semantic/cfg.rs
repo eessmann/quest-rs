@@ -3,6 +3,7 @@ use super::SemanticError;
 use crate::ssa::{BlockId, Program, Terminator};
 use std::collections::{BTreeMap, BTreeSet};
 
+#[must_use]
 pub fn reachable(program: &Program, entry: BlockId) -> BTreeSet<BlockId> {
     let mut seen = BTreeSet::new();
     let mut pending = vec![entry];

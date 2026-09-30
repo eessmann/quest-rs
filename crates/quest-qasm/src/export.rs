@@ -217,7 +217,7 @@ impl Writer {
     )]
     fn statement(&mut self, statement: &StatementKind) -> Result<()> {
         match statement {
-            StatementKind::Oracle { .. } => Err(unsupported(
+            StatementKind::Oracle { .. } | StatementKind::Payload { .. } => Err(unsupported(
                 "oracle capture requires an explicit portable decomposition",
             )),
             StatementKind::Include(path) => {

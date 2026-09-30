@@ -1,6 +1,98 @@
 use crate::{Error, Limits, Result};
 use num_bigint::BigInt;
 use num_traits::Zero;
+/// Exponent of a power of two in the canonical coefficient representation.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub struct PowerOfTwoExponent(pub u32);
+/// Least nonnegative exponent of sqrt(2) clearing all ring denominators.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Sqrt2Exponent(pub u32);
+/// An admitted eighth root of unity, with canonical exponent in 0..8.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct EighthRootPhase(u8);
+impl EighthRootPhase {
+    /// # Errors
+    /// Rejects a noncanonical phase exponent.
+    pub fn new(power: u8) -> Result<Self> {
+        if power >= 8 {
+            return Err(Error::Invalid("noncanonical eighth-root phase".into()));
+        }
+        Ok(Self(power))
+    }
+    #[must_use]
+    pub const fn power(self) -> u8 {
+        self.0
+    }
+}
+/// The quotient Z[omega]/(2); low bit is the constant coefficient.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct OmegaResidue(u8);
+impl OmegaResidue {
+    #[must_use]
+    pub const fn from_bits(bits: u8) -> Self {
+        Self(bits & 15)
+    }
+    #[must_use]
+    pub const fn bits(self) -> u8 {
+        self.0
+    }
+    #[must_use]
+    pub const fn reducible(self) -> bool {
+        matches!(self.0, 0 | 5 | 10 | 15)
+    }
+    #[must_use]
+    pub const fn times_omega(self) -> Self {
+        Self(((self.0 << 1) | (self.0 >> 3)) & 15)
+    }
+    #[must_use]
+    pub const fn conjugated(self) -> Self {
+        Self((self.0 & 5) | ((self.0 & 2) << 2) | ((self.0 & 8) >> 2))
+    }
+    #[must_use]
+    pub fn product(self, rhs: Self) -> Self {
+        let mut out = 0;
+        let mut shifted = rhs;
+        for i in 0..4 {
+            if self.0 & (1 << i) != 0 {
+                out ^= shifted.0;
+            }
+            shifted = shifted.times_omega();
+        }
+        Self(out)
+    }
+    #[must_use]
+    pub fn norm(self) -> Self {
+        self.conjugated().product(self)
+    }
+}
+
+/// Admitted algebraic integer, sharing Cyclotomic's canonical representation.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OmegaInteger(Cyclotomic);
+impl OmegaInteger {
+    /// # Errors
+    /// Rejects nonintegral elements.
+    pub fn admit(value: Cyclotomic) -> Result<Self> {
+        if value.denominator_exponent != 0 {
+            return Err(Error::Invalid("nonintegral omega element".into()));
+        }
+        Ok(Self(value))
+    }
+    #[must_use]
+    pub const fn value(&self) -> &Cyclotomic {
+        &self.0
+    }
+    #[must_use]
+    pub fn residue(&self) -> OmegaResidue {
+        let mut bits = 0;
+        for (index, coefficient) in self.0.coefficients.iter().enumerate() {
+            if coefficient.bit(0) {
+                bits |= 1 << index;
+            }
+        }
+        OmegaResidue(bits)
+    }
+}
 /// Canonical elements (a+bω+cω²+dω³)/2^k, with ω^4=-1.
 /// Coefficients and denominator are private; deserialization cannot bypass admission.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -10,6 +102,89 @@ pub struct Cyclotomic {
     denominator_exponent: u32,
 }
 impl Cyclotomic {
+    #[must_use]
+    pub fn phase(phase: EighthRootPhase) -> Self {
+        Self::omega(phase.power())
+    }
+    #[must_use]
+    pub fn eighth_root_phase(&self) -> Option<EighthRootPhase> {
+        (0..8)
+            .find(|&power| Self::omega(power) == *self)
+            .map(EighthRootPhase)
+    }
+    #[must_use]
+    pub const fn power_of_two_exponent(&self) -> PowerOfTwoExponent {
+        PowerOfTwoExponent(self.denominator_exponent)
+    }
+    /// Multiply by sqrt(2) in the same canonical ring.
+    /// # Errors
+    /// Rejects arithmetic resources beyond the request limits.
+    pub fn times_sqrt2(&self, limits: Limits) -> Result<Self> {
+        self.admit(limits)?;
+        let [a, b, c, d] = &self.coefficients;
+        Self::new(
+            [
+                std::ops::Sub::sub(b, d),
+                std::ops::Add::add(a, c),
+                std::ops::Add::add(b, d),
+                std::ops::Sub::sub(c, a),
+            ],
+            self.denominator_exponent,
+            limits,
+        )
+    }
+    /// # Errors
+    /// Rejects arithmetic resources beyond the request limits.
+    pub fn least_sqrt2_exponent(&self, limits: Limits) -> Result<Sqrt2Exponent> {
+        self.admit(limits)?;
+        if self.denominator_exponent == 0 {
+            return Ok(Sqrt2Exponent(0));
+        }
+        let twice = self
+            .denominator_exponent
+            .checked_mul(2)
+            .ok_or_else(|| Error::Resource("sqrt2 exponent".into()))?;
+        let odd = self.times_sqrt2(limits)?.denominator_exponent < self.denominator_exponent;
+        Ok(Sqrt2Exponent(
+            twice
+                .checked_sub(u32::from(odd))
+                .ok_or_else(|| Error::Resource("sqrt2 exponent".into()))?,
+        ))
+    }
+    /// Scale by a power of sqrt(2) and require an algebraic integer result.
+    /// # Errors
+    /// Rejects a non-clearing exponent or exhausted arithmetic resources.
+    pub fn numerator_at(&self, exponent: Sqrt2Exponent, limits: Limits) -> Result<OmegaInteger> {
+        self.admit(limits)?;
+        check_bits(u64::from(exponent.0), limits)?;
+        let value = if exponent.0 & 1 == 1 {
+            self.times_sqrt2(limits)?
+        } else {
+            self.clone()
+        };
+        let scale = exponent.0 / 2;
+        if scale < value.denominator_exponent {
+            return Err(Error::Invalid(
+                "sqrt2 exponent does not clear denominator".into(),
+            ));
+        }
+        let shift = scale
+            .checked_sub(value.denominator_exponent)
+            .ok_or_else(|| Error::Resource("sqrt2 numerator".into()))?;
+        for coefficient in &value.coefficients {
+            check_bits(coefficient.bits().saturating_add(u64::from(shift)), limits)?;
+        }
+        OmegaInteger::admit(Self::new(
+            value.coefficients.map(|c| std::ops::Shl::shl(c, shift)),
+            0,
+            limits,
+        )?)
+    }
+    /// # Errors
+    /// Rejects an exponent which does not clear denominators or a resource excess.
+    pub fn residue_at(&self, exponent: Sqrt2Exponent, limits: Limits) -> Result<OmegaResidue> {
+        Ok(self.numerator_at(exponent, limits)?.residue())
+    }
     #[must_use]
     pub fn zero() -> Self {
         Self {

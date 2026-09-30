@@ -26,7 +26,9 @@ fn caller_pools_preserve_generalized_export_bits_across_worker_counts() -> Resul
             .collect(),
         Limits::default(),
     )?;
-    let admitted = SynthesisBuilder::new().generalized(&target)?.admit()?;
+    let admitted = SynthesisBuilder::new()
+        .unit_circle_response(&target)?
+        .admit()?;
     let serial = admitted.clone().complete()?.synthesize()?;
     let expected = control_bits(&serial);
     for workers in [1, 2, 4] {
@@ -53,7 +55,7 @@ fn canonical_pool_scope_ends_before_frozen_phase_payload_is_used() -> Result<()>
         vec![Complex64::new(0.0, 0.0), Complex64::new(0.6, 0.0)],
         Limits::default(),
     )?;
-    let admitted = SynthesisBuilder::new().canonical(&target)?.admit()?;
+    let admitted = SynthesisBuilder::new().real_parity_wx(&target)?.admit()?;
     let serial = admitted.clone().complete()?.synthesize()?;
     let parallel = {
         let pool = rayon::ThreadPoolBuilder::new().num_threads(2).build()?;
@@ -86,7 +88,7 @@ fn caller_pools_do_not_retry_failed_work_budgets_with_another_backend() -> Resul
     policy.limits.max_work = 1280;
     let admitted = SynthesisBuilder::new()
         .policy(policy)
-        .canonical(&target)?
+        .real_parity_wx(&target)?
         .admit()?;
     expect_true!(matches!(
         admitted.clone().complete(),
@@ -119,18 +121,20 @@ fn degree_8105_catalog_preserves_canonical_and_generalized_bits() -> Result<()> 
             .collect(),
         Limits::default(),
     )?;
-    let canonical = SynthesisBuilder::new().canonical(&target)?.admit()?;
+    let real_parity_wx = SynthesisBuilder::new().real_parity_wx(&target)?.admit()?;
     let powers = Polynomial::new(
         Laurent::new(0),
-        canonical.coefficients().to_vec(),
+        real_parity_wx.coefficients().to_vec(),
         Limits::default(),
     )?;
-    let generalized = SynthesisBuilder::new().generalized(&powers)?.admit()?;
+    let unit_circle_response = SynthesisBuilder::new()
+        .unit_circle_response(&powers)?
+        .admit()?;
     let start = std::time::Instant::now();
-    let canonical_serial = canonical.clone().complete()?.synthesize()?;
-    let generalized_serial = generalized.clone().complete()?.synthesize()?;
+    let canonical_serial = real_parity_wx.clone().complete()?.synthesize()?;
+    let generalized_serial = unit_circle_response.clone().complete()?.synthesize()?;
     eprintln!(
-        "degree8105 sequential canonical+generalized seconds={}",
+        "degree8105 sequential real_parity_wx+unit_circle_response seconds={}",
         start.elapsed().as_secs_f64()
     );
     for workers in [1, 2, 4] {
@@ -139,11 +143,11 @@ fn degree_8105_catalog_preserves_canonical_and_generalized_bits() -> Result<()> 
             .build()?;
         let execution = ExecutionPolicy::Rayon(&pool);
         let start = std::time::Instant::now();
-        let a = canonical
+        let a = real_parity_wx
             .clone()
             .complete_with(execution)?
             .synthesize_with(execution)?;
-        let b = generalized
+        let b = unit_circle_response
             .clone()
             .complete_with(execution)?
             .synthesize_with(execution)?;
@@ -166,7 +170,7 @@ fn degree_8105_catalog_preserves_canonical_and_generalized_bits() -> Result<()> 
             eq(generalized_serial.conjugate_complement())
         );
         eprintln!(
-            "degree8105 workers={workers} canonical+generalized seconds={}",
+            "degree8105 workers={workers} real_parity_wx+unit_circle_response seconds={}",
             start.elapsed().as_secs_f64()
         );
     }

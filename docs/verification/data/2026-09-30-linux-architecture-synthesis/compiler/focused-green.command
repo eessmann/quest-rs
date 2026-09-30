@@ -1,0 +1,1 @@
+devenv --no-tui shell -- cargo nextest run --locked -p quest-circuit --all-features --no-fail-fast --test-threads 1 -E binary\(beam_contract\)\ \|\ binary\(beam_approx_contract\)\ \|\ binary\(beam_mitm_contract\)\ \|\ binary\(generator_error_contract\) 

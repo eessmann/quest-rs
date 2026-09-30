@@ -1,7 +1,5 @@
 use googletest::prelude::*;
-use quest::{
-    Complex64, Environment, InterpreterLimits, QubitCount, RunInputs, StructuredProgram, circuit,
-};
+use quest::{Complex64, Environment, InterpreterLimits, Program, QubitCount, RunInputs, circuit};
 
 fn isolated(name: &str, body: impl FnOnce() -> Result<()>) -> Result<()> {
     if std::env::var("QUEST_STRUCTURED_TEST").as_deref() == Ok(name) {
@@ -28,7 +26,9 @@ fn structured_feedback_and_density_reset_preserve_observations() -> Result<()> {
                 if (bool(outcome)) { x q[1]; }
                 reset q[0];
             }?;
-            let mut prepared = environment.prepare_structured(program).or_fail()?;
+            let mut prepared = environment
+                .prepare((program).verify()?.lower()?.plan()?)
+                .or_fail()?;
             let mut state = environment
                 .state_vector(QubitCount::new(2).or_fail()?)
                 .or_fail()?;
@@ -61,7 +61,9 @@ fn runtime_loop_capture_once_and_step_failure_report_prefix() -> Result<()> {
             expect_eq!(captures, vec![1]);
             let (macro_diagnostic, source_diagnostic) = {
                 let environment = Environment::builder().build().or_fail()?;
-                let mut prepared = environment.prepare_structured(program).or_fail()?;
+                let mut prepared = environment
+                    .prepare((program).verify()?.lower()?.plan()?)
+                    .or_fail()?;
                 let mut state = environment
                     .state_vector(QubitCount::new(1).or_fail()?)
                     .or_fail()?;
@@ -79,7 +81,9 @@ fn runtime_loop_capture_once_and_step_failure_report_prefix() -> Result<()> {
                     near(-0.375_f64.sin() / 2_f64.sqrt(), 1e-13)
                 );
                 let looping = circuit! {qubit q; while(true){x q;}}?;
-                let mut loop_plan = environment.prepare_structured(looping).or_fail()?;
+                let mut loop_plan = environment
+                    .prepare((looping).verify()?.lower()?.plan()?)
+                    .or_fail()?;
                 let error = loop_plan
                     .run_with_limits(
                         &mut state,
@@ -114,11 +118,13 @@ fn runtime_loop_capture_once_and_step_failure_report_prefix() -> Result<()> {
                 ));
                 expect_false!(macro_diagnostic.provenance.execution.is_empty());
 
-                let sourced = StructuredProgram::parse(
+                let sourced = Program::parse(
                     "qubit q; input int value; if (value > 0) { x q; }",
                     "runtime.qasm",
                 )?;
-                let mut source_plan = environment.prepare_structured(sourced).or_fail()?;
+                let mut source_plan = environment
+                    .prepare((sourced).verify()?.lower()?.plan()?)
+                    .or_fail()?;
                 let source_error = source_plan
                     .run(&mut state, &RunInputs::default())
                     .unwrap_err();
@@ -168,7 +174,9 @@ fn standard_cu_and_cx_preserve_full_phase_on_each_basis_column() -> Result<()> {
                 cu(0.7,-0.4,0.2,0.3) q[1],q[0];
                 CX q[1],q[0];
             }?;
-            let mut prepared = environment.prepare_structured(program).or_fail()?;
+            let mut prepared = environment
+                .prepare((program).verify()?.lower()?.plan()?)
+                .or_fail()?;
             let mut state = environment
                 .state_vector(QubitCount::new(2).or_fail()?)
                 .or_fail()?;
@@ -208,6 +216,126 @@ fn standard_cu_and_cx_preserve_full_phase_on_each_basis_column() -> Result<()> {
                     );
                 }
             }
+            Ok(())
+        },
+    )
+}
+
+#[gtest]
+#[expect(
+    clippy::arithmetic_side_effects,
+    reason = "Independent bounded two-qubit complex fixture"
+)]
+fn prepared_static_dispatch_is_reused_with_dynamic_inputs_and_full_phase() -> Result<()> {
+    isolated(
+        "prepared_static_dispatch_is_reused_with_dynamic_inputs_and_full_phase",
+        || {
+            use quest::language::classical::{FloatWidth, ScalarValue};
+            let environment = Environment::builder().build()?;
+            let program = circuit! {
+                input float theta;
+                qubit[2] q;
+                h q[0];
+                negctrl @ gphase(${quest::Angle::pi(1, 4)?}) q[0];
+                ctrl @ rz(0.25) q[0], q[1];
+                rx(theta) q[1];
+            }?
+            .verify()?
+            .lower()?
+            .plan()?;
+            let mut prepared = environment.prepare(program)?;
+            expect_eq!(prepared.prepared_static_gates(), 3);
+            let prepared_bytes = environment.allocated_bytes();
+            let mut actual = environment.state_vector(QubitCount::new(2)?)?;
+            for theta in [0.1, -0.7, 0.1] {
+                actual.init_zero()?;
+                let mut inputs = RunInputs::default();
+                inputs.insert(
+                    "theta",
+                    quest::ClassicalValue::Scalar(ScalarValue::floating(FloatWidth::F64, theta)?),
+                )?;
+                let result = prepared.run(&mut actual, &inputs)?;
+                expect_eq!(result.completed_quantum, 4);
+                // Independent native matrix application checks the relative phase of
+                // the negative control branch, including the full scalar phase.
+                let phase = Complex64::from_polar(1.0, std::f64::consts::FRAC_PI_4);
+                let inverse_sqrt_two = 2.0_f64.sqrt().recip();
+                let c = (theta / 2.0).cos();
+                let sine = Complex64::new(0.0, -(theta / 2.0).sin());
+                let controlled = Complex64::from_polar(1.0, -0.125);
+                let reference = [
+                    phase * inverse_sqrt_two * c,
+                    controlled * inverse_sqrt_two * c,
+                    phase * inverse_sqrt_two * sine,
+                    controlled * inverse_sqrt_two * sine,
+                ];
+                for (index, value) in reference.into_iter().enumerate() {
+                    expect_that!((actual.amplitude(index)? - value).norm(), lt(2e-14));
+                }
+            }
+            drop(actual);
+            expect_eq!(environment.allocated_bytes(), prepared_bytes);
+            expect_eq!(prepared.prepared_static_gates(), 3);
+            Ok(())
+        },
+    )
+}
+
+#[gtest]
+#[expect(
+    clippy::arithmetic_side_effects,
+    reason = "Bounded complex differences in the native specialization equivalence fixture"
+)]
+fn immutable_specialization_reuses_dispatch_and_rejects_runtime_rebinding() -> Result<()> {
+    isolated(
+        "immutable_specialization_reuses_dispatch_and_rejects_runtime_rebinding",
+        || {
+            use quest::language::classical::{FloatWidth, ScalarValue};
+            let environment = Environment::builder().build()?;
+            let source =
+                "input float theta; qubit q; output float observed = theta; h q; rx(theta) q;";
+            let mut inputs = RunInputs::default();
+            inputs.insert(
+                "theta",
+                quest::ClassicalValue::Scalar(ScalarValue::floating(FloatWidth::F64, -0.7)?),
+            )?;
+            let mut dynamic = environment.prepare(
+                Program::parse(source, "dynamic.qasm")?
+                    .verify()?
+                    .lower()?
+                    .plan()?,
+            )?;
+            let specialized = Program::parse(source, "specialized.qasm")?
+                .verify()?
+                .specialize(&inputs)?
+                .lower()?
+                .plan()?;
+            expect_eq!(specialized.input_specializations().len(), 1);
+            let mut fixed = environment.prepare(specialized)?;
+            expect_eq!(dynamic.prepared_static_gates(), 1);
+            expect_eq!(fixed.prepared_static_gates(), 2);
+            let mut expected = environment.state_vector(QubitCount::new(1)?)?;
+            let mut actual = environment.state_vector(QubitCount::new(1)?)?;
+            let reference = dynamic.run(&mut expected, &inputs)?;
+            for _ in 0..3 {
+                actual.init_zero()?;
+                let output = fixed.run(&mut actual, &RunInputs::default())?;
+                expect_eq!(output.outputs, reference.outputs);
+                expect_eq!(output.completed_quantum, reference.completed_quantum);
+                for index in 0..2 {
+                    expect_that!(
+                        (actual.amplitude(index)? - expected.amplitude(index)?).norm(),
+                        lt(2e-14)
+                    );
+                }
+            }
+            // A supplied value cannot override the immutable specialization. Input
+            // admission must reject it before any quantum effect changes the register.
+            actual.init_zero()?;
+            expect_true!(fixed.run(&mut actual, &inputs).is_err());
+            expect_eq!(actual.amplitude(0)?, Complex64::new(1.0, 0.0));
+            expect_eq!(actual.amplitude(1)?, Complex64::new(0.0, 0.0));
+            expect_eq!(fixed.prepared_static_gates(), 2);
             Ok(())
         },
     )

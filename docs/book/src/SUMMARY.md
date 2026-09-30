@@ -10,6 +10,7 @@
 - [Typed builders and verified SSA](ssa.md)
 - [Runtime limits, effects, and ownership](runtime.md)
 - [Optimization and certificates](optimization.md)
+- [Explicit Clifford+T synthesis](gate-synthesis.md)
 - [Owned diagnostics](diagnostics.md)
 - [Numerical polynomials and function expressions](numerical-polynomials.md)
 - [Staged binary64 QSP synthesis](qsp-synthesis.md)

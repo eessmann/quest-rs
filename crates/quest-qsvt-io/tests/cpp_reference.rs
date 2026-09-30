@@ -41,7 +41,7 @@ fn canonical_full_phase_matches_pinned_cpp_through_degree_8105() -> Result<()> {
             .ok_or_else(|| std::io::Error::other("missing reference catalog family"))?;
         let polynomial = family.polynomial(IoPolicy::default())?;
         let candidate = SynthesisBuilder::new()
-            .canonical(&polynomial)?
+            .real_parity_wx(&polynomial)?
             .admit()?
             .complete()?
             .synthesize()?;
@@ -76,7 +76,7 @@ fn generalized_complex_controls_match_cpp_including_every_matrix_entry_and_k_fac
         Limits::default(),
     )?;
     let candidate = SynthesisBuilder::new()
-        .generalized(&target)?
+        .unit_circle_response(&target)?
         .admit()?
         .complete()?
         .synthesize()?;

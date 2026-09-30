@@ -4,13 +4,14 @@ use super::{
     continuation::{AdmittedContinuation, PreparedContinuation},
     projection::PreparedProjection,
 };
-use crate::{Complex64, Environment, PreparedProgram, QubitCount, Register, StateVector};
+use crate::execution::PreparedRegion;
+use crate::{Complex64, Environment, QubitCount, Register, StateVector};
 use crate::{
     environment::{Reservation, RuntimeResources},
     error::BackendResult,
     values::{bytes_for, reserve_vec},
 };
-use quest_circuit::{Control, ControlState, OracleFragment, ProgramBuilder};
+use quest_circuit::{Control, ControlState, OracleFragment, QuantumRegionBuilder};
 use quest_qsvt::ValidatedTransform;
 use std::ops::{Add, Div, Mul, Sub};
 
@@ -233,10 +234,10 @@ fn check_vector(vector: &[Complex64], dimension: usize) -> Result<()> {
 }
 pub(super) fn controlled_plan_padded(
     resources: &RuntimeResources,
-    program: &quest_circuit::BoundProgram,
+    program: &quest_circuit::BoundRegion,
     width: usize,
     padding: usize,
-) -> crate::Result<quest_circuit::ExecutablePlan> {
+) -> crate::Result<quest_circuit::RegionPlan> {
     let build = || -> quest_circuit::Result<_> {
         let fragment = OracleFragment::builder(program.clone())
             .matrix_tolerance(1e-10)?
@@ -244,7 +245,7 @@ pub(super) fn controlled_plan_padded(
                 max_bytes: resources.memory_budget().bytes(),
             })
             .build()?;
-        let mut builder = ProgramBuilder::new(
+        let mut builder = QuantumRegionBuilder::new(
             width
                 .checked_add(1)
                 .and_then(|n| n.checked_add(padding))
@@ -273,7 +274,7 @@ pub struct PreparedOverlap<'env> {
     initial: Register<'env, StateVector>,
     working: Register<'env, StateVector>,
     scratch: Register<'env, StateVector>,
-    main: PreparedProgram<'env>,
+    main: PreparedRegion<'env>,
     continuation: PreparedContinuation<'env>,
     input: PreparedProjection<'env>,
     output: PreparedProjection<'env>,

@@ -35,6 +35,7 @@ enum Workflow {
 struct FrozenInput {
     workflow: Workflow,
     route: TransformRoute,
+    verification_tolerance: f64,
     block: StoredBlockEncoding,
     qsp: QspInput,
     input: Vec<C>,
@@ -131,6 +132,7 @@ fn read(request: &Request<'_>, context: &mut Context<'_>) -> Result<FrozenInput>
     })?;
     let (qsp, evidence) = crate::synthesis::freeze_input(request.transform, context)?;
     Ok(FrozenInput {
+        verification_tolerance: request.transform.input_tolerance,
         workflow: request.workflow,
         route: request.transform.route,
         block,

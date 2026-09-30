@@ -8,11 +8,40 @@ use std::{
 };
 
 /// A binary64 conversion and an outward upper bound on the coefficient l1 error.
+///
 /// The bound is in the output basis. For monomials it bounds response on |x|<=1.
+/// Both immutable payloads are retained so evidence cannot be reassigned to another target.
+///
+/// ```compile_fail
+/// use quest_polynomial::{Conversion, Monomial, Polynomial};
+/// fn forge(source: Polynomial<Monomial>, polynomial: Polynomial<Monomial>) {
+///     let _ = Conversion { source, polynomial, coefficient_error_bound: 0.0 };
+/// }
+/// ```
 #[derive(Debug, Clone)]
-pub struct Conversion<B: Basis = Monomial> {
-    pub polynomial: Polynomial<B>,
-    pub coefficient_error_bound: f64,
+pub struct Conversion<B: Basis = Monomial, S: Basis = Monomial> {
+    source: Polynomial<S>,
+    polynomial: Polynomial<B>,
+    coefficient_error_bound: f64,
+}
+impl<B: Basis, S: Basis> Conversion<B, S> {
+    #[must_use]
+    pub const fn source(&self) -> &Polynomial<S> {
+        &self.source
+    }
+    #[must_use]
+    pub const fn polynomial(&self) -> &Polynomial<B> {
+        &self.polynomial
+    }
+    #[must_use]
+    pub const fn coefficient_error_bound(&self) -> f64 {
+        self.coefficient_error_bound
+    }
+    /// Discard conversion evidence and retain the rounded destination coefficients.
+    #[must_use]
+    pub fn into_polynomial(self) -> Polynomial<B> {
+        self.polynomial
+    }
 }
 mod sealed {
     pub trait Sealed {}
@@ -58,7 +87,7 @@ impl<B: Basis> Polynomial<B> {
         for (i, c) in self.coefficients().iter().enumerate() {
             let k = i32::try_from(i)
                 .map_err(|_| Error::SupportOverflow)?
-                .checked_add(self.support().0)
+                .checked_add(self.basis().offset())
                 .ok_or(Error::SupportOverflow)?;
             if (k.rem_euclid(2) == 1) != P::ODD && *c != Complex64::new(0.0, 0.0) {
                 return Err(Error::Parity);
@@ -83,8 +112,23 @@ impl<B: Basis> Polynomial<B> {
             return Err(Error::NotReal);
         }
         let zero = Jet::constant(Interval::point(0.0)?)?;
-        if self.coefficients().is_empty() {
+        if self.is_zero() {
             return Ok(zero);
+        }
+        // A Laurent storage offset is not a pole when all negative powers vanish.
+        if self.basis().offset() < 0
+            && self
+                .effective_support()
+                .is_some_and(|(first, _)| first >= 0)
+        {
+            let skip = usize::try_from(self.basis().offset().unsigned_abs())
+                .map_err(|_| Error::SupportOverflow)?;
+            let coefficients = self
+                .coefficients()
+                .get(skip..)
+                .ok_or(Error::SupportOverflow)?;
+            return Polynomial::new(Laurent::new(0), coefficients.to_vec(), self.limits())?
+                .jet_interval(x);
         }
         let variable = Jet {
             value: x,
@@ -109,7 +153,7 @@ impl<B: Basis> Polynomial<B> {
             }
             sum = sum.add(current.mul(Jet::constant(Interval::point(c.re)?)?)?)?;
         }
-        let mut shift = self.support().0.unsigned_abs();
+        let mut shift = self.basis().offset().unsigned_abs();
         let mut factor = variable;
         let mut power = Jet::constant(Interval::point(1.0)?)?;
         while shift > 0 {
@@ -121,7 +165,7 @@ impl<B: Basis> Polynomial<B> {
                 factor = factor.mul(factor)?;
             }
         }
-        if self.support().0 < 0 {
+        if self.basis().offset() < 0 {
             power = power.recip()?;
         }
         sum.mul(power)
@@ -133,27 +177,46 @@ impl<B: Basis> Polynomial<B> {
     /// # Errors
     /// Rejects unsupported support, nonfinite arithmetic, unresolved leading
     /// coefficients, or a caller storage/work limit.
-    pub fn to_basis<C: Basis>(&self, target: C) -> Result<Conversion<C>> {
+    pub fn to_basis<C: Basis>(&self, target: C) -> Result<Conversion<C, B>> {
         if target.offset() != 0 {
             return Err(Error::UnsupportedConversion);
         }
-        let source = self.to_monomial()?;
-        let count = source.polynomial.coefficients().len();
+        if self.basis().offset() < 0 {
+            return Err(Error::UnsupportedConversion);
+        }
+        let offset = usize::try_from(self.basis().offset()).map_err(|_| Error::SupportOverflow)?;
+        let count = self
+            .coefficients()
+            .len()
+            .checked_add(offset)
+            .ok_or(Error::SupportOverflow)?;
+        self.limits().check(count, 12)?;
         let square = count
             .checked_mul(count)
             .ok_or(Error::Budget("conversion storage"))?;
-        self.limits().check(count, 12)?;
+        // Admit the whole transformation before its first allocation. The dense
+        // interval rows coexist with their Vec headers, the converted source,
+        // two interval residuals and the destination coefficients. Twelve linear
+        // arrays conservatively cover those buffers and the monomial stage.
+        let linear_bytes = count
+            .checked_mul(const { 12 * size_of::<Complex64>() + size_of::<Vec<Interval>>() })
+            .ok_or(Error::Budget("conversion storage"))?;
         let bytes = square
             .checked_mul(size_of::<Interval>())
+            .and_then(|dense| dense.checked_add(linear_bytes))
             .ok_or(Error::Budget("conversion storage"))?;
+        // Logical coefficient work includes the monomial recurrence (n²),
+        // basis construction and both triangular residual solves (4n²).
+        let work = square
+            .checked_mul(5)
+            .ok_or(Error::Budget("conversion work"))?;
         if bytes > self.limits().max_bytes
-            || square
-                .checked_mul(4)
-                .ok_or(Error::Budget("conversion work"))?
-                > self.limits().max_work
+            || isize::try_from(bytes).is_err()
+            || work > self.limits().max_work
         {
             return Err(Error::Budget("conversion workspace"));
         }
+        let source = self.to_monomial()?;
         let rows = basis_rows(&target, count)?;
         let zero = Interval::point(0.0)?;
         let radius = Interval::new(
@@ -198,6 +261,7 @@ impl<B: Basis> Polynomial<B> {
             }
         }
         Ok(Conversion {
+            source: self.clone(),
             polynomial: Polynomial::new(target, coefficients, self.limits())?,
             coefficient_error_bound: error.upper(),
         })
@@ -205,11 +269,11 @@ impl<B: Basis> Polynomial<B> {
     /// Explicit quadratic conversion with interval coefficient error evidence.
     /// # Errors
     /// Rejects negative Laurent powers, excessive work/storage or nonfinite arithmetic.
-    pub fn to_monomial(&self) -> Result<Conversion> {
-        if self.support().0 < 0 {
+    pub fn to_monomial(&self) -> Result<Conversion<Monomial, B>> {
+        if self.basis().offset() < 0 {
             return Err(Error::UnsupportedConversion);
         }
-        let offset = usize::try_from(self.support().0).map_err(|_| Error::SupportOverflow)?;
+        let offset = usize::try_from(self.basis().offset()).map_err(|_| Error::SupportOverflow)?;
         let count = self
             .coefficients()
             .len()
@@ -274,6 +338,7 @@ impl<B: Basis> Polynomial<B> {
                 .checked_add(Interval::point(di.lower().abs().max(di.upper().abs()))?)?;
         }
         Ok(Conversion {
+            source: self.clone(),
             polynomial: Polynomial::new(Monomial, values, self.limits())?,
             coefficient_error_bound: error.upper(),
         })
@@ -283,7 +348,7 @@ impl Polynomial<Chebyshev> {
     /// # Errors
     /// Rejects nonfinite derivative coefficients or budget overflow.
     pub fn derivative(&self) -> Result<Self> {
-        let mut c = zeros(self.degree(), self.limits())?;
+        let mut c = zeros(self.stored_order(), self.limits())?;
         let mut next = Complex64::new(0.0, 0.0);
         let mut after = next;
         for (k, v) in c.iter_mut().enumerate().rev() {
@@ -331,7 +396,7 @@ impl Polynomial<Laguerre> {
     /// # Errors
     /// Rejects nonfinite coefficient arithmetic or exceeded storage limits.
     pub fn derivative(&self) -> Result<Self> {
-        let mut coefficients = zeros(self.degree(), self.limits())?;
+        let mut coefficients = zeros(self.stored_order(), self.limits())?;
         let mut tail = Complex64::new(0.0, 0.0);
         for (index, value) in coefficients.iter_mut().enumerate().rev() {
             tail = finite(
@@ -355,7 +420,7 @@ impl Polynomial<Jacobi> {
     /// # Errors
     /// Rejects nonfinite recurrence arithmetic or exceeded resource limits.
     pub fn derivative(&self) -> Result<Self> {
-        let degree = self.degree();
+        let degree = self.stored_order();
         self.limits().check(degree, 5)?;
         if degree
             .checked_mul(degree)
@@ -411,15 +476,15 @@ impl Polynomial<Laurent> {
     /// Rejects signed support overflow or nonfinite derivative coefficients.
     pub fn derivative(&self) -> Result<Self> {
         let offset = self
-            .support()
-            .0
+            .basis()
+            .offset()
             .checked_sub(1)
             .ok_or(Error::SupportOverflow)?;
         let mut c = zeros(self.coefficients().len(), self.limits())?;
         for (i, (out, v)) in c.iter_mut().zip(self.coefficients()).enumerate() {
             let n = self
-                .support()
-                .0
+                .basis()
+                .offset()
                 .checked_add(i32::try_from(i).map_err(|_| Error::SupportOverflow)?)
                 .ok_or(Error::SupportOverflow)?;
             *out = finite(v.mul(f64::from(n)))?;
@@ -431,7 +496,7 @@ fn lowered<B: Basis>(
     p: &Polynomial<B>,
     scale: impl Fn(f64) -> Result<f64>,
 ) -> Result<Vec<Complex64>> {
-    let mut c = zeros(p.degree(), p.limits())?;
+    let mut c = zeros(p.stored_order(), p.limits())?;
     for (i, v) in c.iter_mut().enumerate() {
         let n = i.checked_add(1).ok_or(Error::SupportOverflow)?;
         *v = finite(

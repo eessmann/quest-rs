@@ -83,4 +83,4 @@ An `angle[w]` is a fixed-width modular fraction of one turn. Float-to-angle conv
 
 The registry uses the OpenQASM 3.1 phase convention for `U(θ, φ, λ)`: it is the conventional Euler U matrix multiplied by `exp(i θ/2)`. Its chronological decomposition is `gphase((θ+φ+λ)/2)`, `rz(λ)`, `ry(θ)`, `rz(φ)`. An implementation using only the three rotations loses the required scalar.
 
-Global phase is retained. For example, `Rz(2π) = -I`; it is not the identity when the operation is controlled. Migration tests must compare full complex amplitudes or matrices, including phase, rather than measurement probabilities alone. Ideal `Angle::pi(n,d)` retains exact rational information for proofs; language `pi` does not silently acquire that privilege.
+Global phase is retained. For example, `Rz(2π) = -I`; it is not the identity when the operation is controlled. Migration tests must compare full complex amplitudes or matrices, including phase, rather than measurement probabilities alone. Exact `Angle::pi(n,d)` retains exact rational information for proofs; language `pi` does not silently acquire that privilege.

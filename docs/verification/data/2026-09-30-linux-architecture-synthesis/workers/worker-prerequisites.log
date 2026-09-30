@@ -1,0 +1,14 @@
+Linux CU-05 7.2.4-ogc3.1.fc44.x86_64 #1 SMP PREEMPT_DYNAMIC Sun Sep 13 01:41:06 UTC 2026 x86_64 GNU/Linux
+/usr/bin/cat
+/usr/bin/sleep
+/usr/bin/yes
+/usr/bin/touch
+prlimit-present
+python-present
+524288
+30
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    a=bytearray(700*1024*1024)
+MemoryError
+allocation-status=1

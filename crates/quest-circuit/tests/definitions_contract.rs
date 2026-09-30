@@ -1,14 +1,16 @@
 use googletest::{Result, prelude::*};
+#[allow(unused_imports)]
+use quest_circuit::prelude::*;
 use quest_circuit::*;
 
 #[gtest]
 fn shared_definitions_expand_with_fresh_occurrences_and_ordered_arguments() -> Result<()> {
-    let mut body = ProgramBuilder::new(2, 0)?;
+    let mut body = QuantumRegionBuilder::new(2, 0)?;
     let theta = body.parameter("theta")?;
     body.gate(Gate::Rx(Angle::parameter(theta)?), &[body.qubit(0)?], &[])?;
     body.gate(Gate::Z, &[body.qubit(1)?], &[])?;
     let unitary = body.finish()?.into_unitary()?;
-    let mut b = ProgramBuilder::new(4, 0)?;
+    let mut b = QuantumRegionBuilder::new(4, 0)?;
     let definition = b.define("pair", unitary)?;
     let first = b.call(
         definition,
@@ -35,11 +37,11 @@ fn shared_definitions_expand_with_fresh_occurrences_and_ordered_arguments() -> R
 
 #[gtest]
 fn failed_definition_expansion_does_not_partially_append() -> Result<()> {
-    let mut body = ProgramBuilder::new(1, 0)?;
+    let mut body = QuantumRegionBuilder::new(1, 0)?;
     let q = body.qubit(0)?;
     body.gate(Gate::X, &[q], &[])?;
     body.gate(Gate::Z, &[q], &[])?;
-    let mut b = ProgramBuilder::with_limits(
+    let mut b = QuantumRegionBuilder::with_limits(
         1,
         0,
         ProgramLimits {
@@ -55,11 +57,11 @@ fn failed_definition_expansion_does_not_partially_append() -> Result<()> {
 
 #[gtest]
 fn definition_expansion_preserves_explicit_body_dependencies() -> Result<()> {
-    let mut body = ProgramBuilder::new(2, 0)?;
+    let mut body = QuantumRegionBuilder::new(2, 0)?;
     let a = body.gate(Gate::H, &[body.qubit(0)?], &[])?;
     let z = body.gate(Gate::Z, &[body.qubit(1)?], &[])?;
     body.depend(z, a)?;
-    let mut caller = ProgramBuilder::new(2, 0)?;
+    let mut caller = QuantumRegionBuilder::new(2, 0)?;
     let definition = caller.define("ordered", body.finish()?.into_unitary()?)?;
     let ids = caller.call(definition, &[caller.qubit(0)?, caller.qubit(1)?], &[], &[])?;
     let p = caller.finish()?;
@@ -70,7 +72,7 @@ fn definition_expansion_preserves_explicit_body_dependencies() -> Result<()> {
 
 #[gtest]
 fn adjoint_reverses_explicit_edges_without_serializing_independent_gates() -> Result<()> {
-    let mut body = ProgramBuilder::new(3, 0)?;
+    let mut body = QuantumRegionBuilder::new(3, 0)?;
     let a = body.gate(Gate::H, &[body.qubit(0)?], &[])?;
     let z = body.gate(Gate::Z, &[body.qubit(1)?], &[])?;
     body.gate(Gate::X, &[body.qubit(2)?], &[])?;

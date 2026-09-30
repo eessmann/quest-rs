@@ -55,9 +55,9 @@ pub fn contractivity(target: &[Complex64], policy: Policy) -> Result<f64> {
             f64::from(u32::try_from(index).map_err(|_| Error::Budget("contractivity degree"))?);
         derivative = derivative.checked_add(magnitude.checked_mul(Interval::point(index)?)?)?;
     }
-    let threshold = Interval::point(1.0)?
-        .checked_sub(Interval::point(policy.contractivity_margin)?)?
-        .lower();
+    let threshold_interval =
+        Interval::point(1.0)?.checked_sub(Interval::point(policy.contractivity_margin)?)?;
+    let threshold = threshold_interval.lower();
     if norm.upper() < threshold {
         return Ok(norm.upper());
     }
@@ -82,9 +82,10 @@ pub fn contractivity(target: &[Complex64], policy: Policy) -> Result<f64> {
         let mut max_sample = 0.0_f64;
         for value in values {
             let magnitude = value.magnitude()?;
-            if magnitude.lower() >= threshold {
-                return Err(Error::Contractivity {
-                    upper: magnitude.upper(),
+            if magnitude.lower() >= threshold_interval.upper() {
+                return Err(Error::ContractivityViolation {
+                    lower: magnitude.lower(),
+                    threshold: threshold_interval.upper(),
                 });
             }
             max_sample = max_sample.max(magnitude.upper());

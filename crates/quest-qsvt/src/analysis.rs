@@ -213,7 +213,8 @@ impl EncodingBoundBuilder<Supplied<Interval>, Supplied<Interval>, Supplied<Assum
 /// ```
 pub struct StandardPremises<'t> {
     transform: &'t ValidatedTransform,
-    assumptions: [Assumption; 3],
+    assumptions: Vec<Assumption>,
+    phase_error: Option<Interval>,
 }
 pub struct PremiseBuilder<'t, S = Missing, L = Missing, C = Missing> {
     transform: &'t ValidatedTransform,
@@ -236,7 +237,7 @@ impl<'t> StandardPremises<'t> {
         })
     }
     #[must_use]
-    pub const fn assumptions(&self) -> &[Assumption; 3] {
+    pub fn assumptions(&self) -> &[Assumption] {
         &self.assumptions
     }
 }
@@ -257,7 +258,36 @@ impl<'t, L, C> PremiseBuilder<'t, Missing, L, C> {
         }
     }
 }
+/// A response premise produced by explicit assumption or transform-bound certification.
+/// Its fields are private so evidence cannot be rebound by callers.
+pub struct PhaseResponsePremise {
+    assumption: Option<Assumption>,
+    error: Option<Interval>,
+}
 impl<'t, S, C> PremiseBuilder<'t, S, Missing, C> {
+    /// Establish actual-phase linkage using only the certificate retained by this transform.
+    /// The certified uniform error is added automatically to the final bound.
+    /// # Errors
+    /// Imported or uncertified sequences cannot supply this evidence.
+    #[cfg(feature = "certification")]
+    pub fn certified_actual_phase_response(
+        self,
+    ) -> Result<PremiseBuilder<'t, S, Supplied<PhaseResponsePremise>, C>> {
+        let certificate = self.transform.projector_certificate().ok_or(Error::Input(
+            "transform has no certificate for its converted phase payload",
+        ))?;
+        let error = Interval::new(0.0, certificate.response_bound().upper_f64())?;
+        Ok(PremiseBuilder {
+            transform: self.transform,
+            subspaces: self.subspaces,
+            linkage: Supplied(PhaseResponsePremise {
+                assumption: None,
+                error: Some(error),
+            }),
+            completion: self.completion,
+        })
+    }
+
     /// Assert that the actual frozen phases, including convention conversion,
     /// extract the claimed degree-matching polynomial response for this transform.
     /// A certificate for phases before a rounded conversion does not establish it.
@@ -265,11 +295,14 @@ impl<'t, S, C> PremiseBuilder<'t, S, Missing, C> {
     pub fn assume_actual_phase_response(
         self,
         value: Assumption,
-    ) -> PremiseBuilder<'t, S, Supplied<Assumption>, C> {
+    ) -> PremiseBuilder<'t, S, Supplied<PhaseResponsePremise>, C> {
         PremiseBuilder {
             transform: self.transform,
             subspaces: self.subspaces,
-            linkage: Supplied(value),
+            linkage: Supplied(PhaseResponsePremise {
+                assumption: Some(value),
+                error: None,
+            }),
             completion: self.completion,
         }
     }
@@ -290,12 +323,19 @@ impl<'t, S, L> PremiseBuilder<'t, S, L, Missing> {
         }
     }
 }
-impl<'t> PremiseBuilder<'t, Supplied<Assumption>, Supplied<Assumption>, Supplied<Assumption>> {
+impl<'t>
+    PremiseBuilder<'t, Supplied<Assumption>, Supplied<PhaseResponsePremise>, Supplied<Assumption>>
+{
     #[must_use]
     pub fn build(self) -> StandardPremises<'t> {
+        let mut assumptions = vec![self.subspaces.0, self.completion.0];
+        if let Some(assumption) = self.linkage.0.assumption {
+            assumptions.push(assumption);
+        }
         StandardPremises {
             transform: self.transform,
-            assumptions: [self.subspaces.0, self.linkage.0, self.completion.0],
+            assumptions,
+            phase_error: self.linkage.0.error,
         }
     }
 }
@@ -548,6 +588,9 @@ impl<'t> AnalysisBuilder<'t, Supplied<BlockEncodingBound>, StandardPremises<'t>>
             .checked_mul(self.encoding.0.normalized_error.sqrt()?)?;
         let telescoping = telescope(self.transform, &self.encoding.0)?;
         let mut total = robustness;
+        if let Some(phase_error) = self.premises.phase_error {
+            total = total.checked_add(phase_error)?;
+        }
         if let Some(term) = telescoping {
             total = total.checked_add(term)?;
         }
@@ -561,7 +604,7 @@ impl<'t> AnalysisBuilder<'t, Supplied<BlockEncodingBound>, StandardPremises<'t>>
             telescoping,
             total: Some(total),
             encoding: self.encoding.0,
-            premises: Vec::from(self.premises.assumptions),
+            premises: self.premises.assumptions,
             budget: self.budget,
         })
     }

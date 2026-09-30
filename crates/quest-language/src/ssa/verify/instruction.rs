@@ -39,6 +39,10 @@ pub(super) fn check(
     }
     Ok(())
 }
+#[expect(
+    clippy::too_many_lines,
+    reason = "One exhaustive effect-instruction result and capability check"
+)]
 fn result_types(context: &Context<'_>, item: &Instruction) -> Result<Vec<Type>, SemanticError> {
     let result = match &item.kind {
         K::Assert { condition, .. } => {
@@ -123,6 +127,16 @@ fn result_types(context: &Context<'_>, item: &Instruction) -> Result<Vec<Type>, 
         }
         K::Reset { place, .. } => {
             quantum(&place_type(context.program, place)?)?;
+            vec![Type::Memory]
+        }
+        K::Payload { places, .. } => {
+            for place in places {
+                if place_type(context.program, place)? != Type::Qubit(1) {
+                    return Err(SemanticError::invalid(
+                        "numerical payload operands must be scalar quantum places",
+                    ));
+                }
+            }
             vec![Type::Memory]
         }
         K::Barrier { places, .. } => {
@@ -540,7 +554,7 @@ pub(super) fn gate_effect(
         ));
     }
     if region.gate
-        && (matches!(item.kind, K::Reset { .. })
+        && (matches!(item.kind, K::Reset { .. } | K::Payload { .. })
             || !matches!(
                 item.effect,
                 ssa::Effect::Pure | ssa::Effect::Read | ssa::Effect::Quantum | ssa::Effect::Call

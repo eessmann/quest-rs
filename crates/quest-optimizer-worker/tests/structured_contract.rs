@@ -1,9 +1,9 @@
-#![cfg(all(target_os = "linux", any(feature = "synthesis", feature = "zx")))]
+#![cfg(any(feature = "synthesis", feature = "zx"))]
 use googletest::prelude::*;
 use quest_circuit::{
-    StructuredProgram,
+    Program,
     language::{
-        self, GateKind as G,
+        GateKind as G,
         vm::{GateRequest, Interpreter, QuantumBackend, RunInputs},
     },
 };
@@ -64,10 +64,13 @@ impl QuantumBackend for Backend {
 }
 #[cfg(feature = "synthesis")]
 #[gtest]
+#[cfg_attr(
+    not(target_os = "linux"),
+    ignore = "bounded process execution requires Linux"
+)]
 fn structured_synthesis_preserves_signed_control_phase_and_source_export() -> Result<()> {
     let original =
-        StructuredProgram::parse("qubit[2] q; negctrl @ rz(0.17) q[1],q[0];", "rotation.qasm")?
-            .verify()?;
+        Program::parse("qubit[2] q; negctrl @ rz(0.17) q[1],q[0];", "rotation.qasm")?.verify()?;
     let syntax = quest_circuit::qasm::export_syntax(
         original.clone().lower()?.plan()?.syntax(),
         quest_circuit::qasm::ExportLimits::default(),
@@ -105,10 +108,14 @@ fn structured_synthesis_preserves_signed_control_phase_and_source_export() -> Re
 }
 #[cfg(feature = "synthesis")]
 #[gtest]
+#[cfg_attr(
+    not(target_os = "linux"),
+    ignore = "bounded process execution requires Linux"
+)]
 fn structured_synthesis_bounds_exclusive_paths_and_proves_finite_loop_counts() -> Result<()> {
     let source =
         "qubit q; input bool choice; if(choice) { rz(0.17) q; } else { rx(0.23) q; ry(0.31) q; }";
-    let (_, report) = StructuredProgram::parse(source, "branches.qasm")?
+    let (_, report) = Program::parse(source, "branches.qasm")?
         .verify()?
         .synthesize_rotations(&worker()?, 1e-12, 42, Limits::default())?;
     let epsilon = quest_math::dyadic_from_bits(1e-12_f64.to_bits(), Limits::default())?;
@@ -119,7 +126,7 @@ fn structured_synthesis_bounds_exclusive_paths_and_proves_finite_loop_counts() -
             quest_math::Rational::from_integer(2.into())
         ))
     );
-    let (_, report) = StructuredProgram::parse(
+    let (_, report) = Program::parse(
         "qubit q; int n=0; while(n<2){rz(0.17) q;n+=1;}",
         "loop.qasm",
     )?
@@ -133,7 +140,7 @@ fn structured_synthesis_bounds_exclusive_paths_and_proves_finite_loop_counts() -
         ))
     );
     expect_eq!(report.rotations.len(), 1);
-    let (_, dynamic) = StructuredProgram::parse(
+    let (_, dynamic) = Program::parse(
         "qubit q; input int count; int n=0; while(n<count){rz(0.17) q;n+=1;}",
         "dynamic_loop.qasm",
     )?
@@ -141,8 +148,7 @@ fn structured_synthesis_bounds_exclusive_paths_and_proves_finite_loop_counts() -
     .synthesize_rotations(&worker()?, 1e-12, 42, Limits::default())?;
     expect_true!(dynamic.operator_error_bound.is_none());
     let unbound =
-        StructuredProgram::parse("qubit q; input float theta; rz(theta) q;", "dynamic.qasm")?
-            .verify()?;
+        Program::parse("qubit q; input float theta; rz(theta) q;", "dynamic.qasm")?.verify()?;
     expect_true!(
         unbound
             .synthesize_rotations(&worker()?, 1e-12, 42, Limits::default())
@@ -152,8 +158,12 @@ fn structured_synthesis_bounds_exclusive_paths_and_proves_finite_loop_counts() -
 }
 #[cfg(feature = "zx")]
 #[gtest]
+#[cfg_attr(
+    not(target_os = "linux"),
+    ignore = "bounded process execution requires Linux"
+)]
 fn structured_zx_retains_effects_cfg_and_failed_candidates() -> Result<()> {
-    let original = StructuredProgram::parse("qubit[2] q; output int count=0; while(count<2){h q[1];h q[1];cx q[1],q[0];cx q[1],q[0];count+=1;} bit b=measure q[0]; reset q[1];","zx.qasm")?.verify()?;
+    let original = Program::parse("qubit[2] q; output int count=0; while(count<2){h q[1];h q[1];cx q[1],q[0];cx q[1],q[0];count+=1;} bit b=measure q[0]; reset q[1];","zx.qasm")?.verify()?;
     let missing = Client::new("/quest-worker-missing", WorkerLimits::default())?;
     let (retained, failed) = original
         .clone()
@@ -193,15 +203,22 @@ fn structured_zx_retains_effects_cfg_and_failed_candidates() -> Result<()> {
             .blocks()
             .iter()
             .flat_map(|b| &b.instructions)
-            .all(|i| !matches!(i.kind, language::ssa::InstructionKind::Gate { .. }))
+            .all(|i| !matches!(
+                i.kind,
+                quest_circuit::language::ssa::InstructionKind::Gate { .. }
+            ))
     );
     Ok(())
 }
 
 #[cfg(feature = "synthesis")]
 #[gtest]
+#[cfg_attr(
+    not(target_os = "linux"),
+    ignore = "bounded process execution requires Linux"
+)]
 fn structured_synthesis_maps_a_middle_target_and_mixed_controls() -> Result<()> {
-    let original = StructuredProgram::parse(
+    let original = Program::parse(
         "qubit[3] q; negctrl @ ctrl @ ry(0.23) q[2],q[0],q[1];",
         "mapping.qasm",
     )?
@@ -242,8 +259,12 @@ fn structured_synthesis_maps_a_middle_target_and_mixed_controls() -> Result<()> 
 
 #[cfg(feature = "zx")]
 #[gtest]
+#[cfg_attr(
+    not(target_os = "linux"),
+    ignore = "bounded process execution requires Linux"
+)]
 fn structured_zx_preserves_a_real_extracted_nonidentity_scalar() -> Result<()> {
-    let original = StructuredProgram::parse(
+    let original = Program::parse(
         "qubit[2] q; h q[1]; s q[1]; h q[1]; s q[1]; h q[1]; s q[1]; h q[1]; h q[1];",
         "phase.qasm",
     )?

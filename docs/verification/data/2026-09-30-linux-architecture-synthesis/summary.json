@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-30",
+  "source_manifest_sha256": "59f8829a64737a6ea9a68c91ca8ebeaa5fb182b4bfc179988ada3de80798a184",
+  "status": "passed",
+  "linux_workspace": {
+    "tests_passed": 838,
+    "tests_ignored": 1,
+    "doctests_passed": 49,
+    "doctests_ignored": 1,
+    "build": 0,
+    "clippy_warnings_denied": 0,
+    "format": 0,
+    "bindings": 0,
+    "native_consumers_cpu_openmp": 0,
+    "book": 0
+  },
+  "linux_optional_workers": {
+    "worker_tests": 40,
+    "client_tests": 13,
+    "compiler_tests": 6,
+    "release_phase_test": 1,
+    "native_logical_test": 1,
+    "explicit_warning_denying_lint": 0,
+    "separate_target_directory": true
+  },
+  "linux_qsp": {
+    "all_feature_tests": 94,
+    "doctests": 9,
+    "large_release_fixtures": 3,
+    "native_cli_tests": 25
+  },
+  "linux_mpi": {
+    "collective_tests": 7,
+    "normal_launcher": 0,
+    "matching_abi_witnesses": 0,
+    "strict_lint": 0
+  },
+  "macos_followup": {
+    "math_synthesis_tests": 62,
+    "doctests": 1,
+    "strict_synthesis_lint": 0,
+    "native_consumers_cpu_openmp": 0,
+    "performance_process_records": 21
+  },
+  "gpu": "Not validated for this overhaul",
+  "count_scope": "Stage counts overlap and must not be summed as unique tests; ordinary ignored QSP fixtures were all run explicitly in release.",
+  "original_checkouts": "Primary Cargo/devenv edits and C++ working tree preserved; work is isolated and uncommitted."
+}

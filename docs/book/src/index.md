@@ -1,11 +1,11 @@
 # Start here
 
-The workspace provides two complementary program models. A **structured program** expresses classical computation, runtime control flow, calls, arrays, quantum operations, measurement, and feedback. An **ideal circuit** expresses a finite quantum dependency graph with exact symbolic angles, explicit effects, and bounded optimization passes. Both can be prepared for an installed QuEST backend.
+The workspace provides one staged program model for classical computation, runtime control flow, calls, arrays, exact and numerical quantum operations, measurement, and feedback. Finite quantum regions provide exact symbolic construction and bounded optimization capabilities inside that model. Every executable uses the same native preparation API.
 
 Start with [the interface matrix](interfaces.md), then run the [Bell tutorial](bell.md). Every Rust tutorial shown here is included from a compiled example or integration test. Test fragments use `googletest` assertions and the imports in their containing source file; runnable native functions share the example module imports shown in the Bell chapter. The native example executes several algorithms inside one environment; its integration test starts a separate process to respect QuEST's process lifecycle.
 
 For polynomial quantum algorithms, follow [polynomial preparation](numerical-polynomials.md),
-[canonical and generalized QSP synthesis](qsp-synthesis.md),
+[real-parity Wx and unit-circle QSP synthesis](qsp-synthesis.md),
 [independent certification](qsp-certification.md), and
 [QSVT encodings and transform builders](qsvt-model.md). These stages need no
 native simulator. Continue with [prepared QSVT execution](qsvt-runtime.md) and

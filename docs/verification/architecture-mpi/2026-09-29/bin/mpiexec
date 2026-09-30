@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+export HWLOC_SYNTHETIC='package:1 core:10 pu:1'
+export HWLOC_COMPONENTS=synthetic
+exec /nix/store/4qip1zra36mhxwfqrw9h5imqghwl4wcl-openmpi-5.0.10/bin/mpiexec --bind-to none "$@"

@@ -2,8 +2,7 @@
 
 use googletest::prelude::*;
 use quest_math::{
-    AngleTarget, Axis, Control, Gate, Limits, Sequence, Target, certify_rotation,
-    lift_controlled_rotation,
+    AngleTarget, Axis, Control, Gate, Limits, Target, certify_rotation, lift_controlled_rotation,
 };
 use quest_optimizer_client::{Client, WorkerLimits};
 
@@ -39,31 +38,15 @@ const fn dyadic(axis: Axis, angle: f64) -> Target {
 fn fixed_exact_phase_sequence_survives_the_bounded_process() -> Result<()> {
     let target = rational_pi(Axis::Z, 1, 4);
     let certificate = worker()?.synthesize(&target, EPSILON, 1_234, Limits::default())?;
-    let scalar_phases = certificate
-        .candidate()
-        .operations
-        .iter()
-        .filter(|operation| operation.gate == Gate::W)
-        .count();
-    verify_that!(scalar_phases, gt(0))?;
     verify_that!(certificate.target(), eq(&target))?;
-    let missing_phase = Sequence {
-        qubits: certificate.candidate().qubits,
-        operations: certificate
-            .candidate()
-            .operations
-            .iter()
-            .filter(|operation| operation.gate != Gate::W)
-            .cloned()
-            .collect(),
-    };
+    let mut wrong_phase = certificate.candidate().clone();
+    wrong_phase.operations.push(quest_math::Operation {
+        gate: Gate::W,
+        targets: vec![],
+        controls: vec![],
+    });
     verify_that!(
-        certify_rotation(
-            &missing_phase,
-            &target,
-            EPSILON.to_bits(),
-            Limits::default()
-        ),
+        certify_rotation(&wrong_phase, &target, EPSILON.to_bits(), Limits::default()),
         err(anything())
     )?;
     Ok(())

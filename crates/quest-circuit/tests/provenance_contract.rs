@@ -1,8 +1,10 @@
 use googletest::{Result, prelude::*};
+#[allow(unused_imports)]
+use quest_circuit::prelude::*;
 use quest_circuit::*;
 
-fn rotations(count: usize) -> quest_circuit::Result<(ValidatedProgram, Vec<OccurrenceId>)> {
-    let mut builder = ProgramBuilder::new(1, 0)?;
+fn rotations(count: usize) -> quest_circuit::Result<(QuantumRegion, Vec<OccurrenceId>)> {
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     let q = builder.qubit(0)?;
     let mut sources = Vec::new();
     for _ in 0..count {
@@ -100,7 +102,7 @@ fn diverging_snapshot_edits_cannot_exchange_history_roots() -> Result<()> {
 
 #[gtest]
 fn exact_then_fusion_preserves_history_and_current_dependency_endpoints() -> Result<()> {
-    let mut builder = ProgramBuilder::new(2, 0)?;
+    let mut builder = QuantumRegionBuilder::new(2, 0)?;
     let q = builder.qubit(0)?;
     let mut sources = Vec::new();
     for _ in 0..4 {
@@ -130,7 +132,7 @@ fn exact_then_fusion_preserves_history_and_current_dependency_endpoints() -> Res
 
 #[gtest]
 fn parity_outputs_share_history_and_later_fusion_deduplicates_sources() -> Result<()> {
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     let q = builder.qubit(0)?;
     let mut sources = Vec::new();
     for _ in 0..4 {
@@ -165,7 +167,7 @@ fn parity_outputs_share_history_and_later_fusion_deduplicates_sources() -> Resul
 
 #[gtest]
 fn empty_replacements_retain_distinct_rewrite_events() -> Result<()> {
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     let source = builder.gate(Gate::Id, &[builder.qubit(0)?], &[])?;
     let (output, report) = builder.finish()?.optimize_exact()?;
     expect_true!(output.schedule().is_empty());
@@ -222,11 +224,11 @@ fn composed_passes_budget_retained_history_even_with_one_surviving_operation() -
 #[gtest]
 fn definition_history_budget_rejection_keeps_the_builder_transactional() -> Result<()> {
     let (reference, _) = rotations(4)?;
-    let mut body = ProgramBuilder::new(1, 0)?;
+    let mut body = QuantumRegionBuilder::new(1, 0)?;
     for _ in 0..3 {
         body.gate(Gate::H, &[body.qubit(0)?], &[])?;
     }
-    let mut builder = ProgramBuilder::with_limits(
+    let mut builder = QuantumRegionBuilder::with_limits(
         1,
         0,
         ProgramLimits {

@@ -1,0 +1,100 @@
+• Validating lock
+✓ Validating lock in 6.44ms
+  evaluating file '«nix-internal»/derivation-internal.nix'
+• Configuring shell
+• Configuring cachix
+✓ Configuring cachix in 1.93ms
+• Evaluating shell
+✓ Evaluating shell in 5.30ms (cached)
+✓ Configuring shell in 9.72ms
+• Loading tasks
+• Evaluating devenv.config.task.config
+✓ Evaluating devenv.config.task.config in 357µs (cached)
+✓ Loading tasks in 1.15ms
+• Running tasks
+• Running devenv:files:cleanup
+✓ Running devenv:files:cleanup in 6.84ms
+• Running devenv:enterShell
+✓ Running devenv:enterShell in 7.01ms
+• Running devenv:enterTest
+✓ Running devenv:enterTest in 3.16µs (no command)
+✓ Running tasks in 13.9ms
+    Blocking waiting for file lock on build directory
+   Compiling quest-optimizer-worker v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-worker)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 14.39s
+     Running unittests src/main.rs (target/debug/build/quest-optimizer-worker/3779e7663366f5ac/out/quest_optimizer_worker-3779e7663366f5ac)
+
+running 28 tests
+test mitm::approx::tests::admission_distinguishes_resource_exhaustion_from_request_caps ... ok
+test mitm::approx::tests::approximate_mitm_certifies_zero_rotation ... ok
+test mitm::approx::tests::approximate_search_distinguishes_complete_absence_and_capacity_cutoff ... ok
+test mitm::approx::tests::huge_finite_dyadic_angle_can_be_unresolved_without_becoming_invalid ... ok
+test mitm::approx::tests::interval_tree_keeps_boundary_equality_and_prunes_strictly_far_boxes ... ok
+test mitm::approx::tests::interval_tree_radius_matches_exhaustive_boxes_across_splits ... ok
+test mitm::exact::tests::exact_mitm_distinguishes_complete_absence_from_partial_enumeration ... ok
+test mitm::exact::tests::exact_mitm_preserves_scalar_phase_and_reports_capacity_cutoff ... ok
+test mitm::exact::tests::exact_mitm_reconstructs_noncommuting_chronological_halves ... ok
+test mitm::exact::tests::legal_large_target_is_not_rejected_by_small_table_coefficient_cap ... ok
+test mitm::exact::tests::two_qubit_ordered_targets_use_full_embedded_matrices ... ok
+test mitm::representatives::tests::exhaustive_small_words_preserve_every_continuation_cost ... ok
+test mitm::representatives::tests::same_full_phase_state_keeps_incomparable_wire_transfers ... ok
+test synthesis::tests::affine_target_uses_the_native_candidate_engine ... ok
+test zx::tests::bounded_local_complement_preflights_clique_growth_before_mutation ... ok
+test zx::tests::complete_uncontrolled_gate_set_and_exact_control_extensions_certify ... ok
+test zx::tests::exactly_supported_signed_controls_survive_extraction ... ok
+test zx::tests::examination_budget_charges_sorting_and_clique_before_rewrite ... ok
+test zx::tests::extracted_ancilla_and_changed_interfaces_are_not_admitted ... ok
+test zx::tests::extracted_scalar_phase_is_recovered_with_candidate_target_order ... ok
+test zx::tests::flow_baseline_remains_certifiable_when_optional_rules_exhaust ... ok
+test zx::tests::output_cap_accepts_exactly_the_limit_and_rejects_the_next_gate ... ok
+test zx::tests::pivot_and_gadget_rules_are_exercised_under_bounds ... ok
+test zx::tests::pivot_cross_neighborhood_growth_is_rejected_before_mutation ... ok
+test zx::tests::real_engine_cancels_gates_and_preserves_idle_interface ... ok
+test zx::tests::rule_limits_reject_vertices_edges_examinations_and_rewrites ... ok
+test zx::tests::unsupported_controls_and_malformed_interfaces_return_errors ... ok
+test zx::tests::zero_qubit_scalar_and_deterministic_seed_interface_are_preserved ... ok
+
+test result: ok. 28 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.87s
+
+     Running tests/circuit_contract.rs (target/debug/build/quest-optimizer-worker/a6d224ce99e1aaf6/out/circuit_contract-a6d224ce99e1aaf6)
+
+running 2 tests
+test explicit_synthesis_retains_target_identity_control_phase_and_local_certificates ... ok
+test zx_replacements_are_transactional_and_preserve_measurement_occurrences ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.34s
+
+     Running tests/structured_contract.rs (target/debug/build/quest-optimizer-worker/61dd3c505eb3b1f0/out/structured_contract-61dd3c505eb3b1f0)
+
+running 5 tests
+test structured_synthesis_bounds_exclusive_paths_and_proves_finite_loop_counts ... ok
+test structured_synthesis_maps_a_middle_target_and_mixed_controls ... ok
+test structured_synthesis_preserves_signed_control_phase_and_source_export ... ok
+test structured_zx_preserves_a_real_extracted_nonidentity_scalar ... ok
+test structured_zx_retains_effects_cfg_and_failed_candidates ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 51.27s
+
+     Running tests/synthesis_process.rs (target/debug/build/quest-optimizer-worker/1a4742753adc6a3e/out/synthesis_process-1a4742753adc6a3e)
+
+running 3 tests
+test fixed_exact_phase_sequence_survives_the_bounded_process ... FAILED
+test nontrivial_process_certificate_lifts_to_signed_controls_without_losing_its_bound ... ok
+test seeded_targets_are_reproducible_and_independently_certified ... ok
+
+failures:
+
+---- fixed_exact_phase_sequence_survives_the_bounded_process stdout ----
+optimizer wall-time limit exceeded
+  at crates/quest-optimizer-worker/tests/synthesis_process.rs:40:23
+
+Error: See failure output above
+
+
+
+failures:
+    fixed_exact_phase_sequence_survives_the_bounded_process
+
+test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 114.97s
+
+error: test failed, to rerun pass `-p quest-optimizer-worker --test synthesis_process`

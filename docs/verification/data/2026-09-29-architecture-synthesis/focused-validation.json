@@ -1,0 +1,112 @@
+{
+  "schema": 1,
+  "base_revision": "7148ccaa47e9e39506d62ba1e441d657040b83f8",
+  "branch": "codex/circuit-synthesis",
+  "platform": "aarch64-darwin",
+  "notes": [
+    "Uncommitted isolated implementation; base revision does not identify the final source.",
+    "These checks have explicit scope labels. The separate default-validation receipt records final workspace validation.",
+    "MPI and performance have separate reproducible receipt directories."
+  ],
+  "checks": [
+    {
+      "name": "native-worker-final-nextest",
+      "command": "devenv shell -- cargo nextest run -p quest-rs -p quest-optimizer-worker -p quest-optimizer-client --features quest-rs/qsvt,quest-rs/workers,quest-rs/serde,quest-rs/codespan-reporting,quest-rs/ndarray,quest-optimizer-worker/synthesis,quest-optimizer-worker/zx,quest-optimizer-worker/mitm --locked",
+      "exit_code": 0,
+      "result": "97 passed; 5 Linux-only process tests skipped",
+      "scope": "final source",
+      "log": "focused-native-worker-final-nextest.log.gz",
+      "log_sha256": "3fff0e86b43b52f89f076ef107a3984aacf59789ec969683961ed1b3e92a34ff",
+      "gzip_sha256": "331a633ce4fe36024eef0ddc3f82f4f3d102c7ab7e6c9cd30f51023cd4f7b92d",
+      "original_bytes": 15026
+    },
+    {
+      "name": "native-worker-final-clippy",
+      "command": "devenv shell -- cargo clippy -p quest-rs -p quest-optimizer-worker -p quest-optimizer-client --all-targets --features quest-rs/qsvt,quest-rs/workers,quest-rs/serde,quest-rs/codespan-reporting,quest-rs/ndarray,quest-optimizer-worker/synthesis,quest-optimizer-worker/zx,quest-optimizer-worker/mitm --locked -- -D warnings",
+      "exit_code": 0,
+      "result": "passed",
+      "scope": "final source",
+      "log": "focused-native-worker-final-clippy.log.gz",
+      "log_sha256": "0dd22a31c226679d847faa37d122b5869a998c1c4b6f21108f114b843b3b0aa9",
+      "gzip_sha256": "3d30425ebeb953c28b1edb45ecb2bc354a8503c3a9e42b6f6bdc1b965dc393b1",
+      "original_bytes": 1497
+    },
+    {
+      "name": "native-minimal-clippy",
+      "command": "devenv shell -- cargo clippy -p quest-rs --all-targets --locked -- -D warnings",
+      "exit_code": 0,
+      "result": "passed without QSVT/MPI feature unification",
+      "scope": "native feature-boundary check before final array additions and mechanical region rename",
+      "log": "focused-native-minimal-clippy.log.gz",
+      "log_sha256": "9386424c0217342759bf9bd05bc3b41301883cdc58d1f3d930826ebb4e07c4af",
+      "gzip_sha256": "b365fae2c0e6ddb152d1afaa998c10d3a9b404f8bd8825c9476f7d0e9510e535",
+      "original_bytes": 692
+    },
+    {
+      "name": "format",
+      "command": "devenv shell -- cargo fmt --all -- --check",
+      "exit_code": 0,
+      "result": "passed",
+      "scope": "final source",
+      "log": "focused-format.log.gz",
+      "log_sha256": "5e46be12ff4b1191cac1280e3fafeef42b98b4a3ca4b32c566bfe2bb26f4522a",
+      "gzip_sha256": "833cbea6b8c3d4fbcae19c283d6dd04bbea47b84248af47085a14eccb9fa1e85",
+      "original_bytes": 228
+    },
+    {
+      "name": "book",
+      "command": "/nix/store/npxlk14314il9ld1iqvisi0lh6jiidfm-mdbook-0.5.4/bin/mdbook build docs/book",
+      "exit_code": 0,
+      "result": "passed",
+      "scope": "final source",
+      "log": "focused-book.log.gz",
+      "log_sha256": "01f1a35a193820dda557a4a82b8556bdcf1b681d01188391eb962cd6cfb8cdee",
+      "gzip_sha256": "52f4a9d784c9dbd81ea400940cefa2abddd11de706884dfcda5b5d49f8bd01a1",
+      "original_bytes": 177
+    },
+    {
+      "name": "binding-freshness",
+      "command": "devenv shell -- cargo run --locked -p xtask -- generate-quest-bindings --check",
+      "exit_code": 0,
+      "result": "passed",
+      "scope": "final binding generator and native bridge",
+      "log": "focused-binding-freshness.log.gz",
+      "log_sha256": "f46cf432c4ecb5b038e1800a1844999163e2c190b19826883367c8c2cf39f7e3",
+      "gzip_sha256": "d727f07006e10babe328b886fc2ea6503689152c551a6e590383216102d1a942",
+      "original_bytes": 24030
+    },
+    {
+      "name": "native-consumers",
+      "command": "devenv shell -- cargo run --locked -p xtask -- check-native-consumers --backends cpu,omp",
+      "exit_code": 0,
+      "result": "passed direct/facade/wrapped/renamed CPU and OpenMP consumers, including state-vector and density execution",
+      "scope": "consumer migration acceptance before final builder additions",
+      "log": "focused-native-consumers.log.gz",
+      "log_sha256": "9f1acda00eb9cb70e6c336c706d34cdd8453e48cae8af6e18bc9176899075140",
+      "gzip_sha256": "0eaf0e42e485ed1c73a35809666fea72c636e15b7b56b031e97c056a87e1cb9f",
+      "original_bytes": 25304
+    },
+    {
+      "name": "qsp-all-features",
+      "command": "devenv shell -- cargo test -p quest-qsp --all-features --locked",
+      "exit_code": 0,
+      "result": "passed; ignored large fixtures exercised separately",
+      "scope": "QSP numerical implementation before final private-name cleanup",
+      "log": "focused-qsp-all-features.log.gz",
+      "log_sha256": "6d565de365f2028c55bfe4e8e8c5ecfd6640bfe0df8a0b7733605a9795a3cf60",
+      "gzip_sha256": "31df9f78f0823511ea7f58686dedcd64c4ec956291a3eded2e70fdf684c2f5dc",
+      "original_bytes": 12783
+    },
+    {
+      "name": "qsp-large-release",
+      "command": "devenv shell -- cargo test -p quest-qsp --all-features --release -- --ignored --nocapture",
+      "exit_code": 0,
+      "result": "all 3 ignored fixtures passed",
+      "scope": "QSP algorithm acceptance; before final consumer migration",
+      "log": "focused-qsp-large-release.log.gz",
+      "log_sha256": "631fda3505a3c47d7bceec45e7058146afc57e18a36328a23c6614847895f4dd",
+      "gzip_sha256": "0d9394558adfaba5b842e52906deab5dfd24a839eddfdb92c8874c955270d9cf",
+      "original_bytes": 8883
+    }
+  ]
+}

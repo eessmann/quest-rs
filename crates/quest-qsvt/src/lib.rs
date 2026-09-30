@@ -7,7 +7,13 @@ mod encoding;
 mod materialize;
 mod matrix;
 mod projection;
+mod response;
 mod routes;
+pub use response::{
+    ArgumentDomain, ComponentSelection, EvenResponse, FullResponse, GramArgument,
+    HermitianArgument, OddResponse, ResponseArgument, ResponseComponent, ResponseEvidence,
+    RouteMeaning, RouteResponse, RouteTarget,
+};
 mod space;
 mod transform;
 pub use dense::{DenseEncodingBuilder, DenseNormalization};
@@ -20,6 +26,8 @@ pub use num_complex::Complex64;
 pub use projection::{OperandLayout, Projection, ProjectionControl, ProjectionSpace};
 pub use quest_circuit::{MatrixPolicy, OracleFragment};
 pub use space::{Left, LogicalSpace, ProjectorKind, Right};
+#[cfg(feature = "certification")]
+pub use transform::CertifiedStandardRecipe;
 pub use transform::{
     GeneralizedRecipe, QueryCounts, Route, StandardConvention, StandardRecipe, SuppliedEncoding,
     TransformBuilder, TransformContinuation, TransformEvidence, ValidatedTransform,
@@ -31,6 +39,8 @@ pub type Result<T> = std::result::Result<T, Error>;
 #[derive(Debug, thiserror::Error)]
 #[non_exhaustive]
 pub enum Error {
+    #[error(transparent)]
+    Polynomial(#[from] quest_polynomial::Error),
     #[error(transparent)]
     Circuit(#[from] quest_circuit::Error),
     #[error(transparent)]
@@ -85,5 +95,17 @@ impl NumericalPolicy {
             return Err(Error::Budget("matrix storage"));
         }
         Ok(bytes)
+    }
+}
+
+impl From<quest_circuit::language::angle::Error> for Error {
+    fn from(value: quest_circuit::language::angle::Error) -> Self {
+        Self::Circuit(value.into())
+    }
+}
+
+impl From<quest_circuit::language::matrix::Error> for Error {
+    fn from(value: quest_circuit::language::matrix::Error) -> Self {
+        Self::Circuit(value.into())
     }
 }

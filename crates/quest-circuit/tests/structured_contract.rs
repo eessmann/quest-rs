@@ -1,9 +1,11 @@
 use googletest::prelude::*;
-use quest_circuit::{MacroLocation, StructuredProgram};
+#[allow(unused_imports)]
+use quest_circuit::prelude::*;
+use quest_circuit::{Constructed, MacroLocation, Program};
 
 #[gtest]
 fn structured_stages_retain_source_and_verified_loop_arguments() -> Result<()> {
-    let program = StructuredProgram::parse(
+    let program = Program::<Constructed>::parse(
         "qubit q; int i = 0; while (i < 3) { h q; i += 1; }",
         "loop.qasm",
     )?;
@@ -40,7 +42,7 @@ fn capture_admission_rejects_missing_values() -> Result<()> {
         .find(|token| token.kind == TokenKind::Capture(0))
         .and_then(|token| token.span)
         .or_fail()?;
-    let program = StructuredProgram::from_frontend(
+    let program = Program::<Constructed>::from_frontend(
         &tokens,
         vec![],
         quest_circuit::language::SourceMap::default(),
@@ -62,13 +64,15 @@ fn capture_admission_rejects_missing_values() -> Result<()> {
     ));
     expect_true!(diagnostic.labels.is_empty());
     expect_true!(diagnostic.notes[0].contains("consumer.rs:17:9"));
-    expect_true!(StructuredProgram::parse("qubit q; float x; rx(x) q;", "invalid.qasm").is_err());
+    expect_true!(
+        Program::<Constructed>::parse("qubit q; float x; rx(x) q;", "invalid.qasm").is_err()
+    );
     Ok(())
 }
 
 #[gtest]
 fn parsed_language_error_owns_renderable_source() -> Result<()> {
-    let error = StructuredProgram::parse("qubit q; missing q;", "bad.qasm").unwrap_err();
+    let error = Program::<Constructed>::parse("qubit q; missing q;", "bad.qasm").unwrap_err();
     let diagnostic = error.diagnostic().or_fail()?;
     expect_eq!(diagnostic.stage, quest_circuit::language::Stage::Admission);
     expect_eq!(diagnostic.labels.len(), 1);

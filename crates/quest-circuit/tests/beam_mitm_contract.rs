@@ -1,9 +1,11 @@
 #![cfg(all(feature = "workers", target_os = "linux"))]
 use googletest::{Result, prelude::*};
-use quest_circuit::{Angle, Gate, Operation, ProgramBuilder};
+use quest_circuit::optimizer::{Client, MitmResult, WorkerLimits};
+#[allow(unused_imports)]
+use quest_circuit::prelude::*;
+use quest_circuit::{Angle, Gate, Operation, QuantumRegionBuilder};
 use quest_circuit::{Control, ControlState, WorkerError};
 use quest_math::Limits;
-use quest_optimizer_client::{Client, MitmResult, WorkerLimits};
 use quest_optimizer_protocol::MitmLimits;
 use std::os::unix::fs::PermissionsExt;
 
@@ -25,7 +27,7 @@ fn exact_mitm_candidate_keeps_effect_fence_and_certified_longer_region() -> Resu
     )?;
     std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700))?;
     let client = Client::new(path, WorkerLimits::default())?;
-    let mut builder = ProgramBuilder::new(1, 1)?;
+    let mut builder = QuantumRegionBuilder::new(1, 1)?;
     let q = builder.qubit(0)?;
     let bit = builder.bit(0)?;
     builder.gate(Gate::H, &[q], &[])?;
@@ -76,7 +78,7 @@ fn exact_mitm_preserves_typed_terminal_status_and_original_program() -> Result<(
         )?;
         std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700))?;
         let client = Client::new(path, WorkerLimits::default())?;
-        let mut builder = ProgramBuilder::new(1, 0)?;
+        let mut builder = QuantumRegionBuilder::new(1, 0)?;
         let q = builder.qubit(0)?;
         builder.gate(Gate::H, &[q], &[])?;
         let original = builder.finish()?;
@@ -122,7 +124,7 @@ fn exact_mitm_preserves_signed_controls_and_preflights_work() -> Result<()> {
     )?;
     std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700))?;
     let client = Client::new(path, WorkerLimits::default())?;
-    let mut builder = ProgramBuilder::new(2, 0)?;
+    let mut builder = QuantumRegionBuilder::new(2, 0)?;
     let target = builder.qubit(1)?;
     let control = builder.qubit(0)?;
     builder.gate(
@@ -169,7 +171,7 @@ fn exact_mitm_retains_symbolic_binding_obligations_across_a_fenced_region() -> R
     )?;
     std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700))?;
     let client = Client::new(path, WorkerLimits::default())?;
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     let p = builder.parameter("p")?;
     let q = builder.qubit(0)?;
     builder.gate(Gate::Phase(Angle::parameter(p)?), &[q], &[])?;
@@ -199,7 +201,7 @@ fn exact_mitm_rejects_a_worker_candidate_without_parent_certificate() -> Result<
     )?;
     std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700))?;
     let client = Client::new(path, WorkerLimits::default())?;
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     let q = builder.qubit(0)?;
     builder.gate(Gate::H, &[q], &[])?;
     let original = builder.finish()?;
@@ -213,7 +215,7 @@ fn exact_mitm_rejects_a_worker_candidate_without_parent_certificate() -> Result<
             1,
         ),
         Err(WorkerError::Worker(
-            quest_optimizer_client::Error::Verification(_)
+            quest_circuit::optimizer::Error::Verification(_)
         ))
     ));
     Ok(())
@@ -229,7 +231,7 @@ fn exact_mitm_large_output_ceiling_reserves_only_reachable_depth() -> Result<()>
     )?;
     std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700))?;
     let client = Client::new(path, WorkerLimits::default())?;
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     let q = builder.qubit(0)?;
     builder.gate(Gate::H, &[q], &[])?;
     let original = builder.finish()?;
@@ -256,7 +258,7 @@ fn exact_mitm_rejects_a_certified_worker_result_beyond_requested_depth() -> Resu
     )?;
     std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700))?;
     let client = Client::new(path, WorkerLimits::default())?;
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     let q = builder.qubit(0)?;
     builder.gate(Gate::H, &[q], &[])?;
     let original = builder.finish()?;
@@ -279,7 +281,7 @@ fn exact_mitm_reports_post_request_output_cap_separately_from_preflight() -> Res
     )?;
     std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700))?;
     let client = Client::new(path, WorkerLimits::default())?;
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     let q = builder.qubit(0)?;
     builder.gate(Gate::H, &[q], &[])?;
     expect_true!(matches!(
@@ -299,7 +301,7 @@ fn exact_mitm_reports_post_request_output_cap_separately_from_preflight() -> Res
 #[gtest]
 fn exact_mitm_charges_wide_operand_scan_before_visiting_window() -> Result<()> {
     let client = Client::new("/bin/false", WorkerLimits::default())?;
-    let mut builder = ProgramBuilder::new(1024, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1024, 0)?;
     let target = builder.qubit(0)?;
     let controls = (1..1024)
         .map(|index| Ok(Control::new(builder.qubit(index)?, ControlState::One)))
@@ -324,7 +326,7 @@ fn exact_mitm_charges_wide_operand_scan_before_visiting_window() -> Result<()> {
 #[gtest]
 fn exact_mitm_charges_source_phase_replay_before_visiting_window() -> Result<()> {
     let client = Client::new("/bin/false", WorkerLimits::default())?;
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     let q = builder.qubit(0)?;
     builder.gate(Gate::Phase(Angle::pi(1, 4)?), &[q], &[])?;
     let mut limits = MitmLimits::for_qubits(1)?;
@@ -346,7 +348,7 @@ fn exact_mitm_charges_source_phase_replay_before_visiting_window() -> Result<()>
 #[gtest]
 fn exact_mitm_rejects_malformed_limits_even_without_an_eligible_window() -> Result<()> {
     let client = Client::new("/bin/false", WorkerLimits::default())?;
-    let mut builder = ProgramBuilder::new(1, 1)?;
+    let mut builder = QuantumRegionBuilder::new(1, 1)?;
     let q = builder.qubit(0)?;
     let bit = builder.bit(0)?;
     builder.measure(q, bit)?;
@@ -356,7 +358,7 @@ fn exact_mitm_rejects_malformed_limits_even_without_an_eligible_window() -> Resu
         builder
             .finish()?
             .exact_mitm_candidate_from(0, &client, 0, limits, Limits::default(), 1,),
-        Err(WorkerError::Worker(quest_optimizer_client::Error::Limits))
+        Err(WorkerError::Worker(quest_circuit::optimizer::Error::Limits))
     ));
     Ok(())
 }

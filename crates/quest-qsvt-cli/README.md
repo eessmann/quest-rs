@@ -17,21 +17,39 @@ additional feature; it is never selected after a production failure.
 
 ```sh
 cargo run -p quest-qsvt-cli -- synthesize \
-  --input polynomial.json --output phases.json --mode canonical --certify
+  --input polynomial.json --output phases.json --mode real-parity-wx --certify
 cargo run -p quest-qsvt-cli -- synthesize \
-  --input laurent.json --output controls.json --mode generalized
+  --input laurent.json --output controls.json --mode unit-circle-response
 cargo run -p quest-qsvt-cli --features offline-synthesis -- offline-synthesize \
   --input polynomial.json --output phases.json
 cargo run -p quest-qsvt-cli -- catalog list
 cargo run -p quest-qsvt-cli -- catalog check --kappa 5 --epsilon 0.1 --certify
 ```
 
-Canonical input uses the IO crate's explicit polynomial bases, for example
-`{"basis":"Chebyshev","coefficients":[0.0,0.25]}`. Its phase export retains the
-`pyqsp-wx-symmetric` convention. Generalized construction requires an explicit
+Real-parity Wx input uses the IO crate's explicit polynomial bases, for example
+`{"basis":"Chebyshev","coefficients":[0.0,0.25]}`. Sequence-only phase output retains the
+`pyqsp-wx-symmetric` convention. Unit-circle construction requires an explicit
 nonnegative Laurent polynomial, for example
-`{"basis":"Laurent","coefficients":[[0.1,0.2],[0.05,-0.1]]}`. It writes the
-lossless `gqsp-matrix-upper-left-v1` control sequence, including the final control.
+`{"basis":"Laurent","coefficients":[[0.1,0.2],[0.05,-0.1]]}`.
+
+`--algorithm rhw` (default) selects structured Half-Cholesky;
+`--algorithm inverse-nlft` selects the divide-and-conquer nonlinear Fourier
+inverse. Both support both response conventions and both explicit precision
+routes. No solver or precision fallback occurs.
+
+`--export compiled` is the default. It stores the exact-bit source, target,
+complement and complete phase/control payload, solver/version/precision, limits,
+and SHA256 digest. `--certify` also stores a historical verification receipt.
+`--export sequence` explicitly exports the weaker tagged phase/control format
+and cannot be combined with `--certify`. A `--no-default-features` build supports
+binary64 synthesis with `--export sequence`; compiled artifacts require
+`certification`. For example:
+
+```sh
+cargo run -p quest-qsvt-cli --no-default-features -- synthesize \
+  --input polynomial.json --output sequence.json --export sequence \
+  --algorithm inverse-nlft
+```
 
 Production admission, completion and synthesis use binary64. `--certify`
 independently verifies that frozen export. `--tolerance` defaults to `1e-11`;
@@ -71,6 +89,19 @@ matrices. Polynomial files require `--synthesize-input` (binary64), or an earlie
 `synthesize` command. `--certify-input` separately certifies an explicitly
 synthesized frozen export. Neither flag enables offline fallback. Direct
 Hermitian admission and route-specific projector checks remain library checks.
+
+Compiled inputs are recognized separately from source/sequence JSON, validated,
+and independently recertified at `--input-tolerance` (default `1e-11`). Saved
+receipts are not trusted as acceptance evidence. Wx artifacts undergo fresh
+certification of the actual rounded projector phases/readout, retained by the
+native transform. Generalized artifacts retain their certificate in a typed
+route response. The explicitly chosen route transfers each absolute-order source
+coefficients to `T_k(x)` for direct/Hermitianized routes or `T_k(y)`, `y=x²`, for
+multiplication routes; it does not substitute a Laurent variable. The original
+Laurent offset, span and coefficient bits remain attached to the route meaning.
+The report records `certified_projector_payload` and `response_evidence`.
+Raw imported phase/control sequences remain explicitly weaker evidence.
+
 
 `embedded` preserves the supplied input mass and writes subnormalized logical
 amplitudes. Optional normalized output consumes the runtime conditioning stage;

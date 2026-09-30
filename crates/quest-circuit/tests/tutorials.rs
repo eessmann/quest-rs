@@ -1,11 +1,14 @@
 use googletest::prelude::*;
+use quest_circuit::classical::OptimizationLimits;
+#[allow(unused_imports)]
+use quest_circuit::prelude::*;
 use quest_circuit::{
-    Angle, FusionOptions, Gate, LinearOptions, ParityOptions, ProgramBuilder, StructuredProgram,
+    Angle, Constructed, FusionOptions, Gate, LinearOptions, ParityOptions, Program,
+    QuantumRegionBuilder,
     language::{
         GateKind, SourceId, SourceSnapshot,
         classical::{ScalarType, ScalarValue, Width},
         semantic::{CompileLimits, builder::Builder},
-        ssa::optimization::OptimizationLimits,
         syntax::BinaryOperator,
     },
 };
@@ -91,10 +94,10 @@ fn numeric_widths_and_integer_division_are_explicit() -> Result<()> {
     let narrowed = ScalarValue::parse_number("128")?.cast(ScalarType::Int(Width::new(8)?))?;
     verify_eq!(narrowed.to_i128()?, -128)?;
     verify_that!(
-        StructuredProgram::parse("bit result = true;", "implicit.qasm"),
+        Program::<Constructed>::parse("bit result = true;", "implicit.qasm"),
         err(anything())
     )?;
-    StructuredProgram::parse("bit result = bit(true);", "explicit.qasm")?;
+    Program::<Constructed>::parse("bit result = bit(true);", "explicit.qasm")?;
     Ok(())
 }
 // ANCHOR_END: numeric_rules
@@ -103,7 +106,7 @@ fn numeric_widths_and_integer_division_are_explicit() -> Result<()> {
 #[gtest]
 fn classical_optimization_reports_changes_and_retains_export_authority() -> Result<()> {
     let source = "qubit q; int n = 1 + 2; if (n == 3) { x q; } else { z q; }";
-    let program = StructuredProgram::parse(source, "optimize.qasm")?;
+    let program = Program::<Constructed>::parse(source, "optimize.qasm")?;
     let (optimized, report) = program
         .verify()?
         .optimize_classical(OptimizationLimits::default())?;
@@ -120,7 +123,7 @@ fn classical_optimization_reports_changes_and_retains_export_authority() -> Resu
 // ANCHOR: ideal_optimization
 #[gtest]
 fn ideal_builder_separates_exact_rewrites_binding_and_numerical_fusion() -> Result<()> {
-    let mut builder = ProgramBuilder::new(1, 0)?;
+    let mut builder = QuantumRegionBuilder::new(1, 0)?;
     let q = builder.qubit(0)?;
     let theta = builder.parameter("theta")?;
     builder.gate(Gate::H, &[q], &[])?;
@@ -198,7 +201,7 @@ fn owned_diagnostic_retains_source_and_typed_cause() -> Result<()> {
 // ANCHOR: structured_quantum_optimization
 #[gtest]
 fn structured_quantum_optimization_keeps_syntax_and_reports_inverse_pairs() -> Result<()> {
-    let program = StructuredProgram::parse("qubit q; h q; h q;", "quantum.qasm")?;
+    let program = Program::<Constructed>::parse("qubit q; h q; h q;", "quantum.qasm")?;
     let (optimized, report) = program
         .verify()?
         .optimize_quantum(quest_circuit::StructuredQuantumOptions::default())?;

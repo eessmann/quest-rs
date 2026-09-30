@@ -1,0 +1,11 @@
+   Compiling quest-synthesis v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-synthesis)
+   Compiling quest-language v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-language)
+   Compiling quest-sys v0.2.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-sys)
+   Compiling quest-optimizer-client v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-optimizer-client)
+   Compiling quest-qasm v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-qasm)
+   Compiling quest-macros v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-macros)
+warning: quest-sys@0.2.0: Using QuEST 4.3.0 from /nix/store/wj54sbcsi99kdis36q80zgzd5l63wg7j-quest-4.3.0 with /nix/store/2yfrcmkvspsrjhj283gdawqp37aghxva-clang-wrapper-21.1.8/bin/clang++
+   Compiling quest-rs v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest)
+   Compiling quest-compile v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-compile)
+   Compiling quest-circuit v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-circuit)
+    Finished `release` profile [optimized] target(s) in 17.34s

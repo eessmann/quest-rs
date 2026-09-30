@@ -73,12 +73,12 @@ fn synthesize(target: &quest_math::Target, epsilon_bits: u64, seed: u64) -> Outc
     match synthesis::synthesize(target, epsilon_bits, seed) {
         Ok((sequence, precision_bits)) => Outcome::Candidate {
             sequence,
-            engine: "rsgridsynth-0.2.2-quest.1".into(),
+            engine: "quest-synthesis-ross-selinger-lll-prime-norm-v1".into(),
             precision_bits,
         },
-        Err(message) => Outcome::Failure {
-            code: "synthesis".into(),
-            message,
+        Err(error) => Outcome::Failure {
+            code: synthesis::error_code(&error).into(),
+            message: error.to_string(),
         },
     }
 }

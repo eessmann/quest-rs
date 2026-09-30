@@ -1,0 +1,976 @@
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -2116,6 +2116,7 @@
+  "quest-language",
+  "quest-macros",
+  "quest-math",
++ "quest-optimizer-protocol",
+  "quest-qasm",
+  "serde_json",
+  "sha2",
+--- a/crates/quest-circuit/Cargo.toml
++++ b/crates/quest-circuit/Cargo.toml
+@@ -19,6 +19,7 @@
+ faer = { workspace = true, features = ["std", "linalg"] }
+ quest-language.workspace = true
+ quest-qasm.workspace = true
++quest-optimizer-protocol.workspace = true
+ num-bigint.workspace = true
+ num-complex.workspace = true
+ num-traits.workspace = true
+--- a/crates/quest-circuit/tests/beam_approx_contract.rs
++++ b/crates/quest-circuit/tests/beam_approx_contract.rs
+@@ -1,12 +1,12 @@
+ #![cfg(all(feature = "workers", target_os = "linux"))]
+ use googletest::{Result, prelude::*};
++use quest_circuit::optimizer::{Client, MitmResult, WorkerLimits};
+ #[allow(unused_imports)]
+ use quest_circuit::prelude::*;
+ use quest_circuit::{
+     Angle, BoundAngleTarget, Control, ControlState, Gate, QuantumRegionBuilder, WorkerError,
+ };
+ use quest_math::Limits;
+-use quest_optimizer_client::{Client, MitmResult, WorkerLimits};
+ use quest_optimizer_protocol::MitmLimits;
+ use std::os::unix::fs::PermissionsExt;
+ 
+--- a/crates/quest-circuit/tests/beam_contract.rs
++++ b/crates/quest-circuit/tests/beam_contract.rs
+@@ -207,7 +207,7 @@
+ }
+ 
+ #[cfg(all(feature = "workers", target_os = "linux"))]
+-fn worker_script(body: &str) -> Result<(std::path::PathBuf, quest_optimizer_client::Client)> {
++fn worker_script(body: &str) -> Result<(std::path::PathBuf, quest_circuit::optimizer::Client)> {
+     use std::os::unix::fs::PermissionsExt;
+     use std::sync::atomic::{AtomicUsize, Ordering};
+     static NEXT_SCRIPT: AtomicUsize = AtomicUsize::new(0);
+@@ -219,9 +219,9 @@
+     ));
+     std::fs::write(&path, body)?;
+     std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700))?;
+-    let client = quest_optimizer_client::Client::new(
++    let client = quest_circuit::optimizer::Client::new(
+         path.clone(),
+-        quest_optimizer_client::WorkerLimits::default(),
++        quest_circuit::optimizer::WorkerLimits::default(),
+     )?;
+     Ok((path, client))
+ }
+@@ -619,7 +619,7 @@
+     expect_true!(matches!(
+         result,
+         Err(quest_circuit::Error::Worker(error))
+-            if matches!(*error, quest_circuit::WorkerError::Worker(quest_optimizer_client::Error::Envelope))
++            if matches!(error.downcast_ref::<quest_circuit::WorkerError>(), Some(quest_circuit::WorkerError::Worker(quest_circuit::optimizer::Error::Envelope)))
+     ));
+     Ok(())
+ }
+--- a/crates/quest-circuit/tests/beam_mitm_contract.rs
++++ b/crates/quest-circuit/tests/beam_mitm_contract.rs
+@@ -1,11 +1,11 @@
+ #![cfg(all(feature = "workers", target_os = "linux"))]
+ use googletest::{Result, prelude::*};
++use quest_circuit::optimizer::{Client, MitmResult, WorkerLimits};
+ #[allow(unused_imports)]
+ use quest_circuit::prelude::*;
+ use quest_circuit::{Angle, Gate, Operation, QuantumRegionBuilder};
+ use quest_circuit::{Control, ControlState, WorkerError};
+ use quest_math::Limits;
+-use quest_optimizer_client::{Client, MitmResult, WorkerLimits};
+ use quest_optimizer_protocol::MitmLimits;
+ use std::os::unix::fs::PermissionsExt;
+ 
+@@ -215,7 +215,7 @@
+             1,
+         ),
+         Err(WorkerError::Worker(
+-            quest_optimizer_client::Error::Verification(_)
++            quest_circuit::optimizer::Error::Verification(_)
+         ))
+     ));
+     Ok(())
+@@ -358,7 +358,7 @@
+         builder
+             .finish()?
+             .exact_mitm_candidate_from(0, &client, 0, limits, Limits::default(), 1,),
+-        Err(WorkerError::Worker(quest_optimizer_client::Error::Limits))
+-    ));
+-    Ok(())
+-}
++        Err(WorkerError::Worker(quest_circuit::optimizer::Error::Limits))
++    ));
++    Ok(())
++}
+--- /dev/null
++++ b/crates/quest-circuit/tests/generator_error_contract.rs
+@@ -0,0 +1,76 @@
++#![cfg(any(feature = "synthesis", feature = "workers"))]
++use googletest::prelude::*;
++use quest_circuit::{
++    Angle, Gate, GenerationError, QuantumRegionBuilder, RotationGenerator, RotationSynthesisPasses,
++    SynthesisError, WorkerError, optimizer,
++};
++use quest_math::{ApproxCertificate, Limits, Target};
++
++#[derive(Clone, Copy)]
++enum Failure {
++    Decline,
++    Timeout,
++    Envelope,
++    Cancelled,
++    Certificate,
++}
++impl RotationGenerator for Failure {
++    fn synthesize_rotation(
++        &self,
++        _: &Target,
++        _: f64,
++        _: u64,
++        _: Limits,
++    ) -> std::result::Result<ApproxCertificate, GenerationError> {
++        Err(match self {
++            Self::Decline => GenerationError::Process(optimizer::Error::Candidate {
++                code: "declined".into(),
++                message: "use MITM".into(),
++            }),
++            Self::Timeout => GenerationError::Process(optimizer::Error::Timeout),
++            Self::Envelope => GenerationError::Process(optimizer::Error::Envelope),
++            Self::Cancelled => GenerationError::Native(SynthesisError::Cancelled),
++            Self::Certificate => {
++                GenerationError::CertificateRejected(quest_math::Error::NotCertified)
++            }
++        })
++    }
++}
++#[gtest]
++fn rotation_generation_preserves_process_classification_and_native_failures() -> Result<()> {
++    let mut b = QuantumRegionBuilder::new(1, 0)?;
++    b.gate(Gate::Rx(Angle::radians(0.1)?), &[b.qubit(0)?], &[])?;
++    let region = b.finish()?;
++    for failure in [
++        Failure::Decline,
++        Failure::Timeout,
++        Failure::Envelope,
++        Failure::Cancelled,
++        Failure::Certificate,
++    ] {
++        let result = region
++            .clone()
++            .synthesize_rotations(&failure, 0.2, 0, Limits::default());
++        let correct = match (failure, result) {
++            (
++                Failure::Decline,
++                Err(WorkerError::Worker(optimizer::Error::Candidate { code, message })),
++            ) => code == "declined" && message == "use MITM",
++            (Failure::Timeout, Err(WorkerError::Worker(optimizer::Error::Timeout)))
++            | (Failure::Envelope, Err(WorkerError::Worker(optimizer::Error::Envelope)))
++            | (
++                Failure::Cancelled,
++                Err(WorkerError::Generator(GenerationError::Native(SynthesisError::Cancelled))),
++            )
++            | (
++                Failure::Certificate,
++                Err(WorkerError::Generator(GenerationError::CertificateRejected(
++                    quest_math::Error::NotCertified,
++                ))),
++            ) => true,
++            _ => false,
++        };
++        expect_true!(correct);
++    }
++    Ok(())
++}
+--- a/crates/quest-circuit/tests/worker_contract.rs
++++ b/crates/quest-circuit/tests/worker_contract.rs
+@@ -1,10 +1,10 @@
+ #![cfg(all(feature = "workers", target_os = "linux"))]
+ use googletest::{Result, prelude::*};
++use quest_circuit::optimizer::{Client, WorkerLimits};
+ #[allow(unused_imports)]
+ use quest_circuit::prelude::*;
+ use quest_circuit::{Gate, QuantumRegionBuilder};
+ use quest_math::Limits;
+-use quest_optimizer_client::{Client, WorkerLimits};
+ 
+ #[cfg(all(target_os = "linux", feature = "macros"))]
+ #[gtest]
+--- a/crates/quest-compile/src/workers.rs
++++ b/crates/quest-compile/src/workers.rs
+@@ -22,7 +22,7 @@
+ #[derive(Debug, thiserror::Error)]
+ pub enum WorkerError {
+     #[error(transparent)]
+-    Generator(#[from] crate::GenerationError),
++    Generator(crate::GenerationError),
+     #[error(transparent)]
+     Circuit(#[from] Error),
+     #[error(transparent)]
+@@ -35,6 +35,17 @@
+     RejectedOutput(&'static str),
+     #[error("explicit ordering constraints are not supported by this worker transformation")]
+     Ordering,
++}
++impl From<crate::GenerationError> for WorkerError {
++    fn from(error: crate::GenerationError) -> Self {
++        match error {
++            // Process backends share the existing worker scheduling contract:
++            // a decline permits another generator, timeout stops bounded search,
++            // and invalid envelopes/certificates remain hard typed failures.
++            crate::GenerationError::Process(error) => Self::Worker(error),
++            error => Self::Generator(error),
++        }
++    }
+ }
+ /// Certificate for one source occurrence, with its physical ordered interface.
+ #[derive(Debug, Clone)]
+--- a/crates/quest-optimizer-worker/tests/circuit_contract.rs
++++ b/crates/quest-optimizer-worker/tests/circuit_contract.rs
+@@ -1,8 +1,10 @@
+ #![cfg(all(target_os = "linux", any(feature = "synthesis", feature = "zx")))]
+ use googletest::prelude::*;
++#[cfg(feature = "zx")]
++use quest_circuit::ZxPasses;
+ #[cfg(feature = "synthesis")]
+-use quest_circuit::{Angle, Control, ControlState};
+-use quest_circuit::{Gate, ProgramBuilder};
++use quest_circuit::{Angle, Control, ControlState, ExactPasses, RotationSynthesisPasses};
++use quest_circuit::{Gate, QuantumRegionBuilder};
+ use quest_math::Limits;
+ use quest_optimizer_client::{Client, WorkerLimits};
+ fn worker() -> Result<Client> {
+@@ -15,7 +17,7 @@
+ #[cfg(feature = "synthesis")]
+ #[gtest]
+ fn explicit_synthesis_retains_target_identity_control_phase_and_local_certificates() -> Result<()> {
+-    let mut builder = ProgramBuilder::new(3, 0)?;
++    let mut builder = QuantumRegionBuilder::new(3, 0)?;
+     let q = builder.qubit(2)?;
+     let c = builder.qubit(0)?;
+     let source = builder.gate(
+@@ -61,7 +63,7 @@
+             _ => fail!("unexpected synthesized effect")?,
+         }
+     }
+-    let mut builder = ProgramBuilder::new(1, 1)?;
++    let mut builder = QuantumRegionBuilder::new(1, 1)?;
+     builder.gate(Gate::Rx(Angle::pi(1, 2)?), &[builder.qubit(0)?], &[])?;
+     builder.measure(builder.qubit(0)?, builder.bit(0)?)?;
+     let (_, report) =
+@@ -76,7 +78,7 @@
+ #[cfg(feature = "zx")]
+ #[gtest]
+ fn zx_replacements_are_transactional_and_preserve_measurement_occurrences() -> Result<()> {
+-    let mut builder = ProgramBuilder::new(1, 1)?;
++    let mut builder = QuantumRegionBuilder::new(1, 1)?;
+     let q = builder.qubit(0)?;
+     builder.gate(Gate::H, &[q], &[])?;
+     builder.gate(Gate::H, &[q], &[])?;
+--- a/crates/quest-synthesis/README.md
++++ b/crates/quest-synthesis/README.md
+@@ -72,6 +72,14 @@
+ 
+ ## Validation
+ 
++The grid enumerator intersects its weighted lattice sphere with the necessary
++coefficient-norm ball and a conservative radial bound from exact enclosures.
++This prunes infeasible branches at special angles without changing the target
++or epsilon. A conservative grid storage allowance remains reserved while norm
++solving, exact synthesis and certification run; callbacks receive the remaining
++byte allowance. Public results retain the original request limits. These are
++modeled category bounds, not a universal heap-peak or allocator guarantee.
++
+ ```sh
+ devenv shell -- cargo test -p quest-math -p quest-synthesis -p quest-optimizer-client
+ devenv shell -- cargo clippy -p quest-math -p quest-synthesis --lib
+--- a/crates/quest-synthesis/src/approximation.rs
++++ b/crates/quest-synthesis/src/approximation.rs
+@@ -303,52 +303,57 @@
+     let mut rng = Rng(options.seed);
+     let reverse = rng.next() & 1 != 0;
+     let lattice = crate::grid::Grid::new(&enclosure, &epsilon, &mut budget)?;
+-    for exponent in 0..=options.max_grid_exponent / 2 {
+-        budget.charge(1)?;
+-        if u64::from(exponent).saturating_mul(2).saturating_add(4) > options.limits.coefficient_bits
+-        {
+-            return Err(SynthesisError::Budget {
+-                resource: "grid coefficient bits",
+-            });
+-        }
+-        let radius = BigInt::one() << exponent;
+-        let norm = &radius * &radius;
+-        let result = lattice.enumerate(exponent, &mut budget, |[a, b, c, d], budget| {
++    let mut result = budget.with_reserved_bytes(lattice.reserved_bytes(), |budget| {
++        for exponent in 0..=options.max_grid_exponent / 2 {
+             budget.charge(1)?;
+-            let n = &norm - &a * &a - &b * &b - &c * &c - &d * &d;
+-            let m = -(&a * (&b - &d) + &c * (&b + &d));
+-            if n < BigInt::zero() || &n * &n < &m * &m * 2 {
+-                return Ok(None);
++            if u64::from(exponent).saturating_mul(2).saturating_add(4)
++                > options.limits.coefficient_bits
++            {
++                return Err(SynthesisError::Budget {
++                    resource: "grid coefficient bits",
++                });
+             }
+-            let (rxlo, rxhi) = scale_interval(root_lo, root_hi, &(&b - &d));
+-            let (iylo, iyhi) = scale_interval(root_lo, root_hi, &(&b + &d));
+-            let uxlo = &a * &grid + rxlo;
+-            let uxhi = &a * &grid + rxhi;
+-            let uylo = &c * &grid + iylo;
+-            let uyhi = &c * &grid + iyhi;
+-            let dot = max_product(&uxlo, &uxhi, xlo, xhi) + max_product(&uylo, &uyhi, ylo, yhi);
+-            if dot * &cap_d < &cap_n * &grid * &grid * &radius {
+-                return Ok(None);
++            let radius = BigInt::one() << exponent;
++            let norm = &radius * &radius;
++            let result = lattice.enumerate(exponent, budget, |[a, b, c, d], budget| {
++                budget.charge(1)?;
++                let n = &norm - &a * &a - &b * &b - &c * &c - &d * &d;
++                let m = -(&a * (&b - &d) + &c * (&b + &d));
++                if n < BigInt::zero() || &n * &n < &m * &m * 2 {
++                    return Ok(None);
++                }
++                let (rxlo, rxhi) = scale_interval(root_lo, root_hi, &(&b - &d));
++                let (iylo, iyhi) = scale_interval(root_lo, root_hi, &(&b + &d));
++                let uxlo = &a * &grid + rxlo;
++                let uxhi = &a * &grid + rxhi;
++                let uylo = &c * &grid + iylo;
++                let uyhi = &c * &grid + iyhi;
++                let dot = max_product(&uxlo, &uxhi, xlo, xhi) + max_product(&uylo, &uyhi, ylo, yhi);
++                if dot * &cap_d < &cap_n * &grid * &grid * &radius {
++                    return Ok(None);
++                }
++                let solution = if n.bits() <= 12 {
++                    norm_solution(&n, &m, budget, reverse)?
++                } else {
++                    match crate::norm_equation::solve(&n, &m, budget, rng.next())? {
++                        crate::norm_equation::NormOutcome::Solution(t) => Some(t),
++                        crate::norm_equation::NormOutcome::NoSolution
++                        | crate::norm_equation::NormOutcome::Unresolved => None,
++                    }
++                };
++                let Some(t) = solution else {
++                    return Ok(None);
++                };
++                finish_candidate([a, b, c, d], t, exponent, target, epsilon_bits, budget)
++            })?;
++            if let Some(result) = result {
++                return Ok(result);
+             }
+-            let solution = if n.bits() <= 12 {
+-                norm_solution(&n, &m, budget, reverse)?
+-            } else {
+-                match crate::norm_equation::solve(&n, &m, budget, rng.next())? {
+-                    crate::norm_equation::NormOutcome::Solution(t) => Some(t),
+-                    crate::norm_equation::NormOutcome::NoSolution
+-                    | crate::norm_equation::NormOutcome::Unresolved => None,
+-                }
+-            };
+-            let Some(t) = solution else {
+-                return Ok(None);
+-            };
+-            finish_candidate([a, b, c, d], t, exponent, target, epsilon_bits, budget)
+-        })?;
+-        if let Some(result) = result {
+-            return Ok(result);
+-        }
+-    }
+-    Err(SynthesisError::Budget {
+-        resource: "grid exponent",
+-    })
+-}
++        }
++        Err(SynthesisError::Budget {
++            resource: "grid exponent",
++        })
++    })?;
++    result.limits = options.limits;
++    Ok(result)
++}
+--- a/crates/quest-synthesis/src/grid.rs
++++ b/crates/quest-synthesis/src/grid.rs
+@@ -18,9 +18,65 @@
+     mu: [RVector; 4],
+     norms: [Rational; 4],
+ }
++#[derive(Clone, Copy)]
++struct SearchWindow<'a> {
++    weighted: &'a Rational,
++    coefficient: &'a Rational,
++    radial_error: &'a Rational,
++    radial_headroom: &'a Rational,
++}
++struct IntegerWindow {
++    middle: BigInt,
++    bound: BigInt,
++    lower: BigInt,
++    upper: BigInt,
++}
++fn integer_window(
++    centers: [&Rational; 2],
++    radii_squared: [&Rational; 2],
++    budget: &mut Budget,
++) -> Result<Option<IntegerWindow>> {
++    let bounds: [BigInt; 2] = [
++        crate::approximation::sqrt(
++            &(radii_squared[0].numer() / radii_squared[0].denom()),
++            budget,
++        )? + 2,
++        crate::approximation::sqrt(
++            &(radii_squared[1].numer() / radii_squared[1].denom()),
++            budget,
++        )? + 2,
++    ];
++    let preferred = nearest(centers[0]);
++    let secondary = nearest(centers[1]);
++    let lower = (&preferred - &bounds[0]).max(&secondary - &bounds[1]);
++    let upper = (&preferred + &bounds[0]).min(&secondary + &bounds[1]);
++    for value in [
++        &bounds[0], &bounds[1], &preferred, &secondary, &lower, &upper,
++    ] {
++        admit(value, budget)?;
++    }
++    if lower > upper {
++        return Ok(None);
++    }
++    let middle = preferred.clamp(lower.clone(), upper.clone());
++    let bound = (&middle - &lower).max(&upper - &middle);
++    admit(&bound, budget)?;
++    Ok(Some(IntegerWindow {
++        middle,
++        bound,
++        lower,
++        upper,
++    }))
++}
+ pub(crate) struct Grid {
++    #[cfg(test)]
++    original_basis: Basis,
++    reserved_bytes: usize,
+     transform: Basis,
+     orthogonal: Orthogonal,
++    coefficient_metric: Orthogonal,
++    radial_projection: RVector,
++    radial_headroom: Rational,
+     center: BigInt,
+     radius: BigInt,
+ }
+@@ -167,6 +223,7 @@
+         }
+         let (xlo, xhi) = target.coordinate(0)?;
+         let (ylo, yhi) = target.coordinate(1)?;
++        let target_width = (xhi - xlo) + (yhi - ylo);
+         if ((xhi - xlo) + (yhi - ylo)) * ed * ed * 4096 > en * en * &scale {
+             return Err(SynthesisError::PrecisionUnresolved {
+                 precision_bits: target.bits(),
+@@ -188,6 +245,7 @@
+         )?;
+         let root = DyadicBox8::from_exact(&matrix, target.bits(), budget.options.limits)?;
+         let (lo, hi) = root.coordinate(0)?;
++        let root_width = hi - lo;
+         let r = (lo + hi) >> 1;
+         let radial = [&x * &scale, &r * (&x + &y), &y * &scale, &r * (-&x + &y)];
+         let tangent = [-&y * &scale, &r * (-&y + &x), &x * &scale, &r * (&y + &x)];
+@@ -196,17 +254,49 @@
+         let factors = [ed * ed * 8, ed * en * 4, en * en * 2, en * en * 2];
+         let rows = [radial, tangent, bullet_real, bullet_imag];
+         let basis = std::array::from_fn(|i| std::array::from_fn(|j| &rows[j][i] * &factors[j]));
++        #[cfg(test)]
++        let original_basis = basis.clone();
+         let (transform, orthogonal) = reduce(basis, budget)?;
++        let coefficient_metric = self::orthogonal(&transform, budget)?;
+         let center = (ed * ed * 8 - en * en) * &square;
++        // If both algebraic embeddings lie in the unit disk, the coefficient
++        // norm is at most one. Replacing sqrt(1/2) by its enclosure midpoint
++        // changes the physical point's L1 norm by at most 2*root_width/scale.
++        // The target midpoint's norm is at most 1+target_width/scale. Thus this
++        // exact rational radial upper bound includes every feasible point.
++        let radial_headroom = Rational::from_integer(
++            ed * ed * 8 * (&scale + target_width) * (&scale + root_width * 2) - &center,
++        );
++        budget.charge(64)?;
++        let mut radial_projection = std::array::from_fn(|_| Rational::zero());
++        let mut projection = Rational::zero();
++        for i in 0..4 {
++            projection +=
++                &orthogonal.vectors[i][0] * &orthogonal.vectors[i][0] / &orthogonal.norms[i];
++            admit_rational(&projection, budget)?;
++            radial_projection[i] = projection.clone();
++        }
++        admit_rational(&radial_headroom, budget)?;
+         let radius = en * en * &square * 6;
+         admit(&center, budget)?;
+         admit(&radius, budget)?;
+         Ok(Self {
++            #[cfg(test)]
++            original_basis,
++            reserved_bytes: usize::try_from(scratch).map_err(|_| SynthesisError::Budget {
++                resource: "lattice bytes",
++            })?,
+             transform,
+             orthogonal,
++            coefficient_metric,
++            radial_projection,
++            radial_headroom,
+             center,
+             radius,
+         })
++    }
++    pub(crate) const fn reserved_bytes(&self) -> usize {
++        self.reserved_bytes
+     }
+     pub(crate) fn enumerate<T>(
+         &self,
+@@ -214,8 +304,9 @@
+         budget: &mut Budget,
+         mut visit: impl FnMut(Vector, &mut Budget) -> Result<Option<T>>,
+     ) -> Result<Option<T>> {
+-        budget.charge(1)?;
++        budget.charge(16)?;
+         let factor = BigInt::one() << exponent;
++        admit(&factor, budget)?;
+         let center = &self.center * &factor;
+         admit(&center, budget)?;
+         let y = std::array::from_fn(|i| {
+@@ -223,58 +314,111 @@
+                 / &self.orthogonal.norms[i]
+         });
+         let radius = &self.radius * &factor;
++        admit(&radius, budget)?;
+         let remaining = Rational::from_integer(&radius * &radius);
++        let coefficient_radius = Rational::from_integer(&factor * &factor);
++        let radial_headroom = &self.radial_headroom * Rational::from_integer(factor);
+         for value in &y {
+             admit_rational(value, budget)?;
+         }
+         admit_rational(&remaining, budget)?;
++        admit_rational(&coefficient_radius, budget)?;
++        admit_rational(&radial_headroom, budget)?;
+         self.enumerate_level(
+             3,
+             &y,
+             &mut std::array::from_fn(|_| BigInt::zero()),
+-            &remaining,
++            SearchWindow {
++                weighted: &remaining,
++                coefficient: &coefficient_radius,
++                radial_error: &Rational::zero(),
++                radial_headroom: &radial_headroom,
++            },
+             budget,
+             &mut visit,
+         )
++    }
++    fn outside_radial_bound(
++        &self,
++        level: usize,
++        remaining: SearchWindow<'_>,
++        budget: &Budget,
++    ) -> Result<bool> {
++        let radial_excess = remaining.radial_error - remaining.radial_headroom;
++        admit_rational(&radial_excess, budget)?;
++        if radial_excess.is_positive() {
++            let squared_excess = &radial_excess * &radial_excess;
++            let reachable = remaining.weighted * &self.radial_projection[level];
++            admit_rational(&squared_excess, budget)?;
++            admit_rational(&reachable, budget)?;
++            if squared_excess > reachable {
++                return Ok(true);
++            }
++        }
++        Ok(false)
+     }
+     fn enumerate_level<T>(
+         &self,
+         level: usize,
+         y: &RVector,
+         coefficients: &mut Vector,
+-        remaining: &Rational,
++        remaining: SearchWindow<'_>,
+         budget: &mut Budget,
+         visit: &mut impl FnMut(Vector, &mut Budget) -> Result<Option<T>>,
+     ) -> Result<Option<T>> {
+-        budget.charge(1)?;
++        budget.charge(16)?;
++        if self.outside_radial_bound(level, remaining, budget)? {
++            return Ok(None);
++        }
+         let mut center = y[level].clone();
++        let mut coefficient_center = Rational::zero();
+         for j in (level + 1)..4 {
+             center -=
+                 &self.orthogonal.mu[j][level] * Rational::from_integer(coefficients[j].clone());
+             admit_rational(&center, budget)?;
+-        }
+-        let radius_squared = remaining / &self.orthogonal.norms[level];
++            coefficient_center -= &self.coefficient_metric.mu[j][level]
++                * Rational::from_integer(coefficients[j].clone());
++            admit_rational(&coefficient_center, budget)?;
++        }
++        let radius_squared = remaining.weighted / &self.orthogonal.norms[level];
++        let coefficient_radius = remaining.coefficient / &self.coefficient_metric.norms[level];
++        admit_rational(&coefficient_radius, budget)?;
+         admit_rational(&radius_squared, budget)?;
+-        let bound =
+-            crate::approximation::sqrt(&(radius_squared.numer() / radius_squared.denom()), budget)?
+-                + 2;
+-        let middle = nearest(&center);
+-        admit(&bound, budget)?;
+-        admit(&middle, budget)?;
++        let Some(IntegerWindow {
++            middle,
++            bound,
++            lower,
++            upper,
++        }) = integer_window(
++            [&center, &coefficient_center],
++            [&radius_squared, &coefficient_radius],
++            budget,
++        )?
++        else {
++            return Ok(None);
++        };
+         let mut offset = BigInt::zero();
+         while offset <= bound {
+             for sign in [1, -1] {
+                 if offset.is_zero() && sign < 0 {
+                     continue;
+                 }
+-                budget.charge(1)?;
++                budget.charge(8)?;
+                 let value: BigInt = &middle + &offset * sign;
+                 admit(&value, budget)?;
++                if value < lower || value > upper {
++                    continue;
++                }
+                 let error = Rational::from_integer(value.clone()) - &center;
+                 admit_rational(&error, budget)?;
+                 let cost = &error * &error * &self.orthogonal.norms[level];
+                 admit_rational(&cost, budget)?;
+-                if &cost > remaining {
++                let coefficient_error = Rational::from_integer(value.clone()) - &coefficient_center;
++                let coefficient_cost =
++                    &coefficient_error * &coefficient_error * &self.coefficient_metric.norms[level];
++                admit_rational(&coefficient_error, budget)?;
++                admit_rational(&coefficient_cost, budget)?;
++                if &cost > remaining.weighted || &coefficient_cost > remaining.coefficient {
+                     continue;
+                 }
+                 coefficients[level] = value;
+@@ -291,11 +435,27 @@
+                         return Ok(Some(result));
+                     }
+                 } else {
+-                    let remaining = remaining - cost;
+-                    admit_rational(&remaining, budget)?;
+-                    if let Some(result) =
+-                        self.enumerate_level(level - 1, y, coefficients, &remaining, budget, visit)?
+-                    {
++                    let next = [
++                        remaining.weighted - cost,
++                        remaining.coefficient - coefficient_cost,
++                        remaining.radial_error + &error * &self.orthogonal.vectors[level][0],
++                    ];
++                    for value in &next {
++                        admit_rational(value, budget)?;
++                    }
++                    if let Some(result) = self.enumerate_level(
++                        level - 1,
++                        y,
++                        coefficients,
++                        SearchWindow {
++                            weighted: &next[0],
++                            coefficient: &next[1],
++                            radial_error: &next[2],
++                            radial_headroom: remaining.radial_headroom,
++                        },
++                        budget,
++                        visit,
++                    )? {
+                         return Ok(Some(result));
+                     }
+                 }
+@@ -311,6 +471,80 @@
+     use super::*;
+     use crate::SynthesisOptions;
+     use quest_math::{AngleTarget, Axis, Rational, Target, rotation_enclosure};
++    #[expect(
++        clippy::many_single_char_names,
++        reason = "Exact algebraic coefficients and relative norm components"
++    )]
++    fn feasible(point: &Vector, radius: &BigInt) -> bool {
++        let [a, b, c, d] = point;
++        let n = radius * radius - a * a - b * b - c * c - d * d;
++        let m = a * (b - d) + c * (b + d);
++        !n.is_negative() && &n * &n >= &m * &m * 2
++    }
++    fn in_original_sphere(grid: &Grid, point: &Vector, factor: &BigInt) -> bool {
++        let embedded: Vector = std::array::from_fn(|j| {
++            (0..4).fold(BigInt::zero(), |sum, i| {
++                sum + &point[i] * &grid.original_basis[i][j]
++            })
++        });
++        let mut difference = embedded;
++        difference[0] -= &grid.center * factor;
++        let cost = difference.iter().fold(BigInt::zero(), |sum, x| sum + x * x);
++        let radius = &grid.radius * factor;
++        cost <= &radius * &radius
++    }
++    #[test]
++    fn intersection_pruning_preserves_every_feasible_small_grid_point() {
++        for (numerator, denominator) in [(0, 1), (1, 1), (1, 2), (1, 4), (1, 7), (-1, 4), (5, 4)] {
++            let options = SynthesisOptions::default();
++            let mut budget = Budget {
++                options: options.clone(),
++                used: 0,
++            };
++            let target = Target {
++                axis: Axis::Z,
++                angle: AngleTarget::RationalPi {
++                    numerator: numerator.into(),
++                    denominator: denominator.into(),
++                },
++            };
++            let enclosure =
++                rotation_enclosure(&target, options.limits.precision_bits, options.limits).unwrap();
++            let grid =
++                Grid::new(&enclosure, &Rational::new(1.into(), 2.into()), &mut budget).unwrap();
++            for exponent in 0..=2 {
++                let radius = 1i32 << exponent;
++                let factor = BigInt::from(radius);
++                let mut expected = std::collections::BTreeSet::new();
++                for a in -radius..=radius {
++                    for b in -radius..=radius {
++                        for c in -radius..=radius {
++                            for d in -radius..=radius {
++                                let point = [a.into(), b.into(), c.into(), d.into()];
++                                if feasible(&point, &factor)
++                                    && in_original_sphere(&grid, &point, &factor)
++                                {
++                                    expected.insert(point);
++                                }
++                            }
++                        }
++                    }
++                }
++                let mut actual = std::collections::BTreeSet::new();
++                grid.enumerate(exponent, &mut budget, |point, _| {
++                    if feasible(&point, &factor) {
++                        actual.insert(point);
++                    }
++                    Ok(None::<()>)
++                })
++                .unwrap();
++                assert_eq!(
++                    actual, expected,
++                    "numerator={numerator} denominator={denominator} exponent={exponent}"
++                );
++            }
++        }
++    }
+     #[test]
+     fn orthogonal_rational_storage_obeys_coefficient_bounds() {
+         let mut budget = Budget {
+--- a/crates/quest-synthesis/src/lib.rs
++++ b/crates/quest-synthesis/src/lib.rs
+@@ -114,6 +114,19 @@
+     used: u64,
+ }
+ impl Budget {
++    fn with_reserved_bytes<T>(
++        &mut self,
++        bytes: usize,
++        operation: impl FnOnce(&mut Self) -> Result<T>,
++    ) -> Result<T> {
++        let original = self.options.limits.bytes;
++        self.options.limits.bytes = original.checked_sub(bytes).ok_or(SynthesisError::Budget {
++            resource: "live synthesis bytes",
++        })?;
++        let result = operation(self);
++        self.options.limits.bytes = original;
++        result
++    }
+     // Conservative logical units for independent scalar interval reconstruction:
+     // fixed 2x2 arithmetic plus bounded Taylor and precision-grid iterations.
+     fn rotation_certificate(&mut self, gates: usize, attempts: usize) -> Result<()> {
+@@ -179,3 +192,31 @@
+ }
+ 
+ mod norm_equation;
++
++#[cfg(test)]
++mod budget_tests {
++    use super::*;
++    #[test]
++    fn byte_reservation_restores_limits_on_success_and_failure() {
++        let mut budget = Budget {
++            options: SynthesisOptions::default(),
++            used: 0,
++        };
++        let original = budget.options.limits;
++        let result = budget.with_reserved_bytes(original.bytes, |remaining| {
++            assert_eq!(remaining.options.limits.bytes, 0);
++            remaining.charge(1)?;
++            Ok(17)
++        });
++        assert_eq!(result, Ok(17));
++        assert_eq!(budget.options.limits, original);
++        let result = budget.with_reserved_bytes(original.bytes, |remaining| {
++            assert_eq!(remaining.options.limits.bytes, 0);
++            remaining.charge(1)?;
++            Err::<(), _>(SynthesisError::Cancelled)
++        });
++        assert_eq!(result, Err(SynthesisError::Cancelled));
++        assert_eq!(budget.options.limits, original);
++        assert_eq!(budget.used, 2);
++    }
++}
+--- a/crates/quest-synthesis/tests/approximation.rs
++++ b/crates/quest-synthesis/tests/approximation.rs
+@@ -1,5 +1,69 @@
+ use quest_math::*;
+ use quest_synthesis::*;
++#[test]
++fn quarter_pi_full_phase_candidate_at_twelve_digits() {
++    let target = Target {
++        axis: Axis::Z,
++        angle: AngleTarget::RationalPi {
++            numerator: 1.into(),
++            denominator: 4.into(),
++        },
++    };
++    let result = approximate_rotation(
++        &target,
++        1e-12_f64.to_bits(),
++        SynthesisOptions {
++            seed: 1234,
++            ..SynthesisOptions::default()
++        },
++    )
++    .unwrap();
++    let repeated = approximate_rotation(
++        &target,
++        1e-12_f64.to_bits(),
++        SynthesisOptions {
++            seed: 1234,
++            ..SynthesisOptions::default()
++        },
++    )
++    .unwrap();
++    assert_eq!(result.sequence(), repeated.sequence());
++    assert_eq!(result.work(), repeated.work());
++    certify_rotation(
++        result.sequence(),
++        &target,
++        1e-12_f64.to_bits(),
++        Limits::default(),
++    )
++    .unwrap();
++    let mut wrong_phase = result.sequence().clone();
++    wrong_phase.operations.push(Operation {
++        gate: Gate::W,
++        targets: vec![],
++        controls: vec![],
++    });
++    assert!(
++        certify_rotation(
++            &wrong_phase,
++            &target,
++            1e-12_f64.to_bits(),
++            Limits::default()
++        )
++        .is_err()
++    );
++    assert!(matches!(
++        approximate_rotation(
++            &target,
++            1e-12_f64.to_bits(),
++            SynthesisOptions {
++                seed: 1234,
++                max_work: result.work().saturating_sub(1),
++                ..SynthesisOptions::default()
++            },
++        ),
++        Err(SynthesisError::WorkExhausted { .. })
++    ));
++}
+ fn options() -> SynthesisOptions {
+     SynthesisOptions {
+         limits: Limits {
+--- a/crates/quest-synthesis/tests/resources.rs
++++ b/crates/quest-synthesis/tests/resources.rs
+@@ -10,6 +10,36 @@
+             pi_denominator: 5.into(),
+         },
+     }
++}
++
++#[test]
++fn live_grid_storage_is_unavailable_to_candidate_callbacks() {
++    let limits = Limits {
++        bytes: 8_388_608,
++        ..Limits::default()
++    };
++    // This is exactly the conservative grid reservation at the default
++    // 16,384 coefficient bits. Candidate/certificate storage must be additional.
++    let result = approximate_rotation(
++        &target(),
++        0.2_f64.to_bits(),
++        SynthesisOptions {
++            limits,
++            ..SynthesisOptions::default()
++        },
++    );
++    assert!(matches!(
++        result,
++        Err(SynthesisError::Budget { .. }
++            | SynthesisError::Math(
++                quest_math::Error::Budget { .. } | quest_math::Error::Resource(_)
++            ))
++    ));
++    let accepted =
++        approximate_rotation(&target(), 0.2_f64.to_bits(), SynthesisOptions::default()).unwrap();
++    assert_eq!(accepted.limits(), Limits::default());
++    assert_eq!(accepted.certificate().target(), &target());
++    assert_eq!(accepted.certificate().epsilon_bits(), 0.2_f64.to_bits());
+ }
+ 
+ #[test]
+--- a/devenv.nix
++++ b/devenv.nix
+@@ -13,27 +13,31 @@
+   };
+ in
+ {
++  stdenv = nativeStdenv;
+   languages.rust = {
+     enable = true;
+     toolchainFile = ./rust-toolchain.toml;
+     # Editor integration is managed separately from the configured toolchain.
+     lsp.enable = false;
++    # Keep Cargo's native linker and C/C++ setup on the selected stdenv.
++    clangLinker.enable = false;
+   };
+   languages.c.enable = false;
+   # Native packages are realized through the explicit prefixes below; Cargo and
+-  # CMake discover their include, library, and runtime paths.
++  # CMake discover their include, library, and runtime paths. Bindgen uses the
++  # explicit CLANG/LIBCLANG_PATH dependencies below.
+   packages = [
+     nativeStdenv.cc
+     pkgs.cmake
+     pkgs.ninja
+     pkgs.pkg-config
+     pkgs.cargo-nextest
+-    pkgs.llvmPackages.clang
+     pkgs.llvmPackages.libclang
+   ] ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [ pkgs.binutils pkgs.glibc.bin ];
+   env = {
+     QUEST_ROOT = "${quest}";
+     HDF5_DIR = "${hdf5Prefix}";
++    CC = "${nativeStdenv.cc}/bin/cc";
+     CXX = "${nativeStdenv.cc}/bin/c++";
+     CLANG = "${pkgs.llvmPackages.clang}/bin/clang";
+     LIBCLANG_PATH = "${lib.getLib pkgs.llvmPackages.libclang}/lib";

@@ -1,6 +1,6 @@
 # Runtime limits, effects, and ownership
 
-Structured execution interprets verified CFG blocks, passes block arguments, evaluates typed classical instructions, and issues checked gate/measurement/reset/barrier requests to a quantum backend. The pure `QuantumBackend` trait also supports frontend tests without loading QuEST. The native facade connects these requests to environment-bound registers.
+Preparation resolves static gate parameters, operands and signed controls once into reusable native dispatch records. Execution interprets verified CFG blocks, passes block arguments, evaluates typed classical instructions, and issues checked gate/measurement/reset/barrier requests to a quantum backend. The pure `QuantumBackend` trait also supports frontend tests without loading QuEST. The native facade connects these requests to environment-bound registers.
 
 ## Separate budgets
 
@@ -15,7 +15,7 @@ Structured execution interprets verified CFG blocks, passes block arguments, eva
 
 Limits are checked quantities, not timing promises. Checked retained-size accounting includes owned strings and nested collections; a small top-level struct does not stand in for all of its heap storage. Allocation and backend failures can still occur within an admitted budget.
 
-`InterpreterLimits` defaults to 10,000,000 steps, 64 call frames, and 64 MiB of classical storage; callers can replace these limits for a run. The worker client separately defaults to 30 seconds, 512 MiB process memory, and 64 KiB output. If the platform cannot enforce its worker contract, it returns a capability error. A small iteration count in source can be a useful algorithm bound, but it does not replace interpreter step admission: an invoked body may itself contain substantial work.
+`InterpreterLimits` defaults to 10,000,000 steps, 64 call frames, and 64 MiB of classical storage; callers can replace these limits for a run. Native storage is capped by the environment's remaining budget, and a program without calls needs only one frame. The worker client separately defaults to 30 seconds, 512 MiB process memory, and 64 KiB output. If the platform cannot enforce its worker contract, it returns a capability error. A small iteration count in source can be a useful algorithm bound, but it does not replace interpreter step admission: an invoked body may itself contain substantial work.
 
 ## Partial execution is observable
 
@@ -27,8 +27,7 @@ Potentially trapping classical computations are observable too. An optimizer can
 
 `Environment` uniquely owns a runtime whose native initialization may be entered
 at most once per process. It is confined to its creating thread and implements
-neither `Send` nor `Sync`. Registers, `PreparedProgram`, and
-`PreparedStructuredProgram` borrow it, so their native handles are destroyed
+neither `Send` nor `Sync`. Registers and `PreparedProgram` borrow it, so their native handles are destroyed
 before its scope ends. `Drop` then finalizes the runtime automatically, including
 on an early `?` return or during Rust unwinding. The facade has no explicit
 shutdown method.
@@ -61,4 +60,4 @@ lifetimes and may outlive the environment.
 
 The default environment selects CPU execution without native multithreading. GPU execution and native threading require explicit policy choices. Preparation constructs caches transactionally; run checks native numerical admission before mutation. Direct low-level bridge calls do not enter the facade's memory accounting automatically.
 
-State vectors and density matrices have different effect semantics. Measurement and reset use trajectories for state vectors; density reset applies the complete reset channel. General channels require density registers. Sampling APIs on ideal prepared programs explicitly seed QuEST's process-wide RNG and initialize a fresh zero state per shot. The native tutorials avoid assuming a particular random measurement sequence.
+State vectors and density matrices have different effect semantics. Measurement and reset use trajectories for state vectors; density reset applies the complete reset channel. General channels require density registers. `PreparedProgram::sample_zeroed(shots, seeds, inputs)` seeds QuEST's process-wide RNG and initializes a zero state per shot. Each shot returns an ordinary `RunOutput`, preserving named outputs and execution counts. The native tutorials avoid assuming a particular random measurement sequence.

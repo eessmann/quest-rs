@@ -8,7 +8,7 @@ constructing either value does not initialize QuEST, MPI or a worker pool.
 ## Construct a numerical encoding and a standard transform
 
 The crate's executable rustdoc example builds a small dense encoding and applies
-canonical phases. It materializes the logical output block as a bounded numerical
+real-parity Wx phases. It materializes the logical output block as a bounded numerical
 reference; native state simulation is a later, separate stage.
 
 {{#include ../../../crates/quest-qsvt/README.md:pure_transform}}
@@ -37,18 +37,28 @@ Neither admission path changes the source oracle or makes a resource native.
 
 `TransformBuilder` requires an encoding and one supported recipe before `build`
 is available. The standard recipe accepts a phase sequence carrying its convention
-in its Rust type. Generalized recipes accept immutable controls and state their
-structural route in the builder method.
+in its Rust type. Generalized recipes accept a typed `RouteResponse` and state their structural
+route in the builder method. `RouteTarget<HermitianArgument>` represents a
+Chebyshev response in normalized `x`; `RouteTarget<GramArgument>` represents a
+response in `y = x²`. `from_monomial` retains immutable conversion evidence,
+while `reduce_even` and `reduce_odd` explicitly form the multiplication target
+before synthesis. `bind` checks the candidate target coefficient bits and stored
+span. `bind_certified` additionally preserves the independent certificate.
+`RouteResponse::imported` marks numerical controls with no target evidence.
+`from_unit_circle_coefficients` explicitly transfers each absolute-order `z^k`
+coefficient to `T_k` of the chosen route argument. It retains the original
+Laurent offset and storage span, checks the padding budget, and does not
+perform a variable substitution.
 
 | Recipe | Input and structural meaning |
 | --- | --- |
-| `standard(phases)` | Canonical QSVT with an explicit Wx phase convention |
-| `direct(controls)` | Generalized transformation with Hermitian whole-oracle and agreeing-projector admission |
-| `hermitianized_full(controls)` | Full structural Hermitian lift using the source and its adjoint |
-| `hermitianized_even(controls)` | Reduced even route through that lift |
-| `hermitianized_odd(controls)` | Reduced odd route through that lift |
-| `multiplication_even(controls)` | Reduced even multiplication route |
-| `multiplication_odd(controls)` | Reduced odd multiplication route with bridge projection and source continuation |
+| `standard(phases)` | Standard QSVT with an explicit Wx phase convention |
+| `direct(response)` | Generalized transformation with Hermitian whole-oracle and agreeing-projector admission |
+| `hermitianized_full(response)` | Full structural Hermitian lift using the source and its adjoint |
+| `hermitianized_even(response.even_component())` | Reduced even route through that lift |
+| `hermitianized_odd(response.odd_component())` | Reduced odd route through that lift |
+| `multiplication_even(gram_response)` | Reduced even multiplication route |
+| `multiplication_odd(gram_response)` | Reduced odd multiplication route with bridge projection and source continuation |
 
 Route admission retains its fixed numerical requirements, auxiliary operand
 layout, degree-zero behavior and readout corrections. Unsupported combinations
@@ -61,7 +71,10 @@ construction preserves that order and full scalar phase. Do not append a second
 factor or erase a global phase before applying controls. Standard phase
 conversion also changes floating values: its roundoff estimate is a diagnostic,
 and an earlier QSP certificate does not automatically cover the converted
-transform.
+transform. Use `certify_projector_phases` on a certified real-parity Wx candidate
+and `certified_standard` to construct the transform from the actual certified
+binary64 projector angles and readout. The transform retains that exact payload
+and its conversion evidence.
 
 ## Keep the complete transform
 
@@ -95,9 +108,12 @@ premises tied to the same immutable transform: encoding semantics, actual phase
 linkage, parity and completion hypotheses. An optional execution-error term must
 be supplied before claiming a native-execution bound. Generalized routes retain
 numerical observations but do not publish an established generalized-QSVT
-robustness theorem. QSP/control certificates can be reported separately; the
-transform builder accepts a sequence, does not retain its source certificate,
-and does not automatically certify the constructed transform.
+robustness theorem. Generalized `RouteResponse` retains its target and control certificate when
+provided. That certifies the scalar response; it does not establish a
+generalized-QSVT robustness theorem. For a certified standard transform,
+`certified_actual_phase_response()` supplies the phase premise from its attached
+conversion certificate. Source encoding and completion theorem assumptions
+remain explicit.
 
 See the [analysis contract](qsvt-analysis.md)
 for formulas, normalization composition and premise details. Continue with

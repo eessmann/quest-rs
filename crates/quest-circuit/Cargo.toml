@@ -1,32 +1,29 @@
 [package]
 name = "quest-circuit"
 version = "0.1.0"
-description = "Native-independent quantum circuits, exact algebra, and bounded numerical fusion"
+description = "Unified quantum program construction and compilation facade"
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
 
 [dependencies]
-codespan-reporting = { workspace = true, optional = true }
-faer = { workspace = true, features = ["std", "linalg"] }
-num-bigint = { workspace = true }
-num-complex = { workspace = true }
-num-rational = { workspace = true, features = ["std"] }
-num-traits = { workspace = true }
-petgraph = { workspace = true, features = ["std", "stable_graph"] }
-quest-language.workspace = true
+quest-compile.workspace = true
 quest-macros = { workspace = true, optional = true }
-quest-math = { workspace = true, optional = true }
-quest-optimizer-client = { workspace = true, optional = true }
-quest-optimizer-protocol = { workspace = true, optional = true }
-quest-qasm.workspace = true
-quest-symbolic.workspace = true
-thiserror = { workspace = true }
 
 [lints]
 workspace = true
 
 [dev-dependencies]
+serde_json.workspace = true
+sha2.workspace = true
+faer = { workspace = true, features = ["std", "linalg"] }
+quest-language.workspace = true
+quest-qasm.workspace = true
+quest-optimizer-protocol.workspace = true
+num-bigint.workspace = true
+num-complex.workspace = true
+num-traits.workspace = true
+
 criterion.workspace = true
 googletest = { workspace = true }
 proptest = { workspace = true }
@@ -34,11 +31,12 @@ quest-math.workspace = true
 trybuild = { workspace = true }
 
 [features]
-default = ["macros"]
+default = ["macros", "synthesis"]
 macros = ["dep:quest-macros"]
-codespan-reporting = ["dep:codespan-reporting", "quest-language/codespan-reporting", "quest-qasm/codespan-reporting"]
-serde = ["quest-language/serde", "quest-qasm/serde"]
-workers = ["dep:quest-optimizer-client", "dep:quest-optimizer-protocol", "dep:quest-math"]
+codespan-reporting = ["quest-compile/codespan-reporting"]
+serde = ["quest-compile/serde"]
+synthesis = ["quest-compile/synthesis"]
+workers = ["quest-compile/workers"]
 
 [[bench]]
 name = "compiler"

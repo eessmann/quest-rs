@@ -1,13 +1,13 @@
 //! A projected continuation is admitted and owned as one state.
 use super::projection::{AdmittedProjection, PreparedProjection};
-use crate::{PreparedProgram, execution::AdmittedPlan};
+use crate::execution::{AdmittedPlan, PreparedRegion};
 
 pub enum Continuation<B, P> {
     Direct,
     Projected { bridge: B, program: P },
 }
 pub type AdmittedContinuation<'env> = Continuation<AdmittedProjection<'env>, AdmittedPlan<'env>>;
-pub type PreparedContinuation<'env> = Continuation<PreparedProjection<'env>, PreparedProgram<'env>>;
+pub type PreparedContinuation<'env> = Continuation<PreparedProjection<'env>, PreparedRegion<'env>>;
 impl<B, P> Continuation<B, P> {
     pub const fn bridge(&self) -> Option<&B> {
         match self {
@@ -32,7 +32,7 @@ impl<'env> AdmittedContinuation<'env> {
     pub fn new(
         resources: &'env crate::environment::RuntimeResources,
         transform: &quest_qsvt::ValidatedTransform,
-        plan: impl FnOnce(&quest_circuit::BoundProgram) -> crate::Result<quest_circuit::ExecutablePlan>,
+        plan: impl FnOnce(&quest_circuit::BoundRegion) -> crate::Result<quest_circuit::RegionPlan>,
     ) -> super::Result<Self> {
         match transform.continuation_stage() {
             quest_qsvt::TransformContinuation::Direct => Ok(Self::Direct),

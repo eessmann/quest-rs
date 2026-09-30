@@ -1,0 +1,1038 @@
+{
+  "schema_version": 1,
+  "platform": "x86_64-linux",
+  "checks": [
+    {
+      "name": "acceptance-bindings",
+      "exit_code": 0,
+      "command": "cargo run --locked -p xtask -- generate-quest-bindings --check",
+      "log": "acceptance-bindings.log.gz",
+      "started_utc": "2026-09-29T23:44:41Z",
+      "finished_utc": "2026-09-29T23:44:42Z"
+    },
+    {
+      "name": "acceptance-format",
+      "exit_code": 0,
+      "command": "cargo fmt --all -- --check",
+      "log": "acceptance-format.log.gz",
+      "started_utc": "2026-09-29T23:44:40Z",
+      "finished_utc": "2026-09-29T23:44:41Z"
+    },
+    {
+      "name": "acceptance-native-consumers",
+      "exit_code": 0,
+      "command": "cargo run --locked -p xtask -- check-native-consumers --backends cpu\\,omp",
+      "log": "acceptance-native-consumers.log.gz",
+      "started_utc": "2026-09-29T23:44:42Z",
+      "finished_utc": "2026-09-29T23:45:09Z",
+      "result_summaries": [
+        "direct-cpu-sv: numerical and deployment checks passed",
+        "direct-cpu-dm: numerical and deployment checks passed",
+        "direct-omp-sv: numerical and deployment checks passed",
+        "direct-omp-dm: numerical and deployment checks passed",
+        "direct: RUNPATH and complete native closure passed",
+        "facade-cpu: numerical and deployment checks passed",
+        "facade-omp: numerical and deployment checks passed",
+        "facade: RUNPATH and complete native closure passed",
+        "wrapped-cpu: numerical and deployment checks passed",
+        "wrapped-omp: numerical and deployment checks passed",
+        "wrapped: RUNPATH and complete native closure passed",
+        "renamed-cpu: numerical and deployment checks passed",
+        "renamed-omp: numerical and deployment checks passed",
+        "renamed: RUNPATH and complete native closure passed"
+      ]
+    },
+    {
+      "name": "acceptance-workspace-build",
+      "exit_code": 0,
+      "command": "cargo build --workspace --locked",
+      "log": "acceptance-workspace-build.log.gz",
+      "started_utc": "2026-09-29T23:40:46Z",
+      "finished_utc": "2026-09-29T23:41:02Z"
+    },
+    {
+      "name": "acceptance-workspace-clippy",
+      "exit_code": 0,
+      "command": "cargo clippy --workspace --all-targets --locked -- -D warnings",
+      "log": "acceptance-workspace-clippy.log.gz",
+      "started_utc": "2026-09-29T23:44:21Z",
+      "finished_utc": "2026-09-29T23:44:40Z"
+    },
+    {
+      "name": "acceptance-workspace-doctests",
+      "exit_code": 0,
+      "command": "cargo test --doc --workspace --locked",
+      "log": "acceptance-workspace-doctests.log.gz",
+      "started_utc": "2026-09-29T23:44:13Z",
+      "finished_utc": "2026-09-29T23:44:21Z",
+      "result_summaries": [
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.41s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s",
+        "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s",
+        "test result: ok. 2 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s"
+      ]
+    },
+    {
+      "name": "acceptance-workspace-driver",
+      "exit_code": 0,
+      "command": null,
+      "log": "acceptance-workspace-driver.log.gz"
+    },
+    {
+      "name": "acceptance-workspace-nextest",
+      "exit_code": 0,
+      "command": "cargo nextest run --workspace --locked --no-fail-fast --test-threads=1",
+      "log": "acceptance-workspace-nextest.log.gz",
+      "started_utc": "2026-09-29T23:41:02Z",
+      "finished_utc": "2026-09-29T23:44:13Z",
+      "result_summaries": [
+        "Summary [ 166.753s] 838 tests run: 838 passed, 1 skipped"
+      ]
+    },
+    {
+      "name": "bindings",
+      "exit_code": 0,
+      "command": "cargo run --locked -p xtask -- generate-quest-bindings --check",
+      "log": "bindings.log.gz"
+    },
+    {
+      "name": "compiler-selection-after",
+      "exit_code": 0,
+      "command": null,
+      "log": "compiler-selection-after.log.gz"
+    },
+    {
+      "name": "environment",
+      "exit_code": 0,
+      "command": null,
+      "log": "environment.log.gz"
+    },
+    {
+      "name": "facade-linux",
+      "exit_code": 100,
+      "command": "devenv shell -- cargo nextest run --locked -p quest-circuit --all-features --test-threads=1",
+      "log": "facade-linux.log.gz",
+      "result_summaries": [
+        "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.01s",
+        "Summary [   0.615s] 19/248 tests run: 18 passed, 1 failed, 0 skipped"
+      ]
+    },
+    {
+      "name": "final-bindings",
+      "exit_code": 0,
+      "command": "cargo run --locked -p xtask -- generate-quest-bindings --check",
+      "log": "final-bindings.log.gz",
+      "started_utc": "2026-09-29T23:21:18Z",
+      "finished_utc": "2026-09-29T23:21:19Z"
+    },
+    {
+      "name": "final-book",
+      "exit_code": 0,
+      "command": "nix shell github:NixOS/nixpkgs/6774f7bc253789b113a4f39285dc0fa100abeacc#mdbook --command mdbook build docs/book",
+      "log": "final-book.log.gz",
+      "started_utc": "2026-09-29T23:21:54Z",
+      "finished_utc": "2026-09-29T23:21:56Z"
+    },
+    {
+      "name": "final-format",
+      "exit_code": 0,
+      "command": "cargo fmt --all -- --check",
+      "log": "final-format.log.gz",
+      "started_utc": "2026-09-29T23:21:17Z",
+      "finished_utc": "2026-09-29T23:21:18Z"
+    },
+    {
+      "name": "final-native-consumers",
+      "exit_code": 0,
+      "command": "cargo run --locked -p xtask -- check-native-consumers --backends cpu\\,omp",
+      "log": "final-native-consumers.log.gz",
+      "started_utc": "2026-09-29T23:21:19Z",
+      "finished_utc": "2026-09-29T23:21:46Z",
+      "result_summaries": [
+        "direct-cpu-sv: numerical and deployment checks passed",
+        "direct-cpu-dm: numerical and deployment checks passed",
+        "direct-omp-sv: numerical and deployment checks passed",
+        "direct-omp-dm: numerical and deployment checks passed",
+        "direct: RUNPATH and complete native closure passed",
+        "facade-cpu: numerical and deployment checks passed",
+        "facade-omp: numerical and deployment checks passed",
+        "facade: RUNPATH and complete native closure passed",
+        "wrapped-cpu: numerical and deployment checks passed",
+        "wrapped-omp: numerical and deployment checks passed",
+        "wrapped: RUNPATH and complete native closure passed",
+        "renamed-cpu: numerical and deployment checks passed",
+        "renamed-omp: numerical and deployment checks passed",
+        "renamed: RUNPATH and complete native closure passed"
+      ]
+    },
+    {
+      "name": "final-source-verification",
+      "exit_code": 0,
+      "command": null,
+      "log": "final-source-verification.log.gz"
+    },
+    {
+      "name": "final-workspace-build",
+      "exit_code": 0,
+      "command": "cargo build --workspace --locked",
+      "log": "final-workspace-build.log.gz",
+      "started_utc": "2026-09-29T23:20:55Z",
+      "finished_utc": "2026-09-29T23:21:01Z"
+    },
+    {
+      "name": "final-workspace-clippy",
+      "exit_code": 101,
+      "command": "cargo clippy --workspace --all-targets --locked -- -D warnings",
+      "log": "final-workspace-clippy.log.gz",
+      "started_utc": "2026-09-29T23:21:15Z",
+      "finished_utc": "2026-09-29T23:21:17Z"
+    },
+    {
+      "name": "final-workspace-doctests",
+      "exit_code": 0,
+      "command": "cargo test --doc --workspace --locked",
+      "log": "final-workspace-doctests.log.gz",
+      "started_utc": "2026-09-29T23:21:06Z",
+      "finished_utc": "2026-09-29T23:21:15Z",
+      "result_summaries": [
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.41s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s",
+        "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s",
+        "test result: ok. 2 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s"
+      ]
+    },
+    {
+      "name": "final-workspace-driver",
+      "exit_code": 1,
+      "command": null,
+      "log": "final-workspace-driver.log.gz"
+    },
+    {
+      "name": "final-workspace-nextest",
+      "exit_code": 101,
+      "command": "cargo nextest run --workspace --locked --test-threads=1",
+      "log": "final-workspace-nextest.log.gz",
+      "started_utc": "2026-09-29T23:21:01Z",
+      "finished_utc": "2026-09-29T23:21:06Z"
+    },
+    {
+      "name": "format",
+      "exit_code": 0,
+      "command": "cargo fmt --all -- --check",
+      "log": "format.log.gz"
+    },
+    {
+      "name": "native-consumers",
+      "exit_code": 0,
+      "command": "cargo run --locked -p xtask -- check-native-consumers --backends cpu,omp",
+      "log": "native-consumers.log.gz",
+      "result_summaries": [
+        "direct-cpu-sv: numerical and deployment checks passed",
+        "direct-cpu-dm: numerical and deployment checks passed",
+        "direct-omp-sv: numerical and deployment checks passed",
+        "direct-omp-dm: numerical and deployment checks passed",
+        "direct: RUNPATH and complete native closure passed",
+        "facade-cpu: numerical and deployment checks passed",
+        "facade-omp: numerical and deployment checks passed",
+        "facade: RUNPATH and complete native closure passed",
+        "wrapped-cpu: numerical and deployment checks passed",
+        "wrapped-omp: numerical and deployment checks passed",
+        "wrapped: RUNPATH and complete native closure passed",
+        "renamed-cpu: numerical and deployment checks passed",
+        "renamed-omp: numerical and deployment checks passed",
+        "renamed: RUNPATH and complete native closure passed"
+      ]
+    },
+    {
+      "name": "source-sidecar-cleanup",
+      "exit_code": 0,
+      "command": null,
+      "log": "source-sidecar-cleanup.log.gz"
+    },
+    {
+      "name": "workspace-build",
+      "exit_code": 0,
+      "command": "cargo build --workspace --locked",
+      "log": "workspace-build.log.gz"
+    },
+    {
+      "name": "workspace-clippy",
+      "exit_code": 101,
+      "command": "cargo clippy --workspace --all-targets --locked -- -D warnings",
+      "log": "workspace-clippy.log.gz"
+    },
+    {
+      "name": "workspace-doctests",
+      "exit_code": 0,
+      "command": "cargo test --doc --workspace --locked",
+      "log": "workspace-doctests.log.gz",
+      "result_summaries": [
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.41s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s",
+        "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s",
+        "test result: ok. 2 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s"
+      ]
+    },
+    {
+      "name": "workspace-driver",
+      "exit_code": 1,
+      "command": null,
+      "log": "workspace-driver.log.gz"
+    },
+    {
+      "name": "workspace-nextest",
+      "exit_code": 101,
+      "command": "cargo nextest run --workspace --locked --test-threads=1",
+      "log": "workspace-nextest.log.gz"
+    },
+    {
+      "name": "acceptance-worker-strict",
+      "exit_code": 0,
+      "command": "CARGO_TARGET_DIR=../worker-target devenv shell -- cargo clippy --locked -p quest-optimizer-client -p quest-optimizer-worker --features quest-optimizer-worker/synthesis,quest-optimizer-worker/zx,quest-optimizer-worker/mitm --all-targets -- -D warnings",
+      "log": "acceptance-worker-strict.log.gz"
+    }
+  ],
+  "files": [
+    {
+      "file": "acceptance-bindings.command",
+      "sha256": "479218a0185b7eb199bb77e167aad2cdf65b882a747a7fe5df8aa4b951bd85ae",
+      "sha256_original": "479218a0185b7eb199bb77e167aad2cdf65b882a747a7fe5df8aa4b951bd85ae"
+    },
+    {
+      "file": "acceptance-bindings.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "sha256_original": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "acceptance-bindings.finished",
+      "sha256": "08afaabaa4d982e5546ff965e25e5ccff40b83d9744af289d8a34cfcfa2f346e",
+      "sha256_original": "08afaabaa4d982e5546ff965e25e5ccff40b83d9744af289d8a34cfcfa2f346e"
+    },
+    {
+      "file": "acceptance-bindings.log.gz",
+      "sha256": "40fc8ed66518b73c52b64d19c0601632b55b628520f0867bafa223122ec2b950",
+      "sha256_original": "702f50fe0900f8de4b99e535cc7b48f41e5e6d70b8523fad6efd7f20fd029119"
+    },
+    {
+      "file": "acceptance-bindings.started",
+      "sha256": "887bfb0ffe886eed0e1a0633de77140c424fa6e3a1ce70d2c74d522e97545e9b",
+      "sha256_original": "887bfb0ffe886eed0e1a0633de77140c424fa6e3a1ce70d2c74d522e97545e9b"
+    },
+    {
+      "file": "acceptance-format.command",
+      "sha256": "751da502a6e5289011fb26c3723e31495bbe8a561083227fbe47b3cd8945620a",
+      "sha256_original": "751da502a6e5289011fb26c3723e31495bbe8a561083227fbe47b3cd8945620a"
+    },
+    {
+      "file": "acceptance-format.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "sha256_original": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "acceptance-format.finished",
+      "sha256": "887bfb0ffe886eed0e1a0633de77140c424fa6e3a1ce70d2c74d522e97545e9b",
+      "sha256_original": "887bfb0ffe886eed0e1a0633de77140c424fa6e3a1ce70d2c74d522e97545e9b"
+    },
+    {
+      "file": "acceptance-format.log.gz",
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+      "sha256_original": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "acceptance-format.started",
+      "sha256": "42aa017d814d1117c9d17fa8e98fa269eb6f6ecef9a292015350c6f8f688b125",
+      "sha256_original": "42aa017d814d1117c9d17fa8e98fa269eb6f6ecef9a292015350c6f8f688b125"
+    },
+    {
+      "file": "acceptance-native-consumers.command",
+      "sha256": "396f04709a0e2f2c2cb34f15be41cc21e2b335367647a1eb27bb1f9ad6b4f2c5",
+      "sha256_original": "396f04709a0e2f2c2cb34f15be41cc21e2b335367647a1eb27bb1f9ad6b4f2c5"
+    },
+    {
+      "file": "acceptance-native-consumers.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "sha256_original": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "acceptance-native-consumers.finished",
+      "sha256": "4a899f5199d7ff4fdd05e9adabfc0ce0d0ed34286cfd484f4f4bd10b3fe13b61",
+      "sha256_original": "4a899f5199d7ff4fdd05e9adabfc0ce0d0ed34286cfd484f4f4bd10b3fe13b61"
+    },
+    {
+      "file": "acceptance-native-consumers.log.gz",
+      "sha256": "6ee6986ce637460be2d018dfc5b49fce4a9a4a7f98ffbd111c457d7bae401f8d",
+      "sha256_original": "4e4fa0e390a6b839c898a2384c112ba8d24dd112eab8e9b76342881bdd5d0b9a"
+    },
+    {
+      "file": "acceptance-native-consumers.started",
+      "sha256": "08afaabaa4d982e5546ff965e25e5ccff40b83d9744af289d8a34cfcfa2f346e",
+      "sha256_original": "08afaabaa4d982e5546ff965e25e5ccff40b83d9744af289d8a34cfcfa2f346e"
+    },
+    {
+      "file": "acceptance-workspace-build.command",
+      "sha256": "f49994dd32d2a7b529a160864b4164e9708337c75580b4806aabd6adb60f0fd1",
+      "sha256_original": "f49994dd32d2a7b529a160864b4164e9708337c75580b4806aabd6adb60f0fd1"
+    },
+    {
+      "file": "acceptance-workspace-build.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "sha256_original": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "acceptance-workspace-build.finished",
+      "sha256": "796049533d726ad5b3215192aaa259f66748177e4caea2cd8877674f984827cd",
+      "sha256_original": "796049533d726ad5b3215192aaa259f66748177e4caea2cd8877674f984827cd"
+    },
+    {
+      "file": "acceptance-workspace-build.log.gz",
+      "sha256": "91618b0876f1fbc9ebd81cd46c521a04b706936f97e186acb164754ffc4a7ccd",
+      "sha256_original": "2ad95440b90894640adfe67cd91bf9a004eae4aa481db2a024b947ee33077280"
+    },
+    {
+      "file": "acceptance-workspace-build.started",
+      "sha256": "fe5da70086548e72dea7e88162b46d7c32cff3ebec1192576a2e2c15a07f12ef",
+      "sha256_original": "fe5da70086548e72dea7e88162b46d7c32cff3ebec1192576a2e2c15a07f12ef"
+    },
+    {
+      "file": "acceptance-workspace-clippy.command",
+      "sha256": "06e6312c75d06dc4455faa4fd32c30678ec938b49045355a4630079c7a8c2fd8",
+      "sha256_original": "06e6312c75d06dc4455faa4fd32c30678ec938b49045355a4630079c7a8c2fd8"
+    },
+    {
+      "file": "acceptance-workspace-clippy.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "sha256_original": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "acceptance-workspace-clippy.finished",
+      "sha256": "42aa017d814d1117c9d17fa8e98fa269eb6f6ecef9a292015350c6f8f688b125",
+      "sha256_original": "42aa017d814d1117c9d17fa8e98fa269eb6f6ecef9a292015350c6f8f688b125"
+    },
+    {
+      "file": "acceptance-workspace-clippy.log.gz",
+      "sha256": "86c878af6ea46d96c675e05baebbea7975986d716748618c43265a82186055e6",
+      "sha256_original": "b7adbe2fab9427a81223eba2fd0595f5be0170caae152d02c363b4d687995e26"
+    },
+    {
+      "file": "acceptance-workspace-clippy.started",
+      "sha256": "184cdbfb91338fc91f2c95600796c1ea72a9dc14c172137e2fc2a7e0167db217",
+      "sha256_original": "184cdbfb91338fc91f2c95600796c1ea72a9dc14c172137e2fc2a7e0167db217"
+    },
+    {
+      "file": "acceptance-workspace-doctests.command",
+      "sha256": "7efc2f06c84f8f337d96486e825a1650e8651d5a159afcf79ef4785c479cf39b",
+      "sha256_original": "7efc2f06c84f8f337d96486e825a1650e8651d5a159afcf79ef4785c479cf39b"
+    },
+    {
+      "file": "acceptance-workspace-doctests.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "sha256_original": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "acceptance-workspace-doctests.finished",
+      "sha256": "184cdbfb91338fc91f2c95600796c1ea72a9dc14c172137e2fc2a7e0167db217",
+      "sha256_original": "184cdbfb91338fc91f2c95600796c1ea72a9dc14c172137e2fc2a7e0167db217"
+    },
+    {
+      "file": "acceptance-workspace-doctests.log.gz",
+      "sha256": "708a60557f4e1f270aded5f01616a93c8e02416b9dea3153f2db04964545e4fa",
+      "sha256_original": "fc9799c29f390a1e6c3af1934fc438aec377b97c2f5b4249cac08fd88ef41181"
+    },
+    {
+      "file": "acceptance-workspace-doctests.started",
+      "sha256": "6f7b4eecc979b07905e9ad9a339e3623dd8c022e17d9d9e643bf76cfe4813909",
+      "sha256_original": "6f7b4eecc979b07905e9ad9a339e3623dd8c022e17d9d9e643bf76cfe4813909"
+    },
+    {
+      "file": "acceptance-workspace-driver.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "sha256_original": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "acceptance-workspace-driver.log.gz",
+      "sha256": "593243aec5389a85e39a9c696c8d4fb876ca27999cf85349c54e9994eac26892",
+      "sha256_original": "6d614c8e0205baef6f870cfb6e804239de867a2bc09db854bd3039d0e9700195"
+    },
+    {
+      "file": "acceptance-workspace-nextest.command",
+      "sha256": "cbdf85a5bdc4f553851381a6eeb3cd4e865323b4679de0c6ecc13092fb4d993a",
+      "sha256_original": "cbdf85a5bdc4f553851381a6eeb3cd4e865323b4679de0c6ecc13092fb4d993a"
+    },
+    {
+      "file": "acceptance-workspace-nextest.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "sha256_original": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "acceptance-workspace-nextest.finished",
+      "sha256": "6f7b4eecc979b07905e9ad9a339e3623dd8c022e17d9d9e643bf76cfe4813909",
+      "sha256_original": "6f7b4eecc979b07905e9ad9a339e3623dd8c022e17d9d9e643bf76cfe4813909"
+    },
+    {
+      "file": "acceptance-workspace-nextest.log.gz",
+      "sha256": "34dffe7d997e09a3da945cc256b859252136c5c08a2b381b882c3984d10ce72c",
+      "sha256_original": "0f7ffe8adec7a6b015f15888856f4db197527d21b9c1ed3b8b0152d32a46e874"
+    },
+    {
+      "file": "acceptance-workspace-nextest.started",
+      "sha256": "796049533d726ad5b3215192aaa259f66748177e4caea2cd8877674f984827cd",
+      "sha256_original": "796049533d726ad5b3215192aaa259f66748177e4caea2cd8877674f984827cd"
+    },
+    {
+      "file": "bindings.command",
+      "sha256": "68c41b000b19080ec8b5678d2691721e8cdbdc8588e5f985eb9ae75b448dcc5f",
+      "sha256_original": "68c41b000b19080ec8b5678d2691721e8cdbdc8588e5f985eb9ae75b448dcc5f"
+    },
+    {
+      "file": "bindings.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "sha256_original": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "bindings.log.gz",
+      "sha256": "af7e212c2ba72bcd4154d38b39494558fd1fc749e2f007fd5398ad2782943ca1",
+      "sha256_original": "b159aadf23a4515011a8f2dbdeb1453d2dfe787ed01b140e9d4720e968a45a14"
+    },
+    {
+      "file": "compiler-selection-after.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "sha256_original": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "compiler-selection-after.log.gz",
+      "sha256": "4fef9ae4d5c5135b15d33497b8e08c8adf78fd2816050085ae773eb76833018d",
+      "sha256_original": "9aa0c37b4947ac7b4f49854b094c7edf2d183f67f9061d59aef422f5f1af2c5a"
+    },
+    {
+      "file": "compiler-selection-before.log.gz",
+      "sha256": "45b3d299621ae5d95da7762f6c9acd1b9970b6db968decfd8b28c52b993bf544",
+      "sha256_original": "396fea5c9cddfba6327ba76f51f75370eca09e235a5f5a46b7a50def459659df"
+    },
+    {
+      "file": "compiler-selection-remove-clang.log.gz",
+      "sha256": "2cfe78fa8b78d2fd7e17c00f4972ec8d734dd9ca18789e24938d4c3d4c9fefa9",
+      "sha256_original": "15115d9ebf047aaede29ce3230414f7110626d045c24e475e6c415388444775e"
+    },
+    {
+      "file": "environment-driver.log.gz",
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+      "sha256_original": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "environment.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "sha256_original": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "environment.log.gz",
+      "sha256": "c50002fb18ed3e4ab77361df5bee33ba0a1d4af81a1b0d4e18f126450108f481",
+      "sha256_original": "ab1337342aad2d381ad9d82ba44f04c8f6526f229cedf5d3f0feae8d0ecd1374"
+    },
+    {
+      "file": "facade-linux-driver.log.gz",
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+      "sha256_original": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "facade-linux.command",
+      "sha256": "1647544dd864cf058be29b66568eb41fc9ba1fb9330506a631105f7fd3f040a7",
+      "sha256_original": "1647544dd864cf058be29b66568eb41fc9ba1fb9330506a631105f7fd3f040a7"
+    },
+    {
+      "file": "facade-linux.exit",
+      "sha256": "eea8254c7500ba3de996aa8ad6af399183f04e17d4a8102fde539dbc93a90012",
+      "sha256_original": "eea8254c7500ba3de996aa8ad6af399183f04e17d4a8102fde539dbc93a90012"
+    },
+    {
+      "file": "facade-linux.log.gz",
+      "sha256": "8e4d5974153c4fd3780394f03d35eac72a5fd18ced32ef5bf89a2af5141b6ddd",
+      "sha256_original": "dde4eb2ada2efe140db0215257f9228e0c64729f5b3ec9ba32742865c8752c2e"
+    },
+    {
+      "file": "final-bindings.command",
+      "sha256": "479218a0185b7eb199bb77e167aad2cdf65b882a747a7fe5df8aa4b951bd85ae",
+      "sha256_original": "479218a0185b7eb199bb77e167aad2cdf65b882a747a7fe5df8aa4b951bd85ae"
+    },
+    {
+      "file": "final-bindings.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "sha256_original": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "final-bindings.finished",
+      "sha256": "6b3b0144d8054906361a2002165358afb081dd6b5c75b7735148846ec25b4a65",
+      "sha256_original": "6b3b0144d8054906361a2002165358afb081dd6b5c75b7735148846ec25b4a65"
+    },
+    {
+      "file": "final-bindings.log.gz",
+      "sha256": "4672bb5beed445593708fc5f332ecfa60492fcd64b414802989bd343ce0899f4",
+      "sha256_original": "3a4ae89340920f0fef9ca308f6e2f091fac4e9f443649a79d480cd7604ebf4d4"
+    },
+    {
+      "file": "final-bindings.started",
+      "sha256": "e6de260a065b5993ba499fbc295970b0bf4149d6cc197bc8232ec28e5f0579ac",
+      "sha256_original": "e6de260a065b5993ba499fbc295970b0bf4149d6cc197bc8232ec28e5f0579ac"
+    },
+    {
+      "file": "final-book-driver.log.gz",
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+      "sha256_original": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "final-book.command",
+      "sha256": "69f91e07ffe804ca4c470885ebc242a6e91846375972658a5281a1a14ef281e9",
+      "sha256_original": "69f91e07ffe804ca4c470885ebc242a6e91846375972658a5281a1a14ef281e9"
+    },
+    {
+      "file": "final-book.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "sha256_original": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "final-book.finished",
+      "sha256": "2d3835dcfff41fd1ff38c3712bb818c243cddd8b69bf060a7ce1e9771f865bd0",
+      "sha256_original": "2d3835dcfff41fd1ff38c3712bb818c243cddd8b69bf060a7ce1e9771f865bd0"
+    },
+    {
+      "file": "final-book.log.gz",
+      "sha256": "d5e0d88202adbc37454a3d8a2cae87c314eb460970ebdc37b717ed45e1796a48",
+      "sha256_original": "1f5d2d88ca3c2c512fab98a6ba5195916a701bd0de036cb49c91c561db206e53"
+    },
+    {
+      "file": "final-book.started",
+      "sha256": "bef34edf7eb6746c1762e1b83fe2978b2d9e7bb5308fd2622bd720ef4591bb64",
+      "sha256_original": "bef34edf7eb6746c1762e1b83fe2978b2d9e7bb5308fd2622bd720ef4591bb64"
+    },
+    {
+      "file": "final-format.command",
+      "sha256": "751da502a6e5289011fb26c3723e31495bbe8a561083227fbe47b3cd8945620a",
+      "sha256_original": "751da502a6e5289011fb26c3723e31495bbe8a561083227fbe47b3cd8945620a"
+    },
+    {
+      "file": "final-format.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "sha256_original": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "final-format.finished",
+      "sha256": "e6de260a065b5993ba499fbc295970b0bf4149d6cc197bc8232ec28e5f0579ac",
+      "sha256_original": "e6de260a065b5993ba499fbc295970b0bf4149d6cc197bc8232ec28e5f0579ac"
+    },
+    {
+      "file": "final-format.log.gz",
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+      "sha256_original": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "final-format.started",
+      "sha256": "e655404c09afedfbb05d8634e44cb4fa602878adb65f67fd3df3fcbfe1d48266",
+      "sha256_original": "e655404c09afedfbb05d8634e44cb4fa602878adb65f67fd3df3fcbfe1d48266"
+    },
+    {
+      "file": "final-native-consumers.command",
+      "sha256": "396f04709a0e2f2c2cb34f15be41cc21e2b335367647a1eb27bb1f9ad6b4f2c5",
+      "sha256_original": "396f04709a0e2f2c2cb34f15be41cc21e2b335367647a1eb27bb1f9ad6b4f2c5"
+    },
+    {
+      "file": "final-native-consumers.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "sha256_original": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "final-native-consumers.finished",
+      "sha256": "9ea262e85dd8b1fcdf3b30a0c6e21f63cc259c8554b6eb9fe9b599ef04d1af68",
+      "sha256_original": "9ea262e85dd8b1fcdf3b30a0c6e21f63cc259c8554b6eb9fe9b599ef04d1af68"
+    },
+    {
+      "file": "final-native-consumers.log.gz",
+      "sha256": "7cad69299aafd61b23030605ad4e0e1ec9815ef05d0eab1fab7b9c826c8d4b8c",
+      "sha256_original": "2ea1b374da1650abb9055caa7a23f7934899736ec1e987cdaab973331387c5d6"
+    },
+    {
+      "file": "final-native-consumers.started",
+      "sha256": "6b3b0144d8054906361a2002165358afb081dd6b5c75b7735148846ec25b4a65",
+      "sha256_original": "6b3b0144d8054906361a2002165358afb081dd6b5c75b7735148846ec25b4a65"
+    },
+    {
+      "file": "final-source-verification.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "sha256_original": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "final-source-verification.log.gz",
+      "sha256": "93a8a5a7285df7524d95b4c11952e743111fd4cdcb928a6941ba94a1f339981f",
+      "sha256_original": "d8841b6917867adb756f722edb8e21514eae79bd88d1d2c15001014204a8a878"
+    },
+    {
+      "file": "final-workspace-build.command",
+      "sha256": "f49994dd32d2a7b529a160864b4164e9708337c75580b4806aabd6adb60f0fd1",
+      "sha256_original": "f49994dd32d2a7b529a160864b4164e9708337c75580b4806aabd6adb60f0fd1"
+    },
+    {
+      "file": "final-workspace-build.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "sha256_original": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "final-workspace-build.finished",
+      "sha256": "904dab9f3b3650ffed18e8e0b9d1a62e4eaead51843026bcfbce929cb05e2042",
+      "sha256_original": "904dab9f3b3650ffed18e8e0b9d1a62e4eaead51843026bcfbce929cb05e2042"
+    },
+    {
+      "file": "final-workspace-build.log.gz",
+      "sha256": "3572a755f44020851c4cfa9ff5cb23e1e768e4ed206502b16d9fa6a667c680a2",
+      "sha256_original": "7cee1194acb88b7c4eb8c5aa550476e1a5e4319754a9e8add68d2599b203ba26"
+    },
+    {
+      "file": "final-workspace-build.started",
+      "sha256": "575db950fb8259cafcf64115663175abe92d0895ff4370a2d8d7d4fe494e8aea",
+      "sha256_original": "575db950fb8259cafcf64115663175abe92d0895ff4370a2d8d7d4fe494e8aea"
+    },
+    {
+      "file": "final-workspace-clippy.command",
+      "sha256": "06e6312c75d06dc4455faa4fd32c30678ec938b49045355a4630079c7a8c2fd8",
+      "sha256_original": "06e6312c75d06dc4455faa4fd32c30678ec938b49045355a4630079c7a8c2fd8"
+    },
+    {
+      "file": "final-workspace-clippy.exit",
+      "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+      "sha256_original": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c"
+    },
+    {
+      "file": "final-workspace-clippy.finished",
+      "sha256": "e655404c09afedfbb05d8634e44cb4fa602878adb65f67fd3df3fcbfe1d48266",
+      "sha256_original": "e655404c09afedfbb05d8634e44cb4fa602878adb65f67fd3df3fcbfe1d48266"
+    },
+    {
+      "file": "final-workspace-clippy.log.gz",
+      "sha256": "de3cb4722cafbc5909ecb791ce6e45d1938ef0f6cc8b58c52592688765895f3c",
+      "sha256_original": "f7740c1ad41573061a8aced6be357e5e37bf7c886d200fce23425dcb9b17f47d"
+    },
+    {
+      "file": "final-workspace-clippy.started",
+      "sha256": "350d8f04f366de6f01fe5d12c6976426726f1a2482a1f5cecee6b010e11e968c",
+      "sha256_original": "350d8f04f366de6f01fe5d12c6976426726f1a2482a1f5cecee6b010e11e968c"
+    },
+    {
+      "file": "final-workspace-doctests.command",
+      "sha256": "7efc2f06c84f8f337d96486e825a1650e8651d5a159afcf79ef4785c479cf39b",
+      "sha256_original": "7efc2f06c84f8f337d96486e825a1650e8651d5a159afcf79ef4785c479cf39b"
+    },
+    {
+      "file": "final-workspace-doctests.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "sha256_original": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "final-workspace-doctests.finished",
+      "sha256": "350d8f04f366de6f01fe5d12c6976426726f1a2482a1f5cecee6b010e11e968c",
+      "sha256_original": "350d8f04f366de6f01fe5d12c6976426726f1a2482a1f5cecee6b010e11e968c"
+    },
+    {
+      "file": "final-workspace-doctests.log.gz",
+      "sha256": "b321cb4a96843c851e1f5c782ab91ade135454c280954c8a04e5bba2c890cbaa",
+      "sha256_original": "9949f98729575edc15b6197a645efdfc2c6a3ead525421385a528c5e5656bd1d"
+    },
+    {
+      "file": "final-workspace-doctests.started",
+      "sha256": "2d787d22bafd232b6b6b89278fc24c45da3a193ba0347110fe4a481c0be0b97b",
+      "sha256_original": "2d787d22bafd232b6b6b89278fc24c45da3a193ba0347110fe4a481c0be0b97b"
+    },
+    {
+      "file": "final-workspace-driver.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "sha256_original": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "file": "final-workspace-driver.log.gz",
+      "sha256": "a7641655aac8508b8264b8fadea18d513f3a0327803d446fdcda0907784d2650",
+      "sha256_original": "c6b302b8802ae070ce0a27ddae9f0bb97eaad8a9483cb9b98d32ff645e712870"
+    },
+    {
+      "file": "final-workspace-nextest.command",
+      "sha256": "bf0e5a9a95f535ada196d76305d3d71f15f952be298bb41db79f316ecccd7866",
+      "sha256_original": "bf0e5a9a95f535ada196d76305d3d71f15f952be298bb41db79f316ecccd7866"
+    },
+    {
+      "file": "final-workspace-nextest.exit",
+      "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+      "sha256_original": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c"
+    },
+    {
+      "file": "final-workspace-nextest.finished",
+      "sha256": "2d787d22bafd232b6b6b89278fc24c45da3a193ba0347110fe4a481c0be0b97b",
+      "sha256_original": "2d787d22bafd232b6b6b89278fc24c45da3a193ba0347110fe4a481c0be0b97b"
+    },
+    {
+      "file": "final-workspace-nextest.log.gz",
+      "sha256": "c53523f73d3411f8e82a7292c4d47c316f12f06cb0090bd9aeaf7a141f7b42fb",
+      "sha256_original": "c3fccf23a098eb9c1eccdccd2e5bfe962d8798ceef9e393cb752e2829e293470"
+    },
+    {
+      "file": "final-workspace-nextest.started",
+      "sha256": "904dab9f3b3650ffed18e8e0b9d1a62e4eaead51843026bcfbce929cb05e2042",
+      "sha256_original": "904dab9f3b3650ffed18e8e0b9d1a62e4eaead51843026bcfbce929cb05e2042"
+    },
+    {
+      "file": "format.command",
+      "sha256": "b6e19c16e0d5f97094745b63c78c4f15238111c4de91b081bba774a71abff1e8",
+      "sha256_original": "b6e19c16e0d5f97094745b63c78c4f15238111c4de91b081bba774a71abff1e8"
+    },
+    {
+      "file": "format.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "sha256_original": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "format.log.gz",
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
+      "sha256_original": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "native-consumers.command",
+      "sha256": "dedbc174a3141f24cc6fefcdef40277f7dcf13dc9116ce88d1eff6a56852b5ee",
+      "sha256_original": "dedbc174a3141f24cc6fefcdef40277f7dcf13dc9116ce88d1eff6a56852b5ee"
+    },
+    {
+      "file": "native-consumers.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "sha256_original": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "native-consumers.log.gz",
+      "sha256": "3fbf6027d02f55e308c2c00df6dccc804af87b4e56967b132a77742a57af8d6f",
+      "sha256_original": "2c67902669d9969e269128442b6f83559e556d5dd4698209a6fdcd079cb8a765"
+    },
+    {
+      "file": "run-acceptance-inside.sh",
+      "sha256": "513e0cff461f2801206050e7b93ee57969a967ce7cde258441dd57de43e5008a",
+      "sha256_original": "513e0cff461f2801206050e7b93ee57969a967ce7cde258441dd57de43e5008a"
+    },
+    {
+      "file": "run-acceptance.sh",
+      "sha256": "1b3bf9644fcf135db27739a64eba6d60f2cf99963e8791770ac8de44513c094f",
+      "sha256_original": "1b3bf9644fcf135db27739a64eba6d60f2cf99963e8791770ac8de44513c094f"
+    },
+    {
+      "file": "run-book.sh",
+      "sha256": "eeed292f3159b78973b7e8dfd68d7abaf778d68a43853ec3e661e14baec0c5e7",
+      "sha256_original": "eeed292f3159b78973b7e8dfd68d7abaf778d68a43853ec3e661e14baec0c5e7"
+    },
+    {
+      "file": "run-environment.sh",
+      "sha256": "8944442584398751433012f12bf5d5d41c8e539bda55ef8034ffa08bf0a6a42a",
+      "sha256_original": "8944442584398751433012f12bf5d5d41c8e539bda55ef8034ffa08bf0a6a42a"
+    },
+    {
+      "file": "run-facade.sh",
+      "sha256": "718f6abf87a28eb70b22c5d4d07c3afd726c3eba9ba828bad647591917a90389",
+      "sha256_original": "718f6abf87a28eb70b22c5d4d07c3afd726c3eba9ba828bad647591917a90389"
+    },
+    {
+      "file": "run-final-inside.sh",
+      "sha256": "e7e9b794a10be3b6c362c4d89a62280b2d06fdfdd75ce89cc7ed9a0230ee84b4",
+      "sha256_original": "e7e9b794a10be3b6c362c4d89a62280b2d06fdfdd75ce89cc7ed9a0230ee84b4"
+    },
+    {
+      "file": "run-final.sh",
+      "sha256": "a3c49f1710c18e4a3935eb32219dace29be8245481c6eb852e7d72293f424e39",
+      "sha256_original": "a3c49f1710c18e4a3935eb32219dace29be8245481c6eb852e7d72293f424e39"
+    },
+    {
+      "file": "run-workspace-inside.sh",
+      "sha256": "8a77125e516e405a83bce4e89256c4e676f30a65b0f610f181e7d639d329e9ac",
+      "sha256_original": "8a77125e516e405a83bce4e89256c4e676f30a65b0f610f181e7d639d329e9ac"
+    },
+    {
+      "file": "run-workspace.sh",
+      "sha256": "e66691ed405ef30c04e672cdfddeab1bc35d7547f6408f035e345ae0c44c98e4",
+      "sha256_original": "e66691ed405ef30c04e672cdfddeab1bc35d7547f6408f035e345ae0c44c98e4"
+    },
+    {
+      "file": "source-sidecar-cleanup.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "sha256_original": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "source-sidecar-cleanup.log.gz",
+      "sha256": "411aec02d1daf93be95766da345ba5b21e951b63117009c8698f21a42438b49a",
+      "sha256_original": "906308db5dba029893f13b242545cbcba4566002df06adc5261a5c43dc6ac56a"
+    },
+    {
+      "file": "workspace-build.command",
+      "sha256": "2a30651eba87365b9d8fcdce57c11f887e22ec7a56cc9c04d3614c3d2f1462a2",
+      "sha256_original": "2a30651eba87365b9d8fcdce57c11f887e22ec7a56cc9c04d3614c3d2f1462a2"
+    },
+    {
+      "file": "workspace-build.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "sha256_original": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "workspace-build.log.gz",
+      "sha256": "ddcdb667685b7e911a060ca6abd45f813dd0fbfbd5adf966355e5bcd6ffc03fe",
+      "sha256_original": "f643287f1687a7bd953bae3d7e2c55a13c82da4b1a1e2d46c6cc0360c3a10eaf"
+    },
+    {
+      "file": "workspace-clippy.command",
+      "sha256": "de6e416effb6f19d1eedc0f1fecf9fc0a0c7a5e08be6679848766ef46e9174d1",
+      "sha256_original": "de6e416effb6f19d1eedc0f1fecf9fc0a0c7a5e08be6679848766ef46e9174d1"
+    },
+    {
+      "file": "workspace-clippy.exit",
+      "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+      "sha256_original": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c"
+    },
+    {
+      "file": "workspace-clippy.log.gz",
+      "sha256": "dfb8a36ecd31e56d802d35c65ecd4ea7f68108e2f9bc67ac08711261d0dd1335",
+      "sha256_original": "0d1793de337536bcdc4aaa0e3975be28ed8e9a837ad7f54fded42b6375a94781"
+    },
+    {
+      "file": "workspace-doctests.command",
+      "sha256": "4666522e376175772a91cc82b4dbf980dd1181375ba387ca51f565a0485e5773",
+      "sha256_original": "4666522e376175772a91cc82b4dbf980dd1181375ba387ca51f565a0485e5773"
+    },
+    {
+      "file": "workspace-doctests.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "sha256_original": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "workspace-doctests.log.gz",
+      "sha256": "66346a342a0c5fef7d7aac05ed07f0a02731cf9a2d3ed3db44cab64375e72b67",
+      "sha256_original": "c6f98454d8dcf04b9063e33ebde5b482a9fa69c3a9278ea00b510978c1e8b5e6"
+    },
+    {
+      "file": "workspace-driver.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "sha256_original": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "file": "workspace-driver.log.gz",
+      "sha256": "5e8a581e683e1a9005842f3c94cde534aefe7ccd1e0b75a3f83287ee74732dab",
+      "sha256_original": "55416a512ce9abf85ea960c15bb0854d9a7705c2a5bed7ad52f8b70530d3650e"
+    },
+    {
+      "file": "workspace-nextest.command",
+      "sha256": "8f880f73e587f9725a4fa29741f1da1b035316d755aada15e46ef18cc8bf1648",
+      "sha256_original": "8f880f73e587f9725a4fa29741f1da1b035316d755aada15e46ef18cc8bf1648"
+    },
+    {
+      "file": "workspace-nextest.exit",
+      "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+      "sha256_original": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c"
+    },
+    {
+      "file": "workspace-nextest.log.gz",
+      "sha256": "e0d131e817e35e9bb6d05632a50cacb3cb692f74b1953c403858962d40c6f129",
+      "sha256_original": "41492a5efc5d0eacdcb34649d14cb2c7594838e674578a91da480d3cc5386473"
+    },
+    {
+      "file": "acceptance-worker-strict.command",
+      "sha256": "001db8147a2c51d59ef1380d486935aa333df0fc4d1633559c256d5cdfed4df8",
+      "sha256_original": "001db8147a2c51d59ef1380d486935aa333df0fc4d1633559c256d5cdfed4df8"
+    },
+    {
+      "file": "acceptance-worker-strict.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "sha256_original": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "file": "acceptance-worker-strict.log.gz",
+      "sha256": "018f3bbd39dba5e51ae320c75d6032e5ae78cb3cf9d4d6986d2d4f11edf746bb",
+      "sha256_original": "b88836c24ec96120a84d18b3363e1d1b867082d5e615d3e29a200da1ad889cc4"
+    }
+  ],
+  "status": "passed",
+  "final_acceptance_checks": [
+    "acceptance-bindings",
+    "acceptance-format",
+    "acceptance-native-consumers",
+    "acceptance-workspace-build",
+    "acceptance-workspace-clippy",
+    "acceptance-workspace-doctests",
+    "acceptance-workspace-driver",
+    "acceptance-workspace-nextest",
+    "final-book",
+    "final-source-verification",
+    "source-sidecar-cleanup",
+    "acceptance-worker-strict"
+  ],
+  "source_manifest_sha256": "59f8829a64737a6ea9a68c91ca8ebeaa5fb182b4bfc179988ada3de80798a184",
+  "workspace_tests": {
+    "passed": 838,
+    "failed": 0,
+    "ignored": 1,
+    "binaries": 147
+  },
+  "workspace_doctests": {
+    "passed": 49,
+    "failed": 0,
+    "ignored": 1,
+    "result_groups": 23
+  },
+  "scope_notes": [
+    "Final acceptance checks select the completed corrected-source run; earlier nonzero statuses are preserved diagnostic evidence, not current acceptance failures.",
+    "Optional worker processes, QSP large fixtures, native compiler selection and MPI have separate adjacent receipts.",
+    "The existing fish startup missing-direnv warning did not alter explicit Bash/devenv command exits.",
+    "Eight macOS AppleDouble metadata sidecars were verified and removed from the isolated export; the declared crate source set then matched exactly."
+  ]
+}

@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -uo pipefail
+export CARGO_BUILD_JOBS=6
+cd /home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source
+failed=0
+run_check() {
+    label=$1
+    shift
+    printf '%s\n' "$*" > "../receipts/${label}.command"
+    "$@" > "../receipts/${label}.log" 2>&1
+    status=$?
+    printf '%s\n' "$status" > "../receipts/${label}.exit"
+    printf '%s: exit %s\n' "$label" "$status"
+    if test "$status" -ne 0; then failed=1; fi
+    return "$status"
+}
+run_check workspace-build cargo build --workspace --locked || exit 1
+run_check workspace-nextest cargo nextest run --workspace --locked --test-threads=1
+run_check workspace-doctests cargo test --doc --workspace --locked
+run_check workspace-clippy cargo clippy --workspace --all-targets --locked -- -D warnings
+run_check format cargo fmt --all -- --check
+run_check bindings cargo run --locked -p xtask -- generate-quest-bindings --check
+run_check native-consumers cargo run --locked -p xtask -- check-native-consumers --backends cpu,omp
+printf '%s\n' "$failed" > ../receipts/workspace-driver.exit
+exit "$failed"

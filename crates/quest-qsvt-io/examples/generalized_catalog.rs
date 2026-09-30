@@ -172,7 +172,7 @@ fn run(family: Family, complex: bool) -> Result<(), Failure> {
     let converted = total.elapsed().as_secs_f64();
     let started = Instant::now();
     let admitted = SynthesisBuilder::new()
-        .generalized(&target)
+        .unit_circle_response(&target)
         .and_then(SynthesisBuilder::admit)
         .map_err(|error| Failure::new("admission", error))?;
     let admission = started.elapsed().as_secs_f64();
@@ -223,7 +223,9 @@ fn run(family: Family, complex: bool) -> Result<(), Failure> {
     println!(
         "{{\"family\":\"{}\",\"mode\":\"{mode}\",\"degree\":{},\"status\":\"certified\",\"completion_grid\":{grid},\"response_upper\":{:.17e},\"completion_upper\":{:.17e},\"conversion_upper\":{:.17e},\"reconstruction_upper\":{:.17e},\"unitarity_upper\":{:.17e},\"certification_attempts\":{},\"conversion_seconds\":{converted},\"admission_seconds\":{admission},\"completion_seconds\":{completion},\"synthesis_seconds\":{synthesis},\"certification_seconds\":{certification},\"total_seconds\":{}}}",
         family.name,
-        target.degree(),
+        target
+            .degree()
+            .map_or_else(|| "null".to_owned(), |n| n.to_string()),
         report.response().upper_f64(),
         report.completion().upper_f64(),
         report.conversion().upper_f64(),

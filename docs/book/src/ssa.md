@@ -8,7 +8,7 @@ The typed Rust builder makes common category errors unrepresentable in its API. 
 
 The closure constructs a loop body once. It does not execute the quantum loop in Rust. Reads in its condition and body become language expressions referring to the same local; the interpreter evaluates them as execution proceeds. Handles carry builder ownership, and attempts to mix handles from separate builders return errors. Hygienic internal names preserve handle identity across lexical shadowing.
 
-`Builder::finish` uses the same semantic admission as parsed text. `TypedModule` and `VerifiedProgram` have private trusted constructors. A typed handle is useful early evidence, but it does not bypass independent validation of the completed program.
+`ProgramBuilder::finish` uses the same semantic admission as parsed text. `TypedModule` and `VerifiedProgram` are published only after independent checking. A typed handle is useful early evidence, but it does not bypass independent validation of the completed program.
 
 ## Scalar SSA and effects
 

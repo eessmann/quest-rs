@@ -10,13 +10,17 @@ The following imports are shared by the executable examples in these chapters:
 
 ## Bases, coefficients and intervals
 
-`Polynomial<B>` stores immutable complex coefficients in increasing basis order. Choose `Monomial`, `Chebyshev`, `Hermite`, `Laguerre`, `Jacobi` or `Laurent` explicitly. Hermite explicitly selects `physicists()` or `probabilists()`. Laguerre requires finite alpha > -1; Jacobi requires finite alpha and beta > -1 through checked constructors. `Laurent::new(offset)` preserves signed exponent support; negative powers have a pole at zero. Real interval evaluation requires real coefficients and a defined finite domain.
+`Polynomial<B>` stores immutable complex coefficients in increasing basis order. Choose `Monomial`, `Chebyshev`, `Hermite`, `Laguerre`, `Jacobi` or `Laurent` explicitly. Hermite explicitly selects `physicists()` or `probabilists()`. Laguerre requires finite alpha > -1; Jacobi requires finite alpha and beta > -1 through checked constructors. `Laurent::new(offset)` preserves signed exponent support; nonzero negative effective support has a pole at zero. Real interval evaluation requires real coefficients and a defined finite domain.
 
 ```rust
 {{#include ../../../crates/quest-qsp/examples/qsp_tutorials.rs:polynomial_interval}}
 ```
 
-This evaluates (0.1+T_2(x)) at (x=0.3), giving approximately (-0.72), and encloses its values throughout a neighboring interval. The derivative remains represented in the selected basis with its original parameters. Conversion is a separate cold operation: `to_monomial()` and `to_basis()` return a converted polynomial plus an outward coefficient-error bound. Unsupported support transformations return an error. A conversion bound in an output basis is not automatically a uniform bound on every real domain; the magnitude of that basis on the domain matters.
+This evaluates (0.1+T_2(x)) at (x=0.3), giving approximately (-0.72), and encloses its values throughout a neighboring interval. The derivative remains represented in the selected basis with its original parameters. Conversion is a separate cold operation: `to_monomial()` and `to_basis()` return an immutable `Conversion<Destination, Source>` retaining both payloads and an outward coefficient-error bound. Unsupported support transformations return an error. A conversion bound in an output basis is not automatically a uniform bound on every real domain; the magnitude of that basis on the domain matters.
+
+`stored_support()` includes retained zero coefficients; `effective_support()`
+includes only nonzero terms. `degree()` is the highest nonzero basis order or
+`None` for the zero polynomial. `stored_order()` is a storage/recurrence quantity.
 
 `Even` and `Odd` admission checks exact forbidden coefficients and basis symmetry. Admission consumes the polynomial and returns a parity-bearing type. Tiny forbidden coefficients are not silently discarded. The exact cosine-circle conversion preserves complex coefficients and explicitly rejects inexact subnormal halving.
 

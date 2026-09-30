@@ -135,11 +135,15 @@ fn reverse_conjugate(values: &[Complex64]) -> Vec<Complex64> {
     values.iter().rev().map(Complex64::conj).collect()
 }
 
+#[expect(
+    clippy::too_many_lines,
+    reason = "Ordered Weiss transforms and shared retry budget kept together"
+)]
 pub fn complete(
     target: &[Complex64],
     policy: Policy,
     execution: ExecutionPolicy<'_>,
-) -> Result<(Vec<Complex64>, f64, usize)> {
+) -> Result<(Vec<Complex64>, Vec<Complex64>, f64, usize)> {
     if target.is_empty() {
         return Err(Error::Target("empty target"));
     }
@@ -149,7 +153,7 @@ pub fn complete(
         .and_then(usize::checked_next_power_of_two)
         .ok_or(Error::Budget("completion grid"))?
         .max(32);
-    let mut last_residual = f64::INFINITY;
+    let mut last_residual = None;
     let mut remaining = policy;
     while grid <= policy.max_completion_grid {
         let work = grid
@@ -165,10 +169,11 @@ pub fn complete(
             .ok_or(Error::Budget("Weiss work"))?;
         // Scope FFT plans and samples so they are gone before convolution plans
         // and residual payloads are allocated.
-        let mut a_star = {
+        let (mut a_star, ratio) = {
             let workspace = crate::workspace_policy(
                 policy,
-                grid.checked_add(target.len())
+                grid.checked_mul(3)
+                    .and_then(|v| target.len().checked_mul(2).and_then(|n| v.checked_add(n)))
                     .ok_or(Error::Budget("Weiss payload"))?,
             )?;
             let mut values = zeros(grid, policy.limits)?;
@@ -178,11 +183,16 @@ pub fn complete(
                 .copy_from_slice(target);
             let mut fft = FftWorkspace::new(grid, policy.backend, workspace.limits)?;
             fft.transform(&mut values, FftDirection::Inverse, Normalization::None)?;
+            let mut ratio_samples = values.clone();
             pointwise(&mut values, execution, |_, value| {
                 let norm = value.re.hypot(value.im);
                 let remainder = (-norm).mul_add(norm, 1.0);
                 if remainder <= 0.0 || !remainder.is_finite() {
-                    return Err(Error::Contractivity { upper: norm });
+                    return Err(Error::NotEstablished {
+                        stage: "Weiss logarithm domain",
+                        bound: norm,
+                        tolerance: 1.0,
+                    });
                 }
                 Ok(Complex64::new(0.5 * remainder.ln(), 0.0))
             })?;
@@ -199,6 +209,20 @@ pub fn complete(
                 })
             })?;
             fft.transform(&mut values, FftDirection::Inverse, Normalization::None)?;
+            // G* is anti-analytic. RHW needs b/a = b exp(-G*), not
+            // the outer complement coefficients consumed by inverse NLFT.
+            for (sample, exponent) in ratio_samples.iter_mut().zip(&values) {
+                *sample = finite(sample.mul(exponent.neg().exp()), "Weiss ratio")?;
+            }
+            fft.transform(
+                &mut ratio_samples,
+                FftDirection::Forward,
+                Normalization::ByLength,
+            )?;
+            let ratio = ratio_samples
+                .get(..target.len())
+                .ok_or(Error::Budget("Weiss ratio support"))?
+                .to_vec();
             pointwise(&mut values, execution, |_, value| {
                 finite(value.exp(), "Weiss exponential")
             })?;
@@ -213,7 +237,7 @@ pub fn complete(
                 };
                 *value = at(&values, slot).conj();
             }
-            a_star
+            (a_star, ratio)
         };
         remaining.limits.max_work = rest;
         // Positive real zero mode is the fixed outer-factor convention.
@@ -227,9 +251,9 @@ pub fn complete(
             .max_work
             .checked_sub(work_used)
             .ok_or(Error::Budget("completion work"))?;
-        last_residual = residual;
-        if last_residual <= policy.response_tolerance / 8.0 {
-            return Ok((a_star, last_residual, grid));
+        last_residual = Some(residual);
+        if residual <= policy.response_tolerance / 8.0 {
+            return Ok((a_star, ratio, residual, grid));
         }
         grid = grid
             .checked_mul(2)
@@ -237,7 +261,7 @@ pub fn complete(
     }
     Err(Error::NotEstablished {
         stage: "Weiss completion",
-        bound: last_residual,
+        bound: last_residual.ok_or(Error::Budget("no completion grid admitted"))?,
         tolerance: policy.response_tolerance / 8.0,
     })
 }
@@ -644,6 +668,173 @@ mod parallel_tests {
                 result,
                 Err(Error::NonFinite("first indexed failure"))
             ));
+        }
+        Ok(())
+    }
+}
+
+/// Complex extension of Ni/Ying 2410.06409v2, Algorithm 2 (rank-two
+/// displacement Schur recurrence), with Laneve 2503.03026v2 §5.3 indexing.
+/// K - Z K Z† = [e0,p][e0,p]†, p = conj(reverse(c)).
+/// Fuse forward substitution into the column recurrence: O(n²) arithmetic,
+/// O(n) storage; neither K nor dense L is ever materialized.
+#[expect(
+    clippy::many_single_char_names,
+    clippy::indexing_slicing,
+    clippy::arithmetic_side_effects,
+    reason = "Displacement recurrence uses four length-n vectors and checked nonempty n; all indices follow 0 <= k < j < n"
+)]
+pub fn half_cholesky(c: &[Complex64], policy: Policy) -> Result<(Vec<Complex64>, usize)> {
+    let n = c.len();
+    if n == 0 {
+        return Err(Error::Target("empty Weiss ratio"));
+    }
+    let work = n
+        .checked_mul(n)
+        .and_then(|v| v.checked_mul(32))
+        .ok_or(Error::Budget("Half-Cholesky work"))?;
+    if work > policy.limits.max_work {
+        return Err(Error::Budget("Half-Cholesky work"));
+    }
+    let _ = crate::workspace_policy(
+        policy,
+        n.checked_mul(4)
+            .ok_or(Error::Budget("Half-Cholesky storage"))?,
+    )?;
+    let mut first = zeros(n, policy.limits)?;
+    first[0] = Complex64::new(1.0, 0.0);
+    let mut second = reverse_conjugate(c);
+    let mut solution = second.clone();
+    for k in 0..n {
+        let x = first[k];
+        let y = second[k];
+        let scale = x.norm().hypot(y.norm());
+        if !scale.is_finite() || scale == 0.0 {
+            return Err(Error::SingularPivot);
+        }
+        let alpha = x / scale;
+        let beta = y / scale;
+        let rhs = solution[k];
+        let mut previous = Complex64::new(scale, 0.0);
+        for j in k + 1..n {
+            let u = finite(
+                first[j] * alpha.conj() + second[j] * beta.conj(),
+                "Half-Cholesky generator",
+            )?;
+            let v = finite(
+                -first[j] * beta + second[j] * alpha,
+                "Half-Cholesky generator",
+            )?;
+            solution[j] = finite(solution[j] - (u / scale) * rhs, "Half-Cholesky solve")?;
+            first[j] = previous;
+            second[j] = v;
+            previous = u;
+        }
+    }
+    Ok((reverse_conjugate(&solution), work))
+}
+
+#[cfg(test)]
+#[expect(
+    clippy::arithmetic_side_effects,
+    clippy::needless_range_loop,
+    clippy::panic_in_result_fn,
+    reason = "Independent dense test oracle is explicitly bounded to 32 coefficients"
+)]
+mod rhw_tests {
+    use super::*;
+
+    // Independent direct complex block solve from Laneve §5.2. For each
+    // leading Toeplitz block B, solve [I,-B†; B,I] [u;v]=[0;e_last].
+    // F_{n-m}=u[0]/v[m-1]. No LDL/displacement steps are shared.
+    fn dense_rhw(c: &[Complex64]) -> Vec<Complex64> {
+        assert!(c.len() <= 32, "bounded reference only");
+        let n = c.len();
+        let mut answer = vec![Complex64::new(0.0, 0.0); n];
+        for m in 1..=n {
+            let size = 2 * m;
+            let mut a = vec![vec![Complex64::new(0.0, 0.0); size]; size];
+            let mut rhs = vec![Complex64::new(0.0, 0.0); size];
+            rhs[size - 1] = Complex64::new(1.0, 0.0);
+            for i in 0..size {
+                a[i][i] = Complex64::new(1.0, 0.0);
+            }
+            for row in 0..m {
+                for col in 0..=row {
+                    let b = c[n - 1 - (row - col)].conj();
+                    a[m + row][col] = b;
+                    a[col][m + row] = -b.conj();
+                }
+            }
+            for k in 0..size {
+                let pivot = (k..size)
+                    .max_by(|&i, &j| a[i][k].norm().total_cmp(&a[j][k].norm()))
+                    .unwrap();
+                a.swap(k, pivot);
+                rhs.swap(k, pivot);
+                let diagonal = a[k][k];
+                for j in k..size {
+                    a[k][j] /= diagonal;
+                }
+                rhs[k] /= diagonal;
+                for i in k + 1..size {
+                    let scale = a[i][k];
+                    for j in k..size {
+                        let v = a[k][j];
+                        a[i][j] -= scale * v;
+                    }
+                    let v = rhs[k];
+                    rhs[i] -= scale * v;
+                }
+            }
+            for k in (0..size).rev() {
+                for j in k + 1..size {
+                    let v = rhs[j];
+                    rhs[k] -= a[k][j] * v;
+                }
+            }
+            answer[n - m] = rhs[0] / rhs[size - 1];
+        }
+        answer
+    }
+    #[test]
+    fn half_cholesky_admits_work_and_memory_before_allocating() {
+        let ratio = vec![Complex64::new(0.1, 0.2); 17];
+        let mut policy = Policy::default();
+        policy.limits.max_work = 17 * 17 * 32 - 1;
+        assert!(matches!(
+            half_cholesky(&ratio, policy),
+            Err(Error::Budget("Half-Cholesky work"))
+        ));
+        policy = Policy::default();
+        policy.limits.max_bytes = 4 * 17 * size_of::<Complex64>() - 1;
+        assert!(matches!(
+            half_cholesky(&ratio, policy),
+            Err(Error::Budget(_))
+        ));
+    }
+    #[test]
+    fn structured_matches_independent_direct_block_rhw() -> Result<()> {
+        let mut seed = 0x415f_beef_u64;
+        for n in [1, 2, 3, 5, 8, 17, 32] {
+            let c: Vec<_> = (0..n)
+                .map(|_| {
+                    seed = seed.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
+                    let re =
+                        f64::from(u32::try_from(seed >> 32).unwrap()) / f64::from(u32::MAX) - 0.5;
+                    seed = seed.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(1);
+                    let im =
+                        f64::from(u32::try_from(seed >> 32).unwrap()) / f64::from(u32::MAX) - 0.5;
+                    Complex64::new(re, im)
+                })
+                .collect();
+            let actual = half_cholesky(&c, Policy::default())?.0;
+            for (actual, expected) in actual.iter().zip(dense_rhw(&c)) {
+                assert!(
+                    (*actual - expected).norm() < 5e-13,
+                    "n={n}: {actual} != {expected}"
+                );
+            }
         }
         Ok(())
     }

@@ -1,2 +1,2 @@
-use quest_circuit::legacy_circuit as circuit;
+use quest_circuit::circuit;
 fn main() { let _ = circuit! { qubit q; rx(1e999) q; }; }

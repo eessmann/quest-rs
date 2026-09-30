@@ -6,22 +6,23 @@
 )]
 //! Quest-owned exact angle obligations around the audited affine engine.
 //!
-//! The fork canonicalizes algebra. Source nodes remain shared and immutable so
+//! The project-owned affine engine canonicalizes algebra. Source nodes remain shared and immutable so
 //! cancellation cannot discard a parameter or a finite-conversion obligation.
 
+mod affine;
 mod source;
 
 use std::collections::BTreeMap;
 use std::fmt;
 use std::sync::Arc;
 
-use mathcore::exact::{Affine, Context, Limits, Owner as CoreOwner, Symbol as CoreSymbol};
+use affine::{Affine, Context, Limits, Owner as CoreOwner, Symbol as CoreSymbol};
 use num_bigint::BigInt;
 use num_rational::Ratio;
 use num_traits::Zero;
 use source::{Kind, Linear, MAX_INPUT_BINDINGS, Source, rational_bytes};
 
-pub use mathcore::exact::ExactError;
+pub use affine::ExactError;
 pub type Rational = Ratio<BigInt>;
 
 /// Quest's parameter namespace, independent of the algebra engine's type.
@@ -176,7 +177,7 @@ impl Expr {
     pub fn radians(value: Rational) -> Result<Self> {
         let value = normalize(&value)?;
         let context = Context::new(Owner::new(0).core());
-        let affine = context.from_parts(value.clone(), Rational::zero(), vec![])?;
+        let affine = context.assemble(value.clone(), Rational::zero(), vec![])?;
         Ok(Self {
             context,
             affine,
@@ -195,7 +196,7 @@ impl Expr {
     pub fn pi(value: Rational) -> Result<Self> {
         let value = normalize(&value)?;
         let context = Context::new(Owner::new(0).core());
-        let affine = context.from_parts(Rational::zero(), value.clone(), vec![])?;
+        let affine = context.assemble(Rational::zero(), value.clone(), vec![])?;
         Ok(Self {
             context,
             affine,
@@ -215,7 +216,7 @@ impl Expr {
         let radians = normalize(&radians)?;
         let pi = normalize(&pi)?;
         let context = Context::new(Owner::new(0).core());
-        let affine = context.from_parts(radians.clone(), pi.clone(), vec![])?;
+        let affine = context.assemble(radians.clone(), pi.clone(), vec![])?;
         Ok(Self {
             context,
             affine,
@@ -241,7 +242,7 @@ impl Expr {
             }),
         })
     }
-    pub fn owner(&self) -> Owner {
+    pub const fn owner(&self) -> Owner {
         Owner::new(self.affine.owner().id())
     }
     pub fn constant(&self) -> &Rational {
@@ -251,9 +252,9 @@ impl Expr {
         self.affine.pi_coefficient()
     }
     /// Independently maintained exact source summary for a constant expression.
-    /// This reads the replay summary, without invoking the mathcore affine
+    /// This reads the replay summary, without invoking the checked affine
     /// normalizer; every constructor and combine operation checks it against
-    /// the fork result before publishing the expression.
+    /// the canonicalizer result before publishing the expression.
     /// A constant summary does not erase cancelled symbols' ownership, finite
     /// binding requirements, or the original source conversion obligations.
     #[must_use]
@@ -408,7 +409,7 @@ impl Expr {
             _ => None,
         }
     }
-    /// Unmodified pi source leaf for the legacy conversion path.
+    /// Unmodified pi source leaf retaining its original conversion obligation.
     pub fn pi_leaf(&self) -> Option<&Rational> {
         if let Kind::Pi(value) = &self.source.kind {
             Some(value)
@@ -416,7 +417,7 @@ impl Expr {
             None
         }
     }
-    /// A legacy pi leaf or its direct negation retains `RationalPi` identity.
+    /// A pi source leaf or its direct negation retains `RationalPi` identity.
     pub fn pi_identity(&self) -> Option<Rational> {
         match &self.source.kind {
             Kind::Pi(value) => Some(value.clone()),
@@ -456,7 +457,7 @@ impl Expr {
         }
         Ok(())
     }
-    /// Bind exact rational-radian values and independently check the fork result.
+    /// Bind exact rational-radian values and independently check the canonicalizer result.
     pub fn bind(&self, bindings: &[(Symbol, Rational)]) -> Result<(Rational, Rational)> {
         self.bind_checked(bindings, |_, _| Ok(()))
     }
@@ -510,7 +511,7 @@ impl Expr {
             .map(|(symbol, value)| {
                 Ok((
                     symbol.core(),
-                    context.from_parts(value.clone(), Rational::zero(), vec![])?,
+                    context.assemble(value.clone(), Rational::zero(), vec![])?,
                 ))
             })
             .collect::<Result<Vec<_>>>()?;
@@ -545,7 +546,7 @@ fn rehome(value: &Affine, context: &Context) -> Result<Affine> {
     {
         return Err(Error::ForeignOwner);
     }
-    Ok(context.from_parts(
+    Ok(context.assemble(
         value.constant().clone(),
         value.pi_coefficient().clone(),
         value
@@ -562,7 +563,7 @@ mod tests {
     use num_bigint::BigInt;
 
     #[gtest]
-    fn independent_replay_rejects_incorrect_fork_coefficients() -> Result<()> {
+    fn independent_replay_rejects_incorrect_canonicalizer_coefficients() -> Result<()> {
         let original = Expr::pi(Rational::from_integer(1.into()))?;
         let forged = Expr {
             context: original.context.clone(),

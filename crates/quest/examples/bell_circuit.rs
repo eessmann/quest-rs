@@ -10,7 +10,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         c[1] = measure q[1];
     }?;
     let env = Environment::builder().build()?;
-    let mut prepared = env.prepare_structured(bell)?;
+    let mut prepared = env.prepare((bell).verify()?.lower()?.plan()?)?;
     let mut register = env.state_vector(QubitCount::new(2)?)?;
     let result = prepared.run(&mut register, &RunInputs::default())?;
     println!("{:?}", result.outputs);

@@ -532,6 +532,7 @@ const fn quantum_effect(kind: &InstructionKind) -> bool {
             | InstructionKind::Call { .. }
             | InstructionKind::Measure { .. }
             | InstructionKind::Reset { .. }
+            | InstructionKind::Payload { .. }
             | InstructionKind::Barrier { .. }
     )
 }

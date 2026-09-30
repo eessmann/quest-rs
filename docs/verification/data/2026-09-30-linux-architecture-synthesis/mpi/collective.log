@@ -1,0 +1,189 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.24
+   Compiling quote v1.0.47
+   Compiling autocfg v1.5.1
+   Compiling libc v0.2.189
+   Compiling num-traits v0.2.19
+   Compiling cfg-if v1.0.4
+   Compiling syn v3.0.3
+   Compiling syn v2.0.119
+   Compiling bytemuck v1.25.2
+   Compiling num-complex v0.4.6
+   Compiling memchr v2.8.3
+   Compiling libm v0.2.16
+   Compiling paste v1.0.15
+   Compiling version_check v0.9.5
+   Compiling pulp v0.22.3
+   Compiling pulp-wasm-simd-flag v0.1.1
+   Compiling reborrow v0.5.5
+   Compiling serde_derive v1.0.229
+   Compiling dyn-stack-macros v0.1.3
+   Compiling dyn-stack v0.13.2
+   Compiling jobserver v0.1.35
+   Compiling shlex v2.0.1
+   Compiling find-msvc-tools v0.1.10
+   Compiling nano-gemm-codegen v0.2.1
+   Compiling cc v1.4.2
+   Compiling seq-macro v0.3.6
+   Compiling zmij v1.0.23
+   Compiling thiserror v2.0.20
+   Compiling bitflags v2.13.1
+   Compiling thiserror-impl v2.0.20
+   Compiling serde_json v1.0.151
+   Compiling serde_core v1.0.229
+   Compiling itoa v1.0.18
+   Compiling equivalent v1.0.2
+   Compiling hashbrown v0.17.1
+   Compiling syn v1.0.109
+   Compiling raw-cpuid v11.6.0
+   Compiling num-integer v0.1.47
+   Compiling serde v1.0.229
+   Compiling nano-gemm-core v0.2.1
+   Compiling once_cell v1.21.4
+   Compiling interpol v0.2.1
+   Compiling defer v0.2.1
+   Compiling indexmap v2.14.0
+   Compiling private-gemm-x86 v0.1.20
+   Compiling nano-gemm-c32 v0.2.1
+   Compiling nano-gemm-f64 v0.2.1
+   Compiling nano-gemm-c64 v0.2.1
+   Compiling nano-gemm-f32 v0.2.1
+   Compiling equator-macro v0.2.1
+   Compiling num_cpus v1.17.0
+   Compiling shlex v1.3.0
+   Compiling generativity v1.2.1
+   Compiling equator v0.2.2
+   Compiling gemm-common v0.19.0
+   Compiling equator-macro v0.6.0
+   Compiling glob v0.3.4
+   Compiling equator v0.6.0
+   Compiling clang-sys v1.9.1
+   Compiling foldhash v0.1.5
+   Compiling hashbrown v0.15.5
+   Compiling num-rational v0.4.2
+   Compiling num-bigint v0.5.1
+   Compiling nano-gemm v0.2.2
+   Compiling thiserror v1.0.69
+   Compiling regex-syntax v0.8.11
+   Compiling minimal-lexical v0.2.1
+   Compiling fixedbitset v0.5.7
+   Compiling nom v7.1.3
+   Compiling regex-automata v0.4.18
+   Compiling gemm-c64 v0.19.0
+   Compiling gemm-c32 v0.19.0
+   Compiling gemm-f64 v0.19.0
+   Compiling gemm-f32 v0.19.0
+   Compiling qd v0.8.0
+   Compiling thiserror-impl v1.0.69
+   Compiling libloading v0.8.9
+   Compiling either v1.18.0
+   Compiling shell-words v1.1.1
+   Compiling bindgen v0.72.1
+   Compiling pkg-config v0.3.34
+   Compiling itertools v0.13.0
+   Compiling build-probe-mpi v0.1.6
+   Compiling faer-traits v0.24.0
+   Compiling gemm v0.19.0
+   Compiling regex v1.13.1
+   Compiling cexpr v0.6.0
+   Compiling link-cplusplus v1.0.12
+   Compiling termcolor v1.4.1
+   Compiling rustc-hash v2.1.3
+   Compiling typenum v1.20.1
+   Compiling scratch v1.0.9
+   Compiling faer v0.24.4
+   Compiling hybrid-array v0.4.15
+   Compiling cmake-file-api v0.1.2
+   Compiling cmake v0.1.58
+   Compiling unicode-width v0.2.2
+   Compiling cxxbridge-flags v1.0.198
+   Compiling cxx v1.0.198
+   Compiling codespan-reporting v0.13.1
+   Compiling quest-build v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-build)
+   Compiling mpi-sys v0.2.4
+   Compiling quest-math v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-math)
+   Compiling zerocopy v0.8.57
+   Compiling winnow v1.0.4
+   Compiling rustix v1.1.4
+   Compiling petgraph v0.8.3
+   Compiling toml_parser v1.1.3+spec-1.1.0
+   Compiling quest-symbolic v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-symbolic)
+   Compiling cxx-build v1.0.198
+   Compiling crypto-common v0.2.2
+   Compiling block-buffer v0.12.1
+   Compiling zerocopy-derive v0.8.57
+   Compiling linux-raw-sys v0.12.1
+   Compiling const-oid v0.10.2
+   Compiling strength_reduce v0.2.4
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling toml_edit v0.25.13+spec-1.1.0
+   Compiling transpose v0.2.3
+   Compiling digest v0.11.3
+   Compiling quest-language v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-language)
+   Compiling quest-sys v0.2.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-sys)
+   Compiling quest-synthesis v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-synthesis)
+   Compiling quest-optimizer-protocol v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-protocol)
+   Compiling mpi v0.8.2
+   Compiling primal-check v0.3.4
+   Compiling aho-corasick v1.1.5
+   Compiling cpufeatures v0.3.1
+   Compiling custom_derive v0.1.7
+   Compiling conv v0.3.3
+   Compiling sha2 v0.11.0
+   Compiling rustfft v6.4.1
+   Compiling quest-optimizer-client v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-client)
+   Compiling quest-qasm v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-qasm)
+   Compiling half v2.7.1
+   Compiling proc-macro-crate v3.5.0
+   Compiling cxxbridge-macro v1.0.198
+   Compiling alloca v0.4.0
+   Compiling maryada v0.2.1
+   Compiling target-tuple v1.0.2
+   Compiling rustversion v1.0.23
+   Compiling foldhash v0.2.0
+   Compiling anstyle v1.0.14
+   Compiling ciborium-io v0.2.2
+   Compiling smallvec v1.16.0
+   Compiling clap_lex v1.1.0
+   Compiling clap_builder v4.6.6
+   Compiling ciborium-ll v0.2.2
+   Compiling quest-numerics v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-numerics)
+   Compiling quest-macros v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-macros)
+   Compiling quest-compile v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-compile)
+   Compiling quest-rs v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest)
+   Compiling serde_spanned v1.1.1
+   Compiling same-file v1.0.6
+   Compiling cast v0.3.0
+   Compiling toml_writer v1.1.2+spec-1.1.0
+   Compiling toml v1.1.5+spec-1.1.0
+   Compiling quest-circuit v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-circuit)
+   Compiling criterion-plot v0.8.2
+   Compiling walkdir v2.5.0
+   Compiling quest-polynomial v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-polynomial)
+   Compiling ciborium v0.2.2
+   Compiling clap v4.6.6
+   Compiling tinytemplate v1.2.1
+   Compiling googletest_macro v0.14.3
+   Compiling page_size v0.6.0
+   Compiling anes v0.1.6
+   Compiling oorandom v11.1.5
+   Compiling criterion v0.8.2
+   Compiling googletest v0.14.3
+   Compiling trybuild v1.0.121
+   Compiling quest-qsp v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-qsp)
+warning: quest-sys@0.2.0: Using QuEST 4.3.0 from /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0 with /nix/store/z4c6k0mrlkwl3s4w9ysxc8vq1wylm3ms-gcc-wrapper-15.3.0/bin/g++
+warning: quest-sys@0.2.0: Verified rsmpi MPICC /nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/bin/mpicc matches QuEST MPI ABI and loaded library
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 40.55s
+     Running tests/collective_runtime.rs (../target-mpi/debug/build/quest-rs/1cf4eaa29a3ff88a/out/collective_runtime-1cf4eaa29a3ff88a)
+
+running 7 tests
+test collective_budget_failure_on_one_rank_precedes_native_allocation ... ok
+test collective_compares_full_semantics_and_prepared_identity ... ok
+test collective_mismatched_payload_and_preflight_recover_together ... ok
+test collective_prepared_bell_oracle_and_projection_preserve_mpi ... ok
+test collective_rejects_different_cache_sharing_before_materialization ... ok
+test collective_rejects_different_classical_results_and_step_counts ... ok
+test collective_subgroups_execute_independent_schedules ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.24s
+

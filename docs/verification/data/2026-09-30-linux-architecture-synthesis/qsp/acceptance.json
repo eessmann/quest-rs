@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-30",
+  "host": "Bazzite",
+  "platform": "x86_64-linux",
+  "machine": "AMD Ryzen 9 7950X, 16 cores / 32 logical CPUs",
+  "cargo_build_jobs": 3,
+  "isolated_source": "/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source",
+  "source_manifest": "qsp-source.sha256",
+  "source_edits": "None by QSP validation agent; complete initial manifest and other validation deltas are maintained in the central Linux receipt.",
+  "driver_exit": 0,
+  "stages": [
+    {
+      "name": "qsp-environment",
+      "command": "devenv shell -- /usr/bin/bash -c rustc\\ -vV\\;\\ cargo\\ -V\\;\\ env\\ \\|\\ sort\\ \\|\\ grep\\ -E\\ \\\"\\^\\(OMP_\\|QUEST_\\|CARGO_BUILD_JOBS\\|CC=\\|CXX=\\|CMAKE_PREFIX_PATH=\\)\\\"",
+      "exit_code": 0,
+      "started_utc": "2026-09-29T23:13:26+00:00",
+      "finished_utc": "2026-09-29T23:13:26+00:00",
+      "log": "qsp-environment.log.gz"
+    },
+    {
+      "name": "qsp-all-features",
+      "command": "devenv shell -- cargo test -p quest-qsp --all-features --locked",
+      "exit_code": 0,
+      "started_utc": "2026-09-29T23:13:26+00:00",
+      "finished_utc": "2026-09-29T23:14:02+00:00",
+      "log": "qsp-all-features.log.gz",
+      "tests": {
+        "passed": 94,
+        "failed": 0,
+        "ignored": 3,
+        "binaries": 13
+      },
+      "doctests": {
+        "passed": 9,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    {
+      "name": "qsp-large-release",
+      "command": "devenv shell -- cargo test -p quest-qsp --all-features --release --lib --tests --locked -- --ignored --nocapture",
+      "exit_code": 0,
+      "started_utc": "2026-09-29T23:14:02+00:00",
+      "finished_utc": "2026-09-29T23:19:12+00:00",
+      "log": "qsp-large-release.log.gz",
+      "tests": {
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0,
+        "binaries": 13
+      },
+      "doctests": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    {
+      "name": "qsp-native-cli",
+      "command": "devenv shell -- cargo test -p quest-qsvt-cli --features offline-synthesis\\,rayon --locked",
+      "exit_code": 0,
+      "started_utc": "2026-09-29T23:19:12+00:00",
+      "finished_utc": "2026-09-29T23:19:36+00:00",
+      "log": "qsp-native-cli.log.gz",
+      "tests": {
+        "passed": 25,
+        "failed": 0,
+        "ignored": 0,
+        "binaries": 7
+      },
+      "doctests": {
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0
+      }
+    },
+    {
+      "name": "qsp-all-features-lint",
+      "command": "devenv shell -- cargo clippy -p quest-qsp --all-features --all-targets --locked -- -D warnings",
+      "exit_code": 0,
+      "started_utc": "2026-09-29T23:19:36+00:00",
+      "finished_utc": "2026-09-29T23:19:47+00:00",
+      "log": "qsp-all-features-lint.log.gz"
+    },
+    {
+      "name": "qsp-native-cli-lint",
+      "command": "devenv shell -- cargo clippy -p quest-qsvt-cli -p quest-qsvt-io --features quest-qsvt-cli/offline-synthesis\\,quest-qsvt-cli/rayon --all-targets --locked -- -D warnings",
+      "exit_code": 0,
+      "started_utc": "2026-09-29T23:19:47+00:00",
+      "finished_utc": "2026-09-29T23:20:05+00:00",
+      "log": "qsp-native-cli-lint.log.gz"
+    }
+  ],
+  "large_fixture_diagnostics": [
+    "degree=8192 response_upper=0.000000e0 completion_upper=4.440892e-17 reconstruction_upper=0.000000e0 unitarity_upper=6.280370e-17 attempts=[CertificationAttempt { precision: 256, work_units: 6861923344, modeled_peak_bytes: 1007648880, elapsed: 12.966105341s }]",
+    "OFFLINE_DEGREE_8105 attempts=1 response=4.19907433604448073e-17 reconstruction=6.97491458718325734e-17",
+    "OFFLINE_ATTEMPT OfflineAttempt { precision: 128, grid: 65536, work: 9087506208, computation: 68.717097757s, certification: 44.180901185s, completion_residual: Some(BigFloat { inner: Value(BigFloatNumber { e: -64, s: Pos, m: Mantissa { m: WordBuf { inner: [2709695829134475818, 16465458475355980858] }, n: 128 }, inexact: false }) }) }",
+    "degree8105 sequential real_parity_wx+unit_circle_response seconds=0.21446749",
+    "degree8105 workers=1 real_parity_wx+unit_circle_response seconds=0.211728603",
+    "degree8105 workers=2 real_parity_wx+unit_circle_response seconds=0.201132166",
+    "degree8105 workers=4 real_parity_wx+unit_circle_response seconds=0.196192044"
+  ],
+  "bit_determinism": "The passing degree-8105 fixture compares exact control, Wx phase, and complement values for serial and explicit Rayon pools of 1, 2, and 4 workers in both response conventions, then independently certifies both serial frozen exports. This is within-host determinism, not a cross-platform bit-identity claim.",
+  "limitations": [
+    "The three ordinary ignored large tests were all executed separately in release, passing 3/3 with no ignored fixtures.",
+    "Timing fields are observed validation diagnostics under concurrent host activity, not isolated performance benchmarks.",
+    "Native CLI validation uses the configured CPU/OpenMP QuEST 4.3.0 prefix; this receipt makes no MPI or GPU claim.",
+    "The fish login emits an existing missing-direnv warning before executing the explicit Bash command; no login configuration was modified."
+  ],
+  "logs": [
+    {
+      "file": "qsp-all-features-lint.log.gz",
+      "original": "qsp-all-features-lint.log",
+      "sha256_compressed": "5955e7c68b9c7c5129ed616be1bbb678cff54422b001986fb875e70932af63d7",
+      "sha256_uncompressed": "5ca714719429e57c40a9208c1f0916c664ef941d342e9e67a2497e15ba925f5e"
+    },
+    {
+      "file": "qsp-all-features.log.gz",
+      "original": "qsp-all-features.log",
+      "sha256_compressed": "91f12bda0634bfbc381095f025efafba2c539e63b4ecd03bb6cb60afdcd9dda5",
+      "sha256_uncompressed": "b7623167b1ad06afad5e9d952df05deba4b9e899ff6fb87530e0aa50ee8feca9"
+    },
+    {
+      "file": "qsp-environment.log.gz",
+      "original": "qsp-environment.log",
+      "sha256_compressed": "2dcaed6a57cea787bfcf32f0740f4337b923d31053730415c8ea5a5d673956f4",
+      "sha256_uncompressed": "f6f03fd404da6855559c07f6c9bd54cfee64b4fd8d796e5b5007da1c621c11f9"
+    },
+    {
+      "file": "qsp-large-release.log.gz",
+      "original": "qsp-large-release.log",
+      "sha256_compressed": "f6fadc48b87b4cf15e7373310fd5615b41fcdf53595169294df0976864ca1f70",
+      "sha256_uncompressed": "74ef6b2ac224ffdff3fbd6e42a47bdd368831369cdaba5cde6353801884bca07"
+    },
+    {
+      "file": "qsp-launch.log.gz",
+      "original": "qsp-launch.log",
+      "sha256_compressed": "c7dbca2bae982eda3244dd5a8a780f41b93f5c1977159cd63dd309beb80f990c",
+      "sha256_uncompressed": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "qsp-machine.log.gz",
+      "original": "qsp-machine.log",
+      "sha256_compressed": "1a259ddf26eb5a2ac951056c6bb243ce8e1b57890a9e783b47c6c75d311d79f3",
+      "sha256_uncompressed": "e2715be80cca5f0914516e9d23de175fa15293e2cd49416bf6075d9ec7905784"
+    },
+    {
+      "file": "qsp-native-cli-lint.log.gz",
+      "original": "qsp-native-cli-lint.log",
+      "sha256_compressed": "ecefa3d88670a0733230997e4df0703b1f4b3b3af4ee81541d9915a5f70d3eaa",
+      "sha256_uncompressed": "b1fbd76eb4db3def18cb39d1ecc06dde19279454e1d5300579c86c0366ddc6d3"
+    },
+    {
+      "file": "qsp-native-cli.log.gz",
+      "original": "qsp-native-cli.log",
+      "sha256_compressed": "cf7bbf62a804d0836032e50f54e34399eb350aa9b53534a18d41cebd17687178",
+      "sha256_uncompressed": "9ae3524f6d8b3f6ef65555e0d9d36eaeacc0ea79b0cc124f0645c4efc7f9df3f"
+    }
+  ]
+}

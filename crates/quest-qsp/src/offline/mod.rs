@@ -10,7 +10,7 @@
 //! Available only with `offline-synthesis`, which also enables `certification`.
 //! [`OfflineBuilder`] consumes an original polynomial, an explicit
 //! [`OfflinePolicy`] and then a `solve` request. Production synthesis never
-//! invokes it. Generalized input needs nonnegative Laurent support; canonical
+//! invokes it. `UnitCircleResponse` input needs nonnegative Laurent support; `real_parity_wx`
 //! input needs real Chebyshev coefficients with exactly one parity. Neither
 //! path projects, chops or rescales the source.
 //!
@@ -27,11 +27,11 @@
 //! certificate; the final exported polynomial receives a full-domain error bound.
 //!
 //! ```
-//! use quest_polynomial::{Laurent, Limits, Polynomial};
+//! use quest_polynomial::{Basis, Laurent, Limits, Polynomial};
 //! use quest_qsp::{Complex64, offline::{OfflineBuilder, OfflinePolicy}};
 //! let target = Polynomial::new(Laurent::new(0),
 //!     vec![Complex64::new(0.3, 0.4)], Limits::default())?;
-//! let solved = OfflineBuilder::new().generalized(&target)?
+//! let solved = OfflineBuilder::new().unit_circle_response(&target)?
 //!     .policy(OfflinePolicy::default())?.solve()?;
 //! assert!(solved.certified().report().response().upper_f64() <= 1e-11);
 //! # Ok::<(), Box<dyn std::error::Error>>(())
@@ -45,10 +45,12 @@ use crate::certification::{
     CertificationBuilder, CertificationError, CertificationMode, CertificationPolicy, Certified,
     MpComplex, MpInterval,
 };
-use crate::{AdmittedTarget, Canonical, Complex64, Control, FrozenCandidate, Generalized};
+use crate::{
+    AdmittedTarget, Complex64, Control, FrozenCandidate, RealParityWx, UnitCircleResponse,
+};
 use astro_float::{BigFloat, Consts, RoundingMode};
 use number::Number;
-use quest_polynomial::{Chebyshev, Laurent, Polynomial};
+use quest_polynomial::{Basis, Chebyshev, Laurent, Polynomial};
 pub use remez::{
     ApproximationFailure, FunctionDomain, MissingFunction, OfflineApproximation,
     OfflineRemezBuilder, OfflineRemezPolicy, OriginalFunction, ReadyRemez,
@@ -104,6 +106,8 @@ pub enum OfflineError {
 /// and transcendental iterations are not a process-wide quota.
 #[derive(Clone, Copy, Debug)]
 pub struct OfflinePolicy {
+    /// Factorization, independent of arithmetic precision; never silently changed.
+    pub algorithm: crate::SynthesisAlgorithm,
     /// First computation attempt's precision in bits (default 128).
     pub initial_precision: u32,
     /// Last permitted computation precision in bits (default 4096).
@@ -124,6 +128,7 @@ pub struct OfflinePolicy {
 impl Default for OfflinePolicy {
     fn default() -> Self {
         Self {
+            algorithm: crate::SynthesisAlgorithm::default(),
             initial_precision: 128,
             max_precision: 4096,
             max_grid: 1_048_576,
@@ -205,6 +210,8 @@ pub struct MissingTarget;
 /// Retained original coefficients before precision/resource policy admission.
 #[derive(Debug)]
 pub struct OriginalTarget<M> {
+    source_offset: i32,
+    source_length: usize,
     source: Arc<Vec<Complex64>>,
     degree: usize,
     mode: PhantomData<M>,
@@ -233,17 +240,19 @@ impl OfflineBuilder {
             state: MissingTarget,
         }
     }
-    /// Copy original generalized coefficients, padding any positive offset.
+    /// Copy original `unit_circle_response` coefficients, padding any positive offset.
     /// # Errors
     /// Rejects negative Laurent powers or support overflow.
-    pub fn generalized(
+    pub fn unit_circle_response(
         self,
         polynomial: &Polynomial<Laurent>,
-    ) -> OfflineResult<OfflineBuilder<OriginalTarget<Generalized>>> {
-        let (offset, last) = polynomial.support();
+    ) -> OfflineResult<OfflineBuilder<OriginalTarget<UnitCircleResponse>>> {
+        let (offset, last) = polynomial
+            .stored_support()
+            .unwrap_or_else(|| (polynomial.basis().offset(), polynomial.basis().offset()));
         if offset < 0 {
             return Err(OfflineError::Domain(
-                "offline generalized target needs nonnegative powers",
+                "offline unit_circle_response target needs nonnegative powers",
             ));
         }
         let count = usize::try_from(last)
@@ -264,6 +273,8 @@ impl OfflineBuilder {
             .copy_from_slice(polynomial.coefficients());
         Ok(OfflineBuilder {
             state: OriginalTarget {
+                source_offset: polynomial.basis().offset(),
+                source_length: polynomial.coefficients().len(),
                 source: Arc::new(source),
                 degree: count.saturating_sub(1),
                 mode: PhantomData,
@@ -273,10 +284,10 @@ impl OfflineBuilder {
     /// Copy original real Chebyshev coefficients while preserving exact parity.
     /// # Errors
     /// Rejects complex coefficients or mixed exact parity; no source coefficients are projected.
-    pub fn canonical(
+    pub fn real_parity_wx(
         self,
         polynomial: &Polynomial<Chebyshev>,
-    ) -> OfflineResult<OfflineBuilder<OriginalTarget<Canonical>>> {
+    ) -> OfflineResult<OfflineBuilder<OriginalTarget<RealParityWx>>> {
         let source = polynomial.coefficients();
         let degree = source
             .iter()
@@ -288,11 +299,13 @@ impl OfflineBuilder {
             .any(|(index, c)| c.im != 0.0 || (index % 2 != degree % 2 && c.re != 0.0))
         {
             return Err(OfflineError::Domain(
-                "canonical source requires exact real parity",
+                "real_parity_wx source requires exact real parity",
             ));
         }
         Ok(OfflineBuilder {
             state: OriginalTarget {
+                source_offset: 0,
+                source_length: source.len(),
                 source: Arc::new(source.to_vec()),
                 degree,
                 mode: PhantomData,
@@ -378,7 +391,7 @@ impl ExportSnapshot {
     pub fn controls(&self) -> &[Control] {
         &self.controls
     }
-    /// Last canonical Wx angles in radians; empty for generalized synthesis.
+    /// Last `real_parity_wx` Wx angles in radians; empty for `unit_circle_response` synthesis.
     #[must_use]
     pub fn phases(&self) -> &[f64] {
         &self.phases
@@ -443,7 +456,7 @@ pub struct OfflineReport {
     contractivity_upper: Option<BigFloat>,
 }
 impl OfflineReport {
-    /// Original Chebyshev source or zero-padded generalized power coefficients.
+    /// Original Chebyshev source or zero-padded `unit_circle_response` power coefficients.
     #[must_use]
     pub fn source_coefficients(&self) -> &[Complex64] {
         &self.source
@@ -732,7 +745,7 @@ fn freeze<M: CertificationMode>(
     context: &mut Context,
 ) -> OfflineResult<FrozenCandidate<M>> {
     let (phases, mut matrices) = if M::CANONICAL {
-        kernels::canonical_phases(gamma, context)?
+        kernels::real_parity_wx_phases(gamma, context)?
     } else {
         (Vec::new(), kernels::controls(gamma, context)?)
     };
@@ -775,6 +788,7 @@ fn freeze<M: CertificationMode>(
         return Err(OfflineError::Numerical("nonfinite binary64 export"));
     }
     let policy = crate::Policy {
+        algorithm: context.policy.algorithm,
         response_tolerance: context.policy.certification.response_tolerance,
         contractivity_margin: context.policy.contractivity_margin,
         max_completion_grid: context.policy.max_grid,
@@ -786,6 +800,8 @@ fn freeze<M: CertificationMode>(
         ..crate::Policy::default()
     };
     let admitted = AdmittedTarget {
+        source_offset: original.source_offset,
+        source_length: original.source_length,
         source: Arc::clone(&original.source),
         target: Arc::new(target),
         norm_upper: to_f64(norm, BinaryRounding::Up)?,
@@ -793,12 +809,15 @@ fn freeze<M: CertificationMode>(
         _mode: PhantomData,
     };
     Ok(FrozenCandidate {
+        synthesis_precision: crate::SynthesisPrecision::Arbitrary {
+            bits: context.precision,
+        },
         admitted,
         controls: Arc::new(controls),
         a_star: Arc::new(astar),
         phases: Arc::new(phases),
         completion_residual: to_f64(residual, BinaryRounding::Up)?,
-        reconstruction_residual: f64::INFINITY,
+        reconstruction_residual: None,
         completion_grid: grid,
     })
 }
@@ -828,8 +847,15 @@ fn solve<M: CertificationMode>(
         let computed = (|| -> OfflineResult<_> {
             let target = original(source, &mut context)?;
             let norm = contractivity(&target, &mut context)?;
-            let (astar, residual, grid) = kernels::completion(&target, &mut context)?;
-            let gamma = kernels::inverse(&astar, &target, &mut context)?;
+            let (astar, ratio, residual, grid) = kernels::completion(&target, &mut context)?;
+            let gamma = match policy.algorithm {
+                crate::SynthesisAlgorithm::RhwHalfCholesky => {
+                    kernels::half_cholesky(&ratio, &mut context)?
+                }
+                crate::SynthesisAlgorithm::InverseNlftDivideConquer => {
+                    kernels::inverse(&astar, &target, &mut context)?
+                }
+            };
             let candidate = freeze(
                 source,
                 &target,
