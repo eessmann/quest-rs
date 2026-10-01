@@ -8,7 +8,7 @@ use super::{
 use crate::precision::{BinaryRounding, checked, exact_from_f64, to_f64};
 use astro_float::BigFloat;
 use quest_polynomial::{
-    Chebyshev, Complex64, Expr, ExprNode, Function, Interval, Limits, Polynomial,
+    Backend, Chebyshev, Complex64, Expr, Expression, Function, Interval, Limits, Polynomial,
 };
 use std::time::{Duration, Instant};
 
@@ -42,21 +42,22 @@ impl Default for OfflineRemezPolicy {
 pub struct MissingFunction;
 /// Original expression retained before choosing its real approximation domain.
 #[derive(Debug)]
-pub struct OriginalFunction {
-    function: Function,
+pub struct OriginalFunction<E = Expr> {
+    function: Function<E>,
 }
 /// Defined real interval and original function, with configurable polynomial degree.
 #[derive(Debug)]
-pub struct FunctionDomain {
-    function: Function,
+pub struct FunctionDomain<E = Expr> {
+    function: Function<E>,
     domain: Interval,
     degree: usize,
 }
 /// Approximation inputs with admitted precision and resource policy.
 #[derive(Debug)]
-pub struct ReadyRemez {
-    input: FunctionDomain,
+pub struct ReadyRemez<E = Expr> {
+    input: FunctionDomain<E>,
     policy: OfflineRemezPolicy,
+    admission_work: usize,
 }
 /// Explicit arbitrary-precision exchange followed by a binary64 export error proof.
 ///
@@ -98,23 +99,26 @@ impl OfflineRemezBuilder {
     }
     /// Retain the original function expression for all precision attempts.
     #[must_use]
-    pub const fn function(self, function: Function) -> OfflineRemezBuilder<OriginalFunction> {
+    pub const fn function<E: Expression>(
+        self,
+        function: Function<E>,
+    ) -> OfflineRemezBuilder<OriginalFunction<E>> {
         OfflineRemezBuilder {
             state: OriginalFunction { function },
         }
     }
 }
-impl OfflineRemezBuilder<OriginalFunction> {
-    /// Admit the real approximation interval and interval derivative domain.
+impl<E: Expression> OfflineRemezBuilder<OriginalFunction<E>> {
+    /// Admit the real approximation interval. Derivative validation is deferred
+    /// until `policy` supplies a work budget.
     /// # Errors
-    /// Requires a nondegenerate domain within [-1,1] and defined interval derivatives.
-    pub fn domain(self, domain: Interval) -> OfflineResult<OfflineRemezBuilder<FunctionDomain>> {
+    /// Requires a nondegenerate domain within [-1,1].
+    pub fn domain(self, domain: Interval) -> OfflineResult<OfflineRemezBuilder<FunctionDomain<E>>> {
         if domain.lower() >= domain.upper() || domain.lower() < -1.0 || domain.upper() > 1.0 {
             return Err(OfflineError::Domain(
                 "Remez requires a positive-width subinterval of [-1,1]",
             ));
         }
-        self.state.function.jet_interval(domain)?;
         Ok(OfflineRemezBuilder {
             state: FunctionDomain {
                 function: self.state.function,
@@ -124,7 +128,7 @@ impl OfflineRemezBuilder<OriginalFunction> {
         })
     }
 }
-impl OfflineRemezBuilder<FunctionDomain> {
+impl<E: Expression> OfflineRemezBuilder<FunctionDomain<E>> {
     /// Set the Chebyshev degree (default 16), validated with the policy.
     #[must_use]
     pub const fn degree(mut self, degree: usize) -> Self {
@@ -137,7 +141,7 @@ impl OfflineRemezBuilder<FunctionDomain> {
     pub fn policy(
         self,
         policy: OfflineRemezPolicy,
-    ) -> OfflineResult<OfflineRemezBuilder<ReadyRemez>> {
+    ) -> OfflineResult<OfflineRemezBuilder<ReadyRemez<E>>> {
         policy.offline.validate()?;
         if !policy.error_tolerance.is_finite()
             || policy.error_tolerance <= 0.0
@@ -159,6 +163,16 @@ impl OfflineRemezBuilder<FunctionDomain> {
             return Err(OfflineError::Budget("Remez coefficients"));
         }
         let cells = n.checked_mul(n).ok_or(OfflineError::Budget("QR cells"))?;
+        // Evaluation retains second-order jets at each recursive level. Charge
+        // a conservative live-temporary bound at the largest admitted precision.
+        let expression_bytes = self
+            .state
+            .function
+            .metadata()
+            .depth
+            .checked_mul(32)
+            .and_then(|n| n.checked_mul(modeled_scalar_bytes(policy.offline.max_precision).ok()?))
+            .ok_or(OfflineError::Budget("expression jet storage"))?;
         let bytes = cells
             .checked_mul(4)
             .ok_or(OfflineError::Budget("QR temporaries"))?
@@ -170,22 +184,38 @@ impl OfflineRemezBuilder<FunctionDomain> {
                     .and_then(|stack| bytes.checked_add(stack))
             })
             .and_then(|bytes| bytes.checked_add(65_536))
+            .and_then(|bytes| bytes.checked_add(expression_bytes))
             .ok_or(OfflineError::Budget("QR and interval-stack bytes"))?;
         if bytes > policy.offline.max_bytes {
             return Err(OfflineError::Budget("QR bytes"));
         }
+        // Reject an expanded DAG or unaffordable jet before evaluating it.
+        // This bound covers visits, scalar arithmetic and derivative seed constants.
+        let admission_work = self
+            .state
+            .function
+            .metadata()
+            .nodes
+            .checked_mul(48)
+            .and_then(|work| work.checked_add(2))
+            .ok_or(OfflineError::Budget("Remez domain evaluation work"))?;
+        if admission_work > policy.offline.max_work {
+            return Err(OfflineError::Budget("Remez domain evaluation work"));
+        }
+        self.state.function.jet_interval(self.state.domain)?;
         Ok(OfflineRemezBuilder {
             state: ReadyRemez {
                 input: self.state,
                 policy,
+                admission_work,
             },
         })
     }
 }
 /// Frozen Chebyshev approximation with an independently enclosed uniform error.
 #[derive(Debug)]
-pub struct OfflineApproximation {
-    function: Function,
+pub struct OfflineApproximation<E = Expr> {
+    function: Function<E>,
     domain: Interval,
     polynomial: Polynomial<Chebyshev>,
     error_bound: Interval,
@@ -196,10 +226,10 @@ pub struct OfflineApproximation {
     enclosure_elapsed: Duration,
     exchange_gap: BigFloat,
 }
-impl OfflineApproximation {
+impl<E: Expression> OfflineApproximation<E> {
     /// Original expression against which the exported polynomial was checked.
     #[must_use]
-    pub const fn function(&self) -> &Function {
+    pub const fn function(&self) -> &Function<E> {
         &self.function
     }
     /// Real interval covered by the uniform-error enclosure.
@@ -250,8 +280,8 @@ impl OfflineApproximation {
 }
 /// Original expression and last export retained when the approximation is not established.
 #[derive(Debug)]
-pub struct ApproximationFailure {
-    function: Function,
+pub struct ApproximationFailure<E = Expr> {
+    function: Function<E>,
     domain: Interval,
     degree: usize,
     precision: u32,
@@ -260,10 +290,10 @@ pub struct ApproximationFailure {
     polynomial: Option<Polynomial<Chebyshev>>,
     coefficients: Option<Vec<BigFloat>>,
 }
-impl ApproximationFailure {
+impl<E: Expression> ApproximationFailure<E> {
     /// Original expression retained for diagnosis or a new explicit request.
     #[must_use]
-    pub const fn function(&self) -> &Function {
+    pub const fn function(&self) -> &Function<E> {
         &self.function
     }
     /// Original real approximation interval.
@@ -302,7 +332,7 @@ impl ApproximationFailure {
         self.coefficients.as_deref()
     }
 }
-impl OfflineRemezBuilder<ReadyRemez> {
+impl<E: Expression> OfflineRemezBuilder<ReadyRemez<E>> {
     /// Compute exchange candidates and enclose the final binary64 uniform error.
     /// # Errors
     /// Returns typed budget, domain, or inability-to-establish errors; never calls
@@ -311,11 +341,15 @@ impl OfflineRemezBuilder<ReadyRemez> {
         clippy::too_many_lines,
         reason = "precision retries retain the original source and each typed failure report"
     )]
-    pub fn solve(self) -> OfflineResult<OfflineApproximation> {
-        let ReadyRemez { input, policy } = self.state;
+    pub fn solve(self) -> OfflineResult<OfflineApproximation<E>> {
+        let ReadyRemez {
+            input,
+            policy,
+            admission_work,
+        } = self.state;
         let mut precision = policy.offline.initial_precision;
         let mut attempts = 0usize;
-        let mut work = 0;
+        let mut work = admission_work;
         let mut computation_elapsed = Duration::ZERO;
         let mut enclosure_elapsed = Duration::ZERO;
         loop {
@@ -376,7 +410,7 @@ impl OfflineRemezBuilder<ReadyRemez> {
                             if precision == policy.offline.max_precision {
                                 return Err(OfflineError::ApproximationNotEstablished {
                                     report: Box::new(ApproximationFailure {
-                                        function: input.function,
+                                        function: input.function.to_dynamic(),
                                         domain: input.domain,
                                         degree: input.degree,
                                         precision,
@@ -395,7 +429,7 @@ impl OfflineRemezBuilder<ReadyRemez> {
                     if precision == policy.offline.max_precision {
                         return Err(OfflineError::ApproximationNotEstablished {
                             report: Box::new(ApproximationFailure {
-                                function: input.function,
+                                function: input.function.to_dynamic(),
                                 domain: input.domain,
                                 degree: input.degree,
                                 precision,
@@ -421,103 +455,81 @@ struct Jet {
     value: BigFloat,
     first: BigFloat,
 }
-fn evaluate(expr: &Expr, x: &BigFloat, depth: u16, context: &mut Context) -> OfflineResult<Jet> {
-    context.charge(16)?;
-    let next = depth
-        .checked_sub(1)
-        .ok_or(OfflineError::Budget("expression depth"))?;
-    let zero = BigFloat::from_i64(0, crate::offline::number::precision_bits(context.precision));
-    let one = BigFloat::from_i64(1, crate::offline::number::precision_bits(context.precision));
-    let result = match expr.node() {
-        ExprNode::Variable => Jet {
-            value: x.clone(),
-            first: one,
-        },
-        ExprNode::Constant(v) => Jet {
-            value: exact_from_f64(v, context.precision)?,
-            first: zero,
-        },
-        ExprNode::Add(a, b) | ExprNode::Sub(a, b) | ExprNode::Mul(a, b) | ExprNode::Div(a, b) => {
-            let a = evaluate(a, x, next, context)?;
-            let b = evaluate(b, x, next, context)?;
-            match expr.node() {
-                ExprNode::Add(..) => Jet {
-                    value: add(&a.value, &b.value),
-                    first: add(&a.first, &b.first),
-                },
-                ExprNode::Sub(..) => Jet {
-                    value: sub(&a.value, &b.value),
-                    first: sub(&a.first, &b.first),
-                },
-                ExprNode::Mul(..) => Jet {
-                    value: mul(&a.value, &b.value),
-                    first: add(&mul(&a.first, &b.value), &mul(&a.value, &b.first)),
-                },
-                _ => Jet {
-                    value: div(&a.value, &b.value),
-                    first: div(
-                        &sub(&mul(&a.first, &b.value), &mul(&a.value, &b.first)),
-                        &mul(&b.value, &b.value),
-                    ),
-                },
-            }
-        }
-        ExprNode::Neg(a) => {
-            let a = evaluate(a, x, next, context)?;
-            Jet {
-                value: neg(&a.value),
-                first: neg(&a.first),
-            }
-        }
-        ExprNode::Exp(a) => {
-            let a = evaluate(a, x, next, context)?;
-            let value = context.exp(&a.value)?;
-            let first = mul(&value, &a.first);
-            Jet { value, first }
-        }
-        ExprNode::Ln(a) => {
-            let a = evaluate(a, x, next, context)?;
-            let first = div(&a.first, &a.value);
-            Jet {
-                value: context.ln(&a.value)?,
-                first,
-            }
-        }
-        ExprNode::Sin(a) => {
-            let a = evaluate(a, x, next, context)?;
-            let first = mul(&context.cos(&a.value)?, &a.first);
-            Jet {
-                value: context.sin(&a.value)?,
-                first,
-            }
-        }
-        ExprNode::Cos(a) => {
-            let a = evaluate(a, x, next, context)?;
-            let first = neg(&mul(&context.sin(&a.value)?, &a.first));
-            Jet {
-                value: context.cos(&a.value)?,
-                first,
-            }
-        }
-        ExprNode::Sqrt(a) => {
-            let a = evaluate(a, x, next, context)?;
-            let value = sqrt(&a.value);
-            let first = div(
-                &a.first,
-                &mul(
-                    &BigFloat::from_i64(
-                        2,
-                        crate::offline::number::precision_bits(context.precision),
-                    ),
-                    &value,
-                ),
-            );
-            Jet { value, first }
-        }
-    };
-    validate(&result.value)?;
-    validate(&result.first)?;
-    Ok(result)
+// Arithmetic is supplied here; expression traversal and differentiation are
+// shared with binary64, intervals and the statically typed expression evaluator.
+impl Backend for Context {
+    type Scalar = BigFloat;
+    type Error = OfflineError;
+    fn visit(&mut self) -> OfflineResult<()> {
+        self.charge(1)
+    }
+    fn point(&mut self, value: f64) -> OfflineResult<BigFloat> {
+        self.charge(1)?;
+        Ok(exact_from_f64(value, self.precision)?)
+    }
+    fn add(&mut self, a: BigFloat, b: BigFloat) -> OfflineResult<BigFloat> {
+        self.charge(1)?;
+        let result = add(&a, &b);
+        validate(&result)?;
+        Ok(result)
+    }
+    fn sub(&mut self, a: BigFloat, b: BigFloat) -> OfflineResult<BigFloat> {
+        self.charge(1)?;
+        let result = sub(&a, &b);
+        validate(&result)?;
+        Ok(result)
+    }
+    fn mul(&mut self, a: BigFloat, b: BigFloat) -> OfflineResult<BigFloat> {
+        self.charge(1)?;
+        let result = mul(&a, &b);
+        validate(&result)?;
+        Ok(result)
+    }
+    fn div(&mut self, a: BigFloat, b: BigFloat) -> OfflineResult<BigFloat> {
+        self.charge(1)?;
+        let result = div(&a, &b);
+        validate(&result)?;
+        Ok(result)
+    }
+    fn neg(&mut self, a: BigFloat) -> OfflineResult<BigFloat> {
+        self.charge(1)?;
+        let result = neg(&a);
+        validate(&result)?;
+        Ok(result)
+    }
+    fn sqrt(&mut self, a: BigFloat) -> OfflineResult<BigFloat> {
+        self.charge(1)?;
+        let result = sqrt(&a);
+        validate(&result)?;
+        Ok(result)
+    }
+    fn exp(&mut self, a: BigFloat) -> OfflineResult<BigFloat> {
+        self.charge(1)?;
+        Self::exp(self, &a)
+    }
+    fn ln(&mut self, a: BigFloat) -> OfflineResult<BigFloat> {
+        self.charge(1)?;
+        Self::ln(self, &a)
+    }
+    fn sin(&mut self, a: BigFloat) -> OfflineResult<BigFloat> {
+        self.charge(1)?;
+        Self::sin(self, &a)
+    }
+    fn cos(&mut self, a: BigFloat) -> OfflineResult<BigFloat> {
+        self.charge(1)?;
+        Self::cos(self, &a)
+    }
+}
+fn evaluate<E: Expression>(
+    function: &Function<E>,
+    x: &BigFloat,
+    context: &mut Context,
+) -> OfflineResult<Jet> {
+    let jet = function.jet_backend(context, x.clone())?;
+    Ok(Jet {
+        value: jet.value,
+        first: jet.first,
+    })
 }
 fn scratch<T>(count: usize, label: &'static str) -> OfflineResult<Vec<T>> {
     let mut result = Vec::new();
@@ -559,13 +571,13 @@ fn basis(x: &BigFloat, count: usize) -> OfflineResult<Vec<Jet>> {
     }
     Ok(out)
 }
-fn residual(
-    input: &FunctionDomain,
+fn residual<E: Expression>(
+    input: &FunctionDomain<E>,
     c: &[BigFloat],
     x: &BigFloat,
     context: &mut Context,
 ) -> OfflineResult<Jet> {
-    let mut out = evaluate(input.function.expression(), x, 256, context)?;
+    let mut out = evaluate(&input.function, x, context)?;
     context.charge(
         c.len()
             .checked_mul(16)
@@ -600,8 +612,8 @@ fn point(domain: Interval, index: usize, count: usize, p: u32) -> OfflineResult<
         ),
     ))?)
 }
-fn extrema(
-    input: &FunctionDomain,
+fn extrema<E: Expression>(
+    input: &FunctionDomain<E>,
     c: &[BigFloat],
     policy: OfflineRemezPolicy,
     context: &mut Context,
@@ -806,8 +818,8 @@ fn qr(
     }
     Ok(result)
 }
-fn exchange(
-    input: &FunctionDomain,
+fn exchange<E: Expression>(
+    input: &FunctionDomain<E>,
     policy: OfflineRemezPolicy,
     context: &mut Context,
 ) -> OfflineResult<(Vec<BigFloat>, usize, BigFloat)> {
@@ -834,7 +846,7 @@ fn exchange(
                 crate::offline::number::precision_bits(context.precision),
             ));
             matrix.push(row);
-            rhs.push(evaluate(input.function.expression(), x, 256, context)?.value);
+            rhs.push(evaluate(&input.function, x, context)?.value);
         }
         let mut coefficients = qr(matrix, rhs, context)?;
         coefficients.pop();
@@ -877,8 +889,8 @@ fn exchange(
         "arbitrary-precision exchange iteration budget exhausted",
     ))
 }
-fn residual_interval(
-    function: &Function,
+fn residual_interval<E: Expression>(
+    function: &Function<E>,
     polynomial: &Polynomial<Chebyshev>,
     x: Interval,
 ) -> OfflineResult<(Interval, Interval)> {
@@ -886,33 +898,11 @@ fn residual_interval(
     let b = polynomial.jet_interval(x)?;
     Ok((a.value.checked_sub(b.value)?, a.first.checked_sub(b.first)?))
 }
-fn expression_nodes(expr: &Expr, depth: u16) -> OfflineResult<usize> {
-    let next = depth
-        .checked_sub(1)
-        .ok_or(OfflineError::Budget("Remez expression depth"))?;
-    let children = match expr.node() {
-        ExprNode::Variable | ExprNode::Constant(_) => 0,
-        ExprNode::Add(a, b) | ExprNode::Sub(a, b) | ExprNode::Mul(a, b) | ExprNode::Div(a, b) => {
-            expression_nodes(a, next)?
-                .checked_add(expression_nodes(b, next)?)
-                .ok_or(OfflineError::Budget("Remez expression work"))?
-        }
-        ExprNode::Neg(a)
-        | ExprNode::Exp(a)
-        | ExprNode::Ln(a)
-        | ExprNode::Sin(a)
-        | ExprNode::Cos(a)
-        | ExprNode::Sqrt(a) => expression_nodes(a, next)?,
-    };
-    children
-        .checked_add(1)
-        .ok_or(OfflineError::Budget("Remez expression work"))
-}
 fn magnitude(x: Interval) -> f64 {
     x.lower().abs().max(x.upper().abs())
 }
-fn enclose(
-    function: &Function,
+fn enclose<E: Expression>(
+    function: &Function<E>,
     polynomial: &Polynomial<Chebyshev>,
     domain: Interval,
     policy: OfflineRemezPolicy,
@@ -922,9 +912,11 @@ fn enclose(
     pending.push(domain);
     // A visit evaluates both jets at least twice and may evaluate both endpoints.
     // Charge the worst case before doing the interval arithmetic.
-    let visit_work = expression_nodes(function.expression(), 256)?
+    let visit_work = function
+        .metadata()
+        .nodes
         .checked_add(polynomial.coefficients().len())
-        .and_then(|units| units.checked_mul(4))
+        .and_then(|units| units.checked_mul(4 * 48))
         .ok_or(OfflineError::Budget("Remez enclosure work"))?;
     let mut upper = 0.0_f64;
     let mut visited = 0usize;
@@ -989,6 +981,153 @@ fn enclose(
 mod tests {
     use super::*;
     use googletest::prelude::*;
+    #[test]
+    fn policy_preflights_domain_evaluation_without_expanding_shared_dags() {
+        let domain = Interval::new(-1.0, 1.0).unwrap();
+        let mut expression = quest_polynomial::Expr::variable();
+        for _ in 0..70 {
+            expression = expression.clone() + expression;
+        }
+        let input = OfflineRemezBuilder::new()
+            .function(Function::new(expression))
+            .domain(domain)
+            .unwrap();
+        assert!(matches!(
+            input.policy(OfflineRemezPolicy::default()),
+            Err(OfflineError::Budget(_))
+        ));
+        let input = OfflineRemezBuilder::new()
+            .function(quest_polynomial::typed_function!(|x| x.exp()))
+            .domain(domain)
+            .unwrap();
+        let policy = OfflineRemezPolicy {
+            offline: OfflinePolicy {
+                max_work: 1,
+                ..Default::default()
+            },
+            ..Default::default()
+        };
+        assert!(matches!(input.policy(policy), Err(OfflineError::Budget(_))));
+    }
+    #[test]
+    fn shared_non_copy_backend_matches_analytic_derivatives_and_exact_constants() {
+        struct Square;
+        impl quest_polynomial::GenericCallable for Square {
+            fn evaluate<B: Backend>(
+                &self,
+                backend: &mut B,
+                x: B::Scalar,
+            ) -> std::result::Result<B::Scalar, B::Error> {
+                backend.mul(x.clone(), x)
+            }
+        }
+        let p = 256;
+        let mut context = Context::new(8, p, OfflinePolicy::default()).unwrap();
+        let f = quest_polynomial::typed_function!(|x| (1.0 + x * x).ln());
+        let x = exact_from_f64(0.5, p).unwrap();
+        let j = f.jet_backend(&mut context, x.clone()).unwrap();
+        let one = BigFloat::from_i64(1, super::super::number::precision_bits(p));
+        let four = BigFloat::from_i64(4, super::super::number::precision_bits(p));
+        let five = BigFloat::from_i64(5, super::super::number::precision_bits(p));
+        let expected_first = div(&four, &five);
+        let expected_second = div(
+            &BigFloat::from_i64(24, super::super::number::precision_bits(p)),
+            &BigFloat::from_i64(25, super::super::number::precision_bits(p)),
+        );
+        let expected_value = context.ln(&add(&one, &mul(&x, &x))).unwrap();
+        let tolerance = exact_from_f64(1e-70, p).unwrap();
+        assert!(sub(&j.value, &expected_value).abs() < tolerance);
+        assert!(sub(&j.first, &expected_first).abs() < tolerance);
+        assert!(sub(&j.second, &expected_second).abs() < tolerance);
+        let constant = 0.1_f64;
+        let f = quest_polynomial::typed_function!(|x| x + constant);
+        let zero = BigFloat::from_i64(0, super::super::number::precision_bits(p));
+        let typed = f.evaluate_backend(&mut context, zero.clone()).unwrap();
+        let dynamic = f.to_dynamic().evaluate_backend(&mut context, zero).unwrap();
+        assert_eq!(typed, exact_from_f64(constant, p).unwrap());
+        assert_eq!(typed, dynamic);
+        let custom = quest_polynomial::AssumedFunction::new(
+            Square,
+            quest_polynomial::ConsistencyAssumption::SameFunctionAndDerivatives,
+        );
+        let jet = custom
+            .jet_backend(&mut context, exact_from_f64(0.5, p).unwrap())
+            .unwrap();
+        assert_eq!(jet.value, exact_from_f64(0.25, p).unwrap());
+        assert_eq!(jet.first, exact_from_f64(1.0, p).unwrap());
+        assert_eq!(jet.second, exact_from_f64(2.0, p).unwrap());
+    }
+
+    #[test]
+    fn typed_offline_export_proves_actual_binary64_coefficients() {
+        let constant = 0.1_f64;
+        let f = quest_polynomial::typed_function!(|x| x * 0.25 + constant);
+        let original = f.clone();
+        let result = OfflineRemezBuilder::new()
+            .function(f)
+            .domain(Interval::new(-1.0, 1.0).unwrap())
+            .unwrap()
+            .degree(1)
+            .policy(OfflineRemezPolicy {
+                error_tolerance: 1e-12,
+                ..OfflineRemezPolicy::default()
+            })
+            .unwrap()
+            .solve()
+            .unwrap();
+        assert_eq!(
+            result.polynomial().coefficients(),
+            &[Complex64::new(constant, 0.0), Complex64::new(0.25, 0.0)]
+        );
+        assert_eq!(
+            result.function().evaluate(0.0).unwrap().to_bits(),
+            constant.to_bits()
+        );
+        for x in [-1.0, -0.75, -0.25, 0.0, 0.125, 0.5, 1.0] {
+            let error = (original.evaluate(x).unwrap()
+                - result.polynomial().evaluate_real(x).unwrap())
+            .abs();
+            assert!(error <= result.error_bound().upper());
+        }
+    }
+
+    #[test]
+    fn typed_original_survives_all_precision_attempts_in_failure_report() {
+        let constant = 0.1_f64;
+        let f = quest_polynomial::typed_function!(|x| x.exp() + constant);
+        let result = OfflineRemezBuilder::new()
+            .function(f)
+            .domain(Interval::new(-1.0, 1.0).unwrap())
+            .unwrap()
+            .degree(1)
+            .policy(OfflineRemezPolicy {
+                offline: OfflinePolicy {
+                    initial_precision: 64,
+                    max_precision: 128,
+                    ..OfflinePolicy::default()
+                },
+                max_iterations: 1,
+                error_tolerance: 1e-30,
+                ..OfflineRemezPolicy::default()
+            })
+            .unwrap()
+            .solve();
+        match result {
+            Err(OfflineError::ApproximationNotEstablished { report }) => {
+                assert_eq!(report.attempts(), 2);
+                assert_eq!(report.precision(), 128);
+                let mut context = Context::new(4, 256, OfflinePolicy::default()).unwrap();
+                let x = exact_from_f64(0.0, 256).unwrap();
+                let actual = report.function().evaluate_backend(&mut context, x).unwrap();
+                let expected = add(
+                    &exact_from_f64(1.0, 256).unwrap(),
+                    &exact_from_f64(constant, 256).unwrap(),
+                );
+                assert_eq!(actual, expected);
+            }
+            other => panic!("expected preserved failure report, got {other:?}"),
+        }
+    }
     #[gtest]
     fn exported_error_enclosure_charges_the_offline_work_budget() -> Result<()> {
         let function = quest_polynomial::function!(|x| x);

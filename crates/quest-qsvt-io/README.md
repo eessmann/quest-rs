@@ -6,6 +6,10 @@ See the workspace mdBook guide and crate rustdoc for executable examples.
 
 This Rust port draws on `quest-qsvt` revision `7fe7f740579b03c52a8cf48be6a31268b029c19f`. Its MIT notice is retained in `LICENSE-quest-qsvt`.
 
+The inverse catalog was refreshed against revision
+`568725f2bd488a03a4f98cdf92de924f17b2834a`; all 21 coefficient payloads are
+byte-identical to the original port. Historical fixtures retain their original provenance.
+
 
 ## Compiled QSP artifacts
 

@@ -87,6 +87,9 @@ pub struct Cli {
 pub enum Command {
     /// Construct frozen binary64 phases or matrices; certification is a separate stage.
     Synthesize(SynthesisArgs),
+    /// Export a reproducible matrix for embedded or solve workflows.
+    #[cfg(feature = "hdf5")]
+    MatrixPreset(MatrixPresetArgs),
     /// Run explicitly requested arbitrary-precision construction and certify its frozen export.
     #[cfg(feature = "offline-synthesis")]
     OfflineSynthesize(SynthesisArgs),
@@ -114,8 +117,8 @@ pub enum SynthesisMode {
 /// Numerical solver, independently selectable from response convention and precision.
 #[derive(Debug, Clone, Copy, Default, ValueEnum)]
 pub enum Algorithm {
-    #[default]
     Rhw,
+    #[default]
     InverseNlft,
 }
 impl Algorithm {
@@ -147,7 +150,7 @@ pub struct SynthesisArgs {
     pub output: PathBuf,
     #[arg(long, value_enum, default_value = "real-parity-wx")]
     pub mode: SynthesisMode,
-    #[arg(long, value_enum, default_value = "rhw")]
+    #[arg(long, value_enum, default_value = "inverse-nlft")]
     pub algorithm: Algorithm,
     #[arg(long = "export", value_enum, default_value = "compiled")]
     pub export: ExportFormat,
@@ -167,7 +170,14 @@ pub enum CatalogCommand {
         certify: bool,
         #[arg(long, default_value_t = 1e-11)]
         tolerance: f64,
+        #[arg(long, value_enum, default_value = "inverse-nlft")]
+        algorithm: Algorithm,
     },
+    /// Construct one exact frozen catalogue family and export its payload.
+    Synthesize(CatalogSynthesisArgs),
+    /// Apply one exact stored inverse family to a physical linear system.
+    #[cfg(feature = "native")]
+    Solve(CatalogSolveArgs),
 }
 #[derive(Debug, Clone, Default, Args)]
 pub struct FamilySelection {
@@ -178,6 +188,8 @@ pub struct FamilySelection {
 }
 #[derive(Debug, Clone, Copy, ValueEnum)]
 pub enum TransformRoute {
+    /// Wx chooses standard; generalized controls choose full Hermitianization.
+    Auto,
     Standard,
     Direct,
     HermitianizedFull,
@@ -193,14 +205,14 @@ pub struct TransformArgs {
     /// Explicitly synthesize a polynomial input in binary64 before preparation.
     #[arg(long)]
     pub synthesize_input: bool,
-    #[arg(long, value_enum, default_value = "rhw")]
+    #[arg(long, value_enum, default_value = "inverse-nlft")]
     pub algorithm: Algorithm,
     #[arg(long, requires = "synthesize_input")]
     pub certify_input: bool,
     #[arg(long, default_value_t = 1e-11)]
     pub input_tolerance: f64,
-    /// Explicit route; imported convention tags must agree with this choice.
-    #[arg(long, value_enum)]
+    /// Route and coefficient meaning; auto is deterministic from convention.
+    #[arg(long, value_enum, default_value = "auto")]
     pub route: TransformRoute,
 }
 #[derive(Debug, Clone, Args)]
@@ -208,8 +220,14 @@ pub struct EmbeddedArgs {
     /// Collective MPI execution, reporting masses without gathering a state.
     #[arg(long)]
     pub distributed: bool,
-    #[arg(long)]
-    pub encoding: PathBuf,
+    #[arg(long, required_unless_present = "matrix", conflicts_with = "matrix")]
+    pub encoding: Option<PathBuf>,
+    /// Construct a dense Julia dilation of this logical matrix.
+    #[arg(long, requires = "alpha", conflicts_with = "distributed")]
+    pub matrix: Option<PathBuf>,
+    /// Explicit physical normalization for --matrix.
+    #[arg(long, requires = "matrix")]
+    pub alpha: Option<f64>,
     #[command(flatten)]
     pub transform: TransformArgs,
     #[arg(long)]
@@ -217,19 +235,31 @@ pub struct EmbeddedArgs {
     /// Subnormalized decoded logical amplitudes (local execution only).
     #[arg(
         long,
-        required_unless_present = "distributed",
+        required_unless_present_any = ["distributed", "physical_output_state"],
         conflicts_with = "distributed"
     )]
     pub output_state: Option<PathBuf>,
     #[arg(long, conflicts_with = "distributed")]
     pub normalized_output_state: Option<PathBuf>,
+    /// Interpret input as the complete physical register, including response/auxiliary qubits.
+    #[arg(long, conflicts_with = "distributed")]
+    pub physical_input: bool,
+    /// Write subnormalized postselected physical-register amplitudes.
+    #[arg(long, conflicts_with = "distributed")]
+    pub physical_output_state: Option<PathBuf>,
 }
 #[derive(Debug, Clone, Args)]
 pub struct OverlapArgs {
     #[arg(long)]
     pub distributed: bool,
-    #[arg(long)]
-    pub encoding: PathBuf,
+    #[arg(long, required_unless_present = "matrix", conflicts_with = "matrix")]
+    pub encoding: Option<PathBuf>,
+    /// Construct a dense Julia dilation of this logical matrix.
+    #[arg(long, requires = "alpha", conflicts_with = "distributed")]
+    pub matrix: Option<PathBuf>,
+    /// Explicit physical normalization for --matrix.
+    #[arg(long, requires = "matrix")]
+    pub alpha: Option<f64>,
     #[command(flatten)]
     pub transform: TransformArgs,
     #[arg(long)]
@@ -245,7 +275,7 @@ pub struct SolveArgs {
     pub rhs: PathBuf,
     #[command(flatten)]
     pub transform: TransformArgs,
-    /// Explicit premise that the imported response approximates this scale divided by x.
+    /// Explicit premise that the induced singular-value response approximates this scale divided by x.
     #[arg(long)]
     pub reciprocal_scale: f64,
     /// Physical x, including the recovered norm; never silently normalized.
@@ -256,6 +286,73 @@ pub struct SolveArgs {
     /// Fail if the independently evaluated relative physical residual exceeds this value.
     #[arg(long)]
     pub residual_tolerance: Option<f64>,
+}
+
+/// Export an exact catalogue family using an explicitly selected algorithm.
+#[derive(Debug, Clone, Args)]
+pub struct CatalogSynthesisArgs {
+    #[arg(long)]
+    pub kappa: u32,
+    #[arg(long)]
+    pub epsilon: f64,
+    #[arg(long)]
+    pub output: PathBuf,
+    #[arg(long, value_enum, default_value = "inverse-nlft")]
+    pub algorithm: Algorithm,
+    #[arg(long = "export", value_enum, default_value = "compiled")]
+    pub export: ExportFormat,
+    #[arg(long)]
+    pub certify: bool,
+    #[arg(long, default_value_t = 1e-11)]
+    pub tolerance: f64,
+}
+#[cfg(feature = "native")]
+#[derive(Debug, Clone, Args)]
+pub struct CatalogSolveArgs {
+    #[arg(long)]
+    pub kappa: u32,
+    #[arg(long)]
+    pub epsilon: f64,
+    #[arg(long)]
+    pub matrix: PathBuf,
+    #[arg(long)]
+    pub rhs: PathBuf,
+    #[arg(long)]
+    pub output_state: PathBuf,
+    #[arg(long)]
+    pub normalized_output_state: Option<PathBuf>,
+    #[arg(long)]
+    pub residual_tolerance: Option<f64>,
+    #[arg(long, value_enum, default_value = "inverse-nlft")]
+    pub algorithm: Algorithm,
+    #[arg(long)]
+    pub certify: bool,
+    #[arg(long, default_value_t = 1e-11)]
+    pub tolerance: f64,
+}
+#[cfg(feature = "hdf5")]
+#[derive(Debug, Clone, Copy, ValueEnum)]
+pub enum MatrixPreset {
+    Diagonal,
+    Hermitian,
+    General,
+}
+/// Deterministic, seeded matrix fixtures, exported in the normal interchange format.
+#[cfg(feature = "hdf5")]
+#[derive(Debug, Clone, Args)]
+pub struct MatrixPresetArgs {
+    #[arg(long, value_enum)]
+    pub preset: MatrixPreset,
+    #[arg(long)]
+    pub rows: usize,
+    #[arg(long)]
+    pub cols: usize,
+    #[arg(long, default_value_t = 0)]
+    pub seed: u64,
+    #[arg(long, default_value_t = 1.0)]
+    pub scale: f64,
+    #[arg(long)]
+    pub output: PathBuf,
 }
 
 struct Context<'a> {
@@ -383,6 +480,8 @@ impl Cli {
 fn dispatch(command: Command, context: &mut Context<'_>) -> Result<Value> {
     match command {
         Command::Synthesize(args) => synthesis::run(&args, context, false),
+        #[cfg(feature = "hdf5")]
+        Command::MatrixPreset(args) => synthesis::matrix_preset(&args, context),
         #[cfg(feature = "offline-synthesis")]
         Command::OfflineSynthesize(args) => synthesis::run(&args, context, true),
         Command::Catalog { command } => synthesis::catalog(command, context),
@@ -422,7 +521,16 @@ const fn worker_scope(command: &Command) -> Option<&'static str> {
         Command::Catalog {
             command: CatalogCommand::Check { .. },
         } => Some("independent catalogue families"),
-        Command::Synthesize(_) => Some("binary64 completion and synthesis"),
+        Command::Synthesize(_)
+        | Command::Catalog {
+            command: CatalogCommand::Synthesize(_),
+        } => Some("binary64 completion and synthesis"),
+        #[cfg(feature = "native")]
+        Command::Catalog {
+            command: CatalogCommand::Solve(_),
+        } => Some(
+            "binary64 input completion and synthesis; SVD and native execution stay sequential",
+        ),
         #[cfg(feature = "native")]
         Command::Embedded(args) if args.transform.synthesize_input => Some(
             "binary64 input completion and synthesis; native execution stays on the caller thread",

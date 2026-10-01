@@ -14,6 +14,13 @@ use std::sync::{
     atomic::{AtomicBool, Ordering},
 };
 
+/// Stable identity of the bounded rotation candidate engine, shared with
+/// compiler and worker provenance.
+///
+/// This identifies the algorithm, not a proof
+/// of completeness or optimality of a resource-bounded search.
+pub const ROTATION_ALGORITHM: &str = "ross-selinger-lll-prime-norm-v1";
+
 /// A request-owned cancellation flag; it does not affect deterministic search
 /// choices when left unset. A cancelled request never yields an impossibility.
 #[derive(Debug, Clone, Default)]

@@ -9,6 +9,8 @@ use quest_qsp::{
 };
 use quest_qsvt_io::{CatalogFamily, IoPolicy, QspInput};
 use serde_json::{Value, json};
+#[cfg(feature = "hdf5")]
+use std::ops::{Add, Div, Mul, Sub};
 use std::time::Instant;
 
 enum Candidate {
@@ -345,10 +347,20 @@ pub fn catalog(command: CatalogCommand, context: &mut Context<'_>) -> Result<Val
             family,
             certify: requested,
             tolerance,
+            algorithm,
         } => {
-            policy(tolerance, SynthesisAlgorithm::default())?;
-            check_families(&selected(&family)?, requested, tolerance, context)
+            policy(tolerance, algorithm.solver())?;
+            check_families(
+                &selected(&family)?,
+                requested,
+                tolerance,
+                algorithm,
+                context,
+            )
         }
+        CatalogCommand::Synthesize(args) => catalog_synthesize(&args, context),
+        #[cfg(feature = "native")]
+        CatalogCommand::Solve(args) => crate::execution::catalog_solve(&args, context),
     }
 }
 struct FamilyJob {
@@ -360,6 +372,7 @@ fn family_job(
     family: &CatalogFamily,
     requested: bool,
     tolerance: f64,
+    algorithm: crate::Algorithm,
     clock: &quest_numerics::observer::MonotonicClock,
 ) -> Result<FamilyJob> {
     let start = Instant::now();
@@ -374,14 +387,10 @@ fn family_job(
         pool: None,
     };
     let mut report = family_report(family);
+    crate::set(&mut report, "algorithm", json!(algorithm.name()))?;
     let result = (|| {
         let polynomial = family.polynomial(IoPolicy::default())?;
-        let candidate = real_parity_wx(
-            &polynomial,
-            tolerance,
-            SynthesisAlgorithm::default(),
-            &mut context,
-        )?;
+        let candidate = real_parity_wx(&polynomial, tolerance, algorithm.solver(), &mut context)?;
         finish(candidate, tolerance, requested, &mut context).map(|(_, report)| report)
     })();
     match result {
@@ -415,11 +424,12 @@ fn check_families(
     families: &[&CatalogFamily],
     requested: bool,
     tolerance: f64,
+    algorithm: crate::Algorithm,
     context: &mut Context<'_>,
 ) -> Result<Value> {
     use quest_numerics::observer::Observer;
     let clock = context.clock;
-    let run = |family: &&CatalogFamily| family_job(family, requested, tolerance, clock);
+    let run = |family: &&CatalogFamily| family_job(family, requested, tolerance, algorithm, clock);
     #[cfg(feature = "rayon")]
     let jobs: Vec<_> = context.pool.map_or_else(
         || families.iter().map(run).collect(),
@@ -573,7 +583,13 @@ mod tests {
                     execution: quest_numerics::ExecutionPolicy::Sequential,
                     pool,
                 };
-                let mut report = check_families(&families, false, tolerance, &mut context)?;
+                let mut report = check_families(
+                    &families,
+                    false,
+                    tolerance,
+                    crate::Algorithm::default(),
+                    &mut context,
+                )?;
                 if let Some(families) = report.get_mut("families").and_then(Value::as_array_mut) {
                     for family in families {
                         if let Some(object) = family.as_object_mut() {
@@ -604,15 +620,21 @@ pub fn freeze_input(
         if args.synthesize_input {
             return Err(Error::Input("compiled payload must not be resynthesized"));
         }
-        let certificate = match compiled.certified() {
-            quest_qsp::artifact::LoadedCertified::RealParityWx(c) => certificate_report(c.report()),
-            quest_qsp::artifact::LoadedCertified::UnitCircleResponse(c) => {
-                certificate_report(c.report())
+        let (certificate, algorithm) = match compiled.certified() {
+            quest_qsp::artifact::LoadedCertified::RealParityWx(c) => {
+                (certificate_report(c.report()), c.candidate().algorithm())
             }
+            quest_qsp::artifact::LoadedCertified::UnitCircleResponse(c) => {
+                (certificate_report(c.report()), c.candidate().algorithm())
+            }
+        };
+        let algorithm = match algorithm {
+            SynthesisAlgorithm::RhwHalfCholesky => "rhw",
+            SynthesisAlgorithm::InverseNlftDivideConquer => "inverse-nlft",
         };
         return Ok((
             QspInput::Compiled(compiled),
-            json!({"construction":"compiled-recertified","certified":true,"certificate":certificate}),
+            json!({"construction":"compiled-recertified","certified":true,"certificate":certificate,"algorithm":algorithm}),
         ));
     }
     let QspInput::Polynomial(polynomial) = input else {
@@ -629,7 +651,9 @@ pub fn freeze_input(
             "polynomial execution requires explicit --synthesize-input",
         ));
     }
-    let (candidate, conversion) = if matches!(args.route, crate::TransformRoute::Standard) {
+    let standard = matches!(args.route, crate::TransformRoute::Standard)
+        || (matches!(args.route, crate::TransformRoute::Auto) && polynomial.laurent().is_none());
+    let (candidate, conversion) = if standard {
         let converted = context.measure("basis_conversion", Stage::Approximation, || {
             Ok(polynomial.to_chebyshev()?)
         })?;
@@ -670,4 +694,184 @@ pub fn freeze_input(
         ),
     )?;
     Ok((candidate.into_execution()?, report))
+}
+
+fn exact_family(kappa: u32, epsilon: f64) -> Result<&'static CatalogFamily> {
+    quest_qsvt_io::find_catalog_family(kappa, epsilon).ok_or(Error::Input(
+        "no exact catalogue family matches kappa and epsilon",
+    ))
+}
+fn catalog_synthesize(
+    args: &crate::CatalogSynthesisArgs,
+    context: &mut Context<'_>,
+) -> Result<Value> {
+    if args.certify && args.export == crate::ExportFormat::Sequence {
+        return Err(Error::Input(
+            "--certify requires --export compiled to retain evidence",
+        ));
+    }
+    let family = exact_family(args.kappa, args.epsilon)?;
+    let (candidate, mut report) = catalog_candidate(
+        family,
+        args.tolerance,
+        args.algorithm,
+        args.certify,
+        context,
+    )?;
+    crate::set(&mut report, "catalogue", family_report(family))?;
+    context.measure("write", Stage::Construction, || {
+        std::fs::write(&args.output, candidate.export(args.export)?)?;
+        Ok(())
+    })?;
+    Ok(report)
+}
+fn catalog_candidate(
+    family: &CatalogFamily,
+    tolerance: f64,
+    algorithm: crate::Algorithm,
+    certify: bool,
+    context: &mut Context<'_>,
+) -> Result<(Candidate, Value)> {
+    let target = family.polynomial(IoPolicy::default())?;
+    let candidate = real_parity_wx(&target, tolerance, algorithm.solver(), context)?;
+    let (candidate, mut report) = finish(candidate, tolerance, certify, context)?;
+    crate::set(&mut report, "algorithm", json!(algorithm.name()))?;
+    Ok((candidate, report))
+}
+#[cfg(feature = "native")]
+pub fn freeze_catalog(
+    args: &crate::CatalogSolveArgs,
+    sigma_max: f64,
+    sigma_min: f64,
+    context: &mut Context<'_>,
+) -> Result<(QspInput, Value, f64)> {
+    let family = exact_family(args.kappa, args.epsilon)?;
+    // Compare in normalized coordinates: multiplication by sigma_max could overflow.
+    if sigma_min / sigma_max < 1.0 / f64::from(family.kappa()) {
+        return Err(Error::Input(
+            "matrix singular values lie outside the selected reciprocal catalogue domain",
+        ));
+    }
+    let (candidate, mut report) = catalog_candidate(
+        family,
+        args.tolerance,
+        args.algorithm,
+        args.certify,
+        context,
+    )?;
+    crate::set(&mut report, "catalogue", family_report(family))?;
+    Ok((
+        candidate.into_execution()?,
+        report,
+        family.reciprocal_scale(),
+    ))
+}
+#[cfg(feature = "hdf5")]
+pub fn matrix_preset(args: &crate::MatrixPresetArgs, context: &mut Context<'_>) -> Result<Value> {
+    use crate::MatrixPreset;
+    use num_complex::Complex64 as C;
+    if args.rows == 0 || args.cols == 0 || !args.scale.is_finite() || args.scale <= 0.0 {
+        return Err(Error::Input(
+            "preset requires nonempty dimensions and positive finite scale",
+        ));
+    }
+    if matches!(
+        args.preset,
+        MatrixPreset::Hermitian | MatrixPreset::Diagonal
+    ) && args.rows != args.cols
+    {
+        return Err(Error::Input(
+            "Hermitian and diagonal presets require square dimensions",
+        ));
+    }
+    if args.rows > IoPolicy::default().max_dimension
+        || args.cols > IoPolicy::default().max_dimension
+    {
+        return Err(Error::Budget("preset dimensions"));
+    }
+    let words = args
+        .rows
+        .checked_next_multiple_of(4)
+        .and_then(|r| r.checked_mul(args.cols))
+        .ok_or(Error::Budget("preset dimensions"))?;
+    if words
+        .checked_mul(size_of::<C>())
+        .is_none_or(|n| n > IoPolicy::default().max_bytes)
+    {
+        return Err(Error::Budget("preset matrix storage"));
+    }
+    let mut state = args.seed;
+    let mut sample = || preset_sample(&mut state);
+    let mut dense = faer::Mat::new();
+    dense
+        .try_reserve(args.rows, args.cols)
+        .map_err(|_| Error::Budget("preset matrix allocation"))?;
+    dense.resize_with(args.rows, args.cols, |_, _| C::new(0.0, 0.0));
+    match args.preset {
+        MatrixPreset::Diagonal => {
+            for r in 0..args.rows {
+                dense[(r, r)] = C::new(args.scale.mul(0.5_f64.add(0.5_f64.mul(sample()))), 0.0);
+            }
+        }
+        MatrixPreset::General => {
+            let divisor = f64::from(
+                u32::try_from(args.rows.max(args.cols))
+                    .map_err(|_| Error::Budget("preset dimensions"))?,
+            )
+            .sqrt()
+            .mul(2.0);
+            for r in 0..args.rows {
+                for c in 0..args.cols {
+                    dense[(r, c)] = C::new(
+                        2.0_f64.mul(sample()).sub(1.0).div(divisor).mul(args.scale),
+                        2.0_f64.mul(sample()).sub(1.0).div(divisor).mul(args.scale),
+                    );
+                }
+            }
+        }
+        MatrixPreset::Hermitian => {
+            let divisor = f64::from(
+                u32::try_from(args.rows).map_err(|_| Error::Budget("preset dimensions"))?,
+            )
+            .sqrt()
+            .mul(2.0);
+            for r in 0..args.rows {
+                dense[(r, r)] = C::new(
+                    2.0_f64.mul(sample()).sub(1.0).div(divisor).mul(args.scale),
+                    0.0,
+                );
+                for c in 0..r {
+                    let z = C::new(
+                        2.0_f64.mul(sample()).sub(1.0).div(divisor).mul(args.scale),
+                        2.0_f64.mul(sample()).sub(1.0).div(divisor).mul(args.scale),
+                    );
+                    dense[(r, c)] = z;
+                    dense[(c, r)] = z.conj();
+                }
+            }
+        }
+    }
+    context.measure("write", Stage::Construction, || {
+        quest_qsvt_io::hdf5::write_matrix(&args.output, dense.as_ref(), IoPolicy::default())?;
+        Ok(())
+    })?;
+    Ok(
+        json!({"preset":format!("{:?}",args.preset),"rows":args.rows,"cols":args.cols,"seed":args.seed,"scale":args.scale,"generator":"splitmix64-v1"}),
+    )
+}
+#[cfg(feature = "hdf5")]
+fn preset_sample(state: &mut u64) -> f64 {
+    // SplitMix64; map the leading 53 bits exactly to [0,1).
+    *state = state.wrapping_add(0x9e37_79b9_7f4a_7c15);
+    let mut z = *state;
+    z = (z ^ (z >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
+    z = (z ^ (z >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
+    z ^= z >> 31;
+    let bytes = z.to_le_bytes();
+    let high = u32::from_le_bytes([bytes[4], bytes[5], bytes[6], bytes[7]]);
+    let low = u32::from_le_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]) >> 11;
+    f64::from(high)
+        .mul(2_097_152.0)
+        .add(f64::from(low))
+        .div(9_007_199_254_740_992.0)
 }

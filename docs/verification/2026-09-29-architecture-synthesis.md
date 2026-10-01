@@ -1,5 +1,9 @@
 # Architecture and synthesis overhaul
 
+The solver-default statements below record the September 29 design and validation.
+The October 1 mathematical audit restores inverse NLFT as the production, offline
+and catalogue default while retaining explicit RHW and persisted artifact identities.
+
 Implementation in `codex/circuit-synthesis`, isolated from the primary checkout,
 based on `7148ccaa47e9e39506d62ba1e441d657040b83f8`. The primary Cargo/devenv edits
 and the C++ working tree were not implementation inputs. This record separates

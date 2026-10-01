@@ -45,9 +45,9 @@ Real-parity Wx input uses the IO crate's explicit polynomial bases, for example
 nonnegative Laurent polynomial, for example
 `{"basis":"Laurent","coefficients":[[0.1,0.2],[0.05,-0.1]]}`.
 
-`--algorithm rhw` (default) selects structured Half-Cholesky;
-`--algorithm inverse-nlft` selects the divide-and-conquer nonlinear Fourier
-inverse. Both support both response conventions and both explicit precision
+`--algorithm inverse-nlft` (default) selects the divide-and-conquer nonlinear
+Fourier inverse; `--algorithm rhw` explicitly selects structured Half-Cholesky.
+Catalogue checks, exports and solves accept the same algorithm flag. Both support both response conventions and both explicit precision
 routes. No solver or precision fallback occurs.
 
 `--export compiled` is the default. It stores the exact-bit source, target,
@@ -72,7 +72,7 @@ converted target does not silently certify the earlier conversion.
 `offline-synthesize` always independently certifies its final binary64 export.
 
 There are exactly 21 frozen catalogue families from C++ revision
-`7fe7f740579b03c52a8cf48be6a31268b029c19f`. Selection requires the exact stored
+`568725f2bd488a03a4f98cdf92de924f17b2834a`. Selection requires the exact stored
 `--kappa` and binary64 `--epsilon` pair. No nearby family is substituted. Omit
 both selectors to list or check all 21. `check` actually constructs each target
 and optionally certifies it; an epsilon label is provenance, not a certificate.
@@ -94,7 +94,13 @@ HDF5 layouts are those of `quest-qsvt-io`: `/block_encoding/{U,PiL,PiR}` and
 select the ordered leading logical isometry columns independently of padding.
 Numerical oracle and isometry admission happens before native preparation.
 
-The route is always explicit: `standard`, `direct`, `hermitianized-full`,
+`--route auto` is the default: tagged Wx phases select `standard`; generalized
+controls select `hermitianized-full`, retaining both logical sides. For
+polynomial synthesis, nonnegative Laurent sources select generalized controls;
+other bases select Wx synthesis and must satisfy its real/parity contract.
+Physical solves choose `standard` for Wx and `hermitianized-odd` for generalized
+controls. A failed admission never retries another route or solver. Explicit
+route choices are: `standard`, `direct`, `hermitianized-full`,
 `hermitianized-even`, `hermitianized-odd`, `multiplication-even`, or
 `multiplication-odd`. Standard accepts tagged symmetric or Laurent Wx phases;
 the other routes accept paper-native `psi`/`phi` controls or frozen control
@@ -134,15 +140,20 @@ cargo run -p quest-qsvt-cli -- solve \
   --residual-tolerance 1e-5
 ```
 
-Solve accepts a nonempty square matrix with numerical full rank. It computes
+Solve accepts nonempty square or rectangular matrices with numerical rank
+`min(rows, cols)`. For rectangular systems the response approximates the
+Moore-Penrose pseudoinverse; a nonzero least-squares residual is retained. It computes
 singular values with explicitly sequential faer SVD and bounded scratch, and
-requires `sigma_min > sigma_max * dimension * f64::EPSILON`. It constructs the
+requires `sigma_min > sigma_max * max(rows, cols) * f64::EPSILON`.
+SVD and rank comparison operate on scaled entries, so intermediate overflow or
+underflow does not misclassify large or tiny full-rank matrices. It constructs the
 block dilation of `A.adjoint() / sigma_max`, normalizes the right-hand side,
 and applies the supplied reciprocal singular-value response. Standard requires
 odd degree; the two generalized odd routes are also accepted.
 
-`--reciprocal-scale s` is an explicit premise that the imported route response
-approximates `s/x` over the singular-value domain. The CLI does not infer this
+`--reciprocal-scale s` is an explicit premise that the induced singular-value
+response approximates `s/x` over the singular-value domain. For multiplication-odd, the Gram polynomial
+`P(y)` induces `x P(x²)`, so reciprocity requires `P(y) ≈ s/y`. The CLI does not infer this
 from a filename, certificate of an unrelated target, or catalogue label. Given
 the subnormalized logical output `raw`, it recovers
 
@@ -155,7 +166,44 @@ normalized output is separate. The report independently evaluates both
 `||A physical_x - b||` and that residual divided by `||b||`. If a requested
 residual tolerance fails, the computed outputs and report remain available but
 the process exits nonzero. Without that option, the residual is diagnostic.
-Solve executes locally; distributed solve or full-state output is not advertised.
+Solve executes locally. Physical scaling uses an exponent decomposition to
+avoid intermediate overflow/underflow in the two divisions. Residuals are
+evaluated in normalized coordinates and both relative and absolute norms must
+be finite before output is published.
+
+## Matrix and physical-register workflows
+
+`embedded` and `overlap` accept `--matrix matrix.h5 --alpha alpha` instead of
+`--encoding`. The explicit positive physical normalization must make the matrix
+a contraction; dense Julia dilation retains the original rectangular logical
+dimensions and admits its PSD roots and whole-oracle unitarity.
+
+`matrix-preset --preset diagonal|hermitian|general --rows R --cols C --seed S
+--scale A --output matrix.h5` exports reproducible complex matrices in the
+standard `/matrix/dense` format. Diagonal presets use positive entries in
+`[A/2,A)` and require a square shape, as do Hermitian presets. General presets
+allow rectangular shapes. The documented generator is SplitMix64 with the top
+53 bits mapped to `[0,1)`; `scale` describes entries and is not a certificate of
+spectral normalization. Choose `--alpha` from the desired physical matrix.
+
+For local `embedded`, `--physical-input` reads the complete physical register,
+including response and auxiliary qubits, in little-endian basis order. Its
+length must equal `2^transform_qubits`. The runtime projects the supplied state
+onto the admitted input subspace and reports discarded mass. The optional
+`--output-state` writes decoded logical amplitudes; provide it or a physical
+output path. Optional
+`--physical-output-state` separately writes the complete postselected physical
+register before conditioning, including zero amplitudes outside the selected
+output subspace. Physical register I/O requires local execution.
+
+`catalog synthesize --kappa K --epsilon E --output payload.json` exports an
+exact stored family using the normal `--algorithm`, `--export` and `--certify`
+options. `catalog solve --kappa K --epsilon E --matrix matrix.h5 --rhs rhs.h5
+--output-state x.h5` constructs that family and applies its stored reciprocal
+scale. The normalized singular values must lie in `[1/K,1]` before synthesis.
+`--residual-tolerance` still independently checks the physical answer: an
+epsilon provenance label is never used as a residual certificate. Certification
+checks synthesis against the stored polynomial, not the reciprocal approximation.
 
 ## Catalogue workers and distributed execution
 

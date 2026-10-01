@@ -521,3 +521,111 @@ fn per_synthesis_pool_exports_identical_frozen_words() -> googletest::Result<()>
     expect_eq!(std::fs::read(first)?, std::fs::read(second)?);
     Ok(())
 }
+
+#[gtest]
+fn solver_defaults_are_inverse_nlft_and_catalogue_algorithm_is_selectable() -> googletest::Result<()>
+{
+    let cli = Cli::try_parse_from([
+        "qsvt",
+        "synthesize",
+        "--input",
+        "input.json",
+        "--output",
+        "out.json",
+    ])?;
+    let quest_qsvt_cli::Command::Synthesize(args) = cli.command else {
+        return fail!("command");
+    };
+    expect_true!(matches!(
+        args.algorithm,
+        quest_qsvt_cli::Algorithm::InverseNlft
+    ));
+    for algorithm in ["inverse-nlft", "rhw"] {
+        let report = Cli::try_parse_from([
+            "qsvt",
+            "catalog",
+            "check",
+            "--kappa",
+            "5",
+            "--epsilon",
+            "0.1",
+            "--algorithm",
+            algorithm,
+        ])?
+        .run()?;
+        expect_eq!(report["failed"], 0);
+        expect_eq!(report["families"][0]["algorithm"], algorithm);
+    }
+    Ok(())
+}
+
+#[gtest]
+fn catalogue_export_constructs_exact_family_with_selected_algorithm() -> googletest::Result<()> {
+    let dir = tempfile::tempdir()?;
+    let output = dir.path().join("payload.json");
+    for algorithm in ["inverse-nlft", "rhw"] {
+        let report = Cli::try_parse_from([
+            std::ffi::OsStr::new("qsvt"),
+            std::ffi::OsStr::new("catalog"),
+            std::ffi::OsStr::new("synthesize"),
+            std::ffi::OsStr::new("--kappa"),
+            std::ffi::OsStr::new("5"),
+            std::ffi::OsStr::new("--epsilon"),
+            std::ffi::OsStr::new("0.1"),
+            std::ffi::OsStr::new("--algorithm"),
+            std::ffi::OsStr::new(algorithm),
+            std::ffi::OsStr::new("--export"),
+            std::ffi::OsStr::new("sequence"),
+            std::ffi::OsStr::new("--output"),
+            output.as_os_str(),
+        ])?
+        .run()?;
+        expect_eq!(report["algorithm"], algorithm);
+        expect_eq!(report["degree"], 9);
+        let qsp = quest_qsvt_io::read_qsp_json(
+            &std::fs::read_to_string(&output)?,
+            quest_qsvt_io::IoPolicy::default(),
+        )?;
+        expect_true!(matches!(qsp, quest_qsvt_io::QspInput::Symmetric(_)));
+    }
+    Ok(())
+}
+
+#[cfg(feature = "native")]
+#[gtest]
+fn new_workflows_keep_matrix_and_physical_state_contracts_at_parse_time() {
+    let common = [
+        "qsvt",
+        "embedded",
+        "--matrix",
+        "matrix.h5",
+        "--alpha",
+        "1",
+        "--qsp",
+        "qsp.json",
+        "--input-state",
+        "in.h5",
+        "--physical-output-state",
+        "out.h5",
+    ];
+    expect_true!(Cli::try_parse_from(common).is_ok());
+    let mut invalid = common.to_vec();
+    invalid.extend(["--encoding", "block.h5"]);
+    expect_true!(Cli::try_parse_from(invalid).is_err());
+    let invalid = [
+        "qsvt",
+        "embedded",
+        "--matrix",
+        "matrix.h5",
+        "--qsp",
+        "qsp.json",
+        "--input-state",
+        "in.h5",
+        "--output-state",
+        "out.h5",
+    ];
+    expect_true!(Cli::try_parse_from(invalid).is_err());
+    let mut invalid = common.to_vec();
+    invalid.push("--distributed");
+    expect_true!(Cli::try_parse_from(invalid).is_err());
+}

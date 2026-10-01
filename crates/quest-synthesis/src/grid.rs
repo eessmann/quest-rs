@@ -494,6 +494,72 @@ mod tests {
         cost <= &radius * &radius
     }
     #[test]
+    fn exact_epsilon_cap_is_contained_in_the_search_sphere() {
+        // Independent exact Q(sqrt(2)) comparison for the target z=1.
+        // a + (b-d)/sqrt(2) >= radius*(1-epsilon²/4).
+        fn in_cap(point: &Vector, radius: &BigInt, epsilon: &Rational) -> bool {
+            let right = Rational::from_integer(radius.clone())
+                * (Rational::one() - epsilon * epsilon / BigInt::from(4))
+                - Rational::from_integer(point[0].clone());
+            let radical = &point[1] - &point[3];
+            if radical.is_negative() != right.is_negative() {
+                return !radical.is_negative();
+            }
+            let left_square = &radical * &radical * right.denom() * right.denom();
+            let right_square = right.numer() * right.numer() * 2;
+            if radical.is_negative() {
+                left_square <= right_square
+            } else {
+                left_square >= right_square
+            }
+        }
+        let scale: BigInt = BigInt::one() << 20;
+        let target = DyadicBox8::point(
+            20,
+            [
+                scale.clone(),
+                0.into(),
+                0.into(),
+                0.into(),
+                0.into(),
+                0.into(),
+                scale,
+                0.into(),
+            ],
+        )
+        .unwrap();
+        for denominator in [1, 2, 8] {
+            let epsilon = Rational::new(1.into(), denominator.into());
+            let mut budget = Budget {
+                options: SynthesisOptions::default(),
+                used: 0,
+            };
+            let grid = Grid::new(&target, &epsilon, &mut budget).unwrap();
+            let mut witnesses = 0;
+            for exponent in 0..=2 {
+                let bound = 1_i32 << exponent;
+                let radius = BigInt::from(bound);
+                for a in -bound..=bound {
+                    for b in -bound..=bound {
+                        for c in -bound..=bound {
+                            for d in -bound..=bound {
+                                let point = [a.into(), b.into(), c.into(), d.into()];
+                                if feasible(&point, &radius) && in_cap(&point, &radius, &epsilon) {
+                                    witnesses += 1;
+                                    assert!(
+                                        in_original_sphere(&grid, &point, &radius),
+                                        "epsilon={epsilon}, exponent={exponent}, point={point:?}"
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            assert!(witnesses >= 3, "every level contains the exact target");
+        }
+    }
+    #[test]
     fn intersection_pruning_preserves_every_feasible_small_grid_point() {
         for (numerator, denominator) in [(0, 1), (1, 1), (1, 2), (1, 4), (1, 7), (-1, 4), (5, 4)] {
             let options = SynthesisOptions::default();

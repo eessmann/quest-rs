@@ -1,9 +1,13 @@
-use crate::{Chebyshev, Complex64, Error, Function, Interval, Jet, Limits, Polynomial, Result};
+use crate::{
+    Callable, Chebyshev, Complex64, ConsistencyAssumption, Error, Expr, Expression, Function,
+    Interval, Jet, Limits, Polynomial, Result,
+};
 use faer::{
     Mat, Par,
     dyn_stack::{MemBuffer, MemStack},
     linalg::qr::col_pivoting::{factor, solve},
 };
+use std::cell::Cell;
 
 /// Cold approximation resource and accuracy controls.
 #[derive(Clone, Copy, Debug)]
@@ -30,13 +34,14 @@ impl Default for RemezOptions {
 #[derive(Debug)]
 pub struct MissingTarget;
 #[derive(Debug)]
-pub struct HasTarget {
-    target: Function,
+pub struct HasTarget<E = Expr> {
+    target: Function<E>,
 }
 #[derive(Debug)]
-pub struct ReadyRemez {
-    target: Function,
+pub struct ReadyRemez<E = Expr> {
+    target: Function<E>,
     domain: Interval,
+    admission_work: usize,
 }
 /// Required target and domain are supplied through owning state transitions.
 ///
@@ -79,25 +84,34 @@ impl RemezBuilder {
         }
     }
     #[must_use]
-    pub const fn target(self, target: Function) -> RemezBuilder<HasTarget> {
+    pub const fn target<E: Expression>(self, target: Function<E>) -> RemezBuilder<HasTarget<E>> {
         RemezBuilder {
             state: HasTarget { target },
             options: self.options,
         }
     }
 }
-impl RemezBuilder<HasTarget> {
+impl<E: Expression> RemezBuilder<HasTarget<E>> {
     /// # Errors
     /// Rejects an empty-width domain or a target undefined anywhere in the interval.
-    pub fn domain(self, domain: Interval) -> Result<RemezBuilder<ReadyRemez>> {
+    pub fn domain(self, domain: Interval) -> Result<RemezBuilder<ReadyRemez<E>>> {
         if domain.lower() >= domain.upper() {
             return Err(Error::Domain);
         }
+        let work = Cell::new(0);
+        let target = LimitedFunction {
+            target: &self.state.target,
+            work: &work,
+            limit: self.options.limits.max_work,
+            polynomial_terms: 0,
+        };
+        target.charge(false)?;
         self.state.target.evaluate_interval(domain)?;
         Ok(RemezBuilder {
             state: ReadyRemez {
                 target: self.state.target,
                 domain,
+                admission_work: work.get(),
             },
             options: self.options,
         })
@@ -125,11 +139,62 @@ impl<S> RemezBuilder<S> {
         self
     }
 }
-impl RemezBuilder<ReadyRemez> {
+impl<E: Expression> RemezBuilder<ReadyRemez<E>> {
     /// # Errors
     /// Rejects invalid configuration, failed solves/exchanges, exhausted budgets, or insufficient enclosures.
-    pub fn run(self) -> Result<RemezResult> {
-        remez_impl(&self.state.target, self.state.domain, self.options)
+    /// This compatibility adapter drops the original request on error; use
+    /// `run_reported` to retain the typed target and configuration.
+    pub fn run(self) -> Result<RemezResult<E>> {
+        self.run_reported().map_err(|failure| failure.error)
+    }
+}
+/// Failed native approximation retaining its original mathematical request.
+#[derive(Debug)]
+pub struct RemezFailure<E = Expr> {
+    target: Function<E>,
+    domain: Interval,
+    options: RemezOptions,
+    error: Error,
+}
+impl<E> RemezFailure<E> {
+    #[must_use]
+    pub const fn target(&self) -> &Function<E> {
+        &self.target
+    }
+    #[must_use]
+    pub const fn domain(&self) -> Interval {
+        self.domain
+    }
+    #[must_use]
+    pub const fn options(&self) -> RemezOptions {
+        self.options
+    }
+    #[must_use]
+    pub const fn error(&self) -> &Error {
+        &self.error
+    }
+    #[must_use]
+    pub fn into_parts(self) -> (Function<E>, Interval, RemezOptions, Error) {
+        (self.target, self.domain, self.options, self.error)
+    }
+}
+impl<E: Expression> RemezBuilder<ReadyRemez<E>> {
+    /// Run while retaining the original target and request on numerical failure.
+    /// # Errors
+    /// Returns the original request and the same error as the compatibility `run`.
+    pub fn run_reported(self) -> std::result::Result<RemezResult<E>, RemezFailure<E>> {
+        remez_impl(
+            &self.state.target,
+            self.state.domain,
+            self.options,
+            self.state.admission_work,
+        )
+        .map_err(|error| RemezFailure {
+            target: self.state.target,
+            domain: self.state.domain,
+            options: self.options,
+            error,
+        })
     }
 }
 /// An admitted approximation with an interval upper bound for the actual fixed
@@ -137,37 +202,46 @@ impl RemezBuilder<ReadyRemez> {
 ///
 /// Successful construction establishes their gap is at most the requested tolerance.
 #[derive(Debug, Clone)]
-pub struct RemezResult {
+pub struct RemezResult<E = Expr> {
+    target: Function<E>,
+    data: ApproximationData,
+}
+#[derive(Debug, Clone)]
+struct ApproximationData {
     polynomial: Polynomial<Chebyshev>,
     error_bound: Interval,
     minimax_lower_bound: f64,
     iterations: usize,
     domain: Interval,
 }
-impl RemezResult {
+impl<E: Expression> RemezResult<E> {
+    #[must_use]
+    pub const fn target(&self) -> &Function<E> {
+        &self.target
+    }
     #[must_use]
     pub const fn polynomial(&self) -> &Polynomial<Chebyshev> {
-        &self.polynomial
+        &self.data.polynomial
     }
     #[must_use]
     pub const fn error_bound(&self) -> Interval {
-        self.error_bound
+        self.data.error_bound
     }
     #[must_use]
     pub const fn minimax_lower_bound(&self) -> f64 {
-        self.minimax_lower_bound
+        self.data.minimax_lower_bound
     }
     #[must_use]
     pub const fn iterations(&self) -> usize {
-        self.iterations
+        self.data.iterations
     }
     #[must_use]
     pub const fn domain(&self) -> Interval {
-        self.domain
+        self.data.domain
     }
     #[must_use]
     pub fn into_polynomial(self) -> Polynomial<Chebyshev> {
-        self.polynomial
+        self.data.polynomial
     }
 }
 /// A stationary-point box with separately established existence and uniqueness.
@@ -187,12 +261,19 @@ pub struct CriticalPoints {
 }
 /// # Errors
 /// Rejects invalid configuration, exhausted subdivision budgets or undefined derivatives.
-pub fn isolate_critical_points(
-    function: &Function,
+pub fn isolate_critical_points<E: Expression>(
+    function: &Function<E>,
     domain: Interval,
     width: f64,
     max_subdivisions: usize,
 ) -> Result<CriticalPoints> {
+    let work = Cell::new(0);
+    let function = LimitedFunction {
+        target: function,
+        work: &work,
+        limit: Limits::default().max_work,
+        polynomial_terms: 0,
+    };
     isolate(
         |x| function.jet_interval(x),
         domain,
@@ -257,7 +338,11 @@ fn isolate(
     }
     Ok(CriticalPoints { boxes, examined })
 }
-fn residual_jet(f: &Function, p: &Polynomial<Chebyshev>, x: Interval) -> Result<Jet<Interval>> {
+fn residual_jet<F: Callable>(
+    f: &F,
+    p: &Polynomial<Chebyshev>,
+    x: Interval,
+) -> Result<Jet<Interval>> {
     let f = f.jet_interval(x)?;
     let p = p.jet_interval(x)?;
     Ok(Jet {
@@ -266,7 +351,7 @@ fn residual_jet(f: &Function, p: &Polynomial<Chebyshev>, x: Interval) -> Result<
         second: f.second.checked_sub(p.second)?,
     })
 }
-fn residual(f: &Function, p: &Polynomial<Chebyshev>, x: f64) -> Result<f64> {
+fn residual<F: Callable>(f: &F, p: &Polynomial<Chebyshev>, x: f64) -> Result<f64> {
     let v = f.evaluate(x)? - p.evaluate_real(x)?;
     if !v.is_finite() {
         return Err(Error::NonFinite);
@@ -276,8 +361,8 @@ fn residual(f: &Function, p: &Polynomial<Chebyshev>, x: f64) -> Result<f64> {
 fn magnitude(x: Interval) -> f64 {
     x.lower().abs().max(x.upper().abs())
 }
-fn bound(
-    f: &Function,
+fn bound<F: Callable>(
+    f: &F,
     p: &Polynomial<Chebyshev>,
     domain: Interval,
     roots: &CriticalPoints,
@@ -310,8 +395,8 @@ fn cheb(x: f64, degree: usize) -> f64 {
     }
     current
 }
-fn solve_reference(
-    f: &Function,
+fn solve_reference<F: Callable>(
+    f: &F,
     reference: &[f64],
     options: RemezOptions,
 ) -> Result<Polynomial<Chebyshev>> {
@@ -378,24 +463,106 @@ fn solve_reference(
 /// Convenience adapter to the stateful builder.
 /// # Errors
 /// Same mathematical, numerical and resource failures as `RemezBuilder::run`.
-pub fn remez(target: &Function, domain: Interval, options: RemezOptions) -> Result<RemezResult> {
+pub fn remez<E: Expression>(
+    target: &Function<E>,
+    domain: Interval,
+    options: RemezOptions,
+) -> Result<RemezResult<E>> {
     RemezBuilder::new()
         .target(target.clone())
         .options(options)
         .domain(domain)?
         .run()
 }
-fn remez_impl(f: &Function, domain: Interval, options: RemezOptions) -> Result<RemezResult> {
+// Conservatively charge a complete value/jet traversal before entering it.
+// Metadata is cached for dynamic DAGs, so rejected work is never expanded.
+struct LimitedFunction<'a, E> {
+    target: &'a Function<E>,
+    work: &'a Cell<usize>,
+    limit: usize,
+    polynomial_terms: usize,
+}
+impl<E: Expression> LimitedFunction<'_, E> {
+    fn charge(&self, jet: bool) -> Result<()> {
+        let units = self
+            .target
+            .metadata()
+            .nodes
+            .checked_add(self.polynomial_terms)
+            .and_then(|nodes| nodes.checked_mul(if jet { 48 } else { 2 }))
+            .and_then(|units| units.checked_add(if jet { 2 } else { 0 }))
+            .ok_or(Error::Budget("Remez expression work"))?;
+        let total = self
+            .work
+            .get()
+            .checked_add(units)
+            .ok_or(Error::Budget("Remez expression work"))?;
+        if total > self.limit {
+            return Err(Error::Budget("Remez expression work"));
+        }
+        self.work.set(total);
+        Ok(())
+    }
+}
+impl<E: Expression> Callable for LimitedFunction<'_, E> {
+    fn evaluate(&self, x: f64) -> Result<f64> {
+        self.charge(false)?;
+        self.target.evaluate(x)
+    }
+    fn jet_interval(&self, x: Interval) -> Result<Jet<Interval>> {
+        self.charge(true)?;
+        self.target.jet_interval(x)
+    }
+}
+fn qr_work(options: RemezOptions) -> Result<usize> {
+    let count = options
+        .degree
+        .checked_add(2)
+        .ok_or(Error::Budget("degree"))?;
+    count
+        .checked_mul(count)
+        .and_then(|n| n.checked_mul(count))
+        .and_then(|n| n.checked_mul(options.max_iterations))
+        .ok_or(Error::Budget("Remez work"))
+}
+fn remez_impl<E: Expression>(
+    f: &Function<E>,
+    domain: Interval,
+    options: RemezOptions,
+    admission_work: usize,
+) -> Result<RemezResult<E>> {
+    let initial = qr_work(options)?
+        .checked_add(admission_work)
+        .ok_or(Error::Budget("Remez work"))?;
+    if initial > options.limits.max_work {
+        return Err(Error::Budget("Remez work"));
+    }
+    let work = Cell::new(initial);
+    let target = LimitedFunction {
+        target: f,
+        work: &work,
+        limit: options.limits.max_work,
+        polynomial_terms: options
+            .degree
+            .checked_add(1)
+            .ok_or(Error::Budget("degree"))?,
+    };
+    Ok(RemezResult {
+        target: f.clone(),
+        data: remez_candidate(&target, domain, options)?,
+    })
+}
+fn remez_candidate<F: Callable>(
+    f: &F,
+    domain: Interval,
+    options: RemezOptions,
+) -> Result<ApproximationData> {
     let count = options
         .degree
         .checked_add(2)
         .ok_or(Error::Budget("degree"))?;
     options.limits.check(count, 10)?;
-    let work = count
-        .checked_mul(count)
-        .and_then(|n| n.checked_mul(count))
-        .and_then(|n| n.checked_mul(options.max_iterations))
-        .ok_or(Error::Budget("Remez work"))?;
+    let work = qr_work(options)?;
     if work > options.limits.max_work
         || count
             .checked_mul(count)
@@ -458,7 +625,7 @@ fn remez_impl(f: &Function, domain: Interval, options: RemezOptions) -> Result<R
             .upper()
             <= options.tolerance
         {
-            return Ok(RemezResult {
+            return Ok(ApproximationData {
                 polynomial: p,
                 error_bound: Interval::new(0.0, upper)?,
                 minimax_lower_bound: lower,
@@ -473,8 +640,8 @@ fn remez_impl(f: &Function, domain: Interval, options: RemezOptions) -> Result<R
     Err(Error::NotEstablished("Remez iteration budget"))
 }
 
-fn alternation_bound(
-    f: &Function,
+fn alternation_bound<F: Callable>(
+    f: &F,
     p: &Polynomial<Chebyshev>,
     extrema: &[(f64, f64)],
     count: usize,
@@ -508,4 +675,333 @@ fn alternation_bound(
     }
 
     Ok((lower, best))
+}
+
+/// Compile-time degree witness. Coefficient and alternation dimensions are
+/// checked by generic const expressions; convergence remains a runtime result.
+///
+/// ```compile_fail
+/// #![feature(generic_const_exprs)]
+/// use quest_polynomial::{StaticRemezResult, Expr, Complex64};
+/// fn wrong(result: StaticRemezResult<Expr, 3>) {
+///     let _: &[Complex64; 5] = result.coefficients().unwrap();
+/// }
+/// ```
+///
+/// ```compile_fail
+/// #![feature(generic_const_exprs)]
+/// use quest_polynomial::StaticDegree;
+/// let _ = StaticDegree::<{usize::MAX}>::new();
+/// ```
+#[derive(Debug, Clone, Copy, Default)]
+pub struct StaticDegree<const N: usize>
+where
+    [(); N + 1]:,
+    [(); N + 2]:;
+impl<const N: usize> StaticDegree<N>
+where
+    [(); N + 1]:,
+    [(); N + 2]:,
+{
+    #[must_use]
+    pub const fn new() -> Self {
+        Self
+    }
+    #[must_use]
+    pub const fn coefficient_count(self) -> usize {
+        N.saturating_add(1)
+    }
+    #[must_use]
+    pub const fn alternation_count(self) -> usize {
+        N.saturating_add(2)
+    }
+}
+#[derive(Debug)]
+pub struct StaticRemezBuilder<S, const N: usize>
+where
+    [(); N + 1]:,
+    [(); N + 2]:,
+{
+    inner: RemezBuilder<S>,
+}
+impl<S> RemezBuilder<S> {
+    #[must_use]
+    pub const fn static_degree<const N: usize>(self, _: StaticDegree<N>) -> StaticRemezBuilder<S, N>
+    where
+        [(); N + 1]:,
+        [(); N + 2]:,
+    {
+        StaticRemezBuilder {
+            inner: self.degree(N),
+        }
+    }
+}
+impl<const N: usize> StaticRemezBuilder<MissingTarget, N>
+where
+    [(); N + 1]:,
+    [(); N + 2]:,
+{
+    #[must_use]
+    pub const fn target<E: Expression>(
+        self,
+        target: Function<E>,
+    ) -> StaticRemezBuilder<HasTarget<E>, N> {
+        StaticRemezBuilder {
+            inner: self.inner.target(target),
+        }
+    }
+}
+impl<E: Expression, const N: usize> StaticRemezBuilder<HasTarget<E>, N>
+where
+    [(); N + 1]:,
+    [(); N + 2]:,
+{
+    /// # Errors
+    /// Propagates the runtime domain, numerical or resource failure.
+    pub fn domain(self, domain: Interval) -> Result<StaticRemezBuilder<ReadyRemez<E>, N>> {
+        Ok(StaticRemezBuilder {
+            inner: self.inner.domain(domain)?,
+        })
+    }
+}
+impl<S, const N: usize> StaticRemezBuilder<S, N>
+where
+    [(); N + 1]:,
+    [(); N + 2]:,
+{
+    #[must_use]
+    pub fn tolerance(self, tolerance: f64) -> Self {
+        Self {
+            inner: self.inner.tolerance(tolerance),
+        }
+    }
+    #[must_use]
+    pub fn limits(self, limits: Limits) -> Self {
+        Self {
+            inner: self.inner.limits(limits),
+        }
+    }
+    /// Runtime options retain the statically selected degree.
+    #[must_use]
+    pub fn options(self, options: RemezOptions) -> Self {
+        Self {
+            inner: self.inner.options(options).degree(N),
+        }
+    }
+}
+#[derive(Debug)]
+pub struct StaticRemezResult<E: Expression, const N: usize>
+where
+    [(); N + 1]:,
+{
+    result: RemezResult<E>,
+}
+impl<E: Expression, const N: usize> StaticRemezResult<E, N>
+where
+    [(); N + 1]:,
+{
+    #[must_use]
+    pub const fn result(&self) -> &RemezResult<E> {
+        &self.result
+    }
+    /// Borrow the certified coefficients without allocating or copying an array.
+    /// # Errors
+    /// Defensively checks the dimension already admitted at construction.
+    pub fn coefficients(&self) -> Result<&[Complex64; N + 1]> {
+        self.result
+            .polynomial()
+            .coefficients()
+            .try_into()
+            .map_err(|_| Error::NotEstablished("static coefficient dimension"))
+    }
+}
+impl<E: Expression, const N: usize> StaticRemezBuilder<ReadyRemez<E>, N>
+where
+    [(); N + 1]:,
+    [(); N + 2]:,
+{
+    /// # Errors
+    /// Propagates the runtime domain, numerical or resource failure.
+    pub fn run(self) -> Result<StaticRemezResult<E, N>> {
+        self.run_reported().map_err(|failure| failure.error)
+    }
+    /// Retain the original typed target and static degree request on failure.
+    /// # Errors
+    /// Returns the same failure as `run`, retaining the owned original request.
+    pub fn run_reported(self) -> std::result::Result<StaticRemezResult<E, N>, RemezFailure<E>> {
+        let options = self.inner.options;
+        let result = self.inner.run_reported()?;
+        if result.polynomial().coefficients().len() != N.saturating_add(1) {
+            return Err(RemezFailure {
+                domain: result.domain(),
+                target: result.target,
+                options,
+                error: Error::NotEstablished("static coefficient dimension"),
+            });
+        }
+        Ok(StaticRemezResult { result })
+    }
+}
+
+/// Callable target admitted only under an explicit mathematical premise.
+#[derive(Debug)]
+pub struct HasCallable<C> {
+    target: C,
+    assumption: ConsistencyAssumption,
+}
+#[derive(Debug)]
+pub struct ReadyCallable<C> {
+    target: C,
+    assumption: ConsistencyAssumption,
+    domain: Interval,
+}
+impl RemezBuilder {
+    #[must_use]
+    pub const fn callable<C: Callable>(
+        self,
+        target: C,
+        assumption: ConsistencyAssumption,
+    ) -> RemezBuilder<HasCallable<C>> {
+        RemezBuilder {
+            state: HasCallable { target, assumption },
+            options: self.options,
+        }
+    }
+}
+impl<C: Callable> RemezBuilder<HasCallable<C>> {
+    /// # Errors
+    /// Propagates the runtime domain, numerical or resource failure.
+    pub fn domain(self, domain: Interval) -> Result<RemezBuilder<ReadyCallable<C>>> {
+        if domain.lower() >= domain.upper() {
+            return Err(Error::Domain);
+        }
+        self.state.target.jet_interval(domain)?;
+        Ok(RemezBuilder {
+            state: ReadyCallable {
+                target: self.state.target,
+                assumption: self.state.assumption,
+                domain,
+            },
+            options: self.options,
+        })
+    }
+}
+/// Bounds conditional on the retained caller premise.
+///
+/// This type cannot become
+/// an unconditional expression-backed `RemezResult`. Callable execution cost is
+/// caller-controlled; numerical budgets do not bound work inside callbacks.
+///
+/// ```compile_fail
+/// use quest_polynomial::{ConditionalRemezResult, RemezResult};
+/// fn forge<C>(conditional: ConditionalRemezResult<C>) -> RemezResult {
+///     conditional.into()
+/// }
+/// ```
+#[derive(Debug)]
+pub struct ConditionalRemezResult<C> {
+    target: C,
+    assumption: ConsistencyAssumption,
+    data: ApproximationData,
+}
+impl<C> ConditionalRemezResult<C> {
+    #[must_use]
+    pub const fn target(&self) -> &C {
+        &self.target
+    }
+    #[must_use]
+    pub const fn assumption(&self) -> ConsistencyAssumption {
+        self.assumption
+    }
+    #[must_use]
+    pub const fn polynomial(&self) -> &Polynomial<Chebyshev> {
+        &self.data.polynomial
+    }
+    /// Uniform error bound, valid only under `assumption()`.
+    #[must_use]
+    pub const fn conditional_error_bound(&self) -> Interval {
+        self.data.error_bound
+    }
+    /// Alternation lower bound, valid only under `assumption()`.
+    #[must_use]
+    pub const fn conditional_minimax_lower_bound(&self) -> f64 {
+        self.data.minimax_lower_bound
+    }
+    #[must_use]
+    pub const fn iterations(&self) -> usize {
+        self.data.iterations
+    }
+    #[must_use]
+    pub const fn domain(&self) -> Interval {
+        self.data.domain
+    }
+}
+/// Failed conditional request, retaining the callable and its semantic premise.
+#[derive(Debug)]
+pub struct ConditionalRemezFailure<C> {
+    target: C,
+    assumption: ConsistencyAssumption,
+    domain: Interval,
+    options: RemezOptions,
+    error: Error,
+}
+impl<C> ConditionalRemezFailure<C> {
+    #[must_use]
+    pub const fn target(&self) -> &C {
+        &self.target
+    }
+    #[must_use]
+    pub const fn assumption(&self) -> ConsistencyAssumption {
+        self.assumption
+    }
+    #[must_use]
+    pub const fn domain(&self) -> Interval {
+        self.domain
+    }
+    #[must_use]
+    pub const fn options(&self) -> RemezOptions {
+        self.options
+    }
+    #[must_use]
+    pub const fn error(&self) -> &Error {
+        &self.error
+    }
+    #[must_use]
+    pub fn into_parts(self) -> (C, ConsistencyAssumption, Interval, RemezOptions, Error) {
+        (
+            self.target,
+            self.assumption,
+            self.domain,
+            self.options,
+            self.error,
+        )
+    }
+}
+impl<C: Callable> RemezBuilder<ReadyCallable<C>> {
+    /// # Errors
+    /// Propagates numerical or resource failures, dropping the original callable.
+    pub fn run(self) -> Result<ConditionalRemezResult<C>> {
+        self.run_reported().map_err(|failure| failure.error)
+    }
+    /// Retain the original callable and its premise when approximation fails.
+    /// # Errors
+    /// Returns the owned request together with the numerical/resource failure.
+    pub fn run_reported(
+        self,
+    ) -> std::result::Result<ConditionalRemezResult<C>, ConditionalRemezFailure<C>> {
+        match remez_candidate(&self.state.target, self.state.domain, self.options) {
+            Ok(data) => Ok(ConditionalRemezResult {
+                target: self.state.target,
+                assumption: self.state.assumption,
+                data,
+            }),
+            Err(error) => Err(ConditionalRemezFailure {
+                target: self.state.target,
+                assumption: self.state.assumption,
+                domain: self.state.domain,
+                options: self.options,
+                error,
+            }),
+        }
+    }
 }

@@ -1,3 +1,5 @@
+#![feature(const_trait_impl, const_ops, generic_const_exprs)]
+#![allow(incomplete_features)]
 #![forbid(unsafe_code)]
 //! Typed binary64 polynomials with explicit basis, support and numerical limits.
 //!
@@ -6,14 +8,25 @@
 //! operation; evaluation never selects a different precision backend.
 
 pub use quest_numerics::Interval;
+pub mod typed;
+pub use typed::{Expression, ExpressionMetadata, StaticExpression};
+mod backend;
+pub use backend::{Backend, JetBackend, ScalarBackend};
 mod function;
-pub use function::{CallbackFunction, ConsistencyAssumption, Expr, ExprNode, Function, Jet};
+pub use function::{
+    AssumedFunction, Callable, CallbackFunction, ConsistencyAssumption, Expr, ExprNode, Function,
+    GenericCallable, Jet,
+};
+mod norm;
+pub use norm::{NormDomain, NormEvidence, NormOptions, NormOutcome, NormStatus};
 mod analysis;
 pub use analysis::{Conversion, Even, Odd, Parity, ParityPolynomial};
 mod remez;
 pub use remez::{
-    CriticalPoint, CriticalPoints, HasTarget, MissingTarget, ReadyRemez, RemezBuilder,
-    RemezOptions, RemezResult, isolate_critical_points, remez,
+    ConditionalRemezFailure, ConditionalRemezResult, CriticalPoint, CriticalPoints, HasCallable,
+    HasTarget, MissingTarget, ReadyCallable, ReadyRemez, RemezBuilder, RemezFailure, RemezOptions,
+    RemezResult, StaticDegree, StaticRemezBuilder, StaticRemezResult, isolate_critical_points,
+    remez,
 };
 mod basis;
 pub use basis::{Basis, Chebyshev, Hermite, Jacobi, Laguerre, Laurent, Monomial};

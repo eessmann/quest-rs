@@ -1,0 +1,58 @@
+{
+  "scope": "Local aarch64-apple-darwin; working tree, not committed",
+  "baseline": "4f873db4a01bddfbe2f98a317fa2edccde9ff53f",
+  "cpp_reference": "568725f2bd488a03a4f98cdf92de924f17b2834a",
+  "rustc_revision": "6bb1652a020e80cef79332741d89e996d71933c9",
+  "features": "quest-rs/qsvt,quest-qsvt-cli/offline-synthesis,quest-qsvt-cli/rayon,quest-qsp/simd,quest-optimizer-worker/synthesis",
+  "workspace_nextest": {
+    "passed": 885,
+    "failed": 0,
+    "skipped": 6,
+    "seconds": 63.913
+  },
+  "workspace_doctests": {
+    "passed": 56,
+    "failed": 0,
+    "ignored": 1
+  },
+  "clippy_all_targets_deny_warnings": "passed",
+  "format": "passed",
+  "rustdoc": "passed",
+  "mdbook": "passed",
+  "release_large_degree": {
+    "passed": 3,
+    "degrees": [
+      8192,
+      8105
+    ]
+  },
+  "native_consumers": {
+    "passed": [
+      "direct-cpu",
+      "direct-omp",
+      "facade-cpu",
+      "facade-omp",
+      "wrapped-cpu",
+      "wrapped-omp",
+      "renamed-cpu",
+      "renamed-omp"
+    ]
+  },
+  "catalog": {
+    "source_comparison_families": 21,
+    "inverse_nlft_constructions": 21
+  },
+  "bindings": {
+    "source_artifacts": "unchanged after regeneration",
+    "coverage_manifest_check": "failed: local CPU and discovery metadata differ from recorded MPI manifest; manifest restored"
+  },
+  "pending_platforms": [
+    "Linux",
+    "MPI runtime",
+    "accelerator runtime"
+  ],
+  "notes": [
+    "Counts are taken from retained final logs. Earlier failure and diagnostic logs are not passing gates.",
+    "Benchmarks are one expression and warm leaf rebuilds, not end-to-end Remez or clean workspace compiler costs."
+  ]
+}

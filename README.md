@@ -225,7 +225,9 @@ cargo run -p quest-rs --example qsvt --features qsvt --locked
 The [native tutorial](docs/book/src/qsvt-runtime.md) explains scoped preparation
 and consuming postselection. The [application guide](docs/book/src/qsvt-applications.md)
 covers serial HDF5 setup, all 21 inverse catalogs, physical solve scaling,
-caller-owned Rayon pools and optional rsmpi execution. The default application
+caller-owned Rayon pools and optional rsmpi execution. Binary64, offline and
+catalogue synthesis default to inverse NLFT, with RHW Half-Cholesky available
+through an explicit algorithm selection. The default application
 enables native execution, HDF5 and certification; pure library builds remain
 independent of those application dependencies. MPI requires both the Cargo
 feature and a compatible MPI/SUBCOMM-enabled QuEST installation.

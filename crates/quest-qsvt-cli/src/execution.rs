@@ -98,7 +98,7 @@ fn compiled_transform(
             Ok(builder.certified_standard(converted).build()?)
         }
         LoadedCertified::UnitCircleResponse(certificate) => Ok(match route {
-            TransformRoute::Standard => {
+            TransformRoute::Auto | TransformRoute::Standard => {
                 return Err(Error::Input(
                     "compiled unit-circle controls require a generalized route",
                 ));
@@ -128,12 +128,53 @@ fn compiled_transform(
         }),
     }
 }
+/// A deterministic convention route; admission failures never cause a route retry.
+pub fn resolve_route(route: TransformRoute, input: &QspInput) -> TransformRoute {
+    if !matches!(route, TransformRoute::Auto) {
+        return route;
+    }
+    match input {
+        QspInput::Symmetric(_) | QspInput::Laurent(_) => TransformRoute::Standard,
+        #[cfg(feature = "certification")]
+        QspInput::Compiled(compiled) => match compiled.certified() {
+            quest_qsp::artifact::LoadedCertified::RealParityWx(_) => TransformRoute::Standard,
+            quest_qsp::artifact::LoadedCertified::UnitCircleResponse(_) => {
+                TransformRoute::HermitianizedFull
+            }
+        },
+        _ => TransformRoute::HermitianizedFull,
+    }
+}
+fn read_encoding(
+    encoding_path: Option<&std::path::Path>,
+    matrix_path: Option<&std::path::Path>,
+    alpha: Option<f64>,
+) -> Result<ProjectedEncoding> {
+    match (encoding_path, matrix_path, alpha) {
+        (Some(path), None, None) => {
+            encoding(&hdf5::read_block_encoding(path, IoPolicy::default())?)
+        }
+        (None, Some(path), Some(alpha)) => {
+            let matrix =
+                hdf5::read_matrix(path, IoPolicy::default())?.into_dense(IoPolicy::default())?;
+            Ok(
+                DenseEncodingBuilder::new(matrix.as_ref(), NumericalPolicy::default())?
+                    .normalization(alpha)?
+                    .build()?,
+            )
+        }
+        _ => Err(Error::Input(
+            "supply an encoding or a matrix with explicit alpha",
+        )),
+    }
+}
 pub fn transform(
     source: ProjectedEncoding,
     route: TransformRoute,
     input: QspInput,
     idle: usize,
 ) -> Result<ValidatedTransform> {
+    let route = resolve_route(route, &input);
     let auxiliary = !matches!(route, TransformRoute::Standard | TransformRoute::Direct);
     let layout = quest_qsvt::OperandLayout::canonical(source.num_qubits(), auxiliary)?
         .with_idle_high_qubits(idle)?;
@@ -156,7 +197,7 @@ pub fn transform(
                 _ => return Err(Error::Input("generalized controls missing")),
             };
             Ok(match route {
-                TransformRoute::Standard => {
+                TransformRoute::Auto | TransformRoute::Standard => {
                     return Err(Error::Input("standard route requires tagged Wx phases"));
                 }
                 TransformRoute::Direct => builder
@@ -287,6 +328,7 @@ pub fn product(matrix: MatRef<'_, C>, values: &[C]) -> Result<Vec<C>> {
     )
 }
 struct Executed {
+    physical: Option<Vec<C>>,
     raw: Vec<C>,
     normalized: Option<Vec<C>>,
     mass: quest::qsvt::MassObservation,
@@ -295,16 +337,30 @@ fn execute(
     transform: ValidatedTransform,
     input: &[C],
     normalize: bool,
+    physical_input: bool,
+    physical_output: bool,
     context: &mut Context<'_>,
 ) -> Result<Executed> {
-    if input.len() != transform.input().logical_dimension() {
-        return Err(Error::Input("logical input state dimension"));
+    let width = transform.operands().num_qubits();
+    let input_dimension = if physical_input {
+        1usize
+            .checked_shl(u32::try_from(width).map_err(|_| Error::Budget("register width"))?)
+            .ok_or(Error::Budget("register width"))?
+    } else {
+        transform.input().logical_dimension()
+    };
+    if input.len() != input_dimension {
+        return Err(Error::Input(
+            "input state dimension for selected logical/physical mode",
+        ));
     }
     if !norm(input).is_finite() {
         return Err(Error::Input("input norm overflow"));
     }
-    let width = transform.operands().num_qubits();
     let amplitudes = context.measure("input_embedding", Stage::Construction, || {
+        if physical_input {
+            return vector(input.iter().copied(), input.len());
+        }
         let basis = transform
             .input()
             .materialize_isometry(width, NumericalPolicy::default())?;
@@ -330,6 +386,14 @@ fn execute(
         let mass = result.mass();
         let raw = result.logical_snapshot()?;
         let raw = vector((0..raw.nrows()).map(|r| raw[(r, 0)]), raw.nrows())?;
+        let physical = if physical_output {
+            Some({
+                let state = result.physical_snapshot()?;
+                vector((0..state.nrows()).map(|r| state[(r, 0)]), state.nrows())?
+            })
+        } else {
+            None
+        };
         let normalized = if normalize {
             let conditioned = result.condition()?;
             let snapshot = conditioned.logical_snapshot()?;
@@ -342,6 +406,7 @@ fn execute(
             None
         };
         Ok(Executed {
+            physical,
             raw,
             normalized,
             mass,
@@ -364,19 +429,21 @@ pub fn embedded(args: &EmbeddedArgs, context: &mut Context<'_>) -> Result<Value>
             "MPI application admission is required for distributed execution",
         ));
     }
-    let output_path = args.output_state.as_ref().ok_or(Error::Input(
-        "local embedded execution requires --output-state",
-    ))?;
+    if args.output_state.is_none() && args.physical_output_state.is_none() {
+        return Err(Error::Input(
+            "local embedded execution requires a logical or physical output path",
+        ));
+    }
 
     let (stored, input) = context.measure("read", Stage::Construction, || {
         Ok((
-            hdf5::read_block_encoding(&args.encoding, IoPolicy::default())?,
+            read_encoding(args.encoding.as_deref(), args.matrix.as_deref(), args.alpha)?,
             hdf5::read_state_vector(&args.input_state, IoPolicy::default())?,
         ))
     })?;
     let (frozen, input_report) = crate::synthesis::freeze_input(&args.transform, context)?;
     let transform = context.measure("transform_construction", Stage::Construction, || {
-        transform(encoding(&stored)?, args.transform.route, frozen, 0)
+        transform(stored, args.transform.route, frozen, 0)
     })?;
     let mut report = transform_report(&transform);
     crate::set(&mut report, "input_synthesis", input_report)?;
@@ -384,7 +451,18 @@ pub fn embedded(args: &EmbeddedArgs, context: &mut Context<'_>) -> Result<Value>
         transform,
         &input,
         args.normalized_output_state.is_some(),
+        args.physical_input,
+        args.physical_output_state.is_some(),
         context,
+    )?;
+    crate::set(
+        &mut report,
+        "input_state_space",
+        json!(if args.physical_input {
+            "physical-register"
+        } else {
+            "logical"
+        }),
     )?;
     crate::set(&mut report, "mass", mass_report(executed.mass))?;
     crate::set(
@@ -393,7 +471,12 @@ pub fn embedded(args: &EmbeddedArgs, context: &mut Context<'_>) -> Result<Value>
         json!(norm(&executed.raw)),
     )?;
     context.measure("write", Stage::Postselection, || {
-        hdf5::write_state_vector(output_path, &executed.raw, IoPolicy::default())?;
+        if let Some(path) = &args.output_state {
+            hdf5::write_state_vector(path, &executed.raw, IoPolicy::default())?;
+        }
+        if let (Some(path), Some(values)) = (&args.physical_output_state, &executed.physical) {
+            hdf5::write_state_vector(path, values, IoPolicy::default())?;
+        }
         if let (Some(path), Some(values)) = (&args.normalized_output_state, &executed.normalized) {
             hdf5::write_state_vector(path, values, IoPolicy::default())?;
         }
@@ -410,14 +493,14 @@ pub fn overlap(args: &OverlapArgs, context: &mut Context<'_>) -> Result<Value> {
 
     let (stored, input, reference) = context.measure("read", Stage::Construction, || {
         Ok((
-            hdf5::read_block_encoding(&args.encoding, IoPolicy::default())?,
+            read_encoding(args.encoding.as_deref(), args.matrix.as_deref(), args.alpha)?,
             hdf5::read_state_vector(&args.input_state, IoPolicy::default())?,
             hdf5::read_state_vector(&args.reference_state, IoPolicy::default())?,
         ))
     })?;
     let (frozen, input_report) = crate::synthesis::freeze_input(&args.transform, context)?;
     let transform = context.measure("transform_construction", Stage::Construction, || {
-        transform(encoding(&stored)?, args.transform.route, frozen, 0)
+        transform(stored, args.transform.route, frozen, 0)
     })?;
     let mut report = transform_report(&transform);
     crate::set(&mut report, "input_synthesis", input_report)?;
@@ -459,20 +542,36 @@ pub fn overlap(args: &OverlapArgs, context: &mut Context<'_>) -> Result<Value> {
 }
 fn singular_values(matrix: MatRef<'_, C>) -> Result<(f64, f64, f64)> {
     use faer::linalg::svd::{ComputeSvdVectors, svd, svd_scratch};
-    let n = matrix.nrows();
-    if n == 0 || n != matrix.ncols() {
-        return Err(Error::Input("solve requires a nonempty square matrix"));
+    let rows = matrix.nrows();
+    let cols = matrix.ncols();
+    let n = rows.min(cols);
+    if n == 0 {
+        return Err(Error::Input("solve requires a nonempty matrix"));
+    }
+    let entry_scale = (0..rows)
+        .flat_map(|r| (0..cols).map(move |c| matrix[(r, c)].re.abs().max(matrix[(r, c)].im.abs())))
+        .fold(0.0_f64, f64::max);
+    if !entry_scale.is_finite() || entry_scale <= 0.0 {
+        return Err(Error::Input("solve requires numerical full rank"));
+    }
+    let mut normalized = self::matrix(rows, cols)?;
+    for r in 0..rows {
+        for c in 0..cols {
+            normalized[(r, c)] = matrix[(r, c)].div(entry_scale);
+        }
     }
     let req = svd_scratch::<C>(
-        n,
-        n,
+        rows,
+        cols,
         ComputeSvdVectors::No,
         ComputeSvdVectors::No,
         Par::Seq,
         faer::Spec::default(),
     );
-    if n.checked_mul(n)
-        .and_then(|v| v.checked_add(n))
+    if rows
+        .checked_next_multiple_of(4)
+        .and_then(|r| r.checked_mul(cols))
+        .and_then(|v| v.checked_add(n.checked_next_multiple_of(4)?))
         .and_then(|v| v.checked_mul(size_of::<C>()))
         .and_then(|v| v.checked_add(req.size_bytes()))
         .is_none_or(|v| v > NumericalPolicy::default().max_bytes)
@@ -483,7 +582,7 @@ fn singular_values(matrix: MatRef<'_, C>) -> Result<(f64, f64, f64)> {
     let mut scratch =
         MemBuffer::try_new(req).map_err(|_| Error::Budget("SVD workspace allocation"))?;
     svd(
-        matrix,
+        normalized.as_ref(),
         values.col_mut(0).as_diagonal_mut(),
         None,
         None,
@@ -494,16 +593,25 @@ fn singular_values(matrix: MatRef<'_, C>) -> Result<(f64, f64, f64)> {
     .map_err(|_| Error::Input("SVD failed to converge"))?;
     let maximum = values[(0, 0)].re;
     let minimum = values[(n.saturating_sub(1), 0)].re;
-    let threshold = maximum
-        .mul(f64::from(
-            u32::try_from(n).map_err(|_| Error::Budget("rank dimension"))?,
-        ))
-        .mul(f64::EPSILON);
-    if !maximum.is_finite() || !minimum.is_finite() || maximum <= 0.0 || minimum <= threshold {
+    let dimension =
+        f64::from(u32::try_from(rows.max(cols)).map_err(|_| Error::Budget("rank dimension"))?);
+    let relative_threshold = maximum.mul(dimension.mul(f64::EPSILON));
+    if !maximum.is_finite()
+        || !minimum.is_finite()
+        || maximum <= 0.0
+        || minimum <= relative_threshold
+    {
         return Err(Error::Input(
             "solve requires numerical full rank at sigma_max * dimension * binary64 epsilon",
         ));
     }
+    let threshold = relative_threshold.mul(entry_scale);
+    let maximum = maximum.mul(entry_scale);
+    let minimum = minimum.mul(entry_scale);
+    if !maximum.is_finite() || minimum <= 0.0 {
+        return Err(Error::Input("singular values overflow or underflow"));
+    }
+
     Ok((maximum, minimum, threshold))
 }
 struct SolveInput {
@@ -528,7 +636,8 @@ fn read_solve(args: &SolveArgs, context: &mut Context<'_>) -> Result<SolveInput>
     }
     if !matches!(
         args.transform.route,
-        TransformRoute::Standard
+        TransformRoute::Auto
+            | TransformRoute::Standard
             | TransformRoute::HermitianizedOdd
             | TransformRoute::MultiplicationOdd
     ) {
@@ -561,6 +670,42 @@ fn read_solve(args: &SolveArgs, context: &mut Context<'_>) -> Result<SolveInput>
     })
 }
 pub fn solve(args: &SolveArgs, context: &mut Context<'_>) -> Result<Value> {
+    let input = read_solve(args, context)?;
+    let (frozen, input_report) = crate::synthesis::freeze_input(&args.transform, context)?;
+    finish_solve(args, context, input, frozen, input_report)
+}
+pub fn catalog_solve(args: &crate::CatalogSolveArgs, context: &mut Context<'_>) -> Result<Value> {
+    let family = quest_qsvt_io::find_catalog_family(args.kappa, args.epsilon).ok_or(
+        Error::Input("no exact catalogue family matches kappa and epsilon"),
+    )?;
+    let solve = SolveArgs {
+        matrix: args.matrix.clone(),
+        rhs: args.rhs.clone(),
+        output_state: args.output_state.clone(),
+        normalized_output_state: args.normalized_output_state.clone(),
+        residual_tolerance: args.residual_tolerance,
+        reciprocal_scale: family.reciprocal_scale(),
+        transform: crate::TransformArgs {
+            qsp: std::path::PathBuf::new(),
+            synthesize_input: true,
+            algorithm: args.algorithm,
+            certify_input: args.certify,
+            input_tolerance: args.tolerance,
+            route: TransformRoute::Standard,
+        },
+    };
+    let input = read_solve(&solve, context)?;
+    let (frozen, report, _) =
+        crate::synthesis::freeze_catalog(args, input.sigma_max, input.sigma_min, context)?;
+    finish_solve(&solve, context, input, frozen, report)
+}
+fn finish_solve(
+    args: &SolveArgs,
+    context: &mut Context<'_>,
+    input: SolveInput,
+    frozen: QspInput,
+    input_report: Value,
+) -> Result<Value> {
     let SolveInput {
         a,
         b,
@@ -568,9 +713,8 @@ pub fn solve(args: &SolveArgs, context: &mut Context<'_>) -> Result<Value> {
         sigma_max,
         sigma_min,
         rank_threshold,
-    } = read_solve(args, context)?;
+    } = input;
     let normalized_b = vector(b.iter().map(|z| z.div(b_norm)), b.len())?;
-    let (frozen, input_report) = crate::synthesis::freeze_input(&args.transform, context)?;
     let transform = context.measure("transform_construction", Stage::Construction, || {
         solve_transform(a.as_ref(), sigma_max, args, frozen)
     })?;
@@ -580,9 +724,11 @@ pub fn solve(args: &SolveArgs, context: &mut Context<'_>) -> Result<Value> {
         transform,
         &normalized_b,
         args.normalized_output_state.is_some(),
+        false,
+        false,
         context,
     )?;
-    let scale = b_norm.div(sigma_max).div(args.reciprocal_scale);
+    let scale = positive_ratio(b_norm, sigma_max, args.reciprocal_scale);
     if !scale.is_finite() || scale <= 0.0 {
         return Err(Error::Input(
             "physical solution rescaling overflow or underflow",
@@ -592,16 +738,10 @@ pub fn solve(args: &SolveArgs, context: &mut Context<'_>) -> Result<Value> {
         executed.raw.iter().map(|z| z.mul(scale)),
         executed.raw.len(),
     )?;
-    let residual = context.measure("physical_residual", Stage::Postselection, || {
-        let applied = product(a.as_ref(), &physical)?;
-        let residual = vector(applied.iter().zip(&b).map(|(a, b)| a.sub(*b)), b.len())?;
-        let absolute = norm(&residual);
-        if !absolute.is_finite() {
-            return Err(Error::Input("physical residual overflow"));
-        }
-        Ok(absolute)
-    })?;
-    let relative = residual.div(b_norm);
+    let (relative, residual) =
+        context.measure("physical_residual", Stage::Postselection, || {
+            physical_residual(a.as_ref(), &physical, &normalized_b, sigma_max, b_norm)
+        })?;
     crate::set(&mut report, "mass", mass_report(executed.mass))?;
     crate::set(&mut report, "sigma_max", json!(sigma_max))?;
     crate::set(&mut report, "sigma_min", json!(sigma_min))?;
@@ -646,6 +786,43 @@ pub fn solve(args: &SolveArgs, context: &mut Context<'_>) -> Result<Value> {
     Ok(report)
 }
 
+fn physical_residual(
+    a: MatRef<'_, C>,
+    physical: &[C],
+    normalized_b: &[C],
+    sigma_max: f64,
+    b_norm: f64,
+) -> Result<(f64, f64)> {
+    // Evaluate the actual rounded exported x in normalized coordinates. Exponent
+    // arithmetic avoids overflow in the scale ratio and the physical products.
+    let mut scaled_a = matrix(a.nrows(), a.ncols())?;
+    for r in 0..a.nrows() {
+        for c in 0..a.ncols() {
+            scaled_a[(r, c)] = a[(r, c)].div(sigma_max);
+        }
+    }
+    let scaled_physical = vector(
+        physical.iter().map(|z| {
+            C::new(
+                signed_product_ratio(z.re, sigma_max, b_norm),
+                signed_product_ratio(z.im, sigma_max, b_norm),
+            )
+        }),
+        physical.len(),
+    )?;
+    let applied = product(scaled_a.as_ref(), &scaled_physical)?;
+    let residual = vector(
+        applied.iter().zip(normalized_b).map(|(a, b)| a.sub(*b)),
+        normalized_b.len(),
+    )?;
+    let relative = norm(&residual);
+    let absolute = relative.mul(b_norm);
+    if !relative.is_finite() || !absolute.is_finite() || !norm(physical).is_finite() {
+        return Err(Error::Input("physical solution or residual norm overflow"));
+    }
+    Ok((relative, absolute))
+}
+
 fn solve_transform(
     a: MatRef<'_, C>,
     sigma_max: f64,
@@ -655,15 +832,23 @@ fn solve_transform(
     let encoding = DenseEncodingBuilder::new(a.adjoint(), NumericalPolicy::default())?
         .normalization(sigma_max)?
         .build()?;
-    let transform = transform(encoding, args.transform.route, frozen, 0)?;
+    let route = if matches!(args.transform.route, TransformRoute::Auto) {
+        match resolve_route(TransformRoute::Auto, &frozen) {
+            TransformRoute::Standard => TransformRoute::Standard,
+            _ => TransformRoute::HermitianizedOdd,
+        }
+    } else {
+        args.transform.route
+    };
+    let transform = transform(encoding, route, frozen, 0)?;
     if transform.input().logical_dimension() != a.nrows()
         || transform.output().logical_dimension() != a.ncols()
     {
         return Err(Error::Input(
-            "selected route does not map the square logical spaces",
+            "selected route does not map the rectangular inverse logical spaces",
         ));
     }
-    if matches!(args.transform.route, TransformRoute::Standard) && transform.degree() % 2 == 0 {
+    if matches!(route, TransformRoute::Standard) && transform.degree() % 2 == 0 {
         return Err(Error::Input(
             "reciprocal standard route requires an odd degree",
         ));
@@ -743,4 +928,93 @@ mod compiled_tests {
 
         Ok(())
     }
+}
+
+#[cfg(test)]
+mod numerical_regressions {
+    use super::*;
+    #[test]
+    fn rank_admission_preserves_large_and_small_full_rank_matrices() -> googletest::Result<()> {
+        for scale in [1e308, 1e-308] {
+            let a = Mat::from_fn(2, 2, |r, c| C::new(if r == c { scale } else { 0.0 }, 0.0));
+            let (maximum, minimum, _) = singular_values(a.as_ref())?;
+            googletest::verify_eq!(maximum, scale)?;
+            googletest::verify_eq!(minimum, scale)?;
+        }
+        Ok(())
+    }
+    #[test]
+    fn rectangular_full_rank_is_admitted_but_rectangular_rank_deficiency_is_rejected()
+    -> googletest::Result<()> {
+        for (rows, cols) in [(3, 2), (2, 3)] {
+            let a = Mat::from_fn(rows, cols, |r, c| C::new(f64::from(r == c), 0.0));
+            let _ = singular_values(a.as_ref())?;
+            let a = Mat::from_fn(rows, cols, |r, c| C::new(f64::from(r == 0 && c == 0), 0.0));
+            googletest::verify_true!(singular_values(a.as_ref()).is_err())?;
+        }
+        Ok(())
+    }
+}
+
+// Exact exponent decomposition avoids intermediate overflow/underflow in ratios.
+fn positive_parts(x: f64) -> (f64, i32) {
+    if x < f64::MIN_POSITIVE {
+        let (mantissa, exponent) = positive_parts(x.mul(4_503_599_627_370_496.0));
+        return (mantissa, exponent.saturating_sub(52));
+    }
+    let bits = x.to_bits();
+    let word = bits.to_be_bytes();
+    let exponent = u16::from_be_bytes([word[0], word[1]]) >> 4;
+    (
+        f64::from_bits((bits & ((1u64 << 52) - 1)) | (1023u64 << 52)),
+        i32::from(exponent).saturating_sub(1023),
+    )
+}
+fn apply_exponent(mut value: f64, mut exponent: i32) -> f64 {
+    while exponent > 512 {
+        value = value.mul(2.0_f64.powi(512));
+        exponent = exponent.saturating_sub(512);
+    }
+    while exponent < -512 {
+        value = value.mul(2.0_f64.powi(-512));
+        exponent = exponent.saturating_add(512);
+    }
+    value.mul(2.0_f64.powi(exponent))
+}
+fn positive_ratio(a: f64, b: f64, c: f64) -> f64 {
+    let (am, ae) = positive_parts(a);
+    let (bm, be) = positive_parts(b);
+    let (cm, ce) = positive_parts(c);
+    apply_exponent(am.div(bm).div(cm), ae.saturating_sub(be).saturating_sub(ce))
+}
+
+#[cfg(test)]
+mod scale_regressions {
+    use super::*;
+    #[test]
+    fn physical_scale_has_no_intermediate_underflow_or_overflow() -> googletest::Result<()> {
+        googletest::verify_that!(
+            positive_ratio(1e-300, 1e100, 1e-200),
+            googletest::matchers::near(1e-200, 1e-215)
+        )?;
+        googletest::verify_that!(
+            positive_ratio(1e300, 1e-100, 1e200),
+            googletest::matchers::near(1e200, 1e185)
+        )?;
+        googletest::verify_eq!(
+            positive_ratio(f64::from_bits(1), f64::from_bits(1), 1.0),
+            1.0
+        )?;
+        Ok(())
+    }
+}
+
+fn signed_product_ratio(value: f64, numerator: f64, denominator: f64) -> f64 {
+    if value == 0.0 {
+        return value;
+    }
+    let (vm, ve) = positive_parts(value.abs());
+    let (nm, ne) = positive_parts(numerator);
+    let (dm, de) = positive_parts(denominator);
+    apply_exponent(vm.mul(nm).div(dm), ve.saturating_add(ne).saturating_sub(de)).copysign(value)
 }

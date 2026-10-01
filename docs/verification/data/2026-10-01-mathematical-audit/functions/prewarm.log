@@ -1,0 +1,15 @@
+   Compiling quest-numerics v0.1.0 (/Users/erich/.codex/worktrees/3215/quest-rs/crates/quest-numerics)
+   Compiling quest-polynomial v0.1.0 (/Users/erich/.codex/worktrees/3215/quest-rs/crates/quest-polynomial)
+warning: `feature(generic_const_exprs)` is not supported with the next-generation trait solver
+ --> crates/quest-polynomial/src/lib.rs:1:41
+  |
+1 | #![feature(const_trait_impl, const_ops, generic_const_exprs)]
+  |                                         ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `-Znext-solver=globally` is currently enabled by default for testing
+  = note: reverted the setting to `-Znext-solver=coherence` for this crate
+  = note: the currently stable trait solver will be used for this crate
+  = note: see issues #160895 <https://github.com/rust-lang/rust/issues/160895> for more information
+
+warning: `quest-polynomial` (lib) generated 1 warning
+    Finished `release` profile [optimized] target(s) in 3.41s

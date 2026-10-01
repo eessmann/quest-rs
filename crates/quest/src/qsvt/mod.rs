@@ -375,6 +375,12 @@ impl<'prepared, 'register, 'env> ExecutionResult<'prepared, 'register, 'env> {
     pub fn logical_snapshot(&self) -> Result<Mat<Complex64>> {
         decode(self.register, self.output)
     }
+    /// Read the full postselected physical register before conditioning.
+    /// # Errors
+    /// Rejects allocation budgets, invalid native state or failed state transfer.
+    pub fn physical_snapshot(&self) -> Result<Mat<Complex64>> {
+        Ok(self.register.snapshot()?)
+    }
     /// Release without normalization, preserving every subnormalized amplitude.
     #[must_use]
     pub const fn release(self) -> &'register mut Register<'env, StateVector> {

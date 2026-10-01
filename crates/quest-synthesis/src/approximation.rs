@@ -57,7 +57,7 @@ impl Approximation {
     }
     #[must_use]
     pub const fn algorithm(&self) -> &'static str {
-        "ross-selinger-lll-prime-norm-v1"
+        crate::ROTATION_ALGORITHM
     }
 }
 // SplitMix64, with constants and wrapping behavior pinned as part of the algorithm.

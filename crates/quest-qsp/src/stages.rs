@@ -12,9 +12,9 @@ use std::{
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum SynthesisAlgorithm {
     /// Weiss ratio followed by the rank-two structured Half-Cholesky recurrence.
-    #[default]
     RhwHalfCholesky,
-    /// Explicit divide-and-conquer inverse nonlinear Fourier transform.
+    /// Default divide-and-conquer inverse nonlinear Fourier transform.
+    #[default]
     InverseNlftDivideConquer,
 }
 

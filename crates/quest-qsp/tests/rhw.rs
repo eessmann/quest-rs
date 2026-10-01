@@ -6,10 +6,10 @@ use quest_polynomial::{Laurent, Limits, Polynomial};
 use quest_qsp::{Complex64, Policy, SynthesisAlgorithm, SynthesisBuilder};
 
 #[test]
-fn rhw_default_retains_algorithm_and_complex_response() -> Result<(), Box<dyn std::error::Error>> {
+fn explicit_rhw_retains_algorithm_and_complex_response() -> Result<(), Box<dyn std::error::Error>> {
     assert_eq!(
         Policy::default().algorithm,
-        SynthesisAlgorithm::RhwHalfCholesky
+        SynthesisAlgorithm::InverseNlftDivideConquer
     );
     for coefficients in [
         vec![Complex64::new(0.3, 0.2)],
@@ -30,6 +30,10 @@ fn rhw_default_retains_algorithm_and_complex_response() -> Result<(), Box<dyn st
     ] {
         let target = Polynomial::new(Laurent::new(0), coefficients, Limits::default())?;
         let rhw = SynthesisBuilder::new()
+            .policy(Policy {
+                algorithm: SynthesisAlgorithm::RhwHalfCholesky,
+                ..Policy::default()
+            })
             .unit_circle_response(&target)?
             .admit()?
             .complete()?
@@ -98,6 +102,10 @@ fn contractivity_failure_distinguishes_witness_from_exhausted_bound()
     )?;
     assert!(matches!(
         SynthesisBuilder::new()
+            .policy(Policy {
+                algorithm: SynthesisAlgorithm::RhwHalfCholesky,
+                ..Policy::default()
+            })
             .unit_circle_response(&rejected)?
             .admit(),
         Err(quest_qsp::Error::ContractivityViolation { .. })
@@ -145,6 +153,10 @@ fn seeded_offset_and_near_boundary_rhw_exports_are_independently_certified()
         }
         let target = Polynomial::new(Laurent::new(offset), coefficients, Limits::default())?;
         let completed = SynthesisBuilder::new()
+            .policy(Policy {
+                algorithm: SynthesisAlgorithm::RhwHalfCholesky,
+                ..Policy::default()
+            })
             .unit_circle_response(&target)?
             .admit()?
             .complete()?;
@@ -163,6 +175,10 @@ fn seeded_offset_and_near_boundary_rhw_exports_are_independently_certified()
         Limits::default(),
     )?;
     let frozen = SynthesisBuilder::new()
+        .policy(Policy {
+            algorithm: SynthesisAlgorithm::RhwHalfCholesky,
+            ..Policy::default()
+        })
         .unit_circle_response(&target)?
         .admit()?
         .complete()?
@@ -175,7 +191,8 @@ fn seeded_offset_and_near_boundary_rhw_exports_are_independently_certified()
 }
 
 #[test]
-fn both_real_parities_keep_nlft_as_an_explicit_solver() -> Result<(), Box<dyn std::error::Error>> {
+fn both_real_parities_support_explicit_rhw_and_inverse_nlft()
+-> Result<(), Box<dyn std::error::Error>> {
     use quest_polynomial::Chebyshev;
     for coefficients in [
         vec![0.1, 0.0, -0.2, 0.0, 0.07],
@@ -190,6 +207,10 @@ fn both_real_parities_keep_nlft_as_an_explicit_solver() -> Result<(), Box<dyn st
             Limits::default(),
         )?;
         let rhw = SynthesisBuilder::new()
+            .policy(Policy {
+                algorithm: SynthesisAlgorithm::RhwHalfCholesky,
+                ..Policy::default()
+            })
             .real_parity_wx(&target)?
             .admit()?
             .complete()?

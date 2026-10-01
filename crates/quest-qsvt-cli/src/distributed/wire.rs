@@ -54,7 +54,7 @@ pub fn encode(input: &FrozenInput) -> Result<Vec<u8>> {
         Workflow::Embedded => 0,
         Workflow::Overlap => 1,
     })?);
-    bytes.extend_from_slice(&word(route_word(input.route))?);
+    bytes.extend_from_slice(&word(route_word(input.route)?)?);
     bytes.extend_from_slice(&input.verification_tolerance.to_le_bytes());
     bytes.extend_from_slice(&input.block.alpha().to_le_bytes());
     for n in input
@@ -93,8 +93,13 @@ fn write_matrix(bytes: &mut Vec<u8>, matrix: MatRef<'_, C>) -> Result<()> {
     }
     Ok(())
 }
-const fn route_word(route: TransformRoute) -> usize {
-    match route {
+const fn route_word(route: TransformRoute) -> Result<usize> {
+    Ok(match route {
+        TransformRoute::Auto => {
+            return Err(Error::Input(
+                "automatic route must be resolved before freezing",
+            ));
+        }
         TransformRoute::Standard => 0,
         TransformRoute::Direct => 1,
         TransformRoute::HermitianizedFull => 2,
@@ -102,7 +107,7 @@ const fn route_word(route: TransformRoute) -> usize {
         TransformRoute::HermitianizedOdd => 4,
         TransformRoute::MultiplicationEven => 5,
         TransformRoute::MultiplicationOdd => 6,
-    }
+    })
 }
 const fn route(value: usize) -> Result<TransformRoute> {
     match value {

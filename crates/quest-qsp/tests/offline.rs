@@ -37,33 +37,43 @@ fn remez_policy_checks_exact_modeled_storage_boundary() -> Result<()> {
         .checked_div(8)
         .and_then(|bytes| bytes.checked_add(size_of::<astro_float::BigFloat>()))
         .expect("default Remez precision fits the test model");
-    let exact = 36_usize
-        .checked_mul(scalar_bytes)
-        .and_then(|bytes| {
-            subdivisions
-                .checked_mul(size_of::<Interval>())
-                .and_then(|stack| bytes.checked_add(stack))
-        })
-        .and_then(|bytes| bytes.checked_add(65_536))
-        .expect("small Remez test model fits usize");
-    for (budget, accepted) in [
-        (exact, true),
-        (exact.checked_sub(1).expect("positive byte budget"), false),
+    // Degree one has a 3x3 alternation system and four modeled matrix copies.
+    // Shared second-order evaluation reserves 32 live scalars per tree level.
+    // These independently chosen expressions have depths one and three.
+    for (function, depth) in [
+        (function!(|x| x), 1_usize),
+        (function!(|x| x.exp().sin()), 3_usize),
     ] {
-        let policy = OfflineRemezPolicy {
-            offline: OfflinePolicy {
-                max_bytes: budget,
-                ..OfflinePolicy::default()
-            },
-            max_subdivisions: subdivisions,
-            ..OfflineRemezPolicy::default()
-        };
-        let result = OfflineRemezBuilder::new()
-            .function(function!(|x| x))
-            .domain(Interval::new(-1.0, 1.0)?)?
-            .degree(1)
-            .policy(policy);
-        expect_eq!(result.is_ok(), accepted);
+        let exact = depth
+            .checked_mul(32)
+            .and_then(|temporaries| temporaries.checked_add(36))
+            .and_then(|count| count.checked_mul(scalar_bytes))
+            .and_then(|bytes| {
+                subdivisions
+                    .checked_mul(size_of::<Interval>())
+                    .and_then(|stack| bytes.checked_add(stack))
+            })
+            .and_then(|bytes| bytes.checked_add(65_536))
+            .expect("small Remez test model fits usize");
+        for (budget, accepted) in [
+            (exact, true),
+            (exact.checked_sub(1).expect("positive byte budget"), false),
+        ] {
+            let policy = OfflineRemezPolicy {
+                offline: OfflinePolicy {
+                    max_bytes: budget,
+                    ..OfflinePolicy::default()
+                },
+                max_subdivisions: subdivisions,
+                ..OfflineRemezPolicy::default()
+            };
+            let result = OfflineRemezBuilder::new()
+                .function(function.clone())
+                .domain(Interval::new(-1.0, 1.0)?)?
+                .degree(1)
+                .policy(policy);
+            expect_eq!(result.is_ok(), accepted);
+        }
     }
     Ok(())
 }
@@ -192,12 +202,18 @@ fn offline_nonpolynomial_remez_exchanges_and_proves_export_error() -> Result<()>
 fn offline_remez_rejects_domain_and_insufficient_error_budget() -> Result<()> {
     use quest_polynomial::{Interval, function};
     use quest_qsp::offline::{OfflineRemezBuilder, OfflineRemezPolicy};
-    expect_true!(
-        OfflineRemezBuilder::new()
-            .function(function!(|x| x.ln()))
-            .domain(Interval::new(-1.0, 1.0)?)
-            .is_err()
-    );
+    // Geometry admission is deliberately cheap; derivative-domain evaluation
+    // occurs only after an explicit policy supplies its work/storage bounds.
+    let invalid_domain = OfflineRemezBuilder::new()
+        .function(function!(|x| x.ln()))
+        .domain(Interval::new(-1.0, 1.0)?)?
+        .policy(OfflineRemezPolicy::default());
+    expect_true!(matches!(
+        invalid_domain,
+        Err(OfflineError::Polynomial(quest_polynomial::Error::Interval(
+            quest_numerics::Error::Domain("ln")
+        )))
+    ));
     let result = OfflineRemezBuilder::new()
         .function(function!(|x| x.exp()))
         .domain(Interval::new(-1.0, 1.0)?)?

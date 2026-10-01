@@ -32,8 +32,8 @@ Real-parity Wx input uses the IO crate's explicit polynomial bases, for example
 nonnegative Laurent polynomial, for example
 `{"basis":"Laurent","coefficients":[[0.1,0.2],[0.05,-0.1]]}`.
 
-`--algorithm rhw` (default) selects structured Half-Cholesky;
-`--algorithm inverse-nlft` selects the divide-and-conquer nonlinear Fourier
+`--algorithm rhw` explicitly selects structured Half-Cholesky;
+`--algorithm inverse-nlft` (default) selects the divide-and-conquer nonlinear Fourier
 inverse. Both support both response conventions and both explicit precision
 routes. No solver or precision fallback occurs.
 
@@ -59,7 +59,7 @@ converted target does not silently certify the earlier conversion.
 `offline-synthesize` always independently certifies its final binary64 export.
 
 There are exactly 21 frozen catalogue families from C++ revision
-`7fe7f740579b03c52a8cf48be6a31268b029c19f`. Selection requires the exact stored
+`568725f2bd488a03a4f98cdf92de924f17b2834a`. Selection requires the exact stored
 `--kappa` and binary64 `--epsilon` pair. No nearby family is substituted. Omit
 both selectors to list or check all 21. `check` actually constructs each target
 and optionally certifies it; an epsilon label is provenance, not a certificate.
@@ -226,4 +226,15 @@ runtime/worker preflight produces no trace file. Traces are
 bounded and report dropped events. Timing measures wall time on the calling
 process, not synchronized distributed time or independent GPU event time.
 
-This Rust port draws on `quest-qsvt` revision `7fe7f740579b03c52a8cf48be6a31268b029c19f`. Its MIT notice is retained in `LICENSE-quest-qsvt`.
+This Rust port draws on `quest-qsvt` revision `568725f2bd488a03a4f98cdf92de924f17b2834a`. Its MIT notice is retained in `LICENSE-quest-qsvt`.
+
+
+Local applications also accept matrix-backed encodings with `--matrix` and
+explicit `--alpha`. `--route auto` deterministically selects standard for Wx
+phases and full Hermitianization for generalized controls; physical solve uses
+the generalized odd component. `matrix-preset` creates reproducible seeded
+matrices. `catalog synthesize` exports exact families, while `catalog solve`
+admits their singular-value domain and independently measures the physical
+residual. `embedded --physical-input --physical-output-state FILE` supports
+complete local register I/O alongside decoded logical outputs. See the
+[application guide](../../docs/book/src/qsvt-applications.md) for contracts.

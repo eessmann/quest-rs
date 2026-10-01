@@ -134,7 +134,7 @@ fn read(request: &Request<'_>, context: &mut Context<'_>) -> Result<FrozenInput>
     Ok(FrozenInput {
         verification_tolerance: request.transform.input_tolerance,
         workflow: request.workflow,
-        route: request.transform.route,
+        route: crate::execution::resolve_route(request.transform.route, &qsp),
         block,
         qsp,
         input,
@@ -244,13 +244,21 @@ fn embedded(
     context: &mut Context<'_>,
     comm: &mut MpiCommunicator<'_>,
 ) -> Result<Value> {
-    if args.output_state.is_some() || args.normalized_output_state.is_some() {
+    if args.output_state.is_some()
+        || args.normalized_output_state.is_some()
+        || args.physical_output_state.is_some()
+        || args.physical_input
+        || args.matrix.is_some()
+        || args.alpha.is_some()
+    {
         return Err(Error::Input("distributed full-state output is unsupported"));
     }
     run(
         Request {
             workflow: Workflow::Embedded,
-            encoding: &args.encoding,
+            encoding: args.encoding.as_deref().ok_or(Error::Input(
+                "distributed execution requires an imported encoding",
+            ))?,
             input: &args.input_state,
             reference: None,
             transform: &args.transform,
@@ -264,10 +272,17 @@ fn overlap(
     context: &mut Context<'_>,
     comm: &mut MpiCommunicator<'_>,
 ) -> Result<Value> {
+    if args.matrix.is_some() || args.alpha.is_some() {
+        return Err(Error::Input(
+            "distributed execution requires an imported encoding",
+        ));
+    }
     run(
         Request {
             workflow: Workflow::Overlap,
-            encoding: &args.encoding,
+            encoding: args.encoding.as_deref().ok_or(Error::Input(
+                "distributed execution requires an imported encoding",
+            ))?,
             input: &args.input_state,
             reference: Some(&args.reference_state),
             transform: &args.transform,

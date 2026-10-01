@@ -1,5 +1,9 @@
 # Architecture and synthesis implementation
 
+The solver-default statements below record the September 29 design and validation.
+The October 1 mathematical audit restores inverse NLFT as the production, offline
+and catalogue default while retaining explicit RHW and persisted artifact identities.
+
 Approved by the author in the Codex conversation on 2026-09-29. This document
 records the implementation contract; it does not claim completion.
 

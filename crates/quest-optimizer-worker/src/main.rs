@@ -73,7 +73,7 @@ fn synthesize(target: &quest_math::Target, epsilon_bits: u64, seed: u64) -> Outc
     match synthesis::synthesize(target, epsilon_bits, seed) {
         Ok((sequence, precision_bits)) => Outcome::Candidate {
             sequence,
-            engine: "quest-synthesis-ross-selinger-lll-prime-norm-v1".into(),
+            engine: format!("quest-synthesis-{}", quest_synthesis::ROTATION_ALGORITHM),
             precision_bits,
         },
         Err(error) => Outcome::Failure {

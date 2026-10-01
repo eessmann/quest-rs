@@ -1,0 +1,547 @@
+{
+  "emit_report": true,
+  "failed": 0,
+  "families": [
+    {
+      "algorithm": "inverse-nlft",
+      "degree": 31,
+      "epsilon_label": 0.001,
+      "kappa": 5,
+      "label_is_certificate": false,
+      "reciprocal_scale": 0.1,
+      "source_revision": "7fe7f740579b03c52a8cf48be6a31268b029c19f",
+      "status": "passed",
+      "synthesis": {
+        "certificate": null,
+        "certified": false,
+        "completion_grid": 256,
+        "completion_residual": 1.3392901891485719e-15,
+        "construction": "binary64",
+        "degree": 31,
+        "reconstruction_residual": 6.74710628937923e-16
+      },
+      "timings_seconds": {
+        "admission": 0.056531125,
+        "completion": 0.000517958,
+        "synthesis": 0.001024666
+      },
+      "total_seconds": 0.058332417
+    },
+    {
+      "algorithm": "inverse-nlft",
+      "degree": 21,
+      "epsilon_label": 0.01,
+      "kappa": 5,
+      "label_is_certificate": false,
+      "reciprocal_scale": 0.1,
+      "source_revision": "7fe7f740579b03c52a8cf48be6a31268b029c19f",
+      "status": "passed",
+      "synthesis": {
+        "certificate": null,
+        "certified": false,
+        "completion_grid": 128,
+        "completion_residual": 3.2252736359333484e-13,
+        "construction": "binary64",
+        "degree": 21,
+        "reconstruction_residual": 6.3951164396087206e-15
+      },
+      "timings_seconds": {
+        "admission": 0.000041208,
+        "completion": 0.000182833,
+        "synthesis": 0.00083125
+      },
+      "total_seconds": 0.001068375
+    },
+    {
+      "algorithm": "inverse-nlft",
+      "degree": 9,
+      "epsilon_label": 0.1,
+      "kappa": 5,
+      "label_is_certificate": false,
+      "reciprocal_scale": 0.1,
+      "source_revision": "7fe7f740579b03c52a8cf48be6a31268b029c19f",
+      "status": "passed",
+      "synthesis": {
+        "certificate": null,
+        "certified": false,
+        "completion_grid": 64,
+        "completion_residual": 1.2300374892739375e-12,
+        "construction": "binary64",
+        "degree": 9,
+        "reconstruction_residual": 6.721709057930312e-14
+      },
+      "timings_seconds": {
+        "admission": 0.000018917,
+        "completion": 0.000075583,
+        "synthesis": 0.000293459
+      },
+      "total_seconds": 0.00039525
+    },
+    {
+      "algorithm": "inverse-nlft",
+      "degree": 311,
+      "epsilon_label": 0.001,
+      "kappa": 50,
+      "label_is_certificate": false,
+      "reciprocal_scale": 0.01,
+      "source_revision": "7fe7f740579b03c52a8cf48be6a31268b029c19f",
+      "status": "passed",
+      "synthesis": {
+        "certificate": null,
+        "certified": false,
+        "completion_grid": 2048,
+        "completion_residual": 5.512952445850038e-15,
+        "construction": "binary64",
+        "degree": 311,
+        "reconstruction_residual": 1.7494981836610495e-15
+      },
+      "timings_seconds": {
+        "admission": 0.314003208,
+        "completion": 0.003793667,
+        "synthesis": 0.033082334
+      },
+      "total_seconds": 0.350909292
+    },
+    {
+      "algorithm": "inverse-nlft",
+      "degree": 197,
+      "epsilon_label": 0.01,
+      "kappa": 50,
+      "label_is_certificate": false,
+      "reciprocal_scale": 0.01,
+      "source_revision": "7fe7f740579b03c52a8cf48be6a31268b029c19f",
+      "status": "passed",
+      "synthesis": {
+        "certificate": null,
+        "certified": false,
+        "completion_grid": 2048,
+        "completion_residual": 3.3807981034395877e-15,
+        "construction": "binary64",
+        "degree": 197,
+        "reconstruction_residual": 1.2457195812427383e-15
+      },
+      "timings_seconds": {
+        "admission": 0.000327916,
+        "completion": 0.004917208,
+        "synthesis": 0.015450833
+      },
+      "total_seconds": 0.020725292
+    },
+    {
+      "algorithm": "inverse-nlft",
+      "degree": 81,
+      "epsilon_label": 0.1,
+      "kappa": 50,
+      "label_is_certificate": false,
+      "reciprocal_scale": 0.01,
+      "source_revision": "7fe7f740579b03c52a8cf48be6a31268b029c19f",
+      "status": "passed",
+      "synthesis": {
+        "certificate": null,
+        "certified": false,
+        "completion_grid": 1024,
+        "completion_residual": 1.6993653844192746e-15,
+        "construction": "binary64",
+        "degree": 81,
+        "reconstruction_residual": 6.296936674853552e-16
+      },
+      "timings_seconds": {
+        "admission": 0.000142125,
+        "completion": 0.002141334,
+        "synthesis": 0.005520709
+      },
+      "total_seconds": 0.00782825
+    },
+    {
+      "algorithm": "inverse-nlft",
+      "degree": 629,
+      "epsilon_label": 0.001,
+      "kappa": 100,
+      "label_is_certificate": false,
+      "reciprocal_scale": 0.005,
+      "source_revision": "7fe7f740579b03c52a8cf48be6a31268b029c19f",
+      "status": "passed",
+      "synthesis": {
+        "certificate": null,
+        "certified": false,
+        "completion_grid": 4096,
+        "completion_residual": 7.0778229912337474e-15,
+        "construction": "binary64",
+        "degree": 629,
+        "reconstruction_residual": 3.1116702480458057e-15
+      },
+      "timings_seconds": {
+        "admission": 0.665875208,
+        "completion": 0.00808375,
+        "synthesis": 0.077111542
+      },
+      "total_seconds": 0.75112375
+    },
+    {
+      "algorithm": "inverse-nlft",
+      "degree": 397,
+      "epsilon_label": 0.01,
+      "kappa": 100,
+      "label_is_certificate": false,
+      "reciprocal_scale": 0.005,
+      "source_revision": "7fe7f740579b03c52a8cf48be6a31268b029c19f",
+      "status": "passed",
+      "synthesis": {
+        "certificate": null,
+        "certified": false,
+        "completion_grid": 4096,
+        "completion_residual": 4.5235036075308216e-15,
+        "construction": "binary64",
+        "degree": 397,
+        "reconstruction_residual": 1.6841133401928685e-15
+      },
+      "timings_seconds": {
+        "admission": 0.000649459,
+        "completion": 0.009993625,
+        "synthesis": 0.03417875
+      },
+      "total_seconds": 0.044852583
+    },
+    {
+      "algorithm": "inverse-nlft",
+      "degree": 167,
+      "epsilon_label": 0.1,
+      "kappa": 100,
+      "label_is_certificate": false,
+      "reciprocal_scale": 0.005,
+      "source_revision": "7fe7f740579b03c52a8cf48be6a31268b029c19f",
+      "status": "passed",
+      "synthesis": {
+        "certificate": null,
+        "certified": false,
+        "completion_grid": 2048,
+        "completion_residual": 2.912800159484726e-15,
+        "construction": "binary64",
+        "degree": 167,
+        "reconstruction_residual": 7.335330139576735e-16
+      },
+      "timings_seconds": {
+        "admission": 0.000281125,
+        "completion": 0.004936833,
+        "synthesis": 0.016380959
+      },
+      "total_seconds": 0.021634875
+    },
+    {
+      "algorithm": "inverse-nlft",
+      "degree": 1581,
+      "epsilon_label": 0.001,
+      "kappa": 250,
+      "label_is_certificate": false,
+      "reciprocal_scale": 0.002,
+      "source_revision": "7fe7f740579b03c52a8cf48be6a31268b029c19f",
+      "status": "passed",
+      "synthesis": {
+        "certificate": null,
+        "certified": false,
+        "completion_grid": 16384,
+        "completion_residual": 9.482599775546298e-15,
+        "construction": "binary64",
+        "degree": 1581,
+        "reconstruction_residual": 8.851884667503012e-15
+      },
+      "timings_seconds": {
+        "admission": 1.313964625,
+        "completion": 0.046874208,
+        "synthesis": 0.18873275
+      },
+      "total_seconds": 1.549689584
+    },
+    {
+      "algorithm": "inverse-nlft",
+      "degree": 971,
+      "epsilon_label": 0.01,
+      "kappa": 250,
+      "label_is_certificate": false,
+      "reciprocal_scale": 0.002,
+      "source_revision": "7fe7f740579b03c52a8cf48be6a31268b029c19f",
+      "status": "passed",
+      "synthesis": {
+        "certificate": null,
+        "certified": false,
+        "completion_grid": 8192,
+        "completion_residual": 8.119844371187435e-15,
+        "construction": "binary64",
+        "degree": 971,
+        "reconstruction_residual": 1.749194992916779e-15
+      },
+      "timings_seconds": {
+        "admission": 0.001689667,
+        "completion": 0.022692958,
+        "synthesis": 0.086923292
+      },
+      "total_seconds": 0.111564458
+    },
+    {
+      "algorithm": "inverse-nlft",
+      "degree": 403,
+      "epsilon_label": 0.1,
+      "kappa": 250,
+      "label_is_certificate": false,
+      "reciprocal_scale": 0.002,
+      "source_revision": "7fe7f740579b03c52a8cf48be6a31268b029c19f",
+      "status": "passed",
+      "synthesis": {
+        "certificate": null,
+        "certified": false,
+        "completion_grid": 4096,
+        "completion_residual": 4.7221669933671066e-15,
+        "construction": "binary64",
+        "degree": 403,
+        "reconstruction_residual": 2.0153812545392956e-15
+      },
+      "timings_seconds": {
+        "admission": 0.000665833,
+        "completion": 0.010085417,
+        "synthesis": 0.036238917
+      },
+      "total_seconds": 0.047023875
+    },
+    {
+      "algorithm": "inverse-nlft",
+      "degree": 2699,
+      "epsilon_label": 0.001,
+      "kappa": 500,
+      "label_is_certificate": false,
+      "reciprocal_scale": 0.001,
+      "source_revision": "7fe7f740579b03c52a8cf48be6a31268b029c19f",
+      "status": "passed",
+      "synthesis": {
+        "certificate": null,
+        "certified": false,
+        "completion_grid": 16384,
+        "completion_residual": 1.5324287395869236e-14,
+        "construction": "binary64",
+        "degree": 2699,
+        "reconstruction_residual": 1.3632845971665056e-14
+      },
+      "timings_seconds": {
+        "admission": 0.004439583,
+        "completion": 0.035797709,
+        "synthesis": 0.443497666
+      },
+      "total_seconds": 0.4838295
+    },
+    {
+      "algorithm": "inverse-nlft",
+      "degree": 1981,
+      "epsilon_label": 0.01,
+      "kappa": 500,
+      "label_is_certificate": false,
+      "reciprocal_scale": 0.001,
+      "source_revision": "7fe7f740579b03c52a8cf48be6a31268b029c19f",
+      "status": "passed",
+      "synthesis": {
+        "certificate": null,
+        "certified": false,
+        "completion_grid": 16384,
+        "completion_residual": 1.173802835434378e-14,
+        "construction": "binary64",
+        "degree": 1981,
+        "reconstruction_residual": 6.328706460284395e-15
+      },
+      "timings_seconds": {
+        "admission": 0.003178,
+        "completion": 0.046861125,
+        "synthesis": 0.197189666
+      },
+      "total_seconds": 0.247297792
+    },
+    {
+      "algorithm": "inverse-nlft",
+      "degree": 801,
+      "epsilon_label": 0.1,
+      "kappa": 500,
+      "label_is_certificate": false,
+      "reciprocal_scale": 0.001,
+      "source_revision": "7fe7f740579b03c52a8cf48be6a31268b029c19f",
+      "status": "passed",
+      "synthesis": {
+        "certificate": null,
+        "certified": false,
+        "completion_grid": 8192,
+        "completion_residual": 6.004901134955077e-15,
+        "construction": "binary64",
+        "degree": 801,
+        "reconstruction_residual": 4.135892991809342e-15
+      },
+      "timings_seconds": {
+        "admission": 0.001300583,
+        "completion": 0.042383375,
+        "synthesis": 0.098337833
+      },
+      "total_seconds": 0.142062625
+    },
+    {
+      "algorithm": "inverse-nlft",
+      "degree": 5439,
+      "epsilon_label": 0.001,
+      "kappa": 1000,
+      "label_is_certificate": false,
+      "reciprocal_scale": 0.0005,
+      "source_revision": "7fe7f740579b03c52a8cf48be6a31268b029c19f",
+      "status": "passed",
+      "synthesis": {
+        "certificate": null,
+        "certified": false,
+        "completion_grid": 32768,
+        "completion_residual": 2.0605887234564577e-14,
+        "construction": "binary64",
+        "degree": 5439,
+        "reconstruction_residual": 1.7554008347682388e-14
+      },
+      "timings_seconds": {
+        "admission": 0.008787625,
+        "completion": 0.079395458,
+        "synthesis": 0.992353875
+      },
+      "total_seconds": 1.080678042
+    },
+    {
+      "algorithm": "inverse-nlft",
+      "degree": 3883,
+      "epsilon_label": 0.01,
+      "kappa": 1000,
+      "label_is_certificate": false,
+      "reciprocal_scale": 0.0005,
+      "source_revision": "7fe7f740579b03c52a8cf48be6a31268b029c19f",
+      "status": "passed",
+      "synthesis": {
+        "certificate": null,
+        "certified": false,
+        "completion_grid": 32768,
+        "completion_residual": 1.639954071508994e-14,
+        "construction": "binary64",
+        "degree": 3883,
+        "reconstruction_residual": 6.815350061265083e-15
+      },
+      "timings_seconds": {
+        "admission": 0.006400417,
+        "completion": 0.100987542,
+        "synthesis": 0.4619865
+      },
+      "total_seconds": 0.569484708
+    },
+    {
+      "algorithm": "inverse-nlft",
+      "degree": 1783,
+      "epsilon_label": 0.1,
+      "kappa": 1000,
+      "label_is_certificate": false,
+      "reciprocal_scale": 0.0005,
+      "source_revision": "7fe7f740579b03c52a8cf48be6a31268b029c19f",
+      "status": "passed",
+      "synthesis": {
+        "certificate": null,
+        "certified": false,
+        "completion_grid": 16384,
+        "completion_residual": 1.1299976547314852e-14,
+        "construction": "binary64",
+        "degree": 1783,
+        "reconstruction_residual": 9.66213596360194e-15
+      },
+      "timings_seconds": {
+        "admission": 0.002882917,
+        "completion": 0.04560625,
+        "synthesis": 0.193974209
+      },
+      "total_seconds": 0.242521625
+    },
+    {
+      "algorithm": "inverse-nlft",
+      "degree": 8105,
+      "epsilon_label": 0.001,
+      "kappa": 1500,
+      "label_is_certificate": false,
+      "reciprocal_scale": 0.0003333333333333333,
+      "source_revision": "7fe7f740579b03c52a8cf48be6a31268b029c19f",
+      "status": "passed",
+      "synthesis": {
+        "certificate": null,
+        "certified": false,
+        "completion_grid": 65536,
+        "completion_residual": 2.2643922213412522e-14,
+        "construction": "binary64",
+        "degree": 8105,
+        "reconstruction_residual": 6.228397112238469e-15
+      },
+      "timings_seconds": {
+        "admission": 0.013143083,
+        "completion": 0.207912625,
+        "synthesis": 1.045462083
+      },
+      "total_seconds": 1.266707042
+    },
+    {
+      "algorithm": "inverse-nlft",
+      "degree": 6101,
+      "epsilon_label": 0.01,
+      "kappa": 1500,
+      "label_is_certificate": false,
+      "reciprocal_scale": 0.0003333333333333333,
+      "source_revision": "7fe7f740579b03c52a8cf48be6a31268b029c19f",
+      "status": "passed",
+      "synthesis": {
+        "certificate": null,
+        "certified": false,
+        "completion_grid": 65536,
+        "completion_residual": 1.6540906252872376e-14,
+        "construction": "binary64",
+        "degree": 6101,
+        "reconstruction_residual": 4.839641654487061e-14
+      },
+      "timings_seconds": {
+        "admission": 0.010187125,
+        "completion": 0.206932958,
+        "synthesis": 1.001664209
+      },
+      "total_seconds": 1.218935125
+    },
+    {
+      "algorithm": "inverse-nlft",
+      "degree": 2513,
+      "epsilon_label": 0.1,
+      "kappa": 1500,
+      "label_is_certificate": false,
+      "reciprocal_scale": 0.0003333333333333333,
+      "source_revision": "7fe7f740579b03c52a8cf48be6a31268b029c19f",
+      "status": "passed",
+      "synthesis": {
+        "certificate": null,
+        "certified": false,
+        "completion_grid": 32768,
+        "completion_residual": 9.603943206798632e-15,
+        "construction": "binary64",
+        "degree": 2513,
+        "reconstruction_residual": 1.3552406158335173e-14
+      },
+      "timings_seconds": {
+        "admission": 0.004072959,
+        "completion": 0.101499458,
+        "synthesis": 0.425963708
+      },
+      "total_seconds": 0.531614084
+    }
+  ],
+  "parallelism": {
+    "certification": "serial within each target",
+    "per_family_budgets": true,
+    "scope": "independent catalogue families",
+    "selection": "explicit",
+    "workers": 2
+  },
+  "stage_times_are_summed_worker_wall_times": true,
+  "timings_seconds": {
+    "admission": 2.408582708,
+    "completion": 0.981671874,
+    "synthesis": 5.356199210000001,
+    "total": 4.605580417,
+    "worker_pool": 0.000128917,
+    "worker_pool_teardown": 3.791e-6
+  }
+}

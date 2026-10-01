@@ -295,3 +295,33 @@ fn unsupported_numeric_storage_nonfinite_input_and_bad_sparse_indices_fail()
     )?;
     Ok(())
 }
+
+#[gtest]
+fn canonical_matrix_writer_preserves_rectangular_complex_values_and_rejects_before_replacing_file()
+-> googletest::Result<()> {
+    let dir = tempfile::tempdir()?;
+    let path = dir.path().join("matrix.h5");
+    let matrix = faer::Mat::from_fn(2, 3, |r, c| {
+        Complex64::new(
+            if r == 0 { 1.0 } else { 2.0 },
+            match c {
+                0 => 3.0,
+                1 => 4.0,
+                _ => 5.0,
+            },
+        )
+    });
+    hdf5::write_matrix(&path, matrix.as_ref(), IoPolicy::default())?;
+    let loaded = hdf5::read_matrix(&path, IoPolicy::default())?.into_dense(IoPolicy::default())?;
+    verify_eq!(loaded.shape(), matrix.shape())?;
+    for r in 0..2 {
+        for c in 0..3 {
+            verify_eq!(loaded[(r, c)], matrix[(r, c)])?;
+        }
+    }
+    let original = std::fs::read(&path)?;
+    let invalid = faer::Mat::from_fn(1, 1, |_, _| Complex64::new(f64::NAN, 0.0));
+    verify_true!(hdf5::write_matrix(&path, invalid.as_ref(), IoPolicy::default()).is_err())?;
+    verify_eq!(std::fs::read(&path)?, original)?;
+    Ok(())
+}

@@ -1,0 +1,11 @@
+Thu Oct  1 16:28:20 UTC 2026
+Darwin arm64
+rustc 1.100.0-nightly (6bb1652a0 2026-09-22)
+binary: rustc
+commit-hash: 6bb1652a020e80cef79332741d89e996d71933c9
+commit-date: 2026-09-22
+host: aarch64-apple-darwin
+release: 1.100.0-nightly
+LLVM version: 23.1.1
+cargo 1.100.0-nightly (495c385d0 2026-09-16)
+4f873db4a01bddfbe2f98a317fa2edccde9ff53f

@@ -1,0 +1,5 @@
+representation,phase,iterations,nanoseconds,allocations
+typed,construct,10000,2834,0
+typed,value,1000000,2969166,0
+typed,jet,1000000,6246625,0
+typed,interval_jet,10000,8175583,0

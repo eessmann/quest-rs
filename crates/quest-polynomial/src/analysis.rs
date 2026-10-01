@@ -472,6 +472,64 @@ fn add_coefficient(values: &mut [Complex64], index: usize, value: Complex64) -> 
     Ok(())
 }
 impl Polynomial<Laurent> {
+    /// Convert an exactly inversion-symmetric Laurent polynomial to Chebyshev
+    /// coefficients in `x=(z+z^-1)/2`, using `z^k+z^-k=2*T_k(x)`.
+    ///
+    /// Absent support entries are exact zeros. Complex coefficients are allowed;
+    /// inversion symmetry means `a_k=a_-k`, without complex conjugation. This is
+    /// a change of variable, not evaluation of the Laurent polynomial at x.
+    /// The returned l1 coefficient error bounds binary64 rounding in the output.
+    /// # Errors
+    /// Rejects asymmetry, support/storage/work overflow or nonfinite scaling.
+    pub fn to_chebyshev_symmetric(&self) -> Result<Conversion<Chebyshev, Laurent>> {
+        let degree = self
+            .effective_support()
+            .map_or(0, |(a, b)| a.unsigned_abs().max(b.unsigned_abs()));
+        let count = usize::try_from(degree)
+            .map_err(|_| Error::SupportOverflow)?
+            .checked_add(1)
+            .ok_or(Error::SupportOverflow)?;
+        self.limits().check(count, 4)?;
+        if count
+            .checked_mul(4)
+            .ok_or(Error::Budget("symmetric conversion work"))?
+            > self.limits().max_work
+        {
+            return Err(Error::Budget("symmetric conversion work"));
+        }
+        let coefficient = |exponent: i64| -> Complex64 {
+            exponent
+                .checked_sub(i64::from(self.basis().offset()))
+                .and_then(|i| usize::try_from(i).ok())
+                .and_then(|i| self.coefficients().get(i))
+                .copied()
+                .unwrap_or(Complex64::new(0.0, 0.0))
+        };
+        let mut output = zeros(count, self.limits())?;
+        *output.first_mut().ok_or(Error::SupportOverflow)? = coefficient(0);
+        let mut error = Interval::point(0.0)?;
+        for (k, value) in output.iter_mut().enumerate().skip(1) {
+            let exponent = i64::try_from(k).map_err(|_| Error::SupportOverflow)?;
+            let a = coefficient(exponent);
+            if a != coefficient(exponent.checked_neg().ok_or(Error::SupportOverflow)?) {
+                return Err(Error::UnsupportedConversion);
+            }
+            *value = finite(a.mul(2.0))?;
+            for (original, rounded) in [(a.re, value.re), (a.im, value.im)] {
+                let delta = Interval::point(original)?
+                    .checked_mul(Interval::point(2.0)?)?
+                    .checked_sub(Interval::point(rounded)?)?;
+                error = error.checked_add(Interval::point(
+                    delta.lower().abs().max(delta.upper().abs()),
+                )?)?;
+            }
+        }
+        Ok(Conversion {
+            source: self.clone(),
+            polynomial: Polynomial::new(Chebyshev, output, self.limits())?,
+            coefficient_error_bound: error.upper(),
+        })
+    }
     /// # Errors
     /// Rejects signed support overflow or nonfinite derivative coefficients.
     pub fn derivative(&self) -> Result<Self> {

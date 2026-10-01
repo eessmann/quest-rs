@@ -6,10 +6,11 @@ The examples use the [shared numerical prelude](numerical-polynomials.md).
 
 ## Explicit algorithm choice
 
-`Policy::algorithm` selects `RhwHalfCholesky` (the production default) or
-`InverseNlftDivideConquer`. Both support real-parity Wx phases and complex
-unit-circle generalized QSP controls. Inverse NLFT remains supported for
-generalized phases. A bounded dense RHW factorization is retained as an internal test oracle.
+`Policy::algorithm` defaults to `InverseNlftDivideConquer` in binary64 and
+offline construction. `RhwHalfCholesky` remains an explicit selection. Both
+support real-parity Wx phases and complex unit-circle generalized QSP controls.
+Recorded algorithms in compiled artifacts retain their original meaning;
+loading an RHW artifact does not select or run a different solver. A bounded dense RHW factorization is retained as an internal test oracle.
 
 RHW completion publishes Fourier coefficients of `b/a` with target identity,
 positive-real-constant gauge, grid and contractivity evidence. The structured

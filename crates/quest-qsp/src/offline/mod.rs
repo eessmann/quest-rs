@@ -895,7 +895,17 @@ fn solve<M: CertificationMode>(
                 match certified {
                     Ok(certified) => return Ok(OfflineSolution { certified, report }),
                     Err(source) => {
-                        if precision == policy.max_precision {
+                        // Verification resource/configuration failures are terminal
+                        // policy outcomes: producer retries do not raise those
+                        // limits. Reserve the explicit precision-retry policy for
+                        // numerical bounds/violations, where recomputing can change
+                        // the exported candidate and its verification result.
+                        if precision == policy.max_precision
+                            || matches!(
+                                source,
+                                CertificationError::Budget(_) | CertificationError::Policy(_)
+                            )
+                        {
                             return Err(OfflineError::Certification {
                                 report: Box::new(report),
                                 source: Box::new(source),

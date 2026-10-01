@@ -1,9 +1,9 @@
 # quest-qsp
 
 Real-parity Wx and complex unit-circle quantum signal processing (QSP) in pure Rust.
-The production default uses FFT Weiss ratios and structured RHW Half-Cholesky.
-The divide-and-conquer inverse nonlinear Fourier transform (NLFT) is an explicit
-`SynthesisAlgorithm::InverseNlftDivideConquer` alternative. It produces immutable phases or
+The production and offline default is the divide-and-conquer inverse nonlinear
+Fourier transform (NLFT), `SynthesisAlgorithm::InverseNlftDivideConquer`.
+Structured RHW Half-Cholesky remains an explicit `RhwHalfCholesky` selection. It produces immutable phases or
 two-dimensional controls without requiring an installed native `QuEST` library.
 
 ## `RealParityWx` quickstart

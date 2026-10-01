@@ -338,6 +338,10 @@ impl ConvolutionWorkspace {
     /// Parallel preparation permits concurrent forward FFTs with distinct scratch.
     /// Otherwise the FFTs remain serial. Pointwise multiplication has no
     /// cross-element reduction; finite scans always use left-first index order.
+    /// Numerical work buffers are reused. Rayon's runtime may allocate external
+    /// job-queue blocks and lazy OS synchronization storage, even after earlier
+    /// calls. Batching inside `pool.install` avoids repeated external injection,
+    /// but does not promise an allocation-free multithreaded scheduler.
     ///
     /// # Errors
     /// Same shape, budget, and finite-value failures as [`Self::convolve`].

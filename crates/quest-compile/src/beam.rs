@@ -11,6 +11,8 @@ use crate::{
     OptimizerSnapshot, ParityOptions, QuantumRegion, Result, RoundingStatus, StopReason,
     StructuredTerminalError, TerminalOptions, TerminalStatus,
 };
+#[cfg(any(feature = "workers", feature = "synthesis"))]
+use crate::{ApproximateBeamPasses, MeetInTheMiddlePasses, RotationSynthesisPasses, ZxPasses};
 #[allow(unused_imports)]
 use crate::{
     BoundParityPasses, ExactPasses, LinearPasses, NumericalPasses, OracleExport, ParityPasses,
@@ -3050,6 +3052,3 @@ mod tests {
         Ok(())
     }
 }
-
-#[cfg(any(feature = "workers", feature = "synthesis"))]
-use crate::{ApproximateBeamPasses, MeetInTheMiddlePasses, RotationSynthesisPasses, ZxPasses};

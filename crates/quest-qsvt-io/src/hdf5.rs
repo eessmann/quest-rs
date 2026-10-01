@@ -828,3 +828,41 @@ fn bounded_text(value: &[u8]) -> Result<String> {
         .map_err(|_| Error::Format("non-UTF8 text attribute"))?
         .to_ascii_lowercase())
 }
+
+/// Replace a file with canonical complex128 `/matrix/dense` and shape metadata.
+/// All dimensions, finite entries and allocation limits are admitted before file creation.
+/// # Errors
+/// Rejects shape, nonfinite values and storage limits, or reports HDF5 write errors.
+pub fn write_matrix(
+    path: impl AsRef<Path>,
+    matrix: MatRef<'_, Complex64>,
+    policy: IoPolicy,
+) -> Result<()> {
+    dimensions(matrix.nrows(), matrix.ncols(), policy)?;
+    let count = matrix
+        .nrows()
+        .checked_mul(matrix.ncols())
+        .ok_or(Error::Budget("HDF5 matrix dimensions"))?;
+    let wire = complex_wire(
+        (0..matrix.nrows()).flat_map(|r| (0..matrix.ncols()).map(move |c| matrix[(r, c)])),
+        count,
+        policy,
+    )?;
+    let shape = [
+        u64::try_from(matrix.nrows()).map_err(|_| Error::Budget("matrix rows"))?,
+        u64::try_from(matrix.ncols()).map_err(|_| Error::Budget("matrix columns"))?,
+    ];
+    let file = File::create(path)?;
+    let group = file.create_group("/matrix")?;
+    group
+        .new_attr::<u64>()
+        .shape(2)
+        .create("shape")?
+        .write_raw(&shape)?;
+    file.new_dataset::<H5ppComplex64>()
+        .shape(matrix.shape())
+        .create("/matrix/dense")?
+        .write_raw(&wire)?;
+    file.flush()?;
+    Ok(())
+}

@@ -1,0 +1,5 @@
+representation,phase,iterations,nanoseconds,allocations
+dynamic,construct,10000,1054125,50000
+dynamic,value,1000000,16441833,0
+dynamic,jet,1000000,22899167,0
+dynamic,interval_jet,10000,8230584,0

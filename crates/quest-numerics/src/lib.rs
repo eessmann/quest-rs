@@ -5,6 +5,12 @@
 //! caller-selected backend; roundoff is not a certificate of an exact result.
 //! The default build and execution policy are sequential and scalar.
 
+mod contractors;
+pub use contractors::{
+    ContractorLimits, ContractorMethod, ContractorOutcome, ContractorResult,
+    VectorContractorResult, extended_newton, krawczyk, scalar_hansen_sengupta,
+    vector_hansen_sengupta,
+};
 mod fft;
 mod interval;
 pub mod observer;

@@ -30,6 +30,7 @@ unsafe impl GlobalAlloc for CountingAllocator {
 )]
 fn warmed_scalar_interval_and_derivative_evaluation_allocate_nothing() -> Result<()> {
     let function = function!(|x| (x.clone() * x + 1.0).ln());
+    let typed = quest_polynomial::typed_function!(|x| (x * x + 1.0).ln());
     let polynomial = Polynomial::new(
         Chebyshev,
         vec![Complex64::new(0.3, 0.0); 32],
@@ -42,6 +43,10 @@ fn warmed_scalar_interval_and_derivative_evaluation_allocate_nothing() -> Result
             std::hint::black_box(function.jet(0.3)?);
             std::hint::black_box(function.evaluate_interval(interval)?);
             std::hint::black_box(function.jet_interval(interval)?);
+            std::hint::black_box(typed.evaluate(0.3)?);
+            std::hint::black_box(typed.jet(0.3)?);
+            std::hint::black_box(typed.evaluate_interval(interval)?);
+            std::hint::black_box(typed.jet_interval(interval)?);
             std::hint::black_box(polynomial.evaluate_real(0.3)?);
             std::hint::black_box(polynomial.jet_interval(interval)?);
         }

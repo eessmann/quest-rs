@@ -52,7 +52,7 @@ impl NativeSynthesis {
 }
 impl RotationGenerator for NativeSynthesis {
     fn algorithm(&self) -> &'static str {
-        "ross-selinger-rust-v1"
+        quest_synthesis::ROTATION_ALGORITHM
     }
     fn synthesize_rotation(
         &self,

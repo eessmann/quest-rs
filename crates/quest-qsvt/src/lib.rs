@@ -2,6 +2,8 @@
 #![doc = include_str!("../README.md")]
 
 pub mod analysis;
+mod pauli;
+pub use pauli::{PauliDecomposition, PauliLimits, decompose_pauli};
 mod dense;
 mod encoding;
 mod materialize;
