@@ -45,7 +45,41 @@ precision and deprecated APIs disabled. Pure circuit and macro builds need
 neither QuEST nor libclang nor external BLAS. The full workspace also builds
 the QSVT application and requires **serial HDF5**; parallel HDF5 is rejected.
 
-The standalone [devenv](devenv.nix) provisions the configured Rust toolchain,
+Build directly with installed packages. For a Linux installation using
+GCC 16, CUDA 13.4 and system MPICH, select QuEST in Fish:
+
+```fish
+set -gxa --path CMAKE_PREFIX_PATH /path/to/installed/quest/lib64/cmake/QuEST
+cargo build --workspace --locked
+cargo run --locked --example minimal
+```
+
+Replace `/path/to/...` placeholders with your installation locations.
+
+System serial HDF5 is detected from standard Linux installation paths, including
+Fedora's `H5pubconf-64.h` header layout. To select Homebrew's serial HDF5 when it
+is installed, also append its pkg-config path before building:
+
+```fish
+set -gxa --path PKG_CONFIG_PATH /path/to/installed/hdf5/lib/pkgconfig/
+```
+
+These settings append to the existing package search paths, including system
+MPICH. The default system `cc` and `c++` use GCC 16; no compiler override is
+needed. The installed QuEST library resolves its dependencies through its own
+runtime paths, so `LD_LIBRARY_PATH` is unnecessary. Run the workspace validation
+commands below in this native environment.
+
+For other installations, select package roots explicitly:
+
+```sh
+export QUEST_ROOT=/path/to/installed/quest
+export HDF5_DIR=/path/to/installed/serial-hdf5
+cargo build --workspace --locked
+cargo run --locked --example minimal
+```
+
+The optional standalone [devenv](devenv.nix) provisions the configured Rust toolchain,
 compiler, CMake, libclang, serial HDF5 and an installed shared CPU/OpenMP QuEST
 package without MPI or GPU. Its inputs are pinned in `devenv.lock`, including
 `eessmann/QuEST`'s `cmake-packaging` source at commit `5035520`. From the
@@ -62,15 +96,6 @@ The shell selects the built package with `QUEST_ROOT` and serial HDF5 with
 source lock. If native shell integration is already configured, `devenv allow`
 can activate it in this directory; no `.envrc` is required. Run the workspace
 validation commands below from the shell to test more than the minimal example.
-
-A separately installed QuEST package remains supported:
-
-```sh
-export QUEST_ROOT=/path/to/installed/quest
-export HDF5_DIR=/path/to/installed/serial-hdf5
-cargo build --workspace --locked
-cargo run --locked --example minimal
-```
 
 For ARM64 Grace Hopper nodes using manual/Spack dependencies, follow the
 [no-Nix setup and GPU validation recipe](docs/grace-hopper.md). Select the

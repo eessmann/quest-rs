@@ -20,7 +20,7 @@
 ✓ Running devenv:enterTest in 230ns (no command)
 ✓ Running tasks in 17.5ms
     Blocking waiting for file lock on build directory
-   Compiling quest-optimizer-worker v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-worker)
+   Compiling quest-optimizer-worker v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-optimizer-worker)
 error[E0599]: no method named `synthesize_rotations` found for struct `QuantumRegion` in the current scope
    --> crates/quest-optimizer-worker/tests/circuit_contract.rs:29:14
     |

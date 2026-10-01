@@ -1,1 +1,1 @@
-env QUEST_TUTORIAL_WORKER=/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/target/debug/quest-optimizer-worker cargo test --locked -p quest-rs --features workers --test structured_workers -- --test-threads=1 
+env QUEST_TUTORIAL_WORKER=/path/to/validation/architecture-synthesis/source/target/debug/quest-optimizer-worker cargo test --locked -p quest-rs --features workers --test structured_workers -- --test-threads=1

@@ -7,7 +7,7 @@ For current setup, use the [build guide](../../README.md#build).
 
 ## Native configuration and initial failure
 
-The installation is `/var/home/erich/Projects/opt/quest`, QuEST **4.3.0**, shared,
+The installation is `/path/to/installed/quest`, QuEST **4.3.0**, shared,
 binary64, deprecated APIs disabled. Its enabled features include OpenMP, MPI,
 subcommunicators, CUDA, cuQuantum and BMI2; HIP, ADIOS2 and NUMA are disabled.
 The existing native build uses GCC 15 and MPICH 5.0.1; the Rust CXX bridge uses
@@ -73,8 +73,8 @@ The historical checks used pinned `nightly-2026-09-06` and:
 ```sh
 unset QUEST_NATIVE_CONFIG QUEST_RUNTIME_LIBRARY_PATH
 unset LD_LIBRARY_PATH LD_PRELOAD LD_AUDIT
-export QUEST_ROOT=/var/home/erich/Projects/opt/quest
-export CARGO_TARGET_DIR=/var/home/erich/Projects/quest-rs/target
+export QUEST_ROOT=/path/to/installed/quest
+export CARGO_TARGET_DIR=/path/to/quest-rs/target
 export CARGO_BUILD_JOBS=4
 ```
 
@@ -155,7 +155,7 @@ The complete workspace suite also passed using the relocated CPU package at
 ignore**. This package is QuEST 4.3.0, binary64, deprecated APIs disabled, with
 GPU, MPI and OpenMP disabled. The Rust source was unchanged by this verification.
 
-A subsequent native installation appeared at `/var/home/erich/Projects`.
+A subsequent native installation appeared at `/home/user/Projects`.
 Its `lib64/libQuEST.so.4.3.0` had only `$ORIGIN/` RUNPATH; loader inspection could
 not resolve cuStateVec, cuBLAS/cuBLASLt or MPICH. The test runner consequently
 could not enumerate native tests against that installation. This is a new native
@@ -168,7 +168,7 @@ can load without loader environment variables.
 
 The loader failure above was resolved by repairing the native installation.
 Rust source at `fcdcf0c` was revalidated against
-`QUEST_ROOT=/var/home/erich/Projects`. The native repository was at `adfd00d6`;
+`QUEST_ROOT=/home/user/Projects`. The native repository was at `adfd00d6`;
 its build cache records `CMAKE_INSTALL_RPATH_USE_LINK_PATH=ON`. Installed headers
 report QuEST 4.3.0, binary64, deprecated APIs disabled, and CUDA, cuQuantum, MPI,
 OpenMP, subcommunicators and BMI2 enabled. The installed NUMA flag remains off.

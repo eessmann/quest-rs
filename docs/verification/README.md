@@ -26,8 +26,11 @@ and [correctness regressions](2026-09-28-optimization-roadmap-review.md) link
 technical contracts to source and tests.
 
 Numerical results and compact environment/check summaries live under `data/`.
-Complete historical captures remain available in Git history. Local paths and
-compiler versions identify the measured setup; they are not portable defaults.
+Complete historical captures remain available in Git history. Published local
+paths and user identifiers are replaced with generic placeholders, including
+in logs and environment summaries. Commands retain their options and results;
+recorded hashes identify the original captures. Compiler versions describe the
+measured setup and are not portable defaults.
 Numerical comparisons, mathematical certificates and timing measurements answer
 different questions, and each record states its scope and limitations.
 

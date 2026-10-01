@@ -26,10 +26,10 @@
    Compiling num-bigint v0.5.1
    Compiling getrandom v0.4.3
    Compiling tempfile v3.27.0
-   Compiling quest-math v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-math)
-   Compiling quest-synthesis v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-synthesis)
-   Compiling quest-optimizer-protocol v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-protocol)
-   Compiling quest-optimizer-client v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-client)
+   Compiling quest-math v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-math)
+   Compiling quest-synthesis v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-synthesis)
+   Compiling quest-optimizer-protocol v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-optimizer-protocol)
+   Compiling quest-optimizer-client v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-optimizer-client)
     Finished `test` profile [unoptimized + debuginfo] target(s) in 7.00s
      Running unittests src/lib.rs (target/debug/build/quest-optimizer-client/d8a8d98425d73452/out/quest_optimizer_client-d8a8d98425d73452)
 

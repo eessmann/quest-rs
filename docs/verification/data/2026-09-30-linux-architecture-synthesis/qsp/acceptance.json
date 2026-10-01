@@ -5,7 +5,7 @@
   "platform": "x86_64-linux",
   "machine": "AMD Ryzen 9 7950X, 16 cores / 32 logical CPUs",
   "cargo_build_jobs": 3,
-  "isolated_source": "/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source",
+  "isolated_source": "/path/to/validation/architecture-synthesis/source",
   "source_manifest": "qsp-source.sha256",
   "source_edits": "None by QSP validation agent; complete initial manifest and other validation deltas are maintained in the central Linux receipt.",
   "driver_exit": 0,

@@ -27,7 +27,7 @@ Bash and project `devenv shell`. No login configuration or installed system prof
 was changed.
 
 The remote export is under
-`/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source`.
+`/path/to/validation/architecture-synthesis/source`.
 Receipts retain exact commands, exit statuses and logs. Long numerical test timings
 were observed during validation with other activity on the host; they are not
 isolated performance measurements or cross-platform speedup claims.

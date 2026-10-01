@@ -19,14 +19,14 @@ CPU, local, single-thread native execution even if QuEST supports MPI/CUDA.
 Example from the Rust workspace root (adjust dependency locations):
 
 ```sh
-reference_checkout=/var/home/erich/Projects/quest-qsvt
+reference_checkout=/path/to/quest-qsvt
 reference_dependencies="$reference_checkout/out/build/audit-gcc-release/vcpkg_installed/x64-linux"
 cmake -S benchmarks/reference -B /tmp/quest-qsvt-execution-reference -G Ninja \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ \
   -DREFERENCE_SOURCE="$reference_checkout" \
   -DREFERENCE_CPM_BOOTSTRAP="$reference_checkout/out/build/audit-gcc-release/cmake/CPM_0.42.0.cmake" \
-  -DCMAKE_PREFIX_PATH="$reference_dependencies;/var/home/erich/Projects/opt/hpx-qsp-node-local-release;/var/home/erich/Projects/opt/quest;/var/home/erich/Projects/vcpkg/packages/mimalloc_x64-linux" \
+  -DCMAKE_PREFIX_PATH="$reference_dependencies;/path/to/installed/hpx;/path/to/installed/quest;/path/to/vcpkg/packages/mimalloc_x64-linux" \
   -Dautodiff_DIR="$reference_checkout/extern/autodiff/lib/cmake/autodiff" \
   -Dh5pp_DIR="$reference_checkout/extern/h5pp/lib/cmake/h5pp" \
   -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON -DHDF5_USE_STATIC_LIBRARIES=ON

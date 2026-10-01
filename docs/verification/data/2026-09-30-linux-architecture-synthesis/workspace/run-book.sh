@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -uo pipefail
-export PATH="/home/erich/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH"
-cd /home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source
+export PATH="/home/user/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH"
+cd /path/to/validation/architecture-synthesis/source
 printf '%s\n' 'nix shell github:NixOS/nixpkgs/6774f7bc253789b113a4f39285dc0fa100abeacc#mdbook --command mdbook build docs/book' > ../receipts/final-book.command
 date -u +%FT%TZ > ../receipts/final-book.started
 nix shell github:NixOS/nixpkgs/6774f7bc253789b113a4f39285dc0fa100abeacc#mdbook --command mdbook build docs/book > ../receipts/final-book.log 2>&1

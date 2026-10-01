@@ -24,17 +24,17 @@
    Compiling faer v0.24.4
    Compiling num-bigint v0.5.1
    Compiling num-rational v0.4.2
-   Compiling quest-math v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-math)
-   Compiling quest-symbolic v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-symbolic)
-   Compiling quest-optimizer-protocol v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-protocol)
-   Compiling quest-synthesis v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-synthesis)
-   Compiling quest-optimizer-worker v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-worker)
-   Compiling quest-optimizer-client v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-client)
-   Compiling quest-language v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-language)
-   Compiling quest-qasm v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-qasm)
-   Compiling quest-compile v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-compile)
-   Compiling quest-macros v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-macros)
-   Compiling quest-circuit v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-circuit)
+   Compiling quest-math v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-math)
+   Compiling quest-symbolic v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-symbolic)
+   Compiling quest-optimizer-protocol v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-optimizer-protocol)
+   Compiling quest-synthesis v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-synthesis)
+   Compiling quest-optimizer-worker v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-optimizer-worker)
+   Compiling quest-optimizer-client v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-optimizer-client)
+   Compiling quest-language v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-language)
+   Compiling quest-qasm v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-qasm)
+   Compiling quest-compile v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-compile)
+   Compiling quest-macros v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-macros)
+   Compiling quest-circuit v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-circuit)
     Finished `test` profile [unoptimized + debuginfo] target(s) in 15.23s
      Running unittests src/main.rs (target/debug/build/quest-optimizer-worker/fb6d25e15fa5cd99/out/quest_optimizer_worker-fb6d25e15fa5cd99)
 

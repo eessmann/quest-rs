@@ -25,7 +25,8 @@ On Darwin, `SDKROOT` must name an absolute installed macOS SDK; when absent,
 `CMAKE_OSX_SYSROOT` and shared with binding generation together with the evaluated
 compiler implicit system includes. Global `CXX` can select a Nix compiler wrapper;
 per-target compiler and header-search overrides remain rejected. Compiler target
-checks normalize Clang `arm64` to Rust `aarch64` on Darwin.
+checks normalize Clang `arm64` to Rust `aarch64` on Darwin and accept Red Hat's
+`<arch>-redhat-linux` spelling for native GNU/Linux GCC.
 
 For manual/Spack Linux builds, select a Rust target linker from the same GCC
 installation as `CXX`; loading Spack's `gcc` may leave the system `cc` unchanged.
@@ -90,7 +91,10 @@ package selection and compiler configuration. Linux executables use ordinary
 `DT_RUNPATH`; Darwin executables receive one Mach-O `LC_RPATH` per absolute
 direct-library directory. Evaluated `.dylib` files retain their exact filename,
 and framework pairs preserve library order. The serial HDF5 helper selects
-`libhdf5.dylib` on Darwin while retaining its parallel-HDF5 rejection.
+`libhdf5.dylib` on Darwin and recognizes standard Linux serial installations
+without pkg-config metadata, including Fedora's `H5pubconf-64.h` layout. It
+retains its parallel-HDF5 rejection and matches the locked HDF5 dependency's
+discovery order.
 Indirect dependency deployment is the native installation's
 responsibility. Unsupported linker-state constructs produce an error instead of
 silently changing link semantics.

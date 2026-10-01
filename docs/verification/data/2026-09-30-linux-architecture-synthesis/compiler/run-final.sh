@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -uo pipefail
-export PATH=/home/erich/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/usr/bin:/bin
+export PATH=/home/user/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/usr/bin:/bin
 export CARGO_BUILD_JOBS=3
-cd /home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source
+cd /path/to/validation/architecture-synthesis/source
 run() {
  label=$1; shift
  printf '%q ' "$@" > "../compiler/$label.command"; printf '\n' >> "../compiler/$label.command"

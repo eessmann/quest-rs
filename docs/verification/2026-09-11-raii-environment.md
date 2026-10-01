@@ -49,7 +49,7 @@ workspace lint-policy changes were needed. Two unwind tests have scoped
 ## Configuration and commands
 
 Verified on Linux x86_64 GNU using pinned `nightly-2026-09-06` and the installed
-QuEST **4.3.0** package at `/var/home/erich/Projects/opt/quest`. The package is
+QuEST **4.3.0** package at `/path/to/installed/quest`. The package is
 binary64 with deprecated APIs disabled; CUDA, cuQuantum, MPI, OpenMP,
 subcommunicators and BMI2 are enabled. The bridge compiler is `/usr/bin/c++`.
 No native installation or native source changes were made.
@@ -59,8 +59,8 @@ The checks used:
 ```sh
 unset QUEST_NATIVE_CONFIG QUEST_RUNTIME_LIBRARY_PATH
 unset LD_LIBRARY_PATH LD_PRELOAD LD_AUDIT LIBRARY_PATH
-export QUEST_ROOT=/var/home/erich/Projects/opt/quest
-export CARGO_TARGET_DIR=/var/home/erich/Projects/quest-rs/target
+export QUEST_ROOT=/path/to/installed/quest
+export CARGO_TARGET_DIR=/path/to/quest-rs/target
 export CARGO_BUILD_JOBS=4
 export QUEST_TUTORIAL_WORKER="$CARGO_TARGET_DIR/debug/quest-optimizer-worker"
 ```

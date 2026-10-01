@@ -4,10 +4,10 @@
 ✓ Running devenv:enterShell in 24.8ms
 • Running devenv:enterTest
 ✓ Running devenv:enterTest in 750ns (no command)
-   Compiling quest-synthesis v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-synthesis)
-   Compiling quest-optimizer-client v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-optimizer-client)
-   Compiling quest-compile v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-compile)
-   Compiling quest-circuit v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-circuit)
+   Compiling quest-synthesis v0.1.0 (/path/to/quest-rs/crates/quest-synthesis)
+   Compiling quest-optimizer-client v0.1.0 (/path/to/quest-rs/crates/quest-optimizer-client)
+   Compiling quest-compile v0.1.0 (/path/to/quest-rs/crates/quest-compile)
+   Compiling quest-circuit v0.1.0 (/path/to/quest-rs/crates/quest-circuit)
     Finished `test` profile [unoptimized + debuginfo] target(s) in 4.28s
      Running tests/generator_error_contract.rs (target/debug/build/quest-circuit/eb87138843fdbf3f/out/generator_error_contract-eb87138843fdbf3f)
 

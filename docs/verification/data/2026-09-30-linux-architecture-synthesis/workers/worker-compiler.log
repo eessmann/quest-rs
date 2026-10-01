@@ -35,21 +35,21 @@
    Compiling gemm-f64 v0.19.0
    Compiling zerocopy v0.8.57
    Compiling gemm v0.19.0
-   Compiling quest-math v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-math)
+   Compiling quest-math v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-math)
    Compiling cc v1.4.2
    Compiling petgraph v0.8.3
-   Compiling quest-symbolic v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-symbolic)
+   Compiling quest-symbolic v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-symbolic)
    Compiling faer v0.24.4
    Compiling toml_edit v0.25.13+spec-1.1.0
    Compiling half v2.7.1
    Compiling alloca v0.4.0
-   Compiling quest-synthesis v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-synthesis)
-   Compiling quest-optimizer-protocol v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-protocol)
+   Compiling quest-synthesis v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-synthesis)
+   Compiling quest-optimizer-protocol v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-optimizer-protocol)
    Compiling winnow v1.0.4
    Compiling ciborium-ll v0.2.2
    Compiling tempfile v3.27.0
    Compiling clap_builder v4.6.6
-   Compiling quest-optimizer-client v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-client)
+   Compiling quest-optimizer-client v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-optimizer-client)
    Compiling toml_parser v1.1.3+spec-1.1.0
    Compiling proc-macro-crate v3.5.0
    Compiling ppv-lite86 v0.2.21
@@ -63,11 +63,11 @@
    Compiling proptest v1.11.0
    Compiling trybuild v1.0.121
    Compiling criterion v0.8.2
-   Compiling quest-language v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-language)
-   Compiling quest-qasm v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-qasm)
-   Compiling quest-compile v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-compile)
-   Compiling quest-macros v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-macros)
-   Compiling quest-circuit v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-circuit)
+   Compiling quest-language v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-language)
+   Compiling quest-qasm v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-qasm)
+   Compiling quest-compile v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-compile)
+   Compiling quest-macros v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-macros)
+   Compiling quest-circuit v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-circuit)
 error[E0432]: unresolved import `quest_optimizer_client`
  --> crates/quest-circuit/tests/worker_contract.rs:7:5
   |

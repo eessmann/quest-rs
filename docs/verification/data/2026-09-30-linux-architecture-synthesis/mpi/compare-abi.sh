@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -uo pipefail
-base=/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d
+base=/path/to/validation/architecture-synthesis
 cd "$base/source"
 receipt="$base/mpi"
 : > "$receipt/abi-comparison.log"

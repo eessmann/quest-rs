@@ -1,9 +1,9 @@
    Compiling link-cplusplus v1.0.12
     Checking criterion v0.8.2
-    Checking quest-qsp v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-qsp)
+    Checking quest-qsp v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-qsp)
    Compiling cxx v1.0.198
-   Compiling quest-sys v0.2.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-sys)
+   Compiling quest-sys v0.2.0 (/path/to/validation/architecture-synthesis/source/crates/quest-sys)
 warning: quest-sys@0.2.0: Using QuEST 4.3.0 from /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0 with /nix/store/z4c6k0mrlkwl3s4w9ysxc8vq1wylm3ms-gcc-wrapper-15.3.0/bin/g++
 warning: quest-sys@0.2.0: Verified rsmpi MPICC /nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/bin/mpicc matches QuEST MPI ABI and loaded library
-   Compiling quest-rs v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest)
+   Compiling quest-rs v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest)
     Finished `dev` profile [unoptimized + debuginfo] target(s) in 10.52s

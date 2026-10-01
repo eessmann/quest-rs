@@ -34,8 +34,8 @@ The environment matches the implementation record: Linux x86_64, pinned
 The checks used:
 
 ```sh
-export QUEST_ROOT=/var/home/erich/Projects/opt/quest
-export MPICC=/home/linuxbrew/.linuxbrew/bin/mpicc
+export QUEST_ROOT=/path/to/installed/quest
+export MPICC=/path/to/mpich/bin/mpicc
 export MPICH_CC=/usr/bin/gcc
 export HDF5_DIR=/path/to/serial-hdf5-1.14.6
 export CARGO_BUILD_JOBS=2

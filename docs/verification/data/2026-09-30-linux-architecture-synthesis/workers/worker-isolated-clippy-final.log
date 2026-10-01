@@ -50,12 +50,12 @@
     Checking regex-syntax v0.8.11
     Checking linux-raw-sys v0.12.1
     Checking rustix v1.1.4
-    Checking quest-math v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-math)
+    Checking quest-math v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-math)
     Checking regex-automata v0.4.18
     Checking gemm-common v0.19.0
     Checking nano-gemm-core v0.2.1
-    Checking quest-synthesis v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-synthesis)
-    Checking quest-optimizer-protocol v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-protocol)
+    Checking quest-synthesis v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-synthesis)
+    Checking quest-optimizer-protocol v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-optimizer-protocol)
    Compiling dirs-sys-next v0.1.2
    Compiling parking_lot_core v0.9.12
    Compiling dirs-next v2.0.0
@@ -87,7 +87,7 @@
    Compiling gemm-f64 v0.19.0
    Compiling lalrpop-util v0.19.12
    Compiling gemm-f32 v0.19.0
-    Checking quest-optimizer-client v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-client)
+    Checking quest-optimizer-client v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-optimizer-client)
    Compiling qd v0.8.0
    Compiling nano-gemm-c32 v0.2.1
    Compiling nano-gemm-c64 v0.2.1
@@ -121,7 +121,7 @@
     Checking getrandom v0.2.17
    Compiling fixedbitset v0.5.7
    Compiling petgraph v0.8.3
-   Compiling quest-symbolic v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-symbolic)
+   Compiling quest-symbolic v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-symbolic)
     Checking rand_core v0.6.4
    Compiling faer v0.24.4
     Checking rayon-core v1.13.0
@@ -175,10 +175,10 @@
     Checking backtrace v0.3.76
     Checking color-eyre v0.6.5
     Checking quizx v0.3.0
-    Checking quest-optimizer-worker v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-worker)
-    Checking quest-language v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-language)
-    Checking quest-qasm v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-qasm)
-    Checking quest-compile v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-compile)
-   Compiling quest-macros v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-macros)
-    Checking quest-circuit v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-circuit)
+    Checking quest-optimizer-worker v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-optimizer-worker)
+    Checking quest-language v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-language)
+    Checking quest-qasm v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-qasm)
+    Checking quest-compile v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-compile)
+   Compiling quest-macros v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-macros)
+    Checking quest-circuit v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-circuit)
     Finished `dev` profile [unoptimized + debuginfo] target(s) in 21.56s

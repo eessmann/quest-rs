@@ -1,7 +1,7 @@
 # Linux worker and process acceptance
 
 These receipts were collected from the authorized isolated Bazzite x86_64
-checkout at `/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source`.
+checkout at `/path/to/validation/architecture-synthesis/source`.
 The final source is bound by the parent [826-file validation manifest](../validation-source-manifest.json),
 SHA256 `59f8829a64737a6ea9a68c91ca8ebeaa5fb182b4bfc179988ada3de80798a184`.
 [synthesis-final-overlay.sha256](synthesis-final-overlay.sha256) records the eight

@@ -20,7 +20,7 @@
 ✓ Running devenv:enterTest in 3.16µs (no command)
 ✓ Running tasks in 13.9ms
     Blocking waiting for file lock on build directory
-   Compiling quest-optimizer-worker v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-worker)
+   Compiling quest-optimizer-worker v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-optimizer-worker)
     Finished `test` profile [unoptimized + debuginfo] target(s) in 14.39s
      Running unittests src/main.rs (target/debug/build/quest-optimizer-worker/3779e7663366f5ac/out/quest_optimizer_worker-3779e7663366f5ac)
 

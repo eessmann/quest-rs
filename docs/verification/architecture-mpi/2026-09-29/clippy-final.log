@@ -4,18 +4,18 @@
 ✓ Running devenv:enterShell in 44.6ms
 • Running devenv:enterTest
 ✓ Running devenv:enterTest in 541ns (no command)
-    Checking quest-math v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-math)
-    Checking quest-language v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-language)
-   Compiling quest-sys v0.2.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-sys)
-    Checking quest-synthesis v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-synthesis)
-    Checking quest-optimizer-protocol v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-optimizer-protocol)
-    Checking quest-optimizer-client v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-optimizer-client)
-    Checking quest-qasm v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-qasm)
-    Checking quest-compile v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-compile)
-   Compiling quest-macros v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-macros)
-    Checking quest-circuit v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-circuit)
-    Checking quest-qsvt v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-qsvt)
+    Checking quest-math v0.1.0 (/path/to/quest-rs/crates/quest-math)
+    Checking quest-language v0.1.0 (/path/to/quest-rs/crates/quest-language)
+   Compiling quest-sys v0.2.0 (/path/to/quest-rs/crates/quest-sys)
+    Checking quest-synthesis v0.1.0 (/path/to/quest-rs/crates/quest-synthesis)
+    Checking quest-optimizer-protocol v0.1.0 (/path/to/quest-rs/crates/quest-optimizer-protocol)
+    Checking quest-optimizer-client v0.1.0 (/path/to/quest-rs/crates/quest-optimizer-client)
+    Checking quest-qasm v0.1.0 (/path/to/quest-rs/crates/quest-qasm)
+    Checking quest-compile v0.1.0 (/path/to/quest-rs/crates/quest-compile)
+   Compiling quest-macros v0.1.0 (/path/to/quest-rs/crates/quest-macros)
+    Checking quest-circuit v0.1.0 (/path/to/quest-rs/crates/quest-circuit)
+    Checking quest-qsvt v0.1.0 (/path/to/quest-rs/crates/quest-qsvt)
 warning: quest-sys@0.2.0: Using QuEST 4.3.0 from /nix/store/9zfxh0j6dngfdaj972bxfcd9mm44cnjc-quest-mpi-validation-4.3.0 with /nix/store/2yfrcmkvspsrjhj283gdawqp37aghxva-clang-wrapper-21.1.8/bin/clang++
 warning: quest-sys@0.2.0: Verified rsmpi MPICC /nix/store/rdalrrvgqig1hz05ma3j8ws07fnc8s6l-openmpi-5.0.10-dev/bin/mpicc matches QuEST MPI ABI and loaded library
-   Compiling quest-rs v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest)
+   Compiling quest-rs v0.1.0 (/path/to/quest-rs/crates/quest)
     Finished `dev` profile [unoptimized + debuginfo] target(s) in 35.99s

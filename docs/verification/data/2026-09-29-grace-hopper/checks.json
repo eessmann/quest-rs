@@ -168,7 +168,7 @@
         "--backends",
         "cpu,omp,gpu",
         "--work-dir",
-        "/work/erich/Projects/quest-rs/target/grace-hopper-consumers-final"
+        "/path/to/quest-rs/target/grace-hopper-consumers-final"
       ],
       "exit_code": 0
     },
@@ -246,7 +246,7 @@
     },
     {
       "command": [
-        "/work/erich/Projects/quest-rs/target/grace-hopper-consumers-final/target/debug/quest-consumer-direct",
+        "/path/to/quest-rs/target/grace-hopper-consumers-final/target/debug/quest-consumer-direct",
         "gpu",
         "sv"
       ],
@@ -262,7 +262,7 @@
     },
     {
       "command": [
-        "/work/erich/Projects/quest-rs/target/grace-hopper-consumers-final/target/debug/quest-consumer-facade",
+        "/path/to/quest-rs/target/grace-hopper-consumers-final/target/debug/quest-consumer-facade",
         "gpu"
       ],
       "exit_code": 1,

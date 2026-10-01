@@ -9,6 +9,9 @@ are retained. The tables below use the 2026-09-30 rerun after the Linux search,
 resource-accounting and compiler-selection corrections; the measurements themselves
 were made on macOS. The source manifest binds them to the reviewed correction.
 
+Local checkout paths in archived logs use generic placeholders. Numerical
+measurements and recorded hashes retain their original values.
+
 ## Reproduction
 
 From the repository root:

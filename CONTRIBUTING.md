@@ -5,12 +5,12 @@
 Use the rolling nightly in `rust-toolchain.toml`, CMake 3.28+, a C++20 compiler,
 and an installed QuEST 4.3.x package with binary64 precision and deprecated APIs
 disabled. The full workspace also needs serial HDF5. See the
-[build instructions](README.md#build) for the Nix shell and manual package
-selection, or the [Grace Hopper guide](docs/grace-hopper.md) for manual/Spack
+[build instructions](README.md#build) for installed packages and the optional Nix
+shell, or the [Grace Hopper guide](docs/grace-hopper.md) for manual/Spack
 dependencies and CUDA.
 
-Run commands from the repository root inside `devenv shell` or a configured
-manual environment. Record `rustc -Vv` and the native configuration with
+Run commands from the repository root in a configured native environment or
+the optional `devenv shell`. Record `rustc -Vv` and the native configuration with
 validation results. Linux GNU and aarch64/x86_64 Darwin need separate native
 validation; the optional optimizer process client is Linux-only.
 
@@ -49,6 +49,19 @@ Nextest does not run doctests; run them separately. Native consumer checks
 default to CPU. Use `--backends cpu,omp,gpu` when those native backends and host
 devices are available. Run the feature combinations affected by a change; MPI
 requires an MPI/SUBCOMM-enabled QuEST installation.
+
+For an MPICH installation, select its compiler wrapper explicitly
+before running the MPI integration tests:
+
+```fish
+set -gx MPICC /path/to/mpich/bin/mpicc
+cargo nextest run -p quest-sys --features mpi --test mpi --locked
+```
+
+Replace the placeholder with the wrapper from the MPI installation used by QuEST.
+
+MPI tests require local networking, including the two- and four-rank subprocess
+tests; run them outside a sandbox that blocks local MPI communication.
 
 Use `googletest` with `#[gtest]` for runtime assertions and build-helper
 regressions; compile-fail harnesses use `#[test]`. Name tests after behavior,

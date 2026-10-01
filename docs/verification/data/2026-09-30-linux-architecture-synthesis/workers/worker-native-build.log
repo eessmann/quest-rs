@@ -42,12 +42,12 @@
    Compiling tempfile v3.27.0
    Compiling ascii-canvas v3.0.0
    Compiling string_cache v0.8.9
-   Compiling quest-math v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-math)
+   Compiling quest-math v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-math)
    Compiling color-eyre v0.6.5
    Compiling lalrpop v0.19.12
-   Compiling quest-optimizer-protocol v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-protocol)
-   Compiling quest-synthesis v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-synthesis)
+   Compiling quest-optimizer-protocol v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-optimizer-protocol)
+   Compiling quest-synthesis v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-synthesis)
    Compiling openqasm v0.1.2
    Compiling quizx v0.3.0
-   Compiling quest-optimizer-worker v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-worker)
+   Compiling quest-optimizer-worker v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-optimizer-worker)
     Finished `dev` profile [unoptimized + debuginfo] target(s) in 22.43s

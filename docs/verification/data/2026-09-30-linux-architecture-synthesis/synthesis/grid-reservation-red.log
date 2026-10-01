@@ -4,7 +4,7 @@
 ✓ Running devenv:enterShell in 23.6ms
 • Running devenv:enterTest
 ✓ Running devenv:enterTest in 541ns (no command)
-   Compiling quest-synthesis v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-synthesis)
+   Compiling quest-synthesis v0.1.0 (/path/to/quest-rs/crates/quest-synthesis)
     Finished `test` profile [unoptimized + debuginfo] target(s) in 0.93s
      Running tests/resources.rs (target/debug/build/quest-synthesis/8b2970aec9bf13a9/out/resources-8b2970aec9bf13a9)
 

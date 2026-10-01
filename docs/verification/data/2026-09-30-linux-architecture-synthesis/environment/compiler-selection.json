@@ -41,7 +41,7 @@
     },
     {
       "name": "Linux native consumers",
-      "command": "devenv shell -- cargo run --locked -p xtask -- check-native-consumers --backends cpu,omp --work-dir /home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/receipts/qsp-compiler-consumers",
+      "command": "devenv shell -- cargo run --locked -p xtask -- check-native-consumers --backends cpu,omp --work-dir /path/to/validation/architecture-synthesis/receipts/qsp-compiler-consumers",
       "exit_code": 0,
       "log": "qsp-compiler-candidate-consumers.log.gz",
       "result": "Direct, facade, wrapped, renamed CPU/OpenMP numerical/deployment checks and RUNPATH/native closure passed."

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -uo pipefail
 export CARGO_BUILD_JOBS=6
-cd /home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source
+cd /path/to/validation/architecture-synthesis/source
 failed=0
 run_check() {
     label="acceptance-$1"

@@ -122,7 +122,7 @@
    Compiling proc-macro-crate v3.5.0
    Compiling lalrpop-util v0.19.12
    Compiling ascii-canvas v3.0.0
-   Compiling quest-math v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-math)
+   Compiling quest-math v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-math)
    Compiling gemm-c64 v0.19.0
    Compiling gemm-c32 v0.19.0
    Compiling gemm-f64 v0.19.0
@@ -164,13 +164,13 @@
    Compiling object v0.37.3
    Compiling petgraph v0.8.3
    Compiling logos-derive v0.12.1
-   Compiling quest-symbolic v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-symbolic)
+   Compiling quest-symbolic v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-symbolic)
    Compiling rand_core v0.6.4
    Compiling faer v0.24.4
    Compiling ppv-lite86 v0.2.21
    Compiling futures-executor v0.3.34
-   Compiling quest-synthesis v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-synthesis)
-   Compiling quest-optimizer-protocol v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-protocol)
+   Compiling quest-synthesis v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-synthesis)
+   Compiling quest-optimizer-protocol v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-optimizer-protocol)
    Compiling crypto-common v0.2.2
    Compiling block-buffer v0.12.1
    Compiling openqasm v0.1.2
@@ -217,7 +217,7 @@
    Compiling clap v4.6.6
    Compiling rand v0.8.8
    Compiling env_logger v0.11.11
-   Compiling quest-optimizer-client v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-client)
+   Compiling quest-optimizer-client v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-optimizer-client)
    Compiling itertools v0.13.0
    Compiling approx v0.5.1
    Compiling roots v0.0.8
@@ -227,14 +227,14 @@
    Compiling googletest_macro v0.14.3
    Compiling googletest v0.14.3
    Compiling quizx v0.3.0
-   Compiling quest-language v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-language)
-   Compiling quest-optimizer-worker v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-worker)
-   Compiling quest-qasm v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-qasm)
-   Compiling quest-macros v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-macros)
-   Compiling quest-compile v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-compile)
-   Compiling quest-circuit v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-circuit)
+   Compiling quest-language v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-language)
+   Compiling quest-optimizer-worker v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-optimizer-worker)
+   Compiling quest-qasm v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-qasm)
+   Compiling quest-macros v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-macros)
+   Compiling quest-compile v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-compile)
+   Compiling quest-circuit v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-circuit)
     Finished `release` profile [optimized] target(s) in 45.05s
-     Running tests/synthesis_process.rs (/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/worker-target/release/build/quest-optimizer-worker/1cb7aa300bac3ab7/out/synthesis_process-1cb7aa300bac3ab7)
+     Running tests/synthesis_process.rs (/path/to/validation/architecture-synthesis/worker-target/release/build/quest-optimizer-worker/1cb7aa300bac3ab7/out/synthesis_process-1cb7aa300bac3ab7)
 
 running 1 test
 test fixed_exact_phase_sequence_survives_the_bounded_process ... ok

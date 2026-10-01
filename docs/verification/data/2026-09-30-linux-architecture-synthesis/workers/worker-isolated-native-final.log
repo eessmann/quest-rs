@@ -41,7 +41,7 @@
    Compiling cmake v0.1.58
    Compiling link-cplusplus v1.0.12
    Compiling cxx v1.0.198
-   Compiling quest-symbolic v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-symbolic)
+   Compiling quest-symbolic v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-symbolic)
    Compiling transpose v0.2.3
    Compiling primal-check v0.3.4
    Compiling rustfft v6.4.1
@@ -60,35 +60,35 @@
    Compiling nano-gemm v0.2.2
    Compiling cxxbridge-macro v1.0.198
    Compiling foldhash v0.2.0
-   Compiling quest-numerics v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-numerics)
+   Compiling quest-numerics v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-numerics)
    Compiling googletest_macro v0.14.3
    Compiling zerocopy v0.8.57
    Compiling cmake-file-api v0.1.2
    Compiling faer v0.24.4
-   Compiling quest-math v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-math)
-   Compiling quest-build v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-build)
-   Compiling quest-synthesis v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-synthesis)
-   Compiling quest-sys v0.2.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-sys)
-   Compiling quest-optimizer-protocol v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-protocol)
+   Compiling quest-math v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-math)
+   Compiling quest-build v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-build)
+   Compiling quest-synthesis v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-synthesis)
+   Compiling quest-sys v0.2.0 (/path/to/validation/architecture-synthesis/source/crates/quest-sys)
+   Compiling quest-optimizer-protocol v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-optimizer-protocol)
    Compiling half v2.7.1
-   Compiling quest-optimizer-client v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-client)
+   Compiling quest-optimizer-client v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-optimizer-client)
    Compiling ciborium-ll v0.2.2
-   Compiling quest-rs v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest)
+   Compiling quest-rs v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest)
    Compiling ciborium v0.2.2
    Compiling tinytemplate v1.2.1
    Compiling trybuild v1.0.121
    Compiling criterion v0.8.2
    Compiling googletest v0.14.3
 warning: quest-sys@0.2.0: Using QuEST 4.3.0 from /nix/store/0d389wpw7ikhv5cdg5x8xg9pi184cr77-quest-4.3.0 with /nix/store/z4c6k0mrlkwl3s4w9ysxc8vq1wylm3ms-gcc-wrapper-15.3.0/bin/g++
-   Compiling quest-language v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-language)
-   Compiling quest-polynomial v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-polynomial)
-   Compiling quest-qsp v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-qsp)
-   Compiling quest-qasm v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-qasm)
-   Compiling quest-compile v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-compile)
-   Compiling quest-macros v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-macros)
-   Compiling quest-circuit v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-circuit)
+   Compiling quest-language v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-language)
+   Compiling quest-polynomial v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-polynomial)
+   Compiling quest-qsp v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-qsp)
+   Compiling quest-qasm v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-qasm)
+   Compiling quest-compile v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-compile)
+   Compiling quest-macros v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-macros)
+   Compiling quest-circuit v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-circuit)
     Finished `test` profile [unoptimized + debuginfo] target(s) in 18.66s
-     Running tests/structured_workers.rs (/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/worker-target/debug/build/quest-rs/a821a8acdd4d9834/out/structured_workers-a821a8acdd4d9834)
+     Running tests/structured_workers.rs (/path/to/validation/architecture-synthesis/worker-target/debug/build/quest-rs/a821a8acdd4d9834/out/structured_workers-a821a8acdd4d9834)
 
 running 1 test
 test certified_ssa_synthesis_preserves_native_state_and_density ... 

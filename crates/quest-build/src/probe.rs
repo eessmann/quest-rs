@@ -324,7 +324,9 @@ fn validate_compiler_target(target: &str, compiler: &str) -> Result<()> {
     let same_platform = if darwin {
         compiler.contains("-apple-darwin")
     } else {
+        // Red Hat's native GNU/Linux GCC target omits the final GNU suffix.
         compiler.contains("-linux-gnu")
+            || compiler.strip_suffix("-redhat-linux") == Some(compiler_arch)
     };
     if !same_arch || !same_platform {
         return Err(invalid(format!(
@@ -1379,12 +1381,16 @@ set_target_properties(QuEST::QuEST PROPERTIES
     }
 
     #[gtest]
-    fn compiler_target_validation_normalizes_only_darwin_arm64() -> googletest::Result<()> {
+    fn compiler_target_validation_preserves_native_platform_and_architecture()
+    -> googletest::Result<()> {
         for (rust, compiler) in [
             ("aarch64-apple-darwin", "arm64-apple-darwin25.0.0"),
             ("aarch64-apple-darwin", "aarch64-apple-darwin"),
             ("x86_64-apple-darwin", "x86_64-apple-darwin24.6"),
             ("x86_64-unknown-linux-gnu", "x86_64-pc-linux-gnu"),
+            ("x86_64-unknown-linux-gnu", "x86_64-redhat-linux"),
+            ("aarch64-unknown-linux-gnu", "aarch64-redhat-linux"),
+            ("x86_64-unknown-linux-gnu", "x86_64-redhat-linux-gnu"),
         ] {
             validate_compiler_target(rust, compiler)?;
         }
@@ -1393,6 +1399,10 @@ set_target_properties(QuEST::QuEST PROPERTIES
             ("aarch64-apple-darwin", "aarch64-unknown-linux-gnu"),
             ("x86_64-unknown-linux-gnu", "x86_64-apple-darwin"),
             ("x86_64-unknown-linux-gnu", "x86_64-linux-musl"),
+            ("x86_64-unknown-linux-gnu", "x86_64-redhat-linux-musl"),
+            ("aarch64-unknown-linux-gnu", "x86_64-redhat-linux"),
+            ("x86_64-unknown-linux-gnu", "aarch64-redhat-linux"),
+            ("x86_64-unknown-linux-gnu", "x86_64-w64-mingw32"),
         ] {
             expect_true!(validate_compiler_target(rust, compiler).is_err());
         }

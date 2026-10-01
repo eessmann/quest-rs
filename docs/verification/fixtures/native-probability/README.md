@@ -1,8 +1,18 @@
 # Native probability witness
 
-This is the exact host-specific fixture used for the reviewed QuEST 4.3 fork.
-Its CMake file records the original installed/source paths. Adjust those paths
-to reproduce on another host. It instruments the calculations translation unit
+This fixture reproduces the witness used for the reviewed QuEST 4.3 fork.
+Select the matching installed package and source checkout when configuring:
+
+```sh
+cmake -S docs/verification/fixtures/native-probability \
+  -B target/native-probability \
+  -DCMAKE_PREFIX_PATH=/path/to/installed/quest/lib64/cmake/QuEST \
+  -DQUEST_SOURCE_DIR=/path/to/QuEST
+cmake --build target/native-probability
+```
+
+Replace the placeholder paths with your package and source locations.
+The fixture instruments the calculations translation unit
 with the shift sanitizer and traps on the fault; it does not instrument all of
 QuEST or the Rust bridge.
 

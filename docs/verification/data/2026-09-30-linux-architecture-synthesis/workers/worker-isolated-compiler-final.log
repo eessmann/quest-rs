@@ -43,18 +43,18 @@
    Compiling qd v0.8.0
    Compiling faer-traits v0.24.0
    Compiling gemm v0.19.0
-   Compiling quest-math v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-math)
+   Compiling quest-math v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-math)
    Compiling shlex v2.0.1
    Compiling find-msvc-tools v0.1.10
    Compiling cc v1.4.2
    Compiling faer v0.24.4
    Compiling petgraph v0.8.3
-   Compiling quest-symbolic v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-symbolic)
+   Compiling quest-symbolic v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-symbolic)
    Compiling rand_core v0.9.5
    Compiling toml_edit v0.25.13+spec-1.1.0
    Compiling alloca v0.4.0
-   Compiling quest-synthesis v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-synthesis)
-   Compiling quest-optimizer-protocol v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-protocol)
+   Compiling quest-synthesis v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-synthesis)
+   Compiling quest-optimizer-protocol v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-optimizer-protocol)
    Compiling half v2.7.1
    Compiling ciborium-io v0.2.2
    Compiling target-tuple v1.0.2
@@ -63,7 +63,7 @@
    Compiling tempfile v3.27.0
    Compiling toml_parser v1.1.3+spec-1.1.0
    Compiling ciborium-ll v0.2.2
-   Compiling quest-optimizer-client v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-client)
+   Compiling quest-optimizer-client v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-optimizer-client)
    Compiling proc-macro-crate v3.5.0
    Compiling ppv-lite86 v0.2.21
    Compiling serde_spanned v1.1.1
@@ -95,13 +95,13 @@
    Compiling proptest v1.11.0
    Compiling criterion v0.8.2
    Compiling trybuild v1.0.121
-   Compiling quest-language v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-language)
-   Compiling quest-qasm v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-qasm)
-   Compiling quest-compile v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-compile)
-   Compiling quest-macros v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-macros)
-   Compiling quest-circuit v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-circuit)
+   Compiling quest-language v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-language)
+   Compiling quest-qasm v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-qasm)
+   Compiling quest-compile v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-compile)
+   Compiling quest-macros v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-macros)
+   Compiling quest-circuit v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-circuit)
     Finished `test` profile [unoptimized + debuginfo] target(s) in 18.36s
-     Running tests/worker_contract.rs (/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/worker-target/debug/build/quest-circuit/e163d60b7367daca/out/worker_contract-e163d60b7367daca)
+     Running tests/worker_contract.rs (/path/to/validation/architecture-synthesis/worker-target/debug/build/quest-circuit/e163d60b7367daca/out/worker_contract-e163d60b7367daca)
 
 running 6 tests
 test explicit_synthesis_validates_epsilon_even_without_any_rotation ... ok

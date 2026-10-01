@@ -2,12 +2,13 @@
   "generator": "xtask generate-quest-bindings",
   "parser": "clang crate libclang semantic AST",
   "quest_version": "4.3.0",
-  "quest_root": "QUEST_ROOT",
+  "quest_root": "CMAKE_PREFIX_PATH",
   "deprecated_apis_included": "0",
   "counts": {
     "covered-by-raii": 7,
     "gated-callback": 3,
     "gated-manual-adapter-needed": 337,
+    "gated-mpi": 1,
     "gated-opaque-pointer": 2,
     "generated": 249,
     "intentionally-excluded": 1,
@@ -8981,6 +8982,36 @@
       "signature": "void initClassicalState(Qureg, qindex)",
       "status": "generated",
       "reason": "emitted in checked-in generated cxx bridge"
+    },
+    {
+      "name": "initCustomMpiCommQuESTEnv",
+      "overload_key": "initCustomMpiCommQuESTEnv(int, int, int) -> void",
+      "header": "quest/include/experimental.h",
+      "line": 72,
+      "linkage": "External",
+      "availability": "Available",
+      "result_type": "void",
+      "result_canonical_type": "void",
+      "arguments": [
+        {
+          "name": "questComm",
+          "ty": "MPI_Comm",
+          "canonical_type": "int"
+        },
+        {
+          "name": "useGpuAccel",
+          "ty": "int",
+          "canonical_type": "int"
+        },
+        {
+          "name": "useMultithread",
+          "ty": "int",
+          "canonical_type": "int"
+        }
+      ],
+      "signature": "void initCustomMpiCommQuESTEnv(MPI_Comm, int, int)",
+      "status": "gated-mpi",
+      "reason": "MPI_Comm requires a dedicated mpi Cargo feature and type strategy"
     },
     {
       "name": "initCustomMpiQuESTEnv",

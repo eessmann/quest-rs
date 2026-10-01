@@ -62,12 +62,12 @@
    Compiling codespan-reporting v0.13.1
    Compiling hashbrown v0.15.5
    Compiling cxx v1.0.198
-   Compiling quest-build v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-build)
+   Compiling quest-build v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-build)
    Compiling mpi-sys v0.2.4
-    Checking quest-math v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-math)
+    Checking quest-math v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-math)
    Compiling fixedbitset v0.5.7
    Compiling petgraph v0.8.3
-   Compiling quest-symbolic v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-symbolic)
+   Compiling quest-symbolic v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-symbolic)
    Compiling cxx-build v1.0.198
     Checking crypto-common v0.2.2
     Checking block-buffer v0.12.1
@@ -79,10 +79,10 @@
     Checking digest v0.11.3
     Checking rustix v1.1.4
     Checking zerocopy v0.8.57
-    Checking quest-language v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-language)
-   Compiling quest-sys v0.2.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-sys)
-    Checking quest-synthesis v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-synthesis)
-    Checking quest-optimizer-protocol v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-protocol)
+    Checking quest-language v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-language)
+   Compiling quest-sys v0.2.0 (/path/to/validation/architecture-synthesis/source/crates/quest-sys)
+    Checking quest-synthesis v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-synthesis)
+    Checking quest-optimizer-protocol v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-optimizer-protocol)
     Checking aho-corasick v1.1.5
     Checking primal-check v0.3.4
     Checking regex-syntax v0.8.11
@@ -94,8 +94,8 @@
     Checking regex-automata v0.4.18
     Checking half v2.7.1
    Compiling mpi v0.8.2
-    Checking quest-optimizer-client v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-client)
-    Checking quest-qasm v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-qasm)
+    Checking quest-optimizer-client v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-optimizer-client)
+    Checking quest-qasm v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-qasm)
    Compiling proc-macro-crate v3.5.0
    Compiling cxxbridge-macro v1.0.198
    Compiling alloca v0.4.0
@@ -110,12 +110,12 @@
     Checking toml_parser v1.1.3+spec-1.1.0
     Checking clap_builder v4.6.6
     Checking itertools v0.13.0
-   Compiling quest-macros v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-macros)
+   Compiling quest-macros v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-macros)
     Checking ciborium-ll v0.2.2
-    Checking quest-numerics v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-numerics)
-    Checking quest-compile v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-compile)
+    Checking quest-numerics v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-numerics)
+    Checking quest-compile v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-compile)
     Checking regex v1.13.1
-   Compiling quest-rs v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest)
+   Compiling quest-rs v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest)
     Checking serde_spanned v1.1.1
     Checking toml_datetime v1.1.1+spec-1.1.0
     Checking same-file v1.0.6
@@ -124,19 +124,19 @@
     Checking criterion-plot v0.8.2
     Checking toml v1.1.5+spec-1.1.0
     Checking walkdir v2.5.0
-    Checking quest-polynomial v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-polynomial)
+    Checking quest-polynomial v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-polynomial)
     Checking ciborium v0.2.2
     Checking target-tuple v1.0.2
     Checking clap v4.6.6
     Checking tinytemplate v1.2.1
     Checking page_size v0.6.0
     Checking oorandom v11.1.5
-    Checking quest-circuit v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-circuit)
+    Checking quest-circuit v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-circuit)
     Checking anes v0.1.6
     Checking criterion v0.8.2
     Checking trybuild v1.0.121
     Checking googletest v0.14.3
-    Checking quest-qsp v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-qsp)
+    Checking quest-qsp v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-qsp)
 warning: quest-sys@0.2.0: Using QuEST 4.3.0 from /nix/store/5gc6ks9k2rvq28qi7qc8i30jijvvcha8-quest-mpi-validation-4.3.0 with /nix/store/z4c6k0mrlkwl3s4w9ysxc8vq1wylm3ms-gcc-wrapper-15.3.0/bin/g++
 warning: quest-sys@0.2.0: Verified rsmpi MPICC /nix/store/i5wli517wjps6ndji4s2rzq653qayqsy-openmpi-5.0.10-dev/bin/mpicc matches QuEST MPI ABI and loaded library
     Finished `dev` profile [unoptimized + debuginfo] target(s) in 34.07s

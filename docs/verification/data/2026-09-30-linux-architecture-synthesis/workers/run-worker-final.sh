@@ -1,7 +1,7 @@
 #!/usr/bin/bash
-export PATH=/home/erich/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/usr/bin:/bin
+export PATH=/home/user/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/usr/bin:/bin
 export CARGO_BUILD_JOBS=6
-cd /home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source
+cd /path/to/validation/architecture-synthesis/source
 run() {
  name="$1"
  shift
@@ -16,5 +16,5 @@ run worker-compiler-final cargo test --locked -p quest-circuit --features worker
 run worker-clippy-final cargo clippy --locked -p quest-optimizer-client -p quest-optimizer-worker --features quest-optimizer-worker/synthesis,quest-optimizer-worker/zx,quest-optimizer-worker/mitm --all-targets
 run worker-release-phase-final cargo test --release --locked -p quest-optimizer-worker --features synthesis,zx,mitm --test synthesis_process fixed_exact_phase_sequence_survives_the_bounded_process -- --exact --nocapture --test-threads=1
 run worker-native-build-final cargo build --locked -p quest-optimizer-worker --features synthesis,zx,mitm
-run worker-native-final env QUEST_TUTORIAL_WORKER=/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/target/debug/quest-optimizer-worker cargo test --locked -p quest-rs --features workers --test structured_workers -- --test-threads=1
+run worker-native-final env QUEST_TUTORIAL_WORKER=/path/to/validation/architecture-synthesis/source/target/debug/quest-optimizer-worker cargo test --locked -p quest-rs --features workers --test structured_workers -- --test-threads=1
 printf 'complete\n' > ../receipts/worker-final.done

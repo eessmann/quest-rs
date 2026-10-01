@@ -19,5 +19,5 @@
 • Running devenv:enterTest
 ✓ Running devenv:enterTest in 380ns (no command)
 ✓ Running tasks in 22.4ms
-    Checking quest-optimizer-worker v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-worker)
+    Checking quest-optimizer-worker v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-optimizer-worker)
     Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.20s

@@ -15,9 +15,9 @@ Use CMake 3.28+, rolling Rust nightly, pkg-config, and serial HDF5. Check both
 export CC="$(command -v gcc)"
 export CXX="$(command -v g++)"
 export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER="$CC"
-export QUEST_ROOT=/work/erich/opt/quest
-export CUDAToolkit_ROOT=/work/erich/opt/cuda-13.4
-export CUQUANTUM_ROOT=/work/erich/conda
+export QUEST_ROOT=/path/to/installed/quest
+export CUDAToolkit_ROOT=/path/to/cuda
+export CUQUANTUM_ROOT=/path/to/cuquantum
 ```
 
 The paths above describe the tested node; substitute the corresponding installed
@@ -55,11 +55,11 @@ The existing source build already selects QuEST 4.3.0, binary64, CUDA architectu
 settings while enabling installed dependency runtime paths:
 
 ```sh
-cmake -S /work/erich/Projects/QuEST -B /work/erich/Projects/QuEST/build \
+cmake -S /path/to/QuEST -B /path/to/QuEST/build \
   -DCMAKE_INSTALL_PREFIX="$QUEST_ROOT" \
   -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=ON
-cmake --build /work/erich/Projects/QuEST/build --parallel 8
-cmake --install /work/erich/Projects/QuEST/build
+cmake --build /path/to/QuEST/build --parallel 8
+cmake --install /path/to/QuEST/build
 env -u LD_LIBRARY_PATH -u LD_PRELOAD -u LD_AUDIT \
   ldd "$QUEST_ROOT/lib/libQuEST.so"
 ```
@@ -84,10 +84,10 @@ tested node uses Conda only to provision these developer tools; no environment
 activation is required:
 
 ```sh
-conda create --prefix /work/erich/opt/quest-tools \
+conda create --prefix /path/to/quest-tools \
   --channel conda-forge --override-channels clang libclang --yes
-export CLANG=/work/erich/opt/quest-tools/bin/clang
-export LIBCLANG_PATH=/work/erich/opt/quest-tools/lib
+export CLANG=/path/to/quest-tools/bin/clang
+export LIBCLANG_PATH=/path/to/quest-tools/lib
 ```
 
 Do not replace the selected Spack `CC`/`CXX` when selecting the parser tools.
@@ -104,7 +104,7 @@ cargo fmt --all -- --check
 cargo clippy --workspace --all-targets --locked -- -D warnings
 cargo run --locked -p xtask -- generate-quest-bindings --check
 cargo run --locked -p xtask -- check-native-consumers --backends cpu,omp,gpu \
-  --work-dir /work/erich/Projects/quest-rs/target/grace-hopper-consumers
+  --work-dir /path/to/quest-rs/target/grace-hopper-consumers
 ```
 
 The consumer command builds direct, facade, wrapped and renamed applications,

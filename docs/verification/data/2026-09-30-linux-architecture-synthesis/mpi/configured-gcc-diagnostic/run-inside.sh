@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -uo pipefail
-receipt=/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/mpi
+receipt=/path/to/validation/architecture-synthesis/mpi
 export QUEST_ROOT=$(sed -n '/-quest-mpi-validation-4.3.0$/p' "$receipt/paths.txt" | head -1)
 mpi_dev=$(sed -n '/-openmpi-5.0.10-dev$/p' "$receipt/paths.txt" | head -1)
 mpi_bin=$(sed -n '/-openmpi-5.0.10$/p' "$receipt/paths.txt" | head -1)

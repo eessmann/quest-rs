@@ -19,7 +19,7 @@
 • Running devenv:enterTest
 ✓ Running devenv:enterTest in 260ns (no command)
 ✓ Running tasks in 12.0ms
-   Compiling quest-circuit v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-circuit)
+   Compiling quest-circuit v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-circuit)
     Finished `test` profile [unoptimized + debuginfo] target(s) in 0.60s
      Running tests/worker_contract.rs (target/debug/build/quest-circuit/757144207655faa8/out/worker_contract-757144207655faa8)
 

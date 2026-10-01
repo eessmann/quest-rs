@@ -4,6 +4,6 @@
 ✓ Running devenv:enterShell in 26.4ms
 • Running devenv:enterTest
 ✓ Running devenv:enterTest in 500ns (no command)
-    Checking quest-math v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-math)
-    Checking quest-synthesis v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-synthesis)
+    Checking quest-math v0.1.0 (/path/to/quest-rs/crates/quest-math)
+    Checking quest-synthesis v0.1.0 (/path/to/quest-rs/crates/quest-synthesis)
     Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.88s

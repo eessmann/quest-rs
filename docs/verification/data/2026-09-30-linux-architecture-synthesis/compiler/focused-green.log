@@ -85,7 +85,7 @@
    Compiling termcolor v1.4.1
    Compiling gemm v0.19.0
    Compiling faer-traits v0.24.0
-   Compiling quest-math v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-math)
+   Compiling quest-math v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-math)
    Compiling winnow v1.0.4
    Compiling unicode-width v0.2.2
    Compiling shlex v2.0.1
@@ -93,7 +93,7 @@
    Compiling find-msvc-tools v0.1.10
    Compiling cc v1.4.2
    Compiling toml_parser v1.1.3+spec-1.1.0
-   Compiling quest-symbolic v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-symbolic)
+   Compiling quest-symbolic v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-symbolic)
    Compiling codespan-reporting v0.13.1
    Compiling petgraph v0.8.3
    Compiling faer v0.24.4
@@ -107,8 +107,8 @@
    Compiling digest v0.11.3
    Compiling regex-automata v0.4.18
    Compiling alloca v0.4.0
-   Compiling quest-synthesis v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-synthesis)
-   Compiling quest-optimizer-protocol v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-protocol)
+   Compiling quest-synthesis v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-synthesis)
+   Compiling quest-optimizer-protocol v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-optimizer-protocol)
    Compiling half v2.7.1
    Compiling anstyle v1.0.14
    Compiling rustversion v1.0.23
@@ -119,12 +119,12 @@
    Compiling target-tuple v1.0.2
    Compiling tempfile v3.27.0
    Compiling clap_builder v4.6.6
-   Compiling quest-language v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-language)
+   Compiling quest-language v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-language)
    Compiling sha2 v0.11.0
    Compiling itertools v0.13.0
-   Compiling quest-qasm v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-qasm)
+   Compiling quest-qasm v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-qasm)
    Compiling ciborium-ll v0.2.2
-   Compiling quest-optimizer-client v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-client)
+   Compiling quest-optimizer-client v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-optimizer-client)
    Compiling regex v1.13.1
    Compiling proc-macro-crate v3.5.0
    Compiling ppv-lite86 v0.2.21
@@ -141,9 +141,9 @@
    Compiling bit-set v0.8.0
    Compiling rusty-fork v0.3.1
    Compiling walkdir v2.5.0
-   Compiling quest-macros v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-macros)
+   Compiling quest-macros v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-macros)
    Compiling rand_chacha v0.9.0
-   Compiling quest-compile v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-compile)
+   Compiling quest-compile v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-compile)
    Compiling ciborium v0.2.2
    Compiling clap v4.6.6
    Compiling rand_xorshift v0.4.0
@@ -158,7 +158,7 @@
    Compiling googletest v0.14.3
    Compiling trybuild v1.0.121
    Compiling proptest v1.11.0
-   Compiling quest-circuit v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-circuit)
+   Compiling quest-circuit v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-circuit)
     Finished `test` profile [unoptimized + debuginfo] target(s) in 32.67s
 ────────────
  Nextest run ID 6d5d14f8-0353-4969-bcd4-8ec17e523f78 with nextest profile: default

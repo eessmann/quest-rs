@@ -1,6 +1,6 @@
 # Linux MPI validation
 
-Isolated source: `/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source`.
+Isolated source: `/path/to/validation/architecture-synthesis/source`.
 Pinned `build.nix` selects x86_64-linux `pkgs.stdenv`, QuEST 4.3.0 with OpenMP, MPI and SUBCOMM, and OpenMPI 5.0.10. CUDA/HIP/cuQuantum are disabled. The repository package's installed-consumer check executes during Nix installation checking.
 
 Reproduce from this directory: `bash build.sh`, `bash run.sh`, then `bash compare-abi.sh`. The runner enters the source project's devenv and selects MPI QuEST plus matching explicit MPICC. Cargo uses `../target-mpi` and three jobs. The tests launch actual OpenMPI ranks. No Darwin launcher shim, synthetic topology, compiler override, loader-path override or host profile modification is used.

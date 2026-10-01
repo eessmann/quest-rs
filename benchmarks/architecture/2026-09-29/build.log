@@ -1,15 +1,15 @@
-   Compiling quest-math v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-math)
-   Compiling quest-language v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-language)
-   Compiling quest-sys v0.2.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-sys)
-   Compiling quest-synthesis v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-synthesis)
-   Compiling quest-optimizer-protocol v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-optimizer-protocol)
-   Compiling quest-optimizer-client v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-optimizer-client)
-   Compiling quest-qasm v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-qasm)
+   Compiling quest-math v0.1.0 (/path/to/quest-rs/crates/quest-math)
+   Compiling quest-language v0.1.0 (/path/to/quest-rs/crates/quest-language)
+   Compiling quest-sys v0.2.0 (/path/to/quest-rs/crates/quest-sys)
+   Compiling quest-synthesis v0.1.0 (/path/to/quest-rs/crates/quest-synthesis)
+   Compiling quest-optimizer-protocol v0.1.0 (/path/to/quest-rs/crates/quest-optimizer-protocol)
+   Compiling quest-optimizer-client v0.1.0 (/path/to/quest-rs/crates/quest-optimizer-client)
+   Compiling quest-qasm v0.1.0 (/path/to/quest-rs/crates/quest-qasm)
 warning: quest-sys@0.2.0: Using QuEST 4.3.0 from /nix/store/wj54sbcsi99kdis36q80zgzd5l63wg7j-quest-4.3.0 with /nix/store/2yfrcmkvspsrjhj283gdawqp37aghxva-clang-wrapper-21.1.8/bin/clang++
-   Compiling quest-rs v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest)
-   Compiling quest-macros v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-macros)
-   Compiling quest-compile v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-compile)
-   Compiling quest-circuit v0.1.0 (/Users/erich/.codex/worktrees/circuit-synthesis/quest-rs/crates/quest-circuit)
+   Compiling quest-rs v0.1.0 (/path/to/quest-rs/crates/quest)
+   Compiling quest-macros v0.1.0 (/path/to/quest-rs/crates/quest-macros)
+   Compiling quest-compile v0.1.0 (/path/to/quest-rs/crates/quest-compile)
+   Compiling quest-circuit v0.1.0 (/path/to/quest-rs/crates/quest-circuit)
 warning: associated function `new` is never used
   --> crates/quest/src/execution.rs:45:8
    |

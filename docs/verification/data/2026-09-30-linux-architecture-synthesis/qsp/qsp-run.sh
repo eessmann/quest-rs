@@ -1,8 +1,8 @@
 #!/usr/bin/bash
 set -u
-export PATH=/home/erich/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/usr/bin:/bin
+export PATH=/home/user/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/usr/bin:/bin
 export CARGO_BUILD_JOBS=3
-cd /home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source
+cd /path/to/validation/architecture-synthesis/source
 receipt_dir=../receipts
 trap 'printf "%s\n" "$?" > "$receipt_dir/qsp-driver.exit"' EXIT
 {

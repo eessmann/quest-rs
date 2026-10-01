@@ -41,9 +41,9 @@ layout; pkg-config selects alternative layouts, including `lib64`.
 | cuQuantum / cuStateVec | 26.06.0.17 / 1.14.0 |
 | QuEST | 4.3.0, source `503552065045eaf89baba85e6cd6aad728525554` |
 | QuEST configuration | Shared, binary64, CUDA/cuQuantum/OpenMP enabled; MPI, subcommunicators and deprecated APIs disabled |
-| QuEST installation | `/work/erich/opt/quest`, `CMAKE_INSTALL_RPATH_USE_LINK_PATH=ON` |
+| QuEST installation | `/path/to/installed/quest`, `CMAKE_INSTALL_RPATH_USE_LINK_PATH=ON` |
 | HDF5 | System serial 1.10.7, selected through pkg-config |
-| Parser tools | Matching Clang/libclang 23.1.2, `/work/erich/opt/quest-tools` |
+| Parser tools | Matching Clang/libclang 23.1.2, `/path/to/quest-tools` |
 | Nextest | 0.9.146 |
 
 The existing build requested NUMA but did not find libnuma; it continued without
@@ -54,13 +54,13 @@ dependencies with loader overrides cleared. Runtime paths exclude CUDA stubs.
 Verification used:
 
 ```sh
-export QUEST_ROOT=/work/erich/opt/quest
-export CARGO_TARGET_DIR=/work/erich/Projects/quest-rs/target
-export CC=/work/erich/deps/spack/opt/spack/linux-neoverse_v2/gcc-16.2.0-yzpxszqsyzbpv6fmyxjbaujpkqt6cf2n/bin/gcc
-export CXX=/work/erich/deps/spack/opt/spack/linux-neoverse_v2/gcc-16.2.0-yzpxszqsyzbpv6fmyxjbaujpkqt6cf2n/bin/g++
+export QUEST_ROOT=/path/to/installed/quest
+export CARGO_TARGET_DIR=/path/to/quest-rs/target
+export CC=/path/to/gcc-16/bin/gcc
+export CXX=/path/to/gcc-16/bin/g++
 export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER="$CC"
-export CLANG=/work/erich/opt/quest-tools/bin/clang
-export LIBCLANG_PATH=/work/erich/opt/quest-tools/lib
+export CLANG=/path/to/quest-tools/bin/clang
+export LIBCLANG_PATH=/path/to/quest-tools/lib
 unset HDF5_DIR
 ```
 
@@ -94,7 +94,7 @@ The standalone consumer command was:
 
 ```sh
 cargo run --locked -p xtask -- check-native-consumers --backends cpu,omp,gpu \
-  --work-dir /work/erich/Projects/quest-rs/target/grace-hopper-consumers-final
+  --work-dir /path/to/quest-rs/target/grace-hopper-consumers-final
 ```
 
 Consumer binaries ran outside Cargo with `LD_LIBRARY_PATH`, `LD_PRELOAD` and

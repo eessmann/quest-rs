@@ -41,32 +41,32 @@
    Compiling googletest v0.14.3
    Compiling num-bigint v0.5.1
    Compiling num-rational v0.4.2
-   Compiling quest-math v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-math)
-   Compiling quest-optimizer-protocol v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-protocol)
-   Compiling quest-synthesis v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-synthesis)
-   Compiling quest-optimizer-client v0.1.0 (/var/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/source/crates/quest-optimizer-client)
+   Compiling quest-math v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-math)
+   Compiling quest-optimizer-protocol v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-optimizer-protocol)
+   Compiling quest-synthesis v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-synthesis)
+   Compiling quest-optimizer-client v0.1.0 (/path/to/validation/architecture-synthesis/source/crates/quest-optimizer-client)
     Finished `test` profile [unoptimized + debuginfo] target(s) in 3.84s
-     Running unittests src/lib.rs (/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/worker-target/debug/build/quest-optimizer-client/d8a8d98425d73452/out/quest_optimizer_client-d8a8d98425d73452)
+     Running unittests src/lib.rs (/path/to/validation/architecture-synthesis/worker-target/debug/build/quest-optimizer-client/d8a8d98425d73452/out/quest_optimizer_client-d8a8d98425d73452)
 
 running 1 test
 test process::review_tests::exit_observation_keeps_pid_owned_until_group_cleanup_and_reap ... ok
 
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
 
-     Running tests/capability.rs (/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/worker-target/debug/build/quest-optimizer-client/d7561c7067714823/out/capability-d7561c7067714823)
+     Running tests/capability.rs (/path/to/validation/architecture-synthesis/worker-target/debug/build/quest-optimizer-client/d7561c7067714823/out/capability-d7561c7067714823)
 
 running 0 tests
 
 test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 
-     Running tests/direct.rs (/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/worker-target/debug/build/quest-optimizer-client/1466ae5f6c7a9f82/out/direct-1466ae5f6c7a9f82)
+     Running tests/direct.rs (/path/to/validation/architecture-synthesis/worker-target/debug/build/quest-optimizer-client/1466ae5f6c7a9f82/out/direct-1466ae5f6c7a9f82)
 
 running 1 test
 test direct_engine_works_without_any_process_capability ... ok
 
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.38s
 
-     Running tests/mitm_parent.rs (/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/worker-target/debug/build/quest-optimizer-client/2b374589024955e9/out/mitm_parent-2b374589024955e9)
+     Running tests/mitm_parent.rs (/path/to/validation/architecture-synthesis/worker-target/debug/build/quest-optimizer-client/2b374589024955e9/out/mitm_parent-2b374589024955e9)
 
 running 2 tests
 test parent_approx_certificate_uses_original_target ... ok
@@ -74,7 +74,7 @@ test parent_rejects_forged_exact_candidate_and_preserves_incomplete ... ok
 
 test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
 
-     Running tests/process_contract.rs (/home/erich/validation/quest-rs-architecture-20260930-35ae2cd5c86d/worker-target/debug/build/quest-optimizer-client/e031e62e1752a51d/out/process_contract-e031e62e1752a51d)
+     Running tests/process_contract.rs (/path/to/validation/architecture-synthesis/worker-target/debug/build/quest-optimizer-client/e031e62e1752a51d/out/process_contract-e031e62e1752a51d)
 
 running 9 tests
 test affine_byte_budget_rejects_before_worker_process_starts ... ok
