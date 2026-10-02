@@ -1,11 +1,11 @@
 # quest-macros
 
-Procedural `circuit!` frontend for `quest-circuit` and the `quest` facade. Use the
+Procedural `circuit!` frontend for `quest-compile` and the `quest` facade. Use the
 macro through either public crate, including when its dependency is renamed.
 Expansion constructs a fallible, native-independent validated program and never
 initializes QuEST.
 
-The `quest-circuit` README documents the supported syntax and numerical
+The `quest-compile` README documents the supported syntax and numerical
 conventions. Token parsing uses `syn`; static
 arity, identifier, index, angle and unsupported-feature errors point to compiler
 source spans. Rust interpolations are evaluated once in source order and pass
@@ -18,4 +18,4 @@ no source files or stringified tokens are read during expansion. Locations do
 not include a complete expansion stack.
 
 Cross-crate macro/builder equivalence tests, compile-fail fixtures and hygiene
-checks live in `crates/quest-circuit/tests`.
+checks live in `crates/quest-compile/tests`.

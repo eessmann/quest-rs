@@ -7,17 +7,18 @@ license.workspace = true
 repository.workspace = true
 
 [dependencies]
-num-bigint.workspace = true
-num-rational = { workspace = true, features = ["std"] }
-num-traits.workspace = true
+dashu-base.workspace = true
+dashu-int.workspace = true
+dashu-ratio.workspace = true
 thiserror.workspace = true
 serde = { workspace = true, optional = true, features = ["std", "derive"] }
 
 [features]
-serde = ["dep:serde", "num-bigint/serde", "num-rational/serde"]
+serde = ["dep:serde"]
 
 [dev-dependencies]
 googletest.workspace = true
+serde_json.workspace = true
 
 [lints]
 workspace = true

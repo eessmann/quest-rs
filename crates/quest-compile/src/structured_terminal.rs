@@ -1,14 +1,10 @@
 //! Transactional terminal fusion for mixed executable regions.
+use crate::TerminalPasses;
 use crate::structured_optimize::{self as exact, Context, ResolvedGate, Wire};
 use crate::{
     Angle, ApproximationMode, BoundGate, BudgetCategory, BudgetLease, BudgetLedger, Control,
     ControlState, Gate, LanguageError, MatrixPolicy, OptimizationOptions, OracleFragment, Program,
     QuantumRegionBuilder, StructuredQuantumError, TerminalOptions, TerminalStatus, Verified,
-};
-#[allow(unused_imports)]
-use crate::{
-    BoundParityPasses, ExactPasses, LinearPasses, NumericalPasses, OracleExport, ParityPasses,
-    TerminalPasses,
 };
 use quest_language::{
     GateKind,

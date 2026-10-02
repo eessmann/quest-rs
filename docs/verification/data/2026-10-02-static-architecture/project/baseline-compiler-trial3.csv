@@ -1,0 +1,4 @@
+workload,iterations,nanoseconds,allocations,peak_live_extra_bytes,output_scalars
+compiler_construction_admission,128,445833,20096,19147,4
+compiler_verify_lower_plan,128,679334,23040,16107,24
+compiler_finite_insert_verify_lower_plan_256ops,64,76970375,1145536,686326,128

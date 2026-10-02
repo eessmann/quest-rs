@@ -214,6 +214,12 @@ pub enum StatementKind {
         capture: usize,
         operands: Vec<Expression>,
     },
+    /// Checked finite semantic operations with lexical operand mappings.
+    Finite {
+        operations: Vec<crate::semantic::finite::FiniteOperation>,
+        qubits: Vec<Expression>,
+        bits: Vec<Expression>,
+    },
     Reset(Expression),
     Barrier(Vec<Expression>),
     Expression(Expression),

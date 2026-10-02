@@ -264,7 +264,7 @@ fn standard_degree_three_preserves_wx_conventions_on_rectangular_complex_inputs(
 
 #[gtest]
 fn complex_isometry_and_dense_projector_routes_preserve_ordered_logical_bases() -> Result<()> {
-    use quest_circuit::{Gate, OracleFragment, QuantumRegionBuilder};
+    use quest_compile::{Gate, OracleFragment, QuantumRegionBuilder};
     use quest_qsvt::{EncodingBuilder, Left, LogicalSpace, Right};
     let policy = NumericalPolicy::default();
     let scale = std::f64::consts::FRAC_1_SQRT_2;
@@ -312,7 +312,7 @@ fn complex_isometry_and_dense_projector_routes_preserve_ordered_logical_bases() 
     let expected = Mat::from_fn(2, 1, |row, col| block[(row, col)].mul(0.4_f64.sin()));
     expect_matrix(transform.materialize_block()?.as_ref(), expected.as_ref());
     for instruction in transform.main().instructions() {
-        if let quest_circuit::Operation::Oracle { fragment, .. } = instruction.operation() {
+        if let quest_compile::Operation::Oracle { fragment, .. } = instruction.operation() {
             expect_true!(fragment.shares_storage_with(&oracle));
         }
     }

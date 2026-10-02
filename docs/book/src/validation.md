@@ -3,7 +3,7 @@
 Use the repository's rolling `nightly` and record `rustc -Vv` with results. Pure compiler tests need no native QuEST installation:
 
 ```sh
-cargo test -p quest-circuit --test tutorials --locked
+cargo test -p quest-compile --test tutorials --locked
 cargo test -p quest-language --locked
 cargo test -p quest-qasm --locked
 ```
@@ -47,7 +47,7 @@ cargo run -p quest-qsp --example qsp_tutorials --features offline-synthesis --lo
 cargo test -p quest-qsp --test tutorials --features offline-synthesis --locked
 ```
 
-The feature-enabled run includes independent Astro Float certification and explicit
+The feature-enabled run includes independent Dashu certification and explicit
 offline synthesis/approximation. It never changes the ordinary production route.
 Compile-time stage-order failures are also exercised by the crate doctests.
 

@@ -7,13 +7,13 @@ pub type Result<T> = std::result::Result<T, Error>;
 #[derive(Debug, Error)]
 #[error("{runtime}")]
 pub struct StructuredExecutionError {
-    runtime: Box<quest_circuit::language::vm::RuntimeError<Error>>,
-    diagnostic: Box<quest_circuit::language::Diagnostic>,
+    runtime: Box<quest_compile::language::vm::RuntimeError<Error>>,
+    diagnostic: Box<quest_compile::language::Diagnostic>,
 }
 impl StructuredExecutionError {
     pub(crate) fn new(
-        runtime: quest_circuit::language::vm::RuntimeError<Error>,
-        diagnostic: quest_circuit::language::Diagnostic,
+        runtime: quest_compile::language::vm::RuntimeError<Error>,
+        diagnostic: quest_compile::language::Diagnostic,
     ) -> Self {
         Self {
             runtime: Box::new(runtime),
@@ -21,16 +21,16 @@ impl StructuredExecutionError {
         }
     }
     #[must_use]
-    pub const fn runtime(&self) -> &quest_circuit::language::vm::RuntimeError<Error> {
+    pub const fn runtime(&self) -> &quest_compile::language::vm::RuntimeError<Error> {
         &self.runtime
     }
     #[must_use]
-    pub const fn diagnostic(&self) -> &quest_circuit::language::Diagnostic {
+    pub const fn diagnostic(&self) -> &quest_compile::language::Diagnostic {
         &self.diagnostic
     }
 }
 impl Deref for StructuredExecutionError {
-    type Target = quest_circuit::language::vm::RuntimeError<Error>;
+    type Target = quest_compile::language::vm::RuntimeError<Error>;
     fn deref(&self) -> &Self::Target {
         &self.runtime
     }
@@ -73,14 +73,14 @@ pub enum Error {
         source: quest_sys::QuestError,
     },
     #[error(transparent)]
-    Circuit(#[from] quest_circuit::Error),
+    Circuit(#[from] quest_compile::Error),
     #[error(transparent)]
-    Language(Box<quest_circuit::LanguageError>),
+    Language(Box<quest_compile::LanguageError>),
     #[error(transparent)]
     StructuredExecution(Box<StructuredExecutionError>),
 }
-impl From<quest_circuit::LanguageError> for Error {
-    fn from(error: quest_circuit::LanguageError) -> Self {
+impl From<quest_compile::LanguageError> for Error {
+    fn from(error: quest_compile::LanguageError) -> Self {
         Self::Language(Box::new(error))
     }
 }
@@ -88,7 +88,7 @@ impl From<quest_circuit::LanguageError> for Error {
 impl Error {
     /// Borrow the owned diagnostic attached at a language or structured runtime boundary.
     #[must_use]
-    pub fn diagnostic(&self) -> Option<&quest_circuit::language::Diagnostic> {
+    pub fn diagnostic(&self) -> Option<&quest_compile::language::Diagnostic> {
         match self {
             Self::Language(error) => error.diagnostic(),
             Self::StructuredExecution(error) => Some(error.diagnostic()),
@@ -98,8 +98,8 @@ impl Error {
 
     /// Produce an owned, serializable diagnostic for every facade error.
     #[must_use]
-    pub fn report(&self) -> quest_circuit::language::Diagnostic {
-        use quest_circuit::language::{
+    pub fn report(&self) -> quest_compile::language::Diagnostic {
+        use quest_compile::language::{
             Diagnostic, DiagnosticCause, LanguageFailureKind, ResourceKind, ResourceUsage, Stage,
         };
         if let Some(diagnostic) = self.diagnostic() {
@@ -189,14 +189,14 @@ impl<T> BackendResult<T> for quest_sys::QuestResult<T> {
     }
 }
 
-impl From<quest_circuit::language::angle::Error> for Error {
-    fn from(value: quest_circuit::language::angle::Error) -> Self {
+impl From<quest_compile::language::angle::Error> for Error {
+    fn from(value: quest_compile::language::angle::Error) -> Self {
         Self::Circuit(value.into())
     }
 }
 
-impl From<quest_circuit::language::matrix::Error> for Error {
-    fn from(value: quest_circuit::language::matrix::Error) -> Self {
+impl From<quest_compile::language::matrix::Error> for Error {
+    fn from(value: quest_compile::language::matrix::Error) -> Self {
         Self::Circuit(value.into())
     }
 }

@@ -1,6 +1,17 @@
+use dashu_int::IBig;
 use googletest::{Result, prelude::*};
-use num_bigint::BigInt;
 use quest_math::{Cyclotomic, Limits};
+
+#[cfg(feature = "serde")]
+#[gtest]
+fn cyclotomic_payload_uses_decimal_coefficients() -> Result<()> {
+    let value = Cyclotomic::new([-3, 1, 0, 0].map(IBig::from), 2, Limits::default())?;
+    expect_eq!(
+        serde_json::to_value(value)?,
+        serde_json::json!({"coefficients": ["-3", "1", "0", "0"], "denominator_exponent": 2})
+    );
+    Ok(())
+}
 #[gtest]
 fn eighth_roots_and_sqrt_two_retain_exact_phase() -> Result<()> {
     let limits = Limits::default();
@@ -14,13 +25,13 @@ fn eighth_roots_and_sqrt_two_retain_exact_phase() -> Result<()> {
         Cyclotomic::omega(7).checked_mul(&w, limits)?,
         Cyclotomic::one()
     );
-    let root_half = Cyclotomic::new([0, 1, 0, -1].map(BigInt::from), 1, limits)?;
+    let root_half = Cyclotomic::new([0, 1, 0, -1].map(IBig::from), 1, limits)?;
     expect_eq!(
         root_half.checked_mul(&root_half, limits)?,
-        Cyclotomic::new([1, 0, 0, 0].map(BigInt::from), 1, limits)?
+        Cyclotomic::new([1, 0, 0, 0].map(IBig::from), 1, limits)?
     );
     expect_eq!(
-        Cyclotomic::new([2, 0, 0, 0].map(BigInt::from), 1, limits)?,
+        Cyclotomic::new([2, 0, 0, 0].map(IBig::from), 1, limits)?,
         Cyclotomic::one()
     );
     expect_eq!(
@@ -42,7 +53,7 @@ fn conjugation_and_admission_respect_exact_resource_bounds() -> Result<()> {
     }
     expect_true!(
         Cyclotomic::new(
-            [256, 0, 0, 0].map(BigInt::from),
+            [256, 0, 0, 0].map(IBig::from),
             0,
             Limits {
                 coefficient_bits: 8,
@@ -53,7 +64,7 @@ fn conjugation_and_admission_respect_exact_resource_bounds() -> Result<()> {
     );
     expect_true!(
         Cyclotomic::new(
-            [1, 0, 0, 0].map(BigInt::from),
+            [1, 0, 0, 0].map(IBig::from),
             9,
             Limits {
                 coefficient_bits: 8,

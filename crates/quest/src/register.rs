@@ -122,13 +122,13 @@ impl RegisterDeployment {
     /// Copy this actual native deployment into the compiler's validated target.
     /// # Errors
     /// Rejects a local amplitude count that cannot fit the compiler DTO.
-    pub fn compiler_snapshot(self) -> Result<quest_circuit::DeploymentSnapshot> {
+    pub fn compiler_snapshot(self) -> Result<quest_compile::DeploymentSnapshot> {
         let kind = if self.density {
-            quest_circuit::DeploymentKind::DensityMatrix
+            quest_compile::DeploymentKind::DensityMatrix
         } else {
-            quest_circuit::DeploymentKind::StateVector
+            quest_compile::DeploymentKind::StateVector
         };
-        Ok(quest_circuit::DeploymentSnapshot::new(
+        Ok(quest_compile::DeploymentSnapshot::new(
             kind,
             self.width,
             self.gpu,

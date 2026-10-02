@@ -101,7 +101,7 @@ fn hadamard_then_t_has_independent_exact_coefficients() -> Result<()> {
     )?;
     let expected = [[0, 1, 0, -1], [0, 1, 0, -1], [1, 0, 1, 0], [-1, 0, -1, 0]]
         .into_iter()
-        .map(|coefficients| Cyclotomic::new(coefficients.map(num_bigint::BigInt::from), 1, limits))
+        .map(|coefficients| Cyclotomic::new(coefficients.map(dashu_int::IBig::from), 1, limits))
         .collect::<quest_math::Result<Vec<_>>>()?;
     expect_eq!(matrix.entries(), expected.as_slice());
     Ok(())

@@ -1,0 +1,19 @@
+native CPU width=10 operations=259 signed_matrix_profiles=2 alias_pairs=128 environment_prepared_admitted_bytes=922989; Rust allocator excludes native C++ allocations
+        0.18 real         0.16 user         0.00 sys
+            16662528  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+                1243  page reclaims
+                  32  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                   1  voluntary context switches
+                 113  involuntary context switches
+          3386824573  instructions retired
+           604150141  cycles elapsed
+            12665240  peak memory footprint

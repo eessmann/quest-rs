@@ -1,21 +1,17 @@
 //! Optional candidate replacements. Certificates are owned independently of native resources.
-#[allow(unused_imports)]
-use crate::{
-    BoundParityPasses, ExactPasses, LinearPasses, NumericalPasses, OracleExport, ParityPasses,
-    TerminalPasses,
-};
 // These helpers are shared with sibling worker adapters but must not enter the public facade.
 
-use crate::model::{Occurrence, SemanticOperation};
 use crate::{
     Angle, BoundAngleTarget, Control, ControlState, Error, Gate, OccurrenceId, QuantumRegion,
     QubitId,
 };
 use crate::{ProvenanceGraph, ProvenanceId};
-use num_traits::ToPrimitive;
+use dashu_base::BitTest;
+use quest_language::quantum::model::{Occurrence, SemanticOperation};
 use quest_math::{
-    AngleTarget, ApproxCertificate, Axis, ExactCertificate, Limits, Rational, Sequence, Target,
+    AngleTarget, ApproxCertificate, Axis, ExactCertificate, Limits, RBig, Sequence, Target,
 };
+#[cfg(feature = "workers")]
 use quest_optimizer_client::Client;
 use std::sync::Arc;
 
@@ -25,6 +21,7 @@ pub enum WorkerError {
     Generator(crate::GenerationError),
     #[error(transparent)]
     Circuit(#[from] Error),
+    #[cfg(feature = "workers")]
     #[error(transparent)]
     Worker(#[from] quest_optimizer_client::Error),
     #[error(transparent)]
@@ -42,6 +39,7 @@ impl From<crate::GenerationError> for WorkerError {
             // Process backends share the existing worker scheduling contract:
             // a decline permits another generator, timeout stops bounded search,
             // and invalid envelopes/certificates remain hard typed failures.
+            #[cfg(feature = "workers")]
             crate::GenerationError::Process(error) => Self::Worker(error),
             error => Self::Generator(error),
         }
@@ -63,7 +61,7 @@ pub struct SynthesisReport {
     pub rotations: Vec<RotationCertificate>,
     /// Sum of requested certified local bounds, only through exact unitary operations.
     /// None retains local certificates without claiming a whole-program bound.
-    pub operator_error_bound: Option<Rational>,
+    pub operator_error_bound: Option<RBig>,
     pub provenance: Arc<ProvenanceGraph>,
     pub before_operations: usize,
     pub after_operations: usize,
@@ -95,9 +93,10 @@ pub struct ZxReport {
 /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
 pub fn target_angle(angle: &Angle, limits: Limits) -> Result<AngleTarget, WorkerError> {
     let (_, target) = angle.evaluate_target(&std::collections::BTreeMap::new())?;
-    let cap = limits.coefficient_bits.min(16_384);
-    let check = |values: &[&num_bigint::BigInt]| {
-        if values.iter().any(|value| value.bits() > cap) {
+    let cap = usize::try_from(limits.coefficient_bits.min(16_384))
+        .map_err(|_| WorkerError::Budget("angle identity bits"))?;
+    let check = |values: &[&dashu_int::IBig]| {
+        if values.iter().any(|value| value.bit_len() > cap) {
             Err(WorkerError::Budget("angle identity bits"))
         } else {
             Ok(())
@@ -374,7 +373,7 @@ pub trait RotationSynthesisPasses: Sized {
     /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
     fn synthesize_rotations(
         self,
-        client: &dyn crate::RotationGenerator,
+        client: &impl crate::RotationGenerator,
         epsilon_per_rotation: f64,
         seed: u64,
         limits: Limits,
@@ -395,7 +394,7 @@ impl RotationSynthesisPasses for QuantumRegion {
     )]
     fn synthesize_rotations(
         self,
-        client: &dyn crate::RotationGenerator,
+        client: &impl crate::RotationGenerator,
         epsilon_per_rotation: f64,
         seed: u64,
         limits: Limits,
@@ -404,7 +403,7 @@ impl RotationSynthesisPasses for QuantumRegion {
             || epsilon_per_rotation <= 0.0
             || epsilon_per_rotation >= 1.0
         {
-            return Err(quest_optimizer_client::Error::Limits.into());
+            return Err(WorkerError::Budget("rotation tolerance"));
         }
         if !self.explicit_edges().is_empty() {
             return Err(WorkerError::Ordering);
@@ -415,7 +414,7 @@ impl RotationSynthesisPasses for QuantumRegion {
                 .occurrences()
                 .iter()
                 .all(|o| o.operation.exact_unitary())
-                .then(|| Rational::from_integer(0.into())),
+                .then(|| RBig::from(0)),
             provenance: Arc::clone(self.provenance_arc()),
             before_operations: self.occurrences().len(),
             after_operations: 0,
@@ -492,35 +491,28 @@ impl RotationSynthesisPasses for QuantumRegion {
         }
         for certificate in &report.rotations {
             let evidence = crate::CompilationEvidence {
-                version: 1,
+                version: 3,
                 scope: crate::EvidenceScope::HistoricalLocalCertificate,
-                occurrence: format!("{:?}", certificate.occurrence),
-                interface: certificate
-                    .targets
-                    .iter()
-                    .map(|q| format!("{q:?}"))
-                    .chain(certificate.controls.iter().map(|c| format!("{c:?}")))
-                    .collect(),
-                outputs: output
-                    .iter()
-                    .filter(|o| o.provenance == certificate.provenance)
-                    .map(|o| format!("{:?}", o.id))
-                    .collect(),
+                location: crate::EvidenceLocation::Finite {
+                    occurrence: certificate.occurrence,
+                    targets: certificate.targets.to_vec(),
+                    controls: certificate.controls.to_vec(),
+                    outputs: output
+                        .iter()
+                        .filter(|o| o.provenance == certificate.provenance)
+                        .map(|o| o.id)
+                        .collect(),
+                    input: self.snapshot_id(),
+                    output: certificate.provenance,
+                },
                 algorithm: client.algorithm().into(),
-                input: format!("{:?}", self.snapshot_id()),
-                output: format!("{:?}", certificate.provenance),
                 seed: certificate.seed,
-                target: serde_json::to_value(certificate.certificate.target())
-                    .map_err(|_| WorkerError::Budget("certificate serialization"))?,
-                candidate: serde_json::to_value(certificate.certificate.candidate())
-                    .map_err(|_| WorkerError::Budget("certificate serialization"))?,
+                target: certificate.certificate.target().clone(),
+                candidate: certificate.certificate.candidate().clone(),
                 epsilon_bits: epsilon_per_rotation.to_bits(),
-                limits: serde_json::to_value(limits)
-                    .map_err(|_| WorkerError::Budget("certificate serialization"))?,
+                limits,
             };
-            let encoded = serde_json::to_vec(&evidence)
-                .map_err(|_| WorkerError::Budget("certificate serialization"))?;
-            graph.append_evidence(encoded.into(), budget.remaining)?;
+            graph.append_evidence(Arc::new(evidence), budget.remaining)?;
         }
         report.after_operations = output.len();
         report.provenance = budget.finish(graph, next)?;
@@ -538,25 +530,27 @@ impl RotationSynthesisPasses for QuantumRegion {
     }
 }
 
+#[cfg(feature = "workers")]
 fn quarter_turns(angle: &Angle) -> Option<usize> {
     let value = angle.rational_pi_identity()?;
     angle.evaluate(&std::collections::BTreeMap::new()).ok()?;
-    if value.numer().bits() > 16_384 || value.denom().bits() > 16_384 {
+    if value.numerator().bit_len() > 16_384 || value.denominator().bit_len() > 16_384 {
         return None;
     }
-    let numerator = std::ops::Mul::mul(value.numer(), 4u8);
-    if std::ops::Rem::rem(&numerator, value.denom()) != 0.into() {
+    let numerator = std::ops::Mul::mul(value.numerator(), 4u8);
+    if std::ops::Rem::rem(&numerator, value.denominator()) != 0.into() {
         return None;
     }
-    let quotient = std::ops::Div::div(numerator, value.denom());
-    let power: num_bigint::BigInt = std::ops::Rem::rem(quotient, 8u8);
-    let power = if power.sign() == num_bigint::Sign::Minus {
+    let quotient = std::ops::Div::div(numerator, value.denominator());
+    let power: dashu_int::IBig = std::ops::Rem::rem(quotient, dashu_int::IBig::from(8));
+    let power = if power.sign() == dashu_base::Sign::Negative {
         std::ops::Add::add(power, 8u8)
     } else {
         power
     };
-    power.to_usize()
+    usize::try_from(power).ok()
 }
+#[cfg(feature = "workers")]
 fn quantum_sequence(operations: &[Occurrence], interface: &[QubitId]) -> Option<Sequence> {
     let mut output = Vec::new();
     for occurrence in operations {
@@ -619,6 +613,7 @@ fn quantum_sequence(operations: &[Occurrence], interface: &[QubitId]) -> Option<
         operations: output,
     })
 }
+#[cfg(feature = "workers")]
 pub struct QuantumWindow {
     pub(crate) end: usize,
     pub(crate) interface: Vec<QubitId>,
@@ -626,6 +621,7 @@ pub struct QuantumWindow {
 }
 /// # Errors
 /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+#[cfg(feature = "workers")]
 pub fn quantum_window(
     occurrences: &[Occurrence],
     offset: usize,
@@ -666,6 +662,7 @@ pub fn quantum_window(
     })
 }
 /// Compiler extension over shared semantic capabilities.
+#[cfg(feature = "workers")]
 pub trait ZxPasses: Sized {
     /// # Errors
     /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
@@ -724,6 +721,7 @@ pub trait ZxPasses: Sized {
         limits: Limits,
     ) -> Result<(Self, ZxReport), WorkerError>;
 }
+#[cfg(feature = "workers")]
 impl ZxPasses for QuantumRegion {
     /// Produce one exact certified ZX region candidate for beam scoring.
     /// An unsupported operation is a fence; a worker/admission error propagates.
@@ -1012,10 +1010,11 @@ impl From<quest_language::angle::Error> for WorkerError {
 mod review_tests {
     use super::*;
     use googletest::{Result, prelude::*};
+    #[cfg(feature = "workers")]
     #[gtest]
     fn zx_quarter_turn_admission_retains_pi_conversion_obligation() -> Result<()> {
-        let huge = num_bigint::BigInt::from(10).pow(400);
-        let angle = Angle::rational_pi(crate::BigRational::from_integer(huge))?;
+        let huge = dashu_int::IBig::from(10).pow(400);
+        let angle = Angle::rational_pi(crate::RBig::from(huge))?;
         expect_eq!(quarter_turns(&angle), None);
         Ok(())
     }

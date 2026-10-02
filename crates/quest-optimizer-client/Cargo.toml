@@ -7,11 +7,11 @@ license.workspace = true
 repository.workspace = true
 
 [dependencies]
+dashu-base.workspace = true
 quest-optimizer-protocol.workspace = true
 quest-math = { workspace = true, features = ["serde"] }
 serde_json.workspace = true
 thiserror.workspace = true
-quest-synthesis.workspace = true
 
 [dev-dependencies]
 googletest.workspace = true

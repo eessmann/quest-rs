@@ -1,0 +1,16 @@
+• Running devenv:files:cleanup
+✓ Running devenv:files:cleanup in 24.9ms
+• Running devenv:enterShell
+✓ Running devenv:enterShell in 31.7ms
+• Running devenv:enterTest
+✓ Running devenv:enterTest in 333ns (no command)
+rustc 1.100.0-nightly (6bb1652a0 2026-09-22)
+binary: rustc
+commit-hash: 6bb1652a020e80cef79332741d89e996d71933c9
+commit-date: 2026-09-22
+host: aarch64-apple-darwin
+release: 1.100.0-nightly
+LLVM version: 23.1.1
+cargo 1.100.0-nightly (495c385d0 2026-09-16)
+/nix/store/3fq2fnyv38760hzav5ja94bnd2qfs6ca-rust-default-1.100.0-nightly-2026-09-23/bin/rustc
+/nix/store/3fq2fnyv38760hzav5ja94bnd2qfs6ca-rust-default-1.100.0-nightly-2026-09-23/bin/cargo

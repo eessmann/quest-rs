@@ -1,7 +1,7 @@
 //! Fresh program-owned identities for one unverified transformation transaction.
 use super::{
-    Block, BlockId, InstructionKind, Interface, OracleId, Program, ProgramId, Region, RegionId,
-    Slot, SlotId, Terminator, Type, Value, ValueId,
+    Block, BlockId, Interface, OracleId, Program, ProgramId, Region, RegionId, Slot, SlotId,
+    Terminator, Type, Value, ValueId,
 };
 use crate::semantic::{CompileLimits, SemanticError};
 
@@ -59,8 +59,12 @@ impl Program {
         if width == 0 || width > limits.qubits || values.owner != self.id {
             return Err(SemanticError::invalid("invalid synthetic oracle interface"));
         }
-        if self.regions.iter().any(|region| region.oracle.as_ref().is_some_and(|id| id.index() == capture))
-            || self.blocks.iter().flat_map(|block| &block.instructions).any(|item| matches!(item.kind, InstructionKind::Capture { index, .. } if index == capture)) {
+        if self.regions.iter().any(|region| {
+            region
+                .oracle
+                .as_ref()
+                .is_some_and(|id| id.index() == capture)
+        }) {
             return Err(SemanticError::invalid("synthetic oracle capture collision"));
         }
         let slots = self

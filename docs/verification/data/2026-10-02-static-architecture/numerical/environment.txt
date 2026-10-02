@@ -1,0 +1,17 @@
+2026-10-02T13:24:28.711997+00:00
+Darwin <host> 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:06:24 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6030 arm64 arm Darwin
+rustc 1.100.0-nightly (6bb1652a0 2026-09-22)
+binary: rustc
+commit-hash: 6bb1652a020e80cef79332741d89e996d71933c9
+commit-date: 2026-09-22
+host: aarch64-apple-darwin
+release: 1.100.0-nightly
+LLVM version: 23.1.1
+cargo 1.100.0-nightly (495c385d0 2026-09-16)
+machdep.cpu.brand_string: Apple M3 Pro
+hw.memsize: 19327352832
+hw.ncpu: 11
+release_lto=thin
+jobs=2
+RUSTFLAGS=''
+CARGO_ENCODED_RUSTFLAGS=''

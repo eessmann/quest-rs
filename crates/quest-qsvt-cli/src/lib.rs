@@ -34,7 +34,7 @@ pub enum Error {
     #[error(transparent)]
     Qsvt(#[from] quest_qsvt::Error),
     #[error(transparent)]
-    Circuit(#[from] quest_circuit::Error),
+    Circuit(#[from] quest_compile::Error),
     #[cfg(feature = "native")]
     #[error(transparent)]
     Quest(#[from] quest::Error),

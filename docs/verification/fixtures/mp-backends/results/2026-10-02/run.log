@@ -1,0 +1,11 @@
+• Running devenv:files:cleanup
+✓ Running devenv:files:cleanup in 20.9ms
+• Running devenv:enterShell
+✓ Running devenv:enterShell in 26.7ms
+• Running devenv:enterTest
+✓ Running devenv:enterTest in 500ns (no command)
+    Finished `release` profile [optimized] target(s) in 0.08s
+     Running `docs/verification/fixtures/mp-backends/target/release/quest-mp-backend-bench`
+verified bits=128: 256 exact input pairs, 48 nearest outputs, 128 directed pairs, 256 matrix outputs, 512 QR residual/orthogonality witnesses per backend
+verified bits=256: 256 exact input pairs, 48 nearest outputs, 128 directed pairs, 256 matrix outputs, 512 QR residual/orthogonality witnesses per backend
+verified bits=512: 256 exact input pairs, 48 nearest outputs, 128 directed pairs, 256 matrix outputs, 512 QR residual/orthogonality witnesses per backend

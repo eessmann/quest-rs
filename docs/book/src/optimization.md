@@ -7,7 +7,7 @@ Optimization APIs report which representation changed and which guarantee was es
 The consuming `optimize_classical` wrapper preserves source snapshots, frozen structured syntax, and once-evaluated captures. Constant propagation, pure common-expression elimination, branch simplification, and dead pure computation are bounded and the resulting SSA is independently verified.
 
 ```rust
-{{#include ../../../crates/quest-circuit/tests/tutorials.rs:classical_optimization}}
+{{#include ../../../crates/quest-compile/tests/tutorials.rs:classical_optimization}}
 ```
 
 Constants flow across joins only when incoming values justify the same result; loops use a bounded fixed-point analysis. A potentially trapping operation is retained unless its successful evaluation is proved. Quantum operations, memory effects, and stochastic events cannot be removed as dead scalar work.
@@ -22,7 +22,7 @@ pairs across proven commuting operations, and resynthesizes CNOT/Clifford+T affi
 parity windows. It never puts CFG back edges into a quantum DAG.
 
 ```rust
-{{#include ../../../crates/quest-circuit/tests/tutorials.rs:structured_quantum_optimization}}
+{{#include ../../../crates/quest-compile/tests/tutorials.rs:structured_quantum_optimization}}
 ```
 
 Calls, effects, barriers, dynamic operands, reference-parameter slots, broadcasts,
@@ -36,10 +36,10 @@ uses the bound finite-region representation.
 
 ## Exact region transformations and fusion
 
-`QuantumRegionBuilder` retains exact rational angles and symbolic parameters until binding. Finite passes are compiler extension traits imported through `quest_circuit::prelude::*`. Bind original obligations and import the result into `Program<Constructed>` for execution. `ProgramBuilder` can embed the same finite capability beside classical computation. Compilation passes are explicit; construction does not run an optimization pipeline.
+`QuantumRegionBuilder` retains exact rational angles and symbolic parameters until binding. Finite passes are compiler extension traits imported through `quest_compile::prelude::*`. Bind original obligations and import the result into `Program<Constructed>` for execution. `ProgramBuilder` can embed the same finite capability beside classical computation. Compilation passes are explicit; construction does not run an optimization pipeline.
 
 ```rust
-{{#include ../../../crates/quest-circuit/tests/tutorials.rs:ideal_optimization}}
+{{#include ../../../crates/quest-compile/tests/tutorials.rs:ideal_optimization}}
 ```
 
 Exact local rewrites cancel inverse operations and merge compatible exact rotations across dependencies only when the movement is justified. Global phase and signed controls remain part of the operation. Arbitrary floating angles do not gain exact identities because two decimals look opposite.

@@ -1,5 +1,5 @@
 use googletest::prelude::*;
-use quest_circuit::{Angle, Control, ControlState, Gate, OracleFragment, QuantumRegionBuilder};
+use quest_compile::{Angle, Control, ControlState, Gate, OracleFragment, QuantumRegionBuilder};
 use quest_qsvt::{Complex64, NumericalPolicy, materialize_oracle};
 use std::ops::Sub;
 

@@ -32,6 +32,7 @@ in
     pkgs.ninja
     pkgs.pkg-config
     pkgs.cargo-nextest
+    pkgs.mdbook
     pkgs.llvmPackages.libclang
   ] ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [ pkgs.binutils pkgs.glibc.bin ];
   env = {

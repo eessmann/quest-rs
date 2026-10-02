@@ -1,0 +1,26 @@
+[
+  {
+    "name": "dashu-base",
+    "version": "0.6.1"
+  },
+  {
+    "name": "dashu-float",
+    "version": "0.6.2"
+  },
+  {
+    "name": "dashu-int",
+    "version": "0.6.2"
+  },
+  {
+    "name": "dashu-ratio",
+    "version": "0.6.1"
+  },
+  {
+    "name": "num-bigint",
+    "version": "0.4.8"
+  },
+  {
+    "name": "num-rational",
+    "version": "0.4.2"
+  }
+]

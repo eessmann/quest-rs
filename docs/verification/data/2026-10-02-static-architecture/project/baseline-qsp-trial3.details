@@ -1,0 +1,20 @@
+qsp degree=256 source_count=257 controls=257 grid=2048 completion_residual=2.89907934808216977e-15 reconstruction_residual=8.86031314223782743e-16 tolerance=1e-11 margin=1e-12 algorithm=inverse-nlft-divide-conquer
+qsp degree=1024 source_count=1025 controls=1025 grid=8192 completion_residual=5.57306207879878839e-15 reconstruction_residual=2.44428537577268106e-14 tolerance=1e-11 margin=1e-12 algorithm=inverse-nlft-divide-conquer
+        0.05 real         0.04 user         0.00 sys
+             6619136  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+                 636  page reclaims
+                   5  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                   0  voluntary context switches
+                  20  involuntary context switches
+           982523177  instructions retired
+           185945782  cycles elapsed
+             4424112  peak memory footprint

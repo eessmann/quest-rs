@@ -16,6 +16,11 @@ impl Heap for syntax::Statement {
 impl Heap for S {
     fn heap(&self) -> Result<usize, SemanticError> {
         match self {
+            Self::Finite {
+                operations,
+                qubits,
+                bits,
+            } => sum([operations.heap()?, qubits.heap()?, bits.heap()?]),
             Self::Include(name) => name.heap(),
             Self::Oracle { name, arity, .. } => sum([name.heap()?, arity.heap()?]),
             Self::Alias { name, value } => sum([name.heap()?, value.heap()?]),
@@ -132,6 +137,38 @@ impl Heap for syntax::Expression {
             E::Call(name, arguments) => sum([name.heap()?, arguments.heap()?]),
             E::Cast(ty, value) => sum([ty.heap()?, value.heap()?]),
             E::Array(values) => values.heap(),
+        }
+    }
+}
+
+impl Heap for crate::semantic::finite::FiniteOperation {
+    fn heap(&self) -> Result<usize, SemanticError> {
+        match self {
+            Self::Gate {
+                arguments,
+                targets,
+                controls,
+                ..
+            } => sum([
+                arguments.heap()?,
+                targets.heap()?,
+                controls
+                    .capacity()
+                    .checked_mul(size_of::<(usize, bool)>())
+                    .ok_or_else(|| SemanticError::budget("finite controls"))?,
+            ]),
+            Self::Oracle {
+                targets, controls, ..
+            } => sum([
+                targets.heap()?,
+                controls
+                    .capacity()
+                    .checked_mul(size_of::<(usize, bool)>())
+                    .ok_or_else(|| SemanticError::budget("finite controls"))?,
+            ]),
+            Self::Payload { operands, .. } | Self::Barrier(operands) => operands.heap(),
+            Self::Conditional { operation, .. } => operation.heap(),
+            Self::Measure { .. } | Self::Reset(_) => Ok(0),
         }
     }
 }

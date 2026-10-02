@@ -8,6 +8,9 @@ and [tutorial validation guide](../book/src/validation.md) for current commands.
 
 | Record | Scope |
 | --- | --- |
+| [Dashu migration, 2026-10-02](2026-10-02-dashu-migration.md) | Pure-Rust arbitrary precision, canonical exact interchange, dependency cleanup and numerical/performance validation |
+| [Static architecture, 2026-10-02](2026-10-02-static-architecture.md) | Generic functions/arithmetic, MP intervals, unified Remez/root coverage, compiler/native consolidation and matched performance |
+| [Mathematical audit, 2026-10-01](2026-10-01-mathematical-audit.md) | Paper and C++ capability comparison, QSP/QSVT defaults, mathematical contracts and nightly generic interfaces |
 | [Linux architecture and synthesis, 2026-09-30](2026-09-30-linux-architecture-synthesis.md) | Linux workspace, bounded processes, CPU/OpenMP/MPI, large QSP fixtures and portability corrections |
 | [Architecture and synthesis, 2026-09-29](2026-09-29-architecture-synthesis.md) | Unified program lifecycle, bounded Rust synthesis, RHW/NLFT, payload-bound QSVT evidence and pinned reference comparisons |
 | [Grace Hopper, 2026-09-29](2026-09-29-grace-hopper.md) | Manual/Spack setup, CPU/OpenMP/GPU execution, dependency closure and workspace checks |
@@ -19,7 +22,8 @@ and [tutorial validation guide](../book/src/validation.md) for current commands.
 | [Native packaging, 2026-09-10](2026-09-10-native-cmake.md) | CMake imported targets, installed runtime paths and downstream consumers |
 | [Compiler and runtime, 2026-09-10](2026-09-10-m6-m11.md) | OpenQASM profile, SSA, optional workers and numerical checks |
 
-[Consolidation migration notes](2026-09-28-consolidation-migration.md) and
+[Static architecture migration](2026-10-02-static-architecture-migration.md),
+[consolidation migration notes](2026-09-28-consolidation-migration.md) and
 [optimizer migration notes](2026-09-28-optimization-roadmap-migration.md) explain
 caller-visible changes. The [optimization reference map](2026-09-28-optimization-roadmap-implementation.md)
 and [correctness regressions](2026-09-28-optimization-roadmap-review.md) link

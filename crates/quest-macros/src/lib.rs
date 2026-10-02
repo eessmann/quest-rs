@@ -18,7 +18,7 @@ pub fn circuit_file(input: TokenStream) -> TokenStream {
 }
 fn root_path() -> syn::Result<Tokens> {
     use proc_macro_crate::{FoundCrate, crate_name};
-    for (package, lib) in [("quest-circuit", "quest_circuit"), ("quest-rs", "quest")] {
+    for (package, lib) in [("quest-compile", "quest_compile"), ("quest-rs", "quest")] {
         if let Ok(found) = crate_name(package) {
             let name = match found {
                 FoundCrate::Itself => lib.to_owned(),
@@ -30,7 +30,7 @@ fn root_path() -> syn::Result<Tokens> {
     }
     Err(syn::Error::new(
         Span::call_site(),
-        "circuit! requires a quest-circuit or quest-rs dependency",
+        "circuit! requires a quest-compile or quest-rs dependency",
     ))
 }
 

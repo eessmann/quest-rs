@@ -5,7 +5,7 @@ use faer::{
 };
 use num_complex::Complex64 as C;
 use quest::{Environment, QubitCount};
-use quest_circuit::{NumericalOperator, OracleFragment, QuantumRegionBuilder};
+use quest_compile::{NumericalOperator, OracleFragment, QuantumRegionBuilder};
 use quest_qsvt::{
     DenseEncodingBuilder, EncodingBuilder, Left, LogicalSpace, NumericalPolicy, ProjectedEncoding,
     Right, TransformBuilder, ValidatedTransform,
@@ -24,7 +24,7 @@ pub fn encoding(block: &StoredBlockEncoding) -> Result<ProjectedEncoding> {
     let mut builder = QuantumRegionBuilder::new(width, 0)?;
     let targets = (0..width)
         .map(|index| builder.qubit(index))
-        .collect::<quest_circuit::Result<Vec<_>>>()?;
+        .collect::<quest_compile::Result<Vec<_>>>()?;
     builder.numerical(
         NumericalOperator::from_view(block.u(), policy.matrix_policy())
             .map_err(quest_qsvt::Error::from)?,

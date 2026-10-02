@@ -2,18 +2,15 @@
 //! remains the authority for parameter domains and source conversion obligations.
 use super::{ParityOptions, ParityReport};
 use crate::linear::{self, Cnot, Work};
-#[allow(unused_imports)]
-use crate::{
-    ExactPasses, LinearPasses, NumericalPasses, OracleExport, ParityPasses, TerminalPasses,
-};
+use dashu_base::BitTest;
 
-use crate::model::{Instruction, Occurrence, Operation, SemanticOperation};
 use crate::{
-    Angle, BigRational, BoundAngleTarget, BoundRegion, Error, Gate, ParameterId, ProvenanceGraph,
-    QuantumRegion, QubitId, Result,
+    Angle, BoundAngleTarget, BoundRegion, Error, Gate, ParameterId, ProvenanceGraph, QuantumRegion,
+    QubitId, RBig, Result,
 };
-use num_bigint::BigInt;
-use num_traits::{Signed, Zero};
+use dashu_base::Signed;
+use dashu_int::IBig;
+use quest_language::quantum::model::{Instruction, Occurrence, Operation, SemanticOperation};
 use std::{collections::BTreeMap, sync::Arc};
 
 #[derive(Clone)]
@@ -26,15 +23,15 @@ enum AffineOp {
 }
 #[derive(Clone, PartialEq, Eq)]
 struct Pair {
-    radians: BigRational,
-    pi: BigRational,
+    radians: RBig,
+    pi: RBig,
 }
 impl Pair {
     fn from_target(target: &BoundAngleTarget, options: ParityOptions) -> Result<Self> {
-        let within = |values: &[&BigInt]| {
+        let within = |values: &[&IBig]| {
             values
                 .iter()
-                .all(|value| value.bits() <= options.max_coefficient_bits)
+                .all(|value| value.bit_len() <= options.max_coefficient_bits)
         };
         let (radians, pi) = match target {
             BoundAngleTarget::DyadicRadians { bits } => {
@@ -42,8 +39,8 @@ impl Pair {
                     return Err(Error::Unsupported("signed-zero symbolic parity"));
                 }
                 (
-                    crate::rational::dyadic_from_bits(*bits).ok_or(Error::NonFinite)?,
-                    BigRational::from_integer(0.into()),
+                    quest_language::rational::dyadic_from_bits(*bits).ok_or(Error::NonFinite)?,
+                    RBig::from(0),
                 )
             }
             BoundAngleTarget::RationalPi {
@@ -57,8 +54,8 @@ impl Pair {
                     return Err(Error::Budget("symbolic parity coefficient bits"));
                 }
                 (
-                    BigRational::from_integer(0.into()),
-                    BigRational::new(numerator.clone(), denominator.clone()),
+                    RBig::from(0),
+                    RBig::from_parts_signed(numerator.clone(), denominator.clone()),
                 )
             }
             BoundAngleTarget::AffinePi {
@@ -79,22 +76,22 @@ impl Pair {
                     return Err(Error::Budget("symbolic parity coefficient bits"));
                 }
                 (
-                    BigRational::new(radians_numerator.clone(), radians_denominator.clone()),
-                    BigRational::new(pi_numerator.clone(), pi_denominator.clone()),
+                    RBig::from_parts_signed(radians_numerator.clone(), radians_denominator.clone()),
+                    RBig::from_parts_signed(pi_numerator.clone(), pi_denominator.clone()),
                 )
             }
         };
         Ok(Self { radians, pi })
     }
-    fn bits(&self) -> u64 {
+    fn bit_len(&self) -> usize {
         [&self.radians, &self.pi]
             .into_iter()
-            .map(|v| v.numer().bits().max(v.denom().bits()))
+            .map(|v| v.numerator().bit_len().max(v.denominator().bit_len()))
             .max()
             .unwrap_or(0)
     }
     fn checked(self, options: ParityOptions) -> Result<Self> {
-        if self.bits() > options.max_coefficient_bits {
+        if self.bit_len() > options.max_coefficient_bits {
             return Err(Error::Budget("symbolic parity coefficient bits"));
         }
         Ok(self)
@@ -103,17 +100,17 @@ impl Pair {
         self = self.checked(options)?;
         let period_bits = self
             .pi
-            .denom()
-            .bits()
+            .denominator()
+            .bit_len()
             .checked_add(1)
             .ok_or(Error::Budget("symbolic parity arithmetic"))?;
         Self::admit_forecast(period_bits, options, work)?;
-        let period = std::ops::Mul::mul(self.pi.denom(), BigInt::from(2));
-        let mut numerator = std::ops::Rem::rem(self.pi.numer(), &period);
+        let period = std::ops::Mul::mul(self.pi.denominator(), IBig::from(2));
+        let mut numerator = std::ops::Rem::rem(self.pi.numerator(), &period);
         if numerator.is_negative() {
             std::ops::AddAssign::add_assign(&mut numerator, period);
         }
-        self.pi = BigRational::new(numerator, self.pi.denom().clone());
+        self.pi = RBig::from_parts(numerator, self.pi.denominator().clone());
         self.checked(options)
     }
     fn add(&self, other: &Self, options: ParityOptions, work: &mut Work) -> Result<Self> {
@@ -124,25 +121,25 @@ impl Pair {
         .normalized(options, work)
     }
     fn forecast_add(&self, other: &Self, options: ParityOptions, work: &mut Work) -> Result<()> {
-        let component = |a: &BigRational, b: &BigRational| -> Result<u64> {
+        let component = |a: &RBig, b: &RBig| -> Result<usize> {
             let left = a
-                .numer()
-                .bits()
-                .checked_add(b.denom().bits())
+                .numerator()
+                .bit_len()
+                .checked_add(b.denominator().bit_len())
                 .ok_or(Error::Budget("symbolic parity arithmetic"))?;
             let right = b
-                .numer()
-                .bits()
-                .checked_add(a.denom().bits())
+                .numerator()
+                .bit_len()
+                .checked_add(a.denominator().bit_len())
                 .ok_or(Error::Budget("symbolic parity arithmetic"))?;
             let numerator = left
                 .max(right)
                 .checked_add(1)
                 .ok_or(Error::Budget("symbolic parity arithmetic"))?;
             let denominator = a
-                .denom()
-                .bits()
-                .checked_add(b.denom().bits())
+                .denominator()
+                .bit_len()
+                .checked_add(b.denominator().bit_len())
                 .ok_or(Error::Budget("symbolic parity arithmetic"))?;
             Ok(numerator.max(denominator))
         };
@@ -156,17 +153,17 @@ impl Pair {
         options: ParityOptions,
         work: &mut Work,
     ) -> Result<()> {
-        let ratio_numerator = BigInt::from(numerator).bits();
-        let ratio_denominator = BigInt::from(denominator).bits();
-        let component = |value: &BigRational| -> Result<u64> {
+        let ratio_numerator = IBig::from(numerator).bit_len();
+        let ratio_denominator = IBig::from(denominator).bit_len();
+        let component = |value: &RBig| -> Result<usize> {
             let numerator = value
-                .numer()
-                .bits()
+                .numerator()
+                .bit_len()
                 .checked_add(ratio_numerator)
                 .ok_or(Error::Budget("symbolic parity arithmetic"))?;
             let denominator = value
-                .denom()
-                .bits()
+                .denominator()
+                .bit_len()
                 .checked_add(ratio_denominator)
                 .ok_or(Error::Budget("symbolic parity arithmetic"))?;
             Ok(numerator.max(denominator))
@@ -177,11 +174,11 @@ impl Pair {
             work,
         )
     }
-    fn admit_forecast(bits: u64, options: ParityOptions, work: &mut Work) -> Result<()> {
+    fn admit_forecast(bits: usize, options: ParityOptions, work: &mut Work) -> Result<()> {
         if bits > options.max_coefficient_bits {
             return Err(Error::Budget("symbolic parity coefficient bits"));
         }
-        work.charge(usize::try_from(bits).map_err(|_| Error::Budget("symbolic parity work"))?)
+        work.charge(bits)
     }
     fn scaled(
         &self,
@@ -190,7 +187,7 @@ impl Pair {
         options: ParityOptions,
         work: &mut Work,
     ) -> Result<Self> {
-        let ratio = BigRational::new(numerator.into(), denominator.into());
+        let ratio = RBig::from_parts_signed(numerator.into(), denominator.into());
         Self {
             radians: std::ops::Mul::mul(&self.radians, &ratio),
             pi: std::ops::Mul::mul(&self.pi, &ratio),
@@ -200,7 +197,7 @@ impl Pair {
     fn angle(&self) -> Result<Angle> {
         Ok(Angle::affine(self.radians.clone(), self.pi.clone())?)
     }
-    fn is_zero(&self) -> bool {
+    const fn is_zero(&self) -> bool {
         self.radians.is_zero() && self.pi.is_zero()
     }
 }
@@ -217,7 +214,7 @@ fn raw_from_angle(angle: &Angle, options: ParityOptions) -> Result<Pair> {
 }
 fn normalize_angle(angle: &Angle, options: ParityOptions, work: &mut Work) -> Result<Angle> {
     let pair = raw_from_angle(angle, options)?.normalized(options, work)?;
-    work.charge(usize::try_from(pair.bits()).map_err(|_| Error::Budget("symbolic parity work"))?)?;
+    work.charge(pair.bit_len())?;
     pair.angle()
 }
 fn charge_exact_source(angle: &Angle, work: &mut Work) -> Result<()> {
@@ -240,7 +237,7 @@ fn add_angle(
             work,
         )?;
     } else {
-        Pair::admit_forecast(raw_from_angle(angle, options)?.bits(), options, work)?;
+        Pair::admit_forecast(raw_from_angle(angle, options)?.bit_len(), options, work)?;
     }
     let merged = if let Some(old) = phases.get(&mask) {
         charge_exact_source(old, work)?;
@@ -282,7 +279,7 @@ fn bound_angle(
         return Err(Error::InvalidId);
     };
     let pair = Pair::from_target(target, options)?.checked(options)?;
-    Pair::admit_forecast(pair.bits(), options, work)?;
+    Pair::admit_forecast(pair.bit_len(), options, work)?;
     pair.angle()
 }
 fn adapt(
@@ -396,16 +393,14 @@ fn add_pair(
     if let Some(old) = phases.get(&mask) {
         old.forecast_add(pair, options, work)?;
     } else {
-        Pair::admit_forecast(pair.bits(), options, work)?;
+        Pair::admit_forecast(pair.bit_len(), options, work)?;
     }
     let next = if let Some(old) = phases.get(&mask) {
         old.add(pair, options, work)?
     } else {
         pair.clone().normalized(options, work)?
     };
-    work.charge(
-        usize::try_from(next.bits()).map_err(|_| Error::Budget("symbolic parity replay work"))?,
-    )?;
+    work.charge(next.bit_len())?;
     if next.is_zero() {
         phases.remove(&mask);
     } else {
@@ -759,8 +754,7 @@ impl BoundParityPasses for QuantumRegion {
         }
         // Two simultaneous exact phase tables, source/candidate summaries,
         // replay coefficients and the output sequence can coexist here.
-        let coefficient_bytes = usize::try_from(options.max_coefficient_bits.div_ceil(8))
-            .map_err(|_| Error::Budget("symbolic parity scratch"))?;
+        let coefficient_bytes = options.max_coefficient_bits.div_ceil(8);
         let scratch = coefficient_bytes
             .checked_mul(16)
             .and_then(|bytes| bytes.checked_add(2048))

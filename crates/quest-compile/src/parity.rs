@@ -20,15 +20,13 @@
 //! forecasts. They do not impose a wall-clock deadline or a process-RSS bound.
 use crate::ProvenanceGraph;
 use crate::linear::{self, Work};
-use crate::model::SemanticOperation;
 use crate::{
-    Angle, BigRational, Cnot, Error, Gate, LinearOptions, LinearRewrite, QuantumRegion, QubitId,
-    Result,
+    Angle, Cnot, Error, Gate, LinearOptions, LinearRewrite, QuantumRegion, QubitId, RBig, Result,
 };
-#[allow(unused_imports)]
-use crate::{ExactPasses, LinearPasses, NumericalPasses, OracleExport, TerminalPasses};
-use num_bigint::BigInt;
-use num_traits::{Signed, Zero};
+use dashu_base::BitTest;
+use dashu_base::Signed;
+use dashu_int::IBig;
+use quest_language::quantum::model::SemanticOperation;
 use std::{collections::BTreeMap, sync::Arc};
 mod bound;
 pub use bound::BoundParityPasses;
@@ -37,26 +35,16 @@ pub use bound::BoundParityPasses;
 /// Coefficients multiply mathematical pi; these DTOs are admitted on every call.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AffinePhaseOperation {
-    X {
-        target: usize,
-    },
+    X { target: usize },
     Cnot(Cnot),
-    Phase {
-        target: usize,
-        coefficient: BigRational,
-    },
-    Rz {
-        target: usize,
-        coefficient: BigRational,
-    },
-    GlobalPhase {
-        coefficient: BigRational,
-    },
+    Phase { target: usize, coefficient: RBig },
+    Rz { target: usize, coefficient: RBig },
+    GlobalPhase { coefficient: RBig },
 }
 #[derive(Debug, Clone, Copy)]
 pub struct ParityOptions {
     pub linear: LinearOptions,
-    pub max_coefficient_bits: u64,
+    pub max_coefficient_bits: usize,
 }
 impl Default for ParityOptions {
     fn default() -> Self {
@@ -92,49 +80,55 @@ pub struct ParityReport {
 struct Signature {
     rows: Vec<u64>,
     offsets: u64,
-    phases: BTreeMap<u64, BigRational>,
+    phases: BTreeMap<u64, RBig>,
 }
-fn coefficient_bits(value: &BigRational, options: ParityOptions) -> Result<()> {
-    if value.denom().is_zero() {
-        return Err(Error::ZeroDenominator);
-    }
-    if value.numer().bits().max(value.denom().bits()) > options.max_coefficient_bits {
+fn coefficient_bits(value: &RBig, options: ParityOptions) -> Result<()> {
+    if value
+        .numerator()
+        .bit_len()
+        .max(value.denominator().bit_len())
+        > options.max_coefficient_bits
+    {
         return Err(Error::Budget("parity coefficient bits"));
     }
     Ok(())
 }
-fn reduced(value: &BigRational, options: ParityOptions) -> Result<BigRational> {
+fn reduced(value: &RBig, options: ParityOptions) -> Result<RBig> {
     coefficient_bits(value, options)?;
-    let value = BigRational::new(value.numer().clone(), value.denom().clone());
-    let period = std::ops::Mul::mul(value.denom(), BigInt::from(2));
-    let mut numerator = std::ops::Rem::rem(value.numer(), &period);
+    let period = std::ops::Mul::mul(value.denominator(), IBig::from(2));
+    let mut numerator = std::ops::Rem::rem(value.numerator(), &period);
     if numerator.is_negative() {
         std::ops::AddAssign::add_assign(&mut numerator, period);
     }
-    let result = BigRational::new(numerator, value.denom().clone());
+    let result = RBig::from_parts(numerator, value.denominator().clone());
     coefficient_bits(&result, options)?;
     Ok(result)
 }
 fn add_phase(
-    phases: &mut BTreeMap<u64, BigRational>,
+    phases: &mut BTreeMap<u64, RBig>,
     mask: u64,
-    value: &BigRational,
+    value: &RBig,
     options: ParityOptions,
     work: &mut Work,
 ) -> Result<()> {
     let value = reduced(value, options)?;
     let value = if let Some(old) = phases.get(&mask) {
         let bits = old
-            .numer()
-            .bits()
-            .max(old.denom().bits())
-            .checked_add(value.numer().bits().max(value.denom().bits()))
+            .numerator()
+            .bit_len()
+            .max(old.denominator().bit_len())
+            .checked_add(
+                value
+                    .numerator()
+                    .bit_len()
+                    .max(value.denominator().bit_len()),
+            )
             .and_then(|n| n.checked_add(1))
             .ok_or(Error::Budget("parity arithmetic bits"))?;
         if bits > options.max_coefficient_bits {
             return Err(Error::Budget("parity arithmetic bits"));
         }
-        work.charge(usize::try_from(bits).map_err(|_| Error::Budget("parity work"))?)?;
+        work.charge(bits)?;
         reduced(&std::ops::Add::add(old, value), options)?
     } else {
         value
@@ -156,13 +150,12 @@ fn allocation_preflight(width: usize, count: usize, options: ParityOptions) -> R
         .checked_add(7)
         .and_then(|n| n.checked_div(8))
         .ok_or(Error::Budget("parity bytes"))?;
-    let count = u64::try_from(count).map_err(|_| Error::Budget("parity bytes"))?;
     let bytes = limb_bytes
         .checked_mul(64)
         .and_then(|n| n.checked_add(4096))
         .and_then(|n| n.checked_mul(count.saturating_add(1)))
         .ok_or(Error::Budget("parity bytes"))?;
-    if bytes > u64::try_from(options.linear.max_bytes).map_err(|_| Error::Budget("parity bytes"))? {
+    if bytes > options.linear.max_bytes {
         return Err(Error::Budget("parity bytes"));
     }
     Ok(())
@@ -231,11 +224,9 @@ fn signature(
                 target,
                 coefficient,
             } => {
-                let mut coefficient =
-                    BigRational::new(coefficient.numer().clone(), coefficient.denom().clone());
+                let mut coefficient = coefficient.clone();
                 if matches!(operation, AffinePhaseOperation::Rz { .. }) {
-                    let half =
-                        std::ops::Div::div(std::ops::Neg::neg(&coefficient), BigInt::from(2));
+                    let half = std::ops::Div::div(std::ops::Neg::neg(&coefficient), IBig::from(2));
                     add_phase(&mut result.phases, 0, &half, options, work)?;
                 }
                 if result.offsets & linear::bit(*target)? != 0 {
@@ -411,7 +402,7 @@ fn fold_candidate_with_work(
     }
     Ok(ParitySynthesis { operations })
 }
-fn rational_angle(angle: &Angle) -> Option<BigRational> {
+fn rational_angle(angle: &Angle) -> Option<RBig> {
     let coefficient = angle.rational_pi_identity()?;
     angle.evaluate(&BTreeMap::new()).ok()?;
     Some(coefficient)
@@ -478,23 +469,23 @@ fn adapter(operation: &SemanticOperation) -> Option<AffinePhaseOperation> {
                 },
                 Gate::Z => AffinePhaseOperation::Phase {
                     target,
-                    coefficient: BigRational::from_integer(1.into()),
+                    coefficient: RBig::from(1),
                 },
                 Gate::S => AffinePhaseOperation::Phase {
                     target,
-                    coefficient: BigRational::new(1.into(), 2.into()),
+                    coefficient: RBig::from_parts_signed(1.into(), 2.into()),
                 },
                 Gate::Sdg => AffinePhaseOperation::Phase {
                     target,
-                    coefficient: BigRational::new((-1).into(), 2.into()),
+                    coefficient: RBig::from_parts_signed((-1).into(), 2.into()),
                 },
                 Gate::T => AffinePhaseOperation::Phase {
                     target,
-                    coefficient: BigRational::new(1.into(), 4.into()),
+                    coefficient: RBig::from_parts_signed(1.into(), 4.into()),
                 },
                 Gate::Tdg => AffinePhaseOperation::Phase {
                     target,
-                    coefficient: BigRational::new((-1).into(), 4.into()),
+                    coefficient: RBig::from_parts_signed((-1).into(), 4.into()),
                 },
                 _ => return None,
             })
@@ -535,13 +526,6 @@ fn operation(value: AffinePhaseOperation, owner: u64) -> Result<SemanticOperatio
 pub trait ParityPasses: Sized {
     /// # Errors
     /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
-    fn resynthesize_parity_candidate(
-        self,
-        options: ParityOptions,
-        max_output_operations: usize,
-    ) -> Result<(Self, ParityReport)>;
-    /// # Errors
-    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
     fn parity_candidate(
         self,
         options: ParityOptions,
@@ -560,19 +544,8 @@ pub trait ParityPasses: Sized {
     fn optimize_parity(self, options: ParityOptions) -> Result<(Self, ParityReport)>;
 }
 impl ParityPasses for QuantumRegion {
-    /// Produce one bounded exact affine-window candidate for beam scoring.
-    /// The window may expand; every replacement receives fresh execution IDs.
-    /// Unsupported operations delimit windows and explicit ordering is rejected.
-    /// # Errors
-    /// Rejects malformed input, ordering constraints, or exhausted work/storage/output limits.
-    fn resynthesize_parity_candidate(
-        self,
-        options: ParityOptions,
-        max_output_operations: usize,
-    ) -> Result<(Self, ParityReport)> {
-        self.parity_candidate_from(0, options, max_output_operations)
-    }
-    /// Beam-compatible first-window alias for exact parity candidates.
+    /// Produce the first bounded exact affine-window candidate for beam scoring.
+    /// The window may expand; replacements receive fresh execution IDs.
     /// # Errors
     /// Rejects invalid ordering, exhausted budgets, or an uncertified candidate.
     fn parity_candidate(

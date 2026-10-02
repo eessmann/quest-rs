@@ -210,7 +210,7 @@ fn controlled_lift_rechecks_affine_target_identity_budget() -> Result<()> {
             axis: Axis::Z,
             angle: AngleTarget::AffinePi {
                 radians_numerator: 0.into(),
-                radians_denominator: std::ops::Shl::shl(num_bigint::BigInt::from(1), 1000usize),
+                radians_denominator: std::ops::Shl::shl(dashu_int::IBig::from(1), 1000usize),
                 pi_numerator: 0.into(),
                 pi_denominator: 1.into(),
             },

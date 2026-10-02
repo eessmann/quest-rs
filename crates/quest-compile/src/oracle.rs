@@ -1,8 +1,4 @@
 use crate::MatrixPolicy;
-#[allow(unused_imports)]
-use crate::{
-    BoundParityPasses, ExactPasses, LinearPasses, NumericalPasses, ParityPasses, TerminalPasses,
-};
 use crate::{Control, Error, Operation, OracleFragment, QubitId, Result};
 use std::sync::Arc;
 /// Compiler extension over shared semantic capabilities.

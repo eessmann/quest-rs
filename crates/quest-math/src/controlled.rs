@@ -1,6 +1,7 @@
 use crate::{
-    AngleTarget, ApproxCertificate, Control, Error, Limits, Operation, Rational, Result, Sequence,
+    AngleTarget, ApproxCertificate, Control, Error, Limits, Operation, RBig, Result, Sequence,
 };
+use dashu_base::BitTest;
 
 /// A controlled embedding of an independently certified one-qubit rotation.
 ///
@@ -38,7 +39,7 @@ impl ControlledApproxCertificate {
     }
 
     #[must_use]
-    pub const fn bound_squared(&self) -> &Rational {
+    pub const fn bound_squared(&self) -> &RBig {
         self.base.bound_squared()
     }
 }
@@ -102,17 +103,17 @@ pub fn lift_controlled_rotation(
 
 fn admit_certificate(base: &ApproxCertificate, limits: Limits) -> Result<()> {
     crate::matrix::admit(base.candidate(), limits)?;
-    let mut bits = base
-        .bound_squared()
-        .numer()
-        .bits()
-        .max(base.bound_squared().denom().bits());
+    let mut bits = u64::try_from(base.bound_squared().numerator().bit_len())
+        .unwrap_or(u64::MAX)
+        .max(u64::try_from(base.bound_squared().denominator().bit_len()).unwrap_or(u64::MAX));
     match &base.target().angle {
         AngleTarget::RationalPi {
             numerator,
             denominator,
         } => {
-            bits = bits.max(numerator.bits()).max(denominator.bits());
+            bits = bits
+                .max(u64::try_from(numerator.bit_len()).unwrap_or(u64::MAX))
+                .max(u64::try_from(denominator.bit_len()).unwrap_or(u64::MAX));
         }
         AngleTarget::AffinePi {
             radians_numerator,
@@ -124,10 +125,10 @@ fn admit_certificate(base: &ApproxCertificate, limits: Limits) -> Result<()> {
                 return Err(Error::Invalid("zero affine-pi denominator".into()));
             }
             bits = bits
-                .max(radians_numerator.bits())
-                .max(radians_denominator.bits())
-                .max(pi_numerator.bits())
-                .max(pi_denominator.bits());
+                .max(u64::try_from(radians_numerator.bit_len()).unwrap_or(u64::MAX))
+                .max(u64::try_from(radians_denominator.bit_len()).unwrap_or(u64::MAX))
+                .max(u64::try_from(pi_numerator.bit_len()).unwrap_or(u64::MAX))
+                .max(u64::try_from(pi_denominator.bit_len()).unwrap_or(u64::MAX));
         }
         AngleTarget::DyadicRadians { .. } => {}
     }

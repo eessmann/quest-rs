@@ -17,10 +17,10 @@ The macro checks grammar and types at expansion time and emits a reusable checke
 
 A `QuantumRegion` is a finite capability for exact symbolic construction and compiler passes. It can contain effects, so its name grants no unitarity proof. Bind all its original parameter obligations before embedding it with `ProgramBuilder::region`, or import a whole capability with `Program::from_region`. Numerical matrix tolerance never grants symbolic unitarity.
 
-`quest-language` owns syntax, typed values, SSA, exact angles, finite graphs and verification. `quest-compile` owns transformations, compilation stages and artifacts. `quest-circuit` presents that construction and compilation API; `quest` adds native runtime ownership.
+`quest-language` owns syntax, typed values, SSA, exact angles, finite graphs and verification. `quest-compile` owns the canonical compiler API, macros, transformations, compilation stages and artifacts; `quest` adds native runtime ownership.
 
 ```rust
-{{#include ../../../crates/quest-circuit/tests/tutorials.rs:macro_bell}}
+{{#include ../../../crates/quest-compile/tests/tutorials.rs:macro_bell}}
 ```
 
 Typed subroutine signatures compose `ValueParameter<T>`, `ArrayRef<T, N>`, `RankedArrayRef<T, R>`, `QubitParameter`, and `QubitArrayParameter<N>` using nested pairs; nesting supports arbitrary mixed arity. `define_subroutine` and `call_subroutine` retain an indexed classical return type. `define_procedure` and `call_procedure` admit void, effectful calls, including measurement/reset on quantum references. Array references declare mutability, and the shared checker rejects incorrect shapes, foreign handles, writes through readonly references, and effectful calls from unitary gate definitions.

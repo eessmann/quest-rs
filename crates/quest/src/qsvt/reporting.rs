@@ -1,6 +1,6 @@
 //! Counts the fixed successful state-vector dispatch schedule before execution.
 use crate::{Error, Result};
-use quest_circuit::{BoundGate, ControlState, Operation, RegionPlan, dispatch_recipe};
+use quest_compile::{BoundGate, ControlState, Operation, RegionPlan, dispatch_recipe};
 use std::collections::BTreeMap;
 
 /// Successful QSVT run calls into the native register API, per process/rank.
@@ -110,7 +110,7 @@ fn operation(
     inherited: usize,
     memo: &mut BTreeMap<(usize, usize), usize>,
 ) -> Result<usize> {
-    let zeros = |controls: &[quest_circuit::Control]| {
+    let zeros = |controls: &[quest_compile::Control]| {
         inherited
             .checked_add(
                 controls
@@ -158,7 +158,7 @@ fn operation(
 mod tests {
     use super::*;
     use googletest::prelude::*;
-    use quest_circuit::{Control, Gate, OracleFragment, QuantumRegionBuilder};
+    use quest_compile::{Control, Gate, OracleFragment, QuantumRegionBuilder};
 
     #[gtest]
     fn unrepresentable_dispatch_totals_fail_before_execution() {
@@ -181,15 +181,15 @@ mod tests {
         let b = body.qubit(1)?;
         body.gate(
             Gate::U {
-                theta: quest_circuit::Angle::radians(0.2)?,
-                phi: quest_circuit::Angle::radians(0.3)?,
-                lambda: quest_circuit::Angle::radians(0.4)?,
+                theta: quest_compile::Angle::radians(0.2)?,
+                phi: quest_compile::Angle::radians(0.3)?,
+                lambda: quest_compile::Angle::radians(0.4)?,
             },
             &[b],
             &[Control::new(a, ControlState::Zero)],
         )?;
         body.global_phase(
-            quest_circuit::Angle::radians(0.1)?,
+            quest_compile::Angle::radians(0.1)?,
             &[Control::new(b, ControlState::Zero)],
         )?;
         body.gate(Gate::Sx, &[a], &[])?;

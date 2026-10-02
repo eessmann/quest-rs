@@ -37,5 +37,5 @@ retained file, line, and column as a location note instead of inventing source
 text. Reports survive dropping the program, prepared plan, and environment.
 
 ```rust
-{{#include ../../../crates/quest-circuit/tests/tutorials.rs:owned_diagnostic}}
+{{#include ../../../crates/quest-compile/tests/tutorials.rs:owned_diagnostic}}
 ```

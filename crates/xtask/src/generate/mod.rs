@@ -16,7 +16,7 @@ pub fn run(check: bool) -> Result<(), DynError> {
         None,
     )?;
     let quest_root = clang::QuestRoot::from_package(&package);
-    let registry = emit::load_adapter_registry(&workspace, check)?;
+    let registry = emit::load_adapter_registry(&workspace)?;
 
     let mut items = clang::collect_quest_api(&package)?;
     classify::classify_items(&mut items, &registry)?;

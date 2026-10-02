@@ -17,7 +17,7 @@ clap = { workspace = true, default-features = false, features = ["std", "derive"
 serde_json.workspace = true
 quest-polynomial.workspace = true
 quest-numerics = { workspace = true, features = ["trace-json"] }
-quest-circuit.workspace = true
+quest-compile.workspace = true
 faer = { workspace = true, default-features = false, features = ["std", "linalg"] }
 quest = { workspace = true, features = ["qsvt"], optional = true }
 hdf5-metno = { workspace = true, features = ["complex"], optional = true }

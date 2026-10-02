@@ -1,0 +1,1247 @@
+# Final production source declaration scan
+# Refreshed 2026-10-02 from the current shared worktree.
+# Scope: crates/**/src/**/*.rs; line-oriented struct/enum/trait/type declarations
+# (including associated types), and public reexports. Macro-generated definitions
+# and multiline declarations can be missed; this is not an exhaustive Rust type inventory.
+# Reproduce: rg --sort path -n --glob '**/src/**/*.rs' '^\s*(?:(?:pub(?:\([^)]*\))?\s+)?(?:struct|enum|trait|type)\s+|pub(?:\([^)]*\))?\s+use\s+)' crates
+crates/quest/src/collective.rs:56:pub use quest_sys::mpi::{MpiCommunicator, MpiMessageStatus, MpiRuntime, MpiThreadView};
+crates/quest/src/collective.rs:60:pub struct CollectiveEnvironmentBuilder<'comm, 'runtime> {
+crates/quest/src/collective.rs:104:pub struct CollectiveEnvironment<'comm, 'runtime> {
+crates/quest/src/collective.rs:295:pub struct CollectiveRegister<'env, 'comm, 'runtime> {
+crates/quest/src/collective.rs:439:pub struct CollectivePreparedProgram<'env, 'comm, 'runtime> {
+crates/quest/src/collective.rs:478:    struct Transcript;
+crates/quest/src/collective.rs:480:        type Error = Error;
+crates/quest/src/collective_admission.rs:23:struct Admission<'a> {
+crates/quest/src/collective_payload.rs:24:struct Encoder<'a> {
+crates/quest/src/environment.rs:7:pub enum ExecutionMode {
+crates/quest/src/environment.rs:29:pub struct Capabilities {
+crates/quest/src/environment.rs:36:pub struct EnvironmentBuilder {
+crates/quest/src/environment.rs:128:pub struct Environment {
+crates/quest/src/environment.rs:132:pub struct RuntimeResources {
+crates/quest/src/environment.rs:140:struct RegisterModes {
+crates/quest/src/environment.rs:174:pub struct EnvironmentView<'env> {
+crates/quest/src/environment.rs:329:pub struct Reservation<'a> {
+crates/quest/src/error.rs:4:pub type Result<T> = std::result::Result<T, Error>;
+crates/quest/src/error.rs:9:pub struct StructuredExecutionError {
+crates/quest/src/error.rs:33:    type Target = quest_compile::language::vm::RuntimeError<Error>;
+crates/quest/src/error.rs:41:pub enum Error {
+crates/quest/src/error.rs:183:pub trait BackendResult<T> {
+crates/quest/src/execution.rs:20:pub type MatrixCacheKey = (usize, Vec<bool>);
+crates/quest/src/execution.rs:35:pub struct MatrixPreparation {
+crates/quest/src/execution.rs:122:pub enum NativeMatrix {
+crates/quest/src/execution.rs:132:pub struct NativeControls {
+crates/quest/src/execution.rs:202:enum PreparedOp {
+crates/quest/src/execution.rs:245:pub struct PreparedRegion<'env> {
+crates/quest/src/execution.rs:324:pub struct AdmittedPlan<'env> {
+crates/quest/src/lib.rs:31:pub use quest_compile::language::vm::{ClassicalValue, InterpreterLimits, RunInputs, RunOutput};
+crates/quest/src/lib.rs:32:pub use structured_execution::{PreparedProgram, SampleResult};
+crates/quest/src/lib.rs:34:pub use environment::{
+crates/quest/src/lib.rs:37:pub use error::{Error, Result, StructuredExecutionError};
+crates/quest/src/lib.rs:38:pub use faer;
+crates/quest/src/lib.rs:39:pub use num_complex::Complex64;
+crates/quest/src/lib.rs:40:pub use quest_compile::*;
+crates/quest/src/lib.rs:41:pub use register::{DensityMatrix, Register, RegisterDeployment, RegisterKind, StateVector};
+crates/quest/src/lib.rs:42:pub use values::{MemoryBudget, Outcome, Probability, QubitCount, Shots};
+crates/quest/src/oracle_execution.rs:20:pub struct OracleInventory {
+crates/quest/src/oracle_execution.rs:347:enum OracleOp {
+crates/quest/src/oracle_execution.rs:370:pub struct OracleCache {
+crates/quest/src/oracle_execution.rs:376:struct Frame {
+crates/quest/src/oracle_execution.rs:380:struct Leaf {
+crates/quest/src/output_storage.rs:35:struct Encoder {
+crates/quest/src/payload_execution.rs:12:enum Entry {
+crates/quest/src/payload_execution.rs:23:pub struct PayloadCache {
+crates/quest/src/qsvt/collective/payload.rs:97:struct Encoder {
+crates/quest/src/qsvt/collective.rs:22:pub struct PreparationBuilder<'env, 'comm, 'runtime, T = MissingTransform> {
+crates/quest/src/qsvt/collective.rs:94:pub struct PreparedTransform<'env, 'comm, 'runtime> {
+crates/quest/src/qsvt/collective.rs:137:pub struct ExecutionResult<'prepared, 'register, 'env, 'comm, 'runtime> {
+crates/quest/src/qsvt/collective.rs:179:pub struct ConditionedResult<'prepared, 'register, 'env, 'comm, 'runtime> {
+crates/quest/src/qsvt/collective.rs:196:pub struct OverlapBuilder<'env, 'comm, 'runtime, I = MissingVector, R = MissingVector> {
+crates/quest/src/qsvt/collective.rs:263:pub struct PreparedOverlap<'env, 'comm, 'runtime> {
+crates/quest/src/qsvt/continuation.rs:5:pub enum Continuation<B, P> {
+crates/quest/src/qsvt/continuation.rs:9:pub type AdmittedContinuation<'env> = Continuation<AdmittedProjection<'env>, AdmittedPlan<'env>>;
+crates/quest/src/qsvt/continuation.rs:10:pub type PreparedContinuation<'env> = Continuation<PreparedProjection<'env>, PreparedRegion<'env>>;
+crates/quest/src/qsvt/hadamard.rs:18:pub struct MissingVector;
+crates/quest/src/qsvt/hadamard.rs:19:pub struct SuppliedVector(pub(super) Vec<Complex64>);
+crates/quest/src/qsvt/hadamard.rs:21:pub struct OverlapBuilder<'env, I = MissingVector, R = MissingVector> {
+crates/quest/src/qsvt/hadamard.rs:82:pub struct AdmittedOverlap<'env> {
+crates/quest/src/qsvt/hadamard.rs:273:pub struct PreparedOverlap<'env> {
+crates/quest/src/qsvt/hadamard.rs:406:pub struct OverlapObservation {
+crates/quest/src/qsvt/mod.rs:20:pub use hadamard::{AdmittedOverlap, OverlapBuilder, OverlapObservation, PreparedOverlap};
+crates/quest/src/qsvt/mod.rs:22:pub use quest_qsvt as model;
+crates/quest/src/qsvt/mod.rs:24:pub use reporting::NativeDispatchReport;
+crates/quest/src/qsvt/mod.rs:27:pub type Result<T> = std::result::Result<T, Error>;
+crates/quest/src/qsvt/mod.rs:30:pub enum Error {
+crates/quest/src/qsvt/mod.rs:46:pub enum Stage {
+crates/quest/src/qsvt/mod.rs:55:pub struct MissingTransform;
+crates/quest/src/qsvt/mod.rs:57:pub struct SuppliedTransform(ValidatedTransform);
+crates/quest/src/qsvt/mod.rs:64:pub struct PreparationBuilder<'env, T = MissingTransform> {
+crates/quest/src/qsvt/mod.rs:112:pub struct AdmittedTransform<'env> {
+crates/quest/src/qsvt/mod.rs:191:type RunAdmission = (Vec<bool>, Option<Vec<bool>>);
+crates/quest/src/qsvt/mod.rs:202:pub struct PreparedTransform<'env> {
+crates/quest/src/qsvt/mod.rs:313:pub struct MassObservation {
+crates/quest/src/qsvt/mod.rs:362:pub struct ExecutionResult<'prepared, 'register, 'env> {
+crates/quest/src/qsvt/mod.rs:405:pub struct ConditionedResult<'prepared, 'register, 'env> {
+crates/quest/src/qsvt/projection.rs:11:enum NativeProjector {
+crates/quest/src/qsvt/projection.rs:16:pub(super) struct PreparedProjection<'env> {
+crates/quest/src/qsvt/projection.rs:24:enum ProjectionData {
+crates/quest/src/qsvt/projection.rs:29:pub(super) struct AdmittedProjection<'env> {
+crates/quest/src/qsvt/reporting.rs:14:pub struct NativeDispatchReport {
+crates/quest/src/register.rs:13:    pub trait Kind {
+crates/quest/src/register.rs:17:pub trait RegisterKind: sealed::Kind {}
+crates/quest/src/register.rs:19:pub struct StateVector;
+crates/quest/src/register.rs:21:pub struct DensityMatrix;
+crates/quest/src/register.rs:37:pub struct RegisterDeployment {
+crates/quest/src/register.rs:145:pub struct Register<'env, K: RegisterKind> {
+crates/quest/src/structured_execution.rs:23:pub struct PreparedProgram<'env> {
+crates/quest/src/structured_execution.rs:39:pub struct SampleResult {
+crates/quest/src/structured_execution.rs:345:struct Backend<'a, 'env, K: RegisterKind> {
+crates/quest/src/structured_execution.rs:357:    type Error = Error;
+crates/quest/src/structured_execution.rs:475:struct StaticGate {
+crates/quest/src/values.rs:4:pub struct QubitCount(u8);
+crates/quest/src/values.rs:29:pub struct MemoryBudget(usize);
+crates/quest/src/values.rs:47:pub struct Probability(f64);
+crates/quest/src/values.rs:63:pub enum Outcome {
+crates/quest/src/values.rs:75:pub struct Shots(usize);
+crates/quest-build/src/lib.rs:10:pub use hdf5::emit_serial_hdf5_runtime_paths;
+crates/quest-build/src/lib.rs:14:pub use rsmpi::verify_rsmpi_compatibility;
+crates/quest-build/src/lib.rs:16:pub use package::{BridgeInputs, HeaderContext, NativePackage};
+crates/quest-build/src/lib.rs:27:pub enum BuildError {
+crates/quest-build/src/lib.rs:52:pub type Result<T> = std::result::Result<T, BuildError>;
+crates/quest-build/src/lib.rs:279:pub(crate) struct HeaderConfiguration {
+crates/quest-build/src/package.rs:9:pub struct BridgeInputs {
+crates/quest-build/src/package.rs:16:pub struct HeaderContext {
+crates/quest-build/src/package.rs:29:pub struct NativePackage {
+crates/quest-build/src/probe.rs:94:struct Setup {
+crates/quest-build/src/probe.rs:255:struct CompilerConfiguration {
+crates/quest-build/src/probe.rs:485:struct NativeLink {
+crates/quest-compile/src/beam.rs:25:type CompilerResult<T> = std::result::Result<T, CompilerError>;
+crates/quest-compile/src/beam.rs:30:pub struct BeamOptions {
+crates/quest-compile/src/beam.rs:89:pub struct BeamReport {
+crates/quest-compile/src/beam.rs:209:pub enum BeamMitmStatus {
+crates/quest-compile/src/beam.rs:255:struct WorkerContext<'a> {
+crates/quest-compile/src/beam.rs:263:struct ExactHistory {
+crates/quest-compile/src/beam.rs:270:struct ApproxHistory {
+crates/quest-compile/src/beam.rs:278:enum ApproxEvidence {
+crates/quest-compile/src/beam.rs:406:pub struct BeamRun {
+crates/quest-compile/src/beam.rs:690:struct Candidate {
+crates/quest-compile/src/beam.rs:728:type ScoredPublication = (
+crates/quest-compile/src/beam.rs:790:enum Generator {
+crates/quest-compile/src/beam_approx.rs:17:pub struct ApproxRegionCertificate {
+crates/quest-compile/src/beam_approx.rs:30:pub struct ApproxMitmReport {
+crates/quest-compile/src/beam_approx.rs:82:pub trait ApproximateBeamPasses: Sized {
+crates/quest-compile/src/beam_mitm.rs:16:pub struct ExactMitmReport {
+crates/quest-compile/src/beam_mitm.rs:27:struct ScanWeight {
+crates/quest-compile/src/beam_mitm.rs:96:pub trait MeetInTheMiddlePasses: Sized {
+crates/quest-compile/src/builder.rs:18:pub struct ProgramBuilder {
+crates/quest-compile/src/builder.rs:137:    type Target = builder::Builder;
+crates/quest-compile/src/capture.rs:6:    pub trait Sealed {}
+crates/quest-compile/src/capture.rs:9:pub trait AngleCapture: sealed::Sealed {
+crates/quest-compile/src/capture.rs:15:pub struct CapturedAngle {
+crates/quest-compile/src/classical/constants.rs:9:pub(super) enum State {
+crates/quest-compile/src/classical/constants.rs:33:pub(super) type Lattice = BTreeMap<ValueId, State>;
+crates/quest-compile/src/classical/mod.rs:8:pub struct OptimizationLimits {
+crates/quest-compile/src/classical/mod.rs:25:pub struct OptimizationReport {
+crates/quest-compile/src/classical/mod.rs:51:pub(super) struct Budget {
+crates/quest-compile/src/coherent.rs:11:struct Recorder<'a> {
+crates/quest-compile/src/coherent.rs:53:    type Error = Error;
+crates/quest-compile/src/dispatch_recipe.rs:12:pub enum PrimitiveGate {
+crates/quest-compile/src/dispatch_recipe.rs:25:pub enum DispatchStep {
+crates/quest-compile/src/dispatch_recipe.rs:33:pub struct GateRecipe {
+crates/quest-compile/src/dispatch_recipe.rs:142:pub struct MatrixRecipe<'a> {
+crates/quest-compile/src/dispatch_recipe.rs:250:pub struct RecipeLimits {
+crates/quest-compile/src/dispatch_recipe.rs:305:pub struct PreparedRecipeInventory {
+crates/quest-compile/src/dispatch_recipe.rs:394:struct InventoryWalker {
+crates/quest-compile/src/dispatch_recipe.rs:665:pub struct OracleProfile {
+crates/quest-compile/src/error.rs:3:pub enum CompilerError {
+crates/quest-compile/src/generator.rs:4:pub enum GenerationError {
+crates/quest-compile/src/generator.rs:15:pub trait RotationGenerator {
+crates/quest-compile/src/generator.rs:48:pub struct NativeSynthesis {
+crates/quest-compile/src/generator.rs:89:pub use quest_synthesis::{CancellationToken, SynthesisError, SynthesisOptions};
+crates/quest-compile/src/import.rs:11:pub struct Import {
+crates/quest-compile/src/lib.rs:18:pub use quest_language::payload::QuantumPayload;
+crates/quest-compile/src/lib.rs:23:pub use capture::{AngleCapture, CapturedAngle, capture_angle};
+crates/quest-compile/src/lib.rs:25:pub use builder::ProgramBuilder;
+crates/quest-compile/src/lib.rs:26:pub use quest_language::semantic::builder::{
+crates/quest-compile/src/lib.rs:33:pub use quest_language::quantum::{
+crates/quest-compile/src/lib.rs:38:pub use linear::{
+crates/quest-compile/src/lib.rs:43:pub use parity::{
+crates/quest-compile/src/lib.rs:52:pub use beam::BeamMitmStatus;
+crates/quest-compile/src/lib.rs:53:pub use beam::{BeamOptions, BeamReport};
+crates/quest-compile/src/lib.rs:56:pub use terminal::*;
+crates/quest-compile/src/lib.rs:58:pub use quest_language::quantum::provenance::{
+crates/quest-compile/src/lib.rs:65:pub use structured_terminal::*;
+crates/quest-compile/src/lib.rs:67:pub use quest_language as language;
+crates/quest-compile/src/lib.rs:68:pub use quest_language::quantum::evidence::EvidenceLocation;
+crates/quest-compile/src/lib.rs:69:pub use quest_language::rational::BigRational;
+crates/quest-compile/src/lib.rs:70:pub use quest_qasm as qasm;
+crates/quest-compile/src/lib.rs:71:pub use structured::*;
+crates/quest-compile/src/lib.rs:72:pub use structured_optimize::{
+crates/quest-compile/src/lib.rs:76:pub use structured_pipeline::*;
+crates/quest-compile/src/lib.rs:78:pub use matrix::*;
+crates/quest-compile/src/lib.rs:79:pub use optimize::*;
+crates/quest-compile/src/lib.rs:80:pub use optimizer_contracts::*;
+crates/quest-compile/src/lib.rs:81:pub use quest_language::quantum::model::*;
+crates/quest-compile/src/lib.rs:82:pub use quest_language::quantum::program::*;
+crates/quest-compile/src/lib.rs:84:pub use quest_language::quantum::{Error, Result};
+crates/quest-compile/src/lib.rs:86:pub use error::CompilerError;
+crates/quest-compile/src/lib.rs:88:pub use quest_math as certified;
+crates/quest-compile/src/lib.rs:90:pub use quest_optimizer_client as optimizer;
+crates/quest-compile/src/lib.rs:95:pub use workers::*;
+crates/quest-compile/src/lib.rs:100:pub use beam_mitm::*;
+crates/quest-compile/src/lib.rs:104:pub use beam_approx::*;
+crates/quest-compile/src/lib.rs:109:pub use structured_workers::*;
+crates/quest-compile/src/lib.rs:112:pub use beam_approx::ApproximateBeamPasses;
+crates/quest-compile/src/lib.rs:114:pub use beam_mitm::MeetInTheMiddlePasses;
+crates/quest-compile/src/lib.rs:115:pub use linear::LinearPasses;
+crates/quest-compile/src/lib.rs:116:pub use optimize::ExactPasses;
+crates/quest-compile/src/lib.rs:117:pub use optimize::NumericalPasses;
+crates/quest-compile/src/lib.rs:118:pub use oracle::OracleExport;
+crates/quest-compile/src/lib.rs:119:pub use parity::BoundParityPasses;
+crates/quest-compile/src/lib.rs:120:pub use parity::ParityPasses;
+crates/quest-compile/src/lib.rs:121:pub use terminal::TerminalPasses;
+crates/quest-compile/src/lib.rs:123:pub use workers::RotationSynthesisPasses;
+crates/quest-compile/src/lib.rs:125:pub use workers::ZxPasses;
+crates/quest-compile/src/lib.rs:130:    pub use crate::RotationSynthesisPasses;
+crates/quest-compile/src/lib.rs:132:    pub use crate::{ApproximateBeamPasses, MeetInTheMiddlePasses, ZxPasses};
+crates/quest-compile/src/lib.rs:133:    pub use crate::{
+crates/quest-compile/src/lib.rs:142:pub use generator::*;
+crates/quest-compile/src/lib.rs:146:pub use quest_macros::{circuit, circuit_file};
+crates/quest-compile/src/linear.rs:26:pub struct Cnot {
+crates/quest-compile/src/linear.rs:31:pub struct LinearOptions {
+crates/quest-compile/src/linear.rs:40:pub enum LinearCandidateStrategy {
+crates/quest-compile/src/linear.rs:56:pub struct LinearSynthesis {
+crates/quest-compile/src/linear.rs:76:pub struct LinearRewrite {
+crates/quest-compile/src/linear.rs:82:pub struct LinearReport {
+crates/quest-compile/src/linear.rs:94:pub struct Work {
+crates/quest-compile/src/linear.rs:450:pub trait LinearPasses: Sized {
+crates/quest-compile/src/matrix.rs:1:pub use quest_language::matrix::{MatrixPolicy, NumericalOperator, UnitaryAdmission};
+crates/quest-compile/src/optimize.rs:13:pub enum RewriteKind {
+crates/quest-compile/src/optimize.rs:20:pub struct Rewrite {
+crates/quest-compile/src/optimize.rs:28:pub struct OptimizationReport {
+crates/quest-compile/src/optimize.rs:223:pub struct ExactOptions {
+crates/quest-compile/src/optimize.rs:237:pub trait ExactPasses: Sized {
+crates/quest-compile/src/optimize.rs:362:pub enum SimulatorProfile {
+crates/quest-compile/src/optimize.rs:370:pub struct SimulatorCost {
+crates/quest-compile/src/optimize.rs:447:pub struct FusionOptions {
+crates/quest-compile/src/optimize.rs:572:pub trait NumericalPasses: Sized {
+crates/quest-compile/src/optimizer_contracts.rs:23:pub struct OptimizationLimits {
+crates/quest-compile/src/optimizer_contracts.rs:61:pub enum BudgetCategory {
+crates/quest-compile/src/optimizer_contracts.rs:70:pub struct BudgetUsage {
+crates/quest-compile/src/optimizer_contracts.rs:76:struct LedgerState {
+crates/quest-compile/src/optimizer_contracts.rs:83:pub struct BudgetLedger {
+crates/quest-compile/src/optimizer_contracts.rs:162:pub struct WorkAllowance {
+crates/quest-compile/src/optimizer_contracts.rs:178:pub struct BudgetLease {
+crates/quest-compile/src/optimizer_contracts.rs:210:pub enum DeploymentKind {
+crates/quest-compile/src/optimizer_contracts.rs:217:pub struct DeploymentSnapshot {
+crates/quest-compile/src/optimizer_contracts.rs:318:pub enum CostProfile {
+crates/quest-compile/src/optimizer_contracts.rs:326:pub struct OpaqueTrace {
+crates/quest-compile/src/optimizer_contracts.rs:338:pub enum CommunicationCost {
+crates/quest-compile/src/optimizer_contracts.rs:413:enum TraceWriter {
+crates/quest-compile/src/optimizer_contracts.rs:633:pub struct NativeCost {
+crates/quest-compile/src/optimizer_contracts.rs:782:struct ArithmeticWalk {
+crates/quest-compile/src/optimizer_contracts.rs:991:pub struct CliffordCost {
+crates/quest-compile/src/optimizer_contracts.rs:1026:pub struct CostComponents {
+crates/quest-compile/src/optimizer_contracts.rs:1047:pub struct NativeScore {
+crates/quest-compile/src/optimizer_contracts.rs:1063:pub enum CostComparison {
+crates/quest-compile/src/optimizer_contracts.rs:1072:pub struct OptimizationTarget {
+crates/quest-compile/src/optimizer_contracts.rs:1196:pub struct ApproximationBudget(BigRational);
+crates/quest-compile/src/optimizer_contracts.rs:1206:pub enum ApproximationMode {
+crates/quest-compile/src/optimizer_contracts.rs:1237:pub struct OptimizationOptions {
+crates/quest-compile/src/optimizer_contracts.rs:1273:pub enum OptimizerInputKind {
+crates/quest-compile/src/optimizer_contracts.rs:1281:pub enum OptimizerSnapshot {
+crates/quest-compile/src/optimizer_contracts.rs:1289:pub enum OptimizerInput {
+crates/quest-compile/src/optimizer_contracts.rs:1320:pub enum StopReason {
+crates/quest-compile/src/optimizer_contracts.rs:1336:pub enum OptimizationEvidence {
+crates/quest-compile/src/optimizer_contracts.rs:1345:pub enum RoundingStatus {
+crates/quest-compile/src/optimizer_contracts.rs:1352:pub struct OptimizationOutcome {
+crates/quest-compile/src/optimizer_contracts.rs:1505:pub struct Optimizer {
+crates/quest-compile/src/optimizer_contracts.rs:1741:struct InputReservation {
+crates/quest-compile/src/oracle.rs:5:pub trait OracleExport: Sized {
+crates/quest-compile/src/parity/bound.rs:16:enum AffineOp {
+crates/quest-compile/src/parity/bound.rs:24:struct Pair {
+crates/quest-compile/src/parity/bound.rs:321:struct AngleSignature {
+crates/quest-compile/src/parity/bound.rs:380:struct PairSignature {
+crates/quest-compile/src/parity/bound.rs:684:pub trait BoundParityPasses: Sized {
+crates/quest-compile/src/parity.rs:32:pub use bound::BoundParityPasses;
+crates/quest-compile/src/parity.rs:37:pub enum AffinePhaseOperation {
+crates/quest-compile/src/parity.rs:55:pub struct ParityOptions {
+crates/quest-compile/src/parity.rs:68:pub struct ParitySynthesis {
+crates/quest-compile/src/parity.rs:78:pub struct ParityReport {
+crates/quest-compile/src/parity.rs:90:struct Signature {
+crates/quest-compile/src/parity.rs:533:pub trait ParityPasses: Sized {
+crates/quest-compile/src/structured/artifact.rs:28:pub struct ArtifactLimits {
+crates/quest-compile/src/structured/artifact.rs:43:pub enum ArtifactError {
+crates/quest-compile/src/structured/artifact.rs:57:type Result<T> = std::result::Result<T, ArtifactError>;
+crates/quest-compile/src/structured/artifact.rs:63:struct Envelope {
+crates/quest-compile/src/structured/artifact.rs:71:struct Publication {
+crates/quest-compile/src/structured/artifact.rs:89:pub struct FiniteSourceEvidence {
+crates/quest-compile/src/structured/artifact.rs:99:pub struct OccurrenceEvidence {
+crates/quest-compile/src/structured/artifact.rs:108:pub struct HistoryEvidence {
+crates/quest-compile/src/structured/artifact.rs:115:pub enum AngleData {
+crates/quest-compile/src/structured/artifact.rs:181:struct MatrixData {
+crates/quest-compile/src/structured/artifact.rs:232:enum PayloadData {
+crates/quest-compile/src/structured/artifact.rs:293:struct OracleData {
+crates/quest-compile/src/structured/artifact.rs:301:enum OracleOperation {
+crates/quest-compile/src/structured/artifact.rs:820:    struct Writer {
+crates/quest-compile/src/structured/artifact.rs:858:pub use quest_language::quantum::evidence::{CompilationEvidence, EvidenceScope};
+crates/quest-compile/src/structured/artifact.rs:939:    struct Counter(usize);
+crates/quest-compile/src/structured/specialize.rs:11:pub struct InputSpecialization {
+crates/quest-compile/src/structured/specialize.rs:18:pub struct InputBinding {
+crates/quest-compile/src/structured.rs:11:pub use artifact::{
+crates/quest-compile/src/structured.rs:15:pub use specialize::{InputBinding, InputSpecialization};
+crates/quest-compile/src/structured.rs:19:pub struct Program<S> {
+crates/quest-compile/src/structured.rs:24:pub enum LanguageError {
+crates/quest-compile/src/structured.rs:149:pub struct Constructed {
+crates/quest-compile/src/structured.rs:166:pub struct MacroLocation {
+crates/quest-compile/src/structured.rs:497:pub struct Verified {
+crates/quest-compile/src/structured.rs:757:pub struct Lowered {
+crates/quest-compile/src/structured.rs:762:pub struct StructuredResources {
+crates/quest-compile/src/structured.rs:769:pub struct BlockSchedule {
+crates/quest-compile/src/structured.rs:775:pub struct Executable {
+crates/quest-compile/src/structured_optimize.rs:39:pub struct StructuredQuantumOptions {
+crates/quest-compile/src/structured_optimize.rs:58:pub enum StructuredQuantumError {
+crates/quest-compile/src/structured_optimize.rs:64:type Result<T> = std::result::Result<T, StructuredQuantumError>;
+crates/quest-compile/src/structured_optimize.rs:66:pub struct StructuredOccurrence {
+crates/quest-compile/src/structured_optimize.rs:73:pub struct StructuredQuantumRewrite {
+crates/quest-compile/src/structured_optimize.rs:78:pub struct StructuredQuantumReport {
+crates/quest-compile/src/structured_optimize.rs:90:pub struct Wire {
+crates/quest-compile/src/structured_optimize.rs:95:pub struct ResolvedGate {
+crates/quest-compile/src/structured_optimize.rs:105:pub struct Context<'a> {
+crates/quest-compile/src/structured_optimize.rs:109:pub struct Budget {
+crates/quest-compile/src/structured_pipeline.rs:16:type Result<T> = std::result::Result<T, StructuredTerminalError>;
+crates/quest-compile/src/structured_pipeline.rs:20:pub enum StructuredSkippedStage {
+crates/quest-compile/src/structured_pipeline.rs:32:pub struct StructuredPipelineReport {
+crates/quest-compile/src/structured_pipeline.rs:68:pub struct StructuredPipelineOutcome {
+crates/quest-compile/src/structured_pipeline.rs:239:enum Item {
+crates/quest-compile/src/structured_terminal.rs:18:pub enum StructuredTerminalError {
+crates/quest-compile/src/structured_terminal.rs:26:type Result<T> = std::result::Result<T, StructuredTerminalError>;
+crates/quest-compile/src/structured_terminal.rs:28:pub struct StructuredTerminalReport {
+crates/quest-compile/src/structured_terminal.rs:37:pub struct StructuredFusion {
+crates/quest-compile/src/structured_terminal.rs:69:pub struct StructuredTerminalOutcome {
+crates/quest-compile/src/structured_terminal.rs:257:type Publication = (
+crates/quest-compile/src/structured_workers.rs:19:pub enum StructuredWorkerError {
+crates/quest-compile/src/structured_workers.rs:38:type Result<T> = std::result::Result<T, StructuredWorkerError>;
+crates/quest-compile/src/structured_workers.rs:40:pub struct StructuredRotationCertificate {
+crates/quest-compile/src/structured_workers.rs:49:pub struct StructuredSynthesisReport {
+crates/quest-compile/src/structured_workers.rs:59:pub struct StructuredExactCertificate {
+crates/quest-compile/src/structured_workers.rs:67:pub struct StructuredSkippedCandidate {
+crates/quest-compile/src/structured_workers.rs:72:pub struct StructuredZxReport {
+crates/quest-compile/src/structured_workers.rs:324:struct RotationCounter {
+crates/quest-compile/src/structured_workers.rs:329:struct UnprovedTrace;
+crates/quest-compile/src/structured_workers.rs:331:    type Error = UnprovedTrace;
+crates/quest-compile/src/structured_workers.rs:441:type WireInterface = Vec<(Wire, ssa::Place)>;
+crates/quest-compile/src/structured_workers.rs:776:struct ZxEdit<'a> {
+crates/quest-compile/src/terminal.rs:15:pub struct TerminalOptions {
+crates/quest-compile/src/terminal.rs:69:pub struct CommutationSchedule {
+crates/quest-compile/src/terminal.rs:86:pub enum TerminalStatus {
+crates/quest-compile/src/terminal.rs:94:pub struct TerminalReport {
+crates/quest-compile/src/terminal.rs:133:pub struct TerminalOutcome {
+crates/quest-compile/src/terminal.rs:259:pub trait TerminalPasses: Sized {
+crates/quest-compile/src/workers.rs:20:pub enum WorkerError {
+crates/quest-compile/src/workers.rs:51:pub struct RotationCertificate {
+crates/quest-compile/src/workers.rs:61:pub struct SynthesisReport {
+crates/quest-compile/src/workers.rs:71:pub struct ExactRegionCertificate {
+crates/quest-compile/src/workers.rs:79:pub struct SkippedCandidate {
+crates/quest-compile/src/workers.rs:84:pub struct ZxReport {
+crates/quest-compile/src/workers.rs:239:pub struct ProvenanceBudget {
+crates/quest-compile/src/workers.rs:371:pub trait RotationSynthesisPasses: Sized {
+crates/quest-compile/src/workers.rs:617:pub struct QuantumWindow {
+crates/quest-compile/src/workers.rs:666:pub trait ZxPasses: Sized {
+crates/quest-language/src/angle.rs:12:pub struct ParameterId {
+crates/quest-language/src/angle.rs:25:pub enum Error {
+crates/quest-language/src/angle.rs:41:pub type Result<T> = std::result::Result<T, Error>;
+crates/quest-language/src/angle.rs:44:pub struct Angle(AngleExpr);
+crates/quest-language/src/angle.rs:47:pub struct SymbolicAngle {
+crates/quest-language/src/angle.rs:60:    type Target = Expr;
+crates/quest-language/src/angle.rs:72:pub enum AngleExpr {
+crates/quest-language/src/angle.rs:80:pub enum BoundAngleTarget {
+crates/quest-language/src/classical/mod.rs:11:pub struct Width(u8);
+crates/quest-language/src/classical/mod.rs:13:    type Error = ValueError;
+crates/quest-language/src/classical/mod.rs:41:pub enum FloatWidth {
+crates/quest-language/src/classical/mod.rs:47:pub enum ScalarType {
+crates/quest-language/src/classical/mod.rs:76:pub struct ScalarValue {
+crates/quest-language/src/classical/mod.rs:82:enum Data {
+crates/quest-language/src/classical/mod.rs:88:pub enum ValueError {
+crates/quest-language/src/classical/mod.rs:428:struct SerializedScalar {
+crates/quest-language/src/classical/mod.rs:434:    type Error = ValueError;
+crates/quest-language/src/diagnostic.rs:6:pub enum Stage {
+crates/quest-language/src/diagnostic.rs:19:pub enum Severity {
+crates/quest-language/src/diagnostic.rs:27:pub enum DiagnosticCode {
+crates/quest-language/src/diagnostic.rs:60:pub enum ResourceKind {
+crates/quest-language/src/diagnostic.rs:85:pub struct ResourceUsage {
+crates/quest-language/src/diagnostic.rs:92:pub enum Entity {
+crates/quest-language/src/diagnostic.rs:104:pub struct IrOccurrence {
+crates/quest-language/src/diagnostic.rs:111:pub struct InstructionOccurrence {
+crates/quest-language/src/diagnostic.rs:119:pub struct ExecutionContext {
+crates/quest-language/src/diagnostic.rs:126:pub enum LanguageFailureKind {
+crates/quest-language/src/diagnostic.rs:140:pub enum DiagnosticCause {
+crates/quest-language/src/diagnostic.rs:217:pub enum LabelStyle {
+crates/quest-language/src/diagnostic.rs:223:pub struct Label {
+crates/quest-language/src/diagnostic.rs:230:pub enum TraceKind {
+crates/quest-language/src/diagnostic.rs:237:pub struct TraceFrame {
+crates/quest-language/src/diagnostic.rs:244:pub struct Provenance {
+crates/quest-language/src/diagnostic.rs:251:pub struct Suggestion {
+crates/quest-language/src/diagnostic.rs:257:pub struct Replacement {
+crates/quest-language/src/diagnostic.rs:270:pub struct Diagnostic {
+crates/quest-language/src/gates.rs:5:pub enum Effect {
+crates/quest-language/src/gates.rs:15:pub struct ParameterTransform {
+crates/quest-language/src/gates.rs:20:pub enum Adjoint {
+crates/quest-language/src/gates.rs:29:pub struct ParameterTerm {
+crates/quest-language/src/gates.rs:35:pub struct AngleExpression {
+crates/quest-language/src/gates.rs:57:pub enum Axis {
+crates/quest-language/src/gates.rs:65:pub enum Primitive {
+crates/quest-language/src/gates.rs:75:pub struct GateStep {
+crates/quest-language/src/gates.rs:84:pub enum Decomposition {
+crates/quest-language/src/gates.rs:91:pub struct GateDefinition {
+crates/quest-language/src/gates.rs:173:        pub enum GateKind { $($kind),* }
+crates/quest-language/src/lib.rs:5:pub use gates::*;
+crates/quest-language/src/lib.rs:6:pub use source::*;
+crates/quest-language/src/lib.rs:8:pub use diagnostic::*;
+crates/quest-language/src/lib.rs:12:pub use render::*;
+crates/quest-language/src/lib.rs:32:pub use angle::{Angle, BoundAngleTarget, ParameterId};
+crates/quest-language/src/lib.rs:36:pub use matrix::{MatrixPolicy, NumericalOperator};
+crates/quest-language/src/lib.rs:40:pub use payload::QuantumPayload;
+crates/quest-language/src/matrix.rs:3:pub enum Error {
+crates/quest-language/src/matrix.rs:17:pub type Result<T> = std::result::Result<T, Error>;
+crates/quest-language/src/matrix.rs:24:pub struct MatrixPolicy {
+crates/quest-language/src/matrix.rs:100:pub struct NumericalOperator {
+crates/quest-language/src/matrix.rs:321:pub struct UnitaryAdmission {
+crates/quest-language/src/payload.rs:5:pub enum QuantumPayload {
+crates/quest-language/src/quantum/error.rs:3:pub type Result<T> = std::result::Result<T, Error>;
+crates/quest-language/src/quantum/error.rs:7:pub enum Error {
+crates/quest-language/src/quantum/evidence.rs:6:pub enum EvidenceScope {
+crates/quest-language/src/quantum/evidence.rs:12:pub enum EvidenceLocation {
+crates/quest-language/src/quantum/evidence.rs:34:pub struct CompilationEvidence {
+crates/quest-language/src/quantum/gate_matrix.rs:3:pub use crate::matrix::{MatrixPolicy, NumericalOperator};
+crates/quest-language/src/quantum/mod.rs:8:pub use crate as language;
+crates/quest-language/src/quantum/mod.rs:9:pub use crate::rational;
+crates/quest-language/src/quantum/mod.rs:10:pub use crate::{
+crates/quest-language/src/quantum/mod.rs:14:pub use error::{Error, Result};
+crates/quest-language/src/quantum/mod.rs:15:pub use model::*;
+crates/quest-language/src/quantum/mod.rs:16:pub use oracle::*;
+crates/quest-language/src/quantum/mod.rs:17:pub use program::*;
+crates/quest-language/src/quantum/mod.rs:18:pub use provenance::*;
+crates/quest-language/src/quantum/mod.rs:20:    pub use crate::matrix::*;
+crates/quest-language/src/quantum/mod.rs:24:pub use storage::RetainedStorage;
+crates/quest-language/src/quantum/model.rs:11:        pub struct $name {
+crates/quest-language/src/quantum/model.rs:24:pub use crate::angle::{Angle, BoundAngleTarget, ParameterId};
+crates/quest-language/src/quantum/model.rs:30:pub enum ControlState {
+crates/quest-language/src/quantum/model.rs:37:pub struct Control {
+crates/quest-language/src/quantum/model.rs:58:pub enum Gate {
+crates/quest-language/src/quantum/model.rs:231:pub enum BoundGate {
+crates/quest-language/src/quantum/model.rs:348:pub struct SourceSpan {
+crates/quest-language/src/quantum/model.rs:378:pub enum SemanticOperation {
+crates/quest-language/src/quantum/model.rs:420:pub enum Operation {
+crates/quest-language/src/quantum/model.rs:464:pub struct Operands<'a> {
+crates/quest-language/src/quantum/model.rs:560:pub struct MappedOperands {
+crates/quest-language/src/quantum/model.rs:795:pub struct Occurrence {
+crates/quest-language/src/quantum/model.rs:803:pub struct Instruction {
+crates/quest-language/src/quantum/oracle.rs:6:struct OracleBody {
+crates/quest-language/src/quantum/oracle.rs:19:pub struct OracleFragment {
+crates/quest-language/src/quantum/oracle.rs:25:pub struct NeedsOracleTolerance;
+crates/quest-language/src/quantum/oracle.rs:28:pub struct OracleTolerance {
+crates/quest-language/src/quantum/oracle.rs:33:pub struct OracleBuilder<State = NeedsOracleTolerance> {
+crates/quest-language/src/quantum/program.rs:55:pub struct ProgramLimits {
+crates/quest-language/src/quantum/program.rs:76:pub struct QuantumRegionBuilder {
+crates/quest-language/src/quantum/program.rs:596:pub enum DependencyKind {
+crates/quest-language/src/quantum/program.rs:604:pub struct DependencyEdge {
+crates/quest-language/src/quantum/program.rs:612:pub struct RegionSnapshotId(u64);
+crates/quest-language/src/quantum/program.rs:622:pub struct BoundSnapshotId(u64);
+crates/quest-language/src/quantum/program.rs:631:pub struct QuantumRegion {
+crates/quest-language/src/quantum/program.rs:1033:pub struct UnitaryCircuit(QuantumRegion);
+crates/quest-language/src/quantum/program.rs:1135:pub struct BoundRegion {
+crates/quest-language/src/quantum/program.rs:1312:pub struct RegionPlan(BoundRegion);
+crates/quest-language/src/quantum/provenance.rs:14:pub struct ProvenanceId {
+crates/quest-language/src/quantum/provenance.rs:19:enum NodeKind {
+crates/quest-language/src/quantum/provenance.rs:24:struct Node {
+crates/quest-language/src/quantum/provenance.rs:30:pub enum ProvenanceNode<'a> {
+crates/quest-language/src/quantum/provenance.rs:36:pub struct ExpansionLimits {
+crates/quest-language/src/quantum/provenance.rs:53:pub struct ProvenanceGraph {
+crates/quest-language/src/quantum/storage.rs:5:pub struct RetainedStorage {
+crates/quest-language/src/rational.rs:9:pub type BigRational = num_rational::Ratio<BigInt>;
+crates/quest-language/src/rational.rs:118:pub enum PiConversionError {
+crates/quest-language/src/rational.rs:193:struct PiBounds {
+crates/quest-language/src/render.rs:7:pub enum RenderError {
+crates/quest-language/src/semantic/builder/arrays.rs:7:pub struct Array<T: Classical> {
+crates/quest-language/src/semantic/builder/arrays.rs:13:pub struct Function<A: Classical, R: Classical> {
+crates/quest-language/src/semantic/builder/arrays.rs:184:pub struct ArrayFunction<T: Classical, R: Classical> {
+crates/quest-language/src/semantic/builder/effects.rs:9:pub enum Modifier {
+crates/quest-language/src/semantic/builder/effects.rs:18:pub struct GateDefinition {
+crates/quest-language/src/semantic/builder/mod.rs:22:pub use ranked::RankedArray;
+crates/quest-language/src/semantic/builder/mod.rs:24:pub use signature::{
+crates/quest-language/src/semantic/builder/mod.rs:29:pub use arrays::{Array, ArrayFunction, Function};
+crates/quest-language/src/semantic/builder/mod.rs:31:pub use effects::{GateDefinition, Modifier};
+crates/quest-language/src/semantic/builder/mod.rs:43:pub use types::{Angle, Arithmetic, Bit, Bool, Classical, Float, Int, Numeric, Uint};
+crates/quest-language/src/semantic/builder/mod.rs:46:pub struct Expr<T: Classical> {
+crates/quest-language/src/semantic/builder/mod.rs:54:pub struct Local<T: Classical> {
+crates/quest-language/src/semantic/builder/mod.rs:61:pub struct Qubit {
+crates/quest-language/src/semantic/builder/mod.rs:66:pub struct Builder {
+crates/quest-language/src/semantic/builder/ranked.rs:9:pub struct RankedArray<T: Classical, const R: usize> {
+crates/quest-language/src/semantic/builder/shared.rs:10:pub(super) struct SharedExpression {
+crates/quest-language/src/semantic/builder/shared.rs:18:enum Node {
+crates/quest-language/src/semantic/builder/signature.rs:7:    pub trait Sealed {}
+crates/quest-language/src/semantic/builder/signature.rs:10:pub trait Signature: sealed::Sealed + Clone {
+crates/quest-language/src/semantic/builder/signature.rs:12:    type Parameters;
+crates/quest-language/src/semantic/builder/signature.rs:14:    type Arguments;
+crates/quest-language/src/semantic/builder/signature.rs:31:pub struct ValueParameter<T: Classical>(PhantomData<T>);
+crates/quest-language/src/semantic/builder/signature.rs:45:    type Parameters = Expr<T>;
+crates/quest-language/src/semantic/builder/signature.rs:46:    type Arguments = Expr<T>;
+crates/quest-language/src/semantic/builder/signature.rs:76:pub struct ArrayRef<T: Classical, const N: usize> {
+crates/quest-language/src/semantic/builder/signature.rs:98:    type Parameters = Array<T>;
+crates/quest-language/src/semantic/builder/signature.rs:99:    type Arguments = Array<T>;
+crates/quest-language/src/semantic/builder/signature.rs:137:    type Parameters = ();
+crates/quest-language/src/semantic/builder/signature.rs:138:    type Arguments = ();
+crates/quest-language/src/semantic/builder/signature.rs:157:    type Parameters = (A::Parameters, B::Parameters);
+crates/quest-language/src/semantic/builder/signature.rs:158:    type Arguments = (A::Arguments, B::Arguments);
+crates/quest-language/src/semantic/builder/signature.rs:178:pub struct Subroutine<Sig: Signature, R: Classical> {
+crates/quest-language/src/semantic/builder/signature.rs:244:pub struct QubitParameter;
+crates/quest-language/src/semantic/builder/signature.rs:247:pub struct QubitArrayParameter<const N: usize>;
+crates/quest-language/src/semantic/builder/signature.rs:281:    type Parameters = super::Qubit;
+crates/quest-language/src/semantic/builder/signature.rs:282:    type Arguments = super::Qubit;
+crates/quest-language/src/semantic/builder/signature.rs:301:    type Parameters = super::Qubit;
+crates/quest-language/src/semantic/builder/signature.rs:302:    type Arguments = super::Qubit;
+crates/quest-language/src/semantic/builder/signature.rs:321:pub struct Procedure<Sig: Signature> {
+crates/quest-language/src/semantic/builder/signature.rs:379:pub struct RankedArrayRef<T: Classical, const R: usize> {
+crates/quest-language/src/semantic/builder/signature.rs:404:    type Parameters = super::RankedArray<T, R>;
+crates/quest-language/src/semantic/builder/signature.rs:405:    type Arguments = super::RankedArray<T, R>;
+crates/quest-language/src/semantic/builder/signature.rs:442:pub struct ArraySubroutine<Sig: Signature, T: Classical, const R: usize> {
+crates/quest-language/src/semantic/builder/types.rs:7:    pub trait Sealed {}
+crates/quest-language/src/semantic/builder/types.rs:10:pub trait Classical: sealed::Sealed + Clone {
+crates/quest-language/src/semantic/builder/types.rs:19:pub trait Numeric: Classical {}
+crates/quest-language/src/semantic/builder/types.rs:21:pub trait Arithmetic: Numeric {}
+crates/quest-language/src/semantic/builder/types.rs:23:pub struct Bool;
+crates/quest-language/src/semantic/builder/types.rs:48:        pub struct $name<const WIDTH: u8>;
+crates/quest-language/src/semantic/builder/types.rs:66:pub struct Float<const WIDTH: u8>;
+crates/quest-language/src/semantic/compile.rs:10:pub(super) struct Binding {
+crates/quest-language/src/semantic/compile.rs:16:pub(super) struct Function {
+crates/quest-language/src/semantic/compile.rs:20:pub(super) struct Compiler {
+crates/quest-language/src/semantic/finite.rs:13:pub enum FiniteOperation {
+crates/quest-language/src/semantic/mod.rs:21:pub struct CompileLimits {
+crates/quest-language/src/semantic/mod.rs:42:pub enum ErrorKind {
+crates/quest-language/src/semantic/mod.rs:56:pub struct SemanticError {
+crates/quest-language/src/semantic/mod.rs:198:pub struct TypedModule {
+crates/quest-language/src/semantic/mod.rs:282:pub(crate) use types::{binary_type, place_type, storage_size};
+crates/quest-language/src/semantic/preflight.rs:8:enum Node<'a> {
+crates/quest-language/src/semantic/preflight.rs:13:struct Scan<'a> {
+crates/quest-language/src/semantic/retained.rs:7:pub trait Heap {
+crates/quest-language/src/semantic/template.rs:6:struct Template {
+crates/quest-language/src/source.rs:8:pub struct SourceId(u64);
+crates/quest-language/src/source.rs:23:pub struct SourceSnapshot {
+crates/quest-language/src/source.rs:87:pub struct SourceSpan {
+crates/quest-language/src/source.rs:122:struct SerializedSpan {
+crates/quest-language/src/source.rs:129:    type Error = SourceError;
+crates/quest-language/src/source.rs:149:pub struct SourceMap {
+crates/quest-language/src/source.rs:184:    type Error = SourceError;
+crates/quest-language/src/source.rs:201:pub enum SourceError {
+crates/quest-language/src/ssa/edit.rs:13:pub struct ValueAllocator {
+crates/quest-language/src/ssa/mod.rs:12:pub use quantum::{QuantumDag, QuantumNode};
+crates/quest-language/src/ssa/mod.rs:13:pub use quantum_flow::{
+crates/quest-language/src/ssa/mod.rs:22:pub struct ProgramId(u64);
+crates/quest-language/src/ssa/mod.rs:41:        pub struct $name { owner: ProgramId, index: usize }
+crates/quest-language/src/ssa/mod.rs:55:pub struct SnapshotId(ProgramId);
+crates/quest-language/src/ssa/mod.rs:60:pub struct BlockHandle {
+crates/quest-language/src/ssa/mod.rs:77:pub enum Type {
+crates/quest-language/src/ssa/mod.rs:115:pub struct Value {
+crates/quest-language/src/ssa/mod.rs:121:pub enum Interface {
+crates/quest-language/src/ssa/mod.rs:129:pub struct Slot {
+crates/quest-language/src/ssa/mod.rs:140:pub struct Place {
+crates/quest-language/src/ssa/mod.rs:146:pub enum Effect {
+crates/quest-language/src/ssa/mod.rs:156:pub enum AccessMode {
+crates/quest-language/src/ssa/mod.rs:163:pub struct Access {
+crates/quest-language/src/ssa/mod.rs:169:pub enum CallArgument {
+crates/quest-language/src/ssa/mod.rs:175:pub enum GateModifier {
+crates/quest-language/src/ssa/mod.rs:183:pub enum InstructionKind {
+crates/quest-language/src/ssa/mod.rs:433:pub struct Instruction {
+crates/quest-language/src/ssa/mod.rs:442:pub struct Edge {
+crates/quest-language/src/ssa/mod.rs:448:pub enum Terminator {
+crates/quest-language/src/ssa/mod.rs:497:pub struct Block {
+crates/quest-language/src/ssa/mod.rs:508:pub struct OracleId(usize);
+crates/quest-language/src/ssa/mod.rs:521:pub struct Region {
+crates/quest-language/src/ssa/mod.rs:533:pub struct Program {
+crates/quest-language/src/ssa/mod.rs:569:pub struct VerifiedProgram {
+crates/quest-language/src/ssa/mod.rs:635:pub use edit::ValueAllocator;
+crates/quest-language/src/ssa/quantum.rs:6:pub struct QuantumNode {
+crates/quest-language/src/ssa/quantum.rs:13:pub struct QuantumDag {
+crates/quest-language/src/ssa/quantum_flow.rs:20:pub struct QuantumFlowLimits {
+crates/quest-language/src/ssa/quantum_flow.rs:76:pub struct QuantumFlowUsage {
+crates/quest-language/src/ssa/quantum_flow.rs:85:pub enum AliasRelation {
+crates/quest-language/src/ssa/quantum_flow.rs:93:pub struct QuantumStorage {
+crates/quest-language/src/ssa/quantum_flow.rs:99:pub struct QuantumVersion {
+crates/quest-language/src/ssa/quantum_flow.rs:111:pub struct QuantumFact {
+crates/quest-language/src/ssa/quantum_flow.rs:118:pub struct QuantumEvent {
+crates/quest-language/src/ssa/quantum_flow.rs:127:pub struct QuantumEdge {
+crates/quest-language/src/ssa/quantum_flow.rs:138:pub struct QuantumFlow {
+crates/quest-language/src/ssa/verify/assignment.rs:10:struct Assigned {
+crates/quest-language/src/ssa/verify/dominance.rs:6:pub(super) struct Dominance {
+crates/quest-language/src/ssa/verify.rs:11:pub(super) struct Definition {
+crates/quest-language/src/ssa/verify.rs:16:pub(super) struct Context<'a> {
+crates/quest-language/src/syntax/mod.rs:5:pub use lexer::lex;
+crates/quest-language/src/syntax/mod.rs:6:pub use parser::{parse_source, parse_tokens};
+crates/quest-language/src/syntax/mod.rs:10:pub struct ParseLimits {
+crates/quest-language/src/syntax/mod.rs:26:pub struct Token {
+crates/quest-language/src/syntax/mod.rs:31:pub enum TokenKind {
+crates/quest-language/src/syntax/mod.rs:49:pub struct ParseError {
+crates/quest-language/src/syntax/mod.rs:56:pub enum ParseErrorKind {
+crates/quest-language/src/syntax/mod.rs:136:pub struct Module {
+crates/quest-language/src/syntax/mod.rs:141:pub struct Statement {
+crates/quest-language/src/syntax/mod.rs:147:pub enum StatementKind {
+crates/quest-language/src/syntax/mod.rs:233:pub enum Qualifier {
+crates/quest-language/src/syntax/mod.rs:241:pub struct Parameter {
+crates/quest-language/src/syntax/mod.rs:248:pub enum Type {
+crates/quest-language/src/syntax/mod.rs:259:pub enum ScalarKind {
+crates/quest-language/src/syntax/mod.rs:269:pub enum Iterable {
+crates/quest-language/src/syntax/mod.rs:280:pub enum Modifier {
+crates/quest-language/src/syntax/mod.rs:291:pub struct Expression {
+crates/quest-language/src/syntax/mod.rs:297:pub enum ExpressionKind {
+crates/quest-language/src/syntax/mod.rs:313:pub enum UnaryOperator {
+crates/quest-language/src/syntax/mod.rs:321:pub enum BinaryOperator {
+crates/quest-language/src/syntax/parser.rs:61:struct Parser<'a> {
+crates/quest-language/src/syntax/parser.rs:677:enum Assignment {
+crates/quest-language/src/vm/mod.rs:12:pub use prepared::{DispatchId, PreparedDispatch, prepare_dispatch};
+crates/quest-language/src/vm/mod.rs:23:pub struct QuantumControl {
+crates/quest-language/src/vm/mod.rs:30:pub struct GateRequest<'a> {
+crates/quest-language/src/vm/mod.rs:40:pub struct OracleRequest<'a> {
+crates/quest-language/src/vm/mod.rs:48:pub trait QuantumBackend {
+crates/quest-language/src/vm/mod.rs:49:    type Error: StdError + Send + Sync + 'static;
+crates/quest-language/src/vm/mod.rs:93:pub enum ClassicalValue {
+crates/quest-language/src/vm/mod.rs:124:pub struct RunInputs {
+crates/quest-language/src/vm/mod.rs:159:pub enum InputError {
+crates/quest-language/src/vm/mod.rs:167:pub struct InterpreterLimits {
+crates/quest-language/src/vm/mod.rs:183:pub struct RuntimeContext {
+crates/quest-language/src/vm/mod.rs:189:pub enum RuntimeCause<E> {
+crates/quest-language/src/vm/mod.rs:242:pub struct RuntimeError<E> {
+crates/quest-language/src/vm/mod.rs:329:pub struct RunOutput {
+crates/quest-language/src/vm/mod.rs:337:pub struct Interpreter {
+crates/quest-language/src/vm/mod.rs:394:enum RuntimeValue {
+crates/quest-language/src/vm/mod.rs:400:type Cell = Rc<RefCell<Option<RuntimeValue>>>;
+crates/quest-language/src/vm/mod.rs:403:struct Address {
+crates/quest-language/src/vm/mod.rs:409:enum Binding {
+crates/quest-language/src/vm/mod.rs:415:struct PreparedArgument {
+crates/quest-language/src/vm/mod.rs:422:struct Frame {
+crates/quest-language/src/vm/mod.rs:429:enum QuantumKind {
+crates/quest-language/src/vm/mod.rs:434:struct OwnedGate {
+crates/quest-language/src/vm/mod.rs:442:enum Sink<'a> {
+crates/quest-language/src/vm/mod.rs:448:struct GateBuffer {
+crates/quest-language/src/vm/mod.rs:453:struct Fault<E> {
+crates/quest-language/src/vm/mod.rs:484:type VmResult<T, E> = Result<T, Box<Fault<E>>>;
+crates/quest-language/src/vm/mod.rs:486:struct Engine<'a, B: QuantumBackend> {
+crates/quest-language/src/vm/mod.rs:1675:struct ModifierValues {
+crates/quest-language/src/vm/prepared.rs:11:pub struct DispatchId {
+crates/quest-language/src/vm/prepared.rs:18:pub struct PreparedDispatch {
+crates/quest-language/src/vm/prepared.rs:74:struct NoBackend;
+crates/quest-language/src/vm/prepared.rs:76:    type Error = std::convert::Infallible;
+crates/quest-macros/src/adapter.rs:8:pub struct Adapted {
+crates/quest-macros/src/frontend.rs:15:struct Location {
+crates/quest-macros/src/frontend.rs:21:struct Frontend {
+crates/quest-math/src/approx.rs:9:pub struct ApproxCertificate {
+crates/quest-math/src/approx.rs:170:enum Input {
+crates/quest-math/src/approx.rs:314:struct ComplexInterval {
+crates/quest-math/src/approx.rs:345:pub struct DyadicBox8 {
+crates/quest-math/src/controlled.rs:12:pub struct ControlledApproxCertificate {
+crates/quest-math/src/interval.rs:7:pub struct Interval {
+crates/quest-math/src/interval.rs:56:pub struct Grid {
+crates/quest-math/src/lib.rs:4:pub use types::{
+crates/quest-math/src/lib.rs:8:pub use ring::{
+crates/quest-math/src/lib.rs:12:pub use matrix::{
+crates/quest-math/src/lib.rs:17:pub use approx::{
+crates/quest-math/src/lib.rs:22:pub use controlled::{ControlledApproxCertificate, lift_controlled_rotation};
+crates/quest-math/src/lib.rs:25:pub use synthesis::{
+crates/quest-math/src/matrix.rs:4:pub struct ExactMatrix {
+crates/quest-math/src/matrix.rs:178:pub struct MatrixKey {
+crates/quest-math/src/matrix.rs:183:struct EntryKey {
+crates/quest-math/src/matrix.rs:218:pub struct ExactCertificate {
+crates/quest-math/src/matrix.rs:307:pub struct PhaseRecovery {
+crates/quest-math/src/ring.rs:6:pub struct PowerOfTwoExponent(pub u32);
+crates/quest-math/src/ring.rs:9:pub struct Sqrt2Exponent(pub u32);
+crates/quest-math/src/ring.rs:12:pub struct EighthRootPhase(u8);
+crates/quest-math/src/ring.rs:29:pub struct OmegaResidue(u8);
+crates/quest-math/src/ring.rs:71:pub struct OmegaInteger(Cyclotomic);
+crates/quest-math/src/ring.rs:100:pub struct Cyclotomic {
+crates/quest-math/src/synthesis.rs:9:pub struct BasisIndex(pub usize);
+crates/quest-math/src/synthesis.rs:13:pub enum RowOperation {
+crates/quest-math/src/synthesis.rs:26:pub struct SynthesisProof {
+crates/quest-math/src/synthesis.rs:34:pub struct SynthesisCertificate {
+crates/quest-math/src/synthesis.rs:59:struct Work {
+crates/quest-math/src/types.rs:6:pub enum AngleTarget {
+crates/quest-math/src/types.rs:24:pub enum Axis {
+crates/quest-math/src/types.rs:31:pub struct Target {
+crates/quest-math/src/types.rs:38:pub enum Gate {
+crates/quest-math/src/types.rs:64:pub struct Control {
+crates/quest-math/src/types.rs:71:pub struct Operation {
+crates/quest-math/src/types.rs:79:pub struct Sequence {
+crates/quest-math/src/types.rs:90:pub struct Limits {
+crates/quest-math/src/types.rs:111:pub enum Error {
+crates/quest-math/src/types.rs:129:pub type Result<T> = std::result::Result<T, Error>;
+crates/quest-math/src/types.rs:130:pub type Rational = num_rational::Ratio<BigInt>;
+crates/quest-numerics/src/ad.rs:8:pub struct Jet<T> {
+crates/quest-numerics/src/ad.rs:14:pub struct First<T> {
+crates/quest-numerics/src/ad.rs:19:pub struct Gradient<T, const N: usize> {
+crates/quest-numerics/src/ad.rs:26:pub struct JetBackend<'a, B: Backend>(pub &'a mut B);
+crates/quest-numerics/src/ad.rs:89:    type Scalar = Jet<B::Scalar>;
+crates/quest-numerics/src/ad.rs:90:    type Error = B::Error;
+crates/quest-numerics/src/ad.rs:202:pub struct GradientBackend<'a, B: Backend, const N: usize>(pub &'a mut B);
+crates/quest-numerics/src/ad.rs:250:    type Scalar = Gradient<B::Scalar, N>;
+crates/quest-numerics/src/ad.rs:251:    type Error = B::Error;
+crates/quest-numerics/src/ad.rs:361:pub struct FirstBackend<'a, B: Backend>(pub &'a mut B);
+crates/quest-numerics/src/ad.rs:390:    type Scalar = First<B::Scalar>;
+crates/quest-numerics/src/ad.rs:391:    type Error = B::Error;
+crates/quest-numerics/src/ad.rs:480:pub struct Jacobian<T, const M: usize, const N: usize> {
+crates/quest-numerics/src/ad.rs:486:pub struct JacobianLimits {
+crates/quest-numerics/src/arithmetic/budget.rs:11:pub struct Budget {
+crates/quest-numerics/src/arithmetic/budget.rs:42:pub struct BudgetedBackend<'a, B> {
+crates/quest-numerics/src/arithmetic/budget.rs:61:    type Scalar = B::Scalar;
+crates/quest-numerics/src/arithmetic/budget.rs:62:    type Error = B::Error;
+crates/quest-numerics/src/arithmetic/budget.rs:100:    type Endpoint = B::Endpoint;
+crates/quest-numerics/src/arithmetic/interchange.rs:10:pub enum BinaryRounding {
+crates/quest-numerics/src/arithmetic/interchange.rs:18:type Result<T> = std::result::Result<T, ArithmeticError>;
+crates/quest-numerics/src/arithmetic.rs:21:pub use crate::ad::{First, FirstBackend, Gradient, GradientBackend, Jet, JetBackend};
+crates/quest-numerics/src/arithmetic.rs:25:pub use interchange::{BinaryRounding, exact_from_f64, to_f64};
+crates/quest-numerics/src/arithmetic.rs:27:pub enum ArithmeticError {
+crates/quest-numerics/src/arithmetic.rs:46:pub type ArithmeticResult<T> = Result<T, ArithmeticError>;
+crates/quest-numerics/src/arithmetic.rs:48:pub enum ExactConstant {
+crates/quest-numerics/src/arithmetic.rs:64:pub struct Precision {
+crates/quest-numerics/src/arithmetic.rs:78:pub trait Backend {
+crates/quest-numerics/src/arithmetic.rs:101:    type Scalar: Clone;
+crates/quest-numerics/src/arithmetic.rs:102:    type Error: From<ArithmeticError>;
+crates/quest-numerics/src/arithmetic.rs:167:pub trait PointBackend: Backend {
+crates/quest-numerics/src/arithmetic.rs:182:pub trait EnclosureBackend: Backend {
+crates/quest-numerics/src/arithmetic.rs:183:    type Endpoint: Clone;
+crates/quest-numerics/src/arithmetic.rs:254:    pub trait Sealed {}
+crates/quest-numerics/src/arithmetic.rs:262:pub trait CertifyingBackend: EnclosureBackend + sealed::Sealed {}
+crates/quest-numerics/src/arithmetic.rs:264:pub struct F64Backend;
+crates/quest-numerics/src/arithmetic.rs:305:    type Scalar = f64;
+crates/quest-numerics/src/arithmetic.rs:306:    type Error = ArithmeticError;
+crates/quest-numerics/src/arithmetic.rs:406:pub struct Interval64Backend;
+crates/quest-numerics/src/arithmetic.rs:426:    type Scalar = Interval;
+crates/quest-numerics/src/arithmetic.rs:427:    type Error = ArithmeticError;
+crates/quest-numerics/src/arithmetic.rs:490:    type Endpoint = f64;
+crates/quest-numerics/src/arithmetic.rs:563:pub struct MpInterval {
+crates/quest-numerics/src/arithmetic.rs:577:pub struct MpBackend {
+crates/quest-numerics/src/arithmetic.rs:794:    type Scalar = BigFloat;
+crates/quest-numerics/src/arithmetic.rs:795:    type Error = ArithmeticError;
+crates/quest-numerics/src/arithmetic.rs:922:pub struct MpIntervalBackend {
+crates/quest-numerics/src/arithmetic.rs:993:    type Scalar = MpInterval;
+crates/quest-numerics/src/arithmetic.rs:994:    type Error = ArithmeticError;
+crates/quest-numerics/src/arithmetic.rs:1211:    type Endpoint = BigFloat;
+crates/quest-numerics/src/arithmetic.rs:1318:pub use budget::{Budget, BudgetedBackend};
+crates/quest-numerics/src/fft.rs:10:pub enum FftBackend {
+crates/quest-numerics/src/fft.rs:21:pub enum FftDirection {
+crates/quest-numerics/src/fft.rs:30:pub enum Normalization {
+crates/quest-numerics/src/fft.rs:43:pub struct FftWorkspace {
+crates/quest-numerics/src/fft.rs:63:type Plans = (Arc<dyn Fft<f64>>, Arc<dyn Fft<f64>>);
+crates/quest-numerics/src/fft.rs:218:pub struct ConvolutionWorkspace {
+crates/quest-numerics/src/interval.rs:11:pub struct Interval(maryada::Interval);
+crates/quest-numerics/src/interval.rs:158:    type Output = Result<Self>;
+crates/quest-numerics/src/interval.rs:165:    type Output = Result<Self>;
+crates/quest-numerics/src/interval.rs:172:    type Output = Result<Self>;
+crates/quest-numerics/src/interval.rs:179:    type Output = Result<Self>;
+crates/quest-numerics/src/interval.rs:186:    type Output = Result<Self>;
+crates/quest-numerics/src/lib.rs:13:pub use fft::{ConvolutionWorkspace, FftBackend, FftDirection, FftWorkspace, Normalization};
+crates/quest-numerics/src/lib.rs:14:pub use interval::Interval;
+crates/quest-numerics/src/lib.rs:15:pub use num_complex::Complex64;
+crates/quest-numerics/src/lib.rs:16:pub use policy::{Error, ExecutionPolicy, Limits, ResourceUsage, Result};
+crates/quest-numerics/src/observer.rs:21:pub enum Stage {
+crates/quest-numerics/src/observer.rs:55:pub trait Clock {
+crates/quest-numerics/src/observer.rs:59:pub struct MonotonicClock {
+crates/quest-numerics/src/observer.rs:81:pub enum Outcome {
+crates/quest-numerics/src/observer.rs:97:pub struct Event {
+crates/quest-numerics/src/observer.rs:127:pub trait Observer {
+crates/quest-numerics/src/observer.rs:133:pub struct NoopObserver;
+crates/quest-numerics/src/observer.rs:141:pub struct Span<'a, O: Observer, C: Clock> {
+crates/quest-numerics/src/observer.rs:204:pub struct TraceObserver {
+crates/quest-numerics/src/policy.rs:5:pub enum Error {
+crates/quest-numerics/src/policy.rs:37:pub type Result<T> = std::result::Result<T, Error>;
+crates/quest-numerics/src/policy.rs:46:pub struct Limits {
+crates/quest-numerics/src/policy.rs:67:pub struct ResourceUsage {
+crates/quest-numerics/src/policy.rs:80:pub enum ExecutionPolicy<'pool> {
+crates/quest-numerics/src/roots.rs:12:pub struct RootEvidence {
+crates/quest-numerics/src/roots.rs:28:pub enum Premise {
+crates/quest-numerics/src/roots.rs:32:pub struct Contraction<T> {
+crates/quest-numerics/src/roots.rs:38:pub struct CoverLimits {
+crates/quest-numerics/src/roots.rs:53:pub struct RootBox<T> {
+crates/quest-numerics/src/roots.rs:60:pub struct RootCover<T, E = ArithmeticError> {
+crates/quest-numerics/src/roots.rs:526:pub struct VectorEvaluation<T, const N: usize> {
+crates/quest-numerics/src/shapes.rs:10:pub struct Matrix<T, const R: usize, const C: usize> {
+crates/quest-optimizer-client/src/lib.rs:14:pub struct WorkerLimits {
+crates/quest-optimizer-client/src/lib.rs:30:pub enum Error {
+crates/quest-optimizer-client/src/lib.rs:56:pub enum MitmResult<T> {
+crates/quest-optimizer-client/src/lib.rs:75:pub struct Client {
+crates/quest-optimizer-client/src/process.rs:12:struct ChildGuard {
+crates/quest-optimizer-client/src/process.rs:52:enum Event {
+crates/quest-optimizer-client/src/process.rs:72:struct Progress {
+crates/quest-optimizer-protocol/src/lib.rs:16:pub struct RequestEnvelope {
+crates/quest-optimizer-protocol/src/lib.rs:24:pub struct MitmLimits {
+crates/quest-optimizer-protocol/src/lib.rs:79:pub enum Request {
+crates/quest-optimizer-protocol/src/lib.rs:107:pub struct ResponseEnvelope {
+crates/quest-optimizer-protocol/src/lib.rs:115:pub enum Outcome {
+crates/quest-optimizer-protocol/src/lib.rs:148:pub enum WireError {
+crates/quest-optimizer-protocol/src/lib.rs:156:struct BoundedBytes {
+crates/quest-optimizer-worker/src/mitm/approx.rs:9:struct State {
+crates/quest-optimizer-worker/src/mitm/approx.rs:17:struct Budget {
+crates/quest-optimizer-worker/src/mitm/approx.rs:578:struct Node {
+crates/quest-optimizer-worker/src/mitm/approx.rs:585:struct Tree<'a> {
+crates/quest-optimizer-worker/src/mitm/exact.rs:5:struct State {
+crates/quest-optimizer-worker/src/mitm/exact.rs:13:struct Admission {
+crates/quest-optimizer-worker/src/mitm/exact.rs:21:enum Stop {
+crates/quest-optimizer-worker/src/mitm/representatives.rs:7:pub(super) struct Signature {
+crates/quest-optimizer-worker/src/mitm/representatives.rs:83:struct Representative {
+crates/quest-optimizer-worker/src/mitm/representatives.rs:88:pub(super) struct ParetoIndex {
+crates/quest-optimizer-worker/src/zx.rs:27:struct ZxRuleLimits {
+crates/quest-optimizer-worker/src/zx.rs:46:struct RuleUsage {
+crates/quest-polynomial/src/analysis.rs:26:pub struct Conversion<B: Basis = Monomial, S: Basis = Monomial, D: Shape = DynamicShape> {
+crates/quest-polynomial/src/analysis.rs:51:    pub trait Sealed {}
+crates/quest-polynomial/src/analysis.rs:53:pub trait Parity: sealed::Sealed {
+crates/quest-polynomial/src/analysis.rs:57:pub struct Even;
+crates/quest-polynomial/src/analysis.rs:59:pub struct Odd;
+crates/quest-polynomial/src/analysis.rs:70:pub struct ParityPolynomial<B: Basis, P: Parity, D: Shape = DynamicShape> {
+crates/quest-polynomial/src/basis.rs:6:type RecurrenceResult<A> = std::result::Result<
+crates/quest-polynomial/src/basis.rs:16:    pub trait Sealed {}
+crates/quest-polynomial/src/basis.rs:20:pub trait Basis: sealed::Sealed + Clone + std::fmt::Debug {
+crates/quest-polynomial/src/basis.rs:44:pub struct Monomial;
+crates/quest-polynomial/src/basis.rs:46:pub struct Chebyshev;
+crates/quest-polynomial/src/basis.rs:48:pub struct Laurent {
+crates/quest-polynomial/src/basis.rs:58:pub struct Hermite {
+crates/quest-polynomial/src/basis.rs:76:pub struct Laguerre {
+crates/quest-polynomial/src/basis.rs:94:pub struct Jacobi {
+crates/quest-polynomial/src/function.rs:32:pub struct Function<E, const N: usize = 1> {
+crates/quest-polynomial/src/function.rs:84:pub trait GenericFunction {
+crates/quest-polynomial/src/function.rs:115:pub enum ConsistencyAssumption {
+crates/quest-polynomial/src/function.rs:121:pub struct AssumedFunction<C> {
+crates/quest-polynomial/src/function.rs:148:    pub trait Admitted {}
+crates/quest-polynomial/src/function.rs:152:pub trait AdmittedFunction: GenericFunction + sealed::Admitted {
+crates/quest-polynomial/src/function.rs:153:    type Evidence;
+crates/quest-polynomial/src/function.rs:159:    type Evidence = Structural;
+crates/quest-polynomial/src/function.rs:169:    type Evidence = Assumed;
+crates/quest-polynomial/src/function.rs:180:pub struct Structural;
+crates/quest-polynomial/src/function.rs:183:pub struct Assumed;
+crates/quest-polynomial/src/function.rs:187:pub struct System<E, const N: usize, const M: usize> {
+crates/quest-polynomial/src/function.rs:190:pub trait VectorExpression<const M: usize>: crate::typed::sealed::Sealed {
+crates/quest-polynomial/src/lib.rs:10:pub use quest_numerics::Interval;
+crates/quest-polynomial/src/lib.rs:12:pub use quest_numerics::ad::{First, Gradient, Jet};
+crates/quest-polynomial/src/lib.rs:13:pub use typed::{Expression, ExpressionMetadata, StaticExpression};
+crates/quest-polynomial/src/lib.rs:15:pub use function::{
+crates/quest-polynomial/src/lib.rs:20:pub use norm::{NormDomain, NormEvidence, NormOptions, NormOutcome, NormStatus};
+crates/quest-polynomial/src/lib.rs:22:pub use analysis::{Conversion, Even, Odd, Parity, ParityPolynomial};
+crates/quest-polynomial/src/lib.rs:24:pub use remez::*;
+crates/quest-polynomial/src/lib.rs:26:pub use basis::{Basis, Chebyshev, Hermite, Jacobi, Laguerre, Laurent, Monomial};
+crates/quest-polynomial/src/lib.rs:28:pub use num_complex::Complex64;
+crates/quest-polynomial/src/lib.rs:29:pub use polynomial::{DynamicShape, Polynomial, Shape, StaticShape};
+crates/quest-polynomial/src/lib.rs:31:pub type Result<T> = std::result::Result<T, Error>;
+crates/quest-polynomial/src/lib.rs:35:pub enum Error {
+crates/quest-polynomial/src/lib.rs:64:pub struct Limits {
+crates/quest-polynomial/src/norm.rs:13:pub enum NormDomain {
+crates/quest-polynomial/src/norm.rs:18:pub struct NormOptions {
+crates/quest-polynomial/src/norm.rs:31:pub enum NormStatus {
+crates/quest-polynomial/src/norm.rs:41:pub struct NormEvidence<B: Basis, D: Shape = DynamicShape> {
+crates/quest-polynomial/src/norm.rs:71:pub enum NormOutcome<B: Basis, D: Shape = DynamicShape> {
+crates/quest-polynomial/src/norm.rs:79:struct Rect {
+crates/quest-polynomial/src/norm.rs:245:struct Cell {
+crates/quest-polynomial/src/polynomial.rs:9:    pub trait Sealed {}
+crates/quest-polynomial/src/polynomial.rs:14:pub trait Shape: shape_sealed::Sealed + Clone + std::fmt::Debug {
+crates/quest-polynomial/src/polynomial.rs:18:pub struct DynamicShape(pub usize);
+crates/quest-polynomial/src/polynomial.rs:20:pub struct StaticShape<const COUNT: usize>;
+crates/quest-polynomial/src/polynomial.rs:44:pub struct Polynomial<B: Basis, C = Complex64, D: Shape = DynamicShape> {
+crates/quest-polynomial/src/remez/exchange.rs:11:struct Candidate<C, D: Shape> {
+crates/quest-polynomial/src/remez/exchange.rs:15:pub(super) struct Established<C, T, D: Shape> {
+crates/quest-polynomial/src/remez/linear.rs:16:pub struct LinearSolution<T> {
+crates/quest-polynomial/src/remez/linear.rs:25:pub trait LinearSolver<P: PointBackend<Error = ArithmeticError>> {
+crates/quest-polynomial/src/remez/linear.rs:41:pub struct PivotedQr;
+crates/quest-polynomial/src/remez/linear.rs:43:pub struct MpHouseholder;
+crates/quest-polynomial/src/remez/linear.rs:45:struct System<T> {
+crates/quest-polynomial/src/remez/proof.rs:313:pub(super) struct AdmittedDomain<T, E> {
+crates/quest-polynomial/src/remez.rs:11:pub use linear::{LinearSolver, MpHouseholder, PivotedQr};
+crates/quest-polynomial/src/remez.rs:22:pub struct ExactDomain {
+crates/quest-polynomial/src/remez.rs:40:pub enum Accuracy {
+crates/quest-polynomial/src/remez.rs:49:pub struct RemezOptions {
+crates/quest-polynomial/src/remez.rs:71:pub struct AuditedEnclosures;
+crates/quest-polynomial/src/remez.rs:73:pub struct AssumedEnclosures;
+crates/quest-polynomial/src/remez.rs:75:pub enum EnclosureAssumption {
+crates/quest-polynomial/src/remez.rs:89:pub struct UniformErrorCertificate<T, F, A> {
+crates/quest-polynomial/src/remez.rs:107:pub struct MinimaxGapCertificate<T, F, A> {
+crates/quest-polynomial/src/remez.rs:141:pub struct RemezRequest<F, P, I, D = DynamicShape, L = PivotedQr, A = AuditedEnclosures> {
+crates/quest-polynomial/src/remez.rs:301:pub struct Attempt<C, T, D: Shape> {
+crates/quest-polynomial/src/remez.rs:309:pub struct RemezResult<F: AdmittedFunction, P: PointBackend, I: EnclosureBackend, D: Shape, L, A> {
+crates/quest-polynomial/src/remez.rs:363:pub struct RemezFailure<F, P: PointBackend, I: EnclosureBackend, D: Shape, L, A> {
+crates/quest-polynomial/src/remez.rs:370:pub type RemezOutcome<F, P, I, D, L, A> =
+crates/quest-polynomial/src/remez.rs:479:pub struct PrecisionPair {
+crates/quest-polynomial/src/remez.rs:484:pub struct PrecisionAttempts {
+crates/quest-polynomial/src/typed.rs:10:    pub trait Sealed {}
+crates/quest-polynomial/src/typed.rs:25:pub trait Expression: sealed::Sealed {
+crates/quest-polynomial/src/typed.rs:37:pub struct ExpressionMetadata {
+crates/quest-polynomial/src/typed.rs:111:pub struct Typed<E>(pub(crate) E);
+crates/quest-polynomial/src/typed.rs:113:pub struct VariableNode<const I: usize = 0>;
+crates/quest-polynomial/src/typed.rs:115:pub struct ConstantNode(f64);
+crates/quest-polynomial/src/typed.rs:117:pub struct ExactNode(ExactConstant);
+crates/quest-polynomial/src/typed.rs:182:            type Output=Typed<$node<L,R>>;
+crates/quest-polynomial/src/typed.rs:186:            type Output=Typed<$node<L,ConstantNode>>;
+crates/quest-polynomial/src/typed.rs:190:            type Output=Typed<$node<ConstantNode,R>>;
+crates/quest-polynomial/src/typed.rs:222:    type Output = Typed<Negative<E>>;
+crates/quest-polynomial/src/typed.rs:229:    type Output: Expression;
+crates/quest-polynomial/src/typed.rs:233:    type Output = Self;
+crates/quest-polynomial/src/typed.rs:239:    type Output = Typed<ConstantNode>;
+crates/quest-qasm/src/admit.rs:9:pub struct ImportedModule {
+crates/quest-qasm/src/export.rs:12:pub struct ExportLimits {
+crates/quest-qasm/src/export.rs:77:struct Writer {
+crates/quest-qasm/src/lib.rs:5:pub use export::{ExportLimits, export_syntax};
+crates/quest-qasm/src/lib.rs:6:pub type Result<T> = std::result::Result<T, Box<quest_language::Diagnostic>>;
+crates/quest-qasm/src/lib.rs:15:pub use resolve::{ImportLimits, IncludeEdge, IncludeResolver, ParsedModule, ResolveError, parse};
+crates/quest-qasm/src/lib.rs:17:pub use resolve::NoIncludes;
+crates/quest-qasm/src/lib.rs:18:pub use stdlib::{STANDARD_GATES, StandardLibrary, UPSTREAM_COMMIT, UPSTREAM_STANDARD_GATES};
+crates/quest-qasm/src/lib.rs:20:pub use admit::{ImportedModule, admit_expanded, export, export_typed, import};
+crates/quest-qasm/src/resolve.rs:7:pub struct ImportLimits {
+crates/quest-qasm/src/resolve.rs:25:pub struct ResolveError {
+crates/quest-qasm/src/resolve.rs:36:pub trait IncludeResolver {
+crates/quest-qasm/src/resolve.rs:48:pub struct IncludeEdge {
+crates/quest-qasm/src/resolve.rs:54:pub struct ParsedModule {
+crates/quest-qasm/src/resolve.rs:111:struct Loader<'a, R> {
+crates/quest-qasm/src/resolve.rs:337:pub struct NoIncludes;
+crates/quest-qasm/src/stdlib.rs:10:pub struct StandardLibrary {
+crates/quest-qsp/src/admission.rs:8:struct ComplexInterval {
+crates/quest-qsp/src/artifact.rs:16:pub enum ArtifactError {
+crates/quest-qsp/src/artifact.rs:34:pub type ArtifactResult<T> = std::result::Result<T, ArtifactError>;
+crates/quest-qsp/src/artifact.rs:37:pub struct ArtifactLimits {
+crates/quest-qsp/src/artifact.rs:56:pub struct LoadPolicy {
+crates/quest-qsp/src/artifact.rs:64:pub enum LoadedCompiled {
+crates/quest-qsp/src/artifact.rs:72:pub enum LoadedCertified {
+crates/quest-qsp/src/artifact.rs:79:    pub trait Sealed {}
+crates/quest-qsp/src/artifact.rs:84:pub trait ArtifactMode: private::Sealed {
+crates/quest-qsp/src/artifact.rs:97:struct Envelope {
+crates/quest-qsp/src/artifact.rs:103:struct Payload {
+crates/quest-qsp/src/artifact.rs:129:struct StoredPolicy {
+crates/quest-qsp/src/artifact.rs:140:struct Receipt {
+crates/quest-qsp/src/artifact.rs:153:struct Attempt {
+crates/quest-qsp/src/certification/interval.rs:8:pub struct MpInterval {
+crates/quest-qsp/src/certification/interval.rs:276:pub struct MpComplex {
+crates/quest-qsp/src/certification/mod.rs:31:pub use interval::{MpComplex, MpInterval};
+crates/quest-qsp/src/certification/mod.rs:33:pub(crate) use product::circle_values;
+crates/quest-qsp/src/certification/mod.rs:34:pub use projector::{
+crates/quest-qsp/src/certification/mod.rs:44:pub type CertificationResult<T> = std::result::Result<T, CertificationError>;
+crates/quest-qsp/src/certification/mod.rs:48:pub enum CertificationError {
+crates/quest-qsp/src/certification/mod.rs:97:pub enum ConvolutionMethod {
+crates/quest-qsp/src/certification/mod.rs:111:pub struct CertificationPolicy {
+crates/quest-qsp/src/certification/mod.rs:192:    pub trait Sealed {}
+crates/quest-qsp/src/certification/mod.rs:195:pub trait CertificationMode: sealed::Sealed {
+crates/quest-qsp/src/certification/mod.rs:209:pub struct MissingCandidate;
+crates/quest-qsp/src/certification/mod.rs:212:pub struct WithCandidate<M> {
+crates/quest-qsp/src/certification/mod.rs:217:pub struct ReadyCertification<M> {
+crates/quest-qsp/src/certification/mod.rs:242:pub struct CertificationBuilder<S = MissingCandidate> {
+crates/quest-qsp/src/certification/mod.rs:298:pub struct Certified<M> {
+crates/quest-qsp/src/certification/mod.rs:325:pub struct Bound {
+crates/quest-qsp/src/certification/mod.rs:370:pub struct CertificationAttempt {
+crates/quest-qsp/src/certification/mod.rs:400:pub struct CertificationReport {
+crates/quest-qsp/src/certification/mod.rs:458:struct Context {
+crates/quest-qsp/src/certification/product.rs:7:pub(super) type MatrixPolynomial = [Vec<MpComplex>; 4];
+crates/quest-qsp/src/certification/product.rs:8:pub(super) type Matrix = [MpComplex; 4];
+crates/quest-qsp/src/certification/projector.rs:12:pub enum ProjectorDomain {
+crates/quest-qsp/src/certification/projector.rs:18:pub enum ProjectorNorm {
+crates/quest-qsp/src/certification/projector.rs:24:pub enum ProjectorConvention {
+crates/quest-qsp/src/certification/projector.rs:32:pub struct CertifiedProjectorPhases {
+crates/quest-qsp/src/kernel.rs:60:struct Convolutions<'pool> {
+crates/quest-qsp/src/kernel.rs:295:struct InverseNode {
+crates/quest-qsp/src/kernel.rs:424:struct PolynomialMatrix {
+crates/quest-qsp/src/lib.rs:17:pub use sequence::{
+crates/quest-qsp/src/lib.rs:23:pub use num_complex::Complex64;
+crates/quest-qsp/src/lib.rs:24:pub use quest_numerics::FftBackend;
+crates/quest-qsp/src/lib.rs:25:pub use stages::{
+crates/quest-qsp/src/lib.rs:32:pub type Control = [[Complex64; 2]; 2];
+crates/quest-qsp/src/lib.rs:34:pub type Result<T> = std::result::Result<T, Error>;
+crates/quest-qsp/src/lib.rs:42:pub enum Error {
+crates/quest-qsp/src/offline/kernels.rs:7:pub(super) type Matrix = [Number; 4];
+crates/quest-qsp/src/offline/kernels.rs:170:struct InverseNode {
+crates/quest-qsp/src/offline/mod.rs:60:pub type OfflineResult<T> = std::result::Result<T, OfflineError>;
+crates/quest-qsp/src/offline/mod.rs:64:pub enum OfflineError {
+crates/quest-qsp/src/offline/mod.rs:97:pub struct OfflinePolicy {
+crates/quest-qsp/src/offline/mod.rs:198:pub struct MissingTarget;
+crates/quest-qsp/src/offline/mod.rs:201:pub struct OriginalTarget<M> {
+crates/quest-qsp/src/offline/mod.rs:210:pub struct ReadyOffline<M> {
+crates/quest-qsp/src/offline/mod.rs:216:pub struct OfflineBuilder<S = MissingTarget> {
+crates/quest-qsp/src/offline/mod.rs:338:pub struct OfflineSolution<M> {
+crates/quest-qsp/src/offline/mod.rs:361:pub struct ExportSnapshot {
+crates/quest-qsp/src/offline/mod.rs:399:pub struct OfflineAttempt {
+crates/quest-qsp/src/offline/mod.rs:441:pub struct OfflineReport {
+crates/quest-qsp/src/offline/mod.rs:469:struct Context {
+crates/quest-qsp/src/offline/number.rs:5:pub(super) struct Number {
+crates/quest-qsp/src/precision.rs:9:pub enum PrecisionError {
+crates/quest-qsp/src/precision.rs:22:pub enum BinaryRounding {
+crates/quest-qsp/src/precision.rs:30:type Result<T> = std::result::Result<T, PrecisionError>;
+crates/quest-qsp/src/sequence.rs:11:    pub trait Sealed {}
+crates/quest-qsp/src/sequence.rs:14:pub trait PhaseConvention: sealed::Sealed {
+crates/quest-qsp/src/sequence.rs:22:pub struct WxSymmetric;
+crates/quest-qsp/src/sequence.rs:25:pub struct WxLaurent;
+crates/quest-qsp/src/sequence.rs:28:pub struct WxImaginaryU00;
+crates/quest-qsp/src/sequence.rs:61:pub struct PhaseSequence<C: PhaseConvention> {
+crates/quest-qsp/src/sequence.rs:68:pub struct PhaseSequenceBuilder<C: PhaseConvention> {
+crates/quest-qsp/src/sequence.rs:149:pub struct ConvertedProjectorPhases {
+crates/quest-qsp/src/sequence.rs:167:enum PhaseShift {
+crates/quest-qsp/src/sequence.rs:269:pub struct ControlSequence {
+crates/quest-qsp/src/sequence.rs:274:pub struct MissingControls;
+crates/quest-qsp/src/sequence.rs:277:pub struct SuppliedControls {
+crates/quest-qsp/src/sequence.rs:282:pub struct ControlSequenceBuilder<S = MissingControls> {
+crates/quest-qsp/src/stages.rs:13:pub enum SynthesisAlgorithm {
+crates/quest-qsp/src/stages.rs:23:pub enum SynthesisPrecision {
+crates/quest-qsp/src/stages.rs:40:pub struct Policy {
+crates/quest-qsp/src/stages.rs:104:pub struct UnitCircleResponse;
+crates/quest-qsp/src/stages.rs:110:pub struct RealParityWx;
+crates/quest-qsp/src/stages.rs:113:pub struct MissingTarget;
+crates/quest-qsp/src/stages.rs:117:pub struct ReadyTarget<M> {
+crates/quest-qsp/src/stages.rs:136:pub struct SynthesisBuilder<S = MissingTarget> {
+crates/quest-qsp/src/stages.rs:305:pub struct AdmittedTarget<M> {
+crates/quest-qsp/src/stages.rs:369:pub enum OuterGauge {
+crates/quest-qsp/src/stages.rs:376:pub struct WeissRatio<M> {
+crates/quest-qsp/src/stages.rs:413:pub struct CompletedPolynomial<M> {
+crates/quest-qsp/src/stages.rs:467:pub struct FrozenCandidate<M> {
+crates/quest-qsvt/src/analysis/diagnostics.rs:10:pub enum ReferenceParity {
+crates/quest-qsvt/src/analysis/diagnostics.rs:15:pub struct Reference {
+crates/quest-qsvt/src/analysis/diagnostics.rs:86:pub enum DiagnosticMethod {
+crates/quest-qsvt/src/analysis/diagnostics.rs:92:pub struct EmpiricalEvidence {
+crates/quest-qsvt/src/analysis/diagnostics.rs:130:pub struct MissingReference;
+crates/quest-qsvt/src/analysis/diagnostics.rs:131:pub struct SuppliedReference(Reference);
+crates/quest-qsvt/src/analysis/diagnostics.rs:132:pub struct DiagnosticBuilder<'t, R = MissingReference> {
+crates/quest-qsvt/src/analysis/diagnostics.rs:138:enum Method {
+crates/quest-qsvt/src/analysis/diagnostics.rs:291:struct Svd {
+crates/quest-qsvt/src/analysis.rs:5:pub use diagnostics::{
+crates/quest-qsvt/src/analysis.rs:9:pub type Result<T> = std::result::Result<T, Error>;
+crates/quest-qsvt/src/analysis.rs:12:pub enum Error {
+crates/quest-qsvt/src/analysis.rs:26:pub struct Assumption(String);
+crates/quest-qsvt/src/analysis.rs:42:pub struct Missing;
+crates/quest-qsvt/src/analysis.rs:43:pub struct Supplied<T>(T);
+crates/quest-qsvt/src/analysis.rs:48:pub struct EncodingBoundBuilder<A = Missing, E = Missing, P = Missing> {
+crates/quest-qsvt/src/analysis.rs:60:pub struct BlockEncodingBound {
+crates/quest-qsvt/src/analysis.rs:214:pub struct StandardPremises<'t> {
+crates/quest-qsvt/src/analysis.rs:219:pub struct PremiseBuilder<'t, S = Missing, L = Missing, C = Missing> {
+crates/quest-qsvt/src/analysis.rs:263:pub struct PhaseResponsePremise {
+crates/quest-qsvt/src/analysis.rs:344:pub struct ErrorBudget {
+crates/quest-qsvt/src/analysis.rs:393:pub enum Status {
+crates/quest-qsvt/src/analysis.rs:404:pub struct NumericalObservations {
+crates/quest-qsvt/src/analysis.rs:429:pub struct TransformReport<'t> {
+crates/quest-qsvt/src/analysis.rs:493:pub struct AnalysisBuilder<'t, E = Missing, P = Missing> {
+crates/quest-qsvt/src/dense.rs:15:pub struct DenseNormalization(Normalization);
+crates/quest-qsvt/src/dense.rs:24:pub struct DenseEncodingBuilder<A = Missing> {
+crates/quest-qsvt/src/encoding.rs:6:pub struct Normalization(f64);
+crates/quest-qsvt/src/encoding.rs:24:pub struct Missing;
+crates/quest-qsvt/src/encoding.rs:27:pub struct Present<T>(T);
+crates/quest-qsvt/src/encoding.rs:42:pub struct EncodingBuilder<O = Missing, L = Missing, R = Missing, A = Missing, U = CheckUnitarity> {
+crates/quest-qsvt/src/encoding.rs:148:pub struct CheckUnitarity;
+crates/quest-qsvt/src/encoding.rs:152:pub struct ExplicitUnitaryPremise(Arc<str>);
+crates/quest-qsvt/src/encoding.rs:170:pub struct AssumeUnitarity(ExplicitUnitaryPremise);
+crates/quest-qsvt/src/encoding.rs:173:pub enum OracleUnitarityEvidence {
+crates/quest-qsvt/src/encoding.rs:199:type CompleteEncoding<U> = EncodingBuilder<
+crates/quest-qsvt/src/encoding.rs:250:type EncodingParts = (
+crates/quest-qsvt/src/encoding.rs:300:pub struct ProjectedEncoding {
+crates/quest-qsvt/src/lib.rs:6:pub use pauli::{PauliDecomposition, PauliLimits, decompose_pauli};
+crates/quest-qsvt/src/lib.rs:14:pub use response::{
+crates/quest-qsvt/src/lib.rs:21:pub use dense::{DenseEncodingBuilder, DenseNormalization};
+crates/quest-qsvt/src/lib.rs:22:pub use encoding::{
+crates/quest-qsvt/src/lib.rs:26:pub use materialize::{materialize_oracle, materialize_program};
+crates/quest-qsvt/src/lib.rs:27:pub use num_complex::Complex64;
+crates/quest-qsvt/src/lib.rs:28:pub use projection::{OperandLayout, Projection, ProjectionControl, ProjectionSpace};
+crates/quest-qsvt/src/lib.rs:29:pub use quest_compile::{MatrixPolicy, OracleFragment};
+crates/quest-qsvt/src/lib.rs:30:pub use space::{Left, LogicalSpace, ProjectorKind, Right};
+crates/quest-qsvt/src/lib.rs:32:pub use transform::CertifiedStandardRecipe;
+crates/quest-qsvt/src/lib.rs:33:pub use transform::{
+crates/quest-qsvt/src/lib.rs:39:pub type Result<T> = std::result::Result<T, Error>;
+crates/quest-qsvt/src/lib.rs:43:pub enum Error {
+crates/quest-qsvt/src/lib.rs:68:pub struct NumericalPolicy {
+crates/quest-qsvt/src/pauli.rs:11:pub struct PauliLimits {
+crates/quest-qsvt/src/pauli.rs:31:pub struct PauliDecomposition {
+crates/quest-qsvt/src/projection.rs:9:pub struct OperandLayout {
+crates/quest-qsvt/src/projection.rs:102:pub struct ProjectionControl {
+crates/quest-qsvt/src/projection.rs:110:pub enum ProjectionSpace {
+crates/quest-qsvt/src/projection.rs:142:pub struct Projection {
+crates/quest-qsvt/src/response.rs:11:    pub trait Argument {}
+crates/quest-qsvt/src/response.rs:12:    pub trait Component {}
+crates/quest-qsvt/src/response.rs:16:pub struct HermitianArgument;
+crates/quest-qsvt/src/response.rs:19:pub struct GramArgument;
+crates/quest-qsvt/src/response.rs:21:pub trait ResponseArgument: sealed::Argument {
+crates/quest-qsvt/src/response.rs:34:pub enum ArgumentDomain {
+crates/quest-qsvt/src/response.rs:40:pub struct FullResponse;
+crates/quest-qsvt/src/response.rs:43:pub struct EvenResponse;
+crates/quest-qsvt/src/response.rs:46:pub struct OddResponse;
+crates/quest-qsvt/src/response.rs:47:pub trait ResponseComponent: sealed::Component {
+crates/quest-qsvt/src/response.rs:63:pub enum ComponentSelection {
+crates/quest-qsvt/src/response.rs:75:pub struct RouteTarget<V: ResponseArgument> {
+crates/quest-qsvt/src/response.rs:282:pub enum ResponseEvidence {
+crates/quest-qsvt/src/response.rs:291:pub struct RouteMeaning {
+crates/quest-qsvt/src/response.rs:341:pub struct RouteResponse<V: ResponseArgument, P: ResponseComponent = FullResponse> {
+crates/quest-qsvt/src/routes.rs:14:struct Circuit {
+crates/quest-qsvt/src/routes.rs:406:type Stages = (Projection, Projection, TransformContinuation);
+crates/quest-qsvt/src/space.rs:7:pub struct Left;
+crates/quest-qsvt/src/space.rs:10:pub struct Right;
+crates/quest-qsvt/src/space.rs:14:pub enum ProjectorKind {
+crates/quest-qsvt/src/space.rs:28:pub struct LogicalSpace<Side> {
+crates/quest-qsvt/src/transform.rs:16:pub enum Route {
+crates/quest-qsvt/src/transform.rs:42:pub struct QueryCounts {
+crates/quest-qsvt/src/transform.rs:55:pub struct TransformEvidence {
+crates/quest-qsvt/src/transform.rs:67:pub enum TransformContinuation {
+crates/quest-qsvt/src/transform.rs:84:pub struct ValidatedTransform {
+crates/quest-qsvt/src/transform.rs:237:pub trait StandardConvention: PhaseConvention + Sized {
+crates/quest-qsvt/src/transform.rs:263:pub struct SuppliedEncoding(ProjectedEncoding);
+crates/quest-qsvt/src/transform.rs:266:pub struct StandardRecipe<C: StandardConvention>(PhaseSequence<C>);
+crates/quest-qsvt/src/transform.rs:270:pub struct CertifiedStandardRecipe(
+crates/quest-qsvt/src/transform.rs:275:pub struct GeneralizedRecipe {
+crates/quest-qsvt/src/transform.rs:287:pub struct TransformBuilder<E = Missing, R = Missing> {
+crates/quest-qsvt-cli/src/distributed/wire.rs:124:struct Reader<'a> {
+crates/quest-qsvt-cli/src/distributed.rs:31:enum Workflow {
+crates/quest-qsvt-cli/src/distributed.rs:35:struct FrozenInput {
+crates/quest-qsvt-cli/src/distributed.rs:46:struct Request<'a> {
+crates/quest-qsvt-cli/src/execution.rs:330:struct Executed {
+crates/quest-qsvt-cli/src/execution.rs:617:struct SolveInput {
+crates/quest-qsvt-cli/src/lib.rs:10:pub use workers::Workers;
+crates/quest-qsvt-cli/src/lib.rs:22:pub type Result<T> = std::result::Result<T, Error>;
+crates/quest-qsvt-cli/src/lib.rs:25:pub enum Error {
+crates/quest-qsvt-cli/src/lib.rs:76:pub struct Cli {
+crates/quest-qsvt-cli/src/lib.rs:87:pub enum Command {
+crates/quest-qsvt-cli/src/lib.rs:112:pub enum SynthesisMode {
+crates/quest-qsvt-cli/src/lib.rs:119:pub enum Algorithm {
+crates/quest-qsvt-cli/src/lib.rs:140:pub enum ExportFormat {
+crates/quest-qsvt-cli/src/lib.rs:146:pub struct SynthesisArgs {
+crates/quest-qsvt-cli/src/lib.rs:163:pub enum CatalogCommand {
+crates/quest-qsvt-cli/src/lib.rs:183:pub struct FamilySelection {
+crates/quest-qsvt-cli/src/lib.rs:190:pub enum TransformRoute {
+crates/quest-qsvt-cli/src/lib.rs:202:pub struct TransformArgs {
+crates/quest-qsvt-cli/src/lib.rs:219:pub struct EmbeddedArgs {
+crates/quest-qsvt-cli/src/lib.rs:252:pub struct OverlapArgs {
+crates/quest-qsvt-cli/src/lib.rs:271:pub struct SolveArgs {
+crates/quest-qsvt-cli/src/lib.rs:293:pub struct CatalogSynthesisArgs {
+crates/quest-qsvt-cli/src/lib.rs:311:pub struct CatalogSolveArgs {
+crates/quest-qsvt-cli/src/lib.rs:335:pub enum MatrixPreset {
+crates/quest-qsvt-cli/src/lib.rs:343:pub struct MatrixPresetArgs {
+crates/quest-qsvt-cli/src/lib.rs:358:struct Context<'a> {
+crates/quest-qsvt-cli/src/synthesis.rs:16:enum Candidate {
+crates/quest-qsvt-cli/src/synthesis.rs:366:struct FamilyJob {
+crates/quest-qsvt-cli/src/workers.rs:6:pub enum Workers {
+crates/quest-qsvt-cli/src/workers.rs:11:    type Err = Error;
+crates/quest-qsvt-cli/src/workers.rs:33:pub struct Pool {
+crates/quest-qsvt-io/src/catalog.rs:6:pub struct CatalogFamily {
+crates/quest-qsvt-io/src/compiled.rs:10:pub struct CompiledInput {
+crates/quest-qsvt-io/src/hdf5.rs:17:struct H5ppComplex64 {
+crates/quest-qsvt-io/src/hdf5.rs:23:struct H5ppComplex32 {
+crates/quest-qsvt-io/src/hdf5.rs:29:pub struct Hdf5Input {
+crates/quest-qsvt-io/src/hdf5.rs:34:pub struct Hdf5InputBuilder {
+crates/quest-qsvt-io/src/hdf5.rs:246:enum MatrixStorage {
+crates/quest-qsvt-io/src/hdf5.rs:251:pub struct StoredMatrix {
+crates/quest-qsvt-io/src/hdf5.rs:288:pub struct StoredBlockEncoding {
+crates/quest-qsvt-io/src/hdf5.rs:474:enum ScalarKind {
+crates/quest-qsvt-io/src/hdf5.rs:600:pub struct NeedsBlockMetadata;
+crates/quest-qsvt-io/src/hdf5.rs:602:pub struct BlockMetadata {
+crates/quest-qsvt-io/src/hdf5.rs:608:pub struct StoredBlockEncodingBuilder<State = NeedsBlockMetadata> {
+crates/quest-qsvt-io/src/json.rs:9:pub enum QspInput {
+crates/quest-qsvt-io/src/json.rs:33:pub struct GeneralizedAngleInput {
+crates/quest-qsvt-io/src/json.rs:80:enum AdmittedPolynomial {
+crates/quest-qsvt-io/src/json.rs:90:pub struct PolynomialInput {
+crates/quest-qsvt-io/src/json.rs:96:pub struct PolynomialConversion {
+crates/quest-qsvt-io/src/lib.rs:12:pub use compiled::{CompiledInput, read_compiled_qsp_json};
+crates/quest-qsvt-io/src/lib.rs:19:pub use catalog::{CatalogFamily, catalog_families, find_catalog_family};
+crates/quest-qsvt-io/src/lib.rs:20:pub use json::{
+crates/quest-qsvt-io/src/lib.rs:25:pub use num_complex::Complex64;
+crates/quest-qsvt-io/src/lib.rs:26:pub use sparse::{
+crates/quest-qsvt-io/src/lib.rs:29:pub type Result<T> = std::result::Result<T, Error>;
+crates/quest-qsvt-io/src/lib.rs:33:pub enum Error {
+crates/quest-qsvt-io/src/lib.rs:56:pub struct IoPolicy {
+crates/quest-qsvt-io/src/sparse.rs:6:pub enum SparseFormat {
+crates/quest-qsvt-io/src/sparse.rs:12:pub struct MissingEntries;
+crates/quest-qsvt-io/src/sparse.rs:14:pub struct SuppliedEntries {
+crates/quest-qsvt-io/src/sparse.rs:20:pub struct SparseMatrixBuilder<S = MissingEntries> {
+crates/quest-qsvt-io/src/sparse.rs:28:pub struct SparseMatrix {
+crates/quest-symbolic/src/affine/mod.rs:21:pub struct Owner(u64);
+crates/quest-symbolic/src/affine/mod.rs:32:pub struct Symbol {
+crates/quest-symbolic/src/affine/mod.rs:53:pub struct Limits {
+crates/quest-symbolic/src/affine/mod.rs:72:pub struct Usage {
+crates/quest-symbolic/src/affine/mod.rs:79:pub enum ExactError {
+crates/quest-symbolic/src/affine/mod.rs:99:struct State {
+crates/quest-symbolic/src/affine/mod.rs:107:pub struct Context {
+crates/quest-symbolic/src/affine/mod.rs:436:struct Stage {
+crates/quest-symbolic/src/affine/mod.rs:449:struct Data {
+crates/quest-symbolic/src/affine/mod.rs:468:pub struct Export {
+crates/quest-symbolic/src/affine/mod.rs:513:pub struct Affine {
+crates/quest-symbolic/src/lib.rs:25:pub use affine::ExactError;
+crates/quest-symbolic/src/lib.rs:26:pub type Rational = Ratio<BigInt>;
+crates/quest-symbolic/src/lib.rs:30:pub struct Owner(u64);
+crates/quest-symbolic/src/lib.rs:44:pub struct Symbol {
+crates/quest-symbolic/src/lib.rs:67:pub enum Error {
+crates/quest-symbolic/src/lib.rs:87:pub type Result<T> = std::result::Result<T, Error>;
+crates/quest-symbolic/src/lib.rs:91:pub struct Expr {
+crates/quest-symbolic/src/source.rs:15:pub enum Kind {
+crates/quest-symbolic/src/source.rs:25:pub struct Source {
+crates/quest-symbolic/src/source.rs:315:pub struct Linear {
+crates/quest-synthesis/src/approximation.rs:22:pub struct Approximation {
+crates/quest-synthesis/src/approximation.rs:64:struct Rng(u64);
+crates/quest-synthesis/src/grid.rs:13:type Vector = [BigInt; 4];
+crates/quest-synthesis/src/grid.rs:14:type Basis = [Vector; 4];
+crates/quest-synthesis/src/grid.rs:15:type RVector = [Rational; 4];
+crates/quest-synthesis/src/grid.rs:16:struct Orthogonal {
+crates/quest-synthesis/src/grid.rs:22:struct SearchWindow<'a> {
+crates/quest-synthesis/src/grid.rs:28:struct IntegerWindow {
+crates/quest-synthesis/src/grid.rs:71:pub(crate) struct Grid {
+crates/quest-synthesis/src/lib.rs:8:pub use approximation::{Approximation, approximate_rotation};
+crates/quest-synthesis/src/lib.rs:9:pub use exact::synthesize_matrix;
+crates/quest-synthesis/src/lib.rs:10:pub use normal::{NormalForm, Syllable, normalize_one_qubit};
+crates/quest-synthesis/src/lib.rs:27:pub struct CancellationToken(Arc<AtomicBool>);
+crates/quest-synthesis/src/lib.rs:39:pub enum AncillaPolicy {
+crates/quest-synthesis/src/lib.rs:45:pub struct SynthesisOptions {
+crates/quest-synthesis/src/lib.rs:70:pub enum SynthesisError {
+crates/quest-synthesis/src/lib.rs:95:pub type Result<T> = std::result::Result<T, SynthesisError>;
+crates/quest-synthesis/src/lib.rs:97:pub struct ExactSynthesis {
+crates/quest-synthesis/src/lib.rs:119:struct Budget {
+crates/quest-synthesis/src/norm_equation.rs:9:type Ring = [BigInt; 4];
+crates/quest-synthesis/src/norm_equation.rs:11:pub enum NormOutcome {
+crates/quest-synthesis/src/normal.rs:12:struct Storage {
+crates/quest-synthesis/src/normal.rs:35:pub enum Syllable {
+crates/quest-synthesis/src/normal.rs:40:pub struct NormalForm {
+crates/quest-sys/src/generated_api.rs:21:        type QuestComplex = crate::ffi::QuestComplex;
+crates/quest-sys/src/generated_api.rs:23:        type Qureg = crate::ffi::Qureg;
+crates/quest-sys/src/generated_api.rs:24:        type CompMatr1 = crate::ffi::CompMatr1;
+crates/quest-sys/src/generated_api.rs:25:        type CompMatr2 = crate::ffi::CompMatr2;
+crates/quest-sys/src/generated_api.rs:26:        type CompMatr = crate::ffi::CompMatr;
+crates/quest-sys/src/generated_api.rs:27:        type DiagMatr1 = crate::ffi::DiagMatr1;
+crates/quest-sys/src/generated_api.rs:28:        type DiagMatr2 = crate::ffi::DiagMatr2;
+crates/quest-sys/src/generated_api.rs:29:        type DiagMatr = crate::ffi::DiagMatr;
+crates/quest-sys/src/generated_api.rs:30:        type FullStateDiagMatr = crate::ffi::FullStateDiagMatr;
+crates/quest-sys/src/generated_api.rs:31:        type KrausMap = crate::ffi::KrausMap;
+crates/quest-sys/src/generated_api.rs:32:        type SuperOp = crate::ffi::SuperOp;
+crates/quest-sys/src/generated_api.rs:33:        type PauliStr = crate::ffi::PauliStr;
+crates/quest-sys/src/generated_api.rs:34:        type PauliStrSum = crate::ffi::PauliStrSum;
+crates/quest-sys/src/lib.rs:43:pub use generated_api::*;
+crates/quest-sys/src/lib.rs:52:    pub struct QuestComplex {
+crates/quest-sys/src/lib.rs:58:    pub struct QubitMeasurement {
+crates/quest-sys/src/lib.rs:64:    pub struct NumericalFingerprint {
+crates/quest-sys/src/lib.rs:75:    pub struct QuestEnvironment {
+crates/quest-sys/src/lib.rs:89:    pub struct QuestRegisterDeployment {
+crates/quest-sys/src/lib.rs:103:        type Qureg;
+crates/quest-sys/src/lib.rs:104:        type CompMatr1;
+crates/quest-sys/src/lib.rs:105:        type CompMatr2;
+crates/quest-sys/src/lib.rs:106:        type CompMatr;
+crates/quest-sys/src/lib.rs:107:        type DiagMatr1;
+crates/quest-sys/src/lib.rs:108:        type DiagMatr2;
+crates/quest-sys/src/lib.rs:109:        type DiagMatr;
+crates/quest-sys/src/lib.rs:110:        type FullStateDiagMatr;
+crates/quest-sys/src/lib.rs:111:        type SuperOp;
+crates/quest-sys/src/lib.rs:112:        type KrausMap;
+crates/quest-sys/src/lib.rs:113:        type PauliStr;
+crates/quest-sys/src/lib.rs:114:        type PauliStrSum;
+crates/quest-sys/src/lib.rs:233:pub use ffi::{
+crates/quest-sys/src/lib.rs:239:pub type QuestResult<T> = Result<T, QuestError>;
+crates/quest-sys/src/lib.rs:242:pub enum QuestError {
+crates/quest-sys/src/mpi.rs:139:pub struct MpiRuntime {
+crates/quest-sys/src/mpi.rs:259:pub struct MpiCommunicator<'runtime> {
+crates/quest-sys/src/mpi.rs:413:pub struct MpiQuestEnvironmentBuilder<'communicator, 'runtime> {
+crates/quest-sys/src/mpi.rs:490:pub struct MpiCollectiveLane<'communicator> {
+crates/quest-sys/src/mpi.rs:506:pub struct MpiThreadView<'communicator> {
+crates/quest-sys/src/mpi.rs:613:pub struct MpiMessageStatus {
+crates/quest-sys/src/mpi.rs:630:pub struct MpiQuestEnvironment<'communicator, 'runtime> {
+crates/xtask/src/generate/clang.rs:16:pub struct QuestRoot {
+crates/xtask/src/generate/emit.rs:28:struct PauliFamily {
+crates/xtask/src/generate/emit.rs:49:struct FamilyOutput {
+crates/xtask/src/generate/emit.rs:231:pub struct GeneratedOutput {
+crates/xtask/src/generate/mod.rs:10:pub type DynError = Box<dyn std::error::Error + Send + Sync>;
+crates/xtask/src/generate/model.rs:6:pub struct ApiArgument {
+crates/xtask/src/generate/model.rs:13:pub struct ApiItem {
+crates/xtask/src/generate/model.rs:29:pub struct CoverageManifest<'a> {
+crates/xtask/src/generate/model.rs:40:pub struct AdapterManifest {
+crates/xtask/src/generate/model.rs:46:pub struct AdapterEntry {
+crates/xtask/src/generate/model.rs:56:pub enum AdapterSourceKind {
+crates/xtask/src/generate/model.rs:71:pub struct AdapterRegistry {
+crates/xtask/src/generate/model.rs:153:pub enum CoverageStatus {
+crates/xtask/src/main.rs:34:enum CommandKind {
+crates/xtask/src/native_consumers.rs:19:pub enum Backend {
+crates/xtask/src/native_consumers.rs:519:struct MachoEvidence {

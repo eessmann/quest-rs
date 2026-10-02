@@ -57,6 +57,10 @@ fn statements(body: &mut [Statement]) {
     for statement in body {
         statement.span = None;
         match &mut statement.kind {
+            StatementKind::Finite { qubits, bits, .. } => {
+                expressions(qubits);
+                expressions(bits);
+            }
             StatementKind::Include(_)
             | StatementKind::Break
             | StatementKind::Continue

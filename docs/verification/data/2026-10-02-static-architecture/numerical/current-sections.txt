@@ -1,0 +1,24 @@
+Segment __PAGEZERO: 4294967296
+Segment __TEXT: 901120
+	Section __text: 772388
+	Section __stubs: 912
+	Section __cstring: 13074
+	Section __gcc_except_tab: 8416
+	Section __const: 24765
+	Section __unwind_info: 11064
+	Section __eh_frame: 62608
+	total 893227
+Segment __DATA_CONST: 32768
+	Section __got: 616
+	Section __const: 26552
+	total 27168
+Segment __DATA: 16384
+	Section __data: 2800
+	Section __thread_vars: 168
+	Section __thread_data: 48
+	Section __thread_bss: 73
+	Section __common: 192
+	Section __bss: 120
+	total 3401
+Segment __LINKEDIT: 262144
+total 4296179712

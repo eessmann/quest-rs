@@ -1,4 +1,4 @@
-#![feature(const_trait_impl, const_ops, generic_const_exprs)]
+#![feature(const_trait_impl, const_ops, const_destruct, generic_const_exprs)]
 #![allow(incomplete_features)]
 #![forbid(unsafe_code)]
 //! Typed binary64 polynomials with explicit basis, support and numerical limits.
@@ -9,30 +9,24 @@
 
 pub use quest_numerics::Interval;
 pub mod typed;
+pub use quest_numerics::ad::{First, Gradient, Jet};
 pub use typed::{Expression, ExpressionMetadata, StaticExpression};
-mod backend;
-pub use backend::{Backend, JetBackend, ScalarBackend};
 mod function;
 pub use function::{
-    AssumedFunction, Callable, CallbackFunction, ConsistencyAssumption, Expr, ExprNode, Function,
-    GenericCallable, Jet,
+    AdmittedFunction, Assumed, AssumedFunction, ConsistencyAssumption, Function, GenericFunction,
+    Structural, System, VectorExpression,
 };
 mod norm;
 pub use norm::{NormDomain, NormEvidence, NormOptions, NormOutcome, NormStatus};
 mod analysis;
 pub use analysis::{Conversion, Even, Odd, Parity, ParityPolynomial};
 mod remez;
-pub use remez::{
-    ConditionalRemezFailure, ConditionalRemezResult, CriticalPoint, CriticalPoints, HasCallable,
-    HasTarget, MissingTarget, ReadyCallable, ReadyRemez, RemezBuilder, RemezFailure, RemezOptions,
-    RemezResult, StaticDegree, StaticRemezBuilder, StaticRemezResult, isolate_critical_points,
-    remez,
-};
+pub use remez::*;
 mod basis;
 pub use basis::{Basis, Chebyshev, Hermite, Jacobi, Laguerre, Laurent, Monomial};
 mod polynomial;
 pub use num_complex::Complex64;
-pub use polynomial::Polynomial;
+pub use polynomial::{DynamicShape, Polynomial, Shape, StaticShape};
 
 pub type Result<T> = std::result::Result<T, Error>;
 
@@ -41,6 +35,10 @@ pub type Result<T> = std::result::Result<T, Error>;
 pub enum Error {
     #[error("polynomial value or arithmetic result is not finite")]
     NonFinite,
+    #[error(transparent)]
+    Arithmetic(#[from] quest_numerics::arithmetic::ArithmeticError),
+    #[error("coefficient shape mismatch: expected {expected}, got {actual}")]
+    Shape { expected: usize, actual: usize },
     #[error(transparent)]
     Interval(#[from] quest_numerics::Error),
     #[error("requested parity is not satisfied")]

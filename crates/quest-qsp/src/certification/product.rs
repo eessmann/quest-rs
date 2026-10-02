@@ -8,13 +8,13 @@ pub(super) type MatrixPolynomial = [Vec<MpComplex>; 4];
 pub(super) type Matrix = [MpComplex; 4];
 pub(super) fn controls<M: CertificationMode>(
     candidate: &FrozenCandidate<M>,
-    precision: u32,
-    constants: &mut astro_float::Consts,
+    context: &mut Context,
 ) -> Result<Vec<Matrix>> {
+    let precision = context.precision;
     if M::CANONICAL {
         let mut matrices = Vec::with_capacity(candidate.phases.len());
         for phase in candidate.phases.iter() {
-            let (sin, cos) = MpInterval::sin_cos_exact(*phase, precision, constants)?;
+            let (sin, cos) = MpInterval::sin_cos_exact(*phase, precision, &mut context.cache)?;
             let zero = MpInterval::integer(0, precision);
             matrices.push([
                 MpComplex::new(cos.clone(), zero.clone()),
@@ -253,8 +253,7 @@ fn roots(length: usize, context: &mut Context) -> Result<Arc<Vec<MpComplex>>> {
     )?;
     let mut roots = Vec::with_capacity(length / 2);
     for index in 0..length / 2 {
-        let (sin, cos) =
-            MpInterval::twiddle(index, length, context.precision, &mut context.constants)?;
+        let (sin, cos) = MpInterval::twiddle(index, length, context.precision, &mut context.cache)?;
         roots.push(MpComplex::new(cos, sin.neg()));
     }
     let roots = Arc::new(roots);
@@ -351,5 +350,6 @@ pub fn circle_values(
     for value in &mut values {
         *value = value.mul(&scale)?;
     }
+    context.admit_cache()?;
     Ok((values, context.work, context.bytes))
 }

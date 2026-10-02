@@ -1,4 +1,5 @@
 use super::*;
+use crate::precision::{integer, nearest_mul};
 use googletest::prelude::*;
 #[gtest]
 fn interval_exact_dyadics_preserve_cancellation_and_complex_products() -> Result<()> {
@@ -349,7 +350,7 @@ fn multiprecision_acceptance_does_not_round_an_above_tolerance_bound_to_binary64
 fn exact_admission_and_outward_summary_keep_the_smallest_subnormal() -> Result<()> {
     let smallest = f64::from_bits(1);
     let original = MpInterval::exact(smallest, 64)?;
-    expect_true!(original.lower() > &BigFloat::from_u64(0, 64));
+    expect_true!(original.lower() > &zero(64));
     expect_that!(
         to_f64(original.lower(), BinaryRounding::Nearest)?.to_bits(),
         eq(1)
@@ -387,16 +388,16 @@ fn wx_large_phase_uses_the_exact_export_without_period_reduction() -> Result<()>
 
 #[gtest]
 fn dyadic_twiddle_axes_octants_and_periodicity_use_exact_integer_reduction() -> Result<()> {
-    let mut constants = Consts::new()?;
+    let mut cache = ConstCache::default();
     for length in [1, 2, 4, 8, 16, 64] {
         for k in 0..length {
-            let (s, c) = MpInterval::twiddle(k, length, 128, &mut constants)?;
+            let (s, c) = MpInterval::twiddle(k, length, 128, &mut cache)?;
             let (period_s, period_c) = MpInterval::twiddle(
                 k.checked_add(length)
                     .ok_or(CertificationError::Budget("fixture index"))?,
                 length,
                 128,
-                &mut constants,
+                &mut cache,
             )?;
             expect_that!(s.lower(), eq(period_s.lower()));
             expect_that!(s.upper(), eq(period_s.upper()));
@@ -425,7 +426,7 @@ fn dyadic_twiddle_axes_octants_and_periodicity_use_exact_integer_reduction() -> 
     }
     let diagonal = MpInterval::exact(0.5, 128)?.sqrt()?;
     for k in [1, 3, 5, 7] {
-        let (s, c) = MpInterval::twiddle(k, 8, 128, &mut constants)?;
+        let (s, c) = MpInterval::twiddle(k, 8, 128, &mut cache)?;
         let expected_s = if k < 4 {
             diagonal.clone()
         } else {
@@ -445,16 +446,20 @@ fn dyadic_twiddle_axes_octants_and_periodicity_use_exact_integer_reduction() -> 
 }
 
 #[gtest]
+#[expect(
+    clippy::arithmetic_side_effects,
+    reason = "Native dyadic negation changes only the sign; finite endpoints cannot overflow"
+)]
 fn directed_interval_non_ties_and_nonfinite_endpoints_are_checked() -> Result<()> {
     let third = MpInterval::integer(1, 64).divide_usize(3)?;
-    let one = BigFloat::from_u64(1, 256);
-    let three = BigFloat::from_u64(3, 256);
-    expect_true!(third.lower().mul(&three, 256, Round::ToEven) < one);
-    expect_true!(third.upper().mul(&three, 256, Round::ToEven) > one);
+    let one = integer(256, 1);
+    let three = integer(256, 3);
+    expect_true!(nearest_mul(256, third.lower(), &three)? < one);
+    expect_true!(nearest_mul(256, third.upper(), &three)? > one);
     let negative = third.neg();
-    expect_that!(negative.lower(), eq(&third.upper().neg()));
-    expect_that!(negative.upper(), eq(&third.lower().neg()));
-    expect_true!(MpInterval::bounds(BigFloat::nan(None), one, 64).is_err());
+    expect_that!(negative.lower(), eq(&-third.upper()));
+    expect_that!(negative.upper(), eq(&-third.lower()));
+    expect_true!(MpInterval::bounds(Binary::INFINITY, one, 64).is_err());
     expect_true!(MpInterval::exact(f64::INFINITY, 64).is_err());
     expect_true!(
         CertificationPolicy {
@@ -462,7 +467,11 @@ fn directed_interval_non_ties_and_nonfinite_endpoints_are_checked() -> Result<()
             ..CertificationPolicy::default()
         }
         .validate()
-        .is_err()
+        .is_ok()
     );
+    let third_65 = MpInterval::integer(1, 65).divide_usize(3)?;
+    expect_that!(third_65.lower().precision(), eq(65));
+    expect_that!(third_65.upper().precision(), eq(65));
+    expect_true!(third_65.lower() < third_65.upper());
     Ok(())
 }

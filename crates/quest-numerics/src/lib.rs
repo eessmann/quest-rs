@@ -1,16 +1,10 @@
 #![forbid(unsafe_code)]
-//! Reusable binary64 kernels and checked finite real intervals.
+//! Reusable numerical kernels and statically selected arithmetic policies.
 //!
-//! Production kernels never dispatch to arbitrary precision. FFTs use a fixed
+//! FFT kernels retain binary64 arithmetic. FFTs use a fixed
 //! caller-selected backend; roundoff is not a certificate of an exact result.
 //! The default build and execution policy are sequential and scalar.
 
-mod contractors;
-pub use contractors::{
-    ContractorLimits, ContractorMethod, ContractorOutcome, ContractorResult,
-    VectorContractorResult, extended_newton, krawczyk, scalar_hansen_sengupta,
-    vector_hansen_sengupta,
-};
 mod fft;
 mod interval;
 pub mod observer;
@@ -20,3 +14,10 @@ pub use fft::{ConvolutionWorkspace, FftBackend, FftDirection, FftWorkspace, Norm
 pub use interval::Interval;
 pub use num_complex::Complex64;
 pub use policy::{Error, ExecutionPolicy, Limits, ResourceUsage, Result};
+
+pub mod ad;
+pub mod arithmetic;
+
+pub mod roots;
+
+pub mod shapes;

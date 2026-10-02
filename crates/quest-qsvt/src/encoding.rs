@@ -211,7 +211,7 @@ impl CompleteEncoding<CheckUnitarity> {
         let (oracle, left, right, normalization, policy) = self.parts()?;
         let matrix = crate::materialize_oracle(&oracle, policy)?;
         let numerical =
-            quest_circuit::NumericalOperator::from_view(matrix.as_ref(), policy.matrix_policy())?;
+            quest_compile::NumericalOperator::from_view(matrix.as_ref(), policy.matrix_policy())?;
         let residual = numerical.unitarity_residual(policy.matrix_policy())?;
         if !residual.is_finite() || residual > 1e-12 {
             return Err(Error::Residual {

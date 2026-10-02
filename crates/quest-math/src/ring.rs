@@ -1,6 +1,6 @@
 use crate::{Error, Limits, Result};
-use num_bigint::BigInt;
-use num_traits::Zero;
+use dashu_base::BitTest;
+use dashu_int::IBig;
 /// Exponent of a power of two in the canonical coefficient representation.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct PowerOfTwoExponent(pub u32);
@@ -24,7 +24,7 @@ impl EighthRootPhase {
         self.0
     }
 }
-/// The quotient Z[omega]/(2); low bit is the constant coefficient.
+/// The quotient `Z[omega]/(2)`; low bit is the constant coefficient.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct OmegaResidue(u8);
 impl OmegaResidue {
@@ -98,7 +98,8 @@ impl OmegaInteger {
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize))]
 pub struct Cyclotomic {
-    coefficients: [BigInt; 4],
+    #[cfg_attr(feature = "serde", serde(with = "crate::encoding::integer_array"))]
+    coefficients: [IBig; 4],
     denominator_exponent: u32,
 }
 impl Cyclotomic {
@@ -172,8 +173,15 @@ impl Cyclotomic {
             .checked_sub(value.denominator_exponent)
             .ok_or_else(|| Error::Resource("sqrt2 numerator".into()))?;
         for coefficient in &value.coefficients {
-            check_bits(coefficient.bits().saturating_add(u64::from(shift)), limits)?;
+            check_bits(
+                u64::try_from(coefficient.bit_len())
+                    .unwrap_or(u64::MAX)
+                    .saturating_add(u64::from(shift)),
+                limits,
+            )?;
         }
+        let shift =
+            usize::try_from(shift).map_err(|_| Error::Resource("sqrt2 numerator shift".into()))?;
         OmegaInteger::admit(Self::new(
             value.coefficients.map(|c| std::ops::Shl::shl(c, shift)),
             0,
@@ -188,7 +196,7 @@ impl Cyclotomic {
     #[must_use]
     pub fn zero() -> Self {
         Self {
-            coefficients: std::array::from_fn(|_| BigInt::zero()),
+            coefficients: std::array::from_fn(|_| IBig::ZERO),
             denominator_exponent: 0,
         }
     }
@@ -202,13 +210,13 @@ impl Cyclotomic {
         let sign = if power & 4 == 0 { 1 } else { -1 };
         Self {
             coefficients: std::array::from_fn(|index| {
-                BigInt::from(if index == slot { sign } else { 0 })
+                IBig::from(if index == slot { sign } else { 0 })
             }),
             denominator_exponent: 0,
         }
     }
     #[must_use]
-    pub const fn coefficients(&self) -> &[BigInt; 4] {
+    pub const fn coefficients(&self) -> &[IBig; 4] {
         &self.coefficients
     }
     #[must_use]
@@ -217,22 +225,25 @@ impl Cyclotomic {
     }
     #[must_use]
     pub fn is_zero(&self) -> bool {
-        self.coefficients.iter().all(Zero::is_zero)
+        self.coefficients.iter().all(IBig::is_zero)
     }
     /// Admit exact coefficients and normalize powers of two.
     /// # Errors
     /// Rejects coefficient, denominator and allocation resource excesses.
     pub fn new(
-        mut coefficients: [BigInt; 4],
+        mut coefficients: [IBig; 4],
         mut denominator_exponent: u32,
         limits: Limits,
     ) -> Result<Self> {
         check_bits(u64::from(denominator_exponent), limits)?;
         for coefficient in &coefficients {
-            check_bits(coefficient.bits(), limits)?;
+            check_bits(
+                u64::try_from(coefficient.bit_len()).unwrap_or(u64::MAX),
+                limits,
+            )?;
         }
         crate::types::allocation(limits.coefficient_bits, 8, limits)?;
-        if coefficients.iter().all(Zero::is_zero) {
+        if coefficients.iter().all(IBig::is_zero) {
             return Ok(Self::zero());
         }
         while denominator_exponent != 0 && coefficients.iter().all(|value| !value.bit(0)) {
@@ -251,7 +262,10 @@ impl Cyclotomic {
     fn admit(&self, limits: Limits) -> Result<()> {
         check_bits(u64::from(self.denominator_exponent), limits)?;
         for coefficient in &self.coefficients {
-            check_bits(coefficient.bits(), limits)?;
+            check_bits(
+                u64::try_from(coefficient.bit_len()).unwrap_or(u64::MAX),
+                limits,
+            )?;
         }
         Ok(())
     }
@@ -272,7 +286,7 @@ impl Cyclotomic {
             .checked_add(rhs.denominator_exponent)
             .ok_or_else(|| Error::Resource("denominator exponent".into()))?;
         check_bits(u64::from(exponent), limits)?;
-        let mut result = std::array::from_fn(|_| BigInt::zero());
+        let mut result = std::array::from_fn(|_| IBig::ZERO);
         for (i, a) in self.coefficients.iter().enumerate() {
             for (j, b) in rhs.coefficients.iter().enumerate() {
                 let degree = i
@@ -310,7 +324,11 @@ impl Cyclotomic {
         let right = exponent
             .checked_sub(rhs.denominator_exponent)
             .ok_or_else(|| Error::Resource("right denominator".into()))?;
-        let mut result = std::array::from_fn(|_| BigInt::zero());
+        let left =
+            usize::try_from(left).map_err(|_| Error::Resource("left denominator shift".into()))?;
+        let right = usize::try_from(right)
+            .map_err(|_| Error::Resource("right denominator shift".into()))?;
+        let mut result = std::array::from_fn(|_| IBig::ZERO);
         for ((output, a), b) in result
             .iter_mut()
             .zip(&self.coefficients)

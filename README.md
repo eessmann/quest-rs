@@ -18,15 +18,14 @@ commands and repository conventions.
 | `quest` (`quest-rs`) | Environment-bound registers, native preparation and execution |
 | `quest-language` | Owned sources/diagnostics, gate semantics, typed language, SSA and interpreter |
 | `quest-qasm` | Explicit include resolution and canonical structured text export |
-| `quest-compile` | Staged compiler, exact transformations, explicit synthesis and artifacts |
-| `quest-circuit` | Unified program/builder facade and macro reexports |
+| `quest-compile` | Canonical compiler API and macros, exact transformations, synthesis and typed artifacts |
 | `quest-macros` | Compile-time checked `circuit!` / `circuit_file!` templates |
 | `quest-math` | Exact algebra and independently checked synthesis certificates |
 | `quest-synthesis` | Bounded deterministic Rust Clifford+T candidate generation |
 | `quest-optimizer-client` / `quest-optimizer-worker` | Optional bounded external engine boundary |
 | `quest-sys` | Audited CXX bridge and native RAII resources |
 | `quest-build` / `xtask` | Native configuration, runtime paths and binding generation |
-| [`quest-numerics`](crates/quest-numerics/README.md) | Binary64 kernels, interval arithmetic, reusable workspaces and observers |
+| [`quest-numerics`](crates/quest-numerics/README.md) | Static arithmetic backends, directed intervals, AD, root contractors and reusable workspaces |
 | [`quest-polynomial`](crates/quest-polynomial/README.md) | Typed polynomial bases, function expressions and approximation |
 | [`quest-qsp`](crates/quest-qsp/README.md) | Real-parity Wx and unit-circle QSP, RHW/Half-Cholesky and inverse NLFT, with frozen-export certification |
 | [`quest-qsvt`](crates/quest-qsvt/README.md) | Native-independent encodings, projectors, transforms and analysis |
@@ -106,8 +105,8 @@ For just the facade and its default examples, use `cargo build -p quest-rs --loc
 that package does not require HDF5. The installed package must export
 `QuEST::QuEST` and resolve its own runtime dependencies. CMake compiles the
 static CXX bridge against that target; the evaluated target supplies native
-link requirements. Standard `QuEST_DIR` and `CMAKE_PREFIX_PATH` selection also
-work. See [`quest-build`](crates/quest-build/README.md) for package selection.
+link requirements. `QUEST_ROOT` selects the exact installation prefix, and `CMAKE_PREFIX_PATH`
+retains conventional CMake package search. See [`quest-build`](crates/quest-build/README.md) for package selection.
 
 For a local QuEST installation whose external native libraries live outside
 system loader paths, configure **QuEST itself** with
@@ -150,7 +149,7 @@ process-isolated integration test:
 ```sh
 cargo run -p quest-rs --example tutorials --locked
 cargo test -p quest-rs --test tutorials --locked
-cargo test -p quest-circuit --test tutorials --locked
+cargo test -p quest-compile --test tutorials --locked
 ```
 
 Structured compilation consumes checked stages:
@@ -177,7 +176,7 @@ turn. The U gate follows OpenQASM 3.1's scalar phase convention. See
 
 ## Quantum regions and optimization
 
-`ProgramBuilder` constructs the common typed program, including classical control and finite quantum regions. `QuantumRegionBuilder` constructs a finite capability with owned wire identities, exact rational angles, symbolic parameters, occurrences and provenance. Bind its original parameter obligations, apply compiler extension traits from `quest_circuit::prelude::*`, then embed the result with `ProgramBuilder::region` or `Program::from_bound_region`.
+`ProgramBuilder` constructs the common typed program, including classical control and finite quantum regions. `QuantumRegionBuilder` constructs a finite capability with owned wire identities, exact rational angles, symbolic parameters, occurrences and provenance. Bind its original parameter obligations, apply compiler extension traits from `quest_compile::prelude::*`, then embed the result with `ProgramBuilder::region` or `Program::from_bound_region`.
 
 Explicit passes provide phase-correct local rewrites, bounded CNOT synthesis, exact affine parity folding, and numerical fusion after binding. `NativeSynthesis` is the default in-process Rust rotation generator for explicit `synthesize_rotations` calls. Optional process clients and QuiZX integration retain the same independent candidate checks. Construction and macro expansion never run synthesis.
 
@@ -205,12 +204,14 @@ encoding + typed phases/controls -> QSVT transform -> admission -> preparation
 ```
 
 Production synthesis and native execution use binary64. The optional
-`certification` feature checks frozen values using Astro Float; the separate
+`certification` feature checks frozen values using Dashu; the separate
 `offline-synthesis` feature enables explicitly requested arbitrary-precision
 synthesis. Production failures never invoke it automatically. Numerical
 residuals, certified QSP error bounds and conditional QSVT theorem bounds are
 different evidence; see [certification](docs/book/src/qsp-certification.md).
-No GMP or MPFR dependency is required.
+Project-owned arbitrary-precision integers, rationals and binary floating-point
+values use pinned pure-Rust Dashu components. Native QuEST remains separate
+from this arithmetic.
 
 ```sh
 # Pure numerical tutorials: no native QuEST installation required.

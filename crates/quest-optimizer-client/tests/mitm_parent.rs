@@ -11,7 +11,7 @@ fn client_for(outcome: &str) -> Result<(tempfile::TempDir, Client)> {
     fs::write(
         &path,
         format!(
-            "#!/bin/sh\ncat >/dev/null\nprintf '%s' '{{\"version\":2,\"seed\":42,\"outcome\":{outcome}}}'\n"
+            "#!/bin/sh\ncat >/dev/null\nprintf '%s' '{{\"version\":3,\"seed\":42,\"outcome\":{outcome}}}'\n"
         ),
     )?;
     fs::set_permissions(&path, fs::Permissions::from_mode(0o700))?;

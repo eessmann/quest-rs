@@ -1,0 +1,261 @@
+# Scoped keyword scan for architectural review, final source.
+# Command: rg --sort path -n --glob "**/src/**/*.rs" 'compat|shim|facade|forward|bootstrap|dyn |Box<dyn|serde_json::Value|type [A-Za-z_]+\\s*=' crates
+# Includes incidental wording and test modules; not a complete semantic inventory.
+crates/quest/src/collective.rs:480:        type Error = Error;
+crates/quest/src/error.rs:33:    type Target = quest_compile::language::vm::RuntimeError<Error>;
+crates/quest/src/error.rs:99:    /// Produce an owned, serializable diagnostic for every facade error.
+crates/quest/src/execution.rs:20:pub type MatrixCacheKey = (usize, Vec<bool>);
+crates/quest/src/execution.rs:124:        forward: UniquePtr<quest_sys::CompMatr>,
+crates/quest/src/execution.rs:128:        forward: UniquePtr<quest_sys::DiagMatr>,
+crates/quest/src/execution.rs:683:        let mut forward =
+crates/quest/src/execution.rs:685:        quest_sys::set_diag_matr(forward.pin_mut(), &values)
+crates/quest/src/execution.rs:698:        return Ok(NativeMatrix::Diagonal { forward, adjoint });
+crates/quest/src/execution.rs:707:        forward: native_matrix(extended.as_ref())?,
+crates/quest/src/execution.rs:718:        NativeMatrix::Dense { forward, adjoint } => {
+crates/quest/src/execution.rs:719:            let (forward, adjoint) = if inverse {
+crates/quest/src/execution.rs:720:                (adjoint, forward)
+crates/quest/src/execution.rs:722:                (forward, adjoint)
+crates/quest/src/execution.rs:724:            quest_sys::leftapply_comp_matr(register.pin(), targets, forward)
+crates/quest/src/execution.rs:731:        NativeMatrix::Diagonal { forward, adjoint } => {
+crates/quest/src/execution.rs:732:            let (forward, adjoint) = if inverse {
+crates/quest/src/execution.rs:733:                (adjoint, forward)
+crates/quest/src/execution.rs:735:                (forward, adjoint)
+crates/quest/src/execution.rs:737:            quest_sys::leftapply_diag_matr(register.pin(), targets, forward)
+crates/quest/src/qsvt/collective/payload.rs:41:        queries.source_forward,
+crates/quest/src/qsvt/collective.rs:86:/// # fn f(comm: &quest::collective::MpiCommunicator<'_>, transform: quest::qsvt::model::ValidatedTransform) -> Result<(), Box<dyn std::error::Error>> {
+crates/quest/src/qsvt/mod.rs:191:type RunAdmission = (Vec<bool>, Option<Vec<bool>>);
+crates/quest/src/qsvt/mod.rs:195:/// # fn f(transform: quest::qsvt::model::ValidatedTransform) -> Result<(), Box<dyn std::error::Error>> {
+crates/quest/src/qsvt/mod.rs:349:/// # fn f<'env>(prepared: &mut quest::qsvt::PreparedTransform<'env>, register: &mut quest::Register<'env, quest::StateVector>) -> Result<(), Box<dyn std::error::Error>> {
+crates/quest/src/qsvt/mod.rs:356:/// # fn f(result: quest::qsvt::ExecutionResult<'_, '_, '_>) -> Result<(), Box<dyn std::error::Error>> {
+crates/quest/src/structured_execution.rs:238:    /// Native forward/adjoint pairs shared by payloads and reachable oracle bodies.
+crates/quest/src/structured_execution.rs:357:    type Error = Error;
+crates/quest-build/src/lib.rs:14:pub use rsmpi::verify_rsmpi_compatibility;
+crates/quest-build/src/probe.rs:1129:    fn compiled_abi_guard_rejects_incompatible_precision_before_archiving() -> googletest::Result<()>
+crates/quest-build/src/rsmpi.rs:15:pub fn verify_rsmpi_compatibility(native: &NativePackage) -> Result<()> {
+crates/quest-compile/src/beam.rs:728:type ScoredPublication = (
+crates/quest-compile/src/beam_approx.rs:84:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/beam_mitm.rs:98:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/builder.rs:137:    type Target = builder::Builder;
+crates/quest-compile/src/builder.rs:153:    /// Rejects foreign handles, incompatible types or dimensions, and configured construction limits.
+crates/quest-compile/src/classical/constants.rs:33:pub(super) type Lattice = BTreeMap<ValueId, State>;
+crates/quest-compile/src/coherent.rs:53:    type Error = Error;
+crates/quest-compile/src/coherent.rs:156:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/dispatch_recipe.rs:1://! Pure description of the native dispatch and numerical preparation used by the facade.
+crates/quest-compile/src/dispatch_recipe.rs:140:/// The facade's exact signed-control embedding and two native matrix variants.
+crates/quest-compile/src/dispatch_recipe.rs:203:    /// Bytes of logical forward+adjoint entries, excluding native padding and GPU mirrors.
+crates/quest-compile/src/dispatch_recipe.rs:219:    /// The entry transferred to the forward native variant.
+crates/quest-compile/src/dispatch_recipe.rs:302:/// Pure payload and dispatch inventory. Identity matches the facade's matrix cache:
+crates/quest-compile/src/dispatch_recipe.rs:697:/// Discover unique body/profile pairs across nested calls. The facade consumes
+crates/quest-compile/src/import.rs:167:    /// Rejects incompatible operand interfaces, captures, or SSA effects.
+crates/quest-compile/src/linear.rs:452:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/linear.rs:455:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/linear.rs:463:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/optimize.rs:239:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/optimize.rs:242:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/optimize.rs:574:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/optimize.rs:577:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/optimize.rs:580:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/optimizer_contracts.rs:711:    /// Assemble V1 source-visible metrics from the facade's shared recipe.
+crates/quest-compile/src/optimizer_contracts.rs:712:    /// B is logical forward+adjoint matrix entries; native padding, GPU mirrors,
+crates/quest-compile/src/oracle.rs:7:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/oracle.rs:10:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/parity/bound.rs:686:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/parity.rs:535:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/parity.rs:542:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/parity.rs:550:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/structured/artifact.rs:44:    #[error("compiled artifact version or conventions are incompatible; rebuild from source")]
+crates/quest-compile/src/structured/artifact.rs:45:    Incompatible,
+crates/quest-compile/src/structured/artifact.rs:605:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/structured/artifact.rs:611:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/structured/artifact.rs:714:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/structured/artifact.rs:731:            return Err(ArtifactError::Incompatible);
+crates/quest-compile/src/structured/artifact.rs:861:        return Err(ArtifactError::Incompatible);
+crates/quest-compile/src/structured.rs:37:    #[error("capture {index} is missing or has an incompatible type")]
+crates/quest-compile/src/structured.rs:103:                format!("capture {index} is missing or has an incompatible type"),
+crates/quest-compile/src/structured.rs:352:    /// Rejects malformed SSA and missing or incompatible capture values.
+crates/quest-compile/src/structured.rs:569:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/structured_terminal.rs:257:type Publication = (
+crates/quest-compile/src/structured_workers.rs:331:    type Error = UnprovedTrace;
+crates/quest-compile/src/structured_workers.rs:441:type WireInterface = Vec<(Wire, ssa::Place)>;
+crates/quest-compile/src/terminal.rs:261:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/terminal.rs:268:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/terminal.rs:276:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/workers.rs:2:// These helpers are shared with sibling worker adapters but must not enter the public facade.
+crates/quest-compile/src/workers.rs:94:/// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/workers.rs:139:/// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/workers.rs:173:/// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/workers.rs:330:/// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/workers.rs:373:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/workers.rs:623:/// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/workers.rs:668:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/workers.rs:678:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/workers.rs:689:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/workers.rs:700:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-compile/src/workers.rs:716:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-language/src/angle.rs:60:    type Target = Expr;
+crates/quest-language/src/classical/mod.rs:13:    type Error = ValueError;
+crates/quest-language/src/classical/mod.rs:91:    #[error("scalar operation requires compatible types")]
+crates/quest-language/src/classical/mod.rs:414:    /// Rejects incompatible types, zero divisors and signed overflow.
+crates/quest-language/src/classical/mod.rs:434:    type Error = ValueError;
+crates/quest-language/src/classical/typing.rs:63:    /// Rejects unsupported operators and incompatible scalar types.
+crates/quest-language/src/quantum/model.rs:112:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-language/src/quantum/model.rs:137:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-language/src/quantum/model.rs:211:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-language/src/quantum/model.rs:575:/// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-language/src/quantum/model.rs:600:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-language/src/quantum/model.rs:613:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-language/src/quantum/model.rs:633:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-language/src/quantum/model.rs:699:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-language/src/quantum/oracle.rs:283:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-language/src/quantum/program.rs:769:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-language/src/quantum/program.rs:1154:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-language/src/quantum/program.rs:1441:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-language/src/quantum/program.rs:1490:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-language/src/rational.rs:9:pub type BigRational = num_rational::Ratio<BigInt>;
+crates/quest-language/src/semantic/builder/arrays.rs:193:    /// Rejects foreign handles, incompatible types or dimensions, and configured construction limits.
+crates/quest-language/src/semantic/builder/arrays.rs:244:    /// Rejects foreign handles, incompatible types or dimensions, and configured construction limits.
+crates/quest-language/src/semantic/builder/signature.rs:45:    type Parameters = Expr<T>;
+crates/quest-language/src/semantic/builder/signature.rs:46:    type Arguments = Expr<T>;
+crates/quest-language/src/semantic/builder/signature.rs:98:    type Parameters = Array<T>;
+crates/quest-language/src/semantic/builder/signature.rs:99:    type Arguments = Array<T>;
+crates/quest-language/src/semantic/builder/signature.rs:137:    type Parameters = ();
+crates/quest-language/src/semantic/builder/signature.rs:138:    type Arguments = ();
+crates/quest-language/src/semantic/builder/signature.rs:157:    type Parameters = (A::Parameters, B::Parameters);
+crates/quest-language/src/semantic/builder/signature.rs:158:    type Arguments = (A::Arguments, B::Arguments);
+crates/quest-language/src/semantic/builder/signature.rs:281:    type Parameters = super::Qubit;
+crates/quest-language/src/semantic/builder/signature.rs:282:    type Arguments = super::Qubit;
+crates/quest-language/src/semantic/builder/signature.rs:301:    type Parameters = super::Qubit;
+crates/quest-language/src/semantic/builder/signature.rs:302:    type Arguments = super::Qubit;
+crates/quest-language/src/semantic/builder/signature.rs:404:    type Parameters = super::RankedArray<T, R>;
+crates/quest-language/src/semantic/builder/signature.rs:405:    type Arguments = super::RankedArray<T, R>;
+crates/quest-language/src/semantic/expressions.rs:291:            "incompatible assignment or argument type",
+crates/quest-language/src/semantic/expressions.rs:371:                let compatible = binding.ty == slot.ty
+crates/quest-language/src/semantic/expressions.rs:374:                if !compatible
+crates/quest-language/src/semantic/finite.rs:205:                                "incompatible finite oracle interface",
+crates/quest-language/src/semantic/mod.rs:207:    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+crates/quest-language/src/semantic/statements/loops.rs:119:        let forward = self.binary(B::And, positive, before)?;
+crates/quest-language/src/semantic/statements/loops.rs:121:        let condition = self.binary(B::Or, forward, backward)?;
+crates/quest-language/src/source.rs:129:    type Error = SourceError;
+crates/quest-language/src/source.rs:184:    type Error = SourceError;
+crates/quest-language/src/ssa/quantum_flow.rs:633:    -> Result<(), Box<dyn std::error::Error>> {
+crates/quest-language/src/ssa/quantum_flow.rs:691:            return Err(std::io::Error::other("missing forward-numbered backedge").into());
+crates/quest-language/src/ssa/verify/instruction.rs:325:                let compatible = actual == slot.ty
+crates/quest-language/src/ssa/verify/instruction.rs:328:                if !compatible || *mutable != slot.mutable {
+crates/quest-language/src/vm/mod.rs:256:    fn source(&self) -> Option<&(dyn StdError + 'static)> {
+crates/quest-language/src/vm/mod.rs:400:type Cell = Rc<RefCell<Option<RuntimeValue>>>;
+crates/quest-language/src/vm/prepared.rs:76:    type Error = std::convert::Infallible;
+crates/quest-math/src/types.rs:130:pub type Rational = num_rational::Ratio<BigInt>;
+crates/quest-numerics/src/ad.rs:89:    type Scalar = Jet<B::Scalar>;
+crates/quest-numerics/src/ad.rs:90:    type Error = B::Error;
+crates/quest-numerics/src/ad.rs:250:    type Scalar = Gradient<B::Scalar, N>;
+crates/quest-numerics/src/ad.rs:251:    type Error = B::Error;
+crates/quest-numerics/src/ad.rs:390:    type Scalar = First<B::Scalar>;
+crates/quest-numerics/src/ad.rs:391:    type Error = B::Error;
+crates/quest-numerics/src/arithmetic/budget.rs:61:    type Scalar = B::Scalar;
+crates/quest-numerics/src/arithmetic/budget.rs:62:    type Error = B::Error;
+crates/quest-numerics/src/arithmetic/budget.rs:100:    type Endpoint = B::Endpoint;
+crates/quest-numerics/src/arithmetic.rs:110:    /// whole batch conservatively before forwarding it to an inner backend.
+crates/quest-numerics/src/arithmetic.rs:305:    type Scalar = f64;
+crates/quest-numerics/src/arithmetic.rs:306:    type Error = ArithmeticError;
+crates/quest-numerics/src/arithmetic.rs:426:    type Scalar = Interval;
+crates/quest-numerics/src/arithmetic.rs:427:    type Error = ArithmeticError;
+crates/quest-numerics/src/arithmetic.rs:490:    type Endpoint = f64;
+crates/quest-numerics/src/arithmetic.rs:794:    type Scalar = BigFloat;
+crates/quest-numerics/src/arithmetic.rs:795:    type Error = ArithmeticError;
+crates/quest-numerics/src/arithmetic.rs:993:    type Scalar = MpInterval;
+crates/quest-numerics/src/arithmetic.rs:994:    type Error = ArithmeticError;
+crates/quest-numerics/src/arithmetic.rs:1211:    type Endpoint = BigFloat;
+crates/quest-numerics/src/fft.rs:44:    forward: Arc<dyn Fft<f64>>,
+crates/quest-numerics/src/fft.rs:45:    inverse: Arc<dyn Fft<f64>>,
+crates/quest-numerics/src/fft.rs:63:type Plans = (Arc<dyn Fft<f64>>, Arc<dyn Fft<f64>>);
+crates/quest-numerics/src/fft.rs:69:            Ok((planner.plan_fft_forward(len), planner.plan_fft_inverse(len)))
+crates/quest-numerics/src/fft.rs:83:        return Ok((planner.plan_fft_forward(len), planner.plan_fft_inverse(len)));
+crates/quest-numerics/src/fft.rs:86:        return Ok((planner.plan_fft_forward(len), planner.plan_fft_inverse(len)));
+crates/quest-numerics/src/fft.rs:89:        return Ok((planner.plan_fft_forward(len), planner.plan_fft_inverse(len)));
+crates/quest-numerics/src/fft.rs:147:        let (forward, inverse) = plans(len, backend)?;
+crates/quest-numerics/src/fft.rs:148:        let scratch_len = forward
+crates/quest-numerics/src/fft.rs:156:            forward,
+crates/quest-numerics/src/fft.rs:199:            FftDirection::Forward => self.forward.process_with_scratch(values, &mut self.scratch),
+crates/quest-numerics/src/fft.rs:250:    /// Prepare scratch for independent forward FFTs in the selected caller pool.
+crates/quest-numerics/src/fft.rs:338:    /// Parallel preparation permits concurrent forward FFTs with distinct scratch.
+crates/quest-numerics/src/fft.rs:376:        self.forward_pair(policy)?;
+crates/quest-numerics/src/fft.rs:387:    fn forward_pair(&mut self, policy: ExecutionPolicy<'_>) -> Result<()> {
+crates/quest-numerics/src/fft.rs:392:            let forward = &self.fft.forward;
+crates/quest-numerics/src/fft.rs:398:                    || forward.process_with_scratch(left, first_scratch),
+crates/quest-numerics/src/fft.rs:399:                    || forward.process_with_scratch(right, second_scratch),
+crates/quest-numerics/src/interval.rs:158:    type Output = Result<Self>;
+crates/quest-numerics/src/interval.rs:165:    type Output = Result<Self>;
+crates/quest-numerics/src/interval.rs:172:    type Output = Result<Self>;
+crates/quest-numerics/src/interval.rs:179:    type Output = Result<Self>;
+crates/quest-numerics/src/interval.rs:186:    type Output = Result<Self>;
+crates/quest-polynomial/src/function.rs:159:    type Evidence = Structural;
+crates/quest-polynomial/src/function.rs:169:    type Evidence = Assumed;
+crates/quest-polynomial/src/remez/linear.rs:360:        let mut forward = vec![0_usize; n];
+crates/quest-polynomial/src/remez/linear.rs:368:            &mut forward,
+crates/quest-polynomial/src/remez.rs:123:/// are part of this same type; no separate forwarding builder is involved.
+crates/quest-polynomial/src/typed.rs:182:            type Output=Typed<$node<L,R>>;
+crates/quest-polynomial/src/typed.rs:186:            type Output=Typed<$node<L,ConstantNode>>;
+crates/quest-polynomial/src/typed.rs:190:            type Output=Typed<$node<ConstantNode,R>>;
+crates/quest-polynomial/src/typed.rs:222:    type Output = Typed<Negative<E>>;
+crates/quest-polynomial/src/typed.rs:233:    type Output = Self;
+crates/quest-polynomial/src/typed.rs:239:    type Output = Typed<ConstantNode>;
+crates/quest-qsp/src/certification/mod.rs:224:/// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+crates/quest-qsp/src/certification/product.rs:7:pub(super) type MatrixPolynomial = [Vec<MpComplex>; 4];
+crates/quest-qsp/src/certification/product.rs:8:pub(super) type Matrix = [MpComplex; 4];
+crates/quest-qsp/src/kernel.rs:485:    // Concurrent forward children have disjoint supports, so their live payload
+crates/quest-qsp/src/kernel.rs:602:    fn joined_forward_trees_keep_work_counts_and_all_coefficient_bits() -> googletest::Result<()> {
+crates/quest-qsp/src/kernel.rs:679:/// Fuse forward substitution into the column recurrence: O(n²) arithmetic,
+crates/quest-qsp/src/lib.rs:32:pub type Control = [[Complex64; 2]; 2];
+crates/quest-qsp/src/offline/kernels.rs:7:pub(super) type Matrix = [Number; 4];
+crates/quest-qsp/src/offline/mod.rs:37://! # Ok::<(), Box<dyn std::error::Error>>(())
+crates/quest-qsvt/src/analysis.rs:618:        .source_forward
+crates/quest-qsvt/src/encoding.rs:250:type EncodingParts = (
+crates/quest-qsvt/src/routes.rs:280:    let forward = degree
+crates/quest-qsvt/src/routes.rs:288:        source_forward: forward,
+crates/quest-qsvt/src/routes.rs:352:        source_forward: degree,
+crates/quest-qsvt/src/routes.rs:365:        queries.source_forward = queries
+crates/quest-qsvt/src/routes.rs:366:            .source_forward
+crates/quest-qsvt/src/routes.rs:406:type Stages = (Projection, Projection, TransformContinuation);
+crates/quest-qsvt/src/transform.rs:45:    /// Applications of the supplied source in its forward orientation.
+crates/quest-qsvt/src/transform.rs:46:    pub source_forward: usize,
+crates/quest-qsvt/src/transform.rs:424:    /// Retains a bridge projection and a forward source continuation even when
+crates/quest-qsvt-cli/src/execution.rs:269:        "queries":{"semantic":counts.semantic,"source_forward":counts.source_forward,
+crates/quest-qsvt-cli/src/main.rs:9:        .and_then(serde_json::Value::as_bool)
+crates/quest-qsvt-cli/src/main.rs:17:        .and_then(serde_json::Value::as_u64)
+crates/quest-qsvt-cli/src/workers.rs:11:    type Err = Error;
+crates/quest-symbolic/src/lib.rs:26:pub type Rational = Ratio<BigInt>;
+crates/quest-synthesis/src/grid.rs:13:type Vector = [BigInt; 4];
+crates/quest-synthesis/src/grid.rs:14:type Basis = [Vector; 4];
+crates/quest-synthesis/src/grid.rs:15:type RVector = [Rational; 4];
+crates/quest-synthesis/src/norm_equation.rs:9:type Ring = [BigInt; 4];
+crates/quest-sys/src/generated_api.rs:21:        type QuestComplex = crate::ffi::QuestComplex;
+crates/quest-sys/src/generated_api.rs:23:        type Qureg = crate::ffi::Qureg;
+crates/quest-sys/src/generated_api.rs:26:        type CompMatr = crate::ffi::CompMatr;
+crates/quest-sys/src/generated_api.rs:29:        type DiagMatr = crate::ffi::DiagMatr;
+crates/quest-sys/src/generated_api.rs:30:        type FullStateDiagMatr = crate::ffi::FullStateDiagMatr;
+crates/quest-sys/src/generated_api.rs:31:        type KrausMap = crate::ffi::KrausMap;
+crates/quest-sys/src/generated_api.rs:32:        type SuperOp = crate::ffi::SuperOp;
+crates/quest-sys/src/generated_api.rs:33:        type PauliStr = crate::ffi::PauliStr;
+crates/quest-sys/src/generated_api.rs:34:        type PauliStrSum = crate::ffi::PauliStrSum;
+crates/quest-sys/src/lib.rs:3:    reason = "one-to-one safe CXX wrappers uniformly forward lifecycle and native validation errors"
+crates/quest-sys/src/mpi.rs:119:    // SAFETY: this immutable constant is supplied by mpi-sys's compiled C shim
+crates/xtask/src/generate/clang.rs:429:    fn evaluated_header_context_is_forwarded_without_splitting_paths() -> googletest::Result<()> {
+crates/xtask/src/generate/emit.rs:406:            contains_substring("type QuestComplex = crate::ffi::QuestComplex")
+crates/xtask/src/generate/mod.rs:10:pub type DynError = Box<dyn std::error::Error + Send + Sync>;
+crates/xtask/src/native_consumers.rs:13:    ("facade", "quest-consumer-facade"),
+crates/xtask/src/native_consumers.rs:246:        "[workspace]\nresolver = \"3\"\nmembers = [\"direct\", \"facade\", \"wrapper\", \"wrapped\", \"renamed\"]\n",
+crates/xtask/src/native_consumers.rs:277:        "facade",
+crates/xtask/src/native_consumers.rs:322:    write_file(&work.join("facade/src/main.rs"), &facade_source("quest"))?;
+crates/xtask/src/native_consumers.rs:325:        &facade_library_source("quest"),
+crates/xtask/src/native_consumers.rs:329:        "fn main() -> Result<(), Box<dyn std::error::Error>> { quest_consumer_wrapper::run() }\n",
+crates/xtask/src/native_consumers.rs:331:    write_file(&work.join("renamed/src/main.rs"), &facade_source("quantum"))?;
+crates/xtask/src/native_consumers.rs:372:fn facade_source(crate_name: &str) -> String {
+crates/xtask/src/native_consumers.rs:374:        "fn main() -> Result<(), Box<dyn std::error::Error>> {{\n    run()\n}}\n\n{}",
+crates/xtask/src/native_consumers.rs:375:        facade_library_source(crate_name)
+crates/xtask/src/native_consumers.rs:379:fn facade_library_source(crate_name: &str) -> String {
+crates/xtask/src/native_consumers.rs:381:        r#"pub fn run() -> Result<(), Box<dyn std::error::Error>> {{
+crates/xtask/src/native_consumers.rs:657:        .filter_map(|line| line.trim().split_once(" (compatibility version "))
+crates/xtask/src/native_consumers.rs:937:        let metadata: serde_json::Value = serde_json::from_slice(&metadata.stdout).or_fail()?;
+crates/xtask/src/native_consumers.rs:951:        let facade = fs::read_to_string(fixture.join("facade/src/main.rs")).or_fail()?;
+crates/xtask/src/native_consumers.rs:961:            facade,
+crates/xtask/src/native_consumers.rs:1008:        let dependencies = "/tmp/consumer:\n\t@rpath/libQuEST.dylib (compatibility version 4.3.0, current version 4.3.0)\n\t/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 1.0.0)\n";

@@ -1,8 +1,7 @@
+use dashu_int::IBig;
 use googletest::{Result, prelude::*};
-use num_bigint::BigInt;
-use num_traits::CheckedAdd;
 use quest_math::{
-    AngleTarget, Axis, Gate, Limits, Operation, Rational, Sequence, Target, certify_rotation,
+    AngleTarget, Axis, Gate, Limits, Operation, RBig, Sequence, Target, certify_rotation,
 };
 
 fn invalid() -> std::io::Error {
@@ -68,8 +67,8 @@ fn target(axis: &str, angle: &str) -> Result<Target> {
 
 #[gtest]
 fn independent_decimal_full_matrix_oracles_bracket_every_axis_and_angle_kind() -> Result<()> {
-    let denominator = BigInt::from(10u8).pow(50);
-    let slack = Rational::new(BigInt::from(1u8), BigInt::from(10u8).pow(12));
+    let denominator = IBig::from(10u8).pow(50);
+    let slack = RBig::from_parts_signed(IBig::from(1u8), IBig::from(10u8).pow(12));
     for line in include_str!("fixtures/rotation_oracle.txt")
         .lines()
         .filter(|line| !line.starts_with('#'))
@@ -79,12 +78,12 @@ fn independent_decimal_full_matrix_oracles_bracket_every_axis_and_angle_kind() -
         let target = target(next(&mut fields)?, next(&mut fields)?)?;
         let pass = next(&mut fields)?.parse()?;
         let fail = next(&mut fields)?.parse()?;
-        let lower = Rational::new(next(&mut fields)?.parse()?, denominator.clone());
-        let upper = Rational::new(next(&mut fields)?.parse()?, denominator.clone());
+        let lower = RBig::from_parts_signed(next(&mut fields)?.parse()?, denominator.clone());
+        let upper = RBig::from_parts_signed(next(&mut fields)?.parse()?, denominator.clone());
         expect_true!(fields.next().is_none());
         let certificate = certify_rotation(&candidate, &target, pass, Limits::default())?;
         expect_true!(certificate.bound_squared() >= &lower);
-        let upper_with_slack = upper.checked_add(&slack).ok_or_else(invalid)?;
+        let upper_with_slack = std::ops::Add::add(upper, &slack);
         expect_true!(certificate.bound_squared() <= &upper_with_slack);
         expect_true!(certify_rotation(&candidate, &target, fail, Limits::default()).is_err());
     }

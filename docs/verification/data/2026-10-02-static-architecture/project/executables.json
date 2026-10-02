@@ -1,0 +1,10 @@
+{
+  "baseline": {
+    "bytes": 4233952,
+    "sha256": "36a481cf28d9506605fe57f61ac74173153c7468d5601bed3c7825dca22fbe88"
+  },
+  "current": {
+    "bytes": 4353792,
+    "sha256": "5d1ca88adf29c93914e55c642ea019f8c9d6ab071620f95cfec12b60da5040ad"
+  }
+}

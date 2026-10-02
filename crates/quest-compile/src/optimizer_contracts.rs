@@ -1,19 +1,15 @@
 //! Immutable optimizer admission, budget, and cost contracts.
 //! The native score predicts preferences; it is not a wall-clock estimate.
-#[allow(unused_imports)]
-use crate::{
-    BoundParityPasses, ExactPasses, LinearPasses, NumericalPasses, OracleExport, ParityPasses,
-    TerminalPasses,
-};
 
 use crate::{
-    BigRational, BoundGate, BoundRegion, BoundSnapshotId, Control, ControlState, DependencyEdge,
-    DependencyKind, Error, NumericalOperator, OccurrenceId, Operation, ParameterId, Program,
-    QuantumRegion, QubitId, RegionPlan, RegionSnapshotId, Result, Verified,
+    BoundGate, BoundRegion, BoundSnapshotId, Control, ControlState, DependencyEdge, DependencyKind,
+    Error, NumericalOperator, OccurrenceId, Operation, ParameterId, Program, QuantumRegion,
+    QubitId, RBig, RegionPlan, RegionSnapshotId, Result, Verified,
     dispatch_recipe::{self, DispatchStep, PreparedRecipeInventory, PrimitiveGate, RecipeLimits},
 };
-use num_bigint::BigInt;
-use num_traits::{One, Zero};
+use dashu_base::BitTest;
+use dashu_int::IBig;
+
 use std::{
     cmp::Ordering as Comparison,
     collections::{BTreeMap, BTreeSet},
@@ -1050,12 +1046,12 @@ impl CostComponents {
 /// A score with its ordered unknown-communication component still attached.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NativeScore {
-    known: BigRational,
+    known: RBig,
     opaque: Option<Arc<OpaqueTrace>>,
 }
 impl NativeScore {
     #[must_use]
-    pub const fn known(&self) -> &BigRational {
+    pub const fn known(&self) -> &RBig {
         &self.known
     }
     #[must_use]
@@ -1076,28 +1072,22 @@ pub enum CostComparison {
 #[derive(Debug, Clone)]
 pub struct OptimizationTarget {
     deployment: DeploymentSnapshot,
-    reuse: BigRational,
+    reuse: RBig,
     profile: CostProfile,
 }
 impl OptimizationTarget {
     /// # Errors
     /// Reuse must be positive, normalized, and bounded before score arithmetic.
-    pub fn new(
-        deployment: DeploymentSnapshot,
-        reuse: BigRational,
-        profile: CostProfile,
-    ) -> Result<Self> {
-        if reuse.denom() <= &BigInt::zero()
-            || reuse.numer() <= &BigInt::zero()
-            || reuse.numer().bits() > 16_384
-            || reuse.denom().bits() > 16_384
+    pub fn new(deployment: DeploymentSnapshot, reuse: RBig, profile: CostProfile) -> Result<Self> {
+        if reuse.numerator() <= &IBig::ZERO
+            || reuse.numerator().bit_len() > 16_384
+            || reuse.denominator().bit_len() > 16_384
         {
             return Err(Error::Budget("optimizer reuse"));
         }
-        let (numerator, denominator) = reuse.into_raw();
         Ok(Self {
             deployment,
-            reuse: BigRational::new(numerator, denominator),
+            reuse,
             profile,
         })
     }
@@ -1105,14 +1095,14 @@ impl OptimizationTarget {
     /// # Errors
     /// Rejects invalid deployment metadata.
     pub fn once(deployment: DeploymentSnapshot, profile: CostProfile) -> Result<Self> {
-        Self::new(deployment, BigRational::one(), profile)
+        Self::new(deployment, RBig::ONE, profile)
     }
     #[must_use]
     pub const fn deployment(&self) -> DeploymentSnapshot {
         self.deployment
     }
     #[must_use]
-    pub const fn reuse(&self) -> &BigRational {
+    pub const fn reuse(&self) -> &RBig {
         &self.reuse
     }
     #[must_use]
@@ -1130,24 +1120,23 @@ impl OptimizationTarget {
     pub fn score(&self, cost: &CostComponents) -> Result<NativeScore> {
         let c = &cost.native;
         // QuEST amplitudes are Complex64; L is local state bytes, not entries.
-        let l = BigInt::from(self.deployment.local_amplitudes) * BigInt::from(16u8);
+        let l = IBig::from(self.deployment.local_amplitudes) * IBig::from(16u8);
         let k = match self.deployment.kind {
             DeploymentKind::StateVector => 1u8,
             DeploymentKind::DensityMatrix => 2u8,
         };
-        let mut bracket = BigRational::from_integer(BigInt::from(c.dispatches))
-            + BigRational::from_integer(
-                BigInt::from(k)
-                    * (BigInt::from(64u8) * BigInt::from(c.state_passes)
-                        + BigInt::from(c.arithmetic)),
+        let mut bracket = RBig::from(IBig::from(c.dispatches))
+            + RBig::from(
+                IBig::from(k)
+                    * (IBig::from(64u8) * IBig::from(c.state_passes) + IBig::from(c.arithmetic)),
             )
-            + BigRational::from_integer(BigInt::from(c.coordination));
+            + RBig::from(IBig::from(c.coordination));
         let opaque = match &c.communication {
             CommunicationCost::Known(value) => {
                 if !self.deployment.distributed && *value != 0 {
                     return Err(Error::Unsupported("communication on local register"));
                 }
-                bracket += BigRational::new(BigInt::from(64u8) * BigInt::from(*value), l);
+                bracket += RBig::from_parts_signed(IBig::from(64u8) * IBig::from(*value), l);
                 None
             }
             CommunicationCost::Opaque(signature) => {
@@ -1158,7 +1147,7 @@ impl OptimizationTarget {
             }
         };
         let preparation =
-            BigRational::new(BigInt::from(c.preparation_bytes), BigInt::from(1024u16));
+            RBig::from_parts_signed(IBig::from(c.preparation_bytes), IBig::from(1024u16));
         Ok(NativeScore {
             known: preparation + &self.reuse * bracket,
             opaque,
@@ -1198,10 +1187,10 @@ impl OptimizationTarget {
 
 /// Validated mathematical error bound; its field is private to preserve sign.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ApproximationBudget(BigRational);
+pub struct ApproximationBudget(RBig);
 impl ApproximationBudget {
     #[must_use]
-    pub const fn value(&self) -> &BigRational {
+    pub const fn value(&self) -> &RBig {
         &self.0
     }
 }
@@ -1216,25 +1205,23 @@ pub enum ApproximationMode {
 impl ApproximationMode {
     /// # Errors
     /// Rejects a nonpositive or invalid exact bound.
-    pub fn local(epsilon: BigRational) -> Result<Self> {
+    pub fn local(epsilon: RBig) -> Result<Self> {
         validate_epsilon(epsilon).map(|value| Self::Local(ApproximationBudget(value)))
     }
     /// # Errors
     /// Rejects a nonpositive or invalid exact bound.
-    pub fn global(epsilon: BigRational) -> Result<Self> {
+    pub fn global(epsilon: RBig) -> Result<Self> {
         validate_epsilon(epsilon).map(|value| Self::Global(ApproximationBudget(value)))
     }
 }
-fn validate_epsilon(epsilon: BigRational) -> Result<BigRational> {
-    if epsilon.denom() <= &BigInt::zero()
-        || epsilon.numer() <= &BigInt::zero()
-        || epsilon.numer().bits() > 16_384
-        || epsilon.denom().bits() > 16_384
+fn validate_epsilon(epsilon: RBig) -> Result<RBig> {
+    if epsilon.numerator() <= &IBig::ZERO
+        || epsilon.numerator().bit_len() > 16_384
+        || epsilon.denominator().bit_len() > 16_384
     {
         return Err(Error::Budget("approximation bound"));
     }
-    let (numerator, denominator) = epsilon.into_raw();
-    Ok(BigRational::new(numerator, denominator))
+    Ok(epsilon)
 }
 
 /// Immutable configuration for one consuming optimizer request.
@@ -1691,7 +1678,10 @@ impl Optimizer {
     /// Run deterministic bounded algebraic search, then publish the best fully admitted result.
     /// # Errors
     /// Rejects invalid search admission before publishing any candidate.
-    pub fn search(self, options: crate::BeamOptions) -> Result<OptimizationOutcome> {
+    pub fn search(
+        self,
+        options: crate::BeamOptions,
+    ) -> std::result::Result<OptimizationOutcome, crate::CompilerError> {
         let result = crate::beam::run(self.input, &self.options, &self.ledger, options)?;
         Ok(OptimizationOutcome {
             input: result.input,
@@ -1708,14 +1698,14 @@ impl Optimizer {
     /// Search with optional parent-certified worker proposals under the shared budget.
     /// # Errors
     /// Rejects invalid worker limits or a failed candidate proof transactionally.
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
+    #[cfg(feature = "workers")]
     pub fn search_with_workers(
         self,
         options: crate::BeamOptions,
         client: &quest_optimizer_client::Client,
         seed: u64,
         limits: quest_math::Limits,
-    ) -> Result<OptimizationOutcome> {
+    ) -> std::result::Result<OptimizationOutcome, crate::CompilerError> {
         let result = crate::beam::run_with_workers(
             self.input,
             &self.options,
@@ -1760,7 +1750,9 @@ fn reserve_input(ledger: &BudgetLedger, estimate: InputReservation) -> Result<Bu
         copies,
     } = estimate;
     let per_operation = std::mem::size_of::<crate::Instruction>()
-        .checked_add(std::mem::size_of::<crate::model::Occurrence>())
+        .checked_add(std::mem::size_of::<
+            quest_language::quantum::model::Occurrence,
+        >())
         .and_then(|n| n.checked_add(std::mem::size_of::<[usize; 8]>()))
         .ok_or(Error::Budget("optimizer input storage"))?;
     let per_edge = std::mem::size_of::<crate::DependencyEdge>()

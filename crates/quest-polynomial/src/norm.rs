@@ -5,7 +5,7 @@
 //! Certified supremum norms of original coefficients and original basis
 //! parameters. Branch bounds use directed interval arithmetic; samples only
 //! improve a lower bound. A sample maximum is never an upper certificate.
-use crate::{Basis, Complex64, Error, Interval, Polynomial, Result};
+use crate::{Basis, Complex64, DynamicShape, Error, Interval, Polynomial, Result, Shape};
 use std::ops::Mul;
 
 /// A closed real segment or closed complex disc, including its interior.
@@ -38,16 +38,16 @@ pub enum NormStatus {
 /// Source-bound finite supremum enclosure. Construction is private so evidence
 /// cannot be retargeted to different coefficients or another domain.
 #[derive(Debug, Clone)]
-pub struct NormEvidence<B: Basis> {
-    source: Polynomial<B>,
+pub struct NormEvidence<B: Basis, D: Shape = DynamicShape> {
+    source: Polynomial<B, Complex64, D>,
     domain: NormDomain,
     bounds: Interval,
     status: NormStatus,
     cells: usize,
 }
-impl<B: Basis> NormEvidence<B> {
+impl<B: Basis, D: Shape> NormEvidence<B, D> {
     #[must_use]
-    pub const fn source(&self) -> &Polynomial<B> {
+    pub const fn source(&self) -> &Polynomial<B, Complex64, D> {
         &self.source
     }
     #[must_use]
@@ -68,8 +68,8 @@ impl<B: Basis> NormEvidence<B> {
     }
 }
 #[derive(Debug, Clone)]
-pub enum NormOutcome<B: Basis> {
-    Bounded(NormEvidence<B>),
+pub enum NormOutcome<B: Basis, D: Shape = DynamicShape> {
+    Bounded(NormEvidence<B, D>),
     /// A nonzero negative Laurent coefficient gives a genuine pole at zero.
     UnboundedPole,
     /// Directed pole-location arithmetic could not resolve a boundary case.
@@ -183,7 +183,7 @@ fn real_power(mut x: Interval, mut exponent: u32) -> Result<Interval> {
     clippy::many_single_char_names,
     reason = "Conventional three-term basis recurrence coefficients"
 )]
-fn evaluate<B: Basis>(p: &Polynomial<B>, x: Rect) -> Result<Rect> {
+fn evaluate<B: Basis, D: Shape>(p: &Polynomial<B, Complex64, D>, x: Rect) -> Result<Rect> {
     let zero = Rect::point(Complex64::new(0.0, 0.0))?;
     let Some((first, last)) = p.effective_support() else {
         return Ok(zero);
@@ -258,14 +258,21 @@ fn parameter_rect(domain: NormDomain, t: Interval) -> Result<Rect> {
         }
     }
 }
-fn sample<B: Basis>(p: &Polynomial<B>, domain: NormDomain, t: f64) -> Result<f64> {
+fn sample<B: Basis, D: Shape>(
+    p: &Polynomial<B, Complex64, D>,
+    domain: NormDomain,
+    t: f64,
+) -> Result<f64> {
     Ok(evaluate(p, parameter_rect(domain, Interval::point(t)?)?)?
         .modulus()?
         .lower())
 }
 /// Pole-safe whole-domain coefficient bound for a Laurent polynomial. It is
 /// also a fallback when a boundary arc's rectangular enclosure touches zero.
-fn laurent_bound<B: Basis>(p: &Polynomial<B>, domain: NormDomain) -> Result<f64> {
+fn laurent_bound<B: Basis, D: Shape>(
+    p: &Polynomial<B, Complex64, D>,
+    domain: NormDomain,
+) -> Result<f64> {
     let magnitude = match domain {
         NormDomain::Disc { center, radius } => {
             let norm = Rect::point(center)?.modulus()?;
@@ -307,7 +314,7 @@ fn laurent_bound<B: Basis>(p: &Polynomial<B>, domain: NormDomain) -> Result<f64>
     }
     Ok(bound.upper())
 }
-impl<B: Basis> Polynomial<B> {
+impl<B: Basis, D: Shape> Polynomial<B, Complex64, D> {
     /// Bound sup |p| on a real interval or an entire closed complex disc.
     /// Disc bounds use the maximum-modulus principle only after excluding all
     /// Laurent poles from the disc; a unit circle Laurent norm is a different
@@ -323,7 +330,11 @@ impl<B: Basis> Polynomial<B> {
         clippy::too_many_lines,
         reason = "Keep admission, pole evidence and one bounded refinement loop together"
     )]
-    pub fn certify_norm(&self, domain: NormDomain, options: NormOptions) -> Result<NormOutcome<B>> {
+    pub fn certify_norm(
+        &self,
+        domain: NormDomain,
+        options: NormOptions,
+    ) -> Result<NormOutcome<B, D>> {
         if !options.absolute_tolerance.is_finite()
             || options.absolute_tolerance < 0.0
             || options.max_cells == 0

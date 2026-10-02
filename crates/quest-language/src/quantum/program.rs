@@ -608,6 +608,7 @@ pub struct DependencyEdge {
 }
 /// Identity of the admitted ideal program from which a bound plan arose.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct RegionSnapshotId(u64);
 impl RegionSnapshotId {
     #[must_use]
@@ -617,6 +618,7 @@ impl RegionSnapshotId {
 }
 /// Identity of one immutable bound program publication.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct BoundSnapshotId(u64);
 impl BoundSnapshotId {
     #[must_use]

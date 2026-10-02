@@ -12,13 +12,14 @@ serde_json.workspace = true
 sha2.workspace = true
 codespan-reporting = { workspace = true, optional = true }
 faer = { workspace = true, features = ["std", "linalg"] }
-num-bigint = { workspace = true }
+dashu-int.workspace = true
+dashu-base.workspace = true
 num-complex = { workspace = true }
-num-rational = { workspace = true, features = ["std"] }
 num-traits = { workspace = true }
 petgraph = { workspace = true, features = ["std", "stable_graph"] }
 quest-language = { workspace = true, features = ["templates"] }
-quest-math = { workspace = true, optional = true }
+quest-math = { workspace = true, features = ["serde"] }
+quest-macros = { workspace = true, optional = true }
 quest-optimizer-client = { workspace = true, optional = true }
 quest-optimizer-protocol = { workspace = true, optional = true }
 quest-qasm.workspace = true
@@ -37,8 +38,14 @@ quest-math.workspace = true
 trybuild = { workspace = true }
 
 [features]
-default = ["synthesis"]
+default = ["macros", "synthesis"]
+macros = ["dep:quest-macros"]
 codespan-reporting = ["dep:codespan-reporting", "quest-language/codespan-reporting", "quest-qasm/codespan-reporting"]
 serde = ["quest-language/serde", "quest-qasm/serde"]
-synthesis = ["dep:quest-synthesis", "dep:quest-optimizer-client", "dep:quest-optimizer-protocol", "dep:quest-math"]
-workers = ["synthesis", "dep:quest-optimizer-client", "dep:quest-optimizer-protocol", "dep:quest-math"]
+synthesis = ["dep:quest-synthesis"]
+workers = ["dep:quest-optimizer-client", "dep:quest-optimizer-protocol"]
+
+[[bench]]
+name = "compiler"
+harness = false
+required-features = ["macros"]

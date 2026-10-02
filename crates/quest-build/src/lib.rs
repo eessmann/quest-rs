@@ -51,7 +51,8 @@ pub enum BuildError {
 
 pub type Result<T> = std::result::Result<T, BuildError>;
 
-pub(crate) const QUEST_ENV_VARS: &[&str] = &["QUEST_DIR", "QUEST_ROOT", "QuEST_DIR", "QuEST_ROOT"];
+pub(crate) const QUEST_ENV_VARS: &[&str] = &["QUEST_ROOT"];
+const REMOVED_QUEST_ENV_VARS: &[&str] = &["QUEST_DIR", "QuEST_DIR", "QuEST_ROOT"];
 
 /// Discover installed `QuEST` in a Cargo build script's target and profile.
 ///
@@ -121,7 +122,11 @@ pub fn emit_final_target_runtime_paths() -> Result<()> {
 pub(crate) fn reject_obsolete_environment(
     mut lookup: impl FnMut(&str) -> Option<OsString>,
 ) -> Result<()> {
-    for name in ["QUEST_NATIVE_CONFIG", "QUEST_RUNTIME_LIBRARY_PATH"] {
+    for name in REMOVED_QUEST_ENV_VARS
+        .iter()
+        .copied()
+        .chain(["QUEST_NATIVE_CONFIG", "QUEST_RUNTIME_LIBRARY_PATH"])
+    {
         if lookup(name).is_some() {
             return Err(invalid(format!(
                 "{name} is obsolete; unset it, select installed QuEST with QUEST_ROOT or CMAKE_PREFIX_PATH, and give native libraries RUNPATHs for their own dependencies"
@@ -132,32 +137,37 @@ pub(crate) fn reject_obsolete_environment(
 }
 
 fn watch_environment() {
-    for name in QUEST_ENV_VARS.iter().copied().chain([
-        "QUEST_NATIVE_CONFIG",
-        "QUEST_RUNTIME_LIBRARY_PATH",
-        "CMAKE_PREFIX_PATH",
-        "CMAKE",
-        "CMAKE_GENERATOR",
-        "CMAKE_TOOLCHAIN_FILE",
-        // CMake package dependencies and compiler lookup share this environment
-        // across discovery, bridge compilation, and final-target build scripts.
-        "CUDAToolkit_ROOT",
-        "CUDATOOLKIT_ROOT",
-        "CUDA_PATH",
-        "CUQUANTUM_ROOT",
-        "PATH",
-        "CXX",
-        "CXXFLAGS",
-        "CC",
-        "CFLAGS",
-        "LD_LIBRARY_PATH",
-        "LD_PRELOAD",
-        "LD_AUDIT",
-        "SDKROOT",
-        "DYLD_LIBRARY_PATH",
-        "DYLD_FALLBACK_LIBRARY_PATH",
-        "DYLD_INSERT_LIBRARIES",
-    ]) {
+    for name in QUEST_ENV_VARS
+        .iter()
+        .chain(REMOVED_QUEST_ENV_VARS)
+        .copied()
+        .chain([
+            "QUEST_NATIVE_CONFIG",
+            "QUEST_RUNTIME_LIBRARY_PATH",
+            "CMAKE_PREFIX_PATH",
+            "CMAKE",
+            "CMAKE_GENERATOR",
+            "CMAKE_TOOLCHAIN_FILE",
+            // CMake package dependencies and compiler lookup share this environment
+            // across discovery, bridge compilation, and final-target build scripts.
+            "CUDAToolkit_ROOT",
+            "CUDATOOLKIT_ROOT",
+            "CUDA_PATH",
+            "CUQUANTUM_ROOT",
+            "PATH",
+            "CXX",
+            "CXXFLAGS",
+            "CC",
+            "CFLAGS",
+            "LD_LIBRARY_PATH",
+            "LD_PRELOAD",
+            "LD_AUDIT",
+            "SDKROOT",
+            "DYLD_LIBRARY_PATH",
+            "DYLD_FALLBACK_LIBRARY_PATH",
+            "DYLD_INSERT_LIBRARIES",
+        ])
+    {
         println!("cargo:rerun-if-env-changed={name}");
     }
 }
@@ -368,34 +378,20 @@ pub fn runtime_link_args(target_os: &str, directories: &[PathBuf]) -> Result<Vec
 }
 
 pub(crate) fn explicit_prefix() -> Result<Option<PathBuf>> {
-    let mut found = None;
-    for name in QUEST_ENV_VARS {
-        let Some(candidate) = env::var_os(name) else {
-            continue;
-        };
-        let prefix = normalize_quest_root(Path::new(&candidate))?;
-        if found.as_ref().is_some_and(|earlier| earlier != &prefix) {
-            return Err(invalid(
-                "the explicit QUEST_ROOT/QUEST_DIR aliases select different installations",
-            ));
-        }
-        found = Some(prefix);
-    }
-    Ok(found)
+    env::var_os("QUEST_ROOT")
+        .map(|candidate| installation_prefix(Path::new(&candidate)))
+        .transpose()
 }
 
-fn normalize_quest_root(candidate: &Path) -> Result<PathBuf> {
-    let candidate = absolute(candidate)?;
-    let prefix = candidate
-        .ancestors()
-        .find(|path| path.join("include/quest.h").is_file())
-        .ok_or_else(|| {
-            invalid(format!(
-                "{} does not identify an installed QuEST prefix",
-                candidate.display()
-            ))
-        })?;
-    fs::canonicalize(prefix).map_err(|e| io(prefix, e))
+fn installation_prefix(candidate: &Path) -> Result<PathBuf> {
+    let prefix = absolute(candidate)?;
+    if !prefix.join("include/quest.h").is_file() {
+        return Err(invalid(format!(
+            "QUEST_ROOT={} must name the exact installed QuEST prefix containing include/quest.h; package subdirectories are not prefixes",
+            prefix.display()
+        )));
+    }
+    fs::canonicalize(&prefix).map_err(|error| io(&prefix, error))
 }
 
 pub(crate) fn run(command: &mut Command) -> Result<Output> {
@@ -561,7 +557,13 @@ mod tests {
 
     #[gtest]
     fn obsolete_overrides_fail_with_migration_guidance() -> googletest::Result<()> {
-        for name in ["QUEST_NATIVE_CONFIG", "QUEST_RUNTIME_LIBRARY_PATH"] {
+        for name in [
+            "QUEST_DIR",
+            "QuEST_DIR",
+            "QuEST_ROOT",
+            "QUEST_NATIVE_CONFIG",
+            "QUEST_RUNTIME_LIBRARY_PATH",
+        ] {
             let result = reject_obsolete_environment(|key| (key == name).then(|| "".into()));
             let error = result
                 .err()
@@ -575,17 +577,18 @@ mod tests {
     }
 
     #[gtest]
-    fn normalizes_installed_package_roots_in_lib_and_lib64() -> googletest::Result<()> {
+    fn explicit_installation_selection_rejects_package_subdirectories() -> googletest::Result<()> {
         let directory = tempfile::tempdir().or_fail()?;
         fs::create_dir_all(directory.path().join("include")).or_fail()?;
         fs::write(directory.path().join("include/quest.h"), "").or_fail()?;
+        expect_that!(
+            installation_prefix(directory.path()).or_fail()?,
+            eq(&directory.path().canonicalize().or_fail()?)
+        );
         for lib in ["lib", "lib64"] {
             let package = directory.path().join(lib).join("cmake/QuEST");
             fs::create_dir_all(&package).or_fail()?;
-            expect_that!(
-                normalize_quest_root(&package).or_fail()?,
-                eq(&directory.path().canonicalize().or_fail()?)
-            );
+            expect_that!(installation_prefix(&package).is_err(), eq(true));
         }
         Ok(())
     }

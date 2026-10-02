@@ -1,22 +1,21 @@
-use num_bigint::BigInt;
+use dashu_int::IBig;
 
 /// Exact input identity; finite binary64 angles are decoded as dyadic rationals.
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum AngleTarget {
     DyadicRadians {
         bits: u64,
     },
     RationalPi {
-        numerator: BigInt,
-        denominator: BigInt,
+        numerator: IBig,
+        denominator: IBig,
     },
     /// Exact radians `r + s*pi`, with each coefficient represented as a rational.
     AffinePi {
-        radians_numerator: BigInt,
-        radians_denominator: BigInt,
-        pi_numerator: BigInt,
-        pi_denominator: BigInt,
+        radians_numerator: IBig,
+        radians_denominator: IBig,
+        pi_numerator: IBig,
+        pi_denominator: IBig,
     },
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -127,7 +126,7 @@ pub enum Error {
     NotCertified,
 }
 pub type Result<T> = std::result::Result<T, Error>;
-pub type Rational = num_rational::Ratio<BigInt>;
+pub use dashu_ratio::RBig;
 pub fn budget(resource: &str, requested: u64, limit: u64) -> Error {
     Error::Budget {
         resource: resource.into(),

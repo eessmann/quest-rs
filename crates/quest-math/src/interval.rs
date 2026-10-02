@@ -1,15 +1,15 @@
-use crate::{Error, Limits, Rational, Result};
-use num_bigint::BigInt;
-use num_traits::{Signed, Zero};
+use crate::{Error, Limits, RBig, Result};
+use dashu_base::{Abs, Signed};
+use dashu_int::IBig;
 
 /// Internal closed dyadic interval, in units of the associated Grid's 2^-bits.
 #[derive(Debug, Clone)]
 pub struct Interval {
-    pub lower: BigInt,
-    pub upper: BigInt,
+    pub lower: IBig,
+    pub upper: IBig,
 }
 impl Interval {
-    pub fn point(value: BigInt) -> Self {
+    pub fn point(value: IBig) -> Self {
         Self {
             lower: value.clone(),
             upper: value,
@@ -30,7 +30,7 @@ impl Interval {
     pub fn sub(&self, rhs: &Self) -> Self {
         self.add(&rhs.negated())
     }
-    pub fn scaled(&self, factor: &BigInt) -> Self {
+    pub fn scaled(&self, factor: &IBig) -> Self {
         if factor.is_negative() {
             Self {
                 lower: std::ops::Mul::mul(&self.upper, factor),
@@ -43,19 +43,19 @@ impl Interval {
             }
         }
     }
-    pub fn divided(&self, positive: &BigInt) -> Result<Self> {
+    pub fn divided(&self, positive: &IBig) -> Result<Self> {
         Ok(Self {
             lower: floor_div(&self.lower, positive)?,
             upper: ceil_div(&self.upper, positive)?,
         })
     }
-    pub fn magnitude(&self) -> BigInt {
-        self.lower.abs().max(self.upper.abs())
+    pub fn magnitude(&self) -> IBig {
+        (&self.lower).abs().max((&self.upper).abs())
     }
 }
 pub struct Grid {
     pub bits: usize,
-    pub scale: BigInt,
+    pub scale: IBig,
     pub limits: Limits,
 }
 impl Grid {
@@ -74,18 +74,18 @@ impl Grid {
         crate::types::allocation(scratch, 128, limits)?;
         Ok(Self {
             bits,
-            scale: std::ops::Shl::shl(BigInt::from(1), bits),
+            scale: std::ops::Shl::shl(IBig::from(1), bits),
             limits,
         })
     }
     pub fn integer(&self, value: i32) -> Interval {
         Interval::point(std::ops::Mul::mul(&self.scale, value))
     }
-    pub fn rational(&self, value: &Rational) -> Result<Interval> {
-        let numerator = std::ops::Shl::shl(value.numer(), self.bits);
+    pub fn rational(&self, value: &RBig) -> Result<Interval> {
+        let numerator = std::ops::Shl::shl(value.numerator(), self.bits);
         Ok(Interval {
-            lower: floor_div(&numerator, value.denom())?,
-            upper: ceil_div(&numerator, value.denom())?,
+            lower: floor_div(&numerator, &IBig::from(value.denominator().clone()))?,
+            upper: ceil_div(&numerator, &IBig::from(value.denominator().clone()))?,
         })
     }
     pub fn mul(&self, lhs: &Interval, rhs: &Interval) -> Result<Interval> {
@@ -111,10 +111,10 @@ impl Grid {
     pub fn square(&self, value: &Interval) -> Result<Interval> {
         let maximum = value.magnitude();
         let upper = ceil_div(&std::ops::Mul::mul(&maximum, &maximum), &self.scale)?;
-        let minimum = if value.lower <= BigInt::zero() && value.upper >= BigInt::zero() {
-            BigInt::zero()
+        let minimum = if value.lower <= IBig::ZERO && value.upper >= IBig::ZERO {
+            IBig::ZERO
         } else {
-            value.lower.abs().min(value.upper.abs())
+            (&value.lower).abs().min((&value.upper).abs())
         };
         Ok(Interval {
             lower: floor_div(&std::ops::Mul::mul(&minimum, &minimum), &self.scale)?,
@@ -140,9 +140,9 @@ impl Grid {
             .checked_mul(2)
             .and_then(|value| value.checked_add(1))
             .ok_or_else(|| Error::Resource("sqrt two scale".into()))?;
-        let value = std::ops::Shl::shl(BigInt::from(1), shift);
+        let value = std::ops::Shl::shl(IBig::from(1), shift);
         let mut root = std::ops::Shl::shl(
-            BigInt::from(1),
+            IBig::from(1),
             self.bits
                 .checked_add(1)
                 .ok_or_else(|| Error::Resource("sqrt two seed".into()))?,
@@ -171,7 +171,7 @@ impl Grid {
         let square = self.square(value)?;
         let mut term = if sine { value.clone() } else { self.integer(1) };
         let mut sum = term.clone();
-        let threshold = BigInt::from(65_536);
+        let threshold = IBig::from(65_536);
         for index in 0..self.limits.taylor_terms {
             let degree = index
                 .checked_mul(2)
@@ -187,7 +187,7 @@ impl Grid {
             let next = self
                 .mul(&term, &square)?
                 .negated()
-                .divided(&BigInt::from(denominator))?;
+                .divided(&IBig::from(denominator))?;
             // For |x|<=4, terms strictly decrease once index>=2. The
             // alternating-series remainder is bounded by the first omitted term.
             let remainder = next.magnitude();
@@ -203,8 +203,8 @@ impl Grid {
         Err(Error::NotCertified)
     }
 }
-pub fn floor_div(numerator: &BigInt, denominator: &BigInt) -> Result<BigInt> {
-    if denominator <= &BigInt::zero() {
+pub fn floor_div(numerator: &IBig, denominator: &IBig) -> Result<IBig> {
+    if denominator <= &IBig::ZERO {
         return Err(Error::Invalid(
             "interval denominator must be positive".into(),
         ));
@@ -217,7 +217,7 @@ pub fn floor_div(numerator: &BigInt, denominator: &BigInt) -> Result<BigInt> {
         quotient
     })
 }
-fn ceil_div(numerator: &BigInt, denominator: &BigInt) -> Result<BigInt> {
+fn ceil_div(numerator: &IBig, denominator: &IBig) -> Result<IBig> {
     Ok(std::ops::Neg::neg(floor_div(
         &std::ops::Neg::neg(numerator),
         denominator,
@@ -227,14 +227,14 @@ fn pi_units(bits: usize) -> Result<Interval> {
     let five = atan_units(5, bits)?;
     let large = atan_units(239, bits)?;
     Ok(five
-        .scaled(&BigInt::from(16))
-        .sub(&large.scaled(&BigInt::from(4))))
+        .scaled(&IBig::from(16))
+        .sub(&large.scaled(&IBig::from(4))))
 }
 fn atan_units(reciprocal: u16, bits: usize) -> Result<Interval> {
-    let scale = std::ops::Shl::shl(BigInt::from(1), bits);
-    let square = std::ops::Mul::mul(BigInt::from(reciprocal), BigInt::from(reciprocal));
-    let mut power = BigInt::from(reciprocal);
-    let mut sum = BigInt::zero();
+    let scale = std::ops::Shl::shl(IBig::from(1), bits);
+    let square = std::ops::Mul::mul(IBig::from(reciprocal), IBig::from(reciprocal));
+    let mut power = IBig::from(reciprocal);
+    let mut sum = IBig::ZERO;
     for index in 0..bits {
         let odd = index
             .checked_mul(2)
@@ -242,7 +242,7 @@ fn atan_units(reciprocal: u16, bits: usize) -> Result<Interval> {
             .ok_or_else(|| Error::Resource("arctangent degree".into()))?;
         let term = std::ops::Div::div(&scale, std::ops::Mul::mul(&power, odd));
         if term.is_zero() {
-            let error = BigInt::from(
+            let error = IBig::from(
                 index
                     .checked_add(1)
                     .ok_or_else(|| Error::Resource("arctangent remainder".into()))?,
@@ -260,4 +260,31 @@ fn atan_units(reciprocal: u16, bits: usize) -> Result<Interval> {
         std::ops::MulAssign::mul_assign(&mut power, &square);
     }
     Err(Error::NotCertified)
+}
+
+#[cfg(test)]
+mod signed_division_tests {
+    use super::{ceil_div, floor_div};
+    use dashu_int::IBig;
+    use googletest::prelude::*;
+    #[gtest]
+    fn interval_endpoints_round_negative_quotients_outward() -> googletest::Result<()> {
+        for (numerator, floor, ceil) in [
+            (-7, -3, -2),
+            (-6, -2, -2),
+            (-5, -2, -1),
+            (-1, -1, 0),
+            (0, 0, 0),
+            (1, 0, 1),
+            (5, 1, 2),
+            (6, 2, 2),
+            (7, 2, 3),
+        ] {
+            let numerator = IBig::from(numerator);
+            let denominator = IBig::from(3);
+            expect_eq!(floor_div(&numerator, &denominator)?, IBig::from(floor));
+            expect_eq!(ceil_div(&numerator, &denominator)?, IBig::from(ceil));
+        }
+        Ok(())
+    }
 }

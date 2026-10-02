@@ -10,7 +10,7 @@ use clang::{Availability, Clang, Entity, EntityKind, Index};
 use super::DynError;
 use super::model::{ApiArgument, ApiItem, overload_key};
 
-const QUEST_ENV_VARS: &[&str] = &["QUEST_DIR", "QUEST_ROOT", "QuEST_DIR", "QuEST_ROOT"];
+const QUEST_ENV_VARS: &[&str] = &["QUEST_ROOT"];
 
 #[derive(Debug, Clone)]
 pub struct QuestRoot {
@@ -203,7 +203,7 @@ fn source_label(prefix: &Path) -> String {
     for variable in QUEST_ENV_VARS {
         if env::var_os(variable)
             .and_then(|value| PathBuf::from(value).canonicalize().ok())
-            .is_some_and(|candidate| candidate == prefix || candidate.starts_with(prefix))
+            .is_some_and(|candidate| candidate == prefix)
         {
             return (*variable).to_owned();
         }
@@ -212,7 +212,7 @@ fn source_label(prefix: &Path) -> String {
         .into_iter()
         .flat_map(|value| env::split_paths(&value).collect::<Vec<_>>())
         .filter_map(|candidate| candidate.canonicalize().ok())
-        .any(|candidate| candidate == prefix || candidate.starts_with(prefix))
+        .any(|candidate| candidate == prefix)
     {
         return "CMAKE_PREFIX_PATH".to_owned();
     }
@@ -395,6 +395,8 @@ fn canonicalize_existing(path: &Path) -> Result<PathBuf, DynError> {
 pub fn fixture_package() -> Result<Option<quest_build::NativePackage>, DynError> {
     let explicitly_selected = QUEST_ENV_VARS
         .iter()
+        // Removed selectors are explicit invalid inputs, not reason to skip a fixture.
+        .chain(["QUEST_DIR", "QuEST_DIR", "QuEST_ROOT"].iter())
         .any(|name| env::var_os(name).is_some())
         || env::var_os("CMAKE_PREFIX_PATH").is_some_and(|value| !value.is_empty());
     let work = tempfile::tempdir()?;

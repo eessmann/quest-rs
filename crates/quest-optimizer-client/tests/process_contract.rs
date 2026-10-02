@@ -18,7 +18,7 @@ fn rejects_malformed_output_and_wrong_seed() -> Result<()> {
     let client = Client::new(path, WorkerLimits::default())?;
     verify_that!(client.request(Request::Capabilities, 42), err(anything()))?;
     let (_dir, path) = script(
-        "cat >/dev/null; printf '%s' '{\"version\":2,\"seed\":0,\"outcome\":{\"Capabilities\":{\"synthesis\":false,\"zx\":false,\"mitm\":false}}}'",
+        "cat >/dev/null; printf '%s' '{\"version\":3,\"seed\":0,\"outcome\":{\"Capabilities\":{\"synthesis\":false,\"zx\":false,\"mitm\":false}}}'",
     )?;
     let client = Client::new(path, WorkerLimits::default())?;
     verify_that!(
@@ -77,7 +77,7 @@ fn memory_limit_is_applied_before_worker_execution() -> Result<()> {
 #[gtest]
 fn bounded_valid_response_and_capability_rejection() -> Result<()> {
     let (_dir, path) = script(
-        "cat >/dev/null; printf '%s' '{\"version\":2,\"seed\":42,\"outcome\":{\"Capabilities\":{\"synthesis\":false,\"zx\":false,\"mitm\":false}}}'",
+        "cat >/dev/null; printf '%s' '{\"version\":3,\"seed\":42,\"outcome\":{\"Capabilities\":{\"synthesis\":false,\"zx\":false,\"mitm\":false}}}'",
     )?;
     let client = Client::new(path, WorkerLimits::default())?;
     verify_that!(
@@ -106,7 +106,7 @@ fn bounded_valid_response_and_capability_rejection() -> Result<()> {
 
 #[gtest]
 fn well_formed_candidates_still_need_independent_mathematical_admission() -> Result<()> {
-    let body = "cat >/dev/null; printf '%s' '{\"version\":2,\"seed\":42,\"outcome\":{\"Candidate\":{\"sequence\":{\"qubits\":1,\"operations\":[]},\"engine\":\"untrusted\",\"precision_bits\":1024}}}'";
+    let body = "cat >/dev/null; printf '%s' '{\"version\":3,\"seed\":42,\"outcome\":{\"Candidate\":{\"sequence\":{\"qubits\":1,\"operations\":[]},\"engine\":\"untrusted\",\"precision_bits\":1024}}}'";
     let (_dir, path) = script(body)?;
     let client = Client::new(path, WorkerLimits::default())?;
     let target = quest_math::Target {
@@ -143,7 +143,7 @@ fn well_formed_candidates_still_need_independent_mathematical_admission() -> Res
 
 #[gtest]
 fn expanded_zx_request_is_distinct_and_parent_certifies_its_response() -> Result<()> {
-    let response = r#"{"version":2,"seed":42,"outcome":{"Candidate":{"sequence":{"qubits":1,"operations":[{"gate":"H","targets":[0],"controls":[]}]},"engine":"expanded-fixture","precision_bits":0}}}"#;
+    let response = r#"{"version":3,"seed":42,"outcome":{"Candidate":{"sequence":{"qubits":1,"operations":[{"gate":"H","targets":[0],"controls":[]}]},"engine":"expanded-fixture","precision_bits":0}}}"#;
     let body = format!(
         "input=$(cat); case \"$input\" in *ZxExpanded*) printf '%s' '{response}' ;; *) exit 7 ;; esac"
     );
@@ -164,7 +164,7 @@ fn expanded_zx_request_is_distinct_and_parent_certifies_its_response() -> Result
 
 #[gtest]
 fn affine_target_is_certified_against_original_identity_after_untrusted_response() -> Result<()> {
-    let body = "cat >/dev/null; printf '%s' '{\"version\":2,\"seed\":42,\"outcome\":{\"Candidate\":{\"sequence\":{\"qubits\":1,\"operations\":[]},\"engine\":\"untrusted\",\"precision_bits\":1024}}}'";
+    let body = "cat >/dev/null; printf '%s' '{\"version\":3,\"seed\":42,\"outcome\":{\"Candidate\":{\"sequence\":{\"qubits\":1,\"operations\":[]},\"engine\":\"untrusted\",\"precision_bits\":1024}}}'";
     let (_dir, path) = script(body)?;
     let client = Client::new(path, WorkerLimits::default())?;
     let target = quest_math::Target {

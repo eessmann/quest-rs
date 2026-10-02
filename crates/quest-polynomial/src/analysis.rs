@@ -1,6 +1,10 @@
 use crate::{
-    Basis, Chebyshev, Complex64, Error, Hermite, Interval, Jacobi, Jet, Laguerre, Laurent,
-    Monomial, Polynomial, Result, finite, zeros,
+    Basis, Chebyshev, Complex64, DynamicShape, Error, Hermite, Interval, Jacobi, Laguerre, Laurent,
+    Monomial, Polynomial, Result, Shape, finite, zeros,
+};
+use quest_numerics::{
+    ad::{Jet, JetBackend},
+    arithmetic::{Backend, ExactConstant, Interval64Backend},
 };
 use std::{
     marker::PhantomData,
@@ -19,14 +23,14 @@ use std::{
 /// }
 /// ```
 #[derive(Debug, Clone)]
-pub struct Conversion<B: Basis = Monomial, S: Basis = Monomial> {
-    source: Polynomial<S>,
+pub struct Conversion<B: Basis = Monomial, S: Basis = Monomial, D: Shape = DynamicShape> {
+    source: Polynomial<S, Complex64, D>,
     polynomial: Polynomial<B>,
     coefficient_error_bound: f64,
 }
-impl<B: Basis, S: Basis> Conversion<B, S> {
+impl<B: Basis, S: Basis, D: Shape> Conversion<B, S, D> {
     #[must_use]
-    pub const fn source(&self) -> &Polynomial<S> {
+    pub const fn source(&self) -> &Polynomial<S, Complex64, D> {
         &self.source
     }
     #[must_use]
@@ -63,24 +67,24 @@ impl Parity for Odd {
 }
 /// Polynomial whose forbidden parity coefficients are exactly zero.
 #[derive(Debug, Clone)]
-pub struct ParityPolynomial<B: Basis, P: Parity> {
-    polynomial: Polynomial<B>,
+pub struct ParityPolynomial<B: Basis, P: Parity, D: Shape = DynamicShape> {
+    polynomial: Polynomial<B, Complex64, D>,
     parity: PhantomData<P>,
 }
-impl<B: Basis, P: Parity> ParityPolynomial<B, P> {
+impl<B: Basis, P: Parity, D: Shape> ParityPolynomial<B, P, D> {
     #[must_use]
-    pub const fn polynomial(&self) -> &Polynomial<B> {
+    pub const fn polynomial(&self) -> &Polynomial<B, Complex64, D> {
         &self.polynomial
     }
     #[must_use]
-    pub fn into_polynomial(self) -> Polynomial<B> {
+    pub fn into_polynomial(self) -> Polynomial<B, Complex64, D> {
         self.polynomial
     }
 }
-impl<B: Basis> Polynomial<B> {
+impl<B: Basis, D: Shape> Polynomial<B, Complex64, D> {
     /// # Errors
     /// Rejects nonsymmetric bases or any nonzero forbidden parity coefficient.
-    pub fn admit_parity<P: Parity>(self) -> Result<ParityPolynomial<B, P>> {
+    pub fn admit_parity<P: Parity>(self) -> Result<ParityPolynomial<B, P, D>> {
         if !self.basis().symmetric() {
             return Err(Error::Parity);
         }
@@ -111,65 +115,14 @@ impl<B: Basis> Polynomial<B> {
         if self.coefficients().iter().any(|c| c.im != 0.0) {
             return Err(Error::NotReal);
         }
-        let zero = Jet::constant(Interval::point(0.0)?)?;
-        if self.is_zero() {
-            return Ok(zero);
-        }
-        // A Laurent storage offset is not a pole when all negative powers vanish.
-        if self.basis().offset() < 0
-            && self
-                .effective_support()
-                .is_some_and(|(first, _)| first >= 0)
-        {
-            let skip = usize::try_from(self.basis().offset().unsigned_abs())
-                .map_err(|_| Error::SupportOverflow)?;
-            let coefficients = self
-                .coefficients()
-                .get(skip..)
-                .ok_or(Error::SupportOverflow)?;
-            return Polynomial::new(Laurent::new(0), coefficients.to_vec(), self.limits())?
-                .jet_interval(x);
-        }
-        let variable = Jet {
-            value: x,
-            first: Interval::point(1.0)?,
-            second: Interval::point(0.0)?,
-        };
-        let mut previous = zero;
-        let mut current = Jet::constant(Interval::point(1.0)?)?;
-        let mut sum = zero;
-        for (i, c) in self.coefficients().iter().enumerate() {
-            if i > 0 {
-                let (a, b, d) = self
-                    .basis()
-                    .interval_recurrence(u32::try_from(i).map_err(|_| Error::SupportOverflow)?)?;
-                let next = variable
-                    .mul(Jet::constant(a)?)?
-                    .add(Jet::constant(b)?)?
-                    .mul(current)?
-                    .sub(previous.mul(Jet::constant(d)?)?)?;
-                previous = current;
-                current = next;
-            }
-            sum = sum.add(current.mul(Jet::constant(Interval::point(c.re)?)?)?)?;
-        }
-        let mut shift = self.basis().offset().unsigned_abs();
-        let mut factor = variable;
-        let mut power = Jet::constant(Interval::point(1.0)?)?;
-        while shift > 0 {
-            if shift & 1 != 0 {
-                power = power.mul(factor)?;
-            }
-            shift >>= 1;
-            if shift > 0 {
-                factor = factor.mul(factor)?;
-            }
-        }
-        if self.basis().offset() < 0 {
-            power = power.recip()?;
-        }
-        sum.mul(power)
+        let mut arithmetic = Interval64Backend;
+        let mut backend = JetBackend(&mut arithmetic);
+        let variable = backend.variable(x)?;
+        self.evaluate_lifted(&mut backend, variable, |coefficient, backend| {
+            Ok(backend.constant(&ExactConstant::Binary64(coefficient.re))?)
+        })
     }
+
     /// Explicit conversion into an unshifted basis, with outward coefficient evidence.
     ///
     /// This cold quadratic operation uses an interval triangular solve. Negative
@@ -177,7 +130,7 @@ impl<B: Basis> Polynomial<B> {
     /// # Errors
     /// Rejects unsupported support, nonfinite arithmetic, unresolved leading
     /// coefficients, or a caller storage/work limit.
-    pub fn to_basis<C: Basis>(&self, target: C) -> Result<Conversion<C, B>> {
+    pub fn to_basis<C: Basis>(&self, target: C) -> Result<Conversion<C, B, D>> {
         if target.offset() != 0 {
             return Err(Error::UnsupportedConversion);
         }
@@ -269,7 +222,7 @@ impl<B: Basis> Polynomial<B> {
     /// Explicit quadratic conversion with interval coefficient error evidence.
     /// # Errors
     /// Rejects negative Laurent powers, excessive work/storage or nonfinite arithmetic.
-    pub fn to_monomial(&self) -> Result<Conversion<Monomial, B>> {
+    pub fn to_monomial(&self) -> Result<Conversion<Monomial, B, D>> {
         if self.basis().offset() < 0 {
             return Err(Error::UnsupportedConversion);
         }
@@ -344,10 +297,10 @@ impl<B: Basis> Polynomial<B> {
         })
     }
 }
-impl Polynomial<Chebyshev> {
+impl<D: Shape> Polynomial<Chebyshev, Complex64, D> {
     /// # Errors
     /// Rejects nonfinite derivative coefficients or budget overflow.
-    pub fn derivative(&self) -> Result<Self> {
+    pub fn derivative(&self) -> Result<Polynomial<Chebyshev>> {
         let mut c = zeros(self.stored_order(), self.limits())?;
         let mut next = Complex64::new(0.0, 0.0);
         let mut after = next;
@@ -370,32 +323,32 @@ impl Polynomial<Chebyshev> {
         if let Some(first) = c.first_mut() {
             *first = first.mul(0.5);
         }
-        Self::new(Chebyshev, c, self.limits())
+        Polynomial::new(Chebyshev, c, self.limits())
     }
 }
-impl Polynomial<Monomial> {
+impl<D: Shape> Polynomial<Monomial, Complex64, D> {
     /// # Errors
     /// Rejects nonfinite derivative coefficients.
-    pub fn derivative(&self) -> Result<Self> {
-        Self::new(Monomial, lowered(self, Ok)?, self.limits())
+    pub fn derivative(&self) -> Result<Polynomial<Monomial>> {
+        Polynomial::new(Monomial, lowered(self, Ok)?, self.limits())
     }
 }
-impl Polynomial<Hermite> {
+impl<D: Shape> Polynomial<Hermite, Complex64, D> {
     /// # Errors
     /// Rejects nonfinite derivative coefficients.
-    pub fn derivative(&self) -> Result<Self> {
-        Self::new(
+    pub fn derivative(&self) -> Result<Polynomial<Hermite>> {
+        Polynomial::new(
             *self.basis(),
             lowered(self, |n| Ok(n * self.basis().scale()))?,
             self.limits(),
         )
     }
 }
-impl Polynomial<Laguerre> {
+impl<D: Shape> Polynomial<Laguerre, Complex64, D> {
     /// Differentiate in the same basis with the original alpha parameter.
     /// # Errors
     /// Rejects nonfinite coefficient arithmetic or exceeded storage limits.
-    pub fn derivative(&self) -> Result<Self> {
+    pub fn derivative(&self) -> Result<Polynomial<Laguerre>> {
         let mut coefficients = zeros(self.stored_order(), self.limits())?;
         let mut tail = Complex64::new(0.0, 0.0);
         for (index, value) in coefficients.iter_mut().enumerate().rev() {
@@ -409,17 +362,17 @@ impl Polynomial<Laguerre> {
             )?;
             *value = tail.mul(-1.0);
         }
-        Self::new(*self.basis(), coefficients, self.limits())
+        Polynomial::new(*self.basis(), coefficients, self.limits())
     }
 }
-impl Polynomial<Jacobi> {
+impl<D: Shape> Polynomial<Jacobi, Complex64, D> {
     /// Differentiate in the same basis with both original parameters.
     ///
     /// The cold quadratic recurrence rounds coefficients to binary64. For a
     /// rigorous original-polynomial derivative use `jet_interval` directly.
     /// # Errors
     /// Rejects nonfinite recurrence arithmetic or exceeded resource limits.
-    pub fn derivative(&self) -> Result<Self> {
+    pub fn derivative(&self) -> Result<Polynomial<Jacobi>> {
         let degree = self.stored_order();
         self.limits().check(degree, 5)?;
         if degree
@@ -463,7 +416,7 @@ impl Polynomial<Jacobi> {
             std::mem::swap(&mut previous, &mut current);
             std::mem::swap(&mut current, &mut next);
         }
-        Self::new(*self.basis(), result, self.limits())
+        Polynomial::new(*self.basis(), result, self.limits())
     }
 }
 fn add_coefficient(values: &mut [Complex64], index: usize, value: Complex64) -> Result<()> {
@@ -471,7 +424,7 @@ fn add_coefficient(values: &mut [Complex64], index: usize, value: Complex64) -> 
     *out = finite(out.add(value))?;
     Ok(())
 }
-impl Polynomial<Laurent> {
+impl<D: Shape> Polynomial<Laurent, Complex64, D> {
     /// Convert an exactly inversion-symmetric Laurent polynomial to Chebyshev
     /// coefficients in `x=(z+z^-1)/2`, using `z^k+z^-k=2*T_k(x)`.
     ///
@@ -481,7 +434,7 @@ impl Polynomial<Laurent> {
     /// The returned l1 coefficient error bounds binary64 rounding in the output.
     /// # Errors
     /// Rejects asymmetry, support/storage/work overflow or nonfinite scaling.
-    pub fn to_chebyshev_symmetric(&self) -> Result<Conversion<Chebyshev, Laurent>> {
+    pub fn to_chebyshev_symmetric(&self) -> Result<Conversion<Chebyshev, Laurent, D>> {
         let degree = self
             .effective_support()
             .map_or(0, |(a, b)| a.unsigned_abs().max(b.unsigned_abs()));
@@ -532,7 +485,7 @@ impl Polynomial<Laurent> {
     }
     /// # Errors
     /// Rejects signed support overflow or nonfinite derivative coefficients.
-    pub fn derivative(&self) -> Result<Self> {
+    pub fn derivative(&self) -> Result<Polynomial<Laurent>> {
         let offset = self
             .basis()
             .offset()
@@ -547,11 +500,11 @@ impl Polynomial<Laurent> {
                 .ok_or(Error::SupportOverflow)?;
             *out = finite(v.mul(f64::from(n)))?;
         }
-        Self::new(Laurent::new(offset), c, self.limits())
+        Polynomial::new(Laurent::new(offset), c, self.limits())
     }
 }
-fn lowered<B: Basis>(
-    p: &Polynomial<B>,
+fn lowered<B: Basis, D: Shape>(
+    p: &Polynomial<B, Complex64, D>,
     scale: impl Fn(f64) -> Result<f64>,
 ) -> Result<Vec<Complex64>> {
     let mut c = zeros(p.stored_order(), p.limits())?;

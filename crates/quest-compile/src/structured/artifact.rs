@@ -21,7 +21,7 @@ fn digest(value: &str) -> String {
         .map(|byte| format!("{byte:02x}"))
         .collect()
 }
-const VERSION: u32 = 1;
+const VERSION: u32 = 3;
 const CONVENTIONS: &str =
     "quest-ssa-v1;target0-lsb;full-phase;signed-controls;binary64-captures;exact-affine-distinct";
 #[derive(Debug, Clone, Copy)]
@@ -87,8 +87,8 @@ struct Publication {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct FiniteSourceEvidence {
-    pub ideal_snapshot: String,
-    pub bound_snapshot: String,
+    pub ideal_snapshot: crate::RegionSnapshotId,
+    pub bound_snapshot: crate::BoundSnapshotId,
     pub bindings: Vec<(u64, usize, u64)>,
     pub occurrences: Vec<OccurrenceEvidence>,
     pub history: Vec<HistoryEvidence>,
@@ -99,16 +99,16 @@ pub struct FiniteSourceEvidence {
 pub struct OccurrenceEvidence {
     pub owner: u64,
     pub index: usize,
-    pub provenance: String,
+    pub provenance: crate::ProvenanceId,
     pub source: Option<(String, usize, usize)>,
     pub targets: Vec<Option<AngleData>>,
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct HistoryEvidence {
-    pub id: String,
+    pub id: crate::ProvenanceId,
     pub source: Option<(u64, usize)>,
-    pub inputs: Vec<String>,
+    pub inputs: Vec<crate::ProvenanceId>,
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -150,16 +150,11 @@ impl AngleData {
         }
     }
     fn angle(&self) -> Result<Angle> {
-        fn ratio(n: &str, d: &str) -> Result<crate::BigRational> {
+        fn ratio(n: &str, d: &str) -> Result<crate::RBig> {
             if n.len() > 5000 || d.len() > 5000 {
                 return Err(ArtifactError::Budget);
             }
-            let n = n.parse::<num_bigint::BigInt>().map_err(invalid)?;
-            let d = d.parse::<num_bigint::BigInt>().map_err(invalid)?;
-            if d <= 0.into() {
-                return Err(invalid("nonpositive exact denominator"));
-            }
-            Ok(crate::BigRational::new(n, d))
+            quest_math::encoding::parse_rational(n, d).map_err(invalid)
         }
         Ok(match self {
             Self::Opaque { bits } => Angle::radians(f64::from_bits(*bits)).map_err(invalid)?,
@@ -496,18 +491,14 @@ impl FiniteSourceEvidence {
                 crate::ProvenanceNode::Source(id) => (Some((id.owner, id.index())), Vec::new()),
                 crate::ProvenanceNode::Rewrite(inputs) => {
                     pending.extend_from_slice(inputs);
-                    (None, inputs.iter().map(|id| format!("{id:?}")).collect())
+                    (None, inputs.to_vec())
                 }
             };
-            history.push(HistoryEvidence {
-                id: format!("{id:?}"),
-                source,
-                inputs,
-            });
+            history.push(HistoryEvidence { id, source, inputs });
         }
         Ok(Self {
-            ideal_snapshot: format!("{:?}", region.source_snapshot_id()),
-            bound_snapshot: format!("{:?}", region.snapshot_id()),
+            ideal_snapshot: region.source_snapshot_id(),
+            bound_snapshot: region.snapshot_id(),
             bindings: region
                 .binding_storage()
                 .iter()
@@ -519,7 +510,7 @@ impl FiniteSourceEvidence {
                 .map(|i| OccurrenceEvidence {
                     owner: i.id().owner,
                     index: i.id().index(),
-                    provenance: format!("{:?}", i.provenance()),
+                    provenance: i.provenance(),
                     source: i
                         .source()
                         .map(|s| (s.source().to_owned(), s.range().start, s.range().end)),
@@ -535,8 +526,8 @@ impl FiniteSourceEvidence {
                 .provenance()
                 .evidence()
                 .iter()
-                .map(|record| serde_json::from_slice(record).map_err(invalid))
-                .collect::<Result<_>>()?,
+                .map(|record| record.as_ref().clone())
+                .collect(),
         })
     }
     fn validate(&self) -> Result<()> {
@@ -547,30 +538,26 @@ impl FiniteSourceEvidence {
         {
             return Err(invalid("nonfinite original binding"));
         }
-        let nodes = self
-            .history
-            .iter()
-            .map(|h| h.id.as_str())
-            .collect::<BTreeSet<_>>();
+        let nodes = self.history.iter().map(|h| &h.id).collect::<BTreeSet<_>>();
         if nodes.len() != self.history.len() {
             return Err(invalid("duplicate provenance identity"));
         }
         let mut degrees = BTreeMap::new();
-        let mut users: BTreeMap<&str, Vec<&str>> = BTreeMap::new();
+        let mut users: BTreeMap<&crate::ProvenanceId, Vec<&crate::ProvenanceId>> = BTreeMap::new();
         let mut queue = std::collections::VecDeque::new();
         for h in &self.history {
             if h.source.is_some() && !h.inputs.is_empty() {
                 return Err(invalid("source provenance inputs"));
             }
-            degrees.insert(h.id.as_str(), h.inputs.len());
+            degrees.insert(&h.id, h.inputs.len());
             if h.inputs.is_empty() {
-                queue.push_back(h.id.as_str());
+                queue.push_back(&h.id);
             }
             for input in &h.inputs {
-                if !nodes.contains(input.as_str()) {
+                if !nodes.contains(input) {
                     return Err(invalid("missing provenance input"));
                 }
-                users.entry(input.as_str()).or_default().push(h.id.as_str());
+                users.entry(input).or_default().push(&h.id);
             }
         }
         let mut visited = 0usize;
@@ -594,7 +581,7 @@ impl FiniteSourceEvidence {
             return Err(invalid("cyclic provenance"));
         }
         for item in &self.occurrences {
-            if !nodes.contains(item.provenance.as_str())
+            if !nodes.contains(&item.provenance)
                 || item.source.as_ref().is_some_and(|(_, a, b)| a > b)
             {
                 return Err(invalid("invalid occurrence provenance"));
@@ -698,7 +685,7 @@ impl Program<Executable> {
         };
         for source in &publication.finite_sources {
             for certificate in &source.certificates {
-                certificate.validate(proof_limits)?;
+                validate_evidence(certificate, proof_limits)?;
             }
         }
         let payload = bounded_json(&publication, limits.bytes)?;
@@ -770,12 +757,12 @@ impl Program<Executable> {
             ..limits
         };
         for evidence in &p.evidence {
-            evidence.validate(proof_limits)?;
+            validate_evidence(evidence, proof_limits)?;
         }
         for evidence in &p.finite_sources {
             evidence.validate()?;
             for certificate in &evidence.certificates {
-                certificate.validate(proof_limits)?;
+                validate_evidence(certificate, proof_limits)?;
             }
         }
         for specialization in &p.specializations {
@@ -863,61 +850,26 @@ fn bounded_json(value: &impl Serialize, limit: usize) -> Result<String> {
     String::from_utf8(writer.bytes).map_err(invalid)
 }
 
-/// Scope of persisted local evidence; historical records never certify the current executable.
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
-#[serde(deny_unknown_fields)]
-pub enum EvidenceScope {
-    HistoricalLocalCertificate,
-}
-/// Historical independently checked rotation certificate data, bound to source/output publications.
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct CompilationEvidence {
-    pub version: u32,
-    /// Explicitly historical diagnostics; these records grant no certified-executable or whole-program error capability.
-    pub scope: EvidenceScope,
-    pub occurrence: String,
-    pub interface: Vec<String>,
-    pub outputs: Vec<String>,
-    pub algorithm: String,
-    pub input: String,
-    pub output: String,
-    pub seed: u64,
-    pub target: serde_json::Value,
-    pub candidate: serde_json::Value,
-    pub epsilon_bits: u64,
-    pub limits: serde_json::Value,
-}
-impl CompilationEvidence {
-    fn validate(&self, limits: ArtifactLimits) -> Result<()> {
-        if self.version != 1 {
-            return Err(ArtifactError::Incompatible);
-        }
-        #[cfg(any(feature = "workers", feature = "synthesis"))]
-        {
-            let target: quest_math::Target =
-                serde_json::from_value(self.target.clone()).map_err(invalid)?;
-            let candidate: quest_math::Sequence =
-                serde_json::from_value(self.candidate.clone()).map_err(invalid)?;
-            let mut policy: quest_math::Limits =
-                serde_json::from_value(self.limits.clone()).map_err(invalid)?;
-            policy.bytes = policy.bytes.min(limits.bytes);
-            policy.gates = policy.gates.min(limits.compile.nodes);
-            policy.taylor_terms = policy.taylor_terms.min(4096);
-            policy.qubits = policy.qubits.min(1);
-            policy.coefficient_bits = policy.coefficient_bits.min(16384);
-            policy.precision_bits = policy.precision_bits.min(4096);
-            quest_math::certify_rotation(&candidate, &target, self.epsilon_bits, policy)
-                .map_err(invalid)?;
-            Ok(())
-        }
-        #[cfg(not(any(feature = "workers", feature = "synthesis")))]
-        {
-            let _ = limits;
-            Err(ArtifactError::Incompatible)
-        }
+pub use quest_language::quantum::evidence::{CompilationEvidence, EvidenceScope};
+fn validate_evidence(evidence: &CompilationEvidence, limits: ArtifactLimits) -> Result<()> {
+    if evidence.version != 3 {
+        return Err(ArtifactError::Incompatible);
     }
+    let mut policy = evidence.limits;
+    policy.bytes = policy.bytes.min(limits.bytes);
+    policy.gates = policy.gates.min(limits.compile.nodes);
+    policy.taylor_terms = policy.taylor_terms.min(4096);
+    policy.qubits = policy.qubits.min(1);
+    policy.coefficient_bits = policy.coefficient_bits.min(16384);
+    policy.precision_bits = policy.precision_bits.min(4096);
+    quest_math::certify_rotation(
+        &evidence.candidate,
+        &evidence.target,
+        evidence.epsilon_bits,
+        policy,
+    )
+    .map_err(invalid)?;
+    Ok(())
 }
 impl Program<Executable> {
     #[must_use]

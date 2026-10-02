@@ -168,7 +168,9 @@ fn higher_degree_symmetric_phases_certify_the_real_parity_wx_response() -> Resul
 }
 #[gtest]
 fn cancellation_heavy_complex_degree64_direct_and_fft_enclosures_overlap() -> Result<()> {
-    use astro_float::{BigFloat, RoundingMode};
+    use dashu_base::Abs;
+    use dashu_float::{Context, round::mode::HalfEven};
+    use quest_qsp::precision::Binary;
     use quest_qsp::precision::{BinaryRounding, checked, exact_from_f64, to_f64};
     let mut binomial = 1_u128;
     let denominator = 1_u128
@@ -186,11 +188,13 @@ fn cancellation_heavy_complex_degree64_direct_and_fft_enclosures_overlap() -> Re
                 .and_then(|v| v.checked_div(u128::from(k)))
                 .ok_or_else(|| std::io::Error::other("binomial coefficient"))?;
         }
-        let fraction = checked(BigFloat::from_u128(binomial, 256).div(
-            &BigFloat::from_u128(denominator, 256),
-            256,
-            RoundingMode::ToEven,
-        ))?;
+        let numerator = Binary::from(binomial).with_precision(256).value();
+        let divisor = Binary::from(denominator).with_precision(256).value();
+        let fraction = checked(
+            Context::<HalfEven>::new(256)
+                .div(numerator.repr(), divisor.repr())?
+                .value(),
+        )?;
         let value = to_f64(&fraction, BinaryRounding::Nearest)?;
         let signed = if k % 2 == 0 { value } else { -value };
         coefficients.push(Complex64::new(0.5 * signed, 0.25 * signed));
@@ -214,10 +218,14 @@ fn cancellation_heavy_complex_degree64_direct_and_fft_enclosures_overlap() -> Re
         .candidate(candidate)
         .policy(CertificationPolicy::default())?
         .certify()?;
-    let mut exact_sum = checked(BigFloat::from_u64(0, 256))?;
+    let mut exact_sum = checked(Binary::ZERO.with_precision(256).value())?;
     for value in target.coefficients() {
-        exact_sum =
-            checked(exact_sum.add(&exact_from_f64(value.re, 256)?, 256, RoundingMode::ToEven))?;
+        let next = exact_from_f64(value.re, 256)?;
+        exact_sum = checked(
+            Context::<HalfEven>::new(256)
+                .add(exact_sum.repr(), next.repr())?
+                .value(),
+        )?;
     }
     expect_true!(exact_sum.abs() < exact_from_f64(1e-16, 256)?);
     expect_that!(tree.report().response().upper_f64(), le(1e-11));

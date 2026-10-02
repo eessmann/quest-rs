@@ -1,0 +1,3 @@
+workload,iterations,nanoseconds,allocations,peak_live_extra_bytes,output_scalars
+native_shared_matrix_oracle_preparation,128,10038500,235136,210183,10
+native_shared_matrix_oracle_zeroed_execution,128,138832625,602112,121312,1024

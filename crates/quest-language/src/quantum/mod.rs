@@ -9,7 +9,7 @@ pub use crate as language;
 pub use crate::rational;
 pub use crate::{
     matrix::{MatrixPolicy, NumericalOperator, UnitaryAdmission},
-    rational::BigRational,
+    rational::RBig,
 };
 pub use error::{Error, Result};
 pub use model::*;
@@ -22,3 +22,5 @@ pub mod matrix {
 
 mod storage;
 pub use storage::RetainedStorage;
+
+pub mod evidence;

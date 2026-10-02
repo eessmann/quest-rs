@@ -1,22 +1,25 @@
 use super::{OfflineError, OfflineResult};
-use crate::precision::{BinaryRounding, checked, exact_from_f64, to_f64};
-use astro_float::{BigFloat, Consts, RoundingMode};
+use crate::precision::{
+    Binary, BinaryRounding, PrecisionError, exact_from_f64, integer, nearest_add, nearest_div,
+    nearest_exp, nearest_mul, nearest_sin_cos, nearest_sqrt, nearest_sub, to_f64, zero,
+};
+use dashu_float::ConstCache;
 #[derive(Clone, Debug)]
 pub(super) struct Number {
-    pub re: BigFloat,
-    pub im: BigFloat,
+    pub re: Binary,
+    pub im: Binary,
 }
 impl Number {
     pub fn zero(p: u32) -> Self {
         Self {
-            re: BigFloat::new(crate::offline::number::precision_bits(p)),
-            im: BigFloat::new(crate::offline::number::precision_bits(p)),
+            re: zero(p),
+            im: zero(p),
         }
     }
     pub fn one(p: u32) -> Self {
         Self {
-            re: BigFloat::from_u64(1, crate::offline::number::precision_bits(p)),
-            im: BigFloat::new(crate::offline::number::precision_bits(p)),
+            re: integer(p, 1),
+            im: zero(p),
         }
     }
     pub fn exact(value: crate::Complex64, p: u32) -> OfflineResult<Self> {
@@ -25,29 +28,29 @@ impl Number {
             im: exact_from_f64(value.im, p)?,
         })
     }
-    pub fn real(re: BigFloat) -> Self {
+    pub fn real(re: Binary) -> Self {
         Self {
-            im: BigFloat::new(bits(&re)),
+            im: Binary::ZERO.with_precision(re.precision()).value(),
             re,
         }
     }
     pub fn is_zero(&self) -> bool {
-        self.re.is_zero() && self.im.is_zero()
+        self.re == Binary::ZERO && self.im == Binary::ZERO
     }
-    pub fn is_finite(&self) -> bool {
+    pub const fn is_finite(&self) -> bool {
         finite(&self.re) && finite(&self.im)
     }
-    pub fn add(&self, rhs: &Self) -> Self {
-        Self {
-            re: add(&self.re, &rhs.re),
-            im: add(&self.im, &rhs.im),
-        }
+    pub fn add(&self, rhs: &Self) -> OfflineResult<Self> {
+        Ok(Self {
+            re: add(&self.re, &rhs.re)?,
+            im: add(&self.im, &rhs.im)?,
+        })
     }
-    pub fn sub(&self, rhs: &Self) -> Self {
-        Self {
-            re: sub(&self.re, &rhs.re),
-            im: sub(&self.im, &rhs.im),
-        }
+    pub fn sub(&self, rhs: &Self) -> OfflineResult<Self> {
+        Ok(Self {
+            re: sub(&self.re, &rhs.re)?,
+            im: sub(&self.im, &rhs.im)?,
+        })
     }
     pub fn neg(&self) -> Self {
         Self {
@@ -61,39 +64,38 @@ impl Number {
             im: neg(&self.im),
         }
     }
-    pub fn mul(&self, rhs: &Self) -> Self {
-        Self {
-            re: sub(&mul(&self.re, &rhs.re), &mul(&self.im, &rhs.im)),
-            im: add(&mul(&self.re, &rhs.im), &mul(&self.im, &rhs.re)),
-        }
+    pub fn mul(&self, rhs: &Self) -> OfflineResult<Self> {
+        Ok(Self {
+            re: sub(&mul(&self.re, &rhs.re)?, &mul(&self.im, &rhs.im)?)?,
+            im: add(&mul(&self.re, &rhs.im)?, &mul(&self.im, &rhs.re)?)?,
+        })
     }
-    pub fn scale(&self, scalar: &BigFloat) -> Self {
-        Self {
-            re: mul(&self.re, scalar),
-            im: mul(&self.im, scalar),
-        }
+    pub fn scale(&self, scalar: &Binary) -> OfflineResult<Self> {
+        Ok(Self {
+            re: mul(&self.re, scalar)?,
+            im: mul(&self.im, scalar)?,
+        })
     }
-    pub fn div(&self, rhs: &Self) -> Self {
-        let denominator = add(&mul(&rhs.re, &rhs.re), &mul(&rhs.im, &rhs.im));
-        let numerator = self.mul(&rhs.conj());
-        Self {
-            re: div(&numerator.re, &denominator),
-            im: div(&numerator.im, &denominator),
-        }
+    pub fn div(&self, rhs: &Self) -> OfflineResult<Self> {
+        let denominator = add(&mul(&rhs.re, &rhs.re)?, &mul(&rhs.im, &rhs.im)?)?;
+        let numerator = self.mul(&rhs.conj())?;
+        Ok(Self {
+            re: div(&numerator.re, &denominator)?,
+            im: div(&numerator.im, &denominator)?,
+        })
     }
-    pub fn abs(&self) -> BigFloat {
-        sqrt(&add(&mul(&self.re, &self.re), &mul(&self.im, &self.im)))
+    pub fn abs(&self) -> OfflineResult<Binary> {
+        sqrt(&add(&mul(&self.re, &self.re)?, &mul(&self.im, &self.im)?)?)
     }
-    pub fn exp(&self, constants: &mut Consts) -> OfflineResult<Self> {
-        let radius = checked(self.re.exp(bits(&self.re), RoundingMode::ToEven, constants))?;
-        let cos = checked(self.im.cos(bits(&self.im), RoundingMode::ToEven, constants))?;
-        let sin = checked(self.im.sin(bits(&self.im), RoundingMode::ToEven, constants))?;
-        let result = Self {
-            re: mul(&radius, &cos),
-            im: mul(&radius, &sin),
-        };
-        result.validate()?;
-        Ok(result)
+    pub fn exp(&self, cache: &mut ConstCache) -> OfflineResult<Self> {
+        let p = u32::try_from(self.re.precision())
+            .map_err(|_| OfflineError::Budget("native precision"))?;
+        let radius = nearest_exp(p, &self.re, cache)?;
+        let (sin, cos) = nearest_sin_cos(p, &self.im, cache)?;
+        Ok(Self {
+            re: mul(&radius, &cos)?,
+            im: mul(&radius, &sin)?,
+        })
     }
     pub fn validate(&self) -> OfflineResult<()> {
         validate(&self.re)?;
@@ -106,65 +108,106 @@ impl Number {
         ))
     }
 }
-// Each represented offline value is an exact dyadic operand for the next
-// rounded operation. NaN/backend errors propagate until the checked boundary.
-pub(super) fn represented(mut value: BigFloat) -> BigFloat {
-    value.set_inexact(false);
-    value
+pub(super) const fn finite(value: &Binary) -> bool {
+    !value.repr().is_infinite()
 }
-pub(super) fn bits(value: &BigFloat) -> usize {
-    value.mantissa_max_bit_len().unwrap_or(64).max(64)
-}
-pub(super) fn finite(value: &BigFloat) -> bool {
-    !value.is_nan() && !value.is_inf()
-}
-pub(super) fn validate(value: &BigFloat) -> OfflineResult<()> {
+pub(super) const fn validate(value: &Binary) -> OfflineResult<()> {
     if finite(value) {
         Ok(())
     } else {
-        checked(value.clone())
-            .map(|_| ())
-            .map_err(OfflineError::from)
+        Err(OfflineError::Precision(PrecisionError::Nonfinite))
     }
 }
-pub(super) fn add(a: &BigFloat, b: &BigFloat) -> BigFloat {
-    represented(a.add(b, bits(a).max(bits(b)), RoundingMode::ToEven))
+pub(super) fn add(a: &Binary, b: &Binary) -> OfflineResult<Binary> {
+    Ok(nearest_add(
+        u32::try_from(a.precision().max(b.precision()))
+            .map_err(|_| OfflineError::Budget("native precision"))?,
+        a,
+        b,
+    )?)
 }
-pub(super) fn sub(a: &BigFloat, b: &BigFloat) -> BigFloat {
-    represented(a.sub(b, bits(a).max(bits(b)), RoundingMode::ToEven))
+pub(super) fn sub(a: &Binary, b: &Binary) -> OfflineResult<Binary> {
+    Ok(nearest_sub(
+        u32::try_from(a.precision().max(b.precision()))
+            .map_err(|_| OfflineError::Budget("native precision"))?,
+        a,
+        b,
+    )?)
 }
-pub(super) fn mul(a: &BigFloat, b: &BigFloat) -> BigFloat {
-    represented(a.mul(b, bits(a).max(bits(b)), RoundingMode::ToEven))
+pub(super) fn mul(a: &Binary, b: &Binary) -> OfflineResult<Binary> {
+    Ok(nearest_mul(
+        u32::try_from(a.precision().max(b.precision()))
+            .map_err(|_| OfflineError::Budget("native precision"))?,
+        a,
+        b,
+    )?)
 }
-pub(super) fn div(a: &BigFloat, b: &BigFloat) -> BigFloat {
-    represented(a.div(b, bits(a).max(bits(b)), RoundingMode::ToEven))
+pub(super) fn div(a: &Binary, b: &Binary) -> OfflineResult<Binary> {
+    Ok(nearest_div(
+        u32::try_from(a.precision().max(b.precision()))
+            .map_err(|_| OfflineError::Budget("native precision"))?,
+        a,
+        b,
+    )?)
 }
-pub(super) fn sqrt(a: &BigFloat) -> BigFloat {
-    represented(a.sqrt(bits(a), RoundingMode::ToEven))
+pub(super) fn sqrt(a: &Binary) -> OfflineResult<Binary> {
+    Ok(nearest_sqrt(
+        u32::try_from(a.precision()).map_err(|_| OfflineError::Budget("native precision"))?,
+        a,
+    )?)
 }
-pub(super) fn neg(a: &BigFloat) -> BigFloat {
-    represented(a.neg())
-}
-
-pub(super) fn negative(value: &BigFloat) -> bool {
-    value.is_negative() && !value.is_zero()
-}
-pub(super) fn positive(value: &BigFloat) -> bool {
-    value.is_positive() && !value.is_zero()
-}
-
 #[expect(
-    clippy::as_conversions,
-    reason = "Context admission checks that configured u32 precision fits usize before any numerical kernel is constructed"
+    clippy::arithmetic_side_effects,
+    reason = "Native represented dyadic negation is exact and cannot overflow"
 )]
-pub(super) const fn precision_bits(p: u32) -> usize {
-    p as usize
+pub(super) fn neg(a: &Binary) -> Binary {
+    -a
 }
-
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::precision::{nearest_cos, nearest_sin};
     use googletest::prelude::*;
+    #[gtest]
+    fn complex_exponential_matches_separate_correctly_rounded_primitives() -> googletest::Result<()>
+    {
+        for precision in [65, 128, 256] {
+            for value in [
+                crate::Complex64::new(0.0, -0.0),
+                crate::Complex64::new(-1.0, 0.25),
+                crate::Complex64::new(0.5, -0.25),
+                crate::Complex64::new(0.0, f64::from_bits(1)),
+                crate::Complex64::new(1.0, 1e20),
+            ] {
+                let point = Number::exact(value, precision)?;
+                let actual = point.exp(&mut ConstCache::default())?;
+                let mut scalar_cache = ConstCache::default();
+                let radius = nearest_exp(precision, &point.re, &mut scalar_cache)?;
+                let re = mul(
+                    &radius,
+                    &nearest_cos(precision, &point.im, &mut scalar_cache)?,
+                )?;
+                let im = mul(
+                    &radius,
+                    &nearest_sin(precision, &point.im, &mut scalar_cache)?,
+                )?;
+                expect_that!(&actual.re, eq(&re));
+                expect_that!(&actual.im, eq(&im));
+                expect_eq!(actual.im.repr().is_neg_zero(), im.repr().is_neg_zero());
+            }
+        }
+        let invalid = Number {
+            re: zero(128),
+            im: Binary::INFINITY,
+        };
+        expect_true!(matches!(
+            invalid.exp(&mut ConstCache::default()),
+            Err(OfflineError::Precision(PrecisionError::Arithmetic(
+                dashu_float::FpError::InfiniteInput
+            )))
+        ));
+        Ok(())
+    }
 
     #[gtest]
     fn exact_subnormal_components_and_zero_arithmetic_keep_configured_precision()
@@ -173,32 +216,28 @@ mod tests {
             crate::Complex64::new(f64::from_bits(1), -f64::from_bits(1)),
             256,
         )?;
-        let result = value.add(&Number::zero(256));
-        expect_that!(bits(&result.re), eq(256));
+        let result = value.add(&Number::zero(256))?;
+        expect_that!(result.re.precision(), eq(256));
         let exported = result.binary64()?;
         expect_that!(exported.re.to_bits(), eq(1));
         expect_that!(exported.im.to_bits(), eq((-f64::from_bits(1)).to_bits()));
         Ok(())
     }
-
     #[gtest]
     fn invalid_arbitrary_arithmetic_reaches_typed_boundary_errors() {
-        let invalid = Number::one(128).div(&Number::zero(128));
         expect_true!(matches!(
-            invalid.validate(),
+            Number::one(128).div(&Number::zero(128)),
             Err(OfflineError::Precision(_))
         ));
-        let invalid_root = sqrt(&BigFloat::from_i64(-1, 128));
         expect_true!(matches!(
-            validate(&invalid_root),
-            Err(OfflineError::Precision(_))
+            sqrt(&integer(128, -1)),
+            Err(OfflineError::Precision(PrecisionError::Arithmetic(
+                dashu_float::FpError::OutOfDomain
+            )))
         ));
-        let backend_failure = BigFloat::nan(Some(astro_float::Error::InvalidArgument));
         expect_true!(matches!(
-            validate(&backend_failure),
-            Err(OfflineError::Precision(
-                crate::precision::PrecisionError::Backend(_)
-            ))
+            validate(&Binary::INFINITY),
+            Err(OfflineError::Precision(PrecisionError::Nonfinite))
         ));
     }
 }

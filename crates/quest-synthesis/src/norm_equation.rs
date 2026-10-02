@@ -2,11 +2,11 @@
 //! Returned roots are always checked algebraically. Failure of this bounded
 //! factor search is unresolved; it is never a proof of mathematical impossibility.
 use crate::{Budget, Result, SynthesisError};
-use num_bigint::BigInt;
-use num_traits::{One, Signed, Zero};
+use dashu_base::{Abs, BitTest, Signed};
+use dashu_int::IBig;
 use std::ops::{Add, Mul, Neg, Sub};
 
-type Ring = [BigInt; 4];
+type Ring = [IBig; 4];
 #[derive(Debug, PartialEq, Eq)]
 pub enum NormOutcome {
     Solution(Ring),
@@ -14,8 +14,8 @@ pub enum NormOutcome {
     Unresolved,
 }
 
-fn check(value: &BigInt, budget: &mut Budget) -> Result<()> {
-    let bits = value.bits();
+fn check(value: &IBig, budget: &mut Budget) -> Result<()> {
+    let bits = u64::try_from(value.bit_len()).unwrap_or(u64::MAX);
     if bits > budget.options.limits.coefficient_bits {
         return Err(SynthesisError::Budget {
             resource: "norm coefficient bits",
@@ -70,14 +70,14 @@ fn bullet([a, b, c, d]: &Ring) -> Ring {
     clippy::many_single_char_names,
     reason = "Names are coefficients in the fixed four-dimensional cyclotomic basis"
 )]
-fn relative_norm([a, b, c, d]: &Ring, budget: &mut Budget) -> Result<(BigInt, BigInt)> {
+fn relative_norm([a, b, c, d]: &Ring, budget: &mut Budget) -> Result<(IBig, IBig)> {
     let n = a.mul(a).add(b.mul(b)).add(c.mul(c)).add(d.mul(d));
     let m = a.mul(b.sub(d)).add(c.mul(b.add(d)));
     check(&n, budget)?;
     check(&m, budget)?;
     Ok((n, m))
 }
-fn field_norm(x: &Ring, budget: &mut Budget) -> Result<BigInt> {
+fn field_norm(x: &Ring, budget: &mut Budget) -> Result<IBig> {
     let (n, m) = relative_norm(x, budget)?;
     let result = (&n).mul(&n).sub((&m).mul(&m).mul(2i32));
     check(&result, budget)?;
@@ -87,7 +87,7 @@ fn field_norm(x: &Ring, budget: &mut Budget) -> Result<BigInt> {
     clippy::arithmetic_side_effects,
     reason = "Arbitrary integers do not overflow; every divisor is checked positive and exponent shifts are bounded"
 )]
-fn floor(n: &BigInt, d: &BigInt) -> BigInt {
+fn floor(n: &IBig, d: &IBig) -> IBig {
     let q = n / d;
     if (n % d).is_negative() {
         (&q).sub(1i32)
@@ -109,7 +109,7 @@ fn remainder(a: &Ring, b: &Ring, budget: &mut Budget) -> Result<Option<Ring>> {
         return Err(SynthesisError::Invalid("zero Euclidean divisor"));
     }
     let lower = numerator.map(|value| floor(&value, &denominator));
-    let mut best: Option<(BigInt, Ring)> = None;
+    let mut best: Option<(IBig, Ring)> = None;
     // All 16 corners surrounding the exact quotient; strict norm descent is checked.
     for mask in 0u8..16 {
         budget.charge(1)?;
@@ -127,7 +127,7 @@ fn remainder(a: &Ring, b: &Ring, budget: &mut Budget) -> Result<Option<Ring>> {
             }
         });
         let multiple = product(b, &q, budget)?;
-        let mut r = std::array::from_fn(|_| BigInt::zero());
+        let mut r = std::array::from_fn(|_| IBig::ZERO);
         for ((out, left), right) in r.iter_mut().zip(a).zip(multiple) {
             *out = left.sub(right);
         }
@@ -154,16 +154,16 @@ fn gcd(mut a: Ring, mut b: Ring, budget: &mut Budget) -> Result<Option<Ring>> {
     reason = "Arbitrary integers do not overflow; every divisor is checked positive and exponent shifts are bounded"
 )]
 fn modular_power(
-    mut base: BigInt,
-    mut exponent: BigInt,
-    modulus: &BigInt,
+    mut base: IBig,
+    mut exponent: IBig,
+    modulus: &IBig,
     budget: &mut Budget,
-) -> Result<BigInt> {
-    let mut out = BigInt::one();
+) -> Result<IBig> {
+    let mut out = IBig::ONE;
     base %= modulus;
     while !exponent.is_zero() {
         budget.charge(1)?;
-        if (&exponent & BigInt::one()).is_one() {
+        if (&exponent & IBig::ONE).is_one() {
             out = (&out).mul(&base) % modulus;
             check(&out, budget)?;
         }
@@ -179,12 +179,12 @@ fn modular_power(
     clippy::arithmetic_side_effects,
     reason = "Arbitrary integers do not overflow; every divisor is checked positive and exponent shifts are bounded"
 )]
-fn sqrt_minus_one(modulus: &BigInt, seed: u64, budget: &mut Budget) -> Result<Option<BigInt>> {
-    if modulus <= &BigInt::one() || (modulus % 4i32) != BigInt::one() {
+fn sqrt_minus_one(modulus: &IBig, seed: u64, budget: &mut Budget) -> Result<Option<IBig>> {
+    if modulus <= &IBig::ONE || (modulus % 4i32) != 1 {
         return Ok(None);
     }
     let exponent = modulus.sub(1i32) / 4i32;
-    let start = BigInt::from(seed).add(2i32);
+    let start = IBig::from(seed).add(2i32);
     for offset in 0u32..32 {
         let root = modular_power(
             (&start).add(offset) % modulus,
@@ -206,12 +206,7 @@ fn sqrt_minus_one(modulus: &BigInt, seed: u64, budget: &mut Budget) -> Result<Op
     clippy::arithmetic_side_effects,
     reason = "Arbitrary integers do not overflow; every divisor is checked positive and exponent shifts are bounded"
 )]
-fn correct_unit(
-    mut root: Ring,
-    n: &BigInt,
-    m: &BigInt,
-    budget: &mut Budget,
-) -> Result<Option<Ring>> {
+fn correct_unit(mut root: Ring, n: &IBig, m: &IBig, budget: &mut Budget) -> Result<Option<Ring>> {
     let (a, b) = relative_norm(&root, budget)?;
     let denominator = (&a).mul(&a).sub((&b).mul(&b).mul(2i32));
     if denominator.is_zero() {
@@ -224,25 +219,25 @@ fn correct_unit(
     }
     let mut u = un / &denominator;
     let mut v = vn / &denominator;
-    if u < BigInt::one() || (&u).mul(&u).sub((&v).mul(&v).mul(2i32)) != BigInt::one() {
+    if u < IBig::ONE || (&u).mul(&u).sub((&v).mul(&v).mul(2i32)) != IBig::ONE {
         return Ok(None);
     }
     let inverse = v.is_negative();
     let unit = [
-        BigInt::from(if inverse { -1 } else { 1 }),
-        BigInt::one(),
-        BigInt::zero(),
-        BigInt::from(-1),
+        IBig::from(if inverse { -1 } else { 1 }),
+        IBig::ONE,
+        IBig::ZERO,
+        IBig::from(-1),
     ];
     while !v.is_zero() {
         budget.charge(1)?;
-        let next_u = (&u).mul(3i32).sub(v.abs().mul(4i32));
+        let next_u = (&u).mul(3i32).sub((&v).abs().mul(4i32));
         let next_v = if inverse {
             (&v).mul(3i32).add((&u).mul(2i32))
         } else {
             (&v).mul(3i32).sub((&u).mul(2i32))
         };
-        if next_u < BigInt::one() || next_u >= u {
+        if next_u < IBig::ONE || next_u >= u {
             return Ok(None);
         }
         root = product(&root, &unit, budget)?;
@@ -264,7 +259,7 @@ fn correct_unit(
     clippy::arithmetic_side_effects,
     reason = "Arbitrary integers do not overflow; every divisor is checked positive and exponent shifts are bounded"
 )]
-pub fn solve(n: &BigInt, m: &BigInt, budget: &mut Budget, seed: u64) -> Result<NormOutcome> {
+pub fn solve(n: &IBig, m: &IBig, budget: &mut Budget, seed: u64) -> Result<NormOutcome> {
     budget.charge(1)?;
     check(n, budget)?;
     check(m, budget)?;
@@ -274,26 +269,19 @@ pub fn solve(n: &BigInt, m: &BigInt, budget: &mut Budget, seed: u64) -> Result<N
         return Ok(NormOutcome::NoSolution);
     }
     if n.is_zero() {
-        return Ok(NormOutcome::Solution(std::array::from_fn(|_| {
-            BigInt::zero()
-        })));
+        return Ok(NormOutcome::Solution(std::array::from_fn(|_| IBig::ZERO)));
     }
     let mut a = n.clone();
     let mut b = m.clone();
-    let mut factor = [
-        BigInt::one(),
-        BigInt::zero(),
-        BigInt::zero(),
-        BigInt::zero(),
-    ];
-    while (&a % 2i32).is_zero() {
+    let mut factor = [IBig::ONE, IBig::ZERO, IBig::ZERO, IBig::ZERO];
+    while (&a % 2i32) == 0 {
         budget.charge(1)?;
-        if (&b % 2i32).is_zero() {
+        if (&b % 2i32) == 0 {
             a /= 2;
             b /= 2;
             factor = product(
                 &factor,
-                &[BigInt::one(), BigInt::zero(), BigInt::one(), BigInt::zero()],
+                &[IBig::ONE, IBig::ZERO, IBig::ONE, IBig::ZERO],
                 budget,
             )?;
         } else {
@@ -303,25 +291,20 @@ pub fn solve(n: &BigInt, m: &BigInt, budget: &mut Budget, seed: u64) -> Result<N
             b = next_b;
             factor = product(
                 &factor,
-                &[BigInt::one(), BigInt::one(), BigInt::zero(), BigInt::zero()],
+                &[IBig::ONE, IBig::ONE, IBig::ZERO, IBig::ZERO],
                 budget,
             )?;
         }
     }
     // Modulo 2, n=A+B and m=AB, A=a+c, B=b+d. Odd n forces even m.
-    if !(&b % 2i32).is_zero() {
+    if (&b % 2i32) != 0 {
         return Ok(NormOutcome::NoSolution);
     }
     let p = (&a).mul(&a).sub((&b).mul(&b).mul(2i32));
     check(&p, budget)?;
     let root = if p.is_one() {
         correct_unit(
-            [
-                BigInt::one(),
-                BigInt::zero(),
-                BigInt::zero(),
-                BigInt::zero(),
-            ],
+            [IBig::ONE, IBig::ZERO, IBig::ZERO, IBig::ZERO],
             &a,
             &b,
             budget,
@@ -332,8 +315,8 @@ pub fn solve(n: &BigInt, m: &BigInt, budget: &mut Budget, seed: u64) -> Result<N
             return Ok(NormOutcome::Unresolved);
         };
         let Some(g) = gcd(
-            [a.clone(), b.clone(), BigInt::zero(), (&b).neg()],
-            [h, BigInt::zero(), BigInt::one(), BigInt::zero()],
+            [a.clone(), b.clone(), IBig::ZERO, (&b).neg()],
+            [h, IBig::ZERO, IBig::ONE, IBig::ZERO],
             budget,
         )?
         else {
@@ -375,13 +358,13 @@ mod tests {
             .add((&b).mul(&b))
             .add((&c).mul(&c))
             .add((&d).mul(&d))
-            != BigInt::from(n)
+            != IBig::from(n)
         {
             return Err(crate::SynthesisError::Invalid(
                 "rational norm component differs",
             ));
         }
-        if (&a).mul((&b).sub(&d)).add((&c).mul((&b).add(&d))) != BigInt::from(m) {
+        if (&a).mul((&b).sub(&d)).add((&c).mul((&b).add(&d))) != IBig::from(m) {
             return Err(crate::SynthesisError::Invalid(
                 "quadratic norm component differs",
             ));

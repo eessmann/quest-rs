@@ -1,10 +1,5 @@
 //! Typed captures keep exact mathematical angles separate from QASM floating values.
 use crate::{Angle, LanguageError};
-#[allow(unused_imports)]
-use crate::{
-    BoundParityPasses, ExactPasses, LinearPasses, NumericalPasses, OracleExport, ParityPasses,
-    TerminalPasses,
-};
 use quest_language::classical::{FloatWidth, ScalarValue};
 use std::collections::BTreeMap;
 mod sealed {

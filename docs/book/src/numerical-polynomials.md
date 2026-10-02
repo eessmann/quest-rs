@@ -1,116 +1,51 @@
-# Numerical polynomials and function expressions
+# Numerical polynomials and functions
 
-The numerical crates work without a native QuEST installation. `quest-numerics` supplies reusable binary64 FFT workspaces and finite real intervals; `quest-polynomial` adds immutable typed polynomials, mathematical functions and approximation. The ordinary build uses sequential scalar binary64 kernels. SIMD and caller-owned Rayon execution are explicit opt-ins; production failure never selects Astro Float.
+`quest-numerics` owns checked arithmetic, outward intervals, automatic differentiation and root contractors. `quest-polynomial` owns expression structure, polynomial mathematics and Remez. Both work without a native QuEST installation. Binary64, binary64 intervals, multiprecision points and multiprecision intervals are explicit, statically dispatched choices. Runtime precision and convergence remain numerical obligations.
 
-The following imports are shared by the executable examples in these chapters:
+## Coefficients, bases and shapes
 
-```rust
-{{#include ../../../crates/quest-qsp/examples/qsp_tutorials.rs:numerical_prelude}}
-```
+`Polynomial<B, C, D>` owns immutable coefficients of type `C`, a basis `B`, and an admitted coefficient shape `D`. `DynamicShape` checks runtime input lengths; `StaticShape<N>` keeps the same length in the type. Coefficients and large numerical workspaces live on the heap. The default complex binary64 coefficient type supports QSP and scientific interchange; it does not determine the approximation backend.
 
-## Bases, coefficients and intervals
-
-`Polynomial<B>` stores immutable complex coefficients in increasing basis order. Choose `Monomial`, `Chebyshev`, `Hermite`, `Laguerre`, `Jacobi` or `Laurent` explicitly. Hermite explicitly selects `physicists()` or `probabilists()`. Laguerre requires finite alpha > -1; Jacobi requires finite alpha and beta > -1 through checked constructors. `Laurent::new(offset)` preserves signed exponent support; nonzero negative effective support has a pole at zero. Real interval evaluation requires real coefficients and a defined finite domain.
+Choose `Monomial`, `Chebyshev`, `Hermite`, `Laguerre`, `Jacobi` or `Laurent`. Recurrence coefficients are computed through the selected backend from original parameters and exact integer constants. Multiprecision evaluation does not lift an already rounded binary64 recurrence. Hermite conventions are explicit; checked Laguerre and Jacobi constructors require their real orthogonality parameters to exceed minus one.
 
 ```rust
 {{#include ../../../crates/quest-qsp/examples/qsp_tutorials.rs:polynomial_interval}}
 ```
 
-This evaluates (0.1+T_2(x)) at (x=0.3), giving approximately (-0.72), and encloses its values throughout a neighboring interval. The derivative remains represented in the selected basis with its original parameters. Conversion is a separate cold operation: `to_monomial()` and `to_basis()` return an immutable `Conversion<Destination, Source>` retaining both payloads and an outward coefficient-error bound. Unsupported support transformations return an error. A conversion bound in an output basis is not automatically a uniform bound on every real domain; the magnitude of that basis on the domain matters.
+`stored_support()` includes zero coefficients; `effective_support()` counts only nonzero terms. The zero polynomial has no mathematical degree. Signed Laurent support retains poles at zero. Conversion retains the original payload and outward rounding evidence; a coefficient bound needs basis/domain information before it implies a uniform error bound. Parity admission checks exact forbidden coefficients and basis symmetry.
 
-`stored_support()` includes retained zero coefficients; `effective_support()`
-includes only nonzero terms. `degree()` is the highest nonzero basis order or
-`None` for the zero polynomial. `stored_order()` is a storage/recurrence quantity.
+## One static function interface
 
-`Even` and `Odd` admission checks exact forbidden coefficients and basis symmetry. Admission consumes the polynomial and returns a parity-bearing type. Tiny forbidden coefficients are not silently discarded. The exact cosine-circle conversion preserves complex coefficients and explicitly rejects inexact subnormal halving.
+`function!(|x| (1.0 + x*x).ln())` produces a concrete `Function<E>`. Arithmetic and exp/log/sine/cosine/square-root nodes share one backend evaluator. `GenericFunction::evaluate`, `first` and `jet` select value, first-order or second-order arithmetic at compile time. The first-order path does not compute unused second derivatives.
 
-## One expression for values and derivatives
+Variable leaves are `Copy`; captured exact decimal and rational constants can be owned and non-`Copy`. `typed::exact(ExactConstant::Decimal(source))` retains the original source. Binary64 constants retain their exact dyadic value. No interpreted `Expr`, dynamic conversion, callback pair or alternate function macro remains.
 
-`function!` constructs one mathematical expression. Scalar values, scalar derivatives and interval derivatives all interpret that same expression; callers do not supply unrelated derivative callbacks. Expressions support arithmetic, exponential, logarithm, sine, cosine and square root. Ordinary Rust ownership applies, so use `x.clone()` when an expression uses its variable more than once.
+Static metadata exposes depth, node and operation counts, input dimensions and derivative-domain requirements. Const construction uses nightly const traits and const operators; owned expression composition uses `const_destruct`. Numerical execution still charges backend calls and checks domains. `generic_const_exprs` remains an incomplete nightly feature; compiler-contract tests and validation records identify the tested compiler revision.
+
+`function!(|x, y| [x*x + y, x*y])` constructs a typed system. Its Jacobian uses the same expression nodes and first-order AD, checked const dimensions, heap-owned derivative rows and explicit `JacobianLimits`.
+
+## One approximation engine
 
 ```rust
 {{#include ../../../crates/quest-qsp/examples/qsp_tutorials.rs:function_remez}}
 ```
 
-The binary64 Remez builder needs a function and closed domain before it can run. Its deterministic pivoted QR uses `faer::Par::Seq`. Success establishes a uniform-error upper bound for the actual exported polynomial and an alternation lower bound for the best degree-bounded approximation. **`tolerance` bounds the gap between these bounds; it does not bound the total approximation error.** For the cubic exponential example, the error is about 0.00553 while the established minimax gap is at most (10^{-8}).
+`RemezRequest` owns the function, exact domain, shape, arithmetic policies, linear solver and limits. Runtime degree selection and `.degree::<N>()` use the same engine; the latter checks `N + 1` coefficients and `N + 2` alternation dimensions in the type system. There is no separate offline exchange loop.
 
-The function and its first two derivatives must have finite interval enclosures on the supplied domain. Stationary-point isolation distinguishes boxes with established root existence and uniqueness from unresolved boxes. A subdivision limit, undefined derivative, failed solve or insufficient enclosure returns an error instead of a sampled-grid certificate. Warm scalar/interval polynomial and function evaluations allocate no heap memory; conversion, root isolation and approximation are cold operations with explicit limits.
+`PivotedQr` retains faer's optimized binary64 QR. `MpHouseholder` uses scaled column-pivoted Householder arithmetic. Both enforce the same numerical rank and backward-residual contract. These candidate checks do not establish a certificate.
 
-Callback-backed functions remain separate and require an explicit consistency assumption for independently supplied callbacks. Use the single-expression representation when mathematical provenance matters.
+`UniformErrorCertificate` bounds the actual selected polynomial's uniform error. `MinimaxGapCertificate` additionally uses strict, ordered alternation to bound its distance from the optimal degree-bounded error. `Accuracy` selects the required meaning independently of precision. For the cubic exponential example, uniform error is about 0.00553 even when the minimax gap is below `1e-8`.
 
-## Static expressions and arithmetic policies
+Critical-point isolation uses the shared deterministic root-cover driver on the residual derivative. Coverage, root existence, at-most-one-root evidence and established uniqueness are separate facts. Narrow boxes may cover repeated roots without proving uniqueness. Identically zero derivatives form a covered continuum. Unresolved branches from exhaustion, arithmetic failure or resolution stalls prevent a global certificate.
 
-`typed_function!(|x| (1.0 + x*x).ln())` retains the concrete expression tree in
-`Function<E>`. Typed nodes are `Copy`; construction, arithmetic operators and
-`static_metadata()` can be used in a const context. Constant-only expressions
-such as `typed_function!(|x| 0.5)` are supported. The existing `Function` default
-remains `Function<Expr>` and `function!` continues to construct the dynamic AST.
-`Function::new(0.5.into())` retains its original inference; direct generic
-construction uses `Function::from_expression(expression)`.
-Static dispatch does not allocate an AST or use a vtable. This API deliberately
-uses nightly `const_trait_impl`, `const_ops` and `generic_const_exprs`.
+The enclosing backend evaluates the complete domain, including outward rounding of exact endpoints. Alternation points must lie inside inward-admitted endpoints, so a rounded rational endpoint cannot create an invalid minimax lower bound. Undefined derivative domains return an error.
 
-Static metadata describes node count, maximum depth, mathematical operation
-count, and the positive arguments/nonzero denominators required by derivative
-jets. Counts saturate at `usize::MAX`; dynamic DAG nodes cache this metadata,
-so inspecting a shared subexpression never expands its whole evaluation tree.
-These are structural facts, not domain proofs or convergence decisions.
-Evaluation still rejects nonfinite arithmetic, invalid domains and trees deeper
-than 256 nodes. `sqrt` has a defined scalar value at zero but its second-order
-jet requires a positive argument.
+Multiprecision requests may certify the MP polynomial directly. Selecting `.export_binary64()` freezes coefficients before certification; the audited enclosing backend checks that each frozen coefficient equals the selected mathematical coefficient. Later exports reuse that payload. Increasing proof precision cannot hide binary64 coefficient rounding error.
 
-All expression forms use the same open `Backend` interface. `ScalarBackend<f64>`
-uses checked binary64 operations; `ScalarBackend<Interval>` uses outward
-interval arithmetic. `JetBackend` lifts either policy, or a non-`Copy` backend,
-to first and second derivatives using the same differentiation rules. An
-external backend controls its own precision, errors and accounting through
-`evaluate_backend` and `jet_backend`; no backend transition occurs implicitly.
-Library error certificates always use the library's outward interval policy.
+Every failure owns its original request, exact inputs, attempted precision, last candidate, partial coverage and resource accounting. `run_with_precisions` follows only its explicitly bounded schedule; it retains one owned target, all attempts, total-work limits and admitted history storage. There is no algorithm fallback or tolerance relaxation.
 
-The arbitrary-precision offline Remez path supplies Astro Float arithmetic to
-this shared evaluator. Captured binary64 constants are injected exactly, rather
-than reparsed as decimal approximations. Each precision attempt reuses the
-original typed expression. Success retains that expression and encloses error
-for the actual exported binary64 coefficients. A terminal failure structurally
-converts the original expression to the compatibility AST in its failure report;
-this conversion retains every captured constant bit. Backend operations consume
-the runtime work budget, and storage admission includes recursive derivative-jet
-temporaries at the maximum requested precision.
+## Evidence and extension boundaries
 
-`RemezBuilder::static_degree(StaticDegree::<N>::new())` selects an optional static
-degree. Its result provides a checked borrow of `&[Complex64; N + 1]` from the very same
-heap-backed polynomial that was certified, without allocating a duplicate array; `N + 2` alternation dimensions are also checked
-for representability during type checking. Options cannot override the static
-degree. Numerical convergence, tolerances, precision, allocation limits and
-certification remain runtime decisions. The dynamic `.degree(n)` path remains
-available; offline precision policy likewise remains explicit and runtime.
+`Expression` is sealed. The single open function interface is `GenericFunction`; `AssumedFunction` retains the explicit premise that implementations evaluate the same pure function and respect backend operations. Custom enclosing backends require their own enclosure assumption. Certificate types carry both admissions; unconditional access is available only for sealed expressions with audited enclosing arithmetic.
 
-`Expression` is sealed. User evaluators implement the open `Callable` interface
-or `GenericCallable` with `AssumedFunction`, and must supply
-`ConsistencyAssumption::SameFunctionAndDerivatives`. The generic callable works
-with arbitrary backend scalar types and conditional automatic derivatives.
-`RemezBuilder::callable(callable, assumption)` admits a native approximation and
-returns `ConditionalRemezResult`, which owns the callable and premise. Its
-`conditional_error_bound` and `conditional_minimax_lower_bound` have meaning
-only under that premise. It cannot convert to a trusted `RemezResult`, and
-custom callable work is not claimed to be bounded by expression metadata.
-Offline Remez certification accepts sealed expressions; custom generic
-callables can be evaluated with an explicit arbitrary-precision backend but
-are not admitted to that unconditional offline report.
-
-
-Native trusted Remez precharges cached expression metadata before domain
-admission, then charges every target/polynomial value and jet traversal against
-the remaining work budget alongside the QR reservation. This prevents a shared
-AST with exponentially many logical visits from expanding before admission.
-Offline `.domain(...)` admits interval geometry only; `.policy(...)` checks
-work/storage limits before evaluating interval derivatives and retains that
-admission charge through all precision attempts. Custom callback work remains
-caller-controlled and conditionally interpreted.
-
-Use `.run_reported()` when a failed native approximation must retain its
-original request. `RemezFailure<E>` owns the typed function, interval, options and
-failure reason, including when reached through the static-degree wrapper.
-`ConditionalRemezFailure<C>` additionally retains the callable premise. The
-existing `.run()` is an error-only compatibility adapter and discards that
-request on failure. These failure reports do not claim approximation evidence.
+`BudgetedBackend` accounts executed application-level operations. It does not claim to measure opaque work or allocations inside transcendental libraries or arbitrary callback code. Interval operations check domain and exponent limits. Production MP point and interval arithmetic use the pinned Dashu backend; independent test bounds use exact rational series and inequalities. The QSP verifier retains separate algorithms and the exact-angle subsystem retains symbolic semantics. Storage accounting follows actual significand words, guard bits and retained constant caches. Opaque work and temporary allocations inside transcendental calls remain outside the modeled operation budget.

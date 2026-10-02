@@ -48,7 +48,6 @@ impl OptimizationReport {
         }
     }
 }
-pub type OptimizationError = SemanticError;
 pub(super) struct Budget {
     remaining: usize,
     limit: usize,
@@ -76,7 +75,7 @@ impl Budget {
 pub fn optimize(
     program: VerifiedProgram,
     limits: OptimizationLimits,
-) -> Result<(VerifiedProgram, OptimizationReport), OptimizationError> {
+) -> Result<(VerifiedProgram, OptimizationReport), SemanticError> {
     preflight(&program, limits)?;
     let mut report = OptimizationReport::new(program.snapshot());
     let mut program = program.into_unverified();

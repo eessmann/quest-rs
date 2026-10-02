@@ -15,8 +15,7 @@
 //! # Ok::<(), quest_compile::Error>(())
 //! ```
 
-mod payload;
-pub use payload::QuantumPayload;
+pub use quest_language::payload::QuantumPayload;
 mod capture;
 pub mod classical;
 mod coherent;
@@ -47,26 +46,28 @@ pub use parity::{
 };
 mod beam;
 mod matrix;
-mod model;
+
 mod optimize;
-#[cfg(any(feature = "workers", feature = "synthesis"))]
+#[cfg(feature = "workers")]
 pub use beam::BeamMitmStatus;
 pub use beam::{BeamOptions, BeamReport};
 mod optimizer_contracts;
 mod terminal;
 pub use terminal::*;
-mod program;
-mod provenance;
-pub use provenance::{ExpansionLimits, ProvenanceGraph, ProvenanceId, ProvenanceNode};
-mod rational;
+
+pub use quest_language::quantum::provenance::{
+    ExpansionLimits, ProvenanceGraph, ProvenanceId, ProvenanceNode,
+};
+
 mod structured;
 mod structured_optimize;
 mod structured_terminal;
 pub use structured_terminal::*;
 mod structured_pipeline;
 pub use quest_language as language;
+pub use quest_language::quantum::evidence::EvidenceLocation;
+pub use quest_language::rational::RBig;
 pub use quest_qasm as qasm;
-pub use rational::BigRational;
 pub use structured::*;
 pub use structured_optimize::{
     StructuredOccurrence, StructuredQuantumError, StructuredQuantumOptions,
@@ -75,38 +76,31 @@ pub use structured_optimize::{
 pub use structured_pipeline::*;
 
 pub use matrix::*;
-pub use model::*;
 pub use optimize::*;
 pub use optimizer_contracts::*;
-pub use program::*;
+pub use quest_language::quantum::model::*;
+pub use quest_language::quantum::program::*;
 
 pub use quest_language::quantum::{Error, Result};
-#[cfg(any(feature = "workers", feature = "synthesis"))]
-impl From<WorkerError> for Error {
-    fn from(error: WorkerError) -> Self {
-        Self::Worker(Box::new(error))
-    }
-}
+mod error;
+pub use error::CompilerError;
 #[cfg(any(feature = "workers", feature = "synthesis"))]
 pub use quest_math as certified;
-#[cfg(any(feature = "workers", feature = "synthesis"))]
+#[cfg(feature = "workers")]
 pub use quest_optimizer_client as optimizer;
 
 #[cfg(any(feature = "workers", feature = "synthesis"))]
 mod workers;
 #[cfg(any(feature = "workers", feature = "synthesis"))]
-#[cfg(any(feature = "workers", feature = "synthesis"))]
 pub use workers::*;
 
-#[cfg(any(feature = "workers", feature = "synthesis"))]
+#[cfg(feature = "workers")]
 mod beam_mitm;
-#[cfg(any(feature = "workers", feature = "synthesis"))]
-#[cfg(any(feature = "workers", feature = "synthesis"))]
+#[cfg(feature = "workers")]
 pub use beam_mitm::*;
-#[cfg(any(feature = "workers", feature = "synthesis"))]
+#[cfg(feature = "workers")]
 mod beam_approx;
-#[cfg(any(feature = "workers", feature = "synthesis"))]
-#[cfg(any(feature = "workers", feature = "synthesis"))]
+#[cfg(feature = "workers")]
 pub use beam_approx::*;
 
 #[cfg(any(feature = "workers", feature = "synthesis"))]
@@ -114,9 +108,9 @@ mod structured_workers;
 #[cfg(any(feature = "workers", feature = "synthesis"))]
 pub use structured_workers::*;
 
-#[cfg(any(feature = "workers", feature = "synthesis"))]
+#[cfg(feature = "workers")]
 pub use beam_approx::ApproximateBeamPasses;
-#[cfg(any(feature = "workers", feature = "synthesis"))]
+#[cfg(feature = "workers")]
 pub use beam_mitm::MeetInTheMiddlePasses;
 pub use linear::LinearPasses;
 pub use optimize::ExactPasses;
@@ -127,15 +121,15 @@ pub use parity::ParityPasses;
 pub use terminal::TerminalPasses;
 #[cfg(any(feature = "workers", feature = "synthesis"))]
 pub use workers::RotationSynthesisPasses;
-#[cfg(any(feature = "workers", feature = "synthesis"))]
+#[cfg(feature = "workers")]
 pub use workers::ZxPasses;
 
 /// Compiler extension traits for shared semantic regions.
 pub mod prelude {
     #[cfg(any(feature = "workers", feature = "synthesis"))]
-    pub use crate::{
-        ApproximateBeamPasses, MeetInTheMiddlePasses, RotationSynthesisPasses, ZxPasses,
-    };
+    pub use crate::RotationSynthesisPasses;
+    #[cfg(feature = "workers")]
+    pub use crate::{ApproximateBeamPasses, MeetInTheMiddlePasses, ZxPasses};
     pub use crate::{
         BoundParityPasses, ExactPasses, LinearPasses, NumericalPasses, OracleExport, ParityPasses,
         TerminalPasses,
@@ -146,3 +140,7 @@ pub mod prelude {
 mod generator;
 #[cfg(any(feature = "workers", feature = "synthesis"))]
 pub use generator::*;
+
+extern crate self as quest_compile;
+#[cfg(feature = "macros")]
+pub use quest_macros::{circuit, circuit_file};

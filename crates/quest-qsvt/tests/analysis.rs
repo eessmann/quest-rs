@@ -316,11 +316,11 @@ fn diagnostic_budget_covers_oracle_decomposition_metadata_before_materializing()
 -> googletest::Result<()> {
     use quest_qsvt::{EncodingBuilder, Left, LogicalSpace, Right};
     let policy = NumericalPolicy::default();
-    let mut body = quest_circuit::QuantumRegionBuilder::new(1, 0)?;
+    let mut body = quest_compile::QuantumRegionBuilder::new(1, 0)?;
     for _ in 0..200 {
-        body.global_phase(quest_circuit::Angle::radians(0.)?, &[])?;
+        body.global_phase(quest_compile::Angle::radians(0.)?, &[])?;
     }
-    let oracle = quest_circuit::OracleFragment::builder(body.finish()?.bind(&[])?)
+    let oracle = quest_compile::OracleFragment::builder(body.finish()?.bind(&[])?)
         .matrix_tolerance(1e-12)?
         .build()?;
     let source = EncodingBuilder::new()

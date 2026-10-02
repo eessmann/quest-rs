@@ -1,28 +1,25 @@
 //! Shared source graph and independent affine replay.
 
+use dashu_base::BitTest;
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::Arc;
 
 use crate::affine::Limits;
-use num_bigint::BigInt;
-use num_rational::Ratio;
-use num_traits::Zero;
 
-use crate::{Error, Result, Symbol};
+use crate::{Error, RBig, Result, Symbol};
 
-pub type Rational = Ratio<BigInt>;
 const MAX_NODES: usize = 16_384;
 pub const MAX_INPUT_BINDINGS: usize = 1 << 20;
 
 #[derive(Debug)]
 pub enum Kind {
-    Radians(Rational),
-    Pi(Rational),
-    Affine(Rational, Rational),
+    Radians(RBig),
+    Pi(RBig),
+    Affine(RBig, RBig),
     Parameter(Symbol),
     Negative(Arc<Source>),
     Sum(Arc<Source>, Arc<Source>),
-    Scale(Arc<Source>, Rational),
+    Scale(Arc<Source>, RBig),
 }
 #[derive(Debug)]
 pub struct Source {
@@ -124,7 +121,7 @@ impl Source {
         }
         Self::unary(Kind::Negative(Arc::clone(child)), child)
     }
-    pub(crate) fn scale(child: &Arc<Self>, factor: Rational) -> Result<Arc<Self>> {
+    pub(crate) fn scale(child: &Arc<Self>, factor: RBig) -> Result<Arc<Self>> {
         Self::unary(Kind::Scale(Arc::clone(child), factor), child)
     }
     fn unary(kind: Kind, child: &Self) -> Result<Arc<Self>> {
@@ -164,7 +161,7 @@ impl Source {
     }
     pub(crate) fn pi_leaves<E>(
         &self,
-        mut check: impl FnMut(&Rational) -> std::result::Result<(), E>,
+        mut check: impl FnMut(&RBig) -> std::result::Result<(), E>,
     ) -> std::result::Result<(), E> {
         let mut result = Ok(());
         self.walk(|node| {
@@ -231,13 +228,13 @@ impl Source {
         }
         output.pop().ok_or(Error::IncorrectAlgebra)
     }
-    pub(crate) fn replay(&self, bindings: &BTreeMap<Symbol, Rational>) -> Result<Linear> {
+    pub(crate) fn replay(&self, bindings: &BTreeMap<Symbol, RBig>) -> Result<Linear> {
         self.replay_checked(bindings, |_, _| Ok(()))
     }
     pub(crate) fn replay_checked<E: From<Error>>(
         &self,
-        bindings: &BTreeMap<Symbol, Rational>,
-        mut check: impl FnMut(&Rational, &Rational) -> std::result::Result<(), E>,
+        bindings: &BTreeMap<Symbol, RBig>,
+        mut check: impl FnMut(&RBig, &RBig) -> std::result::Result<(), E>,
     ) -> std::result::Result<Linear, E> {
         let mut traversal = vec![(self, false)];
         let mut values: Vec<Linear> = Vec::new();
@@ -272,7 +269,7 @@ impl Source {
                 },
                 Kind::Parameter(symbol) => bindings.get(symbol).map_or_else(
                     || Linear {
-                        terms: BTreeMap::from([(*symbol, Rational::from_integer(1.into()))]),
+                        terms: BTreeMap::from([(*symbol, RBig::ONE)]),
                         ..Linear::default()
                     },
                     |value| Linear {
@@ -283,7 +280,7 @@ impl Source {
                 Kind::Negative(_) => values
                     .pop()
                     .ok_or(Error::IncorrectAlgebra)?
-                    .scale(&Rational::from_integer((-1).into()))?,
+                    .scale(&RBig::NEG_ONE)?,
                 Kind::Scale(_, factor) => {
                     values.pop().ok_or(Error::IncorrectAlgebra)?.scale(factor)?
                 }
@@ -300,7 +297,7 @@ impl Source {
         values.pop().ok_or_else(|| Error::IncorrectAlgebra.into())
     }
 }
-pub fn rational_bytes(value: &Rational) -> Result<usize> {
+pub fn rational_bytes(value: &RBig) -> Result<usize> {
     let limb_bytes = |bits: u64| -> Result<usize> {
         usize::try_from(bits.div_ceil(64))
             .map_err(|_| Error::SourceLimit)?
@@ -309,23 +306,25 @@ pub fn rational_bytes(value: &Rational) -> Result<usize> {
             .and_then(|bytes| bytes.checked_add(const { 3 * std::mem::size_of::<usize>() }))
             .ok_or(Error::SourceLimit)
     };
-    limb_bytes(value.numer().bits())?
-        .checked_add(limb_bytes(value.denom().bits())?)
+    limb_bytes(u64::try_from(value.numerator().bit_len()).unwrap_or(u64::MAX))?
+        .checked_add(limb_bytes(
+            u64::try_from(value.denominator().bit_len()).unwrap_or(u64::MAX),
+        )?)
         .ok_or(Error::SourceLimit)
 }
 
 #[derive(Debug, Default, Clone)]
 pub struct Linear {
-    pub radians: Rational,
-    pub pi: Rational,
-    pub terms: BTreeMap<Symbol, Rational>,
+    pub radians: RBig,
+    pub pi: RBig,
+    pub terms: BTreeMap<Symbol, RBig>,
 }
 impl Linear {
     pub fn add(mut self, right: Self) -> Result<Self> {
         self.radians = checked_add(&self.radians, &right.radians)?;
         self.pi = checked_add(&self.pi, &right.pi)?;
         for (symbol, coefficient) in right.terms {
-            let old = self.terms.remove(&symbol).unwrap_or_else(Rational::zero);
+            let old = self.terms.remove(&symbol).unwrap_or(RBig::ZERO);
             let sum = checked_add(&old, &coefficient)?;
             if !sum.is_zero() {
                 self.terms.insert(symbol, sum);
@@ -336,7 +335,7 @@ impl Linear {
         }
         Ok(self)
     }
-    pub fn scale(mut self, factor: &Rational) -> Result<Self> {
+    pub fn scale(mut self, factor: &RBig) -> Result<Self> {
         self.radians = checked_mul(&self.radians, factor)?;
         self.pi = checked_mul(&self.pi, factor)?;
         for coefficient in self.terms.values_mut() {
@@ -353,66 +352,74 @@ fn check_width(bits: u64) -> Result<()> {
         Ok(())
     }
 }
-fn checked_add(left: &Rational, right: &Rational) -> Result<Rational> {
+fn checked_add(left: &RBig, right: &RBig) -> Result<RBig> {
     if left.is_zero() {
         return Ok(right.clone());
     }
     if right.is_zero() {
         return Ok(left.clone());
     }
-    if left.numer() == &std::ops::Neg::neg(right.numer()) && left.denom() == right.denom() {
-        return Ok(Rational::zero());
+    if left.numerator() == &std::ops::Neg::neg(right.numerator())
+        && left.denominator() == right.denominator()
+    {
+        return Ok(RBig::ZERO);
     }
-    let a = left
-        .numer()
-        .bits()
-        .checked_add(right.denom().bits())
+    let a = u64::try_from(left.numerator().bit_len())
+        .unwrap_or(u64::MAX)
+        .checked_add(u64::try_from(right.denominator().bit_len()).unwrap_or(u64::MAX))
         .ok_or(Error::SourceLimit)?;
-    let b = right
-        .numer()
-        .bits()
-        .checked_add(left.denom().bits())
+    let b = u64::try_from(right.numerator().bit_len())
+        .unwrap_or(u64::MAX)
+        .checked_add(u64::try_from(left.denominator().bit_len()).unwrap_or(u64::MAX))
         .ok_or(Error::SourceLimit)?;
     check_width(a.max(b).checked_add(1).ok_or(Error::SourceLimit)?)?;
     check_width(
-        left.denom()
-            .bits()
-            .checked_add(right.denom().bits())
+        u64::try_from(left.denominator().bit_len())
+            .unwrap_or(u64::MAX)
+            .checked_add(u64::try_from(right.denominator().bit_len()).unwrap_or(u64::MAX))
             .ok_or(Error::SourceLimit)?,
     )?;
     let value = std::ops::Add::add(left, right);
-    check_width(value.numer().bits().max(value.denom().bits()))?;
+    check_width(
+        u64::try_from(value.numerator().bit_len())
+            .unwrap_or(u64::MAX)
+            .max(u64::try_from(value.denominator().bit_len()).unwrap_or(u64::MAX)),
+    )?;
     Ok(value)
 }
-fn checked_mul(left: &Rational, right: &Rational) -> Result<Rational> {
+fn checked_mul(left: &RBig, right: &RBig) -> Result<RBig> {
     if left.is_zero() || right.is_zero() {
-        return Ok(Rational::zero());
+        return Ok(RBig::ZERO);
     }
-    if left == &Rational::from_integer(1.into()) {
+    if left == &RBig::ONE {
         return Ok(right.clone());
     }
-    if right == &Rational::from_integer(1.into()) {
+    if right == &RBig::ONE {
         return Ok(left.clone());
     }
-    if left == &Rational::from_integer((-1).into()) {
+    if left == &RBig::NEG_ONE {
         return Ok(std::ops::Neg::neg(right.clone()));
     }
-    if right == &Rational::from_integer((-1).into()) {
+    if right == &RBig::NEG_ONE {
         return Ok(std::ops::Neg::neg(left.clone()));
     }
     check_width(
-        left.numer()
-            .bits()
-            .checked_add(right.numer().bits())
+        u64::try_from(left.numerator().bit_len())
+            .unwrap_or(u64::MAX)
+            .checked_add(u64::try_from(right.numerator().bit_len()).unwrap_or(u64::MAX))
             .ok_or(Error::SourceLimit)?,
     )?;
     check_width(
-        left.denom()
-            .bits()
-            .checked_add(right.denom().bits())
+        u64::try_from(left.denominator().bit_len())
+            .unwrap_or(u64::MAX)
+            .checked_add(u64::try_from(right.denominator().bit_len()).unwrap_or(u64::MAX))
             .ok_or(Error::SourceLimit)?,
     )?;
     let value = std::ops::Mul::mul(left, right);
-    check_width(value.numer().bits().max(value.denom().bits()))?;
+    check_width(
+        u64::try_from(value.numerator().bit_len())
+            .unwrap_or(u64::MAX)
+            .max(u64::try_from(value.denominator().bit_len()).unwrap_or(u64::MAX)),
+    )?;
     Ok(value)
 }

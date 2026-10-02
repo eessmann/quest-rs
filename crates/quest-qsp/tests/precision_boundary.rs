@@ -10,7 +10,7 @@ fn production_kernels_and_native_execution_cannot_dispatch_to_the_cold_backend()
     for module in ["admission.rs", "kernel.rs", "sequence.rs", "stages.rs"] {
         let text = std::fs::read_to_string(crate_root.join("src").join(module))?;
         for forbidden in [
-            "astro_float",
+            "dashu_float::",
             "crate::precision",
             "crate::certification",
             "crate::offline",

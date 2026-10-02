@@ -1,6 +1,6 @@
 //! Native distributed communication-buffer requirements, checked before native entry.
 use crate::{Error, Result};
-use quest_circuit::{
+use quest_compile::{
     ControlState, Operation, OracleFragment, RegionPlan,
     dispatch_recipe::{self, DispatchStep, PrimitiveGate},
 };
@@ -145,7 +145,7 @@ impl<'a> Admission<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use quest_circuit::{Gate, QuantumRegionBuilder};
+    use quest_compile::{Gate, QuantumRegionBuilder};
     #[test]
     fn one_amplitude_per_rank_accepts_diagonal_but_rejects_dense_primitives() {
         for (gate, accepted) in [
@@ -164,7 +164,7 @@ mod tests {
     }
     #[test]
     fn controlled_oracle_dense_embedding_and_cache_profiles_are_admitted() {
-        use quest_circuit::{Control, MatrixPolicy, NumericalOperator};
+        use quest_compile::{Control, MatrixPolicy, NumericalOperator};
         let values = faer::Mat::from_fn(2, 2, |row, col| {
             crate::Complex64::new(f64::from(row != col), 0.)
         });
@@ -199,7 +199,7 @@ mod tests {
     }
     #[test]
     fn negative_phase_controls_admit_the_native_x_wrappers() {
-        use quest_circuit::Control;
+        use quest_compile::Control;
         for (state, accepted) in [(ControlState::One, true), (ControlState::Zero, false)] {
             let mut builder = QuantumRegionBuilder::new(2, 0).unwrap();
             builder

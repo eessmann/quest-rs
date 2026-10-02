@@ -12,7 +12,7 @@ quest-optimizer-protocol.workspace = true
 quest-math = { workspace = true, features = ["serde"] }
 serde_json.workspace = true
 color-eyre = { workspace = true, features = ["track-caller"] }
-num-bigint.workspace = true
+dashu-int.workspace = true
 quest-synthesis = { workspace = true, optional = true }
 quizx = { workspace = true, optional = true }
 
@@ -27,5 +27,5 @@ workspace = true
 
 [dev-dependencies]
 googletest.workspace = true
-quest-circuit = { workspace = true, features = ["workers"] }
+quest-compile = { workspace = true, features = ["workers"] }
 quest-optimizer-client.workspace = true

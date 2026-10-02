@@ -2,8 +2,9 @@ use super::{
     Context, OfflineError as Error, OfflineResult as Result, fft,
     number::{Number, add, div, mul, neg, sqrt, sub, validate},
 };
-use crate::precision::{checked, exact_from_f64};
-use astro_float::{BigFloat, RoundingMode};
+use crate::precision::{
+    Binary, abs, checked, exact_from_f64, integer, nearest_atan, nearest_ln, nearest_sin_cos, zero,
+};
 pub(super) type Matrix = [Number; 4];
 fn at(values: &[Number], index: usize, precision: u32) -> Number {
     values
@@ -22,33 +23,33 @@ pub(super) fn controls(gamma: &[Number], context: &mut Context) -> Result<Vec<Ma
             .ok_or(Error::Budget("offline control work"))?,
     )?;
     let p = context.precision;
-    let one = BigFloat::from_i64(1, crate::offline::number::precision_bits(p));
-    let zero = BigFloat::from_i64(0, crate::offline::number::precision_bits(p));
+    let one = integer(p, 1);
+    let zero = integer(p, 0);
     let mut result = Vec::with_capacity(gamma.len());
     for value in gamma {
         value.validate()?;
         let mut scale = one.clone();
         for component in [&value.re, &value.im] {
-            let magnitude = component.clone().abs();
+            let magnitude = abs(component);
             if magnitude > scale {
                 scale = magnitude;
             }
         }
-        let re = div(&value.re, &scale);
-        let im = div(&value.im, &scale);
-        let scaled_one = div(&one, &scale);
+        let re = div(&value.re, &scale)?;
+        let im = div(&value.im, &scale)?;
+        let scaled_one = div(&one, &scale)?;
         let norm = sqrt(&add(
-            &add(&mul(&re, &re), &mul(&im, &im)),
-            &mul(&scaled_one, &scaled_one),
-        ));
+            &add(&mul(&re, &re)?, &mul(&im, &im)?)?,
+            &mul(&scaled_one, &scaled_one)?,
+        )?)?;
         validate(&norm)?;
         let diagonal = Number {
-            re: div(&scaled_one, &norm),
+            re: div(&scaled_one, &norm)?,
             im: zero.clone(),
         };
         let off = Number {
-            re: div(&re, &norm),
-            im: div(&im, &norm),
+            re: div(&re, &norm)?,
+            im: div(&im, &norm)?,
         };
         result.push([diagonal.clone(), off.clone(), off.conj().neg(), diagonal]);
     }
@@ -57,15 +58,15 @@ pub(super) fn controls(gamma: &[Number], context: &mut Context) -> Result<Vec<Ma
 pub(super) fn completion(
     target: &[Number],
     context: &mut Context,
-) -> Result<(Vec<Number>, Vec<Number>, BigFloat, usize)> {
+) -> Result<(Vec<Number>, Vec<Number>, Binary, usize)> {
     let p = context.precision;
-    let one = BigFloat::from_i64(1, crate::offline::number::precision_bits(p));
+    let one = integer(p, 1);
     let half = exact_from_f64(0.5, p)?;
-    let two = BigFloat::from_i64(2, crate::offline::number::precision_bits(p));
+    let two = integer(p, 2);
     let tolerance = div(
         &exact_from_f64(context.policy.certification.completion_tolerance, p)?,
-        &BigFloat::from_i64(16, crate::offline::number::precision_bits(p)),
-    );
+        &integer(p, 16),
+    )?;
     let mut grid = target
         .len()
         .checked_mul(4)
@@ -83,32 +84,28 @@ pub(super) fn completion(
         for value in &mut values {
             let remainder = sub(
                 &one,
-                &add(&mul(&value.re, &value.re), &mul(&value.im, &value.im)),
-            );
+                &add(&mul(&value.re, &value.re)?, &mul(&value.im, &value.im)?)?,
+            )?;
             validate(&remainder)?;
-            if !remainder.is_positive() || remainder.is_zero() {
+            if remainder <= Binary::ZERO {
                 return Err(Error::Numerical("offline Weiss logarithm domain"));
             }
             *value = Number::real(mul(
                 &half,
-                &checked(remainder.ln(
-                    crate::offline::number::precision_bits(p),
-                    RoundingMode::ToEven,
-                    &mut context.constants,
-                ))?,
-            ));
+                &checked(nearest_ln(p, &remainder, &mut context.cache)?)?,
+            )?);
         }
         fft::transform(&mut values, false, true, context)?;
         for (index, value) in values.iter_mut().enumerate().skip(1) {
             if index <= grid / 2 {
                 *value = Number::zero(p);
             } else {
-                *value = value.scale(&two);
+                *value = value.scale(&two)?;
             }
         }
         fft::transform(&mut values, true, false, context)?;
         for (sample, exponent) in ratio_samples.iter_mut().zip(&values) {
-            *sample = sample.mul(&exponent.neg().exp(&mut context.constants)?);
+            *sample = sample.mul(&exponent.neg().exp(&mut context.cache)?)?;
             sample.validate()?;
         }
         fft::transform(&mut ratio_samples, false, true, context)?;
@@ -117,7 +114,7 @@ pub(super) fn completion(
             .ok_or(Error::Budget("offline ratio support"))?
             .to_vec();
         for value in &mut values {
-            *value = value.exp(&mut context.constants)?;
+            *value = value.exp(&mut context.cache)?;
             if !value.is_finite() {
                 return Err(Error::Numerical("offline Weiss exponential"));
             }
@@ -136,7 +133,7 @@ pub(super) fn completion(
         let first = astar
             .first_mut()
             .ok_or(Error::Numerical("empty complement"))?;
-        first.im = BigFloat::from_i64(0, crate::offline::number::precision_bits(p));
+        first.im = integer(p, 0);
         let residual = completion_residual(&astar, target, context)?;
         if residual <= tolerance {
             return Ok((astar, ratio, residual, grid));
@@ -151,18 +148,17 @@ fn completion_residual(
     astar: &[Number],
     target: &[Number],
     context: &mut Context,
-) -> Result<BigFloat> {
+) -> Result<Binary> {
     let a = fft::convolve(astar, &reverse(astar), context)?;
     let b = fft::convolve(target, &reverse(target), context)?;
     let center = target.len().saturating_sub(1);
-    let mut total =
-        BigFloat::from_i64(0, crate::offline::number::precision_bits(context.precision));
+    let mut total = zero(context.precision);
     for (index, (a, b)) in a.iter().zip(&b).enumerate() {
-        let mut value = a.add(b);
+        let mut value = a.add(b)?;
         if index == center {
-            value = value.sub(&Number::one(context.precision));
+            value = value.sub(&Number::one(context.precision))?;
         }
-        total = add(&total, &value.abs());
+        total = add(&total, &value.abs()?)?;
     }
     validate(&total)?;
     Ok(total)
@@ -196,7 +192,7 @@ fn inverse_node(
         if pivot.is_zero() {
             return Err(Error::Numerical("offline singular inverse pivot"));
         }
-        let reflection = at(target, 0, p).div(&pivot);
+        let reflection = at(target, 0, p).div(&pivot)?;
         let matrix = controls(std::slice::from_ref(&reflection), context)?
             .pop()
             .ok_or(Error::Numerical("offline leaf control"))?;
@@ -240,8 +236,8 @@ fn inverse_node(
         let b_index = upper_len
             .checked_add(index)
             .ok_or(Error::Budget("offline midpoint support"))?;
-        midpoint_a.push(at(&ea, a_index, p).add(&at(&xb, a_index, p)));
-        midpoint_b.push(at(&eb, b_index, p).sub(&at(&xa, b_index, p)));
+        midpoint_a.push(at(&ea, a_index, p).add(&at(&xb, a_index, p))?);
+        midpoint_b.push(at(&eb, b_index, p).sub(&at(&xa, b_index, p))?);
     }
     // The second inverse is invoked only after the completed first-half update.
     let lower = inverse_node(&midpoint_a, &midpoint_b, lower_gamma, context)?;
@@ -258,15 +254,15 @@ fn inverse_node(
         let second = index
             .checked_sub(1)
             .map_or_else(|| Number::zero(p), |i| at(&xx, i, p));
-        xi.push(first.add(&at(&xe, index, p)));
-        eta.push(at(&ee, index, p).sub(&second));
+        xi.push(first.add(&at(&xe, index, p))?);
+        eta.push(at(&ee, index, p).sub(&second)?);
     }
     Ok(InverseNode { xi, eta })
 }
 pub(super) fn real_parity_wx_phases(
     gamma: &[Number],
     context: &mut Context,
-) -> Result<(Vec<BigFloat>, Vec<Matrix>)> {
+) -> Result<(Vec<Binary>, Vec<Matrix>)> {
     context.charge(
         gamma
             .len()
@@ -274,17 +270,11 @@ pub(super) fn real_parity_wx_phases(
             .ok_or(Error::Budget("offline phase work"))?,
     )?;
     let p = context.precision;
-    let two = BigFloat::from_i64(2, crate::offline::number::precision_bits(p));
-    let zero = BigFloat::from_i64(0, crate::offline::number::precision_bits(p));
+    let two = integer(p, 2);
+    let zero = integer(p, 0);
     let mut phases: Vec<_> = gamma
         .iter()
-        .map(|value| {
-            checked(value.re.atan(
-                crate::offline::number::precision_bits(p),
-                RoundingMode::ToEven,
-                &mut context.constants,
-            ))
-        })
+        .map(|value| checked(nearest_atan(p, &value.re, &mut context.cache)?))
         .collect::<std::result::Result<_, _>>()?;
     for index in 0..phases.len() / 2 {
         let mirror = phases
@@ -298,9 +288,9 @@ pub(super) fn real_parity_wx_phases(
                 phases
                     .get(mirror)
                     .ok_or(Error::Numerical("offline phase"))?,
-            ),
+            )?,
             &two,
-        );
+        )?;
         phases
             .get_mut(index)
             .ok_or(Error::Numerical("offline phase"))?
@@ -312,16 +302,7 @@ pub(super) fn real_parity_wx_phases(
     let matrices = phases
         .iter()
         .map(|phase| {
-            let sin = checked(phase.sin(
-                crate::offline::number::precision_bits(p),
-                RoundingMode::ToEven,
-                &mut context.constants,
-            ))?;
-            let cos = checked(phase.cos(
-                crate::offline::number::precision_bits(p),
-                RoundingMode::ToEven,
-                &mut context.constants,
-            ))?;
+            let (sin, cos) = nearest_sin_cos(p, phase, &mut context.cache)?;
             Ok([
                 Number {
                     re: cos.clone(),
@@ -370,24 +351,27 @@ pub(super) fn half_cholesky(c: &[Number], context: &mut Context) -> Result<Vec<N
     for k in 0..n {
         let x = first[k].clone();
         let y = second[k].clone();
-        let scale = sqrt(&add(&mul(&x.abs(), &x.abs()), &mul(&y.abs(), &y.abs())));
+        let scale = sqrt(&add(
+            &mul(&x.abs()?, &x.abs()?)?,
+            &mul(&y.abs()?, &y.abs()?)?,
+        )?)?;
         validate(&scale)?;
-        if scale.is_zero() {
+        if scale == Binary::ZERO {
             return Err(Error::Numerical("offline Half-Cholesky pivot"));
         }
-        let inverse = div(&Number::one(p).re, &scale);
-        let alpha = x.scale(&inverse);
-        let beta = y.scale(&inverse);
+        let inverse = div(&Number::one(p).re, &scale)?;
+        let alpha = x.scale(&inverse)?;
+        let beta = y.scale(&inverse)?;
         let rhs = solution[k].clone();
         let mut previous = Number::real(scale);
         for j in k + 1..n {
             let u = first[j]
-                .mul(&alpha.conj())
-                .add(&second[j].mul(&beta.conj()));
-            let v = second[j].mul(&alpha).sub(&first[j].mul(&beta));
+                .mul(&alpha.conj())?
+                .add(&second[j].mul(&beta.conj())?)?;
+            let v = second[j].mul(&alpha)?.sub(&first[j].mul(&beta)?)?;
             u.validate()?;
             v.validate()?;
-            solution[j] = solution[j].sub(&u.scale(&inverse).mul(&rhs));
+            solution[j] = solution[j].sub(&u.scale(&inverse)?.mul(&rhs)?)?;
             solution[j].validate()?;
             first[j] = previous;
             second[j] = v;
@@ -395,4 +379,50 @@ pub(super) fn half_cholesky(c: &[Number], context: &mut Context) -> Result<Vec<N
         }
     }
     Ok(reverse(&solution))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::offline::{ConstCache, OfflinePolicy};
+    use crate::precision::{nearest_cos, nearest_sin};
+    use googletest::prelude::*;
+
+    #[gtest]
+    fn phase_controls_match_separate_correctly_rounded_primitives() -> googletest::Result<()> {
+        for p in [65, 128, 256] {
+            for values in [vec![0.0], vec![-0.0], vec![0.25, -0.5, 1.0, -0.25]] {
+                let gamma = values
+                    .into_iter()
+                    .map(|value| exact_from_f64(value, p).map(Number::real))
+                    .collect::<std::result::Result<Vec<_>, _>>()?;
+                let mut context = Context::new(gamma.len(), p, OfflinePolicy::default())?;
+                let (phases, matrices) = real_parity_wx_phases(&gamma, &mut context)?;
+                expect_eq!(
+                    context.work,
+                    gamma
+                        .len()
+                        .checked_mul(32)
+                        .and_then(|units| units.checked_mul(usize::try_from(p).ok()?.div_ceil(64)))
+                        .ok_or(Error::Budget("fixture work"))?
+                );
+                expect_eq!(phases.len(), gamma.len());
+                let mut scalar_cache = ConstCache::default();
+                for (phase, matrix) in phases.iter().zip(matrices) {
+                    let sin = nearest_sin(p, phase, &mut scalar_cache)?;
+                    let cos = nearest_cos(p, phase, &mut scalar_cache)?;
+                    let expected = [cos.clone(), sin.clone(), neg(&sin), cos];
+                    for (actual, expected) in matrix.iter().zip(expected) {
+                        expect_eq!(&actual.re, &expected);
+                        expect_eq!(
+                            actual.re.repr().is_neg_zero(),
+                            expected.repr().is_neg_zero()
+                        );
+                        expect_eq!(&actual.im, &integer(p, 0));
+                    }
+                }
+            }
+        }
+        Ok(())
+    }
 }

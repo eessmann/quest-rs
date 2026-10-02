@@ -12,7 +12,7 @@ num-complex.workspace = true
 quest-qsp.workspace = true
 quest-polynomial.workspace = true
 quest-numerics.workspace = true
-quest-circuit.workspace = true
+quest-compile.workspace = true
 faer = { workspace = true, default-features = false, features = ["std", "linalg"] }
 
 [dev-dependencies]

@@ -5,7 +5,7 @@ Native discovery lives in the shared `quest-build` crate. The tested installed
 build recipe is Linux GNU with CMake and a C++20 compiler.
 
 Set `QUEST_ROOT` to the installation prefix, or select its package with
-`QuEST_DIR` or `CMAKE_PREFIX_PATH`. CXX generates bridge sources; CMake compiles
+`QUEST_ROOT` (the exact installation prefix) or `CMAKE_PREFIX_PATH`. CXX generates bridge sources; CMake compiles
 the static bridge against `QuEST::QuEST`, consuming its public usage requirements.
 The installed library must resolve its own dependencies, including private GPU
 libraries. Local native installs can opt into CMake's
@@ -58,7 +58,9 @@ every native feature is supported by the facade.
 
 Edit the adapter registry and generator templates together, then regenerate with
 `cargo run -p xtask -- generate-quest-bindings`. `--check` verifies freshness.
-Generation requires libclang; consuming this crate does not.
+Generation requires libclang and the checked-in reviewed `generated_adapters.json`
+registry; missing registry data fails instead of recreating adapters from a
+coverage receipt. Consuming this crate does not require libclang.
 
 With the optional `mpi` feature, `quest_sys::mpi` owns an official rsmpi
 `Universe` and three rsmpi `SimpleCommunicator` contexts per communicator.

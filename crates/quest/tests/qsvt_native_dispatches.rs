@@ -1,7 +1,7 @@
 #![cfg(feature = "qsvt")]
 use googletest::prelude::*;
 use quest::{Complex64 as C, Environment, QubitCount};
-use quest_circuit::{
+use quest_compile::{
     Angle, Control, ControlState, Gate, NumericalOperator, OracleFragment, QuantumRegionBuilder,
 };
 use quest_qsp::{PhaseSequence, WxSymmetric};

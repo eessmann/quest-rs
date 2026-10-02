@@ -1,9 +1,4 @@
 //! Conservative composition of analysis, exact SSA cleanup and terminal fusion.
-#[allow(unused_imports)]
-use crate::{
-    BoundParityPasses, ExactPasses, LinearPasses, NumericalPasses, OracleExport, ParityPasses,
-    TerminalPasses,
-};
 use crate::{
     BudgetCategory, BudgetLease, BudgetLedger, CostComparison, CostProfile, LanguageError,
     OptimizationOptions, Program, QuantumRegionBuilder, StructuredQuantumOptions,

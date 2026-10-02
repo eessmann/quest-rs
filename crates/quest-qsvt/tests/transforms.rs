@@ -1,6 +1,6 @@
 use faer::mat;
 use googletest::prelude::*;
-use quest_circuit::{NumericalOperator, OracleFragment, QuantumRegionBuilder};
+use quest_compile::{NumericalOperator, OracleFragment, QuantumRegionBuilder};
 use quest_qsp::{ControlSequence, PhaseSequence, WxSymmetric};
 use quest_qsvt::{
     Complex64, EncodingBuilder, Left, LogicalSpace, NumericalPolicy, ProjectedEncoding, Right,

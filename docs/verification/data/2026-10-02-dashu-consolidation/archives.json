@@ -1,0 +1,30 @@
+{
+  "historical-astro-rug-primitive-source.tar.gz": {
+    "bytes": 7558,
+    "sha256": "3514c8e1f648badfebe8aab0eb5cd5e4569a5fe05a38f344a34f483499cc3329"
+  },
+  "mp-solvers-final.tar.gz": {
+    "bytes": 71923,
+    "sha256": "4b693f56353db0b2651717cc62722e4fce451314b21708c5d36fc7dcf796024f"
+  },
+  "mp-solvers-pre-optimization.tar.gz": {
+    "bytes": 72004,
+    "sha256": "0a11900ab1ea826900f045bc64f8f0d0777d1cea8fa9b36a009414ad1b41e7c7"
+  },
+  "pre-port-source.tar.gz": {
+    "bytes": 1333420,
+    "sha256": "fbfc00e6071b7733ba344760c6f4035cba8f7a8234e8dcab65ee97ca744465b9"
+  },
+  "primitives.tar.gz": {
+    "bytes": 4081,
+    "sha256": "22bdd3fab8492a90b2d7baeb54dfb6b925c2999ef9cd9c6254585389e5d883a3"
+  },
+  "project-final.tar.gz": {
+    "bytes": 163308,
+    "sha256": "e3a713e6aef54b13f49ddfec8f6c852308bc443a6f3293364f42b7e936318b68"
+  },
+  "project-pre-optimization.tar.gz": {
+    "bytes": 163401,
+    "sha256": "9d55ae36ac63632e0eb536f52c88175500e3acb87540f4245e395a3fb8045904"
+  }
+}

@@ -4,7 +4,7 @@
 //! binary precision, exports binary64 controls once, and independently certifies that
 //! export. A retry reconstructs all numerical state from the original coefficients.
 //! Certification failure retains the original input and last frozen export.
-//! The candidate production reconstruction diagnostic is unavailable (`+infinity`);
+//! The candidate production reconstruction diagnostic is unavailable (`None`);
 //! use the finite independent reconstruction bound in the certified report.
 //!
 //! Available only with `offline-synthesis`, which also enables `certification`.
@@ -15,16 +15,16 @@
 //! path projects, chops or rescales the source.
 //!
 //! Computation starts at 128 bits by default and can double to 4096 bits.
-//! Precision limits are multiples of the backend word size. Each attempt
+//! Precision limits accept individual bits. Each attempt
 //! computes in arbitrary precision, exports binary64 values and invokes the
 //! separate verifier. [`OfflineSolution`] is available only after that export
 //! passes independent certification. More computation precision cannot promise
 //! success below the final binary64 export's attainable error.
 //!
-//! [`OfflineRemezBuilder`] is the separate function-approximation entry point.
-//! Its total uniform-error tolerance differs from the binary64 polynomial
-//! builder's minimax-gap tolerance. The numerical exchange gap is not a minimax
-//! certificate; the final exported polynomial receives a full-domain error bound.
+//! Function approximation uses [`quest_polynomial::RemezRequest`] with an
+//! explicitly selected binary64 or arbitrary-precision backend. Its uniform
+//! error and minimax-gap certificates are distinct. Select binary64 export
+//! before solving, then admit parity and contractivity before QSP synthesis.
 //!
 //! ```
 //! use quest_polynomial::{Basis, Laurent, Limits, Polynomial};
@@ -36,32 +36,31 @@
 //! assert!(solved.certified().report().response().upper_f64() <= 1e-11);
 //! # Ok::<(), Box<dyn std::error::Error>>(())
 //! ```
-use crate::precision::{BinaryRounding, checked, exact_from_f64, to_f64};
+
 mod fft;
 mod kernels;
 mod number;
-mod remez;
 use crate::certification::{
     CertificationBuilder, CertificationError, CertificationMode, CertificationPolicy, Certified,
     MpComplex, MpInterval,
 };
+use crate::precision::{
+    Binary, BinaryRounding, checked, down_sub, exact_from_f64, integer, to_f64, up_add, up_div,
+    up_mul, up_pi, zero,
+};
 use crate::{
     AdmittedTarget, Complex64, Control, FrozenCandidate, RealParityWx, UnitCircleResponse,
 };
-use astro_float::{BigFloat, Consts, RoundingMode};
+use dashu_float::ConstCache;
 use number::Number;
 use quest_polynomial::{Basis, Chebyshev, Laurent, Polynomial};
-pub use remez::{
-    ApproximationFailure, FunctionDomain, MissingFunction, OfflineApproximation,
-    OfflineRemezBuilder, OfflineRemezPolicy, OriginalFunction, ReadyRemez,
-};
 use std::{
     collections::BTreeMap,
     marker::PhantomData,
     sync::Arc,
     time::{Duration, Instant},
 };
-/// Result of explicit arbitrary-precision synthesis or approximation.
+/// Result of explicit arbitrary-precision synthesis.
 pub type OfflineResult<T> = std::result::Result<T, OfflineError>;
 /// Typed offline failures, with reports when final precision or certification fails.
 #[derive(Debug, thiserror::Error)]
@@ -69,8 +68,6 @@ pub type OfflineResult<T> = std::result::Result<T, OfflineError>;
 pub enum OfflineError {
     #[error(transparent)]
     Precision(#[from] crate::precision::PrecisionError),
-    #[error("offline constant cache: {0:?}")]
-    Constants(astro_float::Error),
     #[error("offline policy: {0}")]
     Policy(&'static str),
     #[error("offline source domain: {0}")]
@@ -89,18 +86,12 @@ pub enum OfflineError {
         report: Box<OfflineReport>,
         source: Box<CertificationError>,
     },
-    #[error("uniform approximation not established within configured precision and error budgets")]
-    ApproximationNotEstablished { report: Box<ApproximationFailure> },
-    #[error(transparent)]
-    Polynomial(#[from] quest_polynomial::Error),
-    #[error(transparent)]
-    Numerics(#[from] quest_numerics::Error),
     #[error("offline rigorous numerical admission failed: {0}")]
     Admission(#[from] CertificationError),
 }
 /// Computation precision and resources, with a separate final verification policy.
 ///
-/// Precision limits are whole backend words and must satisfy
+/// Precision limits select individual bits and must satisfy
 /// `64 <= initial_precision <= max_precision <= 1_048_576`. Byte and work
 /// limits model algorithmic resources; backend internal temporary allocation
 /// and transcendental iterations are not a process-wide quota.
@@ -142,15 +133,6 @@ impl Default for OfflinePolicy {
 }
 impl OfflinePolicy {
     fn validate(self) -> OfflineResult<()> {
-        let word_bits = u32::try_from(astro_float::WORD_BIT_SIZE)
-            .map_err(|_| OfflineError::Policy("backend word size"))?;
-        if !self.initial_precision.is_multiple_of(word_bits)
-            || !self.max_precision.is_multiple_of(word_bits)
-        {
-            return Err(OfflineError::Policy(
-                "precision must be a whole backend word",
-            ));
-        }
         if self.initial_precision < 64
             || self.max_precision < self.initial_precision
             || self.max_precision > 1_048_576
@@ -175,9 +157,7 @@ impl OfflinePolicy {
             return Err(OfflineError::Policy("nonzero budgets required"));
         }
         let certification = self.certification;
-        if !certification.initial_precision.is_multiple_of(word_bits)
-            || !certification.max_precision.is_multiple_of(word_bits)
-            || certification.initial_precision < 64
+        if certification.initial_precision < 64
             || certification.max_precision < certification.initial_precision
             || certification.max_precision > 1_048_576
             || certification.max_coefficients == 0
@@ -413,7 +393,7 @@ pub struct OfflineAttempt {
     work: usize,
     computation: Duration,
     certification: Duration,
-    completion_residual: Option<BigFloat>,
+    completion_residual: Option<Binary>,
 }
 impl OfflineAttempt {
     /// Actual computation precision in bits.
@@ -443,7 +423,7 @@ impl OfflineAttempt {
     }
     /// Arbitrary-precision completion diagnostic, when computation completed.
     #[must_use]
-    pub const fn completion_residual(&self) -> Option<&BigFloat> {
+    pub const fn completion_residual(&self) -> Option<&Binary> {
         self.completion_residual.as_ref()
     }
 }
@@ -453,7 +433,7 @@ pub struct OfflineReport {
     source: Arc<Vec<Complex64>>,
     attempts: Vec<OfflineAttempt>,
     last_export: Option<ExportSnapshot>,
-    contractivity_upper: Option<BigFloat>,
+    contractivity_upper: Option<Binary>,
 }
 impl OfflineReport {
     /// Original Chebyshev source or zero-padded `unit_circle_response` power coefficients.
@@ -473,25 +453,30 @@ impl OfflineReport {
     }
     /// Directed contractivity upper bound from the last completed computation.
     #[must_use]
-    pub const fn contractivity_upper(&self) -> Option<&BigFloat> {
+    pub const fn contractivity_upper(&self) -> Option<&Binary> {
         self.contractivity_upper.as_ref()
     }
 }
 struct Context {
-    constants: Consts,
     precision: u32,
     policy: OfflinePolicy,
     work: usize,
     bytes: usize,
     count: usize,
+    cache: ConstCache,
     roots: BTreeMap<usize, Arc<Vec<Number>>>,
 }
 fn modeled_scalar_bytes(precision: u32) -> OfflineResult<usize> {
-    usize::try_from(precision)
-        .map_err(|_| OfflineError::Budget("precision bytes"))?
-        .div_ceil(8)
-        .checked_add(size_of::<BigFloat>())
-        .ok_or(OfflineError::Budget("precision bytes"))
+    usize::try_from(
+        precision
+            .checked_add(1)
+            .ok_or(OfflineError::Budget("guard-bit storage"))?,
+    )
+    .map_err(|_| OfflineError::Budget("precision bytes"))?
+    .div_ceil(64)
+    .checked_mul(8)
+    .and_then(|bytes| bytes.checked_add(size_of::<Binary>()))
+    .ok_or(OfflineError::Budget("precision bytes"))
 }
 impl Context {
     fn new(count: usize, precision: u32, policy: OfflinePolicy) -> OfflineResult<Self> {
@@ -500,42 +485,31 @@ impl Context {
             .ok_or(OfflineError::Budget("offline source support"))?;
         let bytes = Self::modeled_storage(count, precision, policy, grid)?;
         Ok(Self {
-            constants: Consts::new().map_err(OfflineError::Constants)?,
             precision,
             policy,
             work: 0,
             bytes,
             count,
+            cache: ConstCache::default(),
             roots: BTreeMap::new(),
         })
     }
-    fn exp(&mut self, value: &BigFloat) -> OfflineResult<BigFloat> {
-        Ok(checked(value.exp(
-            number::precision_bits(self.precision),
-            RoundingMode::ToEven,
-            &mut self.constants,
-        ))?)
-    }
-    fn ln(&mut self, value: &BigFloat) -> OfflineResult<BigFloat> {
-        Ok(checked(value.ln(
-            number::precision_bits(self.precision),
-            RoundingMode::ToEven,
-            &mut self.constants,
-        ))?)
-    }
-    fn sin(&mut self, value: &BigFloat) -> OfflineResult<BigFloat> {
-        Ok(checked(value.sin(
-            number::precision_bits(self.precision),
-            RoundingMode::ToEven,
-            &mut self.constants,
-        ))?)
-    }
-    fn cos(&mut self, value: &BigFloat) -> OfflineResult<BigFloat> {
-        Ok(checked(value.cos(
-            number::precision_bits(self.precision),
-            RoundingMode::ToEven,
-            &mut self.constants,
-        ))?)
+    // Called once at the end of each owned-cache attempt; include actual retained words.
+    fn admit_cache(&mut self) -> OfflineResult<()> {
+        let cache_bytes = self
+            .cache
+            .total_words()
+            .checked_mul(size_of::<dashu_int::Word>())
+            .and_then(|n| n.checked_add(size_of::<ConstCache>()))
+            .ok_or(OfflineError::Budget("constant cache storage"))?;
+        self.bytes = self
+            .bytes
+            .checked_add(cache_bytes)
+            .ok_or(OfflineError::Budget("constant cache storage"))?;
+        if self.bytes > self.policy.max_bytes {
+            return Err(OfflineError::Budget("constant cache storage"));
+        }
+        Ok(())
     }
     fn charge(&mut self, units: usize) -> OfflineResult<()> {
         let limbs = usize::try_from(self.precision)
@@ -620,7 +594,7 @@ fn original<M: CertificationMode>(
         if index % 2 != source.degree % 2 {
             continue;
         }
-        let value = Number::exact(*value, p)?.scale(&half);
+        let value = Number::exact(*value, p)?.scale(&half)?;
         let high = source
             .degree
             .checked_add(index)
@@ -635,12 +609,12 @@ fn original<M: CertificationMode>(
             let out = result
                 .get_mut(slot)
                 .ok_or(OfflineError::Numerical("conversion support"))?;
-            *out = out.add(&value);
+            *out = out.add(&value)?;
         }
     }
     Ok(result)
 }
-fn contractivity(target: &[Number], context: &mut Context) -> OfflineResult<BigFloat> {
+fn contractivity(target: &[Number], context: &mut Context) -> OfflineResult<Binary> {
     let p = context.precision;
     let exact: Vec<_> = target
         .iter()
@@ -651,38 +625,27 @@ fn contractivity(target: &[Number], context: &mut Context) -> OfflineResult<BigF
             ))
         })
         .collect::<std::result::Result<_, CertificationError>>()?;
-    let mut norm = BigFloat::from_i64(0, number::precision_bits(p));
-    let mut derivative = BigFloat::from_i64(0, number::precision_bits(p));
+    let mut norm = zero(p);
+    let mut derivative = zero(p);
     for (index, value) in exact.iter().enumerate() {
         let magnitude = value.magnitude()?;
-        norm = checked(norm.add(
+        norm = checked(up_add(p, &norm, magnitude.upper())?)?;
+        let term = checked(up_mul(
+            p,
             magnitude.upper(),
-            number::precision_bits(p),
-            RoundingMode::Up,
-        ))?;
-        let term = checked(magnitude.upper().mul(
-            &BigFloat::from_u64(
+            &integer(
+                p,
                 u64::try_from(index).map_err(|_| OfflineError::Budget("integer interchange"))?,
-                number::precision_bits(p),
             ),
-            number::precision_bits(p),
-            RoundingMode::Up,
-        ))?;
-        derivative = checked(derivative.add(&term, number::precision_bits(p), RoundingMode::Up))?;
+        )?)?;
+        derivative = checked(up_add(p, &derivative, &term)?)?;
     }
-    let threshold = checked(BigFloat::from_u64(1, number::precision_bits(p)).sub(
-        &exact_from_f64(context.policy.contractivity_margin, p)?,
-        number::precision_bits(p),
-        RoundingMode::Down,
-    ))?;
+    let margin = exact_from_f64(context.policy.contractivity_margin, p)?;
+    let threshold = checked(down_sub(p, &integer(p, 1), &margin)?)?;
     if norm < threshold {
         return Ok(norm);
     }
-    let pi = checked(
-        context
-            .constants
-            .pi(number::precision_bits(p), RoundingMode::Up),
-    )?;
+    let pi = checked(up_pi(p, &mut context.cache)?)?;
     let mut grid = target
         .len()
         .checked_mul(4)
@@ -702,23 +665,23 @@ fn contractivity(target: &[Number], context: &mut Context) -> OfflineResult<BigF
         let (samples, work, bytes) = crate::certification::circle_values(&exact, grid, p, policy)?;
         context.consume(work)?;
         context.bytes = context.bytes.max(bytes);
-        let mut maximum = BigFloat::from_i64(0, number::precision_bits(p));
+        let mut maximum = zero(p);
         for value in samples {
             let magnitude = value.magnitude()?;
             if magnitude.upper() > &maximum {
                 maximum.clone_from(magnitude.upper());
             }
         }
-        let numerator = checked(pi.mul(&derivative, number::precision_bits(p), RoundingMode::Up))?;
-        let correction = checked(numerator.div(
-            &BigFloat::from_u64(
+        let numerator = checked(up_mul(p, &pi, &derivative)?)?;
+        let correction = checked(up_div(
+            p,
+            &numerator,
+            &integer(
+                p,
                 u64::try_from(grid).map_err(|_| OfflineError::Budget("integer interchange"))?,
-                number::precision_bits(p),
             ),
-            number::precision_bits(p),
-            RoundingMode::Up,
-        ))?;
-        let upper = checked(maximum.add(&correction, number::precision_bits(p), RoundingMode::Up))?;
+        )?)?;
+        let upper = checked(up_add(p, &maximum, &correction)?)?;
         if upper < threshold {
             return Ok(upper);
         }
@@ -739,8 +702,8 @@ fn freeze<M: CertificationMode>(
     target: &[Number],
     astar: &[Number],
     gamma: &[Number],
-    norm: &BigFloat,
-    residual: &BigFloat,
+    norm: &Binary,
+    residual: &Binary,
     grid: usize,
     context: &mut Context,
 ) -> OfflineResult<FrozenCandidate<M>> {
@@ -821,6 +784,12 @@ fn freeze<M: CertificationMode>(
         completion_grid: grid,
     })
 }
+const fn next_precision(precision: u32, maximum: u32) -> u32 {
+    match precision.checked_mul(2) {
+        Some(next) if next < maximum => next,
+        _ => maximum,
+    }
+}
 fn solve<M: CertificationMode>(
     source: &OriginalTarget<M>,
     policy: OfflinePolicy,
@@ -868,6 +837,7 @@ fn solve<M: CertificationMode>(
             )?;
             Ok((candidate, residual, norm, grid))
         })();
+        context.admit_cache()?;
         total_work = total_work
             .checked_add(context.work)
             .ok_or(OfflineError::Budget("offline cumulative work"))?;
@@ -925,9 +895,6 @@ fn solve<M: CertificationMode>(
             }
             Err(error) => return Err(error),
         }
-        precision = precision
-            .checked_mul(2)
-            .unwrap_or(policy.max_precision)
-            .min(policy.max_precision);
+        precision = next_precision(precision, policy.max_precision);
     }
 }

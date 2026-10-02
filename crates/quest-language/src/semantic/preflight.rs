@@ -97,6 +97,20 @@ impl<'a> Scan<'a> {
         depth: usize,
     ) -> Result<(), SemanticError> {
         match &statement.kind {
+            S::Finite {
+                operations,
+                qubits,
+                bits,
+            } => {
+                if operations.len() > self.limits.nodes {
+                    return Err(SemanticError::budget("finite fragment operations"));
+                }
+                for operation in operations {
+                    operation.check_depth(self.limits.call_depth.min(256))?;
+                }
+                self.expressions(qubits, depth)?;
+                self.expressions(bits, depth)?;
+            }
             S::Oracle { arity, .. } => self.push(Node::Expression(arity), depth)?,
             S::Qubit { size, .. } => self.optional(size.as_ref(), depth)?,
             S::Declare {

@@ -15,9 +15,12 @@ export QUEST_ROOT=/path/to/installed/quest
 cargo build --workspace --locked
 ```
 
-`QuEST_DIR` can select the directory containing `QuESTConfig.cmake`;
-`CMAKE_PREFIX_PATH` uses normal CMake package search. The legacy `QUEST_DIR` and
-`QuEST_ROOT` aliases remain supported. Conflicting explicit selections fail.
+`QUEST_ROOT` must name the installation prefix itself, with `include/quest.h`
+and an installed QuEST CMake package below it. A CMake package subdirectory is
+not a prefix. `CMAKE_PREFIX_PATH` retains normal CMake package search and can
+supply dependencies alongside an explicit `QUEST_ROOT`. The removed `QUEST_DIR`,
+`QuEST_DIR` and `QuEST_ROOT` variables fail with migration guidance; unset them
+and select the prefix through `QUEST_ROOT`.
 Package discovery and compilation share the selected compiler and build profile.
 The compiled admission source verifies the supported version and configuration.
 On Darwin, `SDKROOT` must name an absolute installed macOS SDK; when absent,

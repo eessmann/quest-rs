@@ -4,8 +4,10 @@ use quest_math::{ApproxCertificate, Limits, Target};
 pub enum GenerationError {
     #[error("independent candidate certificate rejected: {0}")]
     CertificateRejected(#[from] quest_math::Error),
+    #[cfg(feature = "synthesis")]
     #[error(transparent)]
     Native(#[from] quest_synthesis::SynthesisError),
+    #[cfg(feature = "workers")]
     #[error(transparent)]
     Process(#[from] quest_optimizer_client::Error),
 }
@@ -25,6 +27,7 @@ pub trait RotationGenerator {
         limits: Limits,
     ) -> Result<ApproxCertificate, GenerationError>;
 }
+#[cfg(feature = "workers")]
 impl RotationGenerator for quest_optimizer_client::Client {
     fn algorithm(&self) -> &'static str {
         "process-certified-rotation-v1"
@@ -40,16 +43,19 @@ impl RotationGenerator for quest_optimizer_client::Client {
     }
 }
 /// Portable in-process synthesis. Construction never starts a search.
+#[cfg(feature = "synthesis")]
 #[derive(Debug, Clone, Default)]
 pub struct NativeSynthesis {
     options: quest_synthesis::SynthesisOptions,
 }
+#[cfg(feature = "synthesis")]
 impl NativeSynthesis {
     #[must_use]
     pub const fn new(options: quest_synthesis::SynthesisOptions) -> Self {
         Self { options }
     }
 }
+#[cfg(feature = "synthesis")]
 impl RotationGenerator for NativeSynthesis {
     fn algorithm(&self) -> &'static str {
         quest_synthesis::ROTATION_ALGORITHM
@@ -73,12 +79,13 @@ impl RotationGenerator for NativeSynthesis {
             taylor_terms: limits.taylor_terms.min(options.limits.taylor_terms),
         };
         Ok(
-            quest_optimizer_client::synthesize_direct(target, epsilon.to_bits(), options)?
+            quest_synthesis::approximate_rotation(target, epsilon.to_bits(), options)?
                 .certificate()
                 .clone(),
         )
     }
 }
+#[cfg(feature = "synthesis")]
 pub use quest_synthesis::{CancellationToken, SynthesisError, SynthesisOptions};
 
 #[expect(
@@ -86,7 +93,7 @@ pub use quest_synthesis::{CancellationToken, SynthesisError, SynthesisOptions};
     reason = "Candidate verification is shared only by compiler passes"
 )]
 pub(crate) fn generate_checked(
-    generator: &dyn RotationGenerator,
+    generator: &impl RotationGenerator,
     target: &Target,
     epsilon: f64,
     seed: u64,

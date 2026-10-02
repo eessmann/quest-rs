@@ -1,0 +1,23 @@
+# Independent compiler consolidation review
+
+Reviewer: native/polynomial owner, who did not implement compiler/language/macro consolidation. Reviewed the diff from baseline `001a2b656a5a80a60659a408f87f57670309a09b` plus current new semantic/evidence/error modules. No compiler/language edits made except the separately authorized parity alias removal and its focused regression.
+
+## Findings and disposition
+
+One redundant active interface was confirmed and removed: `ParityPasses::resynthesize_parity_candidate` and `parity_candidate` both forwarded identically to `parity_candidate_from(0, options, max_output_operations)`. `parity_candidate` remains the canonical first-window entrypoint; `parity_candidate_from` serves explicit later-window enumeration. The sole active caller of the removed spelling was migrated. A focused test checks that the canonical first-window entry preserves the exact scalar phase of Rz(2π) and rejects an insufficient output ceiling. Broader existing parity tests still check window expansion, fresh IDs, independent affine phase replay, signed controls, and ordering fences.
+
+No other actionable defect was found in the reviewed changes. This is a scoped architecture/correctness review, not a claim of exhaustive compiler or external-worker validation.
+
+## Contracts inspected
+
+- **Finite insertion:** `FiniteOperation` carries numeric interface/capture identities and GateKind directly. The compiler collects scalar captures once before the fragment, giving every use a dominating definition. Place resolution verifies scalar qubit and mutable one-bit storage. Gate/call/payload effects enter the same SSA emission and independent verifier as text construction. Measurement emission updates the compiler memory token before storing the measured bit. Conditional insertion preserves expected=true/false branch direction and joins memory through checked CFG edges. Recursion is bounded before recursive lowering; retained syntax storage and SSA node admission remain checked.
+- **Separate capture banks:** ProgramBuilder oracle, scalar and payload maps now use their own typed namespaces. Macro capture compaction preserves source expression evaluation order, rewrites scalar Capture tokens only, and retains oracle source indices in oracle declarations. It no longer invents dummy floating captures. Existing/new tests cover mixed macro captures evaluated once and same-index scalar/oracle banks.
+- **Evidence:** `CompilationEvidence` owns typed mathematical Target, Sequence and Limits plus typed finite/structured locations; immutable records are retained directly rather than serialized to bytes and reparsed. Historical-local scope is explicit and grants no executable proof authority. Artifact/template formats both advance version and reject old layouts. Artifact admission still independently certifies candidate versus exact target using bounded proof policy. Finite provenance IDs remain graph-checked, historical snapshots remain distinct, and publication snapshot tests were moved into integration tests rather than dropped with a forwarding module.
+- **Dependency direction:** Language owns semantic identities, quantum/provenance data and payload types. Compiler owns optimization, generation and artifacts. Macro frontend depends on language/QASM and resolves generated paths to quest-compile or quest-rs, including renamed consumer dependencies. Default in-process synthesis calls quest-synthesis directly; process optimizer dependencies and worker passes are feature-gated. The removed quest-circuit package is not referenced by the reviewed active source/manifests. Direct re-exports of canonical semantic owners provide the compiler entrypoint without a second facade package.
+- **Errors:** Compiler stage errors retain concrete semantic/structured/worker variants. Language no longer retains an erased compiler-worker error. Generator output is independently rechecked against the requested target, including a custom generator returning a valid certificate for a different target.
+
+## Focused evidence
+
+`devenv shell -- env CARGO_BUILD_JOBS=2 cargo test -p quest-compile --test parity_contract --test finite_semantic_contract --test snapshot_identity --test generator_provenance` passed 22 tests: parity14, finite semantic5, snapshot1, generator provenance2. Receipt: `compiler-independent-review-tests.log`.
+
+The review also had current native differential evidence: default structured5/oracle7, matrix resource2, QSVT runtime5/native dispatch1 all pass with canonical compiler imports. Native lifetime/static/alias checks remain in their existing guards. No Linux/MPI/accelerator or external-process-worker execution is claimed by this review.

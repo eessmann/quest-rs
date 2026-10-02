@@ -10,8 +10,10 @@ repository.workspace = true
 faer = { workspace = true, features = ["std", "linalg"] }
 num-complex.workspace = true
 quest-symbolic.workspace = true
-num-bigint.workspace = true
-num-rational = { workspace = true, features = ["std"] }
+quest-math.workspace = true
+dashu-base.workspace = true
+dashu-int.workspace = true
+dashu-ratio.workspace = true
 thiserror.workspace = true
 serde_json = { workspace = true, optional = true }
 serde = { workspace = true, optional = true, features = ["derive", "std", "rc"] }
@@ -25,7 +27,7 @@ googletest.workspace = true
 
 [features]
 templates = ["serde", "dep:serde_json"]
-serde = ["dep:serde"]
+serde = ["dep:serde", "quest-math/serde"]
 codespan-reporting = ["dep:codespan-reporting"]
 
 [lints]

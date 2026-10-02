@@ -1,12 +1,14 @@
 use std::{collections::BTreeMap, sync::Arc};
 
-use num_bigint::BigInt;
+use dashu_base::BitTest;
+use dashu_int::IBig;
 
 use super::{Error, NumericalOperator, Result};
 
 macro_rules! owned_id {
     ($name:ident) => {
         #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+        #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
         pub struct $name {
             pub owner: u64,
             pub index: usize,
@@ -25,12 +27,14 @@ owned_id!(OccurrenceId);
 owned_id!(GateDefinitionId);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum ControlState {
     Zero,
     One,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Control {
     qubit: QubitId,
     state: ControlState,
@@ -830,8 +834,10 @@ impl Instruction {
     /// # Errors
     /// Rejects size arithmetic overflow.
     pub fn angle_target_storage_bytes(&self) -> Result<usize> {
-        fn coefficient(value: &BigInt) -> Result<usize> {
-            let limbs = value.bits().div_ceil(64);
+        fn coefficient(value: &IBig) -> Result<usize> {
+            let limbs = u64::try_from(value.bit_len())
+                .unwrap_or(u64::MAX)
+                .div_ceil(64);
             let bytes = usize::try_from(limbs)
                 .map_err(|_| Error::Budget("angle target storage"))?
                 .checked_mul(8)
@@ -847,7 +853,7 @@ impl Instruction {
             .and_then(|x| x.checked_add(const { 3 * std::mem::size_of::<usize>() }))
             .ok_or(Error::Budget("angle target storage"))?;
         for target in self.angle_targets.iter().flatten() {
-            let coefficients: &[&BigInt] = match target {
+            let coefficients: &[&IBig] = match target {
                 BoundAngleTarget::DyadicRadians { .. } => &[],
                 BoundAngleTarget::RationalPi {
                     numerator,
@@ -877,15 +883,13 @@ impl Instruction {
 
 #[cfg(test)]
 mod rational_pi_binding_tests {
-    use super::{Angle, BigInt};
-    use crate::quantum::BigRational;
+    use super::{Angle, IBig};
+    use crate::quantum::RBig;
     use googletest::prelude::*;
     #[gtest]
     fn rational_pi_binding_rounds_only_after_multiplying_by_pi() -> googletest::Result<()> {
-        let tiny = BigRational::new(
-            BigInt::from(1),
-            std::ops::Shl::shl(BigInt::from(1), 1075usize),
-        );
+        let tiny =
+            RBig::from_parts_signed(IBig::from(1), std::ops::Shl::shl(IBig::from(1), 1075usize));
         let angle = Angle::rational_pi(tiny)?;
         expect_eq!(
             angle

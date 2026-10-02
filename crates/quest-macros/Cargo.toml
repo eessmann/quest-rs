@@ -1,7 +1,7 @@
 [package]
 name = "quest-macros"
 version = "0.1.0"
-description = "OpenQASM-style circuit macro for the quest-circuit builder"
+description = "OpenQASM-style circuit macro for the quest-compile builder"
 edition.workspace = true
 license.workspace = true
 repository.workspace = true

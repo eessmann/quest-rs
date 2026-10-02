@@ -1,0 +1,13 @@
+[package]
+name="quest-mp-backend-bench"
+version="0.0.0"
+edition="2024"
+publish=false
+[workspace]
+[dependencies]
+dashu-int="=0.6.2"
+dashu-float="=0.6.2"
+libc="0.2"
+[profile.release]
+lto="thin"
+codegen-units=1

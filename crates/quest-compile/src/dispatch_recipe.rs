@@ -4,11 +4,6 @@ use crate::{
     BoundGate, Control, ControlState, Error, NumericalOperator, Operation, OracleFragment,
     RegionPlan, Result,
 };
-#[allow(unused_imports)]
-use crate::{
-    BoundParityPasses, ExactPasses, LinearPasses, NumericalPasses, OracleExport, ParityPasses,
-    TerminalPasses,
-};
 use num_complex::Complex64;
 use std::collections::BTreeSet;
 

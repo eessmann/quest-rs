@@ -7,7 +7,7 @@ Text import starts with an immutable `SourceSnapshot` and an explicit `IncludeRe
 The bundled `StandardLibrary` resolves only the pinned `stdgates.inc` snapshot. Its source provenance and deliberate phase corrections are recorded in the repository's `docs/openqasm-provenance.md`. Supplying a standard-library resolver is explicit; an include name does not grant arbitrary host filesystem access.
 
 ```rust
-{{#include ../../../crates/quest-circuit/tests/tutorials.rs:import_export}}
+{{#include ../../../crates/quest-compile/tests/tutorials.rs:import_export}}
 ```
 
 `quest_qasm::export` writes canonical root syntax while retaining its include directives. `export_typed` writes the expanded admitted syntax. `export_syntax` accepts structured syntax directly. Formatting is normalized and expressions are parenthesized; comments and original whitespace are not promised. The test reimports the exported root and verifies canonical stability.
@@ -19,7 +19,7 @@ Structured optimization preserves the original admitted syntax as export authori
 `circuit_file!` takes a literal path relative to its Rust source file. The macro reads the entry and resolved include files at compilation and emits compiler-visible dependencies. Cargo rebuilds when tracked source changes. This frontend feeds the same admission and SSA pipeline as text import and `circuit!`.
 
 ```rust
-{{#include ../../../crates/quest-circuit/tests/tutorials.rs:compiler_file}}
+{{#include ../../../crates/quest-compile/tests/tutorials.rs:compiler_file}}
 ```
 
 Its fixture is actual source included by that test:

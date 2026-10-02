@@ -1,6 +1,10 @@
 //! Executable QSP/numerical book companion, requiring no native `QuEST` installation.
 // ANCHOR: numerical_prelude
-use quest_polynomial::{Chebyshev, Interval, Laurent, Limits, Polynomial, RemezBuilder, function};
+use quest_numerics::arithmetic::{ExactConstant, F64Backend, Interval64Backend};
+use quest_polynomial::{
+    Accuracy, Chebyshev, ExactDomain, GenericFunction, Interval, Laurent, Limits, Polynomial,
+    RemezRequest, function,
+};
 use quest_qsp::{Complex64, FrozenCandidate, RealParityWx, SynthesisBuilder, UnitCircleResponse};
 pub type TutorialResult<T> = Result<T, Box<dyn std::error::Error>>;
 // ANCHOR_END: numerical_prelude
@@ -35,21 +39,19 @@ pub fn polynomial_and_interval() -> TutorialResult<f64> {
 /// Reports expression domains, resource limits, or an unestablished approximation.
 pub fn function_and_remez() -> TutorialResult<f64> {
     let target = function!(|x| x.exp());
-    let value_and_derivatives = target.jet(0.3)?;
-    let interval_jet = target.jet_interval(Interval::new(-1.0, 1.0)?)?;
+    let value_and_derivatives = target.jet(&mut F64Backend, 0.3)?;
+    let interval_jet = target.jet(&mut Interval64Backend, Interval::new(-1.0, 1.0)?)?;
     let _ = (value_and_derivatives, interval_jet);
-    let approximation = RemezBuilder::new()
-        .target(target)
-        .degree(3)
-        .tolerance(1e-8)
-        .domain(Interval::new(-1.0, 1.0)?)?
+    let approximation = RemezRequest::binary64(target, ExactDomain::binary64(-1.0, 1.0), 3)
+        .accuracy(Accuracy::MinimaxGap(ExactConstant::Binary64(1e-8)))
+        .export_binary64()
         .run()?;
-    // Tolerance bounds the gap to the minimax lower bound, not the total error.
-    let uniform_error = approximation.error_bound().upper();
-    let minimax_lower = approximation.minimax_lower_bound();
-    if uniform_error - minimax_lower > 1e-8 {
+    // The minimax gap and total uniform error are separate certified quantities.
+    let uniform_error = approximation.uniform_error().unconditional_bound().upper();
+    if approximation.minimax_gap().gap().upper() > 1e-8 {
         return Err("requested minimax gap was not established".into());
     }
+    let _exported = approximation.binary64_polynomial()?;
     Ok(uniform_error)
 }
 // ANCHOR_END: function_remez
@@ -103,7 +105,7 @@ pub fn independent_certification() -> TutorialResult<f64> {
         .candidate(frozen)
         .policy(CertificationPolicy::default())?
         .certify()?;
-    // Each bound retains its Astro Float endpoints. This summary is rounded upward.
+    // Each bound retains its native binary endpoints. This summary is rounded upward.
     let response_bound = certified.report().response().upper_f64();
     let _unitarity_bound = certified.report().unitarity();
     let _all_four_coefficient_arrays = certified.report().coefficients();
@@ -137,20 +139,33 @@ pub fn explicit_offline_synthesis() -> TutorialResult<f64> {
 #[cfg(feature = "offline-synthesis")]
 /// # Errors
 /// Reports undefined functions, exceeded budgets or an unestablished error enclosure.
-pub fn explicit_offline_approximation() -> TutorialResult<f64> {
-    use quest_qsp::offline::{OfflineRemezBuilder, OfflineRemezPolicy};
-    let approximation = OfflineRemezBuilder::new()
-        .function(function!(|x| x.exp()))
-        .domain(Interval::new(-1.0, 1.0)?)?
-        .degree(3)
-        .policy(OfflineRemezPolicy {
-            error_tolerance: 0.006,
-            ..OfflineRemezPolicy::default()
-        })?
-        .solve()?;
-    // This is a rigorous uniform-error bound for the exported polynomial.
-    // The separately reported Astro Float exchange gap is empirical.
-    Ok(approximation.error_bound().upper())
+pub fn explicit_multiprecision_approximation() -> TutorialResult<f64> {
+    use quest_numerics::arithmetic::{
+        BinaryRounding, MpBackend, MpIntervalBackend, Precision, to_f64,
+    };
+    use quest_polynomial::{DynamicShape, MpHouseholder};
+    let precision = Precision {
+        bits: 128,
+        ..Precision::default()
+    };
+    let approximation = RemezRequest::new(
+        function!(|x| x.exp()),
+        ExactDomain::binary64(-1.0, 1.0),
+        DynamicShape(4),
+        MpBackend::new(precision)?,
+        MpIntervalBackend::new(precision)?,
+        MpHouseholder,
+    )
+    .accuracy(Accuracy::UniformError(ExactConstant::Binary64(0.006)))
+    .export_binary64()
+    .run()?;
+    // This certificate bounds the actual exported binary64 coefficients.
+    // QSP still requires explicit parity and contractivity admission.
+    let _exported = approximation.binary64_polynomial()?;
+    Ok(to_f64(
+        approximation.uniform_error().unconditional_bound().upper(),
+        BinaryRounding::Up,
+    )?)
 }
 // ANCHOR_END: offline_approximation
 
@@ -189,8 +204,8 @@ fn main() -> TutorialResult<()> {
             explicit_offline_synthesis()?
         );
         println!(
-            "offline approximation bound: {}",
-            explicit_offline_approximation()?
+            "multiprecision approximation bound: {}",
+            explicit_multiprecision_approximation()?
         );
     }
     Ok(())

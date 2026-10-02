@@ -80,7 +80,7 @@ present. This example retains the caller's left coordinate order `[1, 0]` and a
 one-dimensional right interface:
 
 ```rust
-use quest_circuit::{Gate, OracleFragment, QuantumRegionBuilder};
+use quest_compile::{Gate, OracleFragment, QuantumRegionBuilder};
 use quest_qsvt::{EncodingBuilder, Left, LogicalSpace, NumericalPolicy, Right};
 
 fn main() -> quest_qsvt::Result<()> {

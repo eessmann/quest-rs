@@ -5,6 +5,7 @@ pub mod builder;
 pub mod cfg;
 mod compile;
 mod expressions;
+pub mod finite;
 mod preflight;
 #[doc(hidden)]
 pub mod promote;

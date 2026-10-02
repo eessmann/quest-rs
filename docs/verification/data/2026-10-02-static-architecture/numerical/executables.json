@@ -1,0 +1,18 @@
+{
+  "baseline": {
+    "bytes": 1016528,
+    "sha256": "c81eec19c86bb5215812ab5c4c71fc40106927190c079fc46511272b758ff141"
+  },
+  "baseline-typed": {
+    "bytes": 977344,
+    "sha256": "db6b6e39bb88c32b6cf1268557672701ca97d5ce2e90d4220c02bc39cd112b11"
+  },
+  "current": {
+    "bytes": 1206944,
+    "sha256": "ca168f1214e1e6fc9ccd79e867c64bbc44fea295bdb5b546a41231b2c96d91d3"
+  },
+  "mp": {
+    "bytes": 871472,
+    "sha256": "04d1c987f1f6a706d5e2e32e109f152f8adbb119cac50afb4e3979ab9264b860"
+  }
+}

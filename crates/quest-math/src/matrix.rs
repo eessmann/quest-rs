@@ -1,5 +1,6 @@
 use crate::{Cyclotomic, Error, Gate, Limits, Operation, Result, Sequence};
-use num_bigint::BigInt;
+use dashu_base::BitTest;
+use dashu_int::IBig;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ExactMatrix {
     pub(crate) qubits: usize,
@@ -142,11 +143,9 @@ impl ExactMatrix {
             .try_reserve_exact(self.entries.len())
             .map_err(|_| Error::Resource("matrix key allocation".into()))?;
         for value in &self.entries {
-            if value
-                .coefficients()
-                .iter()
-                .any(|coefficient| coefficient.bits() > limits.coefficient_bits)
-                || u64::from(value.denominator_exponent()) > limits.coefficient_bits
+            if value.coefficients().iter().any(|coefficient| {
+                u64::try_from(coefficient.bit_len()).unwrap_or(u64::MAX) > limits.coefficient_bits
+            }) || u64::from(value.denominator_exponent()) > limits.coefficient_bits
             {
                 return Err(crate::types::budget(
                     "coefficient bits",
@@ -182,7 +181,7 @@ pub struct MatrixKey {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 struct EntryKey {
     denominator_exponent: u32,
-    coefficients: [BigInt; 4],
+    coefficients: [IBig; 4],
 }
 impl MatrixKey {
     /// Conservative owned key bytes, including independent bigint limbs.
@@ -199,11 +198,15 @@ impl MatrixKey {
             .ok_or_else(|| Error::Resource("matrix key storage".into()))?;
         for entry in &self.entries {
             for coefficient in &entry.coefficients {
-                let limb_bytes = usize::try_from(coefficient.bits().div_ceil(64))
-                    .map_err(|_| Error::Resource("matrix key storage".into()))?
-                    .checked_mul(16)
-                    .and_then(|n| n.checked_add(24))
-                    .ok_or_else(|| Error::Resource("matrix key storage".into()))?;
+                let limb_bytes = usize::try_from(
+                    u64::try_from(coefficient.bit_len())
+                        .unwrap_or(u64::MAX)
+                        .div_ceil(64),
+                )
+                .map_err(|_| Error::Resource("matrix key storage".into()))?
+                .checked_mul(16)
+                .and_then(|n| n.checked_add(24))
+                .ok_or_else(|| Error::Resource("matrix key storage".into()))?;
                 bytes = bytes
                     .checked_add(limb_bytes)
                     .ok_or_else(|| Error::Resource("matrix key storage".into()))?;
@@ -516,7 +519,7 @@ pub(super) fn local_gate(gate: Gate, limits: Limits) -> Result<(usize, Vec<Cyclo
     let entries = match gate {
         Gate::W => return Ok((1, vec![Cyclotomic::omega(1)])),
         Gate::H => {
-            let half = Cyclotomic::new([0, 1, 0, -1].map(BigInt::from), 1, limits)?;
+            let half = Cyclotomic::new([0, 1, 0, -1].map(IBig::from), 1, limits)?;
             vec![
                 half.clone(),
                 half.clone(),

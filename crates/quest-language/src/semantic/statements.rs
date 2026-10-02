@@ -122,6 +122,11 @@ impl Compiler {
                     Ok(())
                 }
             }
+            S::Finite {
+                operations,
+                qubits,
+                bits,
+            } => self.finite_fragment(operations, qubits, bits, span),
             S::Payload { capture, operands } => {
                 let places = operands
                     .iter()

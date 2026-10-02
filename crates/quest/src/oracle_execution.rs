@@ -2,12 +2,12 @@
 use crate::{
     Error, Register, RegisterKind, Result,
     execution::{
-        MatrixCacheKey, NativeControls, NativeMatrix, apply_gate, execute_matrix, matrix_cache_key,
-        phase, prepare_numerical,
+        MatrixCacheKey, MatrixPreparation, NativeControls, NativeMatrix, admit_matrix, apply_gate,
+        execute_matrix, phase,
     },
     values::reserve_vec,
 };
-use quest_circuit::{
+use quest_compile::{
     BoundGate, Control, ControlState, Operation, OracleFragment,
     dispatch_recipe::{
         OracleProfile, RecipeLimits, discover_oracle_profiles_with_limits,
@@ -26,7 +26,7 @@ pub struct OracleInventory {
 }
 impl Default for OracleInventory {
     fn default() -> Self {
-        Self::with_budget(quest_circuit::language::semantic::CompileLimits::default().storage_bytes)
+        Self::with_budget(quest_compile::language::semantic::CompileLimits::default().storage_bytes)
     }
 }
 impl OracleInventory {
@@ -242,14 +242,18 @@ impl OracleInventory {
         }
         Ok(())
     }
-    pub(crate) fn estimated_bytes(&self, width: usize, gpu: bool) -> Result<usize> {
+    pub(crate) fn estimated_bytes(
+        &self,
+        width: usize,
+        gpu: bool,
+        seen_matrices: &mut BTreeSet<MatrixCacheKey>,
+    ) -> Result<usize> {
         if self.bodies.is_empty() {
             return Ok(0);
         }
         let mut bytes = OracleFragment::shared_storage_bytes(&self.bodies)?
             .checked_add(self.discovery_bytes)
             .ok_or(Error::Overflow)?;
-        let mut seen_matrices = BTreeSet::new();
         bytes = bytes
             .checked_add(
                 width
@@ -308,28 +312,13 @@ impl OracleInventory {
                                     .ok_or(Error::Overflow)?,
                             )
                             .ok_or(Error::Overflow)?;
-                        let key = matrix_cache_key(
-                            matrix,
-                            profile.iter().copied().chain(states(controls)),
-                        );
-                        if !seen_matrices.insert(key) {
-                            continue;
-                        }
-                        let dimension = matrix
-                            .dimension()
-                            .checked_shl(u32::try_from(count).map_err(|_| Error::Overflow)?)
-                            .ok_or(Error::Overflow)?
-                            .max(2);
-                        let entries = if matrix.is_diagonal() {
-                            dimension
-                        } else {
-                            dimension.checked_mul(dimension).ok_or(Error::Overflow)?
-                        };
+                        let signed = profile
+                            .iter()
+                            .copied()
+                            .chain(states(controls))
+                            .collect::<Vec<_>>();
                         bytes = bytes
-                            .checked_add(crate::values::bytes_for(
-                                entries,
-                                if gpu { 16 } else { 12 },
-                            )?)
+                            .checked_add(admit_matrix(matrix, &signed, gpu, seen_matrices)?)
                             .and_then(|n| n.checked_add(count.checked_mul(128)?))
                             .ok_or(Error::Overflow)?;
                     }
@@ -379,7 +368,7 @@ enum OracleOp {
     Barrier,
 }
 pub struct OracleCache {
-    matrices: Vec<NativeMatrix>,
+    matrix_count: usize,
     bodies: Vec<Vec<OracleOp>>,
     frames: Vec<Frame>,
     leaf: Leaf,
@@ -394,14 +383,17 @@ struct Leaf {
     profile: Vec<bool>,
 }
 impl OracleCache {
-    pub(crate) fn prepare(inventory: &OracleInventory, width: usize) -> Result<Self> {
+    pub(crate) fn prepare(
+        inventory: &OracleInventory,
+        width: usize,
+        matrices: &mut MatrixPreparation,
+    ) -> Result<Self> {
         let width = if inventory.bodies.is_empty() {
             0
         } else {
             width
         };
-        let mut matrices = Vec::new();
-        let mut matrix_cache = BTreeMap::new();
+        let mut used_matrices = BTreeSet::new();
         let mut bodies = reserve_vec(inventory.bodies.len())?;
         for (body, profiles) in inventory.bodies.iter().zip(&inventory.profiles) {
             let mut operations = reserve_vec(body.operations().len())?;
@@ -410,8 +402,8 @@ impl OracleCache {
                     operation,
                     profiles,
                     inventory,
-                    &mut matrices,
-                    &mut matrix_cache,
+                    matrices,
+                    &mut used_matrices,
                 )?);
             }
             bodies.push(operations);
@@ -429,7 +421,7 @@ impl OracleCache {
             controls: NativeControls::with_capacity(width, false)?,
         };
         Ok(Self {
-            matrices,
+            matrix_count: used_matrices.len(),
             bodies,
             frames,
             leaf,
@@ -442,6 +434,7 @@ impl OracleCache {
         controls: &[QuantumControl],
         adjoint: bool,
         register: &mut Register<'_, K>,
+        matrices: &[NativeMatrix],
     ) -> Result<()> {
         for &target in targets {
             register.check_qubit(target)?;
@@ -451,7 +444,7 @@ impl OracleCache {
         }
         execute_body(
             &self.bodies,
-            &self.matrices,
+            matrices,
             &mut self.frames,
             &mut self.leaf,
             body,
@@ -465,18 +458,18 @@ impl OracleCache {
         self.bodies.len()
     }
     pub(crate) const fn matrix_count(&self) -> usize {
-        self.matrices.len()
+        self.matrix_count
     }
 }
 fn prepare_operation(
     operation: &Operation,
     profiles: &BTreeMap<Vec<bool>, usize>,
     inventory: &OracleInventory,
-    matrices: &mut Vec<NativeMatrix>,
-    cache: &mut BTreeMap<MatrixCacheKey, usize>,
+    matrices: &mut MatrixPreparation,
+    used_matrices: &mut BTreeSet<usize>,
 ) -> Result<OracleOp> {
     let targets =
-        |targets: &[quest_circuit::QubitId]| targets.iter().map(|target| target.index()).collect();
+        |targets: &[quest_compile::QubitId]| targets.iter().map(|target| target.index()).collect();
     Ok(match operation {
         Operation::Gate {
             gate,
@@ -513,15 +506,8 @@ fn prepare_operation(
                     .copied()
                     .chain(states(controls))
                     .collect::<Vec<_>>();
-                let key = matrix_cache_key(matrix, profile.iter().copied());
-                let index = if let Some(index) = cache.get(&key) {
-                    *index
-                } else {
-                    let index = matrices.len();
-                    matrices.push(prepare_numerical(matrix, &profile)?);
-                    cache.insert(key, index);
-                    index
-                };
+                let index = matrices.include(matrix, &profile)?;
+                used_matrices.insert(index);
                 variants.insert(profile, index);
             }
             OracleOp::Numerical {
@@ -711,7 +697,7 @@ fn execute_body<K: RegisterKind>(
 
 impl OracleInventory {
     pub(crate) fn from_structured(
-        plan: &quest_circuit::Program<quest_circuit::Executable>,
+        plan: &quest_compile::Program<quest_compile::Executable>,
         budget: usize,
     ) -> Result<Self> {
         let mut inventory = Self::with_budget(budget);
@@ -724,13 +710,13 @@ impl OracleInventory {
     }
     fn structured_region(
         &mut self,
-        plan: &quest_circuit::Program<quest_circuit::Executable>,
-        region: quest_circuit::language::ssa::RegionId,
+        plan: &quest_compile::Program<quest_compile::Executable>,
+        region: quest_compile::language::ssa::RegionId,
         inherited: &[bool],
         depth: usize,
         visited: &mut BTreeMap<(usize, Vec<bool>), usize>,
     ) -> Result<()> {
-        use quest_circuit::language::ssa::{GateModifier, InstructionKind};
+        use quest_compile::language::ssa::{GateModifier, InstructionKind};
         if depth > 64 || inherited.len() > plan.num_qubits() {
             return Err(Error::Value(
                 "structured oracle control or call-depth bound",
@@ -800,7 +786,7 @@ impl OracleInventory {
 mod tests {
     use super::*;
     use googletest::prelude::*;
-    use quest_circuit::{Gate, QuantumRegionBuilder};
+    use quest_compile::{Gate, QuantumRegionBuilder};
     fn body() -> crate::Result<OracleFragment> {
         let mut builder = QuantumRegionBuilder::new(1, 0)?;
         builder.gate(Gate::X, &[builder.qubit(0)?], &[])?;

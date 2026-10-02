@@ -1,22 +1,11 @@
 //! Optional candidate workers with bounded processes and independent admission.
 #![forbid(unsafe_code)]
+use dashu_base::BitTest;
 use quest_math::{ApproxCertificate, ExactCertificate, Limits, Sequence, Target};
 use quest_optimizer_protocol::{
     MitmLimits, Outcome, Request, RequestEnvelope, ResponseEnvelope, VERSION,
 };
 use std::{path::PathBuf, time::Duration};
-
-/// Direct request-bounded Rust synthesis, available on macOS and Linux without
-/// starting a worker process. External workers remain optional.
-/// # Errors
-/// Preserves typed synthesis, resource, cancellation and certificate failures.
-pub fn synthesize_direct(
-    target: &Target,
-    epsilon_bits: u64,
-    options: quest_synthesis::SynthesisOptions,
-) -> quest_synthesis::Result<quest_synthesis::Approximation> {
-    quest_synthesis::approximate_rotation(target, epsilon_bits, options)
-}
 
 #[cfg(target_os = "linux")]
 mod process;
@@ -165,7 +154,10 @@ impl Client {
                 denominator,
             } => {
                 let bits = limits.coefficient_bits.min(16_384);
-                if denominator.bits() == 0 || numerator.bits() > bits || denominator.bits() > bits {
+                if denominator.bit_len() == 0
+                    || u64::try_from(numerator.bit_len()).unwrap_or(u64::MAX) > bits
+                    || u64::try_from(denominator.bit_len()).unwrap_or(u64::MAX) > bits
+                {
                     return Err(Error::Limits);
                 }
             }
@@ -288,9 +280,7 @@ impl Client {
     ) -> Result<MitmResult<ApproxCertificate>, Error> {
         search_limits.validate(1).map_err(|_| Error::Limits)?;
         let epsilon = quest_math::dyadic_from_bits(epsilon_bits, proof_limits)?;
-        if epsilon <= quest_math::Rational::from_integer(0.into())
-            || epsilon >= quest_math::Rational::from_integer(1.into())
-        {
+        if epsilon <= quest_math::RBig::from(0) || epsilon >= quest_math::RBig::from(1) {
             return Err(Error::Limits);
         }
         quest_math::admit_rotation_target(target, proof_limits)?;

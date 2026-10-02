@@ -188,7 +188,7 @@ fn oracle_control_variants_respect_transactional_preparation_budget() -> googlet
             let targets = [builder.qubit(7)?, builder.qubit(6)?];
             let controls = (0..6)
                 .map(|q| Ok(Control::new(builder.qubit(q)?, ControlState::One)))
-                .collect::<quest_circuit::Result<Vec<_>>>()?;
+                .collect::<quest_compile::Result<Vec<_>>>()?;
             builder.oracle(&body, &targets, &controls)?;
             expect_true!(
                 environment
@@ -293,4 +293,42 @@ fn oracle_snapshot_outlives_cached_native_resources() -> googletest::Result<()> 
         );
         Ok(())
     })
+}
+
+#[gtest]
+fn payload_and_oracle_share_only_matching_signed_matrix_profiles() -> googletest::Result<()> {
+    isolated(
+        "payload_and_oracle_share_only_matching_signed_matrix_profiles",
+        || {
+            let environment = Environment::builder().build()?;
+            let source =
+                faer::Mat::from_fn(2, 2, |row, col| Complex64::new(f64::from(row != col), 0.0));
+            let matrix = NumericalOperator::from_view(&source, MatrixPolicy::default())?;
+            let mut local = QuantumRegionBuilder::new(1, 0)?;
+            local.numerical(matrix.clone(), &[local.qubit(0)?], &[])?;
+            let body = OracleFragment::builder(local.finish()?.bind(&[])?)
+                .matrix_tolerance(1e-12)?
+                .build()?;
+            let mut builder = QuantumRegionBuilder::new(2, 0)?;
+            let target = builder.qubit(1)?;
+            let control = builder.qubit(0)?;
+            let negative = [Control::new(control, ControlState::Zero)];
+            let positive = [Control::new(control, ControlState::One)];
+            builder.numerical(matrix.clone(), &[target], &negative)?;
+            builder.oracle(&body, &[target], &negative)?;
+            builder.numerical(matrix, &[target], &positive)?;
+            let program = quest::Program::from_bound_region(builder.finish()?.bind(&[])?)?
+                .verify()?
+                .lower()?
+                .plan()?;
+            let mut prepared = environment.prepare(program)?;
+            expect_eq!(prepared.prepared_oracle_matrix_variants(), 1);
+            expect_eq!(prepared.prepared_matrix_variants(), 2);
+            let mut state = environment.state_vector(QubitCount::new(2)?)?;
+            prepared.run(&mut state, &RunInputs::default())?;
+            // The two negative-controlled X operators cancel; positive control is inactive.
+            expect_that!(state.amplitude(0)?.re, near(1.0, 1e-13));
+            Ok(())
+        },
+    )
 }

@@ -32,7 +32,7 @@ fn book_independent_certification_example_runs() -> Result<()> {
 fn book_explicit_offline_examples_run() -> Result<()> {
     expect_that!(checked(tutorials::explicit_offline_synthesis())?, le(1e-11));
     expect_that!(
-        checked(tutorials::explicit_offline_approximation())?,
+        checked(tutorials::explicit_multiprecision_approximation())?,
         le(0.006)
     );
     Ok(())

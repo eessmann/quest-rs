@@ -1,9 +1,4 @@
 //! Consuming compiler stages for the shared structured language profile.
-#[allow(unused_imports)]
-use crate::{
-    BoundParityPasses, ExactPasses, LinearPasses, NumericalPasses, OracleExport, ParityPasses,
-    TerminalPasses,
-};
 use quest_language::{
     SourceId, SourceMap, SourceSnapshot,
     classical::ScalarValue,
@@ -435,9 +430,6 @@ impl Program<Constructed> {
             .flat_map(|block| &block.instructions)
         {
             if let ssa::InstructionKind::Capture { index, ty } = &instruction.kind {
-                if oracles.contains_key(index) {
-                    return Err(LanguageError::Capture { index: *index });
-                }
                 let capture = captures.get(*index).ok_or_else(|| {
                     let mut diagnostic = LanguageError::Capture { index: *index }
                         .into_diagnostic(quest_language::Stage::Verification, sources.clone());

@@ -1,10 +1,10 @@
-use super::{Affine, Context, ExactError, Limits, Owner, Rational, Symbol};
+use super::{Affine, Context, ExactError, Limits, Owner, RBig, Symbol};
+use dashu_int::IBig;
 use googletest::{Result, prelude::*};
-use num_bigint::BigInt;
 use std::ops::Add;
 
-fn r(n: i64, d: i64) -> Rational {
-    Rational::new(BigInt::from(n), BigInt::from(d))
+fn r(n: i64, d: i64) -> RBig {
+    RBig::from_parts_signed(IBig::from(n), IBig::from(d))
 }
 
 #[gtest]
@@ -14,9 +14,12 @@ fn thirds_are_canonical_and_large_integers_stay_exact() -> Result<()> {
     let two_thirds = third.add(&third)?;
     expect_eq!(two_thirds.constant(), &r(2, 3));
     expect_eq!(third.add(&two_thirds)?, ctx.one()?);
-    let huge = ctx.ratio(BigInt::from(1u64 << 54).add(1), 1.into())?;
-    expect_eq!(huge.constant().numer(), &(BigInt::from(1u64 << 54).add(1)));
-    expect_true!(!ctx.ratio(1.into(), BigInt::from(1u64 << 60))?.is_zero());
+    let huge = ctx.ratio(IBig::from(1u64 << 54).add(1), 1.into())?;
+    expect_eq!(
+        huge.constant().numerator(),
+        &(IBig::from(1u64 << 54).add(1))
+    );
+    expect_true!(!ctx.ratio(1.into(), IBig::from(1u64 << 60))?.is_zero());
     Ok(())
 }
 
@@ -240,15 +243,13 @@ fn export_is_bounded_and_retained_until_drop() -> Result<()> {
 }
 
 #[gtest]
-fn imported_raw_rationals_are_normalized_or_rejected() -> Result<()> {
+fn signed_ratios_are_normalized_at_admission() -> Result<()> {
     let ctx = Context::new(Owner::new(50));
-    let raw = Rational::new_raw(2.into(), 4.into());
-    let value = ctx.assemble(raw, r(0, 1), Vec::new())?;
-    expect_eq!(value.constant().numer(), &BigInt::from(1));
-    expect_eq!(value.constant().denom(), &BigInt::from(2));
-    let invalid = Rational::new_raw(1.into(), 0.into());
+    let value = ctx.ratio((-2).into(), (-4).into())?;
+    expect_eq!(value.constant().numerator(), &IBig::from(1));
+    expect_eq!(value.constant().denominator(), &dashu_int::UBig::from(2u8));
     expect_eq!(
-        ctx.assemble(invalid, r(0, 1), Vec::new()),
+        ctx.ratio(1.into(), 0.into()),
         Err(ExactError::ZeroDenominator)
     );
     Ok(())

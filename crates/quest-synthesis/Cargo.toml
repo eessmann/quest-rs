@@ -8,8 +8,9 @@ repository.workspace = true
 
 [dependencies]
 quest-math.workspace = true
-num-bigint.workspace = true
-num-traits.workspace = true
+dashu-base.workspace = true
+dashu-int.workspace = true
+dashu-ratio.workspace = true
 thiserror.workspace = true
 
 [lints]

@@ -23,15 +23,10 @@
 //! budgets, not process-RSS or wall-clock guarantees. Numerical fusion and optional
 //! external candidate stages are separate from this exact pass.
 use crate::{
-    AffinePhaseOperation as A, BigRational, Cnot, LanguageError, LinearOptions, ParityOptions,
-    Program, Verified,
+    AffinePhaseOperation as A, Cnot, LanguageError, LinearOptions, ParityOptions, Program, RBig,
+    Verified,
 };
-#[allow(unused_imports)]
-use crate::{
-    BoundParityPasses, ExactPasses, LinearPasses, NumericalPasses, OracleExport, ParityPasses,
-    TerminalPasses,
-};
-use num_traits::ToPrimitive;
+
 use quest_language::{
     GateKind as G, SourceSpan,
     classical::ScalarValue,
@@ -291,7 +286,7 @@ fn affine(gate: &ResolvedGate, wires: &BTreeMap<Wire, usize>) -> Option<A> {
         (G::X, []) => Some(A::X { target }),
         (G::Z | G::S | G::T, []) => Some(A::Phase {
             target,
-            coefficient: BigRational::new(
+            coefficient: RBig::from_parts_signed(
                 if gate.inverse { (-1).into() } else { 1.into() },
                 match gate.gate {
                     G::Z => 1,
@@ -325,12 +320,14 @@ pub fn exact_gate(
     }
     Ok(result)
 }
-pub fn quarter_turns(value: &BigRational) -> Option<usize> {
-    let quarters = std::ops::Mul::mul(value, BigRational::from_integer(4.into()));
-    if !quarters.is_integer() {
+pub fn quarter_turns(value: &RBig) -> Option<usize> {
+    let quarters = std::ops::Mul::mul(value, RBig::from(4));
+    if !quarters.denominator().is_one() {
         return None;
     }
-    quarters.to_integer().to_usize().filter(|value| *value < 8)
+    usize::try_from(quarters.numerator())
+        .ok()
+        .filter(|value| *value < 8)
 }
 fn emit_phase(
     output: &mut Vec<ResolvedGate>,

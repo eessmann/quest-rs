@@ -1,17 +1,13 @@
-//! Exact rational storage over the workspace's current bigint version.
-use num_bigint::BigInt;
-use num_traits::{Signed, ToPrimitive, Zero};
+//! Exact rational storage and certified binary64 conversion using native Dashu values.
+use dashu_base::{BitTest, Signed, UnsignedAbs};
+use dashu_int::IBig;
 
-/// Arbitrary rational numbers using the workspace's `num-bigint` version.
-///
-/// `num-rational`'s built-in alias uses bigint 0.4. This project-owned alias
-/// uses the same generic rational implementation with bigint 0.5 instead.
-pub type BigRational = num_rational::Ratio<BigInt>;
+pub use dashu_ratio::RBig;
 
 /// Decode finite binary64 bits as an exact rational. Signed zero is kept by
 /// the caller's source identity because a rational has only one zero.
 #[must_use]
-pub fn dyadic_from_bits(bits: u64) -> Option<BigRational> {
+pub fn dyadic_from_bits(bits: u64) -> Option<RBig> {
     let exponent = (bits >> 52) & 0x7ff;
     if exponent == 0x7ff {
         return None;
@@ -23,15 +19,15 @@ pub fn dyadic_from_bits(bits: u64) -> Option<BigRational> {
         fraction | 0x0010_0000_0000_0000
     };
     if mantissa == 0 {
-        return Some(BigRational::from_integer(0.into()));
+        return Some(RBig::ZERO);
     }
     let shift = if exponent == 0 {
         -1074i32
     } else {
         i32::try_from(exponent).ok()?.checked_sub(1075)?
     };
-    let mut numerator = BigInt::from(mantissa);
-    let mut denominator = BigInt::from(1);
+    let mut numerator = IBig::from(mantissa);
+    let mut denominator = IBig::from(1);
     if shift >= 0 {
         numerator = std::ops::Shl::shl(numerator, usize::try_from(shift).ok()?);
     } else {
@@ -40,22 +36,21 @@ pub fn dyadic_from_bits(bits: u64) -> Option<BigRational> {
     if bits >> 63 != 0 {
         numerator = std::ops::Neg::neg(numerator);
     }
-    Some(BigRational::new(numerator, denominator))
+    Some(RBig::from_parts_signed(numerator, denominator))
 }
 
 /// Correctly rounded binary64 conversion without intermediate integer floats.
 #[must_use]
-pub fn to_f64(value: &BigRational) -> Option<f64> {
-    if value.denom().is_zero() {
-        return None;
-    }
-    if value.numer().is_zero() {
+pub fn to_f64(value: &RBig) -> Option<f64> {
+    if value.numerator().is_zero() {
         return Some(0.0);
     }
-    let negative = value.numer().is_negative() != value.denom().is_negative();
-    let numerator = value.numer().magnitude();
-    let denominator = value.denom().magnitude();
-    let mut exponent = i128::from(numerator.bits()).checked_sub(i128::from(denominator.bits()))?;
+    let negative = value.numerator().is_negative();
+    let numerator = &value.numerator().unsigned_abs();
+    let denominator = value.denominator();
+    let mut exponent = i128::try_from(numerator.bit_len())
+        .ok()?
+        .checked_sub(i128::try_from(denominator.bit_len()).ok()?)?;
     let sign = if negative { 0x8000_0000_0000_0000 } else { 0 };
     if exponent > 1024 {
         return None;
@@ -90,7 +85,7 @@ pub fn to_f64(value: &BigRational) -> Option<f64> {
     let quotient = std::ops::Div::div(&scaled_numerator, &scaled_denominator);
     let remainder = std::ops::Rem::rem(&scaled_numerator, &scaled_denominator);
     let twice_remainder = std::ops::Shl::shl(remainder, 1usize);
-    let mut mantissa = quotient.to_u64()?;
+    let mut mantissa = u64::try_from(quotient).ok()?;
     if twice_remainder > scaled_denominator
         || (twice_remainder == scaled_denominator && mantissa & 1 == 1)
     {
@@ -129,13 +124,10 @@ pub enum PiConversionError {
 /// 4096-bit precision cap instead of silently selecting a neighboring float.
 /// # Errors
 /// Reports nonfinite conversion, unresolved rounding, or exhausted precision bounds.
-pub fn to_pi_f64(value: &BigRational) -> Result<f64, PiConversionError> {
+pub fn to_pi_f64(value: &RBig) -> Result<f64, PiConversionError> {
     static BOUNDS: [std::sync::OnceLock<Result<PiBounds, PiConversionError>>; 6] =
         [const { std::sync::OnceLock::new() }; 6];
-    if value.denom().is_zero() {
-        return Err(PiConversionError::NonFinite);
-    }
-    if value.numer().is_zero() {
+    if value.numerator().is_zero() {
         return Ok(0.0);
     }
     for (bits, cache) in [128, 256, 512, 1024, 2048, 4096].into_iter().zip(&BOUNDS) {
@@ -158,16 +150,13 @@ pub fn to_pi_f64(value: &BigRational) -> Result<f64, PiConversionError> {
 /// Neither term is independently rounded or required to be finite.
 /// # Errors
 /// Reports nonfinite conversion, unresolved rounding, or exhausted precision bounds.
-pub fn to_affine_f64(radians: &BigRational, pi: &BigRational) -> Result<f64, PiConversionError> {
+pub fn to_affine_f64(radians: &RBig, pi: &RBig) -> Result<f64, PiConversionError> {
     static BOUNDS: [std::sync::OnceLock<Result<PiBounds, PiConversionError>>; 6] =
         [const { std::sync::OnceLock::new() }; 6];
-    if radians.denom().is_zero() || pi.denom().is_zero() {
-        return Err(PiConversionError::NonFinite);
-    }
-    if pi.numer().is_zero() {
+    if pi.numerator().is_zero() {
         return to_f64(radians).ok_or(PiConversionError::NonFinite);
     }
-    if radians.numer().is_zero() {
+    if radians.numerator().is_zero() {
         return to_pi_f64(pi);
     }
     let maximum = dyadic_from_bits(f64::MAX.to_bits()).ok_or(PiConversionError::Precision)?;
@@ -191,8 +180,8 @@ pub fn to_affine_f64(radians: &BigRational, pi: &BigRational) -> Result<f64, PiC
     Err(PiConversionError::Precision)
 }
 struct PiBounds {
-    lower: BigRational,
-    upper: BigRational,
+    lower: RBig,
+    upper: RBig,
 }
 fn pi_bounds(bits: usize) -> Result<PiBounds, PiConversionError> {
     // Machin's identity: pi = 16 atan(1/5) - 4 atan(1/239).
@@ -206,17 +195,17 @@ fn pi_bounds(bits: usize) -> Result<PiBounds, PiConversionError> {
         std::ops::Mul::mul(five_upper, 16),
         std::ops::Mul::mul(large_lower, 4),
     );
-    let scale = std::ops::Shl::shl(BigInt::from(1), bits);
+    let scale = std::ops::Shl::shl(IBig::from(1), bits);
     Ok(PiBounds {
-        lower: BigRational::new(lower, scale.clone()),
-        upper: BigRational::new(upper, scale),
+        lower: RBig::from_parts_signed(lower, scale.clone()),
+        upper: RBig::from_parts_signed(upper, scale),
     })
 }
-fn arctangent_bounds(reciprocal: u16, bits: usize) -> Result<(BigInt, BigInt), PiConversionError> {
-    let scale = std::ops::Shl::shl(BigInt::from(1), bits);
-    let square = std::ops::Mul::mul(BigInt::from(reciprocal), BigInt::from(reciprocal));
-    let mut power = BigInt::from(reciprocal);
-    let mut sum = BigInt::zero();
+fn arctangent_bounds(reciprocal: u16, bits: usize) -> Result<(IBig, IBig), PiConversionError> {
+    let scale = std::ops::Shl::shl(IBig::from(1), bits);
+    let square = std::ops::Mul::mul(IBig::from(reciprocal), IBig::from(reciprocal));
+    let mut power = IBig::from(reciprocal);
+    let mut sum = IBig::ZERO;
     for index in 0..bits {
         let odd = index
             .checked_mul(2)
@@ -227,7 +216,7 @@ fn arctangent_bounds(reciprocal: u16, bits: usize) -> Result<(BigInt, BigInt), P
         if term.is_zero() {
             // Each of index truncated terms has absolute error < one scaled
             // unit. The alternating-series remainder is below one further unit.
-            let error = BigInt::from(index.checked_add(1).ok_or(PiConversionError::Precision)?);
+            let error = IBig::from(index.checked_add(1).ok_or(PiConversionError::Precision)?);
             return Ok((
                 std::ops::Sub::sub(&sum, &error),
                 std::ops::Add::add(sum, error),
@@ -245,9 +234,9 @@ fn arctangent_bounds(reciprocal: u16, bits: usize) -> Result<(BigInt, BigInt), P
 
 #[cfg(test)]
 mod tests {
-    use super::{BigRational, pi_bounds, to_affine_f64, to_f64, to_pi_f64};
+    use super::{RBig, pi_bounds, to_affine_f64, to_f64, to_pi_f64};
+    use dashu_int::IBig;
     use googletest::prelude::*;
-    use num_bigint::BigInt;
 
     #[gtest]
     fn direct_affine_conversion_admits_finite_cancellation_of_overflowing_terms()
@@ -255,10 +244,9 @@ mod tests {
         let bounds = pi_bounds(1024)?;
         let midpoint = std::ops::Div::div(
             std::ops::Add::add(&bounds.lower, &bounds.upper),
-            BigInt::from(2),
+            IBig::from(2),
         );
-        let pi_coefficient =
-            BigRational::from_integer(std::ops::Shl::shl(BigInt::from(1), 1100usize));
+        let pi_coefficient = RBig::from(std::ops::Shl::shl(IBig::from(1), 1100usize));
         let radians = std::ops::Neg::neg(std::ops::Mul::mul(&pi_coefficient, &midpoint));
         expect_true!(to_f64(&radians).is_none());
         expect_true!(to_pi_f64(&pi_coefficient).is_err());
@@ -272,32 +260,34 @@ mod tests {
 
     #[gtest]
     fn rational_conversion_rounds_ties_and_subnormals_once() {
-        let power = |shift| std::ops::Shl::shl(BigInt::from(1), shift);
-        let half_ulp = BigRational::new(std::ops::Add::add(power(53usize), 1), power(53usize));
+        let power = |shift| std::ops::Shl::shl(IBig::from(1), shift);
+        let half_ulp =
+            RBig::from_parts_signed(std::ops::Add::add(power(53usize), 1), power(53usize));
         expect_eq!(to_f64(&half_ulp), Some(1.0));
-        let higher_tie = BigRational::new(std::ops::Add::add(power(53usize), 3), power(53usize));
+        let higher_tie =
+            RBig::from_parts_signed(std::ops::Add::add(power(53usize), 3), power(53usize));
         expect_eq!(
             to_f64(&higher_tie),
             Some(f64::from_bits(0x3ff0_0000_0000_0002))
         );
         expect_eq!(
-            to_f64(&BigRational::new(BigInt::from(1), power(1074usize))),
+            to_f64(&RBig::from_parts_signed(IBig::from(1), power(1074usize))),
             Some(f64::from_bits(1))
         );
         expect_eq!(
-            to_f64(&BigRational::new(BigInt::from(1), power(1075usize))),
+            to_f64(&RBig::from_parts_signed(IBig::from(1), power(1075usize))),
             Some(0.0)
         );
         expect_eq!(
-            to_f64(&BigRational::new(BigInt::from(-3), power(1075usize))),
+            to_f64(&RBig::from_parts_signed(IBig::from(-3), power(1075usize))),
             Some(f64::from_bits(0x8000_0000_0000_0002))
         );
-        expect_true!(to_f64(&BigRational::from_integer(power(1024usize))).is_none());
+        expect_true!(to_f64(&RBig::from(power(1024usize))).is_none());
     }
     #[gtest]
     fn rational_pi_keeps_subnormals_until_the_final_rounding() {
-        let denominator = std::ops::Shl::shl(BigInt::from(1), 1075usize);
-        let tiny = BigRational::new(BigInt::from(1), denominator);
+        let denominator = std::ops::Shl::shl(IBig::from(1), 1075usize);
+        let tiny = RBig::from_parts_signed(IBig::from(1), denominator);
         expect_eq!(to_pi_f64(&tiny).map(f64::to_bits), Ok(2));
         expect_eq!(
             to_pi_f64(&std::ops::Neg::neg(tiny)).map(f64::to_bits),
@@ -308,7 +298,7 @@ mod tests {
     fn rational_pi_refines_around_an_independently_computed_midpoint() {
         // These adjacent dyadic ratios straddle (1 + 2^-53) / pi.
         // Independent 1400/1600-digit Gauss-Legendre AGM oracles agree.
-        let denominator = std::ops::Shl::shl(BigInt::from(1), 128usize);
+        let denominator = std::ops::Shl::shl(IBig::from(1), 128usize);
         for (numerator, bits) in [
             (
                 108_315_241_484_954_830_072_309_728_913_637_971_665u128,
@@ -319,7 +309,7 @@ mod tests {
                 0x3ff0_0000_0000_0001,
             ),
         ] {
-            let ratio = BigRational::new(BigInt::from(numerator), denominator.clone());
+            let ratio = RBig::from_parts_signed(IBig::from(numerator), denominator.clone());
             expect_eq!(to_pi_f64(&ratio).map(f64::to_bits), Ok(bits));
         }
     }
@@ -328,9 +318,9 @@ mod tests {
         let fine = super::pi_bounds(8192)
             .map_err(|_| std::io::Error::other("reference bounds unavailable"))?;
         let approximate_pi =
-            std::ops::Div::div(std::ops::Add::add(fine.lower, fine.upper), BigInt::from(2));
-        let denominator = std::ops::Shl::shl(BigInt::from(1), 53usize);
-        let midpoint = BigRational::new(std::ops::Add::add(&denominator, 1), denominator);
+            std::ops::Div::div(std::ops::Add::add(fine.lower, fine.upper), IBig::from(2));
+        let denominator = std::ops::Shl::shl(IBig::from(1), 53usize);
+        let midpoint = RBig::from_parts_signed(std::ops::Add::add(&denominator, 1), denominator);
         let ratio = std::ops::Div::div(midpoint, approximate_pi);
         expect_eq!(to_pi_f64(&ratio), Err(super::PiConversionError::Precision));
         Ok(())

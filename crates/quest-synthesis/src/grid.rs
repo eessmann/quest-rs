@@ -7,42 +7,42 @@
     clippy::redundant_pub_crate
 )]
 use crate::{Budget, Result, SynthesisError};
-use num_bigint::BigInt;
-use num_traits::{One, Signed, Zero};
-use quest_math::{Cyclotomic, DyadicBox8, ExactMatrix, Rational};
-type Vector = [BigInt; 4];
+use dashu_base::{BitTest, Signed};
+use dashu_int::IBig;
+use quest_math::{Cyclotomic, DyadicBox8, ExactMatrix, RBig};
+type Vector = [IBig; 4];
 type Basis = [Vector; 4];
-type RVector = [Rational; 4];
+type RVector = [RBig; 4];
 struct Orthogonal {
     vectors: [RVector; 4],
     mu: [RVector; 4],
-    norms: [Rational; 4],
+    norms: [RBig; 4],
 }
 #[derive(Clone, Copy)]
 struct SearchWindow<'a> {
-    weighted: &'a Rational,
-    coefficient: &'a Rational,
-    radial_error: &'a Rational,
-    radial_headroom: &'a Rational,
+    weighted: &'a RBig,
+    coefficient: &'a RBig,
+    radial_error: &'a RBig,
+    radial_headroom: &'a RBig,
 }
 struct IntegerWindow {
-    middle: BigInt,
-    bound: BigInt,
-    lower: BigInt,
-    upper: BigInt,
+    middle: IBig,
+    bound: IBig,
+    lower: IBig,
+    upper: IBig,
 }
 fn integer_window(
-    centers: [&Rational; 2],
-    radii_squared: [&Rational; 2],
+    centers: [&RBig; 2],
+    radii_squared: [&RBig; 2],
     budget: &mut Budget,
 ) -> Result<Option<IntegerWindow>> {
-    let bounds: [BigInt; 2] = [
+    let bounds: [IBig; 2] = [
         crate::approximation::sqrt(
-            &(radii_squared[0].numer() / radii_squared[0].denom()),
+            &(radii_squared[0].numerator() / radii_squared[0].denominator()),
             budget,
         )? + 2,
         crate::approximation::sqrt(
-            &(radii_squared[1].numer() / radii_squared[1].denom()),
+            &(radii_squared[1].numerator() / radii_squared[1].denominator()),
             budget,
         )? + 2,
     ];
@@ -76,16 +76,16 @@ pub(crate) struct Grid {
     orthogonal: Orthogonal,
     coefficient_metric: Orthogonal,
     radial_projection: RVector,
-    radial_headroom: Rational,
-    center: BigInt,
-    radius: BigInt,
+    radial_headroom: RBig,
+    center: IBig,
+    radius: IBig,
 }
 
-fn nearest(value: &Rational) -> BigInt {
-    let numerator = value.numer() * 2 + value.denom();
-    floor(&numerator, &(value.denom() * 2))
+fn nearest(value: &RBig) -> IBig {
+    let numerator = value.numerator() * 2 + value.denominator();
+    floor(&numerator, &IBig::from(value.denominator() * 2u8))
 }
-fn floor(n: &BigInt, d: &BigInt) -> BigInt {
+fn floor(n: &IBig, d: &IBig) -> IBig {
     let quotient = n / d;
     if (n % d).is_negative() {
         quotient - 1
@@ -93,32 +93,30 @@ fn floor(n: &BigInt, d: &BigInt) -> BigInt {
         quotient
     }
 }
-fn admit(value: &BigInt, budget: &Budget) -> Result<()> {
-    if value.bits() > budget.options.limits.coefficient_bits {
+fn admit(value: &IBig, budget: &Budget) -> Result<()> {
+    if u64::try_from(value.bit_len()).unwrap_or(u64::MAX) > budget.options.limits.coefficient_bits {
         return Err(SynthesisError::Budget {
             resource: "lattice coefficient bits",
         });
     }
     Ok(())
 }
-fn admit_rational(value: &Rational, budget: &Budget) -> Result<()> {
-    admit(value.numer(), budget)?;
-    admit(value.denom(), budget)
+fn admit_rational(value: &RBig, budget: &Budget) -> Result<()> {
+    admit(value.numerator(), budget)?;
+    admit(&IBig::from(value.denominator().clone()), budget)
 }
 fn orthogonal(basis: &Basis, budget: &mut Budget) -> Result<Orthogonal> {
     budget.charge(256)?;
     for value in basis.iter().flatten() {
         admit(value, budget)?;
     }
-    let mut vectors: [RVector; 4] =
-        std::array::from_fn(|_| std::array::from_fn(|_| Rational::zero()));
-    let mut mu: [RVector; 4] = std::array::from_fn(|_| std::array::from_fn(|_| Rational::zero()));
-    let mut norms = std::array::from_fn(|_| Rational::zero());
+    let mut vectors: [RVector; 4] = std::array::from_fn(|_| std::array::from_fn(|_| RBig::ZERO));
+    let mut mu: [RVector; 4] = std::array::from_fn(|_| std::array::from_fn(|_| RBig::ZERO));
+    let mut norms = std::array::from_fn(|_| RBig::ZERO);
     for i in 0..4 {
         for j in 0..i {
-            let mut dot = Rational::from_integer(
-                (0..4).fold(BigInt::zero(), |sum, k| sum + &basis[i][k] * &basis[j][k]),
-            );
+            let mut dot =
+                RBig::from((0..4).fold(IBig::ZERO, |sum, k| sum + &basis[i][k] * &basis[j][k]));
             admit_rational(&dot, budget)?;
             for k in 0..j {
                 dot -= &mu[i][k] * &mu[j][k] * &norms[k];
@@ -127,9 +125,8 @@ fn orthogonal(basis: &Basis, budget: &mut Budget) -> Result<Orthogonal> {
             mu[i][j] = dot / &norms[j];
             admit_rational(&mu[i][j], budget)?;
         }
-        norms[i] =
-            Rational::from_integer(basis[i].iter().fold(BigInt::zero(), |sum, x| sum + x * x));
-        vectors[i][0] = Rational::from_integer(basis[i][0].clone());
+        norms[i] = RBig::from(basis[i].iter().fold(IBig::ZERO, |sum, x| sum + x * x));
+        vectors[i][0] = RBig::from(basis[i][0].clone());
         admit_rational(&norms[i], budget)?;
         for j in 0..i {
             norms[i] = &norms[i] - &mu[i][j] * &mu[i][j] * &norms[j];
@@ -143,15 +140,15 @@ fn orthogonal(basis: &Basis, budget: &mut Budget) -> Result<Orthogonal> {
             ));
         }
         for x in &vectors[i] {
-            admit(x.numer(), budget)?;
-            admit(x.denom(), budget)?;
+            admit(x.numerator(), budget)?;
+            admit(&IBig::from(x.denominator().clone()), budget)?;
         }
     }
     Ok(Orthogonal { vectors, mu, norms })
 }
 fn reduce(mut basis: Basis, budget: &mut Budget) -> Result<(Basis, Orthogonal)> {
     let mut transform =
-        std::array::from_fn(|i| std::array::from_fn(|j| BigInt::from(u8::from(i == j))));
+        std::array::from_fn(|i| std::array::from_fn(|j| IBig::from(u8::from(i == j))));
     let mut gs = orthogonal(&basis, budget)?;
     let mut k = 1;
     while k < 4 {
@@ -166,7 +163,7 @@ fn reduce(mut basis: Basis, budget: &mut Budget) -> Result<(Basis, Orthogonal)> 
                     admit(&basis[k][i], budget)?;
                     admit(&transform[k][i], budget)?;
                 }
-                let rational_q = Rational::from_integer(q);
+                let rational_q = RBig::from(q);
                 for l in 0..j {
                     gs.mu[k][l] = &gs.mu[k][l] - &rational_q * &gs.mu[j][l];
                     admit_rational(&gs.mu[k][l], budget)?;
@@ -176,7 +173,7 @@ fn reduce(mut basis: Basis, budget: &mut Budget) -> Result<(Basis, Orthogonal)> 
             }
         }
         if gs.norms[k]
-            >= (Rational::new(3.into(), 4.into()) - &gs.mu[k][k - 1] * &gs.mu[k][k - 1])
+            >= (RBig::from_parts_signed(3.into(), 4.into()) - &gs.mu[k][k - 1] * &gs.mu[k][k - 1])
                 * &gs.norms[k - 1]
         {
             k += 1;
@@ -190,11 +187,7 @@ fn reduce(mut basis: Basis, budget: &mut Budget) -> Result<(Basis, Orthogonal)> 
     Ok((transform, gs))
 }
 impl Grid {
-    pub(crate) fn new(
-        target: &DyadicBox8,
-        epsilon: &Rational,
-        budget: &mut Budget,
-    ) -> Result<Self> {
+    pub(crate) fn new(target: &DyadicBox8, epsilon: &RBig, budget: &mut Budget) -> Result<Self> {
         budget.charge(1)?;
         // Conservative scratch admission for 4x4 rational Gram--Schmidt buffers.
         let scratch = budget
@@ -210,12 +203,12 @@ impl Grid {
                 resource: "lattice bytes",
             });
         }
-        let scale = BigInt::one() << target.bits();
+        let scale = IBig::ONE << target.bits();
         admit(&scale, budget)?;
         let square = &scale * &scale;
         admit(&square, budget)?;
-        let en = epsilon.numer();
-        let ed = epsilon.denom();
+        let en = epsilon.numerator();
+        let ed = &IBig::from(epsilon.denominator().clone());
         if &scale * en * en < ed * ed * 4096 {
             return Err(SynthesisError::PrecisionUnresolved {
                 precision_bits: target.bits(),
@@ -249,8 +242,8 @@ impl Grid {
         let r = (lo + hi) >> 1;
         let radial = [&x * &scale, &r * (&x + &y), &y * &scale, &r * (-&x + &y)];
         let tangent = [-&y * &scale, &r * (-&y + &x), &x * &scale, &r * (&y + &x)];
-        let bullet_real = [square.clone(), -&r * &scale, BigInt::zero(), &r * &scale];
-        let bullet_imag = [BigInt::zero(), -&r * &scale, square.clone(), -&r * &scale];
+        let bullet_real = [square.clone(), -&r * &scale, IBig::ZERO, &r * &scale];
+        let bullet_imag = [IBig::ZERO, -&r * &scale, square.clone(), -&r * &scale];
         let factors = [ed * ed * 8, ed * en * 4, en * en * 2, en * en * 2];
         let rows = [radial, tangent, bullet_real, bullet_imag];
         let basis = std::array::from_fn(|i| std::array::from_fn(|j| &rows[j][i] * &factors[j]));
@@ -264,17 +257,16 @@ impl Grid {
         // changes the physical point's L1 norm by at most 2*root_width/scale.
         // The target midpoint's norm is at most 1+target_width/scale. Thus this
         // exact rational radial upper bound includes every feasible point.
-        let radial_headroom = Rational::from_integer(
-            ed * ed * 8 * (&scale + target_width) * (&scale + root_width * 2) - &center,
-        );
+        let radial_headroom =
+            RBig::from(ed * ed * 8 * (&scale + target_width) * (&scale + root_width * 2) - &center);
         budget.charge(64)?;
-        let mut radial_projection = std::array::from_fn(|_| Rational::zero());
-        let mut projection = Rational::zero();
+        let mut radial_projection = std::array::from_fn(|_| RBig::ZERO);
+        let mut projection = RBig::ZERO;
         for i in 0..4 {
             projection +=
                 &orthogonal.vectors[i][0] * &orthogonal.vectors[i][0] / &orthogonal.norms[i];
             admit_rational(&projection, budget)?;
-            radial_projection[i] = projection.clone();
+            radial_projection[i].clone_from(&projection);
         }
         admit_rational(&radial_headroom, budget)?;
         let radius = en * en * &square * 6;
@@ -305,19 +297,21 @@ impl Grid {
         mut visit: impl FnMut(Vector, &mut Budget) -> Result<Option<T>>,
     ) -> Result<Option<T>> {
         budget.charge(16)?;
-        let factor = BigInt::one() << exponent;
+        let factor = IBig::ONE
+            << usize::try_from(exponent).map_err(|_| SynthesisError::Budget {
+                resource: "synthesis exponent",
+            })?;
         admit(&factor, budget)?;
         let center = &self.center * &factor;
         admit(&center, budget)?;
         let y = std::array::from_fn(|i| {
-            Rational::from_integer(center.clone()) * &self.orthogonal.vectors[i][0]
-                / &self.orthogonal.norms[i]
+            RBig::from(center.clone()) * &self.orthogonal.vectors[i][0] / &self.orthogonal.norms[i]
         });
         let radius = &self.radius * &factor;
         admit(&radius, budget)?;
-        let remaining = Rational::from_integer(&radius * &radius);
-        let coefficient_radius = Rational::from_integer(&factor * &factor);
-        let radial_headroom = &self.radial_headroom * Rational::from_integer(factor);
+        let remaining = RBig::from(&radius * &radius);
+        let coefficient_radius = RBig::from(&factor * &factor);
+        let radial_headroom = &self.radial_headroom * RBig::from(factor);
         for value in &y {
             admit_rational(value, budget)?;
         }
@@ -327,11 +321,11 @@ impl Grid {
         self.enumerate_level(
             3,
             &y,
-            &mut std::array::from_fn(|_| BigInt::zero()),
+            &mut std::array::from_fn(|_| IBig::ZERO),
             SearchWindow {
                 weighted: &remaining,
                 coefficient: &coefficient_radius,
-                radial_error: &Rational::zero(),
+                radial_error: &RBig::ZERO,
                 radial_headroom: &radial_headroom,
             },
             budget,
@@ -346,7 +340,7 @@ impl Grid {
     ) -> Result<bool> {
         let radial_excess = remaining.radial_error - remaining.radial_headroom;
         admit_rational(&radial_excess, budget)?;
-        if radial_excess.is_positive() {
+        if radial_excess > RBig::ZERO {
             let squared_excess = &radial_excess * &radial_excess;
             let reachable = remaining.weighted * &self.radial_projection[level];
             admit_rational(&squared_excess, budget)?;
@@ -371,13 +365,12 @@ impl Grid {
             return Ok(None);
         }
         let mut center = y[level].clone();
-        let mut coefficient_center = Rational::zero();
+        let mut coefficient_center = RBig::ZERO;
         for j in (level + 1)..4 {
-            center -=
-                &self.orthogonal.mu[j][level] * Rational::from_integer(coefficients[j].clone());
+            center -= &self.orthogonal.mu[j][level] * RBig::from(coefficients[j].clone());
             admit_rational(&center, budget)?;
-            coefficient_center -= &self.coefficient_metric.mu[j][level]
-                * Rational::from_integer(coefficients[j].clone());
+            coefficient_center -=
+                &self.coefficient_metric.mu[j][level] * RBig::from(coefficients[j].clone());
             admit_rational(&coefficient_center, budget)?;
         }
         let radius_squared = remaining.weighted / &self.orthogonal.norms[level];
@@ -397,23 +390,23 @@ impl Grid {
         else {
             return Ok(None);
         };
-        let mut offset = BigInt::zero();
+        let mut offset = IBig::ZERO;
         while offset <= bound {
             for sign in [1, -1] {
                 if offset.is_zero() && sign < 0 {
                     continue;
                 }
                 budget.charge(8)?;
-                let value: BigInt = &middle + &offset * sign;
+                let value: IBig = &middle + &offset * sign;
                 admit(&value, budget)?;
                 if value < lower || value > upper {
                     continue;
                 }
-                let error = Rational::from_integer(value.clone()) - &center;
+                let error = RBig::from(value.clone()) - &center;
                 admit_rational(&error, budget)?;
                 let cost = &error * &error * &self.orthogonal.norms[level];
                 admit_rational(&cost, budget)?;
-                let coefficient_error = Rational::from_integer(value.clone()) - &coefficient_center;
+                let coefficient_error = RBig::from(value.clone()) - &coefficient_center;
                 let coefficient_cost =
                     &coefficient_error * &coefficient_error * &self.coefficient_metric.norms[level];
                 admit_rational(&coefficient_error, budget)?;
@@ -424,7 +417,7 @@ impl Grid {
                 coefficients[level] = value;
                 if level == 0 {
                     let point = std::array::from_fn(|i| {
-                        (0..4).fold(BigInt::zero(), |sum, j| {
+                        (0..4).fold(IBig::ZERO, |sum, j| {
                             sum + &coefficients[j] * &self.transform[j][i]
                         })
                     });
@@ -470,26 +463,26 @@ impl Grid {
 mod tests {
     use super::*;
     use crate::SynthesisOptions;
-    use quest_math::{AngleTarget, Axis, Rational, Target, rotation_enclosure};
+    use quest_math::{AngleTarget, Axis, RBig, Target, rotation_enclosure};
     #[expect(
         clippy::many_single_char_names,
         reason = "Exact algebraic coefficients and relative norm components"
     )]
-    fn feasible(point: &Vector, radius: &BigInt) -> bool {
+    fn feasible(point: &Vector, radius: &IBig) -> bool {
         let [a, b, c, d] = point;
         let n = radius * radius - a * a - b * b - c * c - d * d;
         let m = a * (b - d) + c * (b + d);
         !n.is_negative() && &n * &n >= &m * &m * 2
     }
-    fn in_original_sphere(grid: &Grid, point: &Vector, factor: &BigInt) -> bool {
+    fn in_original_sphere(grid: &Grid, point: &Vector, factor: &IBig) -> bool {
         let embedded: Vector = std::array::from_fn(|j| {
-            (0..4).fold(BigInt::zero(), |sum, i| {
+            (0..4).fold(IBig::ZERO, |sum, i| {
                 sum + &point[i] * &grid.original_basis[i][j]
             })
         });
         let mut difference = embedded;
         difference[0] -= &grid.center * factor;
-        let cost = difference.iter().fold(BigInt::zero(), |sum, x| sum + x * x);
+        let cost = difference.iter().fold(IBig::ZERO, |sum, x| sum + x * x);
         let radius = &grid.radius * factor;
         cost <= &radius * &radius
     }
@@ -497,23 +490,23 @@ mod tests {
     fn exact_epsilon_cap_is_contained_in_the_search_sphere() {
         // Independent exact Q(sqrt(2)) comparison for the target z=1.
         // a + (b-d)/sqrt(2) >= radius*(1-epsilon²/4).
-        fn in_cap(point: &Vector, radius: &BigInt, epsilon: &Rational) -> bool {
-            let right = Rational::from_integer(radius.clone())
-                * (Rational::one() - epsilon * epsilon / BigInt::from(4))
-                - Rational::from_integer(point[0].clone());
+        fn in_cap(point: &Vector, radius: &IBig, epsilon: &RBig) -> bool {
+            let right = RBig::from(radius.clone())
+                * (RBig::ONE - epsilon * epsilon / IBig::from(4))
+                - RBig::from(point[0].clone());
             let radical = &point[1] - &point[3];
             if radical.is_negative() != right.is_negative() {
                 return !radical.is_negative();
             }
-            let left_square = &radical * &radical * right.denom() * right.denom();
-            let right_square = right.numer() * right.numer() * 2;
+            let left_square = &radical * &radical * right.denominator() * right.denominator();
+            let right_square = right.numerator() * right.numerator() * 2;
             if radical.is_negative() {
                 left_square <= right_square
             } else {
                 left_square >= right_square
             }
         }
-        let scale: BigInt = BigInt::one() << 20;
+        let scale: IBig = IBig::ONE << 20;
         let target = DyadicBox8::point(
             20,
             [
@@ -529,7 +522,7 @@ mod tests {
         )
         .unwrap();
         for denominator in [1, 2, 8] {
-            let epsilon = Rational::new(1.into(), denominator.into());
+            let epsilon = RBig::from_parts_signed(1.into(), denominator.into());
             let mut budget = Budget {
                 options: SynthesisOptions::default(),
                 used: 0,
@@ -538,7 +531,7 @@ mod tests {
             let mut witnesses = 0;
             for exponent in 0..=2 {
                 let bound = 1_i32 << exponent;
-                let radius = BigInt::from(bound);
+                let radius = IBig::from(bound);
                 for a in -bound..=bound {
                     for b in -bound..=bound {
                         for c in -bound..=bound {
@@ -576,11 +569,15 @@ mod tests {
             };
             let enclosure =
                 rotation_enclosure(&target, options.limits.precision_bits, options.limits).unwrap();
-            let grid =
-                Grid::new(&enclosure, &Rational::new(1.into(), 2.into()), &mut budget).unwrap();
+            let grid = Grid::new(
+                &enclosure,
+                &RBig::from_parts_signed(1.into(), 2.into()),
+                &mut budget,
+            )
+            .unwrap();
             for exponent in 0..=2 {
                 let radius = 1i32 << exponent;
-                let factor = BigInt::from(radius);
+                let factor = IBig::from(radius);
                 let mut expected = std::collections::BTreeSet::new();
                 for a in -radius..=radius {
                     for b in -radius..=radius {
@@ -652,7 +649,7 @@ mod tests {
         };
         let enclosure =
             rotation_enclosure(&target, options.limits.precision_bits, options.limits).unwrap();
-        let epsilon = Rational::new(1.into(), 1_000_000_000_000_u64.into());
+        let epsilon = RBig::from_parts_signed(1.into(), 1_000_000_000_000_u64.into());
         let lattice = Grid::new(&enclosure, &epsilon, &mut budget).unwrap();
         let found = lattice
             .enumerate(0, &mut budget, |coefficients, _| {

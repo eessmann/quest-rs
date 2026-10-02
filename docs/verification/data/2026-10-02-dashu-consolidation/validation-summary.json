@@ -1,0 +1,269 @@
+{
+  "workspace-tests": {
+    "command": [
+      "cargo",
+      "nextest",
+      "run",
+      "--workspace",
+      "--locked",
+      "--features",
+      "quest-rs/qsvt,quest-rs/workers,quest-rs/serde,quest-rs/codespan-reporting,quest-rs/ndarray,quest-optimizer-worker/synthesis,quest-optimizer-worker/zx,quest-optimizer-worker/mitm,quest-qsp/offline-synthesis,quest-qsp/rayon,quest-qsp/simd,quest-qsvt-cli/offline-synthesis,quest-qsvt-cli/rayon",
+      "--profile",
+      "ci",
+      "--test-threads",
+      "4"
+    ],
+    "exit_code": 0,
+    "seconds": 145.419241709
+  },
+  "workspace-doc-tests": {
+    "command": [
+      "cargo",
+      "test",
+      "--doc",
+      "--workspace",
+      "--locked",
+      "--features",
+      "quest-rs/qsvt,quest-rs/workers,quest-rs/serde,quest-rs/codespan-reporting,quest-rs/ndarray,quest-optimizer-worker/synthesis,quest-optimizer-worker/zx,quest-optimizer-worker/mitm,quest-qsp/offline-synthesis,quest-qsp/rayon,quest-qsp/simd,quest-qsvt-cli/offline-synthesis,quest-qsvt-cli/rayon"
+    ],
+    "exit_code": 0,
+    "seconds": 14.240823500000005
+  },
+  "workspace-clippy": {
+    "command": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--locked",
+      "--features",
+      "quest-rs/qsvt,quest-rs/workers,quest-rs/serde,quest-rs/codespan-reporting,quest-rs/ndarray,quest-optimizer-worker/synthesis,quest-optimizer-worker/zx,quest-optimizer-worker/mitm,quest-qsp/offline-synthesis,quest-qsp/rayon,quest-qsp/simd,quest-qsvt-cli/offline-synthesis,quest-qsvt-cli/rayon",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit_code": 0,
+    "seconds": 28.596352832999997
+  },
+  "large-qsp": {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "quest-qsp",
+      "--all-features",
+      "--lib",
+      "--test",
+      "offline",
+      "--test",
+      "parallel",
+      "--locked",
+      "--",
+      "--ignored",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit_code": 0,
+    "seconds": 357.795045917
+  },
+  "documentation": {
+    "command": [
+      "cargo",
+      "doc",
+      "--workspace",
+      "--no-deps",
+      "--locked",
+      "--features",
+      "quest-rs/qsvt,quest-rs/workers,quest-rs/serde,quest-rs/codespan-reporting,quest-rs/ndarray,quest-optimizer-worker/synthesis,quest-optimizer-worker/zx,quest-optimizer-worker/mitm,quest-qsp/offline-synthesis,quest-qsp/rayon,quest-qsp/simd,quest-qsvt-cli/offline-synthesis,quest-qsvt-cli/rayon"
+    ],
+    "exit_code": 0,
+    "seconds": 25.302855166
+  },
+  "pure-cli": {
+    "command": [
+      "cargo",
+      "check",
+      "-p",
+      "quest-qsvt-cli",
+      "--no-default-features",
+      "--all-targets",
+      "--locked"
+    ],
+    "exit_code": 0,
+    "seconds": 3.3307514589999982
+  },
+  "scalar-kernels": {
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "quest-numerics",
+      "--no-default-features",
+      "--test",
+      "kernels",
+      "--test",
+      "observer",
+      "--locked"
+    ],
+    "exit_code": 0,
+    "seconds": 0.469138375
+  },
+  "formatting": {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "exit_code": 0,
+    "seconds": 1.4206882919999941
+  },
+  "book": {
+    "command": [
+      "mdbook",
+      "build",
+      "docs/book"
+    ],
+    "exit_code": 0,
+    "seconds": 0.20174662500002682
+  },
+  "bindings": {
+    "command": [
+      "cargo",
+      "run",
+      "--locked",
+      "-p",
+      "xtask",
+      "--",
+      "generate-quest-bindings",
+      "--check"
+    ],
+    "exit_code": 0,
+    "seconds": 8.062268541999998
+  },
+  "native-consumers": {
+    "command": [
+      "cargo",
+      "run",
+      "--locked",
+      "-p",
+      "xtask",
+      "--",
+      "check-native-consumers",
+      "--backends",
+      "cpu,omp",
+      "--work-dir",
+      "target/dashu-native-consumers-final"
+    ],
+    "exit_code": 0,
+    "seconds": 100.36563891600002
+  },
+  "compiler-pure": {
+    "command": [
+      "cargo",
+      "clippy",
+      "-p",
+      "quest-compile",
+      "--lib",
+      "--no-default-features",
+      "--locked",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit_code": 0,
+    "seconds": 0.5771205000000066
+  },
+  "compiler-synthesis": {
+    "command": [
+      "cargo",
+      "clippy",
+      "-p",
+      "quest-compile",
+      "--lib",
+      "--no-default-features",
+      "--features",
+      "synthesis",
+      "--locked",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit_code": 0,
+    "seconds": 0.328265832999989
+  },
+  "compiler-workers": {
+    "command": [
+      "cargo",
+      "clippy",
+      "-p",
+      "quest-compile",
+      "--lib",
+      "--no-default-features",
+      "--features",
+      "workers",
+      "--locked",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit_code": 0,
+    "seconds": 0.34790266599998176
+  },
+  "native-direct": {
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "quest-compile",
+      "--no-default-features",
+      "--features",
+      "synthesis",
+      "--test",
+      "native_direct",
+      "--locked"
+    ],
+    "exit_code": 0,
+    "seconds": 0.7127205419999996
+  },
+  "qsp-certification-only": {
+    "command": [
+      "cargo",
+      "clippy",
+      "-p",
+      "quest-qsp",
+      "--all-targets",
+      "--no-default-features",
+      "--features",
+      "certification",
+      "--locked",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit_code": 0,
+    "seconds": 2.3028092089999745
+  },
+  "large-mp-qsp": {
+    "command": [
+      "cargo",
+      "test",
+      "--release",
+      "-p",
+      "quest-qsp",
+      "--all-features",
+      "--lib",
+      "--test",
+      "offline",
+      "--locked",
+      "--",
+      "--ignored",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit_code": 0,
+    "seconds": 157.046274083
+  }
+}

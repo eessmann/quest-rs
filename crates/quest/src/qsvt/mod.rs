@@ -185,7 +185,7 @@ fn dispatch_schedule(
         continuation.bridge().is_some(),
     )
 }
-fn plan(program: &quest_circuit::BoundRegion) -> crate::Result<quest_circuit::RegionPlan> {
+fn plan(program: &quest_compile::BoundRegion) -> crate::Result<quest_compile::RegionPlan> {
     Ok(program.clone().plan()?)
 }
 type RunAdmission = (Vec<bool>, Option<Vec<bool>>);

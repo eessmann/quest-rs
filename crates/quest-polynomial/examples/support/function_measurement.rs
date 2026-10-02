@@ -3,7 +3,8 @@
     clippy::arithmetic_side_effects,
     reason = "Bounded benchmark loops and expression construction"
 )]
-use quest_polynomial::{Expression, Function, Interval};
+use quest_numerics::arithmetic::{F64Backend, Interval64Backend};
+use quest_polynomial::{Expression, Function, GenericFunction, Interval};
 use std::{
     alloc::{GlobalAlloc, Layout, System},
     hint::black_box,
@@ -65,16 +66,16 @@ pub fn run<E: Expression>(
         Ok(())
     })?;
     measure(label, "value", 1_000_000, || {
-        black_box(function.evaluate(black_box(0.3))?);
+        black_box(function.evaluate(&mut F64Backend, black_box(0.3))?);
         Ok(())
     })?;
     measure(label, "jet", 1_000_000, || {
-        black_box(function.jet(black_box(0.3))?);
+        black_box(function.jet(&mut F64Backend, black_box(0.3))?);
         Ok(())
     })?;
     let domain = Interval::new(0.2, 0.3)?;
     measure(label, "interval_jet", 10_000, || {
-        black_box(function.jet_interval(black_box(domain))?);
+        black_box(function.jet(&mut Interval64Backend, black_box(domain))?);
         Ok(())
     })?;
     Ok(())

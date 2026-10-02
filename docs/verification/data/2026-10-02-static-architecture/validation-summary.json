@@ -1,0 +1,153 @@
+{
+  "baseline": "001a2b656a5a80a60659a408f87f57670309a09b",
+  "platform": "aarch64-apple-darwin",
+  "rustc_revision": "6bb1652a020e80cef79332741d89e996d71933c9",
+  "native": "QuEST 4.3.0, CPU/OpenMP, project-local Nix environment",
+  "checks": [
+    {
+      "name": "workspace_supported_features",
+      "status": "passed",
+      "passed": 989,
+      "skipped": 8,
+      "receipt": "workspace-features-nextest.log.gz",
+      "notes": "Final source after QR storage admission, bulk work reservation and AD inlining. Three ignored QSP regressions run separately; five Linux process cases unavailable."
+    },
+    {
+      "name": "workspace_doctests",
+      "status": "passed",
+      "passed": 56,
+      "ignored": 1,
+      "receipt": "workspace-doctests.log.gz"
+    },
+    {
+      "name": "workspace_clippy_all_targets",
+      "status": "passed",
+      "warnings_as_errors": true,
+      "receipt": "workspace-clippy.log.gz"
+    },
+    {
+      "name": "workspace_rustdoc",
+      "status": "passed",
+      "warnings_as_errors": true,
+      "receipt": "workspace-rustdoc.log.gz"
+    },
+    {
+      "name": "format",
+      "status": "passed",
+      "receipt": "workspace-format.log.gz"
+    },
+    {
+      "name": "book",
+      "status": "passed",
+      "receipt": "book-build.log.gz"
+    },
+    {
+      "name": "bindings_freshness",
+      "status": "passed",
+      "receipt": "bindings-check-final.log.gz"
+    },
+    {
+      "name": "pure_cli_no_default_features",
+      "status": "passed",
+      "receipt": "cli-pure-check.log.gz"
+    },
+    {
+      "name": "scalar_numerics_no_default_features",
+      "status": "passed",
+      "passed": 16,
+      "receipt": "numerics-scalar.log.gz"
+    },
+    {
+      "name": "final_polynomial_integration",
+      "status": "passed",
+      "passed": 26,
+      "receipt": "polynomial-last-integration.log.gz",
+      "notes": "After reserve_history extraction and replacing clone/add-zero input validation with Backend::validate."
+    },
+    {
+      "name": "final_polynomial_all_target_clippy",
+      "status": "passed",
+      "receipt": "polynomial-last-clippy.log.gz"
+    },
+    {
+      "name": "large_qsp_release",
+      "status": "passed",
+      "passed": 3,
+      "receipt": "qsp-large-release.log.gz",
+      "degrees": [
+        8192,
+        8105
+      ],
+      "notes": "Independent interval FFT, offline export certification, serial/1/2/4-worker bit equality for both signal conventions."
+    },
+    {
+      "name": "native_cpu_omp_consumers",
+      "status": "passed",
+      "receipt": "native-consumers-final.log.gz",
+      "notes": "Includes installed closure, renamed consumers, and loader paths."
+    },
+    {
+      "name": "compiler_feature_isolation",
+      "status": "passed",
+      "receipt": "compiler-final-gates.log.gz"
+    },
+    {
+      "name": "renamed_compiler_macro_consumer",
+      "status": "passed",
+      "receipt": "compiler-renamed.log.gz"
+    },
+    {
+      "name": "default_suite_migration_fixes",
+      "status": "passed_targeted_after_initial_failure",
+      "initial_passed": 911,
+      "initial_failed": 2,
+      "receipt": "workspace-nextest-complete.log.gz",
+      "fix_receipts": [
+        "precision-boundary-final.log.gz",
+        "native-ui-refresh.log.gz"
+      ],
+      "notes": "Dependency boundary admission and changed non-Send ownership trace. Later supported-feature workspace passed completely."
+    },
+    {
+      "name": "faer_padded_storage_regression",
+      "status": "passed",
+      "passed": 7,
+      "receipt": "linear-storage-green.log.gz",
+      "notes": "Tight 1x1/256-byte limit failed before corrected padded-layout/scratch admission; repeated in final workspace."
+    }
+  ],
+  "unavailable": [
+    "Linux bounded external workers",
+    "Linux native consumers",
+    "MPI execution/ABI runtime",
+    "GPU/accelerator runtime and performance"
+  ],
+  "limitations": [
+    "Known incomplete generic_const_exprs warning and nightly coherence solver fallback.",
+    "MPFR oracle tests sample inclusion; they are not a formal proof of the transcendental library.",
+    "Storage budgets model application workspaces, not opaque upstream library internals or allocator metadata.",
+    "One preexisting documentation example remains ignored."
+  ],
+  "performance": {
+    "status": "passed",
+    "numerical": {
+      "trials": 3,
+      "source_hashes_unchanged": true,
+      "report": "numerical-report.md",
+      "receipts": "numerical/"
+    },
+    "project": {
+      "trials": 3,
+      "processes": 18,
+      "source_hashes_unchanged": true,
+      "report": "project-report.md",
+      "receipts": "project/"
+    },
+    "limitations": [
+      "Darwin local measurements, not a Linux/HPC campaign.",
+      "Rust allocator excludes native allocations and allocator metadata.",
+      "Build timings are single observations; project unchanged builds actually rebuild native-dependent crates.",
+      "Larger binaries and increased Remez allocation counts are retained tradeoffs."
+    ]
+  }
+}

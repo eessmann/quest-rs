@@ -197,6 +197,7 @@ fn configure(
 
 fn bridge_input_file(inputs: Option<&BridgeInputs>) -> Result<String> {
     let mut text = String::new();
+    let mut watched = BTreeSet::new();
     let empty = BridgeInputs::default();
     let inputs = inputs.unwrap_or(&empty);
     for (name, paths) in [
@@ -215,10 +216,11 @@ fn bridge_input_file(inputs: Option<&BridgeInputs>) -> Result<String> {
                 equals.push('=');
             }
             let _ = writeln!(text, "  [{equals}[{value}]{equals}]");
-            println!("cargo:rerun-if-changed={}", path.display());
+            watched.insert(path);
         }
         text.push_str(")\n");
     }
+    emit_input_watches(watched)?;
     Ok(text)
 }
 
@@ -785,7 +787,28 @@ fn watch_inputs(
             inputs.insert(input.path);
         }
     }
+    emit_input_watches(inputs)
+}
+
+fn emit_input_watches(inputs: BTreeSet<PathBuf>) -> Result<()> {
+    let output = env::var_os("OUT_DIR")
+        .map(|path| {
+            let path = Path::new(&path);
+            fs::canonicalize(path).map_err(|error| io(path, error))
+        })
+        .transpose()?;
     for path in inputs {
+        // CXX and CMake recreate these outputs after Cargo starts the build
+        // script. Watching them makes every subsequent build appear stale.
+        // Resolve aliases before deciding ownership: a lexical OUT_DIR prefix
+        // can lead outside through `..` or a symlink. Keep unresolved inputs
+        // watched so a subsequently created external path can invalidate Cargo.
+        if output
+            .as_ref()
+            .is_some_and(|root| fs::canonicalize(&path).is_ok_and(|path| path.starts_with(root)))
+        {
+            continue;
+        }
         println!("cargo:rerun-if-changed={}", path.display());
     }
     Ok(())
@@ -900,6 +923,118 @@ set_target_properties(QuEST::QuEST PROPERTIES
 "#,
         )
         .or_fail()?;
+        Ok(())
+    }
+
+    #[gtest]
+    fn cargo_watches_external_inputs_without_watching_its_own_outputs() -> googletest::Result<()> {
+        const CHILD: &str = "QUEST_BUILD_WATCH_INPUTS_CHILD";
+        if let Some(root) = env::var_os(CHILD) {
+            return emit_fixture_input_watches(Path::new(&root));
+        }
+        let fixture = tempfile::tempdir().or_fail()?;
+        let root = fixture.path().canonicalize().or_fail()?;
+        let output = Command::new(env::current_exe().or_fail()?)
+            .args([
+                "--exact",
+                "probe::tests::cargo_watches_external_inputs_without_watching_its_own_outputs",
+                "--nocapture",
+            ])
+            .env(CHILD, &root)
+            .env("OUT_DIR", root.join("own output"))
+            .env("PROFILE", "release")
+            .env("OPT_LEVEL", "3")
+            .env("DEBUG", "false")
+            .output()
+            .or_fail()?;
+        if !output.status.success() {
+            return fail!(
+                "watch fixture failed:\n{}\n{}",
+                String::from_utf8_lossy(&output.stdout),
+                String::from_utf8_lossy(&output.stderr)
+            );
+        }
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        let watched: BTreeSet<_> = stdout
+            .lines()
+            .filter_map(|line| line.strip_prefix("cargo:rerun-if-changed="))
+            .map(PathBuf::from)
+            .collect();
+        let own_output = root.join("own output");
+        expect_that!(
+            watched
+                .iter()
+                .filter(|path| {
+                    path.canonicalize()
+                        .is_ok_and(|path| path.starts_with(&own_output))
+                })
+                .collect::<Vec<_>>(),
+            is_empty()
+        );
+        for external in [
+            "source.cpp",
+            "own output/../external.cpp",
+            "own output/../future headers",
+            "other output",
+            "package/include/quest.h",
+            "package/lib/cmake/QuEST/QuESTConfig.cmake",
+            if cfg!(target_os = "macos") {
+                "package/lib/libQuEST.dylib"
+            } else {
+                "package/lib/libQuEST.so"
+            },
+        ] {
+            expect_that!(&watched, contains(eq(&root.join(external))));
+        }
+        #[cfg(unix)]
+        expect_that!(&watched, contains(eq(&own_output.join("external headers"))));
+        Ok(())
+    }
+
+    fn emit_fixture_input_watches(root: &Path) -> googletest::Result<()> {
+        let output = root.join("own output");
+        let other_output = root.join("other output");
+        fs::create_dir_all(&output).or_fail()?;
+        fs::create_dir_all(&other_output).or_fail()?;
+        let generated = output.join("generated.cpp");
+        let source = root.join("source.cpp");
+        let external = output.join("../external.cpp");
+        fs::write(&generated, "int generated_value() { return 1; }").or_fail()?;
+        fs::write(&source, "int source_value() { return 2; }").or_fail()?;
+        fs::write(&external, "int external_value() { return 3; }").or_fail()?;
+        let prefix = root.join("package");
+        fixture_package(&prefix)?;
+        let mut inputs = BridgeInputs {
+            sources: vec![generated.clone(), source, external],
+            include_directories: vec![
+                output.clone(),
+                other_output,
+                output.join("../future headers"),
+            ],
+        };
+        #[cfg(unix)]
+        {
+            let alias = output.join("external headers");
+            std::os::unix::fs::symlink(prefix.join("include"), &alias).or_fail()?;
+            inputs.include_directories.push(alias);
+        }
+        let host = fixture_host()?;
+        let work = output.join("quest-native");
+        let setup = configure(&work, &host, &host, Some(&prefix), Some(&inputs), &[]).or_fail()?;
+        let bridge_inputs =
+            fs::read_to_string(work.join("source/bridge-inputs.cmake")).or_fail()?;
+        expect_that!(
+            bridge_inputs,
+            contains_substring(generated.to_string_lossy())
+        );
+        let reader = reply::Reader::from_build_dir(&setup.build_directory).or_fail()?;
+        let probe = read_target(&reader, &setup.profile, "quest_link_query").or_fail()?;
+        let native = prefix.join(if cfg!(target_os = "macos") {
+            "lib/libQuEST.dylib"
+        } else {
+            "lib/libQuEST.so"
+        });
+        watch_inputs(&reader, &probe, &BTreeSet::from([native]), &[]).or_fail()?;
         Ok(())
     }
 

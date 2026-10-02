@@ -2,32 +2,121 @@
 use crate::oracle_execution::{OracleCache, OracleInventory};
 use crate::{Complex64, Error, Result};
 #[cfg(any(feature = "qsvt", all(feature = "mpi", quest_native_mpi)))]
-use crate::{Outcome, QubitCount, environment::Reservation, values::bytes_for};
+use crate::{Outcome, QubitCount, environment::Reservation};
 use crate::{
     error::BackendResult,
     register::{Register, RegisterKind, matrix},
-    values::reserve_vec,
+    values::{bytes_for, reserve_vec},
 };
 use cxx::UniquePtr;
-use quest_circuit::{
+use quest_compile::{
     BoundGate,
     dispatch_recipe::{self, DispatchStep, MatrixRecipe, PrimitiveGate},
 };
 #[cfg(any(feature = "qsvt", all(feature = "mpi", quest_native_mpi)))]
-use quest_circuit::{Control, ControlState, Operation, RegionPlan};
-#[cfg(any(feature = "qsvt", all(feature = "mpi", quest_native_mpi)))]
+use quest_compile::{Control, ControlState, Operation, RegionPlan};
 use std::collections::{BTreeMap, BTreeSet};
 
 pub type MatrixCacheKey = (usize, Vec<bool>);
 
 pub fn matrix_cache_key(
-    matrix: &quest_circuit::NumericalOperator,
+    matrix: &quest_compile::NumericalOperator,
     controls: impl IntoIterator<Item = bool>,
 ) -> MatrixCacheKey {
     (
         matrix.view().as_ptr().addr(),
         controls.into_iter().collect(),
     )
+}
+
+/// One transactional native pool per prepared owner. Keys use retained immutable
+/// source identity and the ordered signed-control profile, never target wires.
+#[derive(Default)]
+pub struct MatrixPreparation {
+    matrices: Vec<NativeMatrix>,
+    indices: BTreeMap<MatrixCacheKey, usize>,
+}
+impl MatrixPreparation {
+    pub fn include(
+        &mut self,
+        matrix: &quest_compile::NumericalOperator,
+        controls: &[bool],
+    ) -> Result<usize> {
+        let key = matrix_cache_key(matrix, controls.iter().copied());
+        if let Some(&index) = self.indices.get(&key) {
+            return Ok(index);
+        }
+        self.matrices
+            .try_reserve(1)
+            .map_err(|_| Error::Allocation)?;
+        // Publish only after both native variants have been created successfully.
+        let native = prepare_numerical(matrix, controls)?;
+        let index = self.matrices.len();
+        self.matrices.push(native);
+        self.indices.insert(key, index);
+        Ok(index)
+    }
+    pub fn finish(self) -> Vec<NativeMatrix> {
+        self.matrices
+    }
+}
+
+/// Size the same signed-control embedding that materialization uses. One
+/// admission set spans ordinary payloads and every reachable oracle profile.
+pub fn admit_matrix(
+    matrix: &quest_compile::NumericalOperator,
+    controls: &[bool],
+    gpu: bool,
+    seen: &mut BTreeSet<MatrixCacheKey>,
+) -> Result<usize> {
+    let recipe = MatrixRecipe::new(matrix, controls)?;
+    let dimension = recipe.dimension();
+    let entries = if recipe.is_diagonal() {
+        dimension
+    } else {
+        dimension.checked_mul(dimension).ok_or(Error::Overflow)?
+    };
+    let key_storage = controls
+        .len()
+        .checked_add(
+            const {
+                size_of::<MatrixCacheKey>()
+                    + 2 * size_of::<NativeMatrix>()
+                    + 12 * size_of::<usize>()
+                    + 256
+            },
+        )
+        .ok_or(Error::Overflow)?;
+    let bytes = bytes_for(entries, if gpu { 16 } else { 12 })?
+        .checked_add(matrix.bytes())
+        .and_then(|bytes| bytes.checked_add(key_storage))
+        .ok_or(Error::Overflow)?;
+    // Check recipe sizing even for aliases; an invalid resource never shortcuts admission.
+    if seen.insert(matrix_cache_key(matrix, controls.iter().copied())) {
+        Ok(bytes)
+    } else {
+        Ok(0)
+    }
+}
+
+pub fn kraus_bytes(kraus: &[quest_compile::NumericalOperator], gpu: bool) -> Result<usize> {
+    let dimension = kraus
+        .first()
+        .ok_or(Error::Value("empty Kraus channel"))?
+        .dimension()
+        .max(2);
+    let square = dimension.checked_mul(dimension).ok_or(Error::Overflow)?;
+    let count = square
+        .checked_mul(square)
+        .and_then(|n| n.checked_mul(if gpu { 8 } else { 4 }))
+        .and_then(|n| {
+            square
+                .checked_mul(kraus.len())
+                .and_then(|m| m.checked_mul(6))
+                .and_then(|m| n.checked_add(m))
+        })
+        .ok_or(Error::Overflow)?;
+    bytes_for(count, 1)
 }
 
 pub enum NativeMatrix {
@@ -114,7 +203,7 @@ enum PreparedOp {
     Oracle {
         body: usize,
         targets: Vec<usize>,
-        controls: Vec<quest_circuit::language::vm::QuantumControl>,
+        controls: Vec<quest_compile::language::vm::QuantumControl>,
         adjoint: bool,
     },
     Gate {
@@ -183,7 +272,7 @@ impl crate::environment::RuntimeResources {
             .len()
             .checked_mul(
                 const {
-                    std::mem::size_of::<quest_circuit::Instruction>()
+                    std::mem::size_of::<quest_compile::Instruction>()
                         + std::mem::size_of::<PreparedOp>()
                         + std::mem::size_of::<NativeMatrix>()
                         + std::mem::size_of::<UniquePtr<quest_sys::KrausMap>>()
@@ -213,7 +302,11 @@ impl crate::environment::RuntimeResources {
                 .ok_or(Error::Overflow)?;
         }
         required = required
-            .checked_add(inventory.estimated_bytes(plan.num_qubits(), self.capabilities().gpu)?)
+            .checked_add(inventory.estimated_bytes(
+                plan.num_qubits(),
+                self.capabilities().gpu,
+                &mut seen_matrices,
+            )?)
             .ok_or(Error::Overflow)?;
         // Admission keys are temporary; the reserved key allowance also covers
         // the materialization cache after this set is released.
@@ -254,23 +347,21 @@ impl<'env> AdmittedPlan<'env> {
             inventory,
             reservation,
         } = self;
-        let oracles = OracleCache::prepare(&inventory, plan.num_qubits())?;
-        let mut matrices = reserve_vec(plan.instructions().len())?;
+        let mut matrices = MatrixPreparation::default();
+        let oracles = OracleCache::prepare(&inventory, plan.num_qubits(), &mut matrices)?;
         let mut channels = reserve_vec(plan.instructions().len())?;
-        let mut cache: BTreeMap<MatrixCacheKey, usize> = BTreeMap::new();
         let mut operations = reserve_vec(plan.instructions().len())?;
         for instruction in plan.instructions() {
             operations.push(prepare_operation(
                 instruction.operation(),
                 &mut matrices,
                 &mut channels,
-                &mut cache,
                 &inventory,
             )?);
         }
         // Locals release native handles on any error before the prepared owner is published.
         Ok(PreparedRegion {
-            matrices,
+            matrices: matrices.finish(),
             oracles,
             channels,
             reservation,
@@ -401,59 +492,15 @@ fn estimate_native(
                 .checked_add(controls.len())
                 .ok_or(Error::Overflow)?;
             let targets = targets_bytes(width.max(1))?;
-            let key = matrix_cache_key(
-                matrix,
-                controls
-                    .iter()
-                    .map(|control| control.state() == ControlState::One),
-            );
-            let key_storage = key
-                .1
-                .len()
-                .checked_add(
-                    const {
-                        std::mem::size_of::<MatrixCacheKey>()
-                            + 5 * std::mem::size_of::<usize>()
-                            + 64
-                    },
-                )
-                .ok_or(Error::Overflow)?;
-            if !seen_matrices.insert(key) {
-                return Ok(targets);
-            }
-            let dimension = 1usize
-                .checked_shl(u32::try_from(width.max(1)).map_err(|_| Error::Overflow)?)
-                .ok_or(Error::Overflow)?;
-            let entries = if matrix.is_diagonal() {
-                dimension
-            } else {
-                dimension.checked_mul(dimension).ok_or(Error::Overflow)?
-            };
-            bytes_for(entries, if gpu { 16 } else { 12 })?
-                .checked_add(matrix.bytes())
-                .and_then(|bytes| bytes.checked_add(key_storage))
-                .ok_or(Error::Overflow)?
+            let profile = controls
+                .iter()
+                .map(|control| control.state() == ControlState::One)
+                .collect::<Vec<_>>();
+            admit_matrix(matrix, &profile, gpu, seen_matrices)?
                 .checked_add(targets)
                 .ok_or(Error::Overflow)
         }
-        Operation::Channel { kraus, .. } => {
-            let d = kraus
-                .first()
-                .ok_or(Error::Value("empty Kraus channel"))?
-                .dimension()
-                .max(2);
-            let d2 = d.checked_mul(d).ok_or(Error::Overflow)?;
-            let elements = d2
-                .checked_mul(d2)
-                .and_then(|n| n.checked_mul(if gpu { 8 } else { 4 }))
-                .and_then(|n| {
-                    d2.checked_mul(kraus.len())
-                        .and_then(|m| m.checked_mul(6))
-                        .and_then(|m| n.checked_add(m))
-                })
-                .ok_or(Error::Overflow)?;
-            bytes_for(elements, 1)
-        }
+        Operation::Channel { kraus, .. } => kraus_bytes(kraus, gpu),
         Operation::Reset { .. } => bytes_for(256, 1),
         Operation::Conditional { operation, .. } => estimate_native(operation, gpu, seen_matrices)?
             .checked_add(std::mem::size_of::<PreparedOp>())
@@ -468,9 +515,8 @@ fn estimate_native(
 #[cfg(any(feature = "qsvt", all(feature = "mpi", quest_native_mpi)))]
 fn prepare_operation(
     op: &Operation,
-    matrices: &mut Vec<NativeMatrix>,
+    matrices: &mut MatrixPreparation,
     channels: &mut Vec<UniquePtr<quest_sys::KrausMap>>,
-    cache: &mut BTreeMap<MatrixCacheKey, usize>,
     inventory: &OracleInventory,
 ) -> Result<PreparedOp> {
     match op {
@@ -483,7 +529,7 @@ fn prepare_operation(
             targets: targets.iter().map(|target| target.index()).collect(),
             controls: controls
                 .iter()
-                .map(|control| quest_circuit::language::vm::QuantumControl {
+                .map(|control| quest_compile::language::vm::QuantumControl {
                     qubit: control.qubit().index(),
                     positive: control.state() == ControlState::One,
                 })
@@ -495,10 +541,10 @@ fn prepare_operation(
             targets,
             controls,
         } => {
-            let key = matrix_cache_key(
-                numerical,
-                controls.iter().map(|c| c.state() == ControlState::One),
-            );
+            let profile = controls
+                .iter()
+                .map(|c| c.state() == ControlState::One)
+                .collect::<Vec<_>>();
             let mut native_targets: Vec<i32> = targets
                 .iter()
                 .map(|q| i32::try_from(q.index()).map_err(|_| Error::Overflow))
@@ -510,15 +556,7 @@ fn prepare_operation(
             if native_targets.is_empty() {
                 native_targets.push(0);
             }
-            let index = if let Some(&index) = cache.get(&key) {
-                index
-            } else {
-                let native = prepare_numerical(numerical, &key.1)?;
-                let index = matrices.len();
-                matrices.push(native);
-                cache.insert(key, index);
-                index
-            };
+            let index = matrices.include(numerical, &profile)?;
             Ok(PreparedOp::Numerical {
                 cache: index,
                 targets: native_targets,
@@ -556,9 +594,7 @@ fn prepare_operation(
         } => Ok(PreparedOp::Conditional {
             bit: bit.index(),
             expected: *expected,
-            operation: Box::new(prepare_operation(
-                operation, matrices, channels, cache, inventory,
-            )?),
+            operation: Box::new(prepare_operation(operation, matrices, channels, inventory)?),
         }),
         Operation::Gate {
             gate,
@@ -588,7 +624,7 @@ fn prepare_operation(
     }
 }
 pub fn prepare_kraus(
-    kraus: &[quest_circuit::NumericalOperator],
+    kraus: &[quest_compile::NumericalOperator],
 ) -> Result<UniquePtr<quest_sys::KrausMap>> {
     let dim = kraus
         .first()
@@ -632,7 +668,7 @@ pub fn prepare_kraus(
 }
 
 pub fn prepare_numerical(
-    numerical: &quest_circuit::NumericalOperator,
+    numerical: &quest_compile::NumericalOperator,
     controls: &[bool],
 ) -> Result<NativeMatrix> {
     let recipe = MatrixRecipe::new(numerical, controls)?;
@@ -752,7 +788,7 @@ fn execute<K: RegisterKind>(
             targets,
             controls,
             adjoint,
-        } => oracles.run(*body, targets, controls, *adjoint, register),
+        } => oracles.run(*body, targets, controls, *adjoint, register, matrices),
         PreparedOp::Numerical { cache, targets } => execute_matrix(
             matrices
                 .get(*cache)
@@ -945,7 +981,7 @@ fn apply_primitive<K: RegisterKind>(
 mod matrix_budget_tests {
     use super::{MatrixCacheKey, estimate};
     use googletest::prelude::*;
-    use quest_circuit::{
+    use quest_compile::{
         Control, ControlState, MatrixPolicy, NumericalOperator, Operation, QuantumRegionBuilder,
     };
     use std::collections::BTreeSet;
@@ -981,6 +1017,55 @@ mod matrix_budget_tests {
         verify_that!(repeated, gt(100))?;
         verify_that!(repeated, lt(1_000))?;
         verify_that!(other_profile, gt(65_536))?;
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod matrix_resource_tests {
+    use super::*;
+    use googletest::prelude::*;
+    use quest_compile::{MatrixPolicy, NumericalOperator};
+
+    #[gtest]
+    fn admission_uses_dispatch_recipe_and_exact_signed_alias_identity() -> googletest::Result<()> {
+        let source =
+            faer::Mat::from_fn(2, 2, |row, col| Complex64::new(f64::from(row != col), 0.0));
+        let matrix = NumericalOperator::from_view(&source, MatrixPolicy::default())?;
+        let clone = matrix.clone();
+        let independent = NumericalOperator::from_view(&source, MatrixPolicy::default())?;
+        let mut seen = BTreeSet::new();
+        let first = admit_matrix(&matrix, &[false, true], false, &mut seen)?;
+        let dimension = MatrixRecipe::new(&matrix, &[false, true])?.dimension();
+        expect_true!(
+            first >= bytes_for(dimension.checked_mul(dimension).ok_or(Error::Overflow)?, 12)?
+        );
+        expect_eq!(admit_matrix(&clone, &[false, true], false, &mut seen)?, 0);
+        expect_eq!(
+            admit_matrix(&clone, &[true, false], false, &mut seen)?,
+            first
+        );
+        expect_eq!(
+            admit_matrix(&independent, &[false, true], false, &mut seen)?,
+            first
+        );
+        let mut gpu_seen = BTreeSet::new();
+        expect_true!(admit_matrix(&matrix, &[false, true], true, &mut gpu_seen)? > first);
+        Ok(())
+    }
+
+    #[gtest]
+    fn scalar_native_embedding_and_overflow_precede_admission_publication() -> googletest::Result<()>
+    {
+        let source = faer::Mat::from_fn(1, 1, |_, _| Complex64::new(0.0, 1.0));
+        let scalar = NumericalOperator::from_view(&source, MatrixPolicy::default())?;
+        let mut seen = BTreeSet::new();
+        expect_eq!(MatrixRecipe::new(&scalar, &[])?.dimension(), 2);
+        expect_true!(admit_matrix(&scalar, &[], false, &mut seen)? >= bytes_for(2, 12)?);
+        let before = seen.len();
+        let controls = vec![false; usize::try_from(usize::BITS)?];
+        expect_true!(admit_matrix(&scalar, &controls, false, &mut seen).is_err());
+        expect_eq!(seen.len(), before);
         Ok(())
     }
 }

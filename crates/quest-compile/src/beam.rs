@@ -1,28 +1,28 @@
 //! Deterministic, bounded search over algebraic circuit publications.
-#[cfg(any(feature = "workers", feature = "synthesis"))]
+#[cfg(feature = "workers")]
 use crate::ParameterId;
-use crate::model::{Occurrence, SemanticOperation};
+use crate::Result;
 use crate::{
-    Angle, ApproximationMode, BigRational, BoundAngleTarget, BoundGate, BoundRegion,
-    BudgetCategory, BudgetLease, BudgetLedger, CliffordCost, CommunicationCost, CostComparison,
-    CostComponents, CostProfile, DependencyKind, Error, ExactOptions, ExpansionLimits, Gate,
-    Instruction, LinearCandidateStrategy, LinearOptions, NativeCost, Operation,
-    OptimizationEvidence, OptimizationOptions, OptimizationTarget, OptimizerInput,
-    OptimizerSnapshot, ParityOptions, QuantumRegion, Result, RoundingStatus, StopReason,
-    StructuredTerminalError, TerminalOptions, TerminalStatus,
+    Angle, ApproximationMode, BoundAngleTarget, BoundGate, BoundRegion, BudgetCategory,
+    BudgetLease, BudgetLedger, CliffordCost, CommunicationCost, CostComparison, CostComponents,
+    CostProfile, DependencyKind, Error, ExactOptions, ExpansionLimits, Gate, Instruction,
+    LinearCandidateStrategy, LinearOptions, NativeCost, Operation, OptimizationEvidence,
+    OptimizationOptions, OptimizationTarget, OptimizerInput, OptimizerSnapshot, ParityOptions,
+    QuantumRegion, RBig, RoundingStatus, StopReason, StructuredTerminalError, TerminalOptions,
+    TerminalStatus,
 };
-#[cfg(any(feature = "workers", feature = "synthesis"))]
+#[cfg(feature = "workers")]
 use crate::{ApproximateBeamPasses, MeetInTheMiddlePasses, RotationSynthesisPasses, ZxPasses};
-#[allow(unused_imports)]
 use crate::{
-    BoundParityPasses, ExactPasses, LinearPasses, NumericalPasses, OracleExport, ParityPasses,
-    TerminalPasses,
+    BoundParityPasses, CompilerError, ExactPasses, LinearPasses, ParityPasses, TerminalPasses,
 };
-#[cfg(any(feature = "workers", feature = "synthesis"))]
-use num_traits::Zero;
-#[cfg(any(feature = "workers", feature = "synthesis"))]
+#[cfg(feature = "workers")]
+use dashu_base::BitTest;
+use quest_language::quantum::model::{Occurrence, SemanticOperation};
+#[cfg(feature = "workers")]
 use quest_optimizer_client::MitmResult;
 use std::collections::BTreeMap;
+type CompilerResult<T> = std::result::Result<T, CompilerError>;
 use std::sync::Arc;
 
 /// Immutable, validated search shape. All ceilings are hard maxima per request.
@@ -95,27 +95,27 @@ pub struct BeamReport {
     pub(crate) unscorable_comparisons: usize,
     pub(crate) generator_budget_exhaustions: usize,
     pub(crate) structured: Option<Arc<crate::StructuredPipelineReport>>,
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
+    #[cfg(feature = "workers")]
     pub(crate) worker_requests: usize,
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
+    #[cfg(feature = "workers")]
     pub(crate) exact_regions: Vec<Arc<crate::ExactRegionCertificate>>,
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
+    #[cfg(feature = "workers")]
     retained_exact_history: Option<Arc<ExactHistory>>,
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
+    #[cfg(feature = "workers")]
     pub(crate) worker_failures: Vec<String>,
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
+    #[cfg(feature = "workers")]
     pub(crate) worker_declines: usize,
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
+    #[cfg(feature = "workers")]
     pub(crate) exact_mitm_statuses: Vec<BeamMitmStatus>,
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
+    #[cfg(feature = "workers")]
     pub(crate) approx_mitm_statuses: Vec<BeamMitmStatus>,
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
+    #[cfg(feature = "workers")]
     pub(crate) local_rotations: Vec<Arc<crate::RotationCertificate>>,
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
+    #[cfg(feature = "workers")]
     pub(crate) approx_regions: Vec<Arc<crate::ApproxRegionCertificate>>,
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
-    pub(crate) cumulative_error: Option<BigRational>,
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
+    #[cfg(feature = "workers")]
+    pub(crate) cumulative_error: Option<RBig>,
+    #[cfg(feature = "workers")]
     retained_approx_history: Option<Arc<ApproxHistory>>,
 }
 impl BeamReport {
@@ -151,60 +151,60 @@ impl BeamReport {
     pub fn structured(&self) -> Option<&crate::StructuredPipelineReport> {
         self.structured.as_deref()
     }
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
+    #[cfg(feature = "workers")]
     #[must_use]
     /// Conservatively admitted worker request slots. A failed MITM preflight
     /// may consume a slot; a successful no-window probe refunds it.
     pub const fn worker_requests(&self) -> usize {
         self.worker_requests
     }
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
+    #[cfg(feature = "workers")]
     #[must_use]
     pub fn exact_regions(&self) -> &[Arc<crate::ExactRegionCertificate>] {
         &self.exact_regions
     }
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
+    #[cfg(feature = "workers")]
     #[must_use]
     pub fn worker_failures(&self) -> &[String] {
         &self.worker_failures
     }
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
+    #[cfg(feature = "workers")]
     #[must_use]
     pub const fn worker_declines(&self) -> usize {
         self.worker_declines
     }
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
+    #[cfg(feature = "workers")]
     #[must_use]
     pub fn exact_mitm_statuses(&self) -> &[BeamMitmStatus] {
         &self.exact_mitm_statuses
     }
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
+    #[cfg(feature = "workers")]
     #[must_use]
     pub fn approx_mitm_statuses(&self) -> &[BeamMitmStatus] {
         &self.approx_mitm_statuses
     }
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
+    #[cfg(feature = "workers")]
     #[must_use]
     pub fn local_rotations(&self) -> &[Arc<crate::RotationCertificate>] {
         &self.local_rotations
     }
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
+    #[cfg(feature = "workers")]
     #[must_use]
     pub fn approx_regions(&self) -> &[Arc<crate::ApproxRegionCertificate>] {
         &self.approx_regions
     }
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
+    #[cfg(feature = "workers")]
     #[must_use]
     /// Exact sum of local allowances on the selected path. This is a
     /// whole-program bound only when the outcome is `GlobalCertified`.
-    pub const fn cumulative_error(&self) -> Option<&BigRational> {
+    pub const fn cumulative_error(&self) -> Option<&RBig> {
         self.cumulative_error.as_ref()
     }
 }
 
 /// Exact status of one optional MITM request; certificates on the published
 /// path are retained separately in the corresponding report history.
-#[cfg(any(feature = "workers", feature = "synthesis"))]
+#[cfg(feature = "workers")]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum BeamMitmStatus {
     Candidate {
@@ -226,7 +226,7 @@ pub enum BeamMitmStatus {
     },
 }
 
-#[cfg(any(feature = "workers", feature = "synthesis"))]
+#[cfg(feature = "workers")]
 fn mitm_status<T>(result: &MitmResult<T>, window: (usize, usize)) -> BeamMitmStatus {
     match result {
         MitmResult::Candidate(_) => BeamMitmStatus::Candidate { window },
@@ -250,7 +250,7 @@ fn mitm_status<T>(result: &MitmResult<T>, window: (usize, usize)) -> BeamMitmSta
     }
 }
 
-#[cfg(any(feature = "workers", feature = "synthesis"))]
+#[cfg(feature = "workers")]
 #[derive(Clone, Copy)]
 struct WorkerContext<'a> {
     client: &'a quest_optimizer_client::Client,
@@ -258,14 +258,14 @@ struct WorkerContext<'a> {
     limits: quest_math::Limits,
 }
 
-#[cfg(any(feature = "workers", feature = "synthesis"))]
+#[cfg(feature = "workers")]
 #[derive(Debug)]
 struct ExactHistory {
     parent: Option<Arc<Self>>,
     certificate: Arc<crate::ExactRegionCertificate>,
     _proof_allowance: Arc<BudgetLease>,
 }
-#[cfg(any(feature = "workers", feature = "synthesis"))]
+#[cfg(feature = "workers")]
 #[derive(Debug)]
 struct ApproxHistory {
     parent: Option<Arc<Self>>,
@@ -273,14 +273,14 @@ struct ApproxHistory {
     _proof_allowance: Arc<BudgetLease>,
 }
 
-#[cfg(any(feature = "workers", feature = "synthesis"))]
+#[cfg(feature = "workers")]
 #[derive(Debug)]
 enum ApproxEvidence {
     Synthesis(Arc<crate::RotationCertificate>),
     Mitm(Arc<crate::ApproxRegionCertificate>),
 }
 
-#[cfg(any(feature = "workers", feature = "synthesis"))]
+#[cfg(feature = "workers")]
 fn zx_generation(
     source: &QuantumRegion,
     offset: usize,
@@ -305,7 +305,7 @@ fn zx_generation(
     }
 }
 
-#[cfg(any(feature = "workers", feature = "synthesis"))]
+#[cfg(feature = "workers")]
 fn rotation_count(source: &QuantumRegion) -> usize {
     source
         .occurrences()
@@ -322,7 +322,7 @@ fn rotation_count(source: &QuantumRegion) -> usize {
         .count()
 }
 
-#[cfg(any(feature = "workers", feature = "synthesis"))]
+#[cfg(feature = "workers")]
 fn exact_mitm_hint(source: &QuantumRegion) -> bool {
     source.occurrences().iter().any(|item| {
         matches!(
@@ -344,29 +344,26 @@ fn exact_mitm_hint(source: &QuantumRegion) -> bool {
     })
 }
 
-#[cfg(any(feature = "workers", feature = "synthesis"))]
+#[cfg(feature = "workers")]
 fn admitted_epsilon(
-    budget: &BigRational,
-    spent: &BigRational,
+    budget: &RBig,
+    spent: &RBig,
     count: usize,
     limits: quest_math::Limits,
-) -> Result<Option<(f64, BigRational)>> {
+) -> Result<Option<(f64, RBig)>> {
     if count == 0 {
         return Ok(None);
     }
     let remaining = std::ops::Sub::sub(budget.clone(), spent.clone());
-    if remaining <= BigRational::zero() {
+    if remaining <= RBig::ZERO {
         return Ok(None);
     }
-    let per = std::ops::Div::div(
-        remaining,
-        BigRational::from_integer(num_bigint::BigInt::from(count)),
-    );
+    let per = std::ops::Div::div(remaining, RBig::from(dashu_int::IBig::from(count)));
     // numerator >= 2^(nbits-1), denominator < 2^dbits; this power of two
     // lies strictly below the rational allowance without floating conversion.
-    let exponent = i64::try_from(per.numer().bits())
+    let exponent = i64::try_from(per.numerator().bit_len())
         .and_then(|numerator| {
-            i64::try_from(per.denom().bits())
+            i64::try_from(per.denominator().bit_len())
                 .map(|denominator| numerator.saturating_sub(denominator).saturating_sub(2))
         })
         .map_err(|_| Error::Budget("beam approximation precision"))?;
@@ -512,15 +509,18 @@ fn source_angle(target: Option<&BoundAngleTarget>, radians: f64) -> Result<Angle
         Some(BoundAngleTarget::RationalPi {
             numerator,
             denominator,
-        }) => Angle::rational_pi(BigRational::new(numerator.clone(), denominator.clone())),
+        }) => Angle::rational_pi(RBig::from_parts_signed(
+            numerator.clone(),
+            denominator.clone(),
+        )),
         Some(BoundAngleTarget::AffinePi {
             radians_numerator,
             radians_denominator,
             pi_numerator,
             pi_denominator,
         }) => Angle::affine(
-            BigRational::new(radians_numerator.clone(), radians_denominator.clone()),
-            BigRational::new(pi_numerator.clone(), pi_denominator.clone()),
+            RBig::from_parts_signed(radians_numerator.clone(), radians_denominator.clone()),
+            RBig::from_parts_signed(pi_numerator.clone(), pi_denominator.clone()),
         ),
         None => Angle::radians(radians),
     }?)
@@ -653,7 +653,7 @@ fn reserve_candidate(program: &QuantumRegion, ledger: &BudgetLedger) -> Result<B
     )
 }
 
-#[cfg(any(feature = "workers", feature = "synthesis"))]
+#[cfg(feature = "workers")]
 fn bind_candidate(
     candidate: &QuantumRegion,
     pairs: &[(ParameterId, f64)],
@@ -671,7 +671,7 @@ fn bind_candidate(
     Ok(bound)
 }
 
-#[cfg(any(feature = "workers", feature = "synthesis"))]
+#[cfg(feature = "workers")]
 fn budget_stop(reason: &str) -> StopReason {
     if reason.contains("byte") || reason.contains("storage") || reason.contains("allocation") {
         StopReason::StorageLimit
@@ -680,10 +680,10 @@ fn budget_stop(reason: &str) -> StopReason {
     }
 }
 
-fn structured_error(error: StructuredTerminalError) -> Error {
+fn structured_error(error: StructuredTerminalError) -> CompilerError {
     match error {
-        StructuredTerminalError::Circuit(error) => error,
-        error => Error::Structured(Box::new(error)),
+        StructuredTerminalError::Circuit(error) => error.into(),
+        error => CompilerError::Structured(error),
     }
 }
 
@@ -696,15 +696,15 @@ struct Candidate {
     allowances: Vec<BudgetLease>,
     expanded: bool,
     bound_only: bool,
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
+    #[cfg(feature = "workers")]
     exact_history: Option<Arc<ExactHistory>>,
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
+    #[cfg(feature = "workers")]
     approx_history: Option<Arc<ApproxHistory>>,
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
-    error_bound: Option<BigRational>,
+    #[cfg(feature = "workers")]
+    error_bound: Option<RBig>,
 }
 
-#[cfg(any(feature = "workers", feature = "synthesis"))]
+#[cfg(feature = "workers")]
 fn same_history<T>(left: Option<&Arc<T>>, right: Option<&Arc<T>>) -> bool {
     match (left, right) {
         (None, None) => true,
@@ -713,14 +713,14 @@ fn same_history<T>(left: Option<&Arc<T>>, right: Option<&Arc<T>>) -> bool {
     }
 }
 
-#[cfg(any(feature = "workers", feature = "synthesis"))]
+#[cfg(feature = "workers")]
 fn same_evidence(left: &Candidate, right: &Candidate) -> bool {
     same_history(left.exact_history.as_ref(), right.exact_history.as_ref())
         && same_history(left.approx_history.as_ref(), right.approx_history.as_ref())
         && left.error_bound == right.error_bound
 }
 
-#[cfg(not(any(feature = "workers", feature = "synthesis")))]
+#[cfg(not(feature = "workers"))]
 const fn same_evidence(_left: &Candidate, _right: &Candidate) -> bool {
     true
 }
@@ -1060,8 +1060,8 @@ fn run_region(
     ledger: &BudgetLedger,
     beam: BeamOptions,
     mut report: BeamReport,
-    #[cfg(any(feature = "workers", feature = "synthesis"))] worker: Option<WorkerContext<'_>>,
-) -> Result<BeamRun> {
+    #[cfg(feature = "workers")] worker: Option<WorkerContext<'_>>,
+) -> CompilerResult<BeamRun> {
     let root_lease = match reserve_candidate(&source, ledger) {
         Ok(value) => value,
         Err(Error::Budget(_)) => {
@@ -1074,7 +1074,7 @@ fn run_region(
                 allowances: Vec::new(),
             });
         }
-        Err(error) => return Err(error),
+        Err(error) => return Err(error.into()),
     };
     let (
         original_score,
@@ -1094,7 +1094,7 @@ fn run_region(
                 allowances: Vec::new(),
             });
         }
-        Err(error) => return Err(error),
+        Err(error) => return Err(error.into()),
     };
     let mut pool = vec![Candidate {
         source: Box::new(source.as_ref().clone()),
@@ -1108,12 +1108,12 @@ fn run_region(
         },
         expanded: false,
         bound_only: false,
-        #[cfg(any(feature = "workers", feature = "synthesis"))]
+        #[cfg(feature = "workers")]
         exact_history: None,
-        #[cfg(any(feature = "workers", feature = "synthesis"))]
+        #[cfg(feature = "workers")]
         approx_history: None,
-        #[cfg(any(feature = "workers", feature = "synthesis"))]
-        error_bound: Some(BigRational::from_integer(0.into())),
+        #[cfg(feature = "workers")]
+        error_bound: Some(RBig::from(0)),
     }];
     let mut evidence = OptimizationEvidence::OriginalInput;
     let mut stop_reason = if original_status == TerminalStatus::Unscorable {
@@ -1122,9 +1122,9 @@ fn run_region(
         StopReason::Complete
     };
     let mut best = 0usize;
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
+    #[cfg(feature = "workers")]
     let mut worker = worker;
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
+    #[cfg(feature = "workers")]
     let worker_report_allowance = if worker.is_some() {
         let bytes = beam
             .workers
@@ -1141,7 +1141,7 @@ fn run_region(
                 worker = None;
                 None
             }
-            Err(error) => return Err(error),
+            Err(error) => return Err(error.into()),
         }
     } else {
         None
@@ -1176,7 +1176,7 @@ fn run_region(
                             stop_reason = StopReason::WorkLimit;
                             break 'rounds;
                         }
-                        Err(error) => return Err(error),
+                        Err(error) => return Err(error.into()),
                     };
                     if !ahead {
                         break;
@@ -1226,7 +1226,7 @@ fn run_region(
                             stop_reason = StopReason::StorageLimit;
                             break;
                         }
-                        Err(error) => return Err(error),
+                        Err(error) => return Err(error.into()),
                     };
                     let (remaining, _) = ledger.remaining()?;
                     let ceiling = if matches!(generator, Generator::Exact) {
@@ -1260,7 +1260,7 @@ fn run_region(
                             continue;
                         }
                         Err(Error::Unsupported(_)) => continue,
-                        Err(error) => return Err(error),
+                        Err(error) => return Err(error.into()),
                     };
                     work.commit(u64::try_from(actual).map_err(|_| Error::Budget("beam work"))?)?;
                     if !changed {
@@ -1283,7 +1283,7 @@ fn run_region(
                             stop_reason = StopReason::WorkLimit;
                             break;
                         }
-                        Err(error) => return Err(error),
+                        Err(error) => return Err(error.into()),
                     }
                     let binding_work = candidate.binding_work_estimate()?;
                     let binding_allowance = match ledger.reserve_work_allowance(binding_work) {
@@ -1292,7 +1292,7 @@ fn run_region(
                             stop_reason = StopReason::WorkLimit;
                             break;
                         }
-                        Err(error) => return Err(error),
+                        Err(error) => return Err(error.into()),
                     };
                     let mut candidate_bound = candidate.clone().bind(&pairs)?;
                     let source = &pool.get(index).ok_or(Error::InvalidId)?.bound;
@@ -1308,7 +1308,7 @@ fn run_region(
                                 stop_reason = StopReason::WorkLimit;
                                 break 'rounds;
                             }
-                            Err(error) => return Err(error),
+                            Err(error) => return Err(error.into()),
                         };
                     if terminal_status == TerminalStatus::Unscorable {
                         stop_reason = StopReason::Unscorable;
@@ -1332,19 +1332,19 @@ fn run_region(
                         },
                         expanded: false,
                         bound_only: false,
-                        #[cfg(any(feature = "workers", feature = "synthesis"))]
+                        #[cfg(feature = "workers")]
                         exact_history: pool
                             .get(index)
                             .ok_or(Error::InvalidId)?
                             .exact_history
                             .clone(),
-                        #[cfg(any(feature = "workers", feature = "synthesis"))]
+                        #[cfg(feature = "workers")]
                         approx_history: pool
                             .get(index)
                             .ok_or(Error::InvalidId)?
                             .approx_history
                             .clone(),
-                        #[cfg(any(feature = "workers", feature = "synthesis"))]
+                        #[cfg(feature = "workers")]
                         error_bound: pool.get(index).ok_or(Error::InvalidId)?.error_bound.clone(),
                     });
                     let latest = pool
@@ -1364,7 +1364,7 @@ fn run_region(
                             stop_reason = StopReason::WorkLimit;
                             break 'rounds;
                         }
-                        Err(error) => return Err(error),
+                        Err(error) => return Err(error.into()),
                     }
                 }
                 'bound_parity: {
@@ -1388,7 +1388,7 @@ fn run_region(
                             stop_reason = StopReason::StorageLimit;
                             break 'rounds;
                         }
-                        Err(error) => return Err(error),
+                        Err(error) => return Err(error.into()),
                     };
                     let (remaining, _) = ledger.remaining()?;
                     let maximum = remaining.min(1_000_000);
@@ -1425,7 +1425,7 @@ fn run_region(
                             break 'bound_parity;
                         }
                         Err(Error::Unsupported(_)) => break 'bound_parity,
-                        Err(error) => return Err(error),
+                        Err(error) => return Err(error.into()),
                     };
                     work.commit(u64::try_from(pass.work).map_err(|_| Error::Budget("beam work"))?)?;
                     if pass.accepted_windows == 0 {
@@ -1447,7 +1447,7 @@ fn run_region(
                             stop_reason = StopReason::WorkLimit;
                             break 'rounds;
                         }
-                        Err(error) => return Err(error),
+                        Err(error) => return Err(error.into()),
                     }
                     let (cost, terminal_bound, rounding, mut terminal_allowances, terminal_status) =
                         match score_candidate(&candidate_bound, config, ledger) {
@@ -1456,7 +1456,7 @@ fn run_region(
                                 stop_reason = StopReason::WorkLimit;
                                 break 'rounds;
                             }
-                            Err(error) => return Err(error),
+                            Err(error) => return Err(error.into()),
                         };
                     if terminal_status == TerminalStatus::Unscorable {
                         stop_reason = StopReason::Unscorable;
@@ -1490,19 +1490,19 @@ fn run_region(
                         },
                         expanded: false,
                         bound_only: !can_expand,
-                        #[cfg(any(feature = "workers", feature = "synthesis"))]
+                        #[cfg(feature = "workers")]
                         exact_history: pool
                             .get(index)
                             .ok_or(Error::InvalidId)?
                             .exact_history
                             .clone(),
-                        #[cfg(any(feature = "workers", feature = "synthesis"))]
+                        #[cfg(feature = "workers")]
                         approx_history: pool
                             .get(index)
                             .ok_or(Error::InvalidId)?
                             .approx_history
                             .clone(),
-                        #[cfg(any(feature = "workers", feature = "synthesis"))]
+                        #[cfg(feature = "workers")]
                         error_bound: pool.get(index).ok_or(Error::InvalidId)?.error_bound.clone(),
                     });
                     let latest = pool
@@ -1522,10 +1522,10 @@ fn run_region(
                             stop_reason = StopReason::WorkLimit;
                             break 'rounds;
                         }
-                        Err(error) => return Err(error),
+                        Err(error) => return Err(error.into()),
                     }
                 }
-                #[cfg(any(feature = "workers", feature = "synthesis"))]
+                #[cfg(feature = "workers")]
                 if let Some(worker) = worker {
                     for expanded in [false, true] {
                         let mut offset = 0usize;
@@ -1563,7 +1563,7 @@ fn run_region(
                                     stop_reason = StopReason::StorageLimit;
                                     break 'rounds;
                                 }
-                                Err(error) => return Err(error),
+                                Err(error) => return Err(error.into()),
                             };
                             let (worker_work, worker_bytes) = ledger.remaining()?;
                             if worker_bytes
@@ -1588,7 +1588,7 @@ fn run_region(
                                     stop_reason = StopReason::WorkLimit;
                                     break 'rounds;
                                 }
-                                Err(error) => return Err(error),
+                                Err(error) => return Err(error.into()),
                             };
                             let seed = worker
                                 .seed
@@ -1651,7 +1651,7 @@ fn run_region(
                                         .worker_requests
                                         .checked_add(1)
                                         .ok_or(Error::Budget("beam worker requests"))?;
-                                    return Err(Error::from(error));
+                                    return Err(CompilerError::from(error));
                                 }
                             };
                             let Some((_, end)) = pass.candidate_window else {
@@ -1680,7 +1680,7 @@ fn run_region(
                                     stop_reason = budget_stop(reason);
                                     break 'rounds;
                                 }
-                                Err(error) => return Err(error),
+                                Err(error) => return Err(error.into()),
                             };
                             let (cost, terminal_bound, rounding, mut terminal_allowances, status) =
                                 match score_candidate(&candidate_bound, config, ledger) {
@@ -1689,7 +1689,7 @@ fn run_region(
                                         stop_reason = budget_stop(reason);
                                         break 'rounds;
                                     }
-                                    Err(error) => return Err(error),
+                                    Err(error) => return Err(error.into()),
                                 };
                             if status == TerminalStatus::Unscorable {
                                 stop_reason = StopReason::Unscorable;
@@ -1755,12 +1755,12 @@ fn run_region(
                                     stop_reason = StopReason::WorkLimit;
                                     break 'rounds;
                                 }
-                                Err(error) => return Err(error),
+                                Err(error) => return Err(error.into()),
                             }
                         }
                     }
                 }
-                #[cfg(any(feature = "workers", feature = "synthesis"))]
+                #[cfg(feature = "workers")]
                 if let Some(worker) = worker {
                     let mut offset = 0usize;
                     let mut requests = 0usize;
@@ -1801,7 +1801,7 @@ fn run_region(
                                 stop_reason = StopReason::StorageLimit;
                                 break 'rounds;
                             }
-                            Err(error) => return Err(error),
+                            Err(error) => return Err(error.into()),
                         };
                         let (remaining_work, remaining_bytes) = ledger.remaining()?;
                         let maximum = remaining_work.min(1_000_000);
@@ -1883,7 +1883,7 @@ fn run_region(
                                 stop_reason = StopReason::Timeout;
                                 break 'rounds;
                             }
-                            Err(error) => return Err(Error::from(error)),
+                            Err(error) => return Err(CompilerError::from(error)),
                         };
                         let Some((start, end)) = pass.candidate_window else {
                             work.commit(pass.local_work)?;
@@ -1929,7 +1929,7 @@ fn run_region(
                                 stop_reason = budget_stop(reason);
                                 break 'rounds;
                             }
-                            Err(error) => return Err(error),
+                            Err(error) => return Err(error.into()),
                         };
                         let (cost, terminal_bound, rounding, mut terminal_allowances, status) =
                             match score_candidate(&candidate_bound, config, ledger) {
@@ -1938,7 +1938,7 @@ fn run_region(
                                     stop_reason = budget_stop(reason);
                                     break 'rounds;
                                 }
-                                Err(error) => return Err(error),
+                                Err(error) => return Err(error.into()),
                             };
                         if status == TerminalStatus::Unscorable {
                             stop_reason = StopReason::Unscorable;
@@ -2000,11 +2000,11 @@ fn run_region(
                                 stop_reason = StopReason::WorkLimit;
                                 break 'rounds;
                             }
-                            Err(error) => return Err(error),
+                            Err(error) => return Err(error.into()),
                         }
                     }
                 }
-                #[cfg(any(feature = "workers", feature = "synthesis"))]
+                #[cfg(feature = "workers")]
                 'synthesis: {
                     let Some(worker) = worker else {
                         break 'synthesis;
@@ -2050,7 +2050,7 @@ fn run_region(
                                 stop_reason = StopReason::WorkLimit;
                                 break 'rounds;
                             }
-                            Err(error) => return Err(error),
+                            Err(error) => return Err(error.into()),
                         };
                     let Some((epsilon, exact_epsilon)) =
                         admitted_epsilon(budget, spent, 1, worker.limits)?
@@ -2058,7 +2058,9 @@ fn run_region(
                         break 'synthesis;
                     };
                     let next_error = std::ops::Add::add(spent, &exact_epsilon);
-                    if next_error.numer().bits() > 16_384 || next_error.denom().bits() > 16_384 {
+                    if next_error.numerator().bit_len() > 16_384
+                        || next_error.denominator().bit_len() > 16_384
+                    {
                         report.generator_budget_exhaustions = report
                             .generator_budget_exhaustions
                             .checked_add(1)
@@ -2092,7 +2094,7 @@ fn run_region(
                             stop_reason = StopReason::StorageLimit;
                             break 'rounds;
                         }
-                        Err(error) => return Err(error),
+                        Err(error) => return Err(error.into()),
                     };
                     let (remaining_work, remaining_bytes) = ledger.remaining()?;
                     if remaining_work < 1_000_000 {
@@ -2163,15 +2165,15 @@ fn run_region(
                             stop_reason = StopReason::Timeout;
                             break 'rounds;
                         }
-                        Err(error) => return Err(Error::from(error)),
+                        Err(error) => return Err(CompilerError::from(error)),
                     };
                     if pass.rotations.len() != 1 || candidate.schedule().len() > maximum_output {
-                        return Err(Error::Budget("beam synthesis output"));
+                        return Err(Error::Budget("beam synthesis output").into());
                     }
                     if matches!(config.approximation(), ApproximationMode::Global(_))
                         && pass.operator_error_bound.is_none()
                     {
-                        return Err(Error::Budget("beam global synthesis proof"));
+                        return Err(Error::Budget("beam global synthesis proof").into());
                     }
                     let candidate_bound = match bind_candidate(
                         &candidate,
@@ -2184,7 +2186,7 @@ fn run_region(
                             stop_reason = budget_stop(reason);
                             break 'rounds;
                         }
-                        Err(error) => return Err(error),
+                        Err(error) => return Err(error.into()),
                     };
                     let (cost, terminal_bound, rounding, mut terminal_allowances, status) =
                         match score_candidate(&candidate_bound, config, ledger) {
@@ -2193,7 +2195,7 @@ fn run_region(
                                 stop_reason = budget_stop(reason);
                                 break 'rounds;
                             }
-                            Err(error) => return Err(error),
+                            Err(error) => return Err(error.into()),
                         };
                     if status == TerminalStatus::Unscorable {
                         stop_reason = StopReason::Unscorable;
@@ -2249,10 +2251,10 @@ fn run_region(
                             stop_reason = StopReason::WorkLimit;
                             break 'rounds;
                         }
-                        Err(error) => return Err(error),
+                        Err(error) => return Err(error.into()),
                     }
                 }
-                #[cfg(any(feature = "workers", feature = "synthesis"))]
+                #[cfg(feature = "workers")]
                 if let Some(worker) = worker
                     && let ApproximationMode::Local(budget) | ApproximationMode::Global(budget) =
                         config.approximation()
@@ -2302,7 +2304,7 @@ fn run_region(
                                 stop_reason = StopReason::WorkLimit;
                                 break 'rounds;
                             }
-                            Err(error) => return Err(error),
+                            Err(error) => return Err(error.into()),
                         };
                         let Some((epsilon, exact_epsilon)) =
                             admitted_epsilon(budget.value(), spent, count, worker.limits)?
@@ -2310,7 +2312,8 @@ fn run_region(
                             break;
                         };
                         let next_error = std::ops::Add::add(spent, &exact_epsilon);
-                        if next_error.numer().bits() > 16_384 || next_error.denom().bits() > 16_384
+                        if next_error.numerator().bit_len() > 16_384
+                            || next_error.denominator().bit_len() > 16_384
                         {
                             report.generator_budget_exhaustions = report
                                 .generator_budget_exhaustions
@@ -2332,7 +2335,7 @@ fn run_region(
                                 stop_reason = StopReason::StorageLimit;
                                 break 'rounds;
                             }
-                            Err(error) => return Err(error),
+                            Err(error) => return Err(error.into()),
                         };
                         let (remaining_work, remaining_bytes) = ledger.remaining()?;
                         let maximum = remaining_work.min(1_000_000);
@@ -2415,7 +2418,7 @@ fn run_region(
                                 stop_reason = StopReason::Timeout;
                                 break 'rounds;
                             }
-                            Err(error) => return Err(Error::from(error)),
+                            Err(error) => return Err(CompilerError::from(error)),
                         };
                         let Some((start, end)) = pass.candidate_window else {
                             work.commit(pass.local_work)?;
@@ -2458,7 +2461,7 @@ fn run_region(
                                 stop_reason = budget_stop(reason);
                                 break 'rounds;
                             }
-                            Err(error) => return Err(error),
+                            Err(error) => return Err(error.into()),
                         };
                         let (cost, terminal_bound, rounding, mut terminal_allowances, status) =
                             match score_candidate(&candidate_bound, config, ledger) {
@@ -2467,7 +2470,7 @@ fn run_region(
                                     stop_reason = budget_stop(reason);
                                     break 'rounds;
                                 }
-                                Err(error) => return Err(error),
+                                Err(error) => return Err(error.into()),
                             };
                         if status == TerminalStatus::Unscorable {
                             stop_reason = StopReason::Unscorable;
@@ -2525,7 +2528,7 @@ fn run_region(
                                 stop_reason = StopReason::WorkLimit;
                                 break 'rounds;
                             }
-                            Err(error) => return Err(error),
+                            Err(error) => return Err(error.into()),
                         }
                     }
                 }
@@ -2547,7 +2550,7 @@ fn run_region(
         }
     }
     let selected = pool.swap_remove(best);
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
+    #[cfg(feature = "workers")]
     {
         report
             .retained_exact_history
@@ -2580,7 +2583,7 @@ fn run_region(
     match config.target().compare(&selected.score, &original_score)? {
         CostComparison::Better => {
             evidence = OptimizationEvidence::ExactVerified;
-            #[cfg(any(feature = "workers", feature = "synthesis"))]
+            #[cfg(feature = "workers")]
             if selected.approx_history.is_some() {
                 evidence = if matches!(config.approximation(), ApproximationMode::Global(budget)
                     if selected.error_bound.as_ref().is_some_and(|error| error <= budget.value())
@@ -2607,11 +2610,11 @@ fn run_region(
     // A beam candidate is published only as a bound execution snapshot.
     let rounding = selected.rounding;
     let bound = selected.terminal_bound.unwrap_or(selected.bound);
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
+    #[cfg(feature = "workers")]
     let mut allowances = selected.allowances;
-    #[cfg(not(any(feature = "workers", feature = "synthesis")))]
+    #[cfg(not(feature = "workers"))]
     let allowances = selected.allowances;
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
+    #[cfg(feature = "workers")]
     if let Some(lease) = worker_report_allowance {
         allowances.push(lease);
     }
@@ -2630,17 +2633,17 @@ pub fn run(
     config: &OptimizationOptions,
     ledger: &BudgetLedger,
     beam: BeamOptions,
-) -> Result<BeamRun> {
+) -> CompilerResult<BeamRun> {
     run_inner(
         input,
         config,
         ledger,
         beam,
-        #[cfg(any(feature = "workers", feature = "synthesis"))]
+        #[cfg(feature = "workers")]
         None,
     )
 }
-#[cfg(any(feature = "workers", feature = "synthesis"))]
+#[cfg(feature = "workers")]
 pub fn run_with_workers(
     input: OptimizerInput,
     config: &OptimizationOptions,
@@ -2649,7 +2652,7 @@ pub fn run_with_workers(
     client: &quest_optimizer_client::Client,
     seed: u64,
     limits: quest_math::Limits,
-) -> Result<BeamRun> {
+) -> CompilerResult<BeamRun> {
     run_inner(
         input,
         config,
@@ -2667,8 +2670,8 @@ fn run_inner(
     config: &OptimizationOptions,
     ledger: &BudgetLedger,
     beam: BeamOptions,
-    #[cfg(any(feature = "workers", feature = "synthesis"))] worker: Option<WorkerContext<'_>>,
-) -> Result<BeamRun> {
+    #[cfg(feature = "workers")] worker: Option<WorkerContext<'_>>,
+) -> CompilerResult<BeamRun> {
     let report = BeamReport {
         input_snapshot: input.snapshot_id(),
         rounds: 0,
@@ -2678,27 +2681,27 @@ fn run_inner(
         unscorable_comparisons: 0,
         generator_budget_exhaustions: 0,
         structured: None,
-        #[cfg(any(feature = "workers", feature = "synthesis"))]
+        #[cfg(feature = "workers")]
         worker_requests: 0,
-        #[cfg(any(feature = "workers", feature = "synthesis"))]
+        #[cfg(feature = "workers")]
         exact_regions: Vec::new(),
-        #[cfg(any(feature = "workers", feature = "synthesis"))]
+        #[cfg(feature = "workers")]
         retained_exact_history: None,
-        #[cfg(any(feature = "workers", feature = "synthesis"))]
+        #[cfg(feature = "workers")]
         local_rotations: Vec::new(),
-        #[cfg(any(feature = "workers", feature = "synthesis"))]
+        #[cfg(feature = "workers")]
         cumulative_error: None,
-        #[cfg(any(feature = "workers", feature = "synthesis"))]
+        #[cfg(feature = "workers")]
         retained_approx_history: None,
-        #[cfg(any(feature = "workers", feature = "synthesis"))]
+        #[cfg(feature = "workers")]
         worker_failures: Vec::new(),
-        #[cfg(any(feature = "workers", feature = "synthesis"))]
+        #[cfg(feature = "workers")]
         worker_declines: 0,
-        #[cfg(any(feature = "workers", feature = "synthesis"))]
+        #[cfg(feature = "workers")]
         exact_mitm_statuses: Vec::new(),
-        #[cfg(any(feature = "workers", feature = "synthesis"))]
+        #[cfg(feature = "workers")]
         approx_mitm_statuses: Vec::new(),
-        #[cfg(any(feature = "workers", feature = "synthesis"))]
+        #[cfg(feature = "workers")]
         approx_regions: Vec::new(),
     };
     match input {
@@ -2709,7 +2712,7 @@ fn run_inner(
             ledger,
             beam,
             report,
-            #[cfg(any(feature = "workers", feature = "synthesis"))]
+            #[cfg(feature = "workers")]
             worker,
         ),
         OptimizerInput::Bound(bound) => run_bound(
@@ -2718,7 +2721,7 @@ fn run_inner(
             ledger,
             beam,
             report,
-            #[cfg(any(feature = "workers", feature = "synthesis"))]
+            #[cfg(feature = "workers")]
             worker,
         ),
         OptimizerInput::VerifiedStructured(program) => {
@@ -2776,8 +2779,8 @@ fn run_bound(
     ledger: &BudgetLedger,
     beam: BeamOptions,
     mut report: BeamReport,
-    #[cfg(any(feature = "workers", feature = "synthesis"))] worker: Option<WorkerContext<'_>>,
-) -> Result<BeamRun> {
+    #[cfg(feature = "workers")] worker: Option<WorkerContext<'_>>,
+) -> CompilerResult<BeamRun> {
     let preparation_bytes = bound
         .retained_bytes()?
         .checked_mul(4)
@@ -2809,7 +2812,7 @@ fn run_bound(
                 ledger,
                 beam,
                 report,
-                #[cfg(any(feature = "workers", feature = "synthesis"))]
+                #[cfg(feature = "workers")]
                 worker,
             )?;
             if let OptimizerInput::Region { mut bound, .. } = result.input {
@@ -2832,7 +2835,7 @@ fn run_bound(
                     allowances: Vec::new(),
                 });
             }
-            Err(error) => return Err(error),
+            Err(error) => return Err(error.into()),
         };
     report.rounds = 1;
     report.generated = 1;
@@ -2867,7 +2870,7 @@ fn run_bound(
             stop_reason = StopReason::StorageLimit;
             None
         }
-        Err(error) => return Err(error),
+        Err(error) => return Err(error.into()),
     };
     if let Some(candidate_lease) = candidate_lease {
         let preparation = bound
@@ -2949,7 +2952,7 @@ fn run_bound(
                         }
                     }
                     Err(Error::Budget(_)) => stop_reason = StopReason::WorkLimit,
-                    Err(error) => return Err(error),
+                    Err(error) => return Err(error.into()),
                 }
             }
         }
@@ -2976,8 +2979,8 @@ mod structured_error_tests {
         ));
         expect_true!(matches!(
             error,
-            Error::Structured(inner)
-                if matches!(inner.downcast_ref::<StructuredTerminalError>(), Some(StructuredTerminalError::Language(
+            CompilerError::Structured(inner)
+                if matches!(Some(&inner), Some(StructuredTerminalError::Language(
                     crate::LanguageError::Budget("source diagnostic")
                 )))
         ));
@@ -3042,7 +3045,7 @@ mod tests {
             bound_only: false,
             exact_history: Some(history),
             approx_history: None,
-            error_bound: Some(BigRational::from_integer(0.into())),
+            error_bound: Some(RBig::from(0)),
         };
         let a = make(history());
         let b = make(history());

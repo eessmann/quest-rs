@@ -3,7 +3,7 @@ use crate::{
     materialize_program, matrix,
 };
 use faer::Mat;
-use quest_circuit::BoundRegion;
+use quest_compile::BoundRegion;
 use quest_qsp::{
     ControlSequence, ConvertedProjectorPhases, PhaseConvention, PhaseSequence, WxImaginaryU00,
     WxLaurent, WxSymmetric,
@@ -74,8 +74,8 @@ pub enum TransformContinuation {
 /// Owned staged transform. Projection and continuation cannot be implicitly
 /// discarded to obtain an oracle. All matrices and circuit bodies are immutable.
 /// ```compile_fail
-/// fn invalid(transform: quest_qsvt::ValidatedTransform) -> quest_circuit::Result<()> {
-///     let mut body = quest_circuit::QuantumRegionBuilder::new(3, 0)?;
+/// fn invalid(transform: quest_qsvt::ValidatedTransform) -> quest_compile::Result<()> {
+///     let mut body = quest_compile::QuantumRegionBuilder::new(3, 0)?;
 ///     body.oracle(&transform, &[], &[])?;
 ///     Ok(())
 /// }

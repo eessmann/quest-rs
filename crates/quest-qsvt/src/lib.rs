@@ -26,7 +26,7 @@ pub use encoding::{
 pub use materialize::{materialize_oracle, materialize_program};
 pub use num_complex::Complex64;
 pub use projection::{OperandLayout, Projection, ProjectionControl, ProjectionSpace};
-pub use quest_circuit::{MatrixPolicy, OracleFragment};
+pub use quest_compile::{MatrixPolicy, OracleFragment};
 pub use space::{Left, LogicalSpace, ProjectorKind, Right};
 #[cfg(feature = "certification")]
 pub use transform::CertifiedStandardRecipe;
@@ -44,7 +44,7 @@ pub enum Error {
     #[error(transparent)]
     Polynomial(#[from] quest_polynomial::Error),
     #[error(transparent)]
-    Circuit(#[from] quest_circuit::Error),
+    Circuit(#[from] quest_compile::Error),
     #[error(transparent)]
     Qsp(#[from] quest_qsp::Error),
     #[error("invalid logical space: {0}")]
@@ -100,14 +100,14 @@ impl NumericalPolicy {
     }
 }
 
-impl From<quest_circuit::language::angle::Error> for Error {
-    fn from(value: quest_circuit::language::angle::Error) -> Self {
+impl From<quest_compile::language::angle::Error> for Error {
+    fn from(value: quest_compile::language::angle::Error) -> Self {
         Self::Circuit(value.into())
     }
 }
 
-impl From<quest_circuit::language::matrix::Error> for Error {
-    fn from(value: quest_circuit::language::matrix::Error) -> Self {
+impl From<quest_compile::language::matrix::Error> for Error {
+    fn from(value: quest_compile::language::matrix::Error) -> Self {
         Self::Circuit(value.into())
     }
 }

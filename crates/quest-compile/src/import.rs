@@ -1,45 +1,25 @@
-//! Lossless finite-region admission into the common structured execution pipeline.
+//! Lossless finite-region admission through checked semantic operations.
 use crate::{
-    Angle, BigRational, BoundAngleTarget, BoundRegion, Constructed, Control, ControlState,
-    LanguageError, Operation, ParameterId, Program, QuantumPayload, QuantumRegion, QubitId,
-};
-#[allow(unused_imports)]
-use crate::{
-    BoundParityPasses, ExactPasses, LinearPasses, NumericalPasses, OracleExport, ParityPasses,
-    TerminalPasses,
+    Angle, BoundAngleTarget, BoundRegion, Constructed, LanguageError, Operation, ParameterId,
+    Program, QuantumPayload, QuantumRegion, RBig,
 };
 use quest_language::{
-    SourceMap,
     classical::{FloatWidth, ScalarValue},
-    semantic::{self, CompileLimits},
-    syntax::{self, Expression, ExpressionKind as E, Statement, StatementKind as S},
+    semantic::finite::FiniteOperation as F,
 };
 use std::collections::BTreeMap;
-const fn expr(kind: E) -> Expression {
-    Expression { kind, span: None }
-}
-const fn stmt(kind: S) -> Statement {
-    Statement { kind, span: None }
-}
-fn qubit(id: QubitId) -> Expression {
-    expr(E::Name(format!("q{}", id.index())))
-}
-fn bit(index: usize) -> Expression {
-    expr(E::Name(format!("c{index}")))
-}
 pub struct Import {
     pub(crate) captures: Vec<ScalarValue>,
     pub(crate) exact: BTreeMap<usize, Angle>,
     pub(crate) oracles: BTreeMap<usize, crate::OracleFragment>,
     pub(crate) payloads: BTreeMap<usize, QuantumPayload>,
-    pub(crate) declarations: Vec<Statement>,
 }
 impl Import {
     fn argument(
         &mut self,
         value: f64,
         target: Option<&BoundAngleTarget>,
-    ) -> Result<Expression, LanguageError> {
+    ) -> Result<usize, LanguageError> {
         let index = self.captures.len();
         self.captures
             .push(ScalarValue::floating(FloatWidth::F64, value)?);
@@ -47,7 +27,7 @@ impl Import {
             Some(BoundAngleTarget::RationalPi {
                 numerator,
                 denominator,
-            }) => Some(Angle::rational_pi(BigRational::new(
+            }) => Some(Angle::rational_pi(RBig::from_parts_signed(
                 numerator.clone(),
                 denominator.clone(),
             ))?),
@@ -57,126 +37,106 @@ impl Import {
                 pi_numerator,
                 pi_denominator,
             }) => Some(Angle::affine(
-                BigRational::new(radians_numerator.clone(), radians_denominator.clone()),
-                BigRational::new(pi_numerator.clone(), pi_denominator.clone()),
+                RBig::from_parts_signed(radians_numerator.clone(), radians_denominator.clone()),
+                RBig::from_parts_signed(pi_numerator.clone(), pi_denominator.clone()),
             )?),
             _ => None,
         };
         if let Some(angle) = angle {
             self.exact.insert(index, angle);
         }
-        Ok(expr(E::Capture(index)))
-    }
-    fn gate(
-        name: &str,
-        arguments: Vec<Expression>,
-        targets: &[QubitId],
-        controls: &[Control],
-    ) -> Statement {
-        stmt(S::Gate {
-            name: name.into(),
-            arguments,
-            operands: controls
-                .iter()
-                .map(|c| qubit(c.qubit()))
-                .chain(targets.iter().copied().map(qubit))
-                .collect(),
-            modifiers: controls
-                .iter()
-                .map(|c| syntax::Modifier::Control {
-                    positive: c.state() == ControlState::One,
-                    count: None,
-                })
-                .collect(),
-        })
+        Ok(index)
     }
     pub(crate) fn operation(
         &mut self,
         operation: &Operation,
         angles: &[Option<BoundAngleTarget>],
-    ) -> Result<Statement, LanguageError> {
+    ) -> Result<F, LanguageError> {
+        let controls = |controls: &[crate::Control]| {
+            controls
+                .iter()
+                .map(|c| (c.qubit().index(), c.state() == crate::ControlState::One))
+                .collect()
+        };
+        let targets = |targets: &[crate::QubitId]| targets.iter().map(|q| q.index()).collect();
         Ok(match operation {
             Operation::Gate {
                 gate,
-                targets,
-                controls,
-            } => {
-                let arguments = gate
+                targets: qs,
+                controls: cs,
+            } => F::Gate {
+                gate: gate.kind(),
+                arguments: gate
                     .parameters()
                     .enumerate()
                     .map(|(i, value)| self.argument(value, angles.get(i).and_then(Option::as_ref)))
-                    .collect::<Result<Vec<_>, _>>()?;
-                Self::gate(gate.kind().definition().name, arguments, targets, controls)
-            }
-            Operation::GlobalPhase { radians, controls } => {
-                let argument = self.argument(*radians, angles.first().and_then(Option::as_ref))?;
-                Self::gate("gphase", vec![argument], &[], controls)
-            }
-            Operation::Measure { qubit: q, bit: b } => stmt(S::Assign {
-                target: bit(b.index()),
-                operator: None,
-                value: expr(E::Measure(Box::new(qubit(*q)))),
-            }),
-            Operation::Reset { qubit: q } => stmt(S::Reset(qubit(*q))),
-            Operation::Barrier { qubits } => {
-                stmt(S::Barrier(qubits.iter().copied().map(qubit).collect()))
-            }
+                    .collect::<Result<Vec<_>, _>>()?,
+                targets: targets(qs),
+                controls: controls(cs),
+            },
+            Operation::GlobalPhase {
+                radians,
+                controls: cs,
+            } => F::Gate {
+                gate: quest_language::GateKind::GlobalPhase,
+                arguments: vec![self.argument(*radians, angles.first().and_then(Option::as_ref))?],
+                targets: Vec::new(),
+                controls: controls(cs),
+            },
+            Operation::Measure { qubit, bit } => F::Measure {
+                qubit: qubit.index(),
+                bit: bit.index(),
+            },
+            Operation::Reset { qubit } => F::Reset(qubit.index()),
+            Operation::Barrier { qubits } => F::Barrier(targets(qubits)),
             Operation::Conditional {
-                bit: b,
+                bit,
                 expected,
                 operation,
-            } => stmt(S::If {
-                condition: expr(E::Binary(
-                    syntax::BinaryOperator::Equal,
-                    Box::new(bit(b.index())),
-                    Box::new(expr(E::BitString(if *expected { "1" } else { "0" }.into()))),
-                )),
-                then_body: vec![self.operation(operation, angles)?],
-                else_body: Vec::new(),
-            }),
+            } => F::Conditional {
+                bit: bit.index(),
+                expected: *expected,
+                operation: Box::new(self.operation(operation, angles)?),
+            },
             Operation::Oracle {
                 fragment,
-                targets,
-                controls,
+                targets: qs,
+                controls: cs,
             } => {
-                let capture = self.captures.len();
-                self.captures
-                    .push(ScalarValue::floating(FloatWidth::F64, 0.0)?);
+                let capture = self.oracles.len();
                 self.oracles.insert(capture, fragment.clone());
-                let name = format!("oracle_{capture}");
-                self.declarations.push(stmt(S::Oracle {
-                    name: name.clone(),
-                    arity: expr(E::Number(fragment.num_qubits().to_string())),
+                F::Oracle {
                     capture,
-                }));
-                Self::gate(&name, Vec::new(), targets, controls)
+                    targets: targets(qs),
+                    controls: controls(cs),
+                }
             }
             Operation::Numerical {
                 matrix,
-                targets,
-                controls,
+                targets: qs,
+                controls: cs,
             } => {
                 let capture = self.payloads.len();
                 self.payloads.insert(
                     capture,
                     QuantumPayload::Matrix {
                         matrix: matrix.clone(),
-                        control_states: controls
+                        control_states: cs
                             .iter()
-                            .map(|c| c.state() == ControlState::One)
+                            .map(|c| c.state() == crate::ControlState::One)
                             .collect(),
                     },
                 );
-                stmt(S::Payload {
+                F::Payload {
                     capture,
-                    operands: controls
+                    operands: cs
                         .iter()
-                        .map(|c| qubit(c.qubit()))
-                        .chain(targets.iter().copied().map(qubit))
+                        .map(|c| c.qubit().index())
+                        .chain(qs.iter().map(|q| q.index()))
                         .collect(),
-                })
+                }
             }
-            Operation::Channel { kraus, targets } => {
+            Operation::Channel { kraus, targets: qs } => {
                 let capture = self.payloads.len();
                 self.payloads.insert(
                     capture,
@@ -184,68 +144,42 @@ impl Import {
                         kraus: kraus.clone(),
                     },
                 );
-                stmt(S::Payload {
+                F::Payload {
                     capture,
-                    operands: targets.iter().copied().map(qubit).collect(),
-                })
+                    operands: targets(qs),
+                }
             }
         })
     }
 }
 impl Program<Constructed> {
-    /// Admit a finite capability into the common executable program lifecycle.
-    /// Original source binding obligations are discharged before translating any operation.
+    /// Admit a finite capability after discharging its original binding obligations.
     /// # Errors
-    /// Rejects incomplete/nonfinite bindings, invalid captures, and shared IR admission failures.
+    /// Rejects incomplete bindings and semantic/SSA admission failures.
     pub fn from_region(
         region: QuantumRegion,
         bindings: &[(ParameterId, f64)],
     ) -> Result<Self, LanguageError> {
         Self::from_bound_region(region.bind(bindings)?)
     }
-    /// Admit an already specialized finite capability while preserving exact target metadata.
+    /// Admit specialized finite operations without reconstructing source expressions.
     /// # Errors
-    /// Rejects shared IR admission or payload interface failures.
+    /// Rejects incompatible operand interfaces, captures, or SSA effects.
     pub fn from_bound_region(region: BoundRegion) -> Result<Self, LanguageError> {
-        let mut import = Import {
-            captures: Vec::new(),
-            exact: BTreeMap::new(),
-            oracles: BTreeMap::new(),
-            payloads: BTreeMap::new(),
-            declarations: Vec::new(),
-        };
+        let mut builder = crate::ProgramBuilder::new()?;
+        let mut qubits = Vec::new();
         for q in 0..region.num_qubits() {
-            import.declarations.push(stmt(S::Qubit {
-                name: format!("q{q}"),
-                size: None,
-            }));
+            qubits.push(builder.qubit(&format!("q{q}"), 1)?);
         }
+        let mut bits = Vec::new();
         for c in 0..region.num_bits() {
-            import.declarations.push(stmt(S::Declare {
-                name: format!("c{c}"),
-                ty: syntax::Type::Scalar(syntax::ScalarKind::Bit, None),
-                initializer: Some(expr(E::BitString("0".into()))),
-                qualifier: syntax::Qualifier::Output,
-            }));
+            let zero = builder.bitstring::<1>("0")?;
+            bits.push(builder.output(&format!("c{c}"), &zero)?);
         }
-        let body = region
-            .instructions()
-            .iter()
-            .map(|instruction| {
-                import.operation(instruction.operation(), instruction.angle_targets())
-            })
-            .collect::<Result<Vec<_>, _>>()?;
-        import.declarations.extend(body);
-        let typed = semantic::admit(
-            syntax::Module {
-                statements: import.declarations,
-            },
-            CompileLimits::default(),
-        )?;
-        Self::from_template(typed, import.captures, SourceMap::default(), Vec::new())
-            .with_angle_captures(import.exact)
-            .with_quantum_payloads(import.payloads)
-            .with_oracles(import.oracles)
-            .map(|program| program.with_origin(region))
+        builder.region(region.clone(), &qubits, &bits)?;
+        Ok(builder
+            .finish()?
+            .with_embedded_origins(Vec::new())
+            .with_origin(region))
     }
 }

@@ -205,27 +205,6 @@ pub fn macro_value(config: &str, name: &str) -> Option<String> {
     })
 }
 
-pub fn rust_name(quest_name: &str) -> String {
-    let mut out = String::new();
-    let mut previous_was_lower_or_digit = false;
-
-    for character in quest_name.chars() {
-        if character.is_ascii_uppercase() {
-            if previous_was_lower_or_digit {
-                out.push('_');
-            }
-            out.push(character.to_ascii_lowercase());
-            previous_was_lower_or_digit = false;
-        } else {
-            out.push(character);
-            previous_was_lower_or_digit =
-                character.is_ascii_lowercase() || character.is_ascii_digit();
-        }
-    }
-
-    out
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;

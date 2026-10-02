@@ -1,13 +1,8 @@
 //! The program construction entrypoint shares the text frontend's typed semantics.
-#[allow(unused_imports)]
-use crate::{
-    BoundParityPasses, ExactPasses, LinearPasses, NumericalPasses, OracleExport, ParityPasses,
-    TerminalPasses,
-};
 use crate::{Constructed, LanguageError, OracleFragment, Program};
 use quest_language::{
     SourceMap,
-    classical::{FloatWidth, ScalarValue},
+    classical::ScalarValue,
     semantic::{
         CompileLimits,
         builder::{self, GateDefinition},
@@ -49,10 +44,8 @@ impl ProgramBuilder {
         name: &str,
         fragment: OracleFragment,
     ) -> Result<GateDefinition, LanguageError> {
-        let index = self.captures.len();
+        let index = self.oracles.len();
         let definition = self.semantic.oracle(name, fragment.num_qubits(), index)?;
-        self.captures
-            .push(ScalarValue::floating(FloatWidth::F64, 0.0)?);
         self.oracles.insert(index, fragment);
         Ok(definition)
     }
@@ -172,15 +165,12 @@ impl ProgramBuilder {
             exact: self.exact.clone(),
             oracles: self.oracles.clone(),
             payloads: self.payloads.clone(),
-            declarations: Vec::new(),
         };
         let mut body = Vec::new();
         for instruction in region.instructions() {
             body.push(import.operation(instruction.operation(), instruction.angle_targets())?);
         }
-        import.declarations.extend(body);
-        self.semantic
-            .append_finite_fragment(import.declarations, qubits, bits)?;
+        self.semantic.append_finite_fragment(body, qubits, bits)?;
         self.captures = import.captures;
         self.exact = import.exact;
         self.oracles = import.oracles;

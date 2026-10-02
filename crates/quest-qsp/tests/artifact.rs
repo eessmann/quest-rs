@@ -121,7 +121,7 @@ fn complex_export_binds_every_control_and_rejects_corruption_and_budgets() {
 }
 #[cfg(feature = "offline-synthesis")]
 #[test]
-fn offline_solver_precision_and_original_support_are_retained() {
+fn offline_solver_65_bit_precision_and_original_support_are_retained() {
     use quest_qsp::offline::{OfflineBuilder, OfflinePolicy};
     use quest_qsp::{SynthesisAlgorithm, SynthesisPrecision};
     for algorithm in [
@@ -139,6 +139,13 @@ fn offline_solver_precision_and_original_support_are_retained() {
             .unwrap()
             .policy(OfflinePolicy {
                 algorithm,
+                initial_precision: 65,
+                max_precision: 65,
+                certification: CertificationPolicy {
+                    initial_precision: 65,
+                    max_precision: 65,
+                    ..CertificationPolicy::default()
+                },
                 ..OfflinePolicy::default()
             })
             .unwrap()
@@ -159,7 +166,7 @@ fn offline_solver_precision_and_original_support_are_retained() {
         assert_eq!(loaded.candidate().algorithm(), algorithm);
         assert!(matches!(
             loaded.candidate().synthesis_precision(),
-            SynthesisPrecision::Arbitrary { bits: 128 }
+            SynthesisPrecision::Arbitrary { bits: 65 }
         ));
     }
 }

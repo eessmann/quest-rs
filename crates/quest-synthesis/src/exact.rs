@@ -1,6 +1,6 @@
 //! Giles--Selinger (arXiv:1212.0506), lemmas 19--21 and 24.
 //! This implementation uses determinant-one row operations in every reduction.
-// Paper variables and exact BigInt formulas are retained for auditability.
+// Paper variables and exact IBig formulas are retained for auditability.
 // Matrix dimensions and phase exponents are admitted before machine arithmetic.
 #![allow(clippy::many_single_char_names, clippy::arithmetic_side_effects)]
 use crate::{AncillaPolicy, Budget, ExactSynthesis, Result, SynthesisError, SynthesisOptions};

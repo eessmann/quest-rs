@@ -21,9 +21,9 @@ the public packages. Common implementation locations are:
 
 - `crates/quest/src/`: environments, typed registers, preparation and execution.
 - `crates/quest-language/`: checked semantics, typed builders, exact angles, SSA and quantum regions.
-- `crates/quest-compile/`: staged programs, specialization, optimization and portable artifacts.
-- `crates/quest-circuit/`, `crates/quest-qasm/` and `crates/quest-macros/`:
-  public construction facade, text interchange and checked token templates.
+- `crates/quest-compile/`: canonical compiler API and macros, staged programs, specialization, optimization and portable artifacts.
+- `crates/quest-qasm/` and `crates/quest-macros/`: text interchange and checked token templates.
+- `crates/quest-numerics/` and `crates/quest-polynomial/`: checked arithmetic, enclosures, AD, root coverage, static expressions and approximation certificates.
 - `crates/quest-synthesis/` and `crates/quest-math/`: bounded candidate generation and independent exact verification.
 - `crates/quest-qsp/` and `crates/quest-qsvt/`: response synthesis, frozen numerical certification and typed transformation routes.
 - `crates/quest-build/`: installed native configuration and executable runtime paths.

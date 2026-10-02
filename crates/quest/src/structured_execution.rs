@@ -8,7 +8,7 @@ use crate::{
     values::reserve_vec,
 };
 use cxx::UniquePtr;
-use quest_circuit::{
+use quest_compile::{
     BoundGate, Executable, Program,
     dispatch_recipe::{self, GateRecipe},
     language::{
@@ -21,6 +21,7 @@ use quest_circuit::{
 /// A prepared structured interpreter. Native reset resources and scratch buffers
 /// are admitted before publication and dropped before the owning environment.
 pub struct PreparedProgram<'env> {
+    matrices: Vec<crate::execution::NativeMatrix>,
     reset: Option<UniquePtr<quest_sys::KrausMap>>,
     payloads: crate::payload_execution::PayloadCache,
     static_gates: std::collections::BTreeMap<vm::DispatchId, StaticGate>,
@@ -63,8 +64,13 @@ impl Environment {
                 .bytes()
                 .saturating_sub(self.resources.allocated_bytes()),
         )?;
+        let mut seen_matrices = std::collections::BTreeSet::new();
         let oracle_bytes = inventory
-            .estimated_bytes(plan.num_qubits(), self.resources.capabilities().gpu)?
+            .estimated_bytes(
+                plan.num_qubits(),
+                self.resources.capabilities().gpu,
+                &mut seen_matrices,
+            )?
             .checked_add(
                 plan.oracle_captures()
                     .len()
@@ -72,28 +78,11 @@ impl Environment {
                     .ok_or(Error::Overflow)?,
             )
             .ok_or(Error::Overflow)?;
-        let static_bytes = plan
-            .dispatch()
-            .gates()
-            .try_fold(0usize, |total, (_, request)| {
-                let operands = request
-                    .targets
-                    .len()
-                    .checked_mul(size_of::<i32>())
-                    .and_then(|n| {
-                        request
-                            .controls
-                            .len()
-                            .checked_mul(32)
-                            .and_then(|controls| n.checked_add(controls))
-                    })
-                    .and_then(|n| n.checked_add(const { size_of::<StaticGate>() + 128 }))
-                    .ok_or(Error::Overflow)?;
-                total.checked_add(operands).ok_or(Error::Overflow)
-            })?;
+        let static_bytes = static_storage(&plan)?;
         let payload_bytes = crate::payload_execution::PayloadCache::estimated_bytes(
             plan.quantum_payloads(),
             self.resources.capabilities().gpu,
+            &mut seen_matrices,
         )?;
         let required = plan
             .resources()
@@ -111,8 +100,13 @@ impl Environment {
             .gates()
             .map(|(id, request)| Ok((id, StaticGate::prepare(request, plan.num_qubits())?)))
             .collect::<Result<_>>()?;
-        let payloads = crate::payload_execution::PayloadCache::prepare(plan.quantum_payloads())?;
-        let oracles = OracleCache::prepare(&inventory, plan.num_qubits())?;
+        drop(seen_matrices);
+        let mut matrices = crate::execution::MatrixPreparation::default();
+        let payloads = crate::payload_execution::PayloadCache::prepare(
+            plan.quantum_payloads(),
+            &mut matrices,
+        )?;
+        let oracles = OracleCache::prepare(&inventory, plan.num_qubits(), &mut matrices)?;
         // Unreachable captures remain owned by the source plan without native resources.
         let oracle_ids = plan
             .oracle_captures()
@@ -133,6 +127,7 @@ impl Environment {
             None
         };
         Ok(PreparedProgram {
+            matrices: matrices.finish(),
             reset,
             payloads,
             static_gates,
@@ -145,6 +140,26 @@ impl Environment {
             fingerprint,
         })
     }
+}
+fn static_storage(plan: &Program<Executable>) -> Result<usize> {
+    plan.dispatch()
+        .gates()
+        .try_fold(0usize, |total, (_, request)| {
+            let operands = request
+                .targets
+                .len()
+                .checked_mul(size_of::<i32>())
+                .and_then(|n| {
+                    request
+                        .controls
+                        .len()
+                        .checked_mul(32)
+                        .and_then(|controls| n.checked_add(controls))
+                })
+                .and_then(|n| n.checked_add(const { size_of::<StaticGate>() + 128 }))
+                .ok_or(Error::Overflow)?;
+            total.checked_add(operands).ok_or(Error::Overflow)
+        })
 }
 impl PreparedProgram<'_> {
     /// Seed the process RNG once and execute each shot from the zero state.
@@ -215,10 +230,15 @@ impl PreparedProgram<'_> {
     pub const fn prepared_oracle_bodies(&self) -> usize {
         self.oracles.body_count()
     }
-    /// Numerical payload/control variants; each owns a forward/adjoint pair.
+    /// Distinct numerical/control variants used by reachable oracle bodies.
     #[must_use]
     pub const fn prepared_oracle_matrix_variants(&self) -> usize {
         self.oracles.matrix_count()
+    }
+    /// Native forward/adjoint pairs shared by payloads and reachable oracle bodies.
+    #[must_use]
+    pub const fn prepared_matrix_variants(&self) -> usize {
+        self.matrices.len()
     }
     #[must_use]
     pub const fn plan(&self) -> &Program<Executable> {
@@ -279,6 +299,7 @@ impl PreparedProgram<'_> {
         let mut backend = Backend {
             register,
             reset: self.reset.as_ref(),
+            matrices: &self.matrices,
             payloads: &self.payloads,
             static_gates: &self.static_gates,
             oracles: &mut self.oracles,
@@ -305,7 +326,7 @@ impl PreparedProgram<'_> {
 fn runtime_diagnostic(
     error: &vm::RuntimeError<Error>,
     plan: &Program<Executable>,
-) -> quest_circuit::language::Diagnostic {
+) -> quest_compile::language::Diagnostic {
     let mut diagnostic = error.diagnostic(plan.sources());
     if diagnostic.labels.is_empty()
         && let Some(span) = diagnostic.occurrence
@@ -324,6 +345,7 @@ fn runtime_diagnostic(
 struct Backend<'a, 'env, K: RegisterKind> {
     register: &'a mut Register<'env, K>,
     reset: Option<&'a UniquePtr<quest_sys::KrausMap>>,
+    matrices: &'a [crate::execution::NativeMatrix],
     payloads: &'a crate::payload_execution::PayloadCache,
     static_gates: &'a std::collections::BTreeMap<vm::DispatchId, StaticGate>,
     oracles: &'a mut OracleCache,
@@ -346,7 +368,7 @@ impl<K: RegisterKind> QuantumBackend for Backend<'_, '_, K> {
     fn apply_payload(&mut self, capture: usize, wires: &[usize]) -> Option<Result<()>> {
         Some(
             self.payloads
-                .execute(capture, wires, self.register, self.targets),
+                .execute(capture, wires, self.register, self.targets, self.matrices),
         )
     }
     fn apply_oracle(&mut self, request: vm::OracleRequest<'_>) -> Option<Result<()>> {
@@ -361,6 +383,7 @@ impl<K: RegisterKind> QuantumBackend for Backend<'_, '_, K> {
                 request.controls,
                 adjoint ^ request.adjoint,
                 self.register,
+                self.matrices,
             )
         })())
     }

@@ -386,9 +386,7 @@ fn decode<M: ArtifactMode>(
     }
     let precision = match payload.precision_bits {
         None => SynthesisPrecision::Binary64,
-        Some(bits) if (64..=1_048_576).contains(&bits) && bits.is_multiple_of(64) => {
-            SynthesisPrecision::Arbitrary { bits }
-        }
+        Some(bits) if (64..=1_048_576).contains(&bits) => SynthesisPrecision::Arbitrary { bits },
         Some(_) => return Err(ArtifactError::Invalid("precision")),
     };
     if payload.completion_grid == 0
@@ -559,7 +557,6 @@ fn validate_receipt(receipt: &Receipt) -> ArtifactResult<()> {
         if attempt.precision < receipt.initial_precision
             || attempt.precision > receipt.max_precision
             || attempt.precision <= previous
-            || !attempt.precision.is_multiple_of(64)
             || attempt.elapsed_nanoseconds >= 1_000_000_000
         {
             return Err(ArtifactError::Invalid("historical attempt"));

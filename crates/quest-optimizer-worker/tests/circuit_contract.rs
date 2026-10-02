@@ -1,10 +1,10 @@
 #![cfg(all(target_os = "linux", any(feature = "synthesis", feature = "zx")))]
 use googletest::prelude::*;
 #[cfg(feature = "zx")]
-use quest_circuit::ZxPasses;
+use quest_compile::ZxPasses;
 #[cfg(feature = "synthesis")]
-use quest_circuit::{Angle, Control, ControlState, ExactPasses, RotationSynthesisPasses};
-use quest_circuit::{Gate, QuantumRegionBuilder};
+use quest_compile::{Angle, Control, ControlState, ExactPasses, RotationSynthesisPasses};
+use quest_compile::{Gate, QuantumRegionBuilder};
 use quest_math::Limits;
 use quest_optimizer_client::{Client, WorkerLimits};
 fn worker() -> Result<Client> {
@@ -37,7 +37,7 @@ fn explicit_synthesis_retains_target_identity_control_phase_and_local_certificat
     expect_eq!(
         report
             .provenance
-            .source_leaves(certificate_root, quest_circuit::ExpansionLimits::default())?,
+            .source_leaves(certificate_root, quest_compile::ExpansionLimits::default())?,
         vec![source]
     );
     let (candidate, _) = candidate.optimize_exact()?;
@@ -46,18 +46,18 @@ fn explicit_synthesis_retains_target_identity_control_phase_and_local_certificat
         expect_eq!(
             plan.provenance().source_leaves(
                 instruction.provenance(),
-                quest_circuit::ExpansionLimits::default()
+                quest_compile::ExpansionLimits::default()
             )?,
             vec![source]
         );
         match instruction.operation() {
-            quest_circuit::Operation::Gate {
+            quest_compile::Operation::Gate {
                 targets, controls, ..
             } => {
                 expect_eq!(targets.as_ref(), &[q]);
                 expect_eq!(controls.as_ref(), &[Control::new(c, ControlState::Zero)]);
             }
-            quest_circuit::Operation::GlobalPhase { controls, .. } => {
+            quest_compile::Operation::GlobalPhase { controls, .. } => {
                 expect_eq!(controls.as_ref(), &[Control::new(c, ControlState::Zero)]);
             }
             _ => fail!("unexpected synthesized effect")?,
@@ -101,14 +101,14 @@ fn zx_replacements_are_transactional_and_preserve_measurement_occurrences() -> R
                 .provenance
                 .source_leaves(
                     accepted.provenance,
-                    quest_circuit::ExpansionLimits::default()
+                    quest_compile::ExpansionLimits::default()
                 )?
                 .len(),
             2
         );
         expect_true!(matches!(
             report.provenance.node(accepted.provenance)?,
-            quest_circuit::ProvenanceNode::Rewrite(_)
+            quest_compile::ProvenanceNode::Rewrite(_)
         ));
         quest_math::verify_exact(
             accepted.certificate.candidate(),

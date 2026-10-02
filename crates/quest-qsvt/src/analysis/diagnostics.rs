@@ -212,7 +212,7 @@ impl DiagnosticBuilder<'_, SuppliedReference> {
         let mut remaining_operations = self
             .policy
             .max_bytes
-            .checked_div(size_of::<quest_circuit::Operation>().max(1))
+            .checked_div(size_of::<quest_compile::Operation>().max(1))
             .ok_or(Error::Budget("diagnostic work"))?;
         let mut metadata = 0usize;
         for program in [Some(self.transform.main()), self.transform.continuation()]
@@ -441,7 +441,7 @@ fn sample(
 // Oracle decomposition retains a mapped operation vector while recursively
 // interpreting children. Admit that live stack separately from dense matrices.
 fn decomposition_storage(
-    operation: &quest_circuit::Operation,
+    operation: &quest_compile::Operation,
     inherited: usize,
     depth: usize,
     remaining: &mut usize,
@@ -452,7 +452,7 @@ fn decomposition_storage(
     if depth > 64 {
         return Err(Error::Budget("diagnostic oracle nesting"));
     }
-    let quest_circuit::Operation::Oracle {
+    let quest_compile::Operation::Oracle {
         fragment, controls, ..
     } = operation
     else {
@@ -464,11 +464,11 @@ fn decomposition_storage(
     let mut own = fragment
         .operations()
         .len()
-        .checked_mul(size_of::<quest_circuit::Operation>())
+        .checked_mul(size_of::<quest_compile::Operation>())
         .ok_or(Error::Budget("oracle operation storage"))?;
     let mut child_peak = 0usize;
     for child in fragment.operations() {
-        use quest_circuit::Operation;
+        use quest_compile::Operation;
         let (targets, controls, matrix) = match child {
             Operation::Gate {
                 targets, controls, ..

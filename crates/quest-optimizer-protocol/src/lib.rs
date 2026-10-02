@@ -4,7 +4,7 @@ use quest_math::{Sequence, Target};
 use serde::{Deserialize, Serialize};
 
 /// Supported wire version.
-pub const VERSION: u16 = 2;
+pub const VERSION: u16 = 3;
 /// Maximum encoded request bytes.
 pub const MAX_REQUEST_BYTES: usize = 65_536;
 /// Maximum encoded response bytes.

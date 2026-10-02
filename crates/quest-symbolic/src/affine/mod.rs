@@ -6,9 +6,9 @@
 //! another context with [`Context::assemble`]. Symbolic values require an
 //! explicit complete mapping with [`Affine::substitute_into`].
 
-use num_bigint::BigInt;
-use num_rational::Ratio;
-use num_traits::{One, Zero};
+use crate::RBig;
+use dashu_base::BitTest;
+use dashu_int::IBig;
 use std::fmt;
 #[cfg(test)]
 use std::fmt::Write as _;
@@ -16,8 +16,6 @@ use std::mem::size_of;
 use std::ops::{Add, Mul, Neg};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
-
-pub type Rational = Ratio<BigInt>;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Owner(u64);
@@ -152,33 +150,29 @@ impl Context {
     }
     #[cfg(test)]
     pub fn zero(&self) -> Result<Affine, ExactError> {
-        self.assemble(Rational::zero(), Rational::zero(), Vec::new())
+        self.assemble(RBig::ZERO, RBig::ZERO, Vec::new())
     }
     #[cfg(test)]
     pub fn one(&self) -> Result<Affine, ExactError> {
-        self.assemble(Rational::one(), Rational::zero(), Vec::new())
+        self.assemble(RBig::ONE, RBig::ZERO, Vec::new())
     }
     #[cfg(test)]
-    pub fn ratio(&self, numerator: BigInt, denominator: BigInt) -> Result<Affine, ExactError> {
+    pub fn ratio(&self, numerator: IBig, denominator: IBig) -> Result<Affine, ExactError> {
         let coefficient = self.make_ratio(numerator, denominator)?;
-        self.assemble(coefficient, Rational::zero(), Vec::new())
+        self.assemble(coefficient, RBig::ZERO, Vec::new())
     }
     #[cfg(test)]
     pub fn pi(&self) -> Result<Affine, ExactError> {
-        self.assemble(Rational::zero(), Rational::one(), Vec::new())
+        self.assemble(RBig::ZERO, RBig::ONE, Vec::new())
     }
     pub fn symbol(&self, symbol: Symbol) -> Result<Affine, ExactError> {
-        self.assemble(
-            Rational::zero(),
-            Rational::zero(),
-            vec![(symbol, Rational::one())],
-        )
+        self.assemble(RBig::ZERO, RBig::ZERO, vec![(symbol, RBig::ONE)])
     }
     pub fn assemble(
         &self,
-        constant: Rational,
-        pi: Rational,
-        mut terms: Vec<(Symbol, Rational)>,
+        constant: RBig,
+        pi: RBig,
+        mut terms: Vec<(Symbol, RBig)>,
     ) -> Result<Affine, ExactError> {
         if u64::try_from(terms.len()).map_err(|_| ExactError::WorkLimit)? > self.limits.max_work {
             return Err(ExactError::WorkLimit);
@@ -194,10 +188,10 @@ impl Context {
         self.charge_work(count_work(terms.len())?)?;
         self.charge_work(sort_work(terms.len())?)?;
         let _stage = self.stage(storage_bytes(&constant, &pi, &terms, terms.capacity())?)?;
-        let constant = self.normalize(constant)?;
-        let pi = self.normalize(pi)?;
+        let constant = self.admit_coefficient(constant)?;
+        let pi = self.admit_coefficient(pi)?;
         for (_, coefficient) in &mut terms {
-            *coefficient = self.normalize(std::mem::take(coefficient))?;
+            *coefficient = self.admit_coefficient(std::mem::take(coefficient))?;
         }
         terms.sort_unstable_by_key(|(symbol, _)| *symbol);
         // Compact within the admitted input allocation. Building a second
@@ -225,38 +219,43 @@ impl Context {
         terms.retain(|(_, coefficient)| !coefficient.is_zero());
         self.publish(constant, pi, terms)
     }
-    fn make_ratio(&self, numerator: BigInt, denominator: BigInt) -> Result<Rational, ExactError> {
+    fn make_ratio(&self, numerator: IBig, denominator: IBig) -> Result<RBig, ExactError> {
         if denominator.is_zero() {
             return Err(ExactError::ZeroDenominator);
         }
         self.check_int(&numerator)?;
         self.check_int(&denominator)?;
-        self.charge_work(bits_work(&[numerator.bits(), denominator.bits()])?)?;
-        Ok(Rational::new(numerator, denominator))
+        self.charge_work(bits_work(&[
+            u64::try_from(numerator.bit_len()).unwrap_or(u64::MAX),
+            u64::try_from(denominator.bit_len()).unwrap_or(u64::MAX),
+        ])?)?;
+        Ok(RBig::from_parts_signed(numerator, denominator))
     }
-    fn check_int(&self, value: &BigInt) -> Result<(), ExactError> {
-        if value.bits() > self.limits.max_coefficient_bits {
+    fn check_int(&self, value: &IBig) -> Result<(), ExactError> {
+        if u64::try_from(value.bit_len()).unwrap_or(u64::MAX) > self.limits.max_coefficient_bits {
             Err(ExactError::CoefficientLimit)
         } else {
             Ok(())
         }
     }
-    fn check_coefficient(&self, value: &Rational) -> Result<(), ExactError> {
-        if value.denom().is_zero() {
-            return Err(ExactError::ZeroDenominator);
+    fn check_coefficient(&self, value: &RBig) -> Result<(), ExactError> {
+        self.check_int(value.numerator())?;
+        if u64::try_from(value.denominator().bit_len()).unwrap_or(u64::MAX)
+            > self.limits.max_coefficient_bits
+        {
+            Err(ExactError::CoefficientLimit)
+        } else {
+            Ok(())
         }
-        self.check_int(value.numer())?;
-        self.check_int(value.denom())
     }
-    fn normalize(&self, value: Rational) -> Result<Rational, ExactError> {
+    fn admit_coefficient(&self, value: RBig) -> Result<RBig, ExactError> {
         self.check_coefficient(&value)?;
-        self.charge_work(bits_work(&[value.numer().bits(), value.denom().bits()])?)?;
-        let normalized = {
-            let (numerator, denominator) = value.into_raw();
-            Rational::new(numerator, denominator)
-        };
-        self.check_coefficient(&normalized)?;
-        Ok(normalized)
+        self.charge_work(bits_work(&[
+            u64::try_from(value.numerator().bit_len()).unwrap_or(u64::MAX),
+            u64::try_from(value.denominator().bit_len()).unwrap_or(u64::MAX),
+        ])?)?;
+        // RBig is already reduced and stores a positive denominator.
+        Ok(value)
     }
     fn charge_work(&self, units: u64) -> Result<(), ExactError> {
         self.state
@@ -268,7 +267,7 @@ impl Context {
             .map_err(|_| ExactError::WorkLimit)?;
         Ok(())
     }
-    fn checked_add(&self, a: &Rational, b: &Rational) -> Result<Rational, ExactError> {
+    fn checked_add(&self, a: &RBig, b: &RBig) -> Result<RBig, ExactError> {
         self.check_coefficient(a)?;
         self.check_coefficient(b)?;
         if a.is_zero() {
@@ -277,13 +276,19 @@ impl Context {
         if b.is_zero() {
             return Ok(a.clone());
         }
-        if a.numer() == &b.numer().neg() && a.denom() == b.denom() {
-            return Ok(Rational::zero());
+        if a.numerator() == &b.numerator().neg() && a.denominator() == b.denominator() {
+            return Ok(RBig::ZERO);
         }
         let max = self.limits.max_coefficient_bits;
-        let left = a.numer().bits().saturating_add(b.denom().bits());
-        let right = b.numer().bits().saturating_add(a.denom().bits());
-        let denominator = a.denom().bits().saturating_add(b.denom().bits());
+        let left = u64::try_from(a.numerator().bit_len())
+            .unwrap_or(u64::MAX)
+            .saturating_add(u64::try_from(b.denominator().bit_len()).unwrap_or(u64::MAX));
+        let right = u64::try_from(b.numerator().bit_len())
+            .unwrap_or(u64::MAX)
+            .saturating_add(u64::try_from(a.denominator().bit_len()).unwrap_or(u64::MAX));
+        let denominator = u64::try_from(a.denominator().bit_len())
+            .unwrap_or(u64::MAX)
+            .saturating_add(u64::try_from(b.denominator().bit_len()).unwrap_or(u64::MAX));
         if left.max(right).saturating_add(1) > max || denominator > max {
             return Err(ExactError::CoefficientLimit);
         }
@@ -292,11 +297,11 @@ impl Context {
         self.check_coefficient(&result)?;
         Ok(result)
     }
-    fn checked_mul(&self, a: &Rational, b: &Rational) -> Result<Rational, ExactError> {
+    fn checked_mul(&self, a: &RBig, b: &RBig) -> Result<RBig, ExactError> {
         self.check_coefficient(a)?;
         self.check_coefficient(b)?;
         if a.is_zero() || b.is_zero() {
-            return Ok(Rational::zero());
+            return Ok(RBig::ZERO);
         }
         if a.is_one() {
             return Ok(b.clone());
@@ -304,14 +309,18 @@ impl Context {
         if b.is_one() {
             return Ok(a.clone());
         }
-        if a == &Rational::one().neg() {
+        if a == &RBig::ONE.neg() {
             return Ok(b.clone().neg());
         }
-        if b == &Rational::one().neg() {
+        if b == &RBig::ONE.neg() {
             return Ok(a.clone().neg());
         }
-        let numerator = a.numer().bits().saturating_add(b.numer().bits());
-        let denominator = a.denom().bits().saturating_add(b.denom().bits());
+        let numerator = u64::try_from(a.numerator().bit_len())
+            .unwrap_or(u64::MAX)
+            .saturating_add(u64::try_from(b.numerator().bit_len()).unwrap_or(u64::MAX));
+        let denominator = u64::try_from(a.denominator().bit_len())
+            .unwrap_or(u64::MAX)
+            .saturating_add(u64::try_from(b.denominator().bit_len()).unwrap_or(u64::MAX));
         if numerator > self.limits.max_coefficient_bits
             || denominator > self.limits.max_coefficient_bits
         {
@@ -324,9 +333,9 @@ impl Context {
     }
     fn publish(
         &self,
-        constant: Rational,
-        pi: Rational,
-        terms: Vec<(Symbol, Rational)>,
+        constant: RBig,
+        pi: RBig,
+        terms: Vec<(Symbol, RBig)>,
     ) -> Result<Affine, ExactError> {
         if terms.len() > self.limits.max_terms {
             return Err(ExactError::TermLimit);
@@ -393,22 +402,25 @@ fn bits_work(bits: &[u64]) -> Result<u64, ExactError> {
         .and_then(|n| n.checked_add(1))
         .ok_or(ExactError::WorkLimit)
 }
-fn coefficient_bytes(value: &Rational) -> Result<u64, ExactError> {
-    value
-        .numer()
-        .bits()
+fn coefficient_bytes(value: &RBig) -> Result<u64, ExactError> {
+    u64::try_from(value.numerator().bit_len())
+        .unwrap_or(u64::MAX)
         .div_ceil(8)
-        .checked_add(value.denom().bits().div_ceil(8))
+        .checked_add(
+            u64::try_from(value.denominator().bit_len())
+                .unwrap_or(u64::MAX)
+                .div_ceil(8),
+        )
         .ok_or(ExactError::StorageLimit)
 }
 fn storage_bytes(
-    constant: &Rational,
-    pi: &Rational,
-    terms: &[(Symbol, Rational)],
+    constant: &RBig,
+    pi: &RBig,
+    terms: &[(Symbol, RBig)],
     capacity: usize,
 ) -> Result<u64, ExactError> {
     let allocation = capacity
-        .checked_mul(size_of::<(Symbol, Rational)>())
+        .checked_mul(size_of::<(Symbol, RBig)>())
         .ok_or(ExactError::StorageLimit)?;
     let base = size_of::<Data>()
         .checked_add(allocation)
@@ -449,9 +461,9 @@ impl Drop for Stage {
 }
 #[derive(Debug)]
 struct Data {
-    constant: Rational,
-    pi: Rational,
-    terms: Vec<(Symbol, Rational)>,
+    constant: RBig,
+    pi: RBig,
+    terms: Vec<(Symbol, RBig)>,
     bytes: u64,
     state: Arc<State>,
 }
@@ -504,9 +516,11 @@ fn decimal_digits_bound(bits: u64) -> Result<u64, ExactError> {
         .ok_or(ExactError::StorageLimit)
 }
 #[cfg(test)]
-fn rational_text_bound(value: &Rational) -> Result<u64, ExactError> {
-    decimal_digits_bound(value.numer().bits())?
-        .checked_add(decimal_digits_bound(value.denom().bits())?)
+fn rational_text_bound(value: &RBig) -> Result<u64, ExactError> {
+    decimal_digits_bound(u64::try_from(value.numerator().bit_len()).unwrap_or(u64::MAX))?
+        .checked_add(decimal_digits_bound(
+            u64::try_from(value.denominator().bit_len()).unwrap_or(u64::MAX),
+        )?)
         .and_then(|v| v.checked_add(2))
         .ok_or(ExactError::StorageLimit)
 }
@@ -528,13 +542,13 @@ impl Affine {
     pub const fn owner(&self) -> Owner {
         self.context.owner
     }
-    pub fn constant(&self) -> &Rational {
+    pub fn constant(&self) -> &RBig {
         &self.data.constant
     }
-    pub fn pi_coefficient(&self) -> &Rational {
+    pub fn pi_coefficient(&self) -> &RBig {
         &self.data.pi
     }
-    pub fn terms(&self) -> impl Iterator<Item = (&Symbol, &Rational)> {
+    pub fn terms(&self) -> impl Iterator<Item = (&Symbol, &RBig)> {
         self.data.terms.iter().map(|(s, c)| (s, c))
     }
     pub fn is_zero(&self) -> bool {
@@ -566,7 +580,7 @@ impl Affine {
         self.context.charge_work(count_work(count)?)?;
         let estimate = self.data.bytes.saturating_add(other.data.bytes);
         let _stage = self.context.stage(estimate)?;
-        let negative = |v: &Rational| if subtract { v.clone().neg() } else { v.clone() };
+        let negative = |v: &RBig| if subtract { v.clone().neg() } else { v.clone() };
         let constant = self
             .context
             .checked_add(&self.data.constant, &negative(&other.data.constant))?;
@@ -610,19 +624,19 @@ impl Affine {
         }
         self.context.publish(constant, pi, terms)
     }
-    pub fn scale_ratio(&self, numerator: BigInt, denominator: BigInt) -> Result<Self, ExactError> {
+    pub fn scale_ratio(&self, numerator: IBig, denominator: IBig) -> Result<Self, ExactError> {
         let factor = self.context.make_ratio(numerator, denominator)?;
         self.scale(&factor)
     }
     #[cfg(test)]
-    pub fn divide_ratio(&self, numerator: BigInt, denominator: BigInt) -> Result<Self, ExactError> {
+    pub fn divide_ratio(&self, numerator: IBig, denominator: IBig) -> Result<Self, ExactError> {
         if numerator.is_zero() || denominator.is_zero() {
             return Err(ExactError::ZeroDenominator);
         }
         let reciprocal = self.context.make_ratio(denominator, numerator)?;
         self.scale(&reciprocal)
     }
-    fn scale(&self, factor: &Rational) -> Result<Self, ExactError> {
+    fn scale(&self, factor: &RBig) -> Result<Self, ExactError> {
         self.context
             .charge_work(count_work(self.data.terms.len())?)?;
         let _stage = self.context.stage(self.data.bytes)?;
@@ -720,10 +734,10 @@ impl Affine {
             output,
             "owner={};r={}/{};pi={}/{};terms=[",
             self.owner().id(),
-            self.constant().numer(),
-            self.constant().denom(),
-            self.pi_coefficient().numer(),
-            self.pi_coefficient().denom()
+            self.constant().numerator(),
+            self.constant().denominator(),
+            self.pi_coefficient().numerator(),
+            self.pi_coefficient().denominator()
         )
         .map_err(|_| ExactError::StorageLimit)?;
         for (index, (symbol, coefficient)) in self.data.terms.iter().enumerate() {
@@ -734,8 +748,8 @@ impl Affine {
                 output,
                 "{}={}/{}",
                 symbol.index(),
-                coefficient.numer(),
-                coefficient.denom()
+                coefficient.numerator(),
+                coefficient.denominator()
             )
             .map_err(|_| ExactError::StorageLimit)?;
         }
@@ -765,9 +779,9 @@ mod storage_tests {
     fn cancelled_storage_is_compact_or_fully_charged() -> googletest::Result<()> {
         let context = Context::new(Owner::new(80));
         let terms = (0..64)
-            .map(|i| (Symbol::new(context.owner(), i), Rational::one()))
+            .map(|i| (Symbol::new(context.owner(), i), RBig::ONE))
             .collect();
-        let expression = context.assemble(Rational::zero(), Rational::zero(), terms)?;
+        let expression = context.assemble(RBig::ZERO, RBig::ZERO, terms)?;
         for zero in [
             expression.sub(&expression)?,
             expression.scale_ratio(0.into(), 1.into())?,
@@ -777,7 +791,7 @@ mod storage_tests {
                 .data
                 .terms
                 .capacity()
-                .checked_mul(size_of::<(Symbol, Rational)>())
+                .checked_mul(size_of::<(Symbol, RBig)>())
                 .or_fail()?;
             expect_true!(
                 zero.data.bytes

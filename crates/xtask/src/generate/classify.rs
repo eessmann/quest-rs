@@ -205,7 +205,7 @@ mod tests {
         };
 
         let workspace = find_workspace_root().or_fail()?;
-        let registry = load_adapter_registry(&workspace, false).or_fail()?;
+        let registry = load_adapter_registry(&workspace).or_fail()?;
         let mut items = collect_quest_api(&package).or_fail()?;
         classify_items(&mut items, &registry).or_fail()?;
 

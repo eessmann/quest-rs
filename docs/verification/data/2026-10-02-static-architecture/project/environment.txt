@@ -1,0 +1,16 @@
+Darwin <host> 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:06:24 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6030 arm64 arm Darwin
+rustc 1.100.0-nightly (6bb1652a0 2026-09-22)
+binary: rustc
+commit-hash: 6bb1652a020e80cef79332741d89e996d71933c9
+commit-date: 2026-09-22
+host: aarch64-apple-darwin
+release: 1.100.0-nightly
+LLVM version: 23.1.1
+cargo 1.100.0-nightly (495c385d0 2026-09-16)
+001a2b656a5a80a60659a408f87f57670309a09b
+001a2b656a5a80a60659a408f87f57670309a09b
+2026-10-02T13:32:58.460064+00:00
+release_lto=thin
+jobs=2
+baseline=/path/to/quest-rs/target/static-numerical-baseline
+current=/path/to/quest-rs

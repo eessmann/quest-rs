@@ -1,0 +1,8 @@
+workload,iterations,nanoseconds,allocations,peak_live_extra_bytes,output_scalars
+canonical_construct,10000,2709,0,0,1
+canonical_value,1000000,3099416,0,0,1
+canonical_jet,1000000,6975709,0,0,3
+canonical_interval,10000,838542,0,0,2
+canonical_interval_jet,10000,7737459,0,0,6
+remez_exp_degree3_gap1e-8,10,5579750,3760,2112,4
+newton_two_roots,10000,5423208,20000,64,4

@@ -290,7 +290,7 @@ fn verify(
                 .checked_mul(128)
                 .ok_or(CertificationError::Budget("projector phase"))?,
         )?;
-        let (sin, cos) = MpInterval::sin_cos_exact(phase, p, &mut context.constants)?;
+        let (sin, cos) = MpInterval::sin_cos_exact(phase, p, &mut context.cache)?;
         let rotation = MpComplex::new(cos, sin);
         for (entry, coefficients) in actual.iter_mut().enumerate() {
             let phase = if entry % 2 == 0 {
@@ -311,7 +311,7 @@ fn verify(
         bound(&product::gram_entry(b, d, b, d, true, context)?, p)?,
     ];
     let unitarity = matrix_bound(&entries, p)?;
-    let (sin, cos) = MpInterval::sin_cos_exact(-readout / 2.0, p, &mut context.constants)?;
+    let (sin, cos) = MpInterval::sin_cos_exact(-readout / 2.0, p, &mut context.cache)?;
     let rotation = MpComplex::new(cos, sin);
     let rotated: Vec<_> = a
         .iter()
@@ -336,7 +336,9 @@ fn verify(
             expected[index] = expected[index].add(&half)?;
         }
     }
-    Ok((bound(&difference(&response, &expected, p)?, p)?, unitarity))
+    let response = bound(&difference(&response, &expected, p)?, p)?;
+    context.admit_cache()?;
+    Ok((response, unitarity))
 }
 
 #[cfg(test)]

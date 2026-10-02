@@ -178,6 +178,89 @@ impl Writer {
         }
         self.push(name)
     }
+    fn finite_operation(
+        &mut self,
+        operation: &quest_language::semantic::finite::FiniteOperation,
+        qubits: &[Expression],
+        bits: &[Expression],
+    ) -> Result<()> {
+        use quest_language::semantic::finite::FiniteOperation as F;
+        let qubit = |index: usize| {
+            qubits
+                .get(index)
+                .ok_or_else(|| unsupported("finite qubit index"))
+        };
+        let bit = |index: usize| {
+            bits.get(index)
+                .ok_or_else(|| unsupported("finite bit index"))
+        };
+        self.enter()?;
+        match operation {
+            F::Gate {
+                gate,
+                arguments,
+                targets,
+                controls,
+            } => {
+                if !arguments.is_empty() {
+                    return Err(unsupported(
+                        "captured finite angle requires explicit portable binding",
+                    ));
+                }
+                for (_, positive) in controls {
+                    self.push(if *positive { "ctrl @ " } else { "negctrl @ " })?;
+                }
+                self.push(gate.definition().name)?;
+                self.push("() ")?;
+                for (i, target) in controls.iter().map(|(q, _)| q).chain(targets).enumerate() {
+                    if i != 0 {
+                        self.push(", ")?;
+                    }
+                    self.expression(qubit(*target)?)?;
+                }
+                self.push(";")?;
+            }
+            F::Measure { qubit: q, bit: b } => {
+                self.expression(bit(*b)?)?;
+                self.push(" = measure ")?;
+                self.expression(qubit(*q)?)?;
+                self.push(";")?;
+            }
+            F::Reset(q) => {
+                self.push("reset ")?;
+                self.expression(qubit(*q)?)?;
+                self.push(";")?;
+            }
+            F::Barrier(targets) => {
+                self.push("barrier ")?;
+                for (i, q) in targets.iter().enumerate() {
+                    if i != 0 {
+                        self.push(", ")?;
+                    }
+                    self.expression(qubit(*q)?)?;
+                }
+                self.push(";")?;
+            }
+            F::Conditional {
+                bit: b,
+                expected,
+                operation,
+            } => {
+                self.push("if (")?;
+                self.expression(bit(*b)?)?;
+                self.push(if *expected { " == 1) { " } else { " == 0) { " })?;
+                self.finite_operation(operation, qubits, bits)?;
+                self.push(" }")?;
+            }
+            F::Oracle { .. } | F::Payload { .. } => {
+                return Err(unsupported(
+                    "finite oracle or payload requires an explicit portable decomposition",
+                ));
+            }
+        }
+        self.depth = self.depth.saturating_sub(1);
+        Ok(())
+    }
     fn quoted(&mut self, text: &str) -> Result<()> {
         if text.contains(['"', '\\', '\n', '\r']) {
             return Err(unsupported("string requires unsupported escapes"));
@@ -217,6 +300,17 @@ impl Writer {
     )]
     fn statement(&mut self, statement: &StatementKind) -> Result<()> {
         match statement {
+            StatementKind::Finite {
+                operations,
+                qubits,
+                bits,
+            } => {
+                for operation in operations {
+                    self.finite_operation(operation, qubits, bits)?;
+                    self.push("\n")?;
+                }
+                Ok(())
+            }
             StatementKind::Oracle { .. } | StatementKind::Payload { .. } => Err(unsupported(
                 "oracle capture requires an explicit portable decomposition",
             )),

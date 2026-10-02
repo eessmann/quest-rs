@@ -1,6 +1,6 @@
 #![cfg(any(feature = "synthesis", feature = "zx"))]
 use googletest::prelude::*;
-use quest_circuit::{
+use quest_compile::{
     Program,
     language::{
         GateKind as G,
@@ -71,9 +71,9 @@ impl QuantumBackend for Backend {
 fn structured_synthesis_preserves_signed_control_phase_and_source_export() -> Result<()> {
     let original =
         Program::parse("qubit[2] q; negctrl @ rz(0.17) q[1],q[0];", "rotation.qasm")?.verify()?;
-    let syntax = quest_circuit::qasm::export_syntax(
+    let syntax = quest_compile::qasm::export_syntax(
         original.clone().lower()?.plan()?.syntax(),
-        quest_circuit::qasm::ExportLimits::default(),
+        quest_compile::qasm::ExportLimits::default(),
     )?;
     let (candidate, report) =
         original.synthesize_rotations(&worker()?, 1e-12, 42, Limits::default())?;
@@ -98,9 +98,9 @@ fn structured_synthesis_preserves_signed_control_phase_and_source_export() -> Re
         },
     )?;
     expect_eq!(
-        quest_circuit::qasm::export_syntax(
+        quest_compile::qasm::export_syntax(
             candidate.lower()?.plan()?.syntax(),
-            quest_circuit::qasm::ExportLimits::default()
+            quest_compile::qasm::ExportLimits::default()
         )?,
         syntax
     );
@@ -121,10 +121,7 @@ fn structured_synthesis_bounds_exclusive_paths_and_proves_finite_loop_counts() -
     let epsilon = quest_math::dyadic_from_bits(1e-12_f64.to_bits(), Limits::default())?;
     expect_eq!(
         report.operator_error_bound,
-        Some(std::ops::Mul::mul(
-            epsilon,
-            quest_math::Rational::from_integer(2.into())
-        ))
+        Some(std::ops::Mul::mul(epsilon, quest_math::RBig::from(2)))
     );
     let (_, report) = Program::parse(
         "qubit q; int n=0; while(n<2){rz(0.17) q;n+=1;}",
@@ -136,7 +133,7 @@ fn structured_synthesis_bounds_exclusive_paths_and_proves_finite_loop_counts() -
         report.operator_error_bound,
         Some(std::ops::Mul::mul(
             quest_math::dyadic_from_bits(1e-12_f64.to_bits(), Limits::default())?,
-            quest_math::Rational::from_integer(2.into()),
+            quest_math::RBig::from(2),
         ))
     );
     expect_eq!(report.rotations.len(), 1);
@@ -205,7 +202,7 @@ fn structured_zx_retains_effects_cfg_and_failed_candidates() -> Result<()> {
             .flat_map(|b| &b.instructions)
             .all(|i| !matches!(
                 i.kind,
-                quest_circuit::language::ssa::InstructionKind::Gate { .. }
+                quest_compile::language::ssa::InstructionKind::Gate { .. }
             ))
     );
     Ok(())

@@ -10,6 +10,7 @@ static NEXT_NODE: AtomicU64 = AtomicU64::new(1);
 /// A history node, checked against the owning immutable graph on every query.
 /// Independent edits of a cloned program cannot alias newly appended nodes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ProvenanceId {
     index: usize,
     identity: u64,
@@ -53,7 +54,7 @@ pub struct ProvenanceGraph {
     nodes: Vec<Node>,
     inputs: Vec<ProvenanceId>,
     next_occurrence: usize,
-    evidence: Vec<Arc<[u8]>>,
+    evidence: Vec<Arc<super::evidence::CompilationEvidence>>,
 }
 impl ProvenanceGraph {
     #[must_use]
@@ -76,28 +77,32 @@ impl ProvenanceGraph {
         self.evidence.iter().try_fold(
             self.evidence
                 .capacity()
-                .checked_mul(size_of::<Arc<[u8]>>())
+                .checked_mul(size_of::<Arc<super::evidence::CompilationEvidence>>())
                 .ok_or(Error::Budget("provenance evidence storage"))?,
             |n, item| {
-                n.checked_add(item.len())
+                n.checked_add(item.retained_bytes())
                     .ok_or(Error::Budget("provenance evidence storage"))
             },
         )
     }
     /// Versioned compiler evidence remains attached across graph edits and binding.
-    /// Records are untrusted bytes; compiler artifact admission independently checks their mathematical content.
+    /// Records are typed historical data; compiler artifact admission independently checks their mathematical content.
     #[must_use]
-    pub fn evidence(&self) -> &[Arc<[u8]>] {
+    pub fn evidence(&self) -> &[Arc<super::evidence::CompilationEvidence>] {
         &self.evidence
     }
     /// Append immutable compiler evidence to this private transaction.
     /// # Errors
     /// Rejects storage overflow or an exhausted total provenance budget.
-    pub fn append_evidence(&mut self, record: Arc<[u8]>, max_bytes: usize) -> Result<()> {
+    pub fn append_evidence(
+        &mut self,
+        record: Arc<super::evidence::CompilationEvidence>,
+        max_bytes: usize,
+    ) -> Result<()> {
         let need = self
             .retained_bytes()?
-            .checked_add(record.len())
-            .and_then(|n| n.checked_add(size_of::<Arc<[u8]>>()))
+            .checked_add(record.retained_bytes())
+            .and_then(|n| n.checked_add(size_of::<Arc<super::evidence::CompilationEvidence>>()))
             .ok_or(Error::Budget("provenance evidence storage"))?;
         if need > max_bytes {
             return Err(Error::Budget("provenance evidence storage"));

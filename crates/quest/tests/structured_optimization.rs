@@ -110,7 +110,7 @@ fn terminal_structured_fusion_preserves_full_native_state_and_density_operators(
     isolated(
         "terminal_structured_fusion_preserves_full_native_state_and_density_operators",
         || {
-            use quest_circuit::{
+            use quest_compile::{
                 ApproximationMode, BudgetLedger, CostProfile, OptimizationLimits,
                 OptimizationOptions, OptimizationTarget, TerminalOptions,
             };

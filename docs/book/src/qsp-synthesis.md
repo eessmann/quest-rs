@@ -61,7 +61,7 @@ Enable `quest-qsp/rayon` to borrow a caller-owned pool for each consuming numeri
 
 The ordinary `complete()` and `synthesize()` methods select sequential execution. For inverse NLFT, explicit pool execution preserves each reduction and the inverse dependency order: first half, midpoint, second half. Independent forward FFTs use separate prepared scratch, pointwise operations use fixed index semantics, and sufficiently large forward reconstruction subtrees can run concurrently. Small work stays serial. No global pool or pool lifetime enters the frozen payload, and failures never dispatch to another precision or backend.
 
-Parallel subtrees receive deterministic partitions of the remaining byte and work budgets; their work is counted back into the parent before reconstruction continues. This can reject a tight budget that fits serial execution because concurrent branches require separate FFT plans and scratch. Errors are selected in the original left-before-right order. Opaque plan storage remains an explicitly modeled allowance rather than an allocator hard cap. Certification and offline Astro Float stages remain separate from this binary64 execution policy.
+Parallel subtrees receive deterministic partitions of the remaining byte and work budgets; their work is counted back into the parent before reconstruction continues. This can reject a tight budget that fits serial execution because concurrent branches require separate FFT plans and scratch. Errors are selected in the original left-before-right order. Opaque plan storage remains an explicitly modeled allowance rather than an allocator hard cap. Certification and offline Dashu stages remain separate from this binary64 execution policy.
 
 ## Observe the complete stage
 

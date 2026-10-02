@@ -483,7 +483,7 @@ impl Compiler {
         }
         Ok(())
     }
-    fn declare_function(
+    pub(super) fn declare_function(
         &mut self,
         name: &str,
         parameters: Vec<(String, Type, bool, bool)>,

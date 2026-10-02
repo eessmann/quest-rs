@@ -41,10 +41,6 @@ pub enum Error {
     NativeIndex,
     #[error("unsupported capability: {0}")]
     Unsupported(&'static str),
-    #[error("structured optimization: {0}")]
-    Structured(Box<dyn std::error::Error + Send + Sync>),
-    #[error("worker optimization: {0}")]
-    Worker(Box<dyn std::error::Error + Send + Sync>),
     #[error("source range end precedes its start")]
     SourceRange,
 }

@@ -1,6 +1,6 @@
 use googletest::prelude::*;
 use quest::{Complex64, Environment, Error, MemoryBudget, QubitCount};
-use quest_circuit::prelude::*;
+use quest_compile::prelude::*;
 
 fn isolated(name: &str, body: impl FnOnce() -> googletest::Result<()>) -> googletest::Result<()> {
     if std::env::var("QUEST_RUNTIME_TEST").as_deref() == Ok(name) {
@@ -76,7 +76,7 @@ fn preparation_accounts_for_retained_exact_angle_coefficients() -> googletest::R
             // plans execute the same rounded radians but retain different proofs.
             let numerator = format!("1{}1", "0".repeat(398)).parse()?;
             let denominator = format!("1{}", "0".repeat(399)).parse()?;
-            let large = plan(quest::Angle::rational_pi(quest::BigRational::new(
+            let large = plan(quest::Angle::rational_pi(quest::RBig::from_parts_signed(
                 numerator,
                 denominator,
             ))?)?;
@@ -793,7 +793,7 @@ fn diagonal_preparation_retains_structure_under_a_small_native_budget() -> googl
             let targets = (0..5)
                 .rev()
                 .map(|index| builder.qubit(index))
-                .collect::<std::result::Result<Vec<_>, quest_circuit::Error>>()?;
+                .collect::<std::result::Result<Vec<_>, quest_compile::Error>>()?;
             builder.numerical(operator, &targets, &[])?;
             let mut prepared = env.prepare(
                 quest::Program::from_region(builder.finish()?, &[])?

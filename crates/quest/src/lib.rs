@@ -1,6 +1,6 @@
 //! Idiomatic, environment-bound `QuEST` 4.3 simulation.
 //!
-//! The pure circuit model is re-exported from [`quest_circuit`]. Numerical
+//! The pure circuit model is re-exported from [`quest_compile`]. Numerical
 //! operators are immutable faer matrices; `QuEST` owns simulation storage.
 #![forbid(unsafe_code)]
 #![cfg_attr(
@@ -28,7 +28,7 @@ pub mod qsvt;
 mod register;
 mod structured_execution;
 mod values;
-pub use quest_circuit::language::vm::{ClassicalValue, InterpreterLimits, RunInputs, RunOutput};
+pub use quest_compile::language::vm::{ClassicalValue, InterpreterLimits, RunInputs, RunOutput};
 pub use structured_execution::{PreparedProgram, SampleResult};
 
 pub use environment::{
@@ -37,6 +37,6 @@ pub use environment::{
 pub use error::{Error, Result, StructuredExecutionError};
 pub use faer;
 pub use num_complex::Complex64;
-pub use quest_circuit::*;
+pub use quest_compile::*;
 pub use register::{DensityMatrix, Register, RegisterDeployment, RegisterKind, StateVector};
 pub use values::{MemoryBudget, Outcome, Probability, QubitCount, Shots};

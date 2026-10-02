@@ -1,6 +1,6 @@
 //! Full semantic values and canonical cache-sharing graph; addresses are never serialized.
 use crate::{Error, Result};
-use quest_circuit::{
+use quest_compile::{
     BoundGate, Control, ControlState, Operation, OracleFragment, QubitId, RegionPlan,
 };
 

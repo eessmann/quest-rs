@@ -1,5 +1,11 @@
 # Optimization measurement fixtures
 
+These are frozen reproduction sources for the September 2026 records. Their
+compiler imports target the historical checkout named in each record. Use a
+matching historical checkout; the October static-architecture migration deliberately
+removed `quest-circuit` and does not provide an adapter for these old fixtures.
+Current comparisons have their own versioned fixture and source fingerprints.
+
 `run_baseline.py` runs `baseline_compiler.rs` against a selected repository tree.
 Choose a fresh output directory; previous evidence is never overwritten:
 

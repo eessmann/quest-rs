@@ -5,10 +5,6 @@ use crate::{
     DependencyKind, Error, Instruction, MatrixPolicy, NativeCost, OccurrenceId, Operation,
     OptimizationTarget, ProvenanceGraph, QubitId, Result, validate_mandatory_projection,
 };
-#[allow(unused_imports)]
-use crate::{
-    BoundParityPasses, ExactPasses, LinearPasses, NumericalPasses, OracleExport, ParityPasses,
-};
 use std::{
     collections::{BTreeMap, BTreeSet},
     sync::Arc,

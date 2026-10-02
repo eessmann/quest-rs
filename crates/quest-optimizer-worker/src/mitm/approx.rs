@@ -1,5 +1,5 @@
 use super::representatives::{ParetoIndex, Signature};
-use num_bigint::BigInt;
+use dashu_int::IBig;
 use quest_math::{
     DyadicBox8, ExactMatrix, Limits, Operation, Sequence, Target, adjoint_times_rotation_enclosure,
     certify_rotation, dyadic_from_bits,
@@ -109,9 +109,7 @@ fn run(target: &Target, epsilon_bits: u64, limits: MitmLimits) -> Result<Outcome
         Ok(epsilon) => epsilon,
         Err(error) => return admission_error(&error, "epsilon admission"),
     };
-    if epsilon <= quest_math::Rational::from_integer(0.into())
-        || epsilon >= quest_math::Rational::from_integer(1.into())
-    {
+    if epsilon <= quest_math::RBig::from(0) || epsilon >= quest_math::RBig::from(1) {
         return Err("MITM epsilon must be positive and less than one".into());
     }
     let table_limits = Limits {
@@ -327,12 +325,12 @@ fn run(target: &Target, epsilon_bits: u64, limits: MitmLimits) -> Result<Outcome
         };
         let epsilon_squared = std::ops::Mul::mul(&epsilon, &epsilon);
         let scale_squared = std::ops::Shl::shl(
-            BigInt::from(1),
+            IBig::from(1),
             bits.checked_mul(2).ok_or("precision overflow")?,
         );
         let threshold = std::ops::Div::div(
-            std::ops::Mul::mul(epsilon_squared.numer(), scale_squared),
-            epsilon_squared.denom(),
+            std::ops::Mul::mul(epsilon_squared.numerator(), scale_squared),
+            epsilon_squared.denominator(),
         );
         let mut any_hit = false;
         for (right_index, state) in right.iter().enumerate() {
@@ -656,10 +654,10 @@ impl<'a> Tree<'a> {
             return Ok(node_index);
         }
         let mut split_axis = 0usize;
-        let mut widest = BigInt::from(-1);
+        let mut widest = IBig::from(-1);
         for axis in 0..8 {
-            let mut minimum: Option<BigInt> = None;
-            let mut maximum: Option<BigInt> = None;
+            let mut minimum: Option<IBig> = None;
+            let mut maximum: Option<IBig> = None;
             for &index in self
                 .order
                 .get(start..end)
@@ -698,7 +696,7 @@ impl<'a> Tree<'a> {
                         .get(index)
                         .and_then(|box_| box_.coordinate(split_axis).ok())
                         .map_or_else(
-                            || BigInt::from(0),
+                            || IBig::from(0),
                             |(lower, upper)| std::ops::Add::add(lower, upper),
                         )
                 };
@@ -724,7 +722,7 @@ impl<'a> Tree<'a> {
     fn query(
         &self,
         box_: &DyadicBox8,
-        radius_squared: &BigInt,
+        radius_squared: &IBig,
         hits: &mut Vec<usize>,
         budget: &mut Budget,
     ) -> quest_math::Result<bool> {
@@ -734,7 +732,7 @@ impl<'a> Tree<'a> {
         &self,
         index: usize,
         box_: &DyadicBox8,
-        radius_squared: &BigInt,
+        radius_squared: &IBig,
         hits: &mut Vec<usize>,
         budget: &mut Budget,
     ) -> quest_math::Result<bool> {
@@ -886,14 +884,14 @@ mod tests {
             let mut box_ = DyadicBox8::point(
                 8,
                 std::array::from_fn(|axis| {
-                    num_bigint::BigInt::from(index.saturating_mul(axis.saturating_add(1)))
+                    dashu_int::IBig::from(index.saturating_mul(axis.saturating_add(1)))
                 }),
             )?;
             if index % 3 == 0 {
                 let widened = DyadicBox8::point(
                     8,
                     std::array::from_fn(|axis| {
-                        num_bigint::BigInt::from(
+                        dashu_int::IBig::from(
                             index
                                 .saturating_mul(axis.saturating_add(1))
                                 .saturating_add(2),
@@ -908,7 +906,7 @@ mod tests {
         let query = DyadicBox8::point(
             8,
             std::array::from_fn(|axis| {
-                num_bigint::BigInt::from(7usize.saturating_mul(axis.saturating_add(1)))
+                dashu_int::IBig::from(7usize.saturating_mul(axis.saturating_add(1)))
             }),
         )?;
         for threshold in [0, 1, 20, 400, 10_000] {

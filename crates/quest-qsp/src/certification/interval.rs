@@ -1,20 +1,34 @@
 //! Outward arbitrary-precision scalar and complex rectangles for cold verification.
+#![expect(
+    clippy::arithmetic_side_effects,
+    reason = "Directed native binary arithmetic operates on validated finite endpoints with admitted precision"
+)]
 use super::{CertificationError as Error, CertificationResult as Result};
-use crate::precision::{checked, exact_from_f64};
-use astro_float::{BigFloat, Consts, RoundingMode as Round};
+use crate::precision::{
+    Binary, abs, checked, down_add, down_cos, down_div, down_mul, down_pi, down_sin, down_sin_cos,
+    down_sqrt, down_sub, exact_from_f64, integer, native_precision, up_add, up_cos, up_div, up_mul,
+    up_pi, up_sin, up_sin_cos, up_sqrt, up_sub, zero,
+};
+use dashu_float::ConstCache;
 
 /// Closed real interval with finite dyadic endpoints and a fixed working precision.
 #[derive(Clone, Debug)]
 pub struct MpInterval {
-    lower: BigFloat,
-    upper: BigFloat,
+    lower: Binary,
+    upper: Binary,
     precision: u32,
 }
 impl MpInterval {
-    pub(crate) fn bounds(lower: BigFloat, upper: BigFloat, precision: u32) -> Result<Self> {
+    pub(crate) fn bounds(lower: Binary, upper: Binary, precision: u32) -> Result<Self> {
         let lower = checked(lower)?;
         let upper = checked(upper)?;
-        if lower > upper || precision < 64 {
+        let admitted_digits = native_precision(precision)
+            .checked_add(1)
+            .ok_or(Error::Budget("interval guard-bit storage"))?;
+        if lower.digits() > admitted_digits || upper.digits() > admitted_digits {
+            return Err(Error::Budget("interval guard-bit storage"));
+        }
+        if lower > upper || !(64..=crate::precision::MAX_PRECISION).contains(&precision) {
             return Err(Error::Arithmetic("invalid multiprecision interval"));
         }
         Ok(Self {
@@ -28,7 +42,7 @@ impl MpInterval {
         Self::bounds(lower.clone(), lower, precision)
     }
     pub(crate) fn integer(value: i32, precision: u32) -> Self {
-        let lower = BigFloat::from_i32(value, usize::try_from(precision).unwrap_or(usize::MAX));
+        let lower = integer(precision, value);
         Self {
             upper: lower.clone(),
             lower,
@@ -37,12 +51,12 @@ impl MpInterval {
     }
     /// Exact represented lower dyadic endpoint.
     #[must_use]
-    pub const fn lower(&self) -> &BigFloat {
+    pub const fn lower(&self) -> &Binary {
         &self.lower
     }
     /// Exact represented upper dyadic endpoint.
     #[must_use]
-    pub const fn upper(&self) -> &BigFloat {
+    pub const fn upper(&self) -> &Binary {
         &self.upper
     }
     /// Whether the exact binary64 value is enclosed; nonfinite inputs return false.
@@ -55,45 +69,39 @@ impl MpInterval {
         self.precision
     }
     pub(crate) fn is_zero(&self) -> bool {
-        self.lower.is_zero() && self.upper.is_zero()
+        self.lower == Binary::ZERO && self.upper == Binary::ZERO
     }
-    // Infallible clones and integer construction can retain a backend error
-    // sentinel. Validate before comparisons or exact-zero shortcuts erase it.
+    // Validate before comparisons or zero shortcuts can erase nonfinite input.
     fn validate(&self) -> Result<()> {
-        for endpoint in [&self.lower, &self.upper] {
-            if let Some(error) = endpoint.err() {
-                return Err(crate::precision::PrecisionError::from(error).into());
-            }
-            if endpoint.is_nan() || endpoint.is_inf() {
-                return Err(crate::precision::PrecisionError::Nonfinite.into());
-            }
+        if self.lower.repr().is_infinite() || self.upper.repr().is_infinite() {
+            return Err(crate::precision::PrecisionError::Nonfinite.into());
         }
         Ok(())
     }
     pub(crate) fn add(&self, rhs: &Self) -> Result<Self> {
         self.validate()?;
         rhs.validate()?;
-        let p = usize::try_from(self.precision()).unwrap_or(usize::MAX);
+        let p = self.precision();
         Self::bounds(
-            self.lower.add(&rhs.lower, p, Round::Down),
-            self.upper.add(&rhs.upper, p, Round::Up),
+            down_add(p, &self.lower, &rhs.lower)?,
+            up_add(p, &self.upper, &rhs.upper)?,
             self.precision,
         )
     }
     pub(crate) fn sub(&self, rhs: &Self) -> Result<Self> {
         self.validate()?;
         rhs.validate()?;
-        let p = usize::try_from(self.precision()).unwrap_or(usize::MAX);
+        let p = self.precision();
         Self::bounds(
-            self.lower.sub(&rhs.upper, p, Round::Down),
-            self.upper.sub(&rhs.lower, p, Round::Up),
+            down_sub(p, &self.lower, &rhs.upper)?,
+            up_sub(p, &self.upper, &rhs.lower)?,
             self.precision,
         )
     }
     pub(crate) fn neg(&self) -> Self {
         Self {
-            lower: self.upper.neg(),
-            upper: self.lower.neg(),
+            lower: -&self.upper,
+            upper: -&self.lower,
             precision: self.precision,
         }
     }
@@ -103,18 +111,18 @@ impl MpInterval {
         if self.is_zero() || rhs.is_zero() {
             return Ok(Self::integer(0, self.precision));
         }
-        let p = usize::try_from(self.precision).unwrap_or(usize::MAX);
+        let p = self.precision;
         let pairs = [
             (&self.lower, &rhs.lower),
             (&self.lower, &rhs.upper),
             (&self.upper, &rhs.lower),
             (&self.upper, &rhs.upper),
         ];
-        let mut lower = checked(self.lower.mul(&rhs.lower, p, Round::Down))?;
-        let mut upper = checked(self.lower.mul(&rhs.lower, p, Round::Up))?;
+        let mut lower = checked(down_mul(p, &self.lower, &rhs.lower)?)?;
+        let mut upper = checked(up_mul(p, &self.lower, &rhs.lower)?)?;
         for (left, right) in pairs.into_iter().skip(1) {
-            let down = checked(left.mul(right, p, Round::Down))?;
-            let up = checked(left.mul(right, p, Round::Up))?;
+            let down = checked(down_mul(p, left, right)?)?;
+            let up = checked(up_mul(p, left, right)?)?;
             if down < lower {
                 lower = down;
             }
@@ -129,23 +137,23 @@ impl MpInterval {
         if rhs == 0 {
             return Err(Error::Arithmetic("zero interval denominator"));
         }
-        let p = usize::try_from(self.precision).unwrap_or(usize::MAX);
-        let divisor = checked(BigFloat::from_u64(
-            u64::try_from(rhs).map_err(|_| Error::Budget("integer divisor"))?,
+        let p = self.precision;
+        let divisor = checked(integer(
             p,
+            u64::try_from(rhs).map_err(|_| Error::Budget("integer divisor"))?,
         ))?;
         Self::bounds(
-            self.lower.div(&divisor, p, Round::Down),
-            self.upper.div(&divisor, p, Round::Up),
+            down_div(p, &self.lower, &divisor)?,
+            up_div(p, &self.upper, &divisor)?,
             self.precision,
         )
     }
     pub(crate) fn abs_bounds(&self) -> Result<Self> {
         self.validate()?;
-        let left = checked(self.lower.abs())?;
-        let right = checked(self.upper.abs())?;
+        let left = checked(abs(&self.lower))?;
+        let right = checked(abs(&self.upper))?;
         let lower = if self.contains_f64(0.0) {
-            BigFloat::from_u64(0, usize::try_from(self.precision).unwrap_or(usize::MAX))
+            zero(self.precision)
         } else if left < right {
             left.clone()
         } else {
@@ -156,51 +164,44 @@ impl MpInterval {
     }
     pub(crate) fn square(&self) -> Result<Self> {
         let a = self.abs_bounds()?;
-        let p = usize::try_from(self.precision).unwrap_or(usize::MAX);
+        let p = self.precision;
         Self::bounds(
-            a.lower.mul(&a.lower, p, Round::Down),
-            a.upper.mul(&a.upper, p, Round::Up),
+            down_mul(p, &a.lower, &a.lower)?,
+            up_mul(p, &a.upper, &a.upper)?,
             self.precision,
         )
     }
     pub(crate) fn sqrt(&self) -> Result<Self> {
         self.validate()?;
-        if self.lower < BigFloat::from_u64(0, usize::try_from(self.precision).unwrap_or(usize::MAX))
-        {
+        if self.lower < zero(self.precision) {
             return Err(Error::Arithmetic("negative square root"));
         }
-        let p = usize::try_from(self.precision).unwrap_or(usize::MAX);
+        let p = self.precision;
         Self::bounds(
-            self.lower.sqrt(p, Round::Down),
-            self.upper.sqrt(p, Round::Up),
+            down_sqrt(p, &self.lower)?,
+            up_sqrt(p, &self.upper)?,
             self.precision,
         )
     }
     pub(crate) fn sin_cos_exact(
         value: f64,
         precision: u32,
-        cache: &mut Consts,
+        cache: &mut ConstCache,
     ) -> Result<(Self, Self)> {
         let x = exact_from_f64(value, precision)?;
-        let p = usize::try_from(precision).unwrap_or(usize::MAX);
+        let p = precision;
+        let (sin_lower, cos_lower) = down_sin_cos(p, &x, cache)?;
+        let (sin_upper, cos_upper) = up_sin_cos(p, &x, cache)?;
         Ok((
-            Self::bounds(
-                x.sin(p, Round::Down, cache),
-                x.sin(p, Round::Up, cache),
-                precision,
-            )?,
-            Self::bounds(
-                x.cos(p, Round::Down, cache),
-                x.cos(p, Round::Up, cache),
-                precision,
-            )?,
+            Self::bounds(sin_lower, sin_upper, precision)?,
+            Self::bounds(cos_lower, cos_upper, precision)?,
         ))
     }
     pub(crate) fn twiddle(
         index: usize,
         length: usize,
         precision: u32,
-        cache: &mut Consts,
+        cache: &mut ConstCache,
     ) -> Result<(Self, Self)> {
         if !length.is_power_of_two() || u32::try_from(length).is_err() {
             return Err(Error::Arithmetic("non-dyadic FFT angle"));
@@ -240,24 +241,24 @@ impl MpInterval {
             precision,
         )
         .divide_usize(length)?;
-        let p = usize::try_from(precision).unwrap_or(usize::MAX);
-        let pi = Self::bounds(cache.pi(p, Round::Down), cache.pi(p, Round::Up), precision)?;
+        let p = precision;
+        let pi = Self::bounds(down_pi(p, cache)?, up_pi(p, cache)?, precision)?;
         let angle = t.mul(&pi)?;
         // The reflected angle is in [0,pi/4]. Verify its entire numerical
         // enclosure is in [0,1], where sine increases and cosine decreases.
-        let zero = BigFloat::from_u64(0, p);
-        let one = BigFloat::from_u64(1, p);
+        let zero = zero(p);
+        let one = integer(p, 1);
         if angle.lower < zero || angle.upper > one {
             return Err(Error::Arithmetic("FFT monotonic enclosure"));
         }
         let mut sin = Self::bounds(
-            angle.lower.sin(p, Round::Down, cache),
-            angle.upper.sin(p, Round::Up, cache),
+            down_sin(p, &angle.lower, cache)?,
+            up_sin(p, &angle.upper, cache)?,
             precision,
         )?;
         let mut cos = Self::bounds(
-            angle.upper.cos(p, Round::Down, cache),
-            angle.lower.cos(p, Round::Up, cache),
+            down_cos(p, &angle.upper, cache)?,
+            up_cos(p, &angle.lower, cache)?,
             precision,
         )?;
         if reflected {
@@ -361,10 +362,63 @@ mod tests {
     use googletest::prelude::*;
 
     #[gtest]
-    fn backend_error_sentinel_is_not_erased_by_zero_or_absolute_shortcuts() {
+    fn exact_trigonometric_pairs_match_separate_directed_primitives() -> googletest::Result<()> {
+        for precision in [65, 128, 256] {
+            for phase in [
+                0.0,
+                -0.0,
+                0.25,
+                -0.25,
+                f64::from_bits(1),
+                std::f64::consts::FRAC_PI_2.next_down(),
+                std::f64::consts::FRAC_PI_2.next_up(),
+                1e20,
+                -1e20,
+                f64::MAX,
+            ] {
+                let point = exact_from_f64(phase, precision)?;
+                let mut pair_cache = ConstCache::default();
+                let (sin, cos) = MpInterval::sin_cos_exact(phase, precision, &mut pair_cache)?;
+                let mut scalar_cache = ConstCache::default();
+                let references = [
+                    down_sin(precision, &point, &mut scalar_cache)?,
+                    up_sin(precision, &point, &mut scalar_cache)?,
+                    down_cos(precision, &point, &mut scalar_cache)?,
+                    up_cos(precision, &point, &mut scalar_cache)?,
+                ];
+                for (actual, expected) in [sin.lower(), sin.upper(), cos.lower(), cos.upper()]
+                    .into_iter()
+                    .zip(&references)
+                {
+                    expect_that!(actual, eq(expected));
+                    expect_eq!(actual.repr().is_neg_zero(), expected.repr().is_neg_zero());
+                }
+            }
+        }
+        Ok(())
+    }
+
+    #[gtest]
+    fn stored_guard_digit_is_admitted_without_changing_its_dyadic_value() -> googletest::Result<()>
+    {
+        let significand = (dashu_int::IBig::ONE << 64) + dashu_int::IBig::ONE;
+        let point = Binary::from_repr(
+            dashu_float::Repr::new(significand, -64),
+            dashu_float::Context::new(64),
+        );
+        let enclosure = MpInterval::bounds(point.clone(), point.clone(), 64)?;
+        expect_that!(enclosure.lower(), eq(&point));
+        expect_that!(enclosure.upper(), eq(&point));
+        expect_that!(enclosure.lower().digits(), eq(65));
+        expect_true!(enclosure.lower() > &integer(64, 1));
+        Ok(())
+    }
+
+    #[gtest]
+    fn nonfinite_input_is_not_erased_by_zero_or_absolute_shortcuts() {
         let failed = MpInterval {
-            lower: BigFloat::nan(Some(astro_float::Error::MemoryAllocation)),
-            upper: BigFloat::from_u64(0, 64),
+            lower: Binary::INFINITY,
+            upper: zero(64),
             precision: 64,
         };
         let zero = MpInterval::integer(0, 64);
@@ -381,8 +435,8 @@ mod tests {
         use crate::certification::{CertificationPolicy, Context, ConvolutionMethod, product};
         let invalid = MpComplex::new(
             MpInterval {
-                lower: BigFloat::nan(Some(astro_float::Error::MemoryAllocation)),
-                upper: BigFloat::from_u64(0, 64),
+                lower: Binary::INFINITY,
+                upper: zero(64),
                 precision: 64,
             },
             MpInterval::integer(0, 64),

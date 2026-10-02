@@ -1,7 +1,7 @@
 //! Exact affine angles, source obligations, and opaque finite floating angles.
-use crate::rational::BigRational;
-use num_bigint::BigInt;
-use num_traits::Zero;
+use crate::rational::RBig;
+use dashu_base::BitTest;
+use dashu_int::IBig;
 use quest_symbolic::{Expr, Owner, Symbol};
 use std::{
     collections::BTreeMap,
@@ -82,21 +82,21 @@ pub enum BoundAngleTarget {
         bits: u64,
     },
     RationalPi {
-        numerator: BigInt,
-        denominator: BigInt,
+        numerator: IBig,
+        denominator: IBig,
     },
     AffinePi {
-        radians_numerator: BigInt,
-        radians_denominator: BigInt,
-        pi_numerator: BigInt,
-        pi_denominator: BigInt,
+        radians_numerator: IBig,
+        radians_denominator: IBig,
+        pi_numerator: IBig,
+        pi_denominator: IBig,
     },
 }
 
 impl Angle {
     /// Independently replay a parameter-free exact source before inspecting its coefficients.
     #[must_use]
-    pub fn independent_constant_summary(&self) -> Option<(&BigRational, &BigRational)> {
+    pub fn independent_constant_summary(&self) -> Option<(&RBig, &RBig)> {
         if let AngleExpr::Symbolic(expr) = &self.0 {
             expr.independent_constant_summary()
         } else {
@@ -215,41 +215,35 @@ impl Angle {
             return Err(Error::ZeroDenominator);
         }
         Ok(Self(AngleExpr::Symbolic(SymbolicAngle::new(Expr::pi(
-            BigRational::new(numerator.into(), denominator.into()),
+            RBig::from_parts_signed(numerator.into(), denominator.into()),
         )?))))
     }
-    /// Admit an arbitrary rational multiple of pi. Ratios made with
-    /// `BigRational::new_raw` are validated and normalized here. Conversion to
-    /// finite machine radians remains a fallible step during binding.
-    #[expect(
-        clippy::needless_pass_by_value,
-        reason = "Admission takes ownership consistently with all angle constructors"
-    )]
+    /// Admit an arbitrary rational multiple of pi. Native Dashu values are
+    /// already reduced with a positive denominator. Conversion to finite
+    /// machine radians remains a fallible step during binding.
     /// # Errors
-    /// Rejects a zero denominator, including one supplied through a raw rational.
-    pub fn rational_pi(value: BigRational) -> Result<Self> {
-        if value.denom().is_zero() {
-            return Err(Error::ZeroDenominator);
-        }
-        if value.numer().bits().max(value.denom().bits()) > 16_384 {
+    /// Rejects exhausted exact coefficient budgets.
+    pub fn rational_pi(value: RBig) -> Result<Self> {
+        if u64::try_from(value.numerator().bit_len())
+            .unwrap_or(u64::MAX)
+            .max(u64::try_from(value.denominator().bit_len()).unwrap_or(u64::MAX))
+            > 16_384
+        {
             return Err(Error::Budget("exact angle coefficient bits"));
         }
         Ok(Self(AngleExpr::Symbolic(SymbolicAngle::new(Expr::pi(
-            BigRational::new(value.numer().clone(), value.denom().clone()),
+            value,
         )?))))
     }
     /// Admit an exact `r + s*pi` angle.
     /// # Errors
-    /// Rejects invalid rationals or exhausted exact-expression budgets.
-    pub fn affine(radians: BigRational, pi: BigRational) -> Result<Self> {
-        if radians.denom().is_zero() || pi.denom().is_zero() {
-            return Err(Error::ZeroDenominator);
-        }
+    /// Rejects exhausted exact-expression budgets.
+    pub fn affine(radians: RBig, pi: RBig) -> Result<Self> {
         if [
-            radians.numer().bits(),
-            radians.denom().bits(),
-            pi.numer().bits(),
-            pi.denom().bits(),
+            u64::try_from(radians.numerator().bit_len()).unwrap_or(u64::MAX),
+            u64::try_from(radians.denominator().bit_len()).unwrap_or(u64::MAX),
+            u64::try_from(pi.numerator().bit_len()).unwrap_or(u64::MAX),
+            u64::try_from(pi.denominator().bit_len()).unwrap_or(u64::MAX),
         ]
         .into_iter()
         .any(|bits| bits > 16_384)
@@ -305,7 +299,7 @@ impl Angle {
     /// Checked exact rational scaling.
     /// # Errors
     /// Rejects opaque operands, zero denominators, or exhausted budgets.
-    pub fn scaled_ratio(&self, numerator: BigInt, denominator: BigInt) -> Result<Self> {
+    pub fn scaled_ratio(&self, numerator: IBig, denominator: IBig) -> Result<Self> {
         match &self.0 {
             AngleExpr::Symbolic(value) => Ok(Self(AngleExpr::Symbolic(SymbolicAngle::new(
                 value.scale_ratio(numerator, denominator)?,
@@ -318,7 +312,7 @@ impl Angle {
         matches!(&self.0, AngleExpr::Symbolic(_))
     }
     #[must_use]
-    pub fn rational_pi_identity(&self) -> Option<BigRational> {
+    pub fn rational_pi_identity(&self) -> Option<RBig> {
         if let AngleExpr::Symbolic(value) = &self.0 {
             value.pi_identity()
         } else {
@@ -454,8 +448,8 @@ fn evaluate_symbolic_target(
         return Ok((
             value,
             BoundAngleTarget::RationalPi {
-                numerator: pi.numer().clone(),
-                denominator: pi.denom().clone(),
+                numerator: pi.numerator().clone(),
+                denominator: pi.denominator().clone().into(),
             },
         ));
     }
@@ -487,24 +481,24 @@ fn evaluate_symbolic_target(
     Ok((
         value,
         BoundAngleTarget::AffinePi {
-            radians_numerator: radians.numer().clone(),
-            radians_denominator: radians.denom().clone(),
-            pi_numerator: pi.numer().clone(),
-            pi_denominator: pi.denom().clone(),
+            radians_numerator: radians.numerator().clone(),
+            radians_denominator: radians.denominator().clone().into(),
+            pi_numerator: pi.numerator().clone(),
+            pi_denominator: pi.denominator().clone().into(),
         },
     ))
 }
 fn exact_target_from_expr(expr: &Expr) -> BoundAngleTarget {
     expr.pi_identity().map_or_else(
         || BoundAngleTarget::AffinePi {
-            radians_numerator: expr.constant().numer().clone(),
-            radians_denominator: expr.constant().denom().clone(),
-            pi_numerator: expr.pi_coefficient().numer().clone(),
-            pi_denominator: expr.pi_coefficient().denom().clone(),
+            radians_numerator: expr.constant().numerator().clone(),
+            radians_denominator: expr.constant().denominator().clone().into(),
+            pi_numerator: expr.pi_coefficient().numerator().clone(),
+            pi_denominator: expr.pi_coefficient().denominator().clone().into(),
         },
         |pi| BoundAngleTarget::RationalPi {
-            numerator: pi.numer().clone(),
-            denominator: pi.denom().clone(),
+            numerator: pi.numerator().clone(),
+            denominator: pi.denominator().clone().into(),
         },
     )
 }

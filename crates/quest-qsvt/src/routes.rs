@@ -4,7 +4,7 @@ use crate::{
     TransformContinuation, TransformEvidence, ValidatedTransform, materialize_oracle, matrix,
 };
 use faer::MatRef;
-use quest_circuit::{
+use quest_compile::{
     Angle, BoundRegion, Control, ControlState, Gate, NumericalOperator, ProgramLimits,
     QuantumRegionBuilder, QubitId,
 };
@@ -35,7 +35,7 @@ impl Circuit {
         let bytes = targets
             .checked_mul(size_of::<QubitId>())
             .and_then(|n| n.checked_add(controls.checked_mul(size_of::<Control>())?))
-            .and_then(|n| n.checked_add(size_of::<quest_circuit::Operation>()))
+            .and_then(|n| n.checked_add(size_of::<quest_compile::Operation>()))
             .and_then(|n| n.checked_add(payload))
             .ok_or(Error::Budget("transform operation storage"))?;
         self.retained_bytes = self
@@ -483,7 +483,7 @@ fn retained_counts(program: &BoundRegion) -> Result<usize> {
         .iter()
         .try_fold(0usize, |count, instruction| {
             let calls = match instruction.operation() {
-                quest_circuit::Operation::Oracle { fragment, .. } => fragment.query_count(),
+                quest_compile::Operation::Oracle { fragment, .. } => fragment.query_count(),
                 _ => 0,
             };
             count

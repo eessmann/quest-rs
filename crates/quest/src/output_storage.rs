@@ -1,11 +1,11 @@
 //! Conservative owned result storage, shared by batches and collective admission.
 use crate::{Error, Result};
-use quest_circuit::language::ssa::VerifiedProgram;
+use quest_compile::language::ssa::VerifiedProgram;
 #[cfg(any(test, all(feature = "mpi", quest_native_mpi)))]
-use quest_circuit::language::vm::{ClassicalValue, RunOutput};
+use quest_compile::language::vm::{ClassicalValue, RunOutput};
 
 pub fn estimated_bytes(program: &VerifiedProgram) -> Result<usize> {
-    quest_circuit::language::vm::output_storage(program).ok_or(Error::Overflow)
+    quest_compile::language::vm::output_storage(program).ok_or(Error::Overflow)
 }
 
 /// Versioned, deterministic result contract; includes exact scalar bits and widths.
@@ -60,7 +60,7 @@ impl Encoder {
         self.append(&value.to_le_bytes())
     }
     fn value(&mut self, value: &ClassicalValue) -> Result<()> {
-        use quest_circuit::language::classical::{FloatWidth, ScalarType};
+        use quest_compile::language::classical::{FloatWidth, ScalarType};
         match value {
             ClassicalValue::Array(values) => {
                 self.word(0)?;
@@ -97,7 +97,7 @@ impl Encoder {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use quest_circuit::language::classical::ScalarValue;
+    use quest_compile::language::classical::ScalarValue;
     #[test]
     fn collective_output_encoding_binds_values_and_execution_counts() {
         let first = RunOutput {
@@ -123,7 +123,7 @@ mod tests {
     }
     #[test]
     fn scalar_output_admission_includes_names_and_map_cells() {
-        let program = quest_circuit::Program::parse("output int answer=42;", "outputs")
+        let program = quest_compile::Program::parse("output int answer=42;", "outputs")
             .unwrap()
             .verify()
             .unwrap()

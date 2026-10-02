@@ -1,0 +1,3 @@
+workload,iterations,nanoseconds,allocations,peak_live_extra_bytes,output_scalars
+qsp_complete_inverse_nlft_degree256,12,12630583,104772,248856,257
+qsp_complete_inverse_nlft_degree1024,4,20262834,136564,1002664,1025

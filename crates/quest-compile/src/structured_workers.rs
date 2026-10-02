@@ -1,11 +1,6 @@
 //! Optional certified replacements in static interfaces of structured SSA.
 //! Candidate generation never changes the immutable source/export authority.
 use crate::structured_optimize::{self as exact, Context, ResolvedGate, Wire};
-#[allow(unused_imports)]
-use crate::{
-    BoundParityPasses, ExactPasses, LinearPasses, NumericalPasses, OracleExport, ParityPasses,
-    TerminalPasses,
-};
 use crate::{LanguageError, Program, StructuredOccurrence, Verified};
 use quest_language::{
     GateKind as G, SourceSpan,
@@ -14,8 +9,9 @@ use quest_language::{
     ssa::{self, InstructionKind as K, ValueId},
 };
 use quest_math::{
-    ApproxCertificate, ExactCertificate, Gate as M, Limits, Operation, Rational, Sequence,
+    ApproxCertificate, ExactCertificate, Gate as M, Limits, Operation, RBig, Sequence,
 };
+#[cfg(feature = "workers")]
 use quest_optimizer_client::Client;
 use std::collections::BTreeMap;
 
@@ -29,6 +25,7 @@ pub enum StructuredWorkerError {
     Language(#[from] LanguageError),
     #[error(transparent)]
     Quantum(#[from] crate::StructuredQuantumError),
+    #[cfg(feature = "workers")]
     #[error(transparent)]
     Worker(#[from] quest_optimizer_client::Error),
     #[error(transparent)]
@@ -56,7 +53,7 @@ pub struct StructuredSynthesisReport {
     /// An exact classical trace count, or maximum-path count through an acyclic CFG.
     /// A trace must complete without inputs or quantum observations within fixed budgets.
     /// Unproved cycles or observations retain local certificates without a global claim.
-    pub operator_error_bound: Option<Rational>,
+    pub operator_error_bound: Option<RBig>,
 }
 #[derive(Debug, Clone)]
 pub struct StructuredExactCertificate {
@@ -78,6 +75,7 @@ pub struct StructuredZxReport {
     pub accepted: Vec<StructuredExactCertificate>,
     pub skipped: Vec<StructuredSkippedCandidate>,
 }
+#[cfg(feature = "workers")]
 impl StructuredZxReport {
     const fn new(snapshot: ssa::SnapshotId) -> Self {
         Self {
@@ -371,8 +369,8 @@ fn trace_count(
 fn bound(
     program: &ssa::Program,
     weights: &BTreeMap<ssa::BlockId, usize>,
-    epsilon: &Rational,
-) -> Option<Rational> {
+    epsilon: &RBig,
+) -> Option<RBig> {
     // Memoization on both call and CFG dependencies detects back edges; no unproved loop multiplicity.
     fn visit(
         id: ssa::BlockId,
@@ -435,17 +433,14 @@ fn bound(
     }
     let entry = program.regions.get(program.entry.index())?.entry;
     let count = visit(entry, program, weights, &mut BTreeMap::new(), 0)?;
-    Some(std::ops::Mul::mul(
-        epsilon,
-        Rational::from_integer(count.into()),
-    ))
+    Some(std::ops::Mul::mul(epsilon, RBig::from(count)))
 }
 type WireInterface = Vec<(Wire, ssa::Place)>;
 fn synthesize_gate(
     resolved: &ResolvedGate,
     bits: u64,
     exact_angle: Option<&crate::Angle>,
-    client: &dyn crate::RotationGenerator,
+    client: &impl crate::RotationGenerator,
     epsilon: f64,
     seed: u64,
     limits: Limits,
@@ -516,7 +511,7 @@ impl Program<Verified> {
     )]
     pub fn synthesize_rotations(
         self,
-        client: &dyn crate::RotationGenerator,
+        client: &impl crate::RotationGenerator,
         epsilon: f64,
         seed: u64,
         limits: Limits,
@@ -631,7 +626,7 @@ impl Program<Verified> {
             )?;
             let epsilon = quest_math::dyadic_from_bits(epsilon.to_bits(), limits)?;
             report.operator_error_bound = multiplicity
-                .map(|count| std::ops::Mul::mul(&epsilon, Rational::from_integer(count.into())))
+                .map(|count| std::ops::Mul::mul(&epsilon, RBig::from(count)))
                 .or_else(|| bound(&program, &weights, &epsilon));
             let program = program
                 .verify(CompileLimits::default())
@@ -646,30 +641,23 @@ impl Program<Verified> {
                 .map(|rotation| {
                     let certificate = rotation.certificate.base();
                     Ok(crate::CompilationEvidence {
-                        version: 1,
+                        version: 3,
                         scope: crate::EvidenceScope::HistoricalLocalCertificate,
-                        occurrence: format!("{:?}", rotation.occurrence),
-                        interface: rotation
-                            .interface
-                            .iter()
-                            .map(|p| format!("{p:?}"))
-                            .collect(),
-                        outputs: rotation
-                            .outputs
-                            .iter()
-                            .map(|id| format!("{id:?}"))
-                            .collect(),
+                        location: crate::EvidenceLocation::Structured {
+                            block: rotation.occurrence.block,
+                            instruction: rotation.occurrence.instruction,
+                            memory: rotation.occurrence.memory,
+                            interface: rotation.interface.clone(),
+                            outputs: rotation.outputs.clone(),
+                            input: report.input_snapshot,
+                            output: report.output_snapshot,
+                        },
                         algorithm: client.algorithm().into(),
-                        input: format!("{:?}", report.input_snapshot),
-                        output: format!("{:?}", report.output_snapshot),
                         seed: rotation.seed,
-                        target: serde_json::to_value(certificate.target())
-                            .map_err(|_| budget("certificate artifact"))?,
-                        candidate: serde_json::to_value(certificate.candidate())
-                            .map_err(|_| budget("certificate artifact"))?,
+                        target: certificate.target().clone(),
+                        candidate: certificate.candidate().clone(),
                         epsilon_bits: certificate.epsilon_bits(),
-                        limits: serde_json::to_value(limits)
-                            .map_err(|_| budget("certificate artifact"))?,
+                        limits,
                     })
                 })
                 .collect::<Result<Vec<_>>>()?;
@@ -677,6 +665,7 @@ impl Program<Verified> {
         })
     }
 }
+#[cfg(feature = "workers")]
 impl Program<Verified> {
     /// Request exactly checked ZX candidates for static Clifford+T windows.
     /// Effects, calls, dynamic operands and parameters stop a window. Failed,
@@ -747,6 +736,7 @@ impl Program<Verified> {
     }
 }
 
+#[cfg(feature = "workers")]
 fn scan_window(
     original: &[ssa::Instruction],
     offset: usize,
@@ -779,6 +769,7 @@ fn scan_window(
     Ok((gates, positions, end))
 }
 
+#[cfg(feature = "workers")]
 struct ZxEdit<'a> {
     context: Context<'a>,
     client: &'a Client,
@@ -789,6 +780,7 @@ struct ZxEdit<'a> {
     replacements: BTreeMap<ValueId, ValueId>,
     report: StructuredZxReport,
 }
+#[cfg(feature = "workers")]
 impl ZxEdit<'_> {
     fn block(&mut self, block: &mut ssa::Block) -> Result<()> {
         let original = std::mem::take(&mut block.instructions);

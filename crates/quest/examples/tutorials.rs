@@ -208,7 +208,7 @@ pub fn structured_certified_loop(executable: &std::path::Path) -> TutorialResult
     let (candidate, report) =
         original.synthesize_rotations(&client, epsilon, 2026, Limits::default())?;
     let expected = quest::certified::dyadic_from_bits(epsilon.to_bits(), Limits::default())?;
-    let expected = std::ops::Mul::mul(expected, quest::certified::Rational::from_integer(2.into()));
+    let expected = std::ops::Mul::mul(expected, quest::certified::RBig::from(2));
     if captures != 1 || report.rotations.len() != 1 || report.operator_error_bound != Some(expected)
     {
         return Err("once-evaluated capture or proven two-iteration bound changed".into());

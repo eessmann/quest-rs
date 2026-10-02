@@ -7,9 +7,9 @@ repository.workspace = true
 description = "Quest-owned obligations around checked exact affine expressions"
 
 [dependencies]
-num-bigint.workspace = true
-num-rational = { workspace = true, features = ["std"] }
-num-traits.workspace = true
+dashu-base.workspace = true
+dashu-int.workspace = true
+dashu-ratio.workspace = true
 
 [dev-dependencies]
 googletest.workspace = true

@@ -167,7 +167,7 @@ impl Frontend {
         syn::Error::new(rust, message)
     }
     fn emit(self) -> syn::Result<TokenStream> {
-        let module = syntax::parse_tokens(&self.tokens, ParseLimits::default())
+        let mut module = syntax::parse_tokens(&self.tokens, ParseLimits::default())
             .map_err(|error| self.error(error.span, error))?;
         let oracle_captures = module
             .statements
@@ -180,6 +180,25 @@ impl Frontend {
                 }
             })
             .collect::<std::collections::BTreeSet<_>>();
+        // Oracle identities inhabit a separate typed namespace. Compact only scalar
+        // captures, preserving source evaluation order without dummy floating values.
+        let scalar_indices = (0..self.captures.len())
+            .filter(|index| !oracle_captures.contains(index))
+            .enumerate()
+            .map(|(scalar, source)| (source, scalar))
+            .collect::<BTreeMap<_, _>>();
+        if !oracle_captures.is_empty() {
+            let mut tokens = self.tokens.clone();
+            for token in &mut tokens {
+                if let syntax::TokenKind::Capture(index) = &mut token.kind
+                    && let Some(scalar) = scalar_indices.get(index)
+                {
+                    *index = *scalar;
+                }
+            }
+            module = syntax::parse_tokens(&tokens, ParseLimits::default())
+                .map_err(|error| self.error(error.span, error))?;
+        }
         let admitted = quest_qasm::admit_expanded(module, &self.sources, CompileLimits::default())
             .map_err(|error| {
                 self.error(
@@ -206,19 +225,19 @@ impl Frontend {
         let captures = &self.captures;
         let capture_statements = captures.iter().enumerate().map(|(index, expression)| {
             if oracle_captures.contains(&index) {
-                quote! {
+                Ok(quote! {
                     #__oracles.insert(#index, { let #__value: #root::OracleFragment = #expression; #__value });
-                    #__captures.push(#root::language::classical::ScalarValue::floating(#root::language::classical::FloatWidth::F64, 0.0)?);
-                }
+                })
             } else {
-                quote! {
-    let #__value = #root::capture_angle(#expression)?;
-    if let Some(exact) = #__value.exact() { #__exact.insert(#index, exact.clone()); }
-    #__captures.push(#__value.scalar());
-}
+                let index = scalar_indices.get(&index).copied().ok_or_else(|| self.error(None, "missing scalar capture mapping"))?;
+                Ok(quote! {
+                    let #__value = #root::capture_angle(#expression)?;
+                    if let Some(exact) = #__value.exact() { #__exact.insert(#index, exact.clone()); }
+                    #__captures.push(#__value.scalar());
+                })
             }
-        });
-        let capture_count = captures.len();
+        }).collect::<syn::Result<Vec<_>>>()?;
+        let capture_count = scalar_indices.len();
         let sources = self.sources.iter().map(|source| {
             let id = source.id().value();
             let name = source.name();

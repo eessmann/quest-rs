@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["crates/quest", "crates/quest-sys", "crates/quest-build", "crates/quest-circuit", "crates/quest-compile", "crates/quest-symbolic", "crates/quest-macros", "crates/xtask", "crates/quest-language", "crates/quest-qasm", "crates/quest-math", "crates/quest-synthesis", "crates/quest-optimizer-protocol", "crates/quest-optimizer-worker", "crates/quest-optimizer-client", "crates/quest-numerics", "crates/quest-polynomial", "crates/quest-qsp", "crates/quest-qsvt", "crates/quest-qsvt-io", "crates/quest-qsvt-cli"]
+members = ["crates/quest", "crates/quest-sys", "crates/quest-build", "crates/quest-compile", "crates/quest-symbolic", "crates/quest-macros", "crates/xtask", "crates/quest-language", "crates/quest-qasm", "crates/quest-math", "crates/quest-synthesis", "crates/quest-optimizer-protocol", "crates/quest-optimizer-worker", "crates/quest-optimizer-client", "crates/quest-numerics", "crates/quest-polynomial", "crates/quest-qsp", "crates/quest-qsvt", "crates/quest-qsvt-io", "crates/quest-qsvt-cli"]
 default-members = ["crates/quest"]
 
 [workspace.package]
@@ -9,13 +9,16 @@ license = "MIT"
 repository = "https://github.com/eessmann/quest-rs"
 
 [workspace.dependencies]
+dashu-base = { version = "=0.6.1", default-features = false, features = ["std"] }
+dashu-int = { version = "=0.6.2", default-features = false, features = ["std"] }
+dashu-ratio = { version = "=0.6.1", default-features = false, features = ["std"] }
+dashu-float = { version = "=0.6.2", default-features = false, features = ["std"] }
 quest = { package = "quest-rs", path = "crates/quest", version = "0.1" }
 clap = { version = "4.6.6", default-features = false }
 mpi = { version = "0.8.2", default-features = false }
 rustfft = { version = "=6.4.1", default-features = false }
 maryada = { version = "=0.2.1", default-features = false }
 rayon = { version = "=1.12.0", default-features = false }
-astro-float = { version = "=0.9.6", default-features = false }
 hdf5-metno = { version = "=0.14.1", default-features = false }
 quest-numerics = { path = "crates/quest-numerics", version = "0.1" }
 quest-polynomial = { path = "crates/quest-polynomial", version = "0.1" }
@@ -34,7 +37,6 @@ quest-language = { path = "crates/quest-language", version = "0.1" }
 color-eyre = { version = "0.6.5", default-features = false }
 quest-sys = { path = "crates/quest-sys", version = "0.2" }
 quest-build = { path = "crates/quest-build", version = "0.1" }
-quest-circuit = { path = "crates/quest-circuit", version = "0.1" }
 quest-compile = { path = "crates/quest-compile", version = "0.1", default-features = false }
 quest-symbolic = { path = "crates/quest-symbolic", version = "0.1" }
 quest-macros = { path = "crates/quest-macros", version = "0.1" }
@@ -48,8 +50,6 @@ googletest = "0.14"
 
 faer = { version = "0.24.4", default-features = false }
 num-complex = "0.4"
-num-rational = { version = "0.4", default-features = false }
-num-bigint = "0.5"
 num-traits = "0.2"
 ndarray = { version = "0.17", default-features = false }
 codespan-reporting = "0.13"

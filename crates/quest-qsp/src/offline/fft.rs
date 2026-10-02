@@ -1,6 +1,5 @@
 use super::{Context, OfflineError as Error, OfflineResult as Result, number::Number};
-use crate::precision::checked;
-use astro_float::{BigFloat, RoundingMode};
+use crate::precision::{checked, integer, nearest_pi, nearest_sin_cos};
 use std::sync::Arc;
 fn roots(length: usize, context: &mut Context) -> Result<Arc<Vec<Number>>> {
     if let Some(values) = context.roots.get(&length) {
@@ -12,38 +11,35 @@ fn roots(length: usize, context: &mut Context) -> Result<Arc<Vec<Number>>> {
             .ok_or(Error::Budget("offline twiddles"))?,
     )?;
     let mut values = Vec::with_capacity(length / 2);
+    // The one-point transform has no twiddles and previously allocated no constant cache.
+    if length == 1 {
+        let values = Arc::new(values);
+        context.roots.insert(length, Arc::clone(&values));
+        return Ok(values);
+    }
+    let p = context.precision;
+    let pi = checked(nearest_pi(p, &mut context.cache)?)?;
     for index in 0..length / 2 {
         let numerator = index
             .checked_mul(2)
             .ok_or(Error::Budget("offline FFT angle"))?;
         let rational = super::number::div(
-            &BigFloat::from_u64(
+            &integer(
+                p,
                 u64::try_from(numerator)
                     .map_err(|_| super::OfflineError::Budget("integer interchange"))?,
-                crate::offline::number::precision_bits(context.precision),
             ),
-            &BigFloat::from_u64(
+            &integer(
+                p,
                 u64::try_from(length)
                     .map_err(|_| super::OfflineError::Budget("integer interchange"))?,
-                crate::offline::number::precision_bits(context.precision),
             ),
-        );
-        let pi = checked(context.constants.pi(
-            crate::offline::number::precision_bits(context.precision),
-            RoundingMode::ToEven,
-        ))?;
-        let angle = checked(super::number::mul(&rational, &pi))?;
+        )?;
+        let angle = checked(super::number::mul(&rational, &pi)?)?;
+        let (sin, cos) = nearest_sin_cos(p, &angle, &mut context.cache)?;
         values.push(Number {
-            re: checked(angle.cos(
-                crate::offline::number::precision_bits(context.precision),
-                RoundingMode::ToEven,
-                &mut context.constants,
-            ))?,
-            im: super::number::neg(&checked(angle.sin(
-                crate::offline::number::precision_bits(context.precision),
-                RoundingMode::ToEven,
-                &mut context.constants,
-            ))?),
+            re: cos,
+            im: super::number::neg(&sin),
         });
     }
     let values = Arc::new(values);
@@ -96,10 +92,10 @@ pub(super) fn transform(
                             .ok_or(Error::Budget("offline twiddle index"))?,
                     )
                     .ok_or(Error::Numerical("offline FFT twiddle"))?;
-                let value = b.mul(&if inverse { root.conj() } else { root.clone() });
+                let value = b.mul(&if inverse { root.conj() } else { root.clone() })?;
                 let original = a.clone();
-                *a = original.add(&value);
-                *b = original.sub(&value);
+                *a = original.add(&value)?;
+                *b = original.sub(&value)?;
             }
         }
         if stage == length {
@@ -111,15 +107,15 @@ pub(super) fn transform(
     }
     if normalize {
         let inverse_length = super::number::div(
-            &BigFloat::from_i64(1, crate::offline::number::precision_bits(context.precision)),
-            &BigFloat::from_u64(
+            &integer(context.precision, 1),
+            &integer(
+                context.precision,
                 u64::try_from(length)
                     .map_err(|_| super::OfflineError::Budget("integer interchange"))?,
-                crate::offline::number::precision_bits(context.precision),
             ),
-        );
+        )?;
         for value in values.iter_mut() {
-            *value = value.scale(&inverse_length);
+            *value = value.scale(&inverse_length)?;
         }
     }
     for value in values {
@@ -156,7 +152,7 @@ pub(super) fn convolve(
                             .ok_or(Error::Budget("offline convolution index"))?,
                     )
                     .ok_or(Error::Numerical("offline support"))?;
-                *out = out.add(&a.mul(b));
+                *out = out.add(&a.mul(b)?)?;
             }
         }
         for value in &result {
@@ -179,9 +175,49 @@ pub(super) fn convolve(
     transform(&mut a, false, false, context)?;
     transform(&mut b, false, false, context)?;
     for (a, b) in a.iter_mut().zip(b) {
-        *a = a.mul(&b);
+        *a = a.mul(&b)?;
     }
     transform(&mut a, true, true, context)?;
     a.truncate(count);
     Ok(a)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::super::OfflinePolicy;
+    use super::*;
+    use crate::precision::{nearest_cos, nearest_sin};
+    use googletest::prelude::*;
+    #[gtest]
+    fn roots_preserve_exact_values_cache_reuse_and_length_one_resources() -> googletest::Result<()>
+    {
+        for length in [1, 2, 8, 32] {
+            let mut context = Context::new(length, 65, OfflinePolicy::default())?;
+            let actual = roots(length, &mut context)?;
+            let work = context.work;
+            let reused = roots(length, &mut context)?;
+            expect_true!(Arc::ptr_eq(&actual, &reused));
+            expect_eq!(context.work, work);
+            if length == 1 {
+                expect_true!(actual.is_empty());
+                expect_eq!(context.cache.total_words(), 0);
+            }
+            for (index, root) in actual.iter().enumerate() {
+                let numerator = index.checked_mul(2).ok_or(Error::Budget("fixture angle"))?;
+                let ratio = super::super::number::div(
+                    &integer(65, u64::try_from(numerator)?),
+                    &integer(65, u64::try_from(length)?),
+                )?;
+                let mut scalar_cache = crate::offline::ConstCache::default();
+                let pi = nearest_pi(65, &mut scalar_cache)?;
+                let angle = super::super::number::mul(&ratio, &pi)?;
+                let re = nearest_cos(65, &angle, &mut scalar_cache)?;
+                let im = super::super::number::neg(&nearest_sin(65, &angle, &mut scalar_cache)?);
+                expect_that!(&root.re, eq(&re));
+                expect_that!(&root.im, eq(&im));
+                expect_eq!(root.im.repr().is_neg_zero(), im.repr().is_neg_zero());
+            }
+        }
+        Ok(())
+    }
 }

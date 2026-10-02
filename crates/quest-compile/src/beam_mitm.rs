@@ -1,15 +1,10 @@
 //! One-window, parent-certified exact MITM candidate adapter for the beam.
-use crate::model::{Occurrence, SemanticOperation};
 use crate::workers::{
     ProvenanceBudget, QuantumWindow, WorkerError, admit_output, candidate_replacement,
     quantum_window,
 };
-#[allow(unused_imports)]
-use crate::{
-    BoundParityPasses, ExactPasses, LinearPasses, NumericalPasses, OracleExport, ParityPasses,
-    TerminalPasses,
-};
 use crate::{Error, ExactRegionCertificate, Gate, ProvenanceGraph, QuantumRegion};
+use quest_language::quantum::model::{Occurrence, SemanticOperation};
 use quest_math::Limits;
 use quest_optimizer_client::{Client, MitmResult};
 use quest_optimizer_protocol::MitmLimits;

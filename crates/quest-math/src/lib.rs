@@ -1,8 +1,9 @@
 #![doc = include_str!("../README.md")]
 #![forbid(unsafe_code)]
+pub mod encoding;
 mod types;
 pub use types::{
-    AngleTarget, Axis, Control, Error, Gate, Limits, Operation, Rational, Result, Sequence, Target,
+    AngleTarget, Axis, Control, Error, Gate, Limits, Operation, RBig, Result, Sequence, Target,
 };
 mod ring;
 pub use ring::{

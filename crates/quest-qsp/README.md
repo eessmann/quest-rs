@@ -121,8 +121,8 @@ No optional features are enabled by default.
 
 | Feature | Effect |
 | --- | --- |
-| `certification` | Adds independent directed `astro-float` verification of a frozen binary64 export. |
-| `offline-synthesis` | Enables `certification` and explicit arbitrary-precision synthesis and approximation builders. |
+| `certification` | Adds independent directed native Dashu verification of a frozen binary64 export. |
+| `offline-synthesis` | Enables `certification` and explicit arbitrary-precision synthesis builders. |
 | `rayon` | Enables caller-owned pools for `complete_with` and `synthesize_with`. |
 | `simd` | Compiles SIMD FFT backends; select `Policy::backend = FftBackend::Simd` explicitly. |
 
@@ -164,7 +164,7 @@ The verifier bounds source conversion, completion, response, all four
 reconstructed matrix entries and unitarity. `UnitCircleResponse` matrices are imported
 as exact binary64 dyadics. `RealParityWx` verification reconstructs rotations from
 the exact exported phase values using directed arbitrary-precision trigonometry.
-Reports retain `astro_float::BigFloat` endpoints; binary64 upper summaries round
+Reports retain native `dashu_float::FBig<HalfEven, 2>` endpoints; binary64 upper summaries round
 upward. Default verification starts at 256 bits and can retry up to 1024 bits.
 More verifier precision can tighten an enclosure but cannot repair export error.
 
@@ -174,16 +174,21 @@ then `.policy(OfflinePolicy::default())?.solve()?`. These builders start from
 original binary64 coefficients, compute separate arbitrary-precision candidates,
 export binary64 controls or phases, and independently certify each export.
 Retries rebuild numerical state from the original source. Defaults begin at
-128 bits and allow up to 4096 bits; precision limits must align to backend words.
+128 bits and allow up to 4096 bits. Precision limits accept individual bits,
+including 65 bits. Storage admission includes a retained arithmetic guard bit
+and the actual words in each attempt's owned constant cache. Adaptive
+transcendental scratch and allocator overhead are outside these modeled limits.
 Reports separate computation and certification time. The offline candidate's
 production `reconstruction_residual()` is unavailable (`None`); use
 `solved.certified().report().reconstruction()` for the independent bound.
 
-`OfflineRemezBuilder` provides a separate function-approximation path over a
-positive-width subinterval of `[-1, 1]`. Its `error_tolerance` bounds the exported
-polynomial's **total uniform error**. The reported numerical exchange gap is
-empirical and is not a minimax certificate. Admit parity and contractivity
-explicitly before using such a polynomial for QSP.
+Function approximation uses `quest_polynomial::RemezRequest` for both binary64
+and arbitrary-precision arithmetic. Select `Accuracy::UniformError` for a total
+error bound or `Accuracy::MinimaxGap` for the gap to the minimax lower bound;
+the result retains these as separate certificates. Choose `.export_binary64()`
+before `.run()`, then obtain the certified coefficients with
+`.binary64_polynomial()`. Admit parity and contractivity explicitly before
+using that polynomial for QSP.
 
 ## Certified projector conversion
 

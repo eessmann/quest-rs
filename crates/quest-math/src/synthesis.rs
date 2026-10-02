@@ -1,6 +1,6 @@
 //! Independent compositional checker for matrix reduction and elementary lowering.
 // Phase exponents are admitted below eight, and all row divisors are admitted
-// nonzero powers of two. BigInt arithmetic is intentionally exact and unbounded
+// nonzero powers of two. IBig arithmetic is intentionally exact and unbounded
 // only within the separately enforced coefficient/byte limits.
 #![allow(clippy::arithmetic_side_effects)]
 use crate::{Cyclotomic, Error, ExactMatrix, Limits, Operation, Result, Sequence};

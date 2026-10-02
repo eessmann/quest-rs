@@ -1,6 +1,6 @@
 use faer::mat;
 use googletest::prelude::*;
-use quest_circuit::{Gate, OracleFragment, QuantumRegionBuilder};
+use quest_compile::{Gate, OracleFragment, QuantumRegionBuilder};
 use quest_qsvt::ExplicitUnitaryPremise;
 use quest_qsvt::{EncodingBuilder, Left, LogicalSpace, NumericalPolicy, Right};
 
@@ -69,7 +69,7 @@ fn whole_oracle_admission_does_not_reuse_individual_gate_tolerances() -> Result<
             quest_qsvt::Complex64::new(1.0, 0.0)
         ]
     ];
-    let numerical = quest_circuit::NumericalOperator::from_view(
+    let numerical = quest_compile::NumericalOperator::from_view(
         matrix.as_ref(),
         NumericalPolicy::default().matrix_policy(),
     )?;

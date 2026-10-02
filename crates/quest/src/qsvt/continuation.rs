@@ -32,7 +32,7 @@ impl<'env> AdmittedContinuation<'env> {
     pub fn new(
         resources: &'env crate::environment::RuntimeResources,
         transform: &quest_qsvt::ValidatedTransform,
-        plan: impl FnOnce(&quest_circuit::BoundRegion) -> crate::Result<quest_circuit::RegionPlan>,
+        plan: impl FnOnce(&quest_compile::BoundRegion) -> crate::Result<quest_compile::RegionPlan>,
     ) -> super::Result<Self> {
         match transform.continuation_stage() {
             quest_qsvt::TransformContinuation::Direct => Ok(Self::Direct),

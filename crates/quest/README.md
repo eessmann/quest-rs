@@ -10,7 +10,7 @@ is **`quest-rs`**, with Rust library name **`quest`**.
 | `crates/quest-sys` | Audited CXX bridge and native RAII resources |
 | `crates/quest-language` | Checked semantics, exact angles, effects, SSA and immutable quantum payloads |
 | `crates/quest-compile` | Optimization, specialization, portable lowering and compiled artifacts |
-| `crates/quest-circuit` | Public program API over the semantic core and compiler |
+| `crates/quest-compile` | Public program API over the semantic core and compiler |
 | `crates/quest-synthesis` | Bounded Rust Clifford+T candidate generation; independent certificates belong to `quest-math` |
 | `crates/quest-macros` | Rust token-tree frontend, without native dependencies |
 | `crates/quest-build` | Installed `CMake` target discovery, bridge compilation and final-executable linking |
@@ -36,7 +36,7 @@ HDF5 support. Select serial HDF5 through pkg-config or `HDF5_DIR`, then use
 
 The installed package must export `QuEST::QuEST` and resolve its own runtime
 dependencies. `CMake` compiles the static CXX bridge against that target.
-`QuEST_DIR` and `CMAKE_PREFIX_PATH` selection are also supported. Local native
+`QUEST_ROOT` selects the exact installation prefix; `CMAKE_PREFIX_PATH` supports conventional package discovery. Local native
 installs with external CUDA/cuQuantum or MPI libraries can use `CMake`'s
 `CMAKE_INSTALL_RPATH_USE_LINK_PATH=ON` option, provided `QuEST`'s RPATH helper
 honors it. Cargo does not repair or bundle native installations.
@@ -140,12 +140,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 The primary macro shares the documented `OpenQASM` 3.1 simulator profile with the
 text frontend in `quest::qasm`. It supports typed classical control, user gates,
 nonrecursive subroutines, signed controls, integer powers and once-evaluated
-`${rust_expression}` captures. Pure consumers use `quest-circuit`; its default
+`${rust_expression}` captures. Pure consumers use `quest-compile`; its default
 `macros` feature reexports `circuit!`. Optional `codespan-reporting` and `serde`
 render or serialize shared owned diagnostics. Macro expansion emits a checked reusable
 template; captures run once in source order. Typed `${Angle::pi(1, 4)?}` captures
 retain exact angles alongside ordinary floating captures.
-See [the circuit profile](https://github.com/eessmann/quest-rs/blob/main/crates/quest-circuit/README.md) for supported syntax.
+See [the circuit profile](https://github.com/eessmann/quest-rs/blob/main/crates/quest-compile/README.md) for supported syntax.
 
 ## Circuit semantics
 
@@ -203,7 +203,7 @@ cargo fmt --all -- --check
 cargo clippy --workspace --all-targets --locked -- -D warnings
 cargo run --locked -p xtask -- generate-quest-bindings --check
 cargo run --locked -p xtask -- check-native-consumers
-cargo test --locked -p quest-circuit --no-default-features
+cargo test --locked -p quest-compile --no-default-features
 ```
 
 Binding generation additionally requires libclang. Set `LIBCLANG_PATH` if needed;
@@ -220,11 +220,15 @@ configurations and results.
 
 Shared `OracleFragment` calls remain retained in the common program. Preparation builds each shared body once and caches numerical matrices by
 payload identity and the signed control profiles needed by reachable calls.
-Forward and adjoint native matrices belong to one cached variant. Targets and
+Ordinary payloads and reachable oracle bodies share one native pool and one
+admission inventory per prepared owner. Forward and adjoint native matrices
+belong to one cached variant. Targets and
 orientation are applied during execution using preallocated remapping buffers;
 repeated calls do not flatten or rebuild the body. The prepared owner exposes
 `prepared_oracle_bodies()` and `prepared_oracle_matrix_variants()` for inspecting
-these retained resources.
+oracle resources, and `prepared_matrix_variants()` for the total shared native
+pool. Independently prepared owners retain their own pools and environment
+reservations.
 
 Numerical controls use the existing general linear-operator path. Preparation
 embeds each required control profile once, preserving negative controls and the

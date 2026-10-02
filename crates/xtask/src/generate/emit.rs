@@ -7,13 +7,12 @@ use super::DynError;
 use super::clang::QuestRoot;
 use super::model::{
     AdapterEntry, AdapterManifest, AdapterRegistry, AdapterSourceKind, ApiItem, CoverageManifest,
-    macro_value, rust_name,
+    macro_value,
 };
 
 const GENERATOR_NAME: &str = "xtask generate-quest-bindings";
 const ADAPTER_MANIFEST_PATH: &str = "crates/quest-sys/generated/generated_adapters.json";
 const COVERAGE_MANIFEST_PATH: &str = "crates/quest-sys/generated/api_coverage.json";
-const GENERATED_NAMES_PATH: &str = "crates/quest-sys/generated/generated_names.txt";
 const GENERATED_RUST_PATH: &str = "crates/quest-sys/src/generated_api.rs";
 const GENERATED_HEADER_PATH: &str =
     "crates/quest-sys/src/cxx_bindings/include/quest_generated_bindings.hpp";
@@ -234,27 +233,13 @@ pub struct GeneratedOutput {
     pub contents: String,
 }
 
-#[derive(serde::Deserialize)]
-struct CoverageBootstrap {
-    items: Vec<ApiItem>,
-}
-
-pub fn load_adapter_registry(workspace: &Path, check: bool) -> Result<AdapterRegistry, DynError> {
+pub fn load_adapter_registry(workspace: &Path) -> Result<AdapterRegistry, DynError> {
     let path = workspace.join(ADAPTER_MANIFEST_PATH);
-    if path.is_file() {
-        let text = fs::read_to_string(&path)?;
-        let manifest: AdapterManifest = serde_json::from_str(&text)?;
-        return AdapterRegistry::new(sorted_entries(manifest.entries)).map_err(Into::into);
-    }
-
-    if check {
-        return Err(format!(
-            "{ADAPTER_MANIFEST_PATH} is missing; rerun xtask generate-quest-bindings"
-        )
-        .into());
-    }
-
-    bootstrap_adapter_registry(workspace)
+    let text = fs::read_to_string(&path).map_err(|error| format!(
+        "could not read reviewed adapter registry {ADAPTER_MANIFEST_PATH}: {error}; restore the reviewed registry from version control before generating bindings"
+    ))?;
+    let manifest: AdapterManifest = serde_json::from_str(&text)?;
+    AdapterRegistry::new(sorted_entries(manifest.entries)).map_err(Into::into)
 }
 
 pub fn render_outputs(
@@ -275,10 +260,6 @@ pub fn render_outputs(
         GeneratedOutput {
             path: GENERATED_CPP_PATH,
             contents: cpp,
-        },
-        GeneratedOutput {
-            path: GENERATED_NAMES_PATH,
-            contents: render_generated_names(registry),
         },
         GeneratedOutput {
             path: ADAPTER_MANIFEST_PATH,
@@ -317,37 +298,6 @@ pub fn write_or_check(
     Ok(())
 }
 
-fn bootstrap_adapter_registry(workspace: &Path) -> Result<AdapterRegistry, DynError> {
-    let coverage_path = workspace.join(COVERAGE_MANIFEST_PATH);
-    let text = fs::read_to_string(&coverage_path).map_err(|error| {
-        format!(
-            "could not bootstrap {ADAPTER_MANIFEST_PATH} from {COVERAGE_MANIFEST_PATH}: {error}"
-        )
-    })?;
-    let coverage: CoverageBootstrap = serde_json::from_str(&text)?;
-    let entries = coverage
-        .items
-        .into_iter()
-        .filter(|item| item.status == "generated")
-        .map(|item| {
-            let source_kind = if item.reason.contains("hand-written core") {
-                AdapterSourceKind::Core
-            } else {
-                AdapterSourceKind::Generated
-            };
-            AdapterEntry {
-                overload_key: item.overload_key,
-                quest_name: item.name.clone(),
-                adapter_name: item.name.clone(),
-                rust_name: rust_name(&item.name),
-                source_kind,
-            }
-        })
-        .collect::<Vec<_>>();
-
-    AdapterRegistry::new(sorted_entries(entries)).map_err(Into::into)
-}
-
 fn sorted_entries(mut entries: Vec<AdapterEntry>) -> Vec<AdapterEntry> {
     entries.sort_by(|left, right| {
         left.overload_key
@@ -355,19 +305,6 @@ fn sorted_entries(mut entries: Vec<AdapterEntry>) -> Vec<AdapterEntry> {
             .then_with(|| left.adapter_name.cmp(&right.adapter_name))
     });
     entries
-}
-
-fn render_generated_names(registry: &AdapterRegistry) -> String {
-    let mut names = BTreeSet::new();
-    for entry in registry.entries() {
-        if entry.source_kind == AdapterSourceKind::Generated {
-            names.insert(entry.adapter_name.as_str());
-        }
-    }
-
-    let mut out = names.into_iter().collect::<Vec<_>>().join("\n");
-    out.push('\n');
-    out
 }
 
 fn render_adapter_manifest(registry: &AdapterRegistry) -> Result<String, DynError> {
@@ -506,7 +443,7 @@ mod tests {
             .parent()
             .and_then(Path::parent)
             .or_fail()?;
-        let registry = load_adapter_registry(workspace, true).or_fail()?;
+        let registry = load_adapter_registry(workspace).or_fail()?;
         let (rust, header, cpp) = render_source_templates(&registry).or_fail()?;
 
         for family in &PAULI_FAMILIES {
@@ -549,6 +486,26 @@ mod tests {
     }
 
     #[gtest]
+    fn generation_requires_the_reviewed_adapter_registry() -> googletest::Result<()> {
+        let workspace = tempfile::tempdir().or_fail()?;
+        let coverage = workspace.path().join(COVERAGE_MANIFEST_PATH);
+        fs::create_dir_all(coverage.parent().or_fail()?).or_fail()?;
+        // A coverage receipt is not authority to recreate reviewed adapters.
+        fs::write(coverage, r#"{"items": []}"#).or_fail()?;
+        {
+            let result = load_adapter_registry(workspace.path());
+            let Err(error) = result else {
+                return fail!("missing reviewed registry must fail in every generation mode");
+            };
+            verify_that!(
+                error.to_string(),
+                contains_substring("reviewed adapter registry")
+            )?;
+        }
+        Ok(())
+    }
+
+    #[gtest]
     fn checked_in_generator_files_do_not_contain_machine_paths() -> googletest::Result<()> {
         let workspace = Path::new(env!("CARGO_MANIFEST_DIR"))
             .parent()
@@ -559,7 +516,6 @@ mod tests {
             "crates/quest-sys/build.rs",
             "crates/quest-sys/generated/api_coverage.json",
             "crates/quest-sys/generated/generated_adapters.json",
-            "crates/quest-sys/generated/generated_names.txt",
             "crates/xtask/src/generate/clang.rs",
             "crates/xtask/src/generate/classify.rs",
             "crates/xtask/src/generate/emit.rs",

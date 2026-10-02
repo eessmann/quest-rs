@@ -22,12 +22,15 @@
 //! memory and work do not impose allocator quotas or preempt internal backend
 //! transcendental iterations. This module verifies the QSP export's numerical
 //! properties; it does not certify native execution or an application's oracle.
+
 pub(crate) mod interval;
 mod product;
 mod projector;
-use crate::precision::{BinaryRounding, checked, exact_from_f64, to_f64};
+use crate::precision::{
+    Binary, BinaryRounding, checked, exact_from_f64, to_f64, up_add, up_mul, up_sqrt, zero,
+};
 use crate::{FrozenCandidate, RealParityWx, UnitCircleResponse};
-use astro_float::{BigFloat, Consts, RoundingMode as Round};
+use dashu_float::ConstCache;
 pub use interval::{MpComplex, MpInterval};
 #[cfg(feature = "offline-synthesis")]
 pub(crate) use product::circle_values;
@@ -62,7 +65,7 @@ pub enum CertificationError {
         /// Last full product unitarity enclosure.
         unitarity: Box<Bound>,
     },
-    /// Invalid tolerance, precision alignment or resource configuration.
+    /// Invalid tolerance, precision or resource configuration.
     #[error("invalid certification policy: {0}")]
     Policy(&'static str),
     /// Modeled coefficient, byte or work resources were exhausted.
@@ -103,8 +106,8 @@ pub enum ConvolutionMethod {
 }
 /// Precision, accuracy and modeled resources for independent verification.
 ///
-/// Precision is in bits and must be a multiple of `astro_float::WORD_BIT_SIZE`,
-/// with `64 <= initial_precision <= max_precision <= 1_048_576`. All tolerances
+/// Precision is selected in individual bits, with
+/// `64 <= initial_precision <= max_precision <= 1_048_576`. All tolerances
 /// must be positive and finite. Configuration is checked by
 /// [`CertificationBuilder::policy`].
 #[derive(Debug, Clone, Copy)]
@@ -156,15 +159,9 @@ impl CertificationPolicy {
         if self.initial_precision < 64
             || self.max_precision < self.initial_precision
             || self.max_precision > 1_048_576
-            || !usize::try_from(self.initial_precision)
-                .unwrap_or(usize::MAX)
-                .is_multiple_of(astro_float::WORD_BIT_SIZE)
-            || !usize::try_from(self.max_precision)
-                .unwrap_or(usize::MAX)
-                .is_multiple_of(astro_float::WORD_BIT_SIZE)
         {
             return Err(CertificationError::Policy(
-                "word-aligned precision must satisfy 64 <= initial <= maximum <= 1048576",
+                "precision must satisfy 64 <= initial <= maximum <= 1048576",
             ));
         }
         for tolerance in [
@@ -323,20 +320,20 @@ impl<M> Certified<M> {
 /// Frobenius bound also bounds the spectral/operator norm.
 #[derive(Debug, Clone)]
 pub struct Bound {
-    lower: BigFloat,
-    upper: BigFloat,
+    lower: Binary,
+    upper: Binary,
     lower_f64: f64,
     upper_f64: f64,
 }
 impl Bound {
     /// Rigorous arbitrary-precision lower witness for the supremum norm.
     #[must_use]
-    pub const fn lower(&self) -> &BigFloat {
+    pub const fn lower(&self) -> &Binary {
         &self.lower
     }
     /// Rigorous arbitrary-precision sufficient upper bound.
     #[must_use]
-    pub const fn upper(&self) -> &BigFloat {
+    pub const fn upper(&self) -> &Binary {
         &self.upper
     }
     /// Lower witness summarized in binary64 with downward rounding.
@@ -349,7 +346,7 @@ impl Bound {
     pub const fn upper_f64(&self) -> f64 {
         self.upper_f64
     }
-    fn new(lower: BigFloat, upper: BigFloat) -> CertificationResult<Self> {
+    fn new(lower: Binary, upper: Binary) -> CertificationResult<Self> {
         let lower = checked(lower)?;
         let upper = checked(upper)?;
         if lower > upper {
@@ -460,8 +457,8 @@ struct Context {
     policy: CertificationPolicy,
     work: usize,
     bytes: usize,
+    cache: ConstCache,
     roots: BTreeMap<usize, Arc<Vec<MpComplex>>>,
-    constants: Consts,
 }
 impl Context {
     fn new(count: usize, precision: u32, policy: CertificationPolicy) -> CertificationResult<Self> {
@@ -475,12 +472,16 @@ impl Context {
         let levels = usize::try_from(fft.ilog2())
             .map_err(|_| CertificationError::Budget("tree levels"))?
             .saturating_add(1);
-        let float_bytes = usize::try_from(precision)
-            .map_err(|_| CertificationError::Budget("precision"))?
-            .div_ceil(astro_float::WORD_BIT_SIZE)
-            .checked_mul(astro_float::WORD_BIT_SIZE / 8)
-            .and_then(|bytes| bytes.checked_add(64))
-            .ok_or(CertificationError::Budget("precision storage"))?;
+        let float_bytes = usize::try_from(
+            precision
+                .checked_add(1)
+                .ok_or(CertificationError::Budget("guard-bit storage"))?,
+        )
+        .map_err(|_| CertificationError::Budget("precision"))?
+        .div_ceil(64)
+        .checked_mul(8)
+        .and_then(|bytes| bytes.checked_add(64))
+        .ok_or(CertificationError::Budget("precision storage"))?;
         // Conservative logical live coefficients, tree temporaries and FFT
         // rectangles; includes limb storage, not a process allocator cap.
         let slots = count
@@ -499,14 +500,31 @@ impl Context {
             policy,
             work: 0,
             bytes,
+            cache: ConstCache::default(),
             roots: BTreeMap::new(),
-            constants: Consts::new().map_err(crate::precision::PrecisionError::from)?,
         })
+    }
+    // Called once at the end of each owned-cache attempt; include actual retained words.
+    fn admit_cache(&mut self) -> CertificationResult<()> {
+        let cache_bytes = self
+            .cache
+            .total_words()
+            .checked_mul(size_of::<dashu_int::Word>())
+            .and_then(|n| n.checked_add(size_of::<ConstCache>()))
+            .ok_or(CertificationError::Budget("constant cache storage"))?;
+        self.bytes = self
+            .bytes
+            .checked_add(cache_bytes)
+            .ok_or(CertificationError::Budget("constant cache storage"))?;
+        if self.bytes > self.policy.max_bytes {
+            return Err(CertificationError::Budget("constant cache storage"));
+        }
+        Ok(())
     }
     fn charge(&mut self, units: usize) -> CertificationResult<()> {
         let limbs = usize::try_from(self.precision)
             .map_err(|_| CertificationError::Budget("precision work"))?
-            .div_ceil(astro_float::WORD_BIT_SIZE);
+            .div_ceil(64);
         let weighted = units
             .checked_mul(limbs)
             .ok_or(CertificationError::Budget("work overflow"))?;
@@ -616,6 +634,7 @@ fn certify<M: CertificationMode>(
             .checked_sub(total_work)
             .ok_or(CertificationError::Budget("retry work"))?;
         let mut report = verify(&candidate, &mut context)?;
+        context.admit_cache()?;
         total_work = total_work
             .checked_add(context.work)
             .ok_or(CertificationError::Budget("retry work"))?;
@@ -743,30 +762,30 @@ fn difference(
         .collect()
 }
 fn bound(values: &[MpComplex], precision: u32) -> CertificationResult<Bound> {
-    let p = usize::try_from(precision).map_err(|_| CertificationError::Budget("precision"))?;
-    let mut lower = checked(BigFloat::from_u64(0, p))?;
+    let p = precision;
+    let mut lower = checked(zero(p))?;
     let mut upper = lower.clone();
     for value in values {
         let magnitude = value.magnitude()?;
         if magnitude.lower() > &lower {
             lower.clone_from(magnitude.lower());
         }
-        upper = checked(upper.add(magnitude.upper(), p, Round::Up))?;
+        upper = checked(up_add(p, &upper, magnitude.upper())?)?;
     }
     Bound::new(lower, upper)
 }
 fn matrix_bound(entries: &[Bound; 4], precision: u32) -> CertificationResult<Bound> {
-    let p = usize::try_from(precision).map_err(|_| CertificationError::Budget("precision"))?;
-    let mut lower = checked(BigFloat::from_u64(0, p))?;
+    let p = precision;
+    let mut lower = checked(zero(p))?;
     let mut squared = lower.clone();
     for entry in entries {
         if entry.lower > lower {
             lower.clone_from(&entry.lower);
         }
-        let term = checked(entry.upper.mul(&entry.upper, p, Round::Up))?;
-        squared = checked(squared.add(&term, p, Round::Up))?;
+        let term = checked(up_mul(p, &entry.upper, &entry.upper)?)?;
+        squared = checked(up_add(p, &squared, &term)?)?;
     }
-    Bound::new(lower, squared.sqrt(p, Round::Up))
+    Bound::new(lower, up_sqrt(p, &squared)?)
 }
 
 fn verify<M: CertificationMode>(
@@ -779,7 +798,7 @@ fn verify<M: CertificationMode>(
     let astar = coefficients(candidate.conjugate_complement(), precision)?;
     let source = expected_source(candidate, precision)?;
     let conversion = bound(&difference(&target, &source, precision)?, precision)?;
-    let controls = product::controls(candidate, precision, &mut context.constants)?;
+    let controls = product::controls(candidate, context)?;
     let actual = product::reconstruct(&controls, context)?;
     let expected = [
         target.clone(),

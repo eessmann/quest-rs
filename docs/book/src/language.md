@@ -70,7 +70,7 @@ Use parentheses when the distinction matters to a reader. Canonical export adds 
 `int`, `uint`, `bit`, and `angle` widths are checked in 1 through 64. Supported floats are binary32 and binary64. Bare integer literals use signed 64-bit arithmetic; floating literals use binary64. `pi` and `π` are floating constants. An integer expression `1 / 2` is zero, so `pi * (1 / 2)` is zero too. Use a floating operand or an explicit cast when floating division is intended.
 
 ```rust
-{{#include ../../../crates/quest-circuit/tests/tutorials.rs:numeric_rules}}
+{{#include ../../../crates/quest-compile/tests/tutorials.rs:numeric_rules}}
 ```
 
 Signed arithmetic overflow is an error. Unsigned arithmetic wraps at its width. Integer narrowing retains the target-width low bits; an `int[8]` conversion of 128 is -128. These rules apply consistently at constant evaluation and execution. Invalid division, shifts, nonfinite results, and out-of-bounds indices are diagnosed rather than delegated to Rust overflow settings.

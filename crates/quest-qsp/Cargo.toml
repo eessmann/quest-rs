@@ -15,7 +15,9 @@ num-complex.workspace = true
 quest-numerics.workspace = true
 quest-polynomial.workspace = true
 rayon = { workspace = true, optional = true }
-astro-float = { workspace = true, features = ["std"], optional = true }
+dashu-base = { workspace = true, optional = true }
+dashu-int = { workspace = true, optional = true }
+dashu-float = { workspace = true, optional = true }
 
 [dev-dependencies]
 criterion.workspace = true
@@ -26,7 +28,7 @@ workspace = true
 
 [features]
 artifact = ["certification", "dep:serde", "dep:serde_json", "dep:sha2"]
-certification = ["dep:astro-float"]
+certification = ["dep:dashu-base", "dep:dashu-int", "dep:dashu-float"]
 offline-synthesis = ["certification"]
 rayon = ["dep:rayon", "quest-numerics/rayon"]
 simd = ["quest-numerics/simd"]

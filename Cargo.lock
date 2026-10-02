@@ -116,38 +116,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "astro-float"
-version = "0.9.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2cf6ecd69dd6fbe3763187ff2fa2b0e475b79f04ed86f631a7bc6b04ede0355e"
-dependencies = [
- "astro-float-macro",
- "astro-float-num",
-]
-
-[[package]]
-name = "astro-float-macro"
-version = "0.4.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9c007205ae7076600c8a59022866990afac02ff186f9031839f67ecce4df2146"
-dependencies = [
- "astro-float-num",
- "proc-macro2",
- "quote",
- "syn 1.0.109",
-]
-
-[[package]]
-name = "astro-float-num"
-version = "0.3.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bc7f6a0312e8f5845f84241b21bd2394d49940b6bc333c6a84f992e6dc9ebb85"
-dependencies = [
- "itertools 0.10.5",
- "lazy_static",
-]
-
-[[package]]
 name = "autocfg"
 version = "1.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -614,6 +582,48 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 3.0.3",
+]
+
+[[package]]
+name = "dashu-base"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "861a614e79388a4c72aa66b0bdabc91e3a4f30d53e0c8d962953e207d75884d0"
+dependencies = [
+ "num-modular",
+]
+
+[[package]]
+name = "dashu-float"
+version = "0.6.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4be5a53987dee3a7e9e874aad24cd42cf074f0aa1e6b4d1230189837ea672a49"
+dependencies = [
+ "dashu-base",
+ "dashu-int",
+ "static_assertions",
+]
+
+[[package]]
+name = "dashu-int"
+version = "0.6.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "64a0490b40a6a3f6427970035f17f76fd59c01d3cd9f9140809672863a0d64c8"
+dependencies = [
+ "cfg-if",
+ "dashu-base",
+ "num-modular",
+ "static_assertions",
+]
+
+[[package]]
+name = "dashu-ratio"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eb0b7e2610ae7f28b2ab8b09229afedc9cbc7a32e7c647b916a3a49ca00123c1"
+dependencies = [
+ "dashu-base",
+ "dashu-int",
 ]
 
 [[package]]
@@ -1463,12 +1473,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "lazy_static"
-version = "1.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bbd2bcb4c963f2ddae06a2efc7e9f3591312473c50c6685e1f298068316e66fe"
-
-[[package]]
 name = "libc"
 version = "0.2.189"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1740,7 +1744,7 @@ version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "35bd024e8b2ff75562e5f34e7f4905839deb4b22955ef5e73d2fea1b9813cb23"
 dependencies = [
- "num-bigint 0.4.8",
+ "num-bigint",
  "num-complex",
  "num-integer",
  "num-iter",
@@ -1756,17 +1760,6 @@ checksum = "c89e69e7e0f03bea5ef08013795c25018e101932225a656383bd384495ecc367"
 dependencies = [
  "num-integer",
  "num-traits",
-]
-
-[[package]]
-name = "num-bigint"
-version = "0.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "93e7820bc0a80a0238e650327316f929ba18d5be054b647490a3a6a339f3e7c0"
-dependencies = [
- "num-integer",
- "num-traits",
- "serde",
 ]
 
 [[package]]
@@ -1799,15 +1792,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "num-modular"
+version = "0.6.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "26ac76200f74e658124f95fa63e1a82b2fd2181c5b2fdde80b3d89d2d3f905e7"
+
+[[package]]
 name = "num-rational"
 version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f83d14da390562dca69fc84082e73e548e1ad308d24accdedd2720017cb37824"
 dependencies = [
- "num-bigint 0.4.8",
+ "num-bigint",
  "num-integer",
  "num-traits",
- "serde",
 ]
 
 [[package]]
@@ -2102,42 +2100,21 @@ dependencies = [
 ]
 
 [[package]]
-name = "quest-circuit"
-version = "0.1.0"
-dependencies = [
- "criterion",
- "faer",
- "googletest",
- "num-bigint 0.5.1",
- "num-complex",
- "num-traits",
- "proptest",
- "quest-compile",
- "quest-language",
- "quest-macros",
- "quest-math",
- "quest-optimizer-protocol",
- "quest-qasm",
- "serde_json",
- "sha2",
- "trybuild",
-]
-
-[[package]]
 name = "quest-compile"
 version = "0.1.0"
 dependencies = [
  "codespan-reporting",
  "criterion",
+ "dashu-base",
+ "dashu-int",
  "faer",
  "googletest",
- "num-bigint 0.5.1",
  "num-complex",
- "num-rational",
  "num-traits",
  "petgraph 0.8.3",
  "proptest",
  "quest-language",
+ "quest-macros",
  "quest-math",
  "quest-optimizer-client",
  "quest-optimizer-protocol",
@@ -2156,13 +2133,15 @@ name = "quest-language"
 version = "0.1.0"
 dependencies = [
  "codespan-reporting",
+ "dashu-base",
+ "dashu-int",
+ "dashu-ratio",
  "faer",
  "googletest",
- "num-bigint 0.5.1",
  "num-complex",
- "num-rational",
  "num-traits",
  "petgraph 0.8.3",
+ "quest-math",
  "quest-symbolic",
  "serde",
  "serde_json",
@@ -2187,11 +2166,12 @@ dependencies = [
 name = "quest-math"
 version = "0.1.0"
 dependencies = [
+ "dashu-base",
+ "dashu-int",
+ "dashu-ratio",
  "googletest",
- "num-bigint 0.5.1",
- "num-rational",
- "num-traits",
  "serde",
+ "serde_json",
  "thiserror 2.0.20",
 ]
 
@@ -2199,6 +2179,10 @@ dependencies = [
 name = "quest-numerics"
 version = "0.1.0"
 dependencies = [
+ "dashu-base",
+ "dashu-float",
+ "dashu-int",
+ "dashu-ratio",
  "googletest",
  "maryada",
  "num-complex",
@@ -2212,10 +2196,10 @@ dependencies = [
 name = "quest-optimizer-client"
 version = "0.1.0"
 dependencies = [
+ "dashu-base",
  "googletest",
  "quest-math",
  "quest-optimizer-protocol",
- "quest-synthesis",
  "rustix",
  "serde_json",
  "tempfile",
@@ -2238,9 +2222,9 @@ name = "quest-optimizer-worker"
 version = "0.1.0"
 dependencies = [
  "color-eyre",
+ "dashu-int",
  "googletest",
- "num-bigint 0.5.1",
- "quest-circuit",
+ "quest-compile",
  "quest-math",
  "quest-optimizer-client",
  "quest-optimizer-protocol",
@@ -2274,8 +2258,10 @@ dependencies = [
 name = "quest-qsp"
 version = "0.1.0"
 dependencies = [
- "astro-float",
  "criterion",
+ "dashu-base",
+ "dashu-float",
+ "dashu-int",
  "googletest",
  "num-complex",
  "quest-numerics",
@@ -2294,7 +2280,7 @@ dependencies = [
  "faer",
  "googletest",
  "num-complex",
- "quest-circuit",
+ "quest-compile",
  "quest-numerics",
  "quest-polynomial",
  "quest-qsp",
@@ -2312,7 +2298,7 @@ dependencies = [
  "hdf5-metno",
  "num-complex",
  "quest-build",
- "quest-circuit",
+ "quest-compile",
  "quest-numerics",
  "quest-polynomial",
  "quest-qsp",
@@ -2352,7 +2338,7 @@ dependencies = [
  "ndarray 0.17.2",
  "num-complex",
  "quest-build",
- "quest-circuit",
+ "quest-compile",
  "quest-qsp",
  "quest-qsvt",
  "quest-sys",
@@ -2364,18 +2350,19 @@ dependencies = [
 name = "quest-symbolic"
 version = "0.1.0"
 dependencies = [
+ "dashu-base",
+ "dashu-int",
+ "dashu-ratio",
  "googletest",
- "num-bigint 0.5.1",
- "num-rational",
- "num-traits",
 ]
 
 [[package]]
 name = "quest-synthesis"
 version = "0.1.0"
 dependencies = [
- "num-bigint 0.5.1",
- "num-traits",
+ "dashu-base",
+ "dashu-int",
+ "dashu-ratio",
  "quest-math",
  "thiserror 2.0.20",
 ]
@@ -2851,6 +2838,12 @@ name = "smallvec"
 version = "1.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b9be42f50aa861c555654aa3a37f52f4b1074bacf4e48fe0ef7fa584e80f1f0f"
+
+[[package]]
+name = "static_assertions"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 
 [[package]]
 name = "strength_reduce"

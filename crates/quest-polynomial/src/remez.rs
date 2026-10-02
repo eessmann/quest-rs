@@ -1,1007 +1,698 @@
+//! One owning exchange engine. Candidate arithmetic and the meaning of its
+//! certificates are independent choices. Every numerical failure returns the
+//! original target, exact request and accumulated evidence.
+mod exchange;
+pub mod linear;
+mod proof;
 use crate::{
-    Callable, Chebyshev, Complex64, ConsistencyAssumption, Error, Expr, Expression, Function,
-    Interval, Jet, Limits, Polynomial, Result,
+    AdmittedFunction, Chebyshev, Complex64, DynamicShape, Error, Limits, Polynomial, Result, Shape,
+    StaticShape, Structural,
 };
-use faer::{
-    Mat, Par,
-    dyn_stack::{MemBuffer, MemStack},
-    linalg::qr::col_pivoting::{factor, solve},
+pub use linear::{LinearSolver, MpHouseholder, PivotedQr};
+use quest_numerics::arithmetic::{
+    ArithmeticError, CertifyingBackend, EnclosureBackend, ExactConstant, F64Backend,
+    Interval64Backend, PointBackend,
 };
-use std::cell::Cell;
+use quest_numerics::arithmetic::{Budget, BudgetedBackend};
+use quest_numerics::roots::RootCover;
+use std::{fmt, marker::PhantomData, sync::Arc};
 
-/// Cold approximation resource and accuracy controls.
-#[derive(Clone, Copy, Debug)]
+/// Source values are retained, without binary64 pre-rounding.
+#[derive(Clone, Debug)]
+pub struct ExactDomain {
+    pub lower: ExactConstant,
+    pub upper: ExactConstant,
+}
+impl ExactDomain {
+    #[must_use]
+    pub const fn new(lower: ExactConstant, upper: ExactConstant) -> Self {
+        Self { lower, upper }
+    }
+    #[must_use]
+    pub const fn binary64(lower: f64, upper: f64) -> Self {
+        Self::new(
+            ExactConstant::Binary64(lower),
+            ExactConstant::Binary64(upper),
+        )
+    }
+}
+#[derive(Clone, Debug)]
+pub enum Accuracy {
+    UniformError(ExactConstant),
+    MinimaxGap(ExactConstant),
+    Both {
+        uniform: ExactConstant,
+        gap: ExactConstant,
+    },
+}
+#[derive(Clone, Debug)]
 pub struct RemezOptions {
-    pub degree: usize,
+    pub accuracy: Accuracy,
+    pub root_width: ExactConstant,
     pub max_iterations: usize,
     pub max_subdivisions: usize,
-    pub root_width: f64,
-    pub tolerance: f64,
     pub limits: Limits,
+    /// Round candidate coefficients to binary64 before any certificate is made.
+    pub export_binary64: bool,
 }
 impl Default for RemezOptions {
     fn default() -> Self {
         Self {
-            degree: 8,
+            accuracy: Accuracy::MinimaxGap(ExactConstant::Binary64(1e-8)),
+            root_width: ExactConstant::Binary64(1e-10),
             max_iterations: 30,
             max_subdivisions: 32768,
-            root_width: 1e-10,
-            tolerance: 1e-8,
             limits: Limits::default(),
+            export_binary64: false,
         }
     }
 }
 #[derive(Debug)]
-pub struct MissingTarget;
+pub struct AuditedEnclosures;
 #[derive(Debug)]
-pub struct HasTarget<E = Expr> {
-    target: Function<E>,
+pub struct AssumedEnclosures;
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum EnclosureAssumption {
+    AllOperationsEncloseTheirMathematicalResult,
 }
-#[derive(Debug)]
-pub struct ReadyRemez<E = Expr> {
-    target: Function<E>,
-    domain: Interval,
-    admission_work: usize,
-}
-/// Required target and domain are supplied through owning state transitions.
+/// Certificate type parameters retain both function and arithmetic admission.
+/// Its constructor is private and only the enclosure proof may create it.
 ///
-/// The polynomial is expressed in the original real variable, using `T_k(x)`.
-/// Its bound applies only on the supplied finite closed interval. The target
-/// must have finite interval enclosures for its first two derivatives there.
-///
-/// ```
-/// use quest_polynomial::{function, Interval, RemezBuilder};
-/// # fn example() -> quest_polynomial::Result<()> {
-/// let result = RemezBuilder::new().target(function!(|x| x.exp()))
-///     .degree(3).tolerance(1e-8)
-///     .domain(Interval::new(-1.0, 1.0)?)?.run()?;
-/// assert!(result.error_bound().upper() < 0.006);
-/// # Ok(())
-/// # }
-/// # example().unwrap();
-/// ```
-///
+/// Conditional functions cannot obtain unconditional evidence:
 /// ```compile_fail
-/// use quest_polynomial::RemezBuilder;
-/// let result = RemezBuilder::new().degree(3).run(); // target/domain missing
+/// use quest_polynomial::{AssumedFunction, ConsistencyAssumption, ExactDomain, RemezRequest, function};
+/// let f = AssumedFunction::new(function!(|x| x), ConsistencyAssumption::SameFunctionAndValidEnclosures);
+/// let result = RemezRequest::binary64(f, ExactDomain::binary64(-1.0, 1.0), 1).run().unwrap();
+/// result.uniform_error().unconditional_bound();
 /// ```
 #[derive(Debug)]
-pub struct RemezBuilder<S = MissingTarget> {
-    state: S,
-    options: RemezOptions,
+pub struct UniformErrorCertificate<T, F, A> {
+    bound: T,
+    _evidence: PhantomData<(F, A)>,
 }
-impl Default for RemezBuilder {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-impl RemezBuilder {
+impl<T, F, A> UniformErrorCertificate<T, F, A> {
     #[must_use]
-    pub fn new() -> Self {
-        Self {
-            state: MissingTarget,
-            options: RemezOptions::default(),
-        }
-    }
-    #[must_use]
-    pub const fn target<E: Expression>(self, target: Function<E>) -> RemezBuilder<HasTarget<E>> {
-        RemezBuilder {
-            state: HasTarget { target },
-            options: self.options,
-        }
+    pub const fn bound(&self) -> &T {
+        &self.bound
     }
 }
-impl<E: Expression> RemezBuilder<HasTarget<E>> {
-    /// # Errors
-    /// Rejects an empty-width domain or a target undefined anywhere in the interval.
-    pub fn domain(self, domain: Interval) -> Result<RemezBuilder<ReadyRemez<E>>> {
-        if domain.lower() >= domain.upper() {
-            return Err(Error::Domain);
-        }
-        let work = Cell::new(0);
-        let target = LimitedFunction {
-            target: &self.state.target,
-            work: &work,
-            limit: self.options.limits.max_work,
-            polynomial_terms: 0,
-        };
-        target.charge(false)?;
-        self.state.target.evaluate_interval(domain)?;
-        Ok(RemezBuilder {
-            state: ReadyRemez {
-                target: self.state.target,
-                domain,
-                admission_work: work.get(),
-            },
-            options: self.options,
-        })
+impl<T> UniformErrorCertificate<T, Structural, AuditedEnclosures> {
+    /// Available only for sealed expressions and audited enclosing arithmetic.
+    #[must_use]
+    pub const fn unconditional_bound(&self) -> &T {
+        &self.bound
     }
 }
-impl<S> RemezBuilder<S> {
-    #[must_use]
-    pub const fn degree(mut self, degree: usize) -> Self {
-        self.options.degree = degree;
-        self
-    }
-    #[must_use]
-    pub const fn tolerance(mut self, tolerance: f64) -> Self {
-        self.options.tolerance = tolerance;
-        self
-    }
-    #[must_use]
-    pub const fn limits(mut self, limits: Limits) -> Self {
-        self.options.limits = limits;
-        self
-    }
-    #[must_use]
-    pub const fn options(mut self, options: RemezOptions) -> Self {
-        self.options = options;
-        self
-    }
-}
-impl<E: Expression> RemezBuilder<ReadyRemez<E>> {
-    /// # Errors
-    /// Rejects invalid configuration, failed solves/exchanges, exhausted budgets, or insufficient enclosures.
-    /// This compatibility adapter drops the original request on error; use
-    /// `run_reported` to retain the typed target and configuration.
-    pub fn run(self) -> Result<RemezResult<E>> {
-        self.run_reported().map_err(|failure| failure.error)
-    }
-}
-/// Failed native approximation retaining its original mathematical request.
 #[derive(Debug)]
-pub struct RemezFailure<E = Expr> {
-    target: Function<E>,
-    domain: Interval,
-    options: RemezOptions,
-    error: Error,
+pub struct MinimaxGapCertificate<T, F, A> {
+    lower: T,
+    gap: T,
+    _evidence: PhantomData<(F, A)>,
 }
-impl<E> RemezFailure<E> {
+impl<T, F, A> MinimaxGapCertificate<T, F, A> {
     #[must_use]
-    pub const fn target(&self) -> &Function<E> {
-        &self.target
+    pub const fn lower_bound(&self) -> &T {
+        &self.lower
     }
     #[must_use]
-    pub const fn domain(&self) -> Interval {
-        self.domain
-    }
-    #[must_use]
-    pub const fn options(&self) -> RemezOptions {
-        self.options
-    }
-    #[must_use]
-    pub const fn error(&self) -> &Error {
-        &self.error
-    }
-    #[must_use]
-    pub fn into_parts(self) -> (Function<E>, Interval, RemezOptions, Error) {
-        (self.target, self.domain, self.options, self.error)
+    pub const fn gap(&self) -> &T {
+        &self.gap
     }
 }
-impl<E: Expression> RemezBuilder<ReadyRemez<E>> {
-    /// Run while retaining the original target and request on numerical failure.
-    /// # Errors
-    /// Returns the original request and the same error as the compatibility `run`.
-    pub fn run_reported(self) -> std::result::Result<RemezResult<E>, RemezFailure<E>> {
-        remez_impl(
-            &self.state.target,
-            self.state.domain,
-            self.options,
-            self.state.admission_work,
-        )
-        .map_err(|error| RemezFailure {
-            target: self.state.target,
-            domain: self.state.domain,
-            options: self.options,
-            error,
-        })
-    }
-}
-/// An admitted approximation with an interval upper bound for the actual fixed
-/// binary64 polynomial and an alternation lower bound for the minimax error.
+/// A request is constructed with all required inputs. Static coefficient counts
+/// are part of this same type; no separate forwarding builder is involved.
 ///
-/// Successful construction establishes their gap is at most the requested tolerance.
-#[derive(Debug, Clone)]
-pub struct RemezResult<E = Expr> {
-    target: Function<E>,
-    data: ApproximationData,
-}
-#[derive(Debug, Clone)]
-struct ApproximationData {
-    polynomial: Polynomial<Chebyshev>,
-    error_bound: Interval,
-    minimax_lower_bound: f64,
-    iterations: usize,
-    domain: Interval,
-}
-impl<E: Expression> RemezResult<E> {
-    #[must_use]
-    pub const fn target(&self) -> &Function<E> {
-        &self.target
-    }
-    #[must_use]
-    pub const fn polynomial(&self) -> &Polynomial<Chebyshev> {
-        &self.data.polynomial
-    }
-    #[must_use]
-    pub const fn error_bound(&self) -> Interval {
-        self.data.error_bound
-    }
-    #[must_use]
-    pub const fn minimax_lower_bound(&self) -> f64 {
-        self.data.minimax_lower_bound
-    }
-    #[must_use]
-    pub const fn iterations(&self) -> usize {
-        self.data.iterations
-    }
-    #[must_use]
-    pub const fn domain(&self) -> Interval {
-        self.data.domain
-    }
-    #[must_use]
-    pub fn into_polynomial(self) -> Polynomial<Chebyshev> {
-        self.data.polynomial
-    }
-}
-/// A stationary-point box with separately established existence and uniqueness.
-#[derive(Debug, Clone, Copy)]
-/// `unique` establishes at most one root; `exists` establishes at least one.
-pub struct CriticalPoint {
-    pub interval: Interval,
-    pub exists: bool,
-    pub unique: bool,
-}
-/// Every stationary point lies in one of these boxes. Boxes can overlap at
-/// subdivision endpoints; unresolved boxes are not asserted to contain roots.
-#[derive(Debug, Clone)]
-pub struct CriticalPoints {
-    pub boxes: Vec<CriticalPoint>,
-    pub examined: usize,
-}
-/// # Errors
-/// Rejects invalid configuration, exhausted subdivision budgets or undefined derivatives.
-pub fn isolate_critical_points<E: Expression>(
-    function: &Function<E>,
-    domain: Interval,
-    width: f64,
-    max_subdivisions: usize,
-) -> Result<CriticalPoints> {
-    let work = Cell::new(0);
-    let function = LimitedFunction {
-        target: function,
-        work: &work,
-        limit: Limits::default().max_work,
-        polynomial_terms: 0,
-    };
-    isolate(
-        |x| function.jet_interval(x),
-        domain,
-        width,
-        max_subdivisions,
-    )
-}
-fn midpoint(x: Interval) -> f64 {
-    0.5_f64.mul_add(x.lower(), 0.5 * x.upper())
-}
-fn opposite(a: Interval, b: Interval) -> bool {
-    (a.upper() < 0.0 && b.lower() > 0.0) || (a.lower() > 0.0 && b.upper() < 0.0)
-}
-fn isolate(
-    jet: impl Fn(Interval) -> Result<Jet<Interval>>,
-    domain: Interval,
-    width: f64,
-    budget: usize,
-) -> Result<CriticalPoints> {
-    if !width.is_finite() || width <= 0.0 || budget == 0 {
-        return Err(Error::Domain);
-    }
-    let mut pending = vec![domain];
-    let mut boxes = Vec::new();
-    let mut examined = 0_usize;
-    while let Some(interval) = pending.pop() {
-        examined = examined.checked_add(1).ok_or(Error::Budget("root work"))?;
-        if examined > budget {
-            return Err(Error::NotEstablished("stationary-point subdivision budget"));
-        }
-        let j = jet(interval)?;
-        if !j.first.contains(0.0) {
-            continue;
-        }
-        let middle = midpoint(interval);
-        if interval.upper() - interval.lower() <= width
-            || middle <= interval.lower()
-            || middle >= interval.upper()
-        {
-            let a = jet(Interval::point(interval.lower())?)?.first;
-            let b = jet(Interval::point(interval.upper())?)?.first;
-            let exists = opposite(a, b)
-                || (a.lower() == 0.0 && a.upper() == 0.0)
-                || (b.lower() == 0.0 && b.upper() == 0.0);
-            boxes.push(CriticalPoint {
-                interval,
-                exists,
-                unique: !j.second.contains(0.0),
-            });
-            continue;
-        }
-        if j.first.lower() == 0.0 && j.first.upper() == 0.0 {
-            boxes.push(CriticalPoint {
-                interval,
-                exists: true,
-                unique: false,
-            });
-            continue;
-        }
-        pending.push(Interval::new(middle, interval.upper())?);
-        pending.push(Interval::new(interval.lower(), middle)?);
-    }
-    Ok(CriticalPoints { boxes, examined })
-}
-fn residual_jet<F: Callable>(
-    f: &F,
-    p: &Polynomial<Chebyshev>,
-    x: Interval,
-) -> Result<Jet<Interval>> {
-    let f = f.jet_interval(x)?;
-    let p = p.jet_interval(x)?;
-    Ok(Jet {
-        value: f.value.checked_sub(p.value)?,
-        first: f.first.checked_sub(p.first)?,
-        second: f.second.checked_sub(p.second)?,
-    })
-}
-fn residual<F: Callable>(f: &F, p: &Polynomial<Chebyshev>, x: f64) -> Result<f64> {
-    let v = f.evaluate(x)? - p.evaluate_real(x)?;
-    if !v.is_finite() {
-        return Err(Error::NonFinite);
-    }
-    Ok(v)
-}
-fn magnitude(x: Interval) -> f64 {
-    x.lower().abs().max(x.upper().abs())
-}
-fn bound<F: Callable>(
-    f: &F,
-    p: &Polynomial<Chebyshev>,
-    domain: Interval,
-    roots: &CriticalPoints,
-) -> Result<f64> {
-    let mut bound = 0.0_f64;
-    for x in [domain.lower(), domain.upper()] {
-        bound = bound.max(magnitude(residual_jet(f, p, Interval::point(x)?)?.value));
-    }
-    for root in &roots.boxes {
-        // Both the direct enclosure and centered mean-value enclosure are valid.
-        let center = midpoint(root.interval);
-        let j = residual_jet(f, p, root.interval)?;
-        let at_center = residual_jet(f, p, Interval::point(center)?)?.value;
-        let delta = root.interval.checked_sub(Interval::point(center)?)?;
-        let centered = at_center.checked_add(j.first.checked_mul(delta)?)?;
-        bound = bound.max(magnitude(j.value).min(magnitude(centered)));
-    }
-    Ok(bound)
-}
-fn cheb(x: f64, degree: usize) -> f64 {
-    let mut previous = 1.0;
-    let mut current = x;
-    if degree == 0 {
-        return previous;
-    }
-    for _ in 1..degree {
-        let next = (2.0 * x).mul_add(current, -previous);
-        previous = current;
-        current = next;
-    }
-    current
-}
-fn solve_reference<F: Callable>(
-    f: &F,
-    reference: &[f64],
-    options: RemezOptions,
-) -> Result<Polynomial<Chebyshev>> {
-    let n = reference.len();
-    let degree = options.degree;
-    let par = Par::Seq;
-    let mut matrix = Mat::from_fn(n, n, |i, j| {
-        if j > degree {
-            if i % 2 == 0 { 1.0 } else { -1.0 }
-        } else {
-            cheb(reference.get(i).copied().unwrap_or(f64::NAN), j)
-        }
-    });
-    let mut rhs = Mat::zeros(n, 1);
-    for (i, x) in reference.iter().enumerate() {
-        *rhs.get_mut(i, 0) = f.evaluate(*x)?;
-    }
-    let mut forward = vec![0_usize; n];
-    let mut backward = vec![0_usize; n];
-    let mut coefficients = Mat::zeros(1, n);
-    let req = factor::qr_in_place_scratch::<usize, f64>(n, n, 1, par, faer::Spec::default());
-    let mut scratch = MemBuffer::new(req);
-    let (_, permutation) = factor::qr_in_place(
-        matrix.as_mut(),
-        coefficients.as_mut(),
-        &mut forward,
-        &mut backward,
-        par,
-        MemStack::new(&mut scratch),
-        faer::Spec::default(),
-    );
-    let scale = matrix.get(0, 0).abs();
-    for i in 0..n {
-        let diagonal = *matrix.get(i, i);
-        if !diagonal.is_finite() || diagonal.abs() <= scale * 1e-14 {
-            return Err(Error::NotEstablished("rank deficient alternation system"));
-        }
-    }
-    let mut scratch = MemBuffer::new(solve::solve_in_place_scratch::<usize, f64>(n, 1, 1, par));
-    solve::solve_in_place(
-        matrix.as_ref(),
-        coefficients.as_ref(),
-        matrix.as_ref(),
-        permutation,
-        rhs.as_mut(),
-        par,
-        MemStack::new(&mut scratch),
-    );
-    let count = degree.checked_add(1).ok_or(Error::SupportOverflow)?;
-    let values = (0..count)
-        .map(|i| Complex64::new(*rhs.get(i, 0), 0.0))
-        .collect();
-    let p = Polynomial::new(Chebyshev, values, options.limits)?;
-    for (i, x) in reference.iter().enumerate() {
-        let sign: f64 = if i % 2 == 0 { 1.0 } else { -1.0 };
-        let r = sign.mul_add(*rhs.get(n.saturating_sub(1), 0), p.evaluate_real(*x)?)
-            - f.evaluate(*x)?;
-        if !r.is_finite() || r.abs() > options.tolerance * 0.1 {
-            return Err(Error::NotEstablished("alternation solve residual"));
-        }
-    }
-    Ok(p)
-}
-/// Convenience adapter to the stateful builder.
-/// # Errors
-/// Same mathematical, numerical and resource failures as `RemezBuilder::run`.
-pub fn remez<E: Expression>(
-    target: &Function<E>,
-    domain: Interval,
-    options: RemezOptions,
-) -> Result<RemezResult<E>> {
-    RemezBuilder::new()
-        .target(target.clone())
-        .options(options)
-        .domain(domain)?
-        .run()
-}
-// Conservatively charge a complete value/jet traversal before entering it.
-// Metadata is cached for dynamic DAGs, so rejected work is never expanded.
-struct LimitedFunction<'a, E> {
-    target: &'a Function<E>,
-    work: &'a Cell<usize>,
-    limit: usize,
-    polynomial_terms: usize,
-}
-impl<E: Expression> LimitedFunction<'_, E> {
-    fn charge(&self, jet: bool) -> Result<()> {
-        let units = self
-            .target
-            .metadata()
-            .nodes
-            .checked_add(self.polynomial_terms)
-            .and_then(|nodes| nodes.checked_mul(if jet { 48 } else { 2 }))
-            .and_then(|units| units.checked_add(if jet { 2 } else { 0 }))
-            .ok_or(Error::Budget("Remez expression work"))?;
-        let total = self
-            .work
-            .get()
-            .checked_add(units)
-            .ok_or(Error::Budget("Remez expression work"))?;
-        if total > self.limit {
-            return Err(Error::Budget("Remez expression work"));
-        }
-        self.work.set(total);
-        Ok(())
-    }
-}
-impl<E: Expression> Callable for LimitedFunction<'_, E> {
-    fn evaluate(&self, x: f64) -> Result<f64> {
-        self.charge(false)?;
-        self.target.evaluate(x)
-    }
-    fn jet_interval(&self, x: Interval) -> Result<Jet<Interval>> {
-        self.charge(true)?;
-        self.target.jet_interval(x)
-    }
-}
-fn qr_work(options: RemezOptions) -> Result<usize> {
-    let count = options
-        .degree
-        .checked_add(2)
-        .ok_or(Error::Budget("degree"))?;
-    count
-        .checked_mul(count)
-        .and_then(|n| n.checked_mul(count))
-        .and_then(|n| n.checked_mul(options.max_iterations))
-        .ok_or(Error::Budget("Remez work"))
-}
-fn remez_impl<E: Expression>(
-    f: &Function<E>,
-    domain: Interval,
-    options: RemezOptions,
-    admission_work: usize,
-) -> Result<RemezResult<E>> {
-    let initial = qr_work(options)?
-        .checked_add(admission_work)
-        .ok_or(Error::Budget("Remez work"))?;
-    if initial > options.limits.max_work {
-        return Err(Error::Budget("Remez work"));
-    }
-    let work = Cell::new(initial);
-    let target = LimitedFunction {
-        target: f,
-        work: &work,
-        limit: options.limits.max_work,
-        polynomial_terms: options
-            .degree
-            .checked_add(1)
-            .ok_or(Error::Budget("degree"))?,
-    };
-    Ok(RemezResult {
-        target: f.clone(),
-        data: remez_candidate(&target, domain, options)?,
-    })
-}
-fn remez_candidate<F: Callable>(
-    f: &F,
-    domain: Interval,
-    options: RemezOptions,
-) -> Result<ApproximationData> {
-    let count = options
-        .degree
-        .checked_add(2)
-        .ok_or(Error::Budget("degree"))?;
-    options.limits.check(count, 10)?;
-    let work = qr_work(options)?;
-    if work > options.limits.max_work
-        || count
-            .checked_mul(count)
-            .and_then(|n| n.checked_mul(32))
-            .ok_or(Error::Budget("Remez storage"))?
-            > options.limits.max_bytes
-    {
-        return Err(Error::Budget("Remez workspace"));
-    }
-    if !options.tolerance.is_finite() || options.tolerance <= 0.0 || options.max_iterations == 0 {
-        return Err(Error::Domain);
-    }
-    let divisor =
-        f64::from(u32::try_from(count.saturating_sub(1)).map_err(|_| Error::Budget("degree"))?);
-    let center = midpoint(domain);
-    let radius = 0.5_f64.mul_add(-domain.lower(), 0.5 * domain.upper());
-    let mut reference = Vec::with_capacity(count);
-    for i in 0..count {
-        let theta = std::f64::consts::PI
-            * f64::from(u32::try_from(i).map_err(|_| Error::SupportOverflow)?)
-            / divisor;
-        reference.push((-radius).mul_add(theta.cos(), center));
-    }
-    if let Some(x) = reference.first_mut() {
-        *x = domain.lower();
-    }
-    if let Some(x) = reference.last_mut() {
-        *x = domain.upper();
-    }
-    for iteration in 0..options.max_iterations {
-        let p = solve_reference(f, &reference, options)?;
-        let roots = isolate(
-            |x| residual_jet(f, &p, x),
-            domain,
-            options.root_width,
-            options.max_subdivisions,
-        )?;
-        let upper = bound(f, &p, domain, &roots)?;
-        let mut points = vec![domain.lower()];
-        points.extend(roots.boxes.iter().map(|root| midpoint(root.interval)));
-        points.push(domain.upper());
-        points.sort_by(f64::total_cmp);
-        points.dedup();
-        let mut extrema: Vec<(f64, f64)> = Vec::new();
-        for x in points {
-            let value = residual(f, &p, x)?;
-            if let Some(last) = extrema.last_mut()
-                && last.1.is_sign_positive() == value.is_sign_positive()
-            {
-                if value.abs() > last.1.abs() {
-                    *last = (x, value);
-                }
-                continue;
-            }
-            extrema.push((x, value));
-        }
-        let (lower, best) = alternation_bound(f, &p, &extrema, count)?;
-        if Interval::point(upper)?
-            .checked_sub(Interval::point(lower)?)?
-            .upper()
-            <= options.tolerance
-        {
-            return Ok(ApproximationData {
-                polynomial: p,
-                error_bound: Interval::new(0.0, upper)?,
-                minimax_lower_bound: lower,
-                iterations: iteration.saturating_add(1),
-                domain,
-            });
-        }
-        let start = best.ok_or(Error::NotEstablished("insufficient strict alternation"))?;
-        reference.clear();
-        reference.extend(extrema.iter().skip(start).take(count).map(|(x, _)| *x));
-    }
-    Err(Error::NotEstablished("Remez iteration budget"))
-}
-
-fn alternation_bound<F: Callable>(
-    f: &F,
-    p: &Polynomial<Chebyshev>,
-    extrema: &[(f64, f64)],
-    count: usize,
-) -> Result<(f64, Option<usize>)> {
-    let mut lower = 0.0_f64;
-    let mut best = None;
-    for (start, window) in extrema.windows(count).enumerate() {
-        let mut candidate = f64::INFINITY;
-        let mut previous = None;
-        for (x, _) in window {
-            let enclosure = residual_jet(f, p, Interval::point(*x)?)?.value;
-            let (sign, amplitude) = if enclosure.lower() > 0.0 {
-                (true, enclosure.lower())
-            } else if enclosure.upper() < 0.0 {
-                (false, -enclosure.upper())
-            } else {
-                candidate = 0.0;
-                break;
-            };
-            if previous == Some(sign) {
-                candidate = 0.0;
-                break;
-            }
-            previous = Some(sign);
-            candidate = candidate.min(amplitude);
-        }
-        if candidate > lower {
-            lower = candidate;
-            best = Some(start);
-        }
-    }
-
-    Ok((lower, best))
-}
-
-/// Compile-time degree witness. Coefficient and alternation dimensions are
-/// checked by generic const expressions; convergence remains a runtime result.
-///
+/// Arithmetic admission is required independently of structural functions:
 /// ```compile_fail
-/// #![feature(generic_const_exprs)]
-/// use quest_polynomial::{StaticRemezResult, Expr, Complex64};
-/// fn wrong(result: StaticRemezResult<Expr, 3>) {
-///     let _: &[Complex64; 5] = result.coefficients().unwrap();
+/// use quest_numerics::arithmetic::{EnclosureBackend, F64Backend};
+/// use quest_polynomial::{DynamicShape, ExactDomain, PivotedQr, RemezRequest, function};
+/// fn unreviewed<I: EnclosureBackend<Endpoint=f64, Error=quest_numerics::arithmetic::ArithmeticError>>(intervals: I) {
+///     RemezRequest::new(function!(|x| x), ExactDomain::binary64(-1.0,1.0), DynamicShape(2), F64Backend, intervals, PivotedQr);
 /// }
 /// ```
 ///
+/// Degree relationships are checked, including overflow:
 /// ```compile_fail
 /// #![feature(generic_const_exprs)]
-/// use quest_polynomial::StaticDegree;
-/// let _ = StaticDegree::<{usize::MAX}>::new();
+/// #![allow(incomplete_features)]
+/// use quest_polynomial::{ExactDomain, RemezRequest, function};
+/// let request = RemezRequest::binary64(function!(|x| x), ExactDomain::binary64(-1.0,1.0), 1).degree::<{usize::MAX}>();
 /// ```
-#[derive(Debug, Clone, Copy, Default)]
-pub struct StaticDegree<const N: usize>
+pub struct RemezRequest<F, P, I, D = DynamicShape, L = PivotedQr, A = AuditedEnclosures> {
+    target: F,
+    domain: ExactDomain,
+    shape: D,
+    point: P,
+    enclosure: I,
+    solver: L,
+    options: RemezOptions,
+    enclosure_assumption: Option<EnclosureAssumption>,
+    requested_degree: Option<usize>,
+    precision_policy: Option<PrecisionAttempts>,
+    _admission: PhantomData<A>,
+}
+impl<F, P, I, D, L> RemezRequest<F, P, I, D, L, AuditedEnclosures>
 where
-    [(); N + 1]:,
-    [(); N + 2]:;
-impl<const N: usize> StaticDegree<N>
-where
-    [(); N + 1]:,
-    [(); N + 2]:,
+    F: AdmittedFunction,
+    P: PointBackend<Error = ArithmeticError>,
+    I: CertifyingBackend<Endpoint = P::Scalar, Error = ArithmeticError>,
+    D: Shape,
 {
     #[must_use]
-    pub const fn new() -> Self {
-        Self
-    }
-    #[must_use]
-    pub const fn coefficient_count(self) -> usize {
-        N.saturating_add(1)
-    }
-    #[must_use]
-    pub const fn alternation_count(self) -> usize {
-        N.saturating_add(2)
+    pub fn new(
+        target: F,
+        domain: ExactDomain,
+        shape: D,
+        point: P,
+        enclosure: I,
+        solver: L,
+    ) -> Self {
+        Self {
+            target,
+            domain,
+            shape,
+            point,
+            enclosure,
+            solver,
+            options: RemezOptions::default(),
+            enclosure_assumption: None,
+            requested_degree: None,
+            precision_policy: None,
+            _admission: PhantomData,
+        }
     }
 }
-#[derive(Debug)]
-pub struct StaticRemezBuilder<S, const N: usize>
+impl<F: AdmittedFunction> RemezRequest<F, F64Backend, Interval64Backend> {
+    #[must_use]
+    pub fn binary64(target: F, domain: ExactDomain, degree: usize) -> Self {
+        // Overflow is represented as an invalid empty shape and rejected by run,
+        // where the complete original request is retained.
+        let mut request = Self::new(
+            target,
+            domain,
+            DynamicShape(degree.checked_add(1).unwrap_or(0)),
+            F64Backend,
+            Interval64Backend,
+            PivotedQr,
+        );
+        request.requested_degree = Some(degree);
+        request
+    }
+}
+impl<F, P, I, D, L> RemezRequest<F, P, I, D, L, AssumedEnclosures>
 where
-    [(); N + 1]:,
-    [(); N + 2]:,
+    F: AdmittedFunction,
+    P: PointBackend<Error = ArithmeticError>,
+    I: EnclosureBackend<Endpoint = P::Scalar, Error = ArithmeticError>,
+    D: Shape,
 {
-    inner: RemezBuilder<S>,
-}
-impl<S> RemezBuilder<S> {
     #[must_use]
-    pub const fn static_degree<const N: usize>(self, _: StaticDegree<N>) -> StaticRemezBuilder<S, N>
+    pub fn assuming_enclosures(
+        target: F,
+        domain: ExactDomain,
+        shape: D,
+        point: P,
+        enclosure: I,
+        solver: L,
+        assumption: EnclosureAssumption,
+    ) -> Self {
+        Self {
+            target,
+            domain,
+            shape,
+            point,
+            enclosure,
+            solver,
+            options: RemezOptions::default(),
+            enclosure_assumption: Some(assumption),
+            requested_degree: None,
+            precision_policy: None,
+            _admission: PhantomData,
+        }
+    }
+}
+impl<F, P, I, D, L, A> RemezRequest<F, P, I, D, L, A> {
+    #[must_use]
+    pub fn options(mut self, options: RemezOptions) -> Self {
+        self.options = options;
+        self
+    }
+    #[must_use]
+    pub fn accuracy(mut self, accuracy: Accuracy) -> Self {
+        self.options.accuracy = accuracy;
+        self
+    }
+    #[must_use]
+    pub const fn export_binary64(mut self) -> Self {
+        self.options.export_binary64 = true;
+        self
+    }
+    #[must_use]
+    pub const fn target(&self) -> &F {
+        &self.target
+    }
+    #[must_use]
+    pub const fn requested_degree(&self) -> Option<usize> {
+        self.requested_degree
+    }
+    #[must_use]
+    pub const fn precision_policy(&self) -> Option<&PrecisionAttempts> {
+        self.precision_policy.as_ref()
+    }
+    #[must_use]
+    pub const fn domain(&self) -> &ExactDomain {
+        &self.domain
+    }
+    #[must_use]
+    pub const fn configuration(&self) -> &RemezOptions {
+        &self.options
+    }
+    #[must_use]
+    pub const fn shape(&self) -> &D {
+        &self.shape
+    }
+    #[must_use]
+    pub const fn enclosure_assumption(&self) -> Option<EnclosureAssumption> {
+        self.enclosure_assumption
+    }
+    /// Compile-time degree plus one is checked by the pinned nightly compiler.
+    #[must_use]
+    pub fn degree<const N: usize>(self) -> RemezRequest<F, P, I, StaticShape<{ N + 1 }>, L, A>
     where
         [(); N + 1]:,
         [(); N + 2]:,
     {
-        StaticRemezBuilder {
-            inner: self.degree(N),
-        }
-    }
-}
-impl<const N: usize> StaticRemezBuilder<MissingTarget, N>
-where
-    [(); N + 1]:,
-    [(); N + 2]:,
-{
-    #[must_use]
-    pub const fn target<E: Expression>(
-        self,
-        target: Function<E>,
-    ) -> StaticRemezBuilder<HasTarget<E>, N> {
-        StaticRemezBuilder {
-            inner: self.inner.target(target),
-        }
-    }
-}
-impl<E: Expression, const N: usize> StaticRemezBuilder<HasTarget<E>, N>
-where
-    [(); N + 1]:,
-    [(); N + 2]:,
-{
-    /// # Errors
-    /// Propagates the runtime domain, numerical or resource failure.
-    pub fn domain(self, domain: Interval) -> Result<StaticRemezBuilder<ReadyRemez<E>, N>> {
-        Ok(StaticRemezBuilder {
-            inner: self.inner.domain(domain)?,
-        })
-    }
-}
-impl<S, const N: usize> StaticRemezBuilder<S, N>
-where
-    [(); N + 1]:,
-    [(); N + 2]:,
-{
-    #[must_use]
-    pub fn tolerance(self, tolerance: f64) -> Self {
-        Self {
-            inner: self.inner.tolerance(tolerance),
-        }
-    }
-    #[must_use]
-    pub fn limits(self, limits: Limits) -> Self {
-        Self {
-            inner: self.inner.limits(limits),
-        }
-    }
-    /// Runtime options retain the statically selected degree.
-    #[must_use]
-    pub fn options(self, options: RemezOptions) -> Self {
-        Self {
-            inner: self.inner.options(options).degree(N),
-        }
-    }
-}
-#[derive(Debug)]
-pub struct StaticRemezResult<E: Expression, const N: usize>
-where
-    [(); N + 1]:,
-{
-    result: RemezResult<E>,
-}
-impl<E: Expression, const N: usize> StaticRemezResult<E, N>
-where
-    [(); N + 1]:,
-{
-    #[must_use]
-    pub const fn result(&self) -> &RemezResult<E> {
-        &self.result
-    }
-    /// Borrow the certified coefficients without allocating or copying an array.
-    /// # Errors
-    /// Defensively checks the dimension already admitted at construction.
-    pub fn coefficients(&self) -> Result<&[Complex64; N + 1]> {
-        self.result
-            .polynomial()
-            .coefficients()
-            .try_into()
-            .map_err(|_| Error::NotEstablished("static coefficient dimension"))
-    }
-}
-impl<E: Expression, const N: usize> StaticRemezBuilder<ReadyRemez<E>, N>
-where
-    [(); N + 1]:,
-    [(); N + 2]:,
-{
-    /// # Errors
-    /// Propagates the runtime domain, numerical or resource failure.
-    pub fn run(self) -> Result<StaticRemezResult<E, N>> {
-        self.run_reported().map_err(|failure| failure.error)
-    }
-    /// Retain the original typed target and static degree request on failure.
-    /// # Errors
-    /// Returns the same failure as `run`, retaining the owned original request.
-    pub fn run_reported(self) -> std::result::Result<StaticRemezResult<E, N>, RemezFailure<E>> {
-        let options = self.inner.options;
-        let result = self.inner.run_reported()?;
-        if result.polynomial().coefficients().len() != N.saturating_add(1) {
-            return Err(RemezFailure {
-                domain: result.domain(),
-                target: result.target,
-                options,
-                error: Error::NotEstablished("static coefficient dimension"),
-            });
-        }
-        Ok(StaticRemezResult { result })
-    }
-}
-
-/// Callable target admitted only under an explicit mathematical premise.
-#[derive(Debug)]
-pub struct HasCallable<C> {
-    target: C,
-    assumption: ConsistencyAssumption,
-}
-#[derive(Debug)]
-pub struct ReadyCallable<C> {
-    target: C,
-    assumption: ConsistencyAssumption,
-    domain: Interval,
-}
-impl RemezBuilder {
-    #[must_use]
-    pub const fn callable<C: Callable>(
-        self,
-        target: C,
-        assumption: ConsistencyAssumption,
-    ) -> RemezBuilder<HasCallable<C>> {
-        RemezBuilder {
-            state: HasCallable { target, assumption },
+        RemezRequest {
+            target: self.target,
+            domain: self.domain,
+            shape: StaticShape,
+            point: self.point,
+            enclosure: self.enclosure,
+            solver: self.solver,
             options: self.options,
+            enclosure_assumption: self.enclosure_assumption,
+            requested_degree: Some(N),
+            precision_policy: self.precision_policy,
+            _admission: PhantomData,
         }
     }
 }
-impl<C: Callable> RemezBuilder<HasCallable<C>> {
+#[derive(Debug)]
+pub struct Attempt<C, T, D: Shape> {
+    pub precision_bits: usize,
+    pub iterations: usize,
+    pub work: usize,
+    pub candidate: Option<Polynomial<Chebyshev, C, D>>,
+    pub coverage: Option<RootCover<T>>,
+    pub binary64_export: Option<Arc<[f64]>>,
+}
+pub struct RemezResult<F: AdmittedFunction, P: PointBackend, I: EnclosureBackend, D: Shape, L, A> {
+    request: RemezRequest<F, P, I, D, L, A>,
+    polynomial: Polynomial<Chebyshev, P::Scalar, D>,
+    binary64_export: Option<Arc<[f64]>>,
+    uniform: UniformErrorCertificate<I::Scalar, F::Evidence, A>,
+    minimax: MinimaxGapCertificate<I::Scalar, F::Evidence, A>,
+    attempts: Vec<Attempt<P::Scalar, I::Scalar, D>>,
+}
+impl<F: AdmittedFunction, P: PointBackend, I: EnclosureBackend, D: Shape, L, A>
+    RemezResult<F, P, I, D, L, A>
+{
+    #[must_use]
+    pub const fn target(&self) -> &F {
+        &self.request.target
+    }
+    #[must_use]
+    pub const fn request(&self) -> &RemezRequest<F, P, I, D, L, A> {
+        &self.request
+    }
+    #[must_use]
+    pub const fn polynomial(&self) -> &Polynomial<Chebyshev, P::Scalar, D> {
+        &self.polynomial
+    }
+    #[must_use]
+    pub const fn uniform_error(&self) -> &UniformErrorCertificate<I::Scalar, F::Evidence, A> {
+        &self.uniform
+    }
+    #[must_use]
+    pub const fn minimax_gap(&self) -> &MinimaxGapCertificate<I::Scalar, F::Evidence, A> {
+        &self.minimax
+    }
+    #[must_use]
+    pub fn attempts(&self) -> &[Attempt<P::Scalar, I::Scalar, D>] {
+        &self.attempts
+    }
+    #[must_use]
+    pub fn into_polynomial(self) -> Polynomial<Chebyshev, P::Scalar, D> {
+        self.polynomial
+    }
+    /// Explicit binary64 interchange for QSP and other numerical consumers.
     /// # Errors
-    /// Propagates the runtime domain, numerical or resource failure.
-    pub fn domain(self, domain: Interval) -> Result<RemezBuilder<ReadyCallable<C>>> {
-        if domain.lower() >= domain.upper() {
-            return Err(Error::Domain);
-        }
-        self.state.target.jet_interval(domain)?;
-        Ok(RemezBuilder {
-            state: ReadyCallable {
-                target: self.state.target,
-                assumption: self.state.assumption,
-                domain,
-            },
-            options: self.options,
-        })
+    /// Requires that this exact export was selected before certification.
+    pub fn binary64_polynomial(&self) -> Result<Polynomial<Chebyshev>> {
+        let payload = self
+            .binary64_export
+            .as_ref()
+            .ok_or(Error::NotEstablished("binary64 export was not certified"))?;
+        let values = payload
+            .iter()
+            .map(|value| Complex64::new(*value, 0.0))
+            .collect();
+        Polynomial::new(Chebyshev, values, self.request.options.limits)
     }
 }
-/// Bounds conditional on the retained caller premise.
-///
-/// This type cannot become
-/// an unconditional expression-backed `RemezResult`. Callable execution cost is
-/// caller-controlled; numerical budgets do not bound work inside callbacks.
-///
-/// ```compile_fail
-/// use quest_polynomial::{ConditionalRemezResult, RemezResult};
-/// fn forge<C>(conditional: ConditionalRemezResult<C>) -> RemezResult {
-///     conditional.into()
-/// }
-/// ```
-#[derive(Debug)]
-pub struct ConditionalRemezResult<C> {
-    target: C,
-    assumption: ConsistencyAssumption,
-    data: ApproximationData,
-}
-impl<C> ConditionalRemezResult<C> {
-    #[must_use]
-    pub const fn target(&self) -> &C {
-        &self.target
-    }
-    #[must_use]
-    pub const fn assumption(&self) -> ConsistencyAssumption {
-        self.assumption
-    }
-    #[must_use]
-    pub const fn polynomial(&self) -> &Polynomial<Chebyshev> {
-        &self.data.polynomial
-    }
-    /// Uniform error bound, valid only under `assumption()`.
-    #[must_use]
-    pub const fn conditional_error_bound(&self) -> Interval {
-        self.data.error_bound
-    }
-    /// Alternation lower bound, valid only under `assumption()`.
-    #[must_use]
-    pub const fn conditional_minimax_lower_bound(&self) -> f64 {
-        self.data.minimax_lower_bound
-    }
-    #[must_use]
-    pub const fn iterations(&self) -> usize {
-        self.data.iterations
-    }
-    #[must_use]
-    pub const fn domain(&self) -> Interval {
-        self.data.domain
-    }
-}
-/// Failed conditional request, retaining the callable and its semantic premise.
-#[derive(Debug)]
-pub struct ConditionalRemezFailure<C> {
-    target: C,
-    assumption: ConsistencyAssumption,
-    domain: Interval,
-    options: RemezOptions,
+pub struct RemezFailure<F, P: PointBackend, I: EnclosureBackend, D: Shape, L, A> {
+    request: Box<RemezRequest<F, P, I, D, L, A>>,
     error: Error,
+    attempts: Vec<Attempt<P::Scalar, I::Scalar, D>>,
 }
-impl<C> ConditionalRemezFailure<C> {
+/// A solver outcome owns the exact request on either branch. This alias names
+/// that shared ownership contract rather than introducing an adapter.
+pub type RemezOutcome<F, P, I, D, L, A> =
+    std::result::Result<RemezResult<F, P, I, D, L, A>, RemezFailure<F, P, I, D, L, A>>;
+impl<F, P: PointBackend, I: EnclosureBackend, D: Shape, L, A> RemezFailure<F, P, I, D, L, A> {
     #[must_use]
-    pub const fn target(&self) -> &C {
-        &self.target
-    }
-    #[must_use]
-    pub const fn assumption(&self) -> ConsistencyAssumption {
-        self.assumption
-    }
-    #[must_use]
-    pub const fn domain(&self) -> Interval {
-        self.domain
-    }
-    #[must_use]
-    pub const fn options(&self) -> RemezOptions {
-        self.options
+    pub const fn request(&self) -> &RemezRequest<F, P, I, D, L, A> {
+        &self.request
     }
     #[must_use]
     pub const fn error(&self) -> &Error {
         &self.error
     }
     #[must_use]
-    pub fn into_parts(self) -> (C, ConsistencyAssumption, Interval, RemezOptions, Error) {
-        (
-            self.target,
-            self.assumption,
-            self.domain,
-            self.options,
-            self.error,
-        )
+    pub fn attempts(&self) -> &[Attempt<P::Scalar, I::Scalar, D>] {
+        &self.attempts
+    }
+    #[must_use]
+    pub fn into_request(self) -> RemezRequest<F, P, I, D, L, A> {
+        *self.request
     }
 }
-impl<C: Callable> RemezBuilder<ReadyCallable<C>> {
-    /// # Errors
-    /// Propagates numerical or resource failures, dropping the original callable.
-    pub fn run(self) -> Result<ConditionalRemezResult<C>> {
-        self.run_reported().map_err(|failure| failure.error)
+impl<F, P: PointBackend, I: EnclosureBackend, D: Shape, L, A> fmt::Debug
+    for RemezFailure<F, P, I, D, L, A>
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("RemezFailure")
+            .field("error", &self.error)
+            .field("attempts", &self.attempts.len())
+            .finish_non_exhaustive()
     }
-    /// Retain the original callable and its premise when approximation fails.
+}
+impl<F, P: PointBackend, I: EnclosureBackend, D: Shape, L, A> fmt::Display
+    for RemezFailure<F, P, I, D, L, A>
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.error.fmt(f)
+    }
+}
+impl<F, P: PointBackend, I: EnclosureBackend, D: Shape, L, A> std::error::Error
+    for RemezFailure<F, P, I, D, L, A>
+{
+}
+impl<F, P, I, D, L, A> RemezRequest<F, P, I, D, L, A>
+where
+    F: AdmittedFunction,
+    P: PointBackend<Error = ArithmeticError>,
+    I: EnclosureBackend<Endpoint = P::Scalar, Error = ArithmeticError>,
+    D: Shape,
+    L: for<'b> LinearSolver<BudgetedBackend<'b, P>>,
+{
     /// # Errors
-    /// Returns the owned request together with the numerical/resource failure.
-    pub fn run_reported(
-        self,
-    ) -> std::result::Result<ConditionalRemezResult<C>, ConditionalRemezFailure<C>> {
-        match remez_candidate(&self.state.target, self.state.domain, self.options) {
-            Ok(data) => Ok(ConditionalRemezResult {
-                target: self.state.target,
-                assumption: self.state.assumption,
-                data,
+    /// Returns the owning request, last candidate, root coverage and accounting.
+    pub fn run(mut self) -> RemezOutcome<F, P, I, D, L, A> {
+        let work = Budget::new(self.options.limits.max_work);
+        let mut attempt = Attempt {
+            precision_bits: self.point.precision_bits(),
+            iterations: 0,
+            work: 0,
+            candidate: None,
+            coverage: None,
+            binary64_export: None,
+        };
+        let result = {
+            let mut point = BudgetedBackend::new(&mut self.point, &work);
+            let mut interval = BudgetedBackend::new(&mut self.enclosure, &work);
+            exchange::run(
+                &self.target,
+                &self.domain,
+                &self.shape,
+                &mut point,
+                &mut interval,
+                &self.solver,
+                &self.options,
+                &mut attempt,
+            )
+        };
+        attempt.work = work.used();
+        match result {
+            Ok(exchange::Established {
+                polynomial,
+                uniform: upper,
+                lower,
+                gap,
+            }) => Ok(RemezResult {
+                request: self,
+                polynomial,
+                binary64_export: attempt.binary64_export.clone(),
+                uniform: UniformErrorCertificate {
+                    bound: upper,
+                    _evidence: PhantomData,
+                },
+                minimax: MinimaxGapCertificate {
+                    lower,
+                    gap,
+                    _evidence: PhantomData,
+                },
+                attempts: vec![attempt],
             }),
-            Err(error) => Err(ConditionalRemezFailure {
-                target: self.state.target,
-                assumption: self.state.assumption,
-                domain: self.state.domain,
-                options: self.options,
+            Err(error) => Err(RemezFailure {
+                request: Box::new(self),
                 error,
+                attempts: vec![attempt],
             }),
         }
     }
+}
+
+/// Explicit, finite candidate/proof precision attempts. There is no automatic
+/// algorithm change or tolerance relaxation when an attempt fails.
+#[derive(Clone, Copy, Debug)]
+pub struct PrecisionPair {
+    pub candidate_bits: usize,
+    pub proof_bits: usize,
+}
+#[derive(Clone, Debug)]
+pub struct PrecisionAttempts {
+    pub attempts: Vec<PrecisionPair>,
+    pub max_total_work: usize,
+}
+impl<F, D, A>
+    RemezRequest<
+        F,
+        quest_numerics::arithmetic::MpBackend,
+        quest_numerics::arithmetic::MpIntervalBackend,
+        D,
+        MpHouseholder,
+        A,
+    >
+where
+    F: AdmittedFunction,
+    D: Shape,
+{
+    /// # Errors
+    /// Retains the same owned target, exact inputs and all attempted candidates.
+    /// A schedule is limited to 32 entries, and total work is bounded separately
+    /// from the per-attempt request limit.
+    pub fn run_with_precisions(
+        mut self,
+        policy: PrecisionAttempts,
+    ) -> RemezOutcome<
+        F,
+        quest_numerics::arithmetic::MpBackend,
+        quest_numerics::arithmetic::MpIntervalBackend,
+        D,
+        MpHouseholder,
+        A,
+    > {
+        use quest_numerics::arithmetic::{MpBackend, MpIntervalBackend};
+        let mut history = Vec::new();
+        if policy.attempts.is_empty() || policy.attempts.len() > 32 {
+            self.precision_policy = Some(policy);
+            return Err(RemezFailure {
+                request: Box::new(self),
+                error: Error::Domain,
+                attempts: history,
+            });
+        }
+        self.precision_policy = Some(policy.clone());
+        let original_limit = self.options.limits.max_work;
+        let original_bytes = self.options.limits.max_bytes;
+        if let Err(error) = reserve_history(&mut history, policy.attempts.len(), original_bytes) {
+            return Err(RemezFailure {
+                request: Box::new(self),
+                error,
+                attempts: history,
+            });
+        }
+        let mut used = 0usize;
+        let mut last_error = Error::NotEstablished("precision schedule exhausted");
+        for pair in policy.attempts {
+            let mut candidate = self.point.precision();
+            candidate.bits = pair.candidate_bits;
+            let mut proof = self.enclosure.precision();
+            proof.bits = pair.proof_bits;
+            let backends = MpBackend::new(candidate).and_then(|point| {
+                MpIntervalBackend::new(proof).map(|enclosure| (point, enclosure))
+            });
+            let (point, enclosure) = match backends {
+                Ok(values) => values,
+                Err(error) => {
+                    return Err(RemezFailure {
+                        request: Box::new(self),
+                        error: error.into(),
+                        attempts: history,
+                    });
+                }
+            };
+            let retained = match retained_bytes(&history, &point, &enclosure) {
+                Ok(bytes) => bytes,
+                Err(error) => {
+                    return Err(RemezFailure {
+                        request: Box::new(self),
+                        error,
+                        attempts: history,
+                    });
+                }
+            };
+            let Some(remaining_bytes) = original_bytes.checked_sub(retained) else {
+                return Err(RemezFailure {
+                    request: Box::new(self),
+                    error: Error::Budget("precision history storage"),
+                    attempts: history,
+                });
+            };
+            let remaining = policy.max_total_work.saturating_sub(used);
+            if remaining == 0 {
+                return Err(RemezFailure {
+                    request: Box::new(self),
+                    error: Error::Budget("total precision-attempt work"),
+                    attempts: history,
+                });
+            }
+            self.point = point;
+            self.enclosure = enclosure;
+            self.options.limits.max_work = original_limit.min(remaining);
+            self.options.limits.max_bytes = remaining_bytes;
+            match self.run() {
+                Ok(mut report) => {
+                    history.append(&mut report.attempts);
+                    report.attempts = history;
+                    report.request.options.limits.max_work = original_limit;
+                    report.request.options.limits.max_bytes = original_bytes;
+                    return Ok(report);
+                }
+                Err(mut failure) => {
+                    for attempt in &failure.attempts {
+                        used = used.saturating_add(attempt.work);
+                    }
+                    history.append(&mut failure.attempts);
+                    last_error = failure.error;
+                    self = *failure.request;
+                    self.options.limits.max_work = original_limit;
+                    self.options.limits.max_bytes = original_bytes;
+                }
+            }
+        }
+        self.options.limits.max_work = original_limit;
+        self.options.limits.max_bytes = original_bytes;
+        Err(RemezFailure {
+            request: Box::new(self),
+            error: last_error,
+            attempts: history,
+        })
+    }
+}
+
+fn reserve_history<T>(history: &mut Vec<T>, count: usize, max_bytes: usize) -> Result<()> {
+    let bytes = count
+        .checked_mul(size_of::<T>())
+        .ok_or(Error::Budget("precision history storage"))?;
+    if bytes > max_bytes {
+        return Err(Error::Budget("precision history storage"));
+    }
+    history
+        .try_reserve_exact(count)
+        .map_err(|_| Error::Budget("precision history storage"))
+}
+
+fn retained_bytes<P, I, D>(
+    attempts: &Vec<Attempt<P::Scalar, I::Scalar, D>>,
+    point: &P,
+    enclosure: &I,
+) -> Result<usize>
+where
+    P: PointBackend<Error = ArithmeticError>,
+    I: EnclosureBackend<Error = ArithmeticError>,
+    D: Shape,
+{
+    fn add(total: &mut usize, bytes: usize) -> Result<()> {
+        *total = total
+            .checked_add(bytes)
+            .ok_or(Error::Budget("retained Remez evidence"))?;
+        Ok(())
+    }
+    let mut total = attempts
+        .capacity()
+        .checked_mul(size_of::<Attempt<P::Scalar, I::Scalar, D>>())
+        .ok_or(Error::Budget("retained Remez evidence"))?;
+    for attempt in attempts {
+        if let Some(candidate) = &attempt.candidate {
+            add(&mut total, candidate.retained_heap_bytes(point)?)?;
+        }
+        if let Some(export) = &attempt.binary64_export {
+            add(&mut total, 2_usize.saturating_mul(size_of::<usize>()))?;
+            add(
+                &mut total,
+                export
+                    .len()
+                    .checked_mul(size_of::<f64>())
+                    .ok_or(Error::Budget("export evidence"))?,
+            )?;
+        }
+        if let Some(cover) = &attempt.coverage {
+            add(
+                &mut total,
+                cover
+                    .covered
+                    .capacity()
+                    .checked_mul(size_of::<quest_numerics::roots::RootBox<I::Scalar>>())
+                    .ok_or(Error::Budget("cover evidence"))?,
+            )?;
+            let capacity = cover
+                .excluded
+                .capacity()
+                .checked_add(cover.unresolved.capacity())
+                .ok_or(Error::Budget("cover evidence"))?;
+            add(
+                &mut total,
+                capacity
+                    .checked_mul(size_of::<I::Scalar>())
+                    .ok_or(Error::Budget("cover evidence"))?,
+            )?;
+            for value in cover
+                .covered
+                .iter()
+                .map(|root| &root.interval)
+                .chain(&cover.excluded)
+                .chain(&cover.unresolved)
+            {
+                add(
+                    &mut total,
+                    enclosure
+                        .storage_bytes(value)?
+                        .saturating_sub(size_of::<I::Scalar>()),
+                )?;
+            }
+        }
+    }
+    Ok(total)
 }

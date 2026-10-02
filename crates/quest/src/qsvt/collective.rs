@@ -388,7 +388,7 @@ fn capacity(transform: &ValidatedTransform, ranks: i32) -> crate::Result<()> {
     Ok(())
 }
 fn check_operation(
-    operation: &quest_circuit::Operation,
+    operation: &quest_compile::Operation,
     inherited: usize,
     local: usize,
     depth: usize,
@@ -397,7 +397,7 @@ fn check_operation(
         return Err(crate::Error::Value("QSVT oracle nesting limit"));
     }
     match operation {
-        quest_circuit::Operation::Numerical {
+        quest_compile::Operation::Numerical {
             matrix,
             targets,
             controls,
@@ -414,7 +414,7 @@ fn check_operation(
                 ));
             }
         }
-        quest_circuit::Operation::Oracle {
+        quest_compile::Operation::Oracle {
             fragment, controls, ..
         } => {
             let inherited = inherited

@@ -1,0 +1,22 @@
+error[E0277]: the trait bound `bool: AngleCapture` is not satisfied
+ --> tests/ui/structured_capture_type.rs:3:38
+  |
+3 |     let _ = circuit! { qubit q; rx(${true}) q; };
+  |             -------------------------^^^^-------
+  |             |                        |
+  |             |                        the trait `AngleCapture` is not implemented for `bool`
+  |             required by a bound introduced by this call
+  |
+help: the following other types implement trait `AngleCapture`
+ --> src/capture.rs
+  |
+  | impl AngleCapture for f64 {
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^ `f64`
+...
+  | impl AngleCapture for Angle {
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^ `quest_compile::Angle`
+note: required by a bound in `capture_angle`
+ --> src/capture.rs
+  |
+  | pub fn capture_angle(value: impl AngleCapture) -> Result<CapturedAngle, LanguageError> {
+  |                                  ^^^^^^^^^^^^ required by this bound in `capture_angle`

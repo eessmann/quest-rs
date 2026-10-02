@@ -1,0 +1,20 @@
+compiler structured_width=4 loop_iterations=64 ssa_instructions=24
+compiler finite_width=4 finite_operations=256 captures=128 exact_captures=128
+        0.10 real         0.08 user         0.00 sys
+             8257536  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+                 734  page reclaims
+                   7  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                   0  voluntary context switches
+                  70  involuntary context switches
+          1569995849  instructions retired
+           332381008  cycles elapsed
+             4866456  peak memory footprint

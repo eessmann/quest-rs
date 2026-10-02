@@ -11,7 +11,7 @@ use crate::{
     error::BackendResult,
     values::{bytes_for, reserve_vec},
 };
-use quest_circuit::{Control, ControlState, OracleFragment, QuantumRegionBuilder};
+use quest_compile::{Control, ControlState, OracleFragment, QuantumRegionBuilder};
 use quest_qsvt::ValidatedTransform;
 use std::ops::{Add, Div, Mul, Sub};
 
@@ -234,14 +234,14 @@ fn check_vector(vector: &[Complex64], dimension: usize) -> Result<()> {
 }
 pub(super) fn controlled_plan_padded(
     resources: &RuntimeResources,
-    program: &quest_circuit::BoundRegion,
+    program: &quest_compile::BoundRegion,
     width: usize,
     padding: usize,
-) -> crate::Result<quest_circuit::RegionPlan> {
-    let build = || -> quest_circuit::Result<_> {
+) -> crate::Result<quest_compile::RegionPlan> {
+    let build = || -> quest_compile::Result<_> {
         let fragment = OracleFragment::builder(program.clone())
             .matrix_tolerance(1e-10)?
-            .matrix_policy(quest_circuit::MatrixPolicy {
+            .matrix_policy(quest_compile::MatrixPolicy {
                 max_bytes: resources.memory_budget().bytes(),
             })
             .build()?;
@@ -249,12 +249,12 @@ pub(super) fn controlled_plan_padded(
             width
                 .checked_add(1)
                 .and_then(|n| n.checked_add(padding))
-                .ok_or(quest_circuit::Error::Budget("Hadamard width"))?,
+                .ok_or(quest_compile::Error::Budget("Hadamard width"))?,
             0,
         )?;
         let targets = (0..width)
             .map(|q| builder.qubit(q))
-            .collect::<quest_circuit::Result<Vec<_>>>()?;
+            .collect::<quest_compile::Result<Vec<_>>>()?;
         builder.oracle(
             &fragment,
             &targets,

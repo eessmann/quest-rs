@@ -2,11 +2,11 @@
 use crate::{
     Error, Register, RegisterKind, Result,
     error::BackendResult,
-    execution::{self, MatrixCacheKey, NativeMatrix},
-    values::{bytes_for, reserve_vec},
+    execution::{self, MatrixCacheKey, MatrixPreparation, NativeMatrix},
+    values::reserve_vec,
 };
 use cxx::UniquePtr;
-use quest_circuit::{QuantumPayload, dispatch_recipe::MatrixRecipe};
+use quest_compile::QuantumPayload;
 use std::collections::{BTreeMap, BTreeSet};
 
 enum Entry {
@@ -22,70 +22,41 @@ enum Entry {
 }
 pub struct PayloadCache {
     entries: BTreeMap<usize, Entry>,
-    matrices: Vec<NativeMatrix>,
     channels: Vec<UniquePtr<quest_sys::KrausMap>>,
 }
 impl PayloadCache {
     pub(crate) fn estimated_bytes(
         bank: &BTreeMap<usize, QuantumPayload>,
         gpu: bool,
+        matrices: &mut BTreeSet<MatrixCacheKey>,
     ) -> Result<usize> {
         let mut bytes = bank.len().checked_mul(192).ok_or(Error::Overflow)?;
-        let mut matrices = BTreeSet::new();
         let mut channels = BTreeSet::new();
         for payload in bank.values() {
             let extra = match payload {
                 QuantumPayload::Matrix {
                     matrix,
                     control_states,
-                } => {
-                    let key = execution::matrix_cache_key(matrix, control_states.iter().copied());
-                    if !matrices.insert(key) {
-                        continue;
-                    }
-                    let recipe = MatrixRecipe::new(matrix, control_states)?;
-                    let dim = recipe.dimension();
-                    let count = if recipe.is_diagonal() {
-                        dim
-                    } else {
-                        dim.checked_mul(dim).ok_or(Error::Overflow)?
-                    };
-                    bytes_for(count, if gpu { 16 } else { 12 })?
-                }
+                } => execution::admit_matrix(matrix, control_states, gpu, matrices)?,
                 QuantumPayload::Channel { kraus } => {
                     if !channels.insert(kraus.as_ptr().addr()) {
                         continue;
                     }
-                    let dim = kraus
-                        .first()
-                        .ok_or(Error::Value("empty Kraus channel"))?
-                        .dimension()
-                        .max(2);
-                    let square = dim.checked_mul(dim).ok_or(Error::Overflow)?;
-                    let count = square
-                        .checked_mul(square)
-                        .and_then(|n| n.checked_mul(if gpu { 8 } else { 4 }))
-                        .and_then(|n| {
-                            square
-                                .checked_mul(kraus.len())
-                                .and_then(|m| m.checked_mul(6))
-                                .and_then(|m| n.checked_add(m))
-                        })
-                        .ok_or(Error::Overflow)?;
-                    bytes_for(count, 1)?
+                    execution::kraus_bytes(kraus, gpu)?
                 }
             };
             bytes = bytes.checked_add(extra).ok_or(Error::Overflow)?;
         }
         Ok(bytes)
     }
-    pub(crate) fn prepare(bank: &BTreeMap<usize, QuantumPayload>) -> Result<Self> {
+    pub(crate) fn prepare(
+        bank: &BTreeMap<usize, QuantumPayload>,
+        matrices: &mut MatrixPreparation,
+    ) -> Result<Self> {
         let mut result = Self {
             entries: BTreeMap::new(),
-            matrices: reserve_vec(bank.len())?,
             channels: reserve_vec(bank.len())?,
         };
-        let mut matrices: BTreeMap<MatrixCacheKey, usize> = BTreeMap::new();
         let mut channels = BTreeMap::new();
         for (&id, payload) in bank {
             let entry = match payload {
@@ -93,17 +64,7 @@ impl PayloadCache {
                     matrix,
                     control_states,
                 } => {
-                    let key = execution::matrix_cache_key(matrix, control_states.iter().copied());
-                    let index = if let Some(&index) = matrices.get(&key) {
-                        index
-                    } else {
-                        let index = result.matrices.len();
-                        result
-                            .matrices
-                            .push(execution::prepare_numerical(matrix, control_states)?);
-                        matrices.insert(key, index);
-                        index
-                    };
+                    let index = matrices.include(matrix, control_states)?;
                     Entry::Matrix {
                         index,
                         controls: control_states.len(),
@@ -139,6 +100,7 @@ impl PayloadCache {
         wires: &[usize],
         register: &mut Register<'_, K>,
         scratch: &mut Vec<i32>,
+        matrices: &[NativeMatrix],
     ) -> Result<()> {
         let entry = self
             .entries
@@ -168,7 +130,7 @@ impl PayloadCache {
         }
         match entry {
             Entry::Matrix { index, .. } => execution::execute_matrix(
-                self.matrices
+                matrices
                     .get(*index)
                     .ok_or(Error::Value("matrix payload index"))?,
                 register,

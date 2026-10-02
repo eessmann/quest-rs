@@ -1,5 +1,16 @@
-use crate::function::Real;
 use crate::{Error, Interval, Result};
+use quest_numerics::arithmetic::{
+    ArithmeticError, Backend, ExactConstant, F64Backend, Interval64Backend,
+};
+
+type RecurrenceResult<A> = std::result::Result<
+    (
+        <A as Backend>::Scalar,
+        <A as Backend>::Scalar,
+        <A as Backend>::Scalar,
+    ),
+    <A as Backend>::Error,
+>;
 
 mod sealed {
     pub trait Sealed {}
@@ -7,16 +18,18 @@ mod sealed {
 
 /// A three-term basis, with signed support supplied only by Laurent.
 pub trait Basis: sealed::Sealed + Clone + std::fmt::Debug {
+    /// Compute the three-term recurrence in the selected arithmetic backend.
+    /// Integer factors are imported exactly before division or multiplication.
+    /// # Errors
+    /// Rejects invalid basis orders and propagates checked backend arithmetic.
+    fn recurrence_with<A: Backend>(&self, degree: u32, backend: &mut A) -> RecurrenceResult<A>;
     #[doc(hidden)]
-    fn recurrence(&self, degree: u32) -> Result<(f64, f64, f64)>;
+    fn recurrence(&self, degree: u32) -> Result<(f64, f64, f64)> {
+        Ok(self.recurrence_with(degree, &mut F64Backend)?)
+    }
     #[doc(hidden)]
     fn interval_recurrence(&self, degree: u32) -> Result<(Interval, Interval, Interval)> {
-        let (a, b, c) = self.recurrence(degree)?;
-        Ok((
-            Interval::point(a)?,
-            Interval::point(b)?,
-            Interval::point(c)?,
-        ))
+        Ok(self.recurrence_with(degree, &mut Interval64Backend)?)
     }
     #[doc(hidden)]
     fn symmetric(&self) -> bool {
@@ -103,55 +116,76 @@ impl sealed::Sealed for Laurent {}
 impl sealed::Sealed for Hermite {}
 impl sealed::Sealed for Laguerre {}
 impl sealed::Sealed for Jacobi {}
+fn integer<A: Backend>(backend: &mut A, value: i64) -> std::result::Result<A::Scalar, A::Error> {
+    backend.constant(&ExactConstant::Integer(value))
+}
+fn monomial<A: Backend>(backend: &mut A) -> RecurrenceResult<A> {
+    Ok((
+        integer(backend, 1)?,
+        integer(backend, 0)?,
+        integer(backend, 0)?,
+    ))
+}
 impl Basis for Monomial {
-    fn recurrence(&self, _: u32) -> Result<(f64, f64, f64)> {
-        Ok((1.0, 0.0, 0.0))
+    fn recurrence_with<A: Backend>(&self, _: u32, backend: &mut A) -> RecurrenceResult<A> {
+        monomial(backend)
     }
 }
 impl Basis for Laurent {
-    fn recurrence(&self, _: u32) -> Result<(f64, f64, f64)> {
-        Ok((1.0, 0.0, 0.0))
+    fn recurrence_with<A: Backend>(&self, _: u32, backend: &mut A) -> RecurrenceResult<A> {
+        monomial(backend)
     }
     fn offset(&self) -> i32 {
         self.offset
     }
 }
 impl Basis for Chebyshev {
-    fn recurrence(&self, degree: u32) -> Result<(f64, f64, f64)> {
-        Ok(if degree <= 1 {
-            (1.0, 0.0, 0.0)
+    fn recurrence_with<A: Backend>(&self, degree: u32, backend: &mut A) -> RecurrenceResult<A> {
+        if degree <= 1 {
+            monomial(backend)
         } else {
-            (2.0, 0.0, 1.0)
-        })
+            Ok((
+                integer(backend, 2)?,
+                integer(backend, 0)?,
+                integer(backend, 1)?,
+            ))
+        }
     }
 }
 impl Basis for Hermite {
-    fn recurrence(&self, degree: u32) -> Result<(f64, f64, f64)> {
-        let scale = if self.physicists { 2.0 } else { 1.0 };
-        Ok((scale, 0.0, scale * f64::from(degree.saturating_sub(1))))
+    fn recurrence_with<A: Backend>(&self, degree: u32, backend: &mut A) -> RecurrenceResult<A> {
+        let scale = integer(backend, if self.physicists { 2 } else { 1 })?;
+        let previous = integer(backend, i64::from(degree.saturating_sub(1)))?;
+        let back = backend.mul(scale.clone(), previous)?;
+        Ok((scale, integer(backend, 0)?, back))
     }
 }
 impl Basis for Laguerre {
     fn symmetric(&self) -> bool {
         false
     }
-    fn interval_recurrence(&self, degree: u32) -> Result<(Interval, Interval, Interval)> {
-        laguerre_interval(degree, self.alpha)
-    }
-    fn recurrence(&self, degree: u32) -> Result<(f64, f64, f64)> {
-        let n = f64::from(degree);
+    fn recurrence_with<A: Backend>(&self, degree: u32, backend: &mut A) -> RecurrenceResult<A> {
         if degree == 0 {
-            return Err(Error::BasisParameters);
+            return Err(ArithmeticError::Domain("Laguerre recurrence order").into());
         }
-        checked((
-            -1.0 / n,
-            (2.0_f64.mul_add(n, -1.0) + self.alpha) / n,
-            if degree == 1 {
-                0.0
-            } else {
-                (n - 1.0 + self.alpha) / n
-            },
-        ))
+        let n = integer(backend, i64::from(degree))?;
+        let alpha = backend.point(self.alpha)?;
+        let one = integer(backend, 1)?;
+        let minus_one = integer(backend, -1)?;
+        let scale = backend.div(minus_one, n.clone())?;
+        let twice = integer(backend, 2)?;
+        let twice = backend.mul(twice, n.clone())?;
+        let shift = backend.sub(twice, one.clone())?;
+        let shift = backend.add(shift, alpha.clone())?;
+        let shift = backend.div(shift, n.clone())?;
+        let back = if degree == 1 {
+            integer(backend, 0)?
+        } else {
+            let previous = backend.sub(n.clone(), one)?;
+            let previous = backend.add(previous, alpha)?;
+            backend.div(previous, n)?
+        };
+        Ok((scale, shift, back))
     }
 }
 impl Basis for Jacobi {
@@ -162,76 +196,44 @@ impl Basis for Jacobi {
     fn symmetric(&self) -> bool {
         self.alpha == self.beta
     }
-    fn interval_recurrence(&self, degree: u32) -> Result<(Interval, Interval, Interval)> {
-        jacobi_interval(degree, self.alpha, self.beta)
-    }
-    fn recurrence(&self, degree: u32) -> Result<(f64, f64, f64)> {
-        let (a, b) = (self.alpha, self.beta);
+    fn recurrence_with<A: Backend>(&self, degree: u32, backend: &mut A) -> RecurrenceResult<A> {
+        let alpha = backend.point(self.alpha)?;
+        let beta = backend.point(self.beta)?;
+        let one = integer(backend, 1)?;
+        let two = integer(backend, 2)?;
+        let sum = backend.add(alpha.clone(), beta.clone())?;
         if degree <= 1 {
-            return checked(((a + b + 2.0) / 2.0, (a - b) / 2.0, 0.0));
+            let scale = backend.add(sum, two.clone())?;
+            let scale = backend.div(scale, two.clone())?;
+            let shift = backend.sub(alpha, beta)?;
+            let shift = backend.div(shift, two)?;
+            return Ok((scale, shift, integer(backend, 0)?));
         }
-        let n = f64::from(degree);
-        let sum = a + b;
-        let twice = 2.0_f64.mul_add(n, sum);
-        let denominator = 2.0 * n * (n + sum) * (twice - 2.0);
-        checked((
-            (twice - 1.0) * twice * (twice - 2.0) / denominator,
-            (twice - 1.0) * b.mul_add(-b, a * a) / denominator,
-            2.0 * (n + a - 1.0) * (n + b - 1.0) * twice / denominator,
-        ))
+        let n = integer(backend, i64::from(degree))?;
+        let twice = backend.mul(two.clone(), n.clone())?;
+        let twice = backend.add(twice, sum.clone())?;
+        let twice_minus_two = backend.sub(twice.clone(), two.clone())?;
+        let n_sum = backend.add(n.clone(), sum)?;
+        let denominator = backend.mul(two.clone(), n.clone())?;
+        let denominator = backend.mul(denominator, n_sum)?;
+        let denominator = backend.mul(denominator, twice_minus_two.clone())?;
+        let twice_minus_one = backend.sub(twice.clone(), one.clone())?;
+        let scale = backend.mul(twice_minus_one.clone(), twice.clone())?;
+        let scale = backend.mul(scale, twice_minus_two)?;
+        let scale = backend.div(scale, denominator.clone())?;
+        let alpha_square = backend.mul(alpha.clone(), alpha.clone())?;
+        let beta_square = backend.mul(beta.clone(), beta.clone())?;
+        let difference = backend.sub(alpha_square, beta_square)?;
+        let shift = backend.mul(twice_minus_one, difference)?;
+        let shift = backend.div(shift, denominator.clone())?;
+        let n_alpha = backend.add(n.clone(), alpha)?;
+        let n_alpha = backend.sub(n_alpha, one.clone())?;
+        let n_beta = backend.add(n, beta)?;
+        let n_beta = backend.sub(n_beta, one)?;
+        let back = backend.mul(two, n_alpha)?;
+        let back = backend.mul(back, n_beta)?;
+        let back = backend.mul(back, twice)?;
+        let back = backend.div(back, denominator)?;
+        Ok((scale, shift, back))
     }
-}
-const fn checked(value: (f64, f64, f64)) -> Result<(f64, f64, f64)> {
-    if value.0.is_finite() && value.1.is_finite() && value.2.is_finite() {
-        Ok(value)
-    } else {
-        Err(Error::NonFinite)
-    }
-}
-
-fn laguerre_interval(degree: u32, alpha: f64) -> Result<(Interval, Interval, Interval)> {
-    let n = Interval::point(f64::from(degree))?;
-    let a = Interval::point(alpha)?;
-    let one = Interval::point(1.0)?;
-    Ok((
-        one.neg()?.div(n)?,
-        n.mul(Interval::point(2.0)?)?.sub(one)?.add(a)?.div(n)?,
-        if degree == 1 {
-            Interval::point(0.0)?
-        } else {
-            n.sub(one)?.add(a)?.div(n)?
-        },
-    ))
-}
-fn jacobi_interval(degree: u32, alpha: f64, beta: f64) -> Result<(Interval, Interval, Interval)> {
-    let a = Interval::point(alpha)?;
-    let b = Interval::point(beta)?;
-    let one = Interval::point(1.0)?;
-    let two = Interval::point(2.0)?;
-    if degree <= 1 {
-        return Ok((
-            a.add(b)?.add(two)?.div(two)?,
-            a.sub(b)?.div(two)?,
-            Interval::point(0.0)?,
-        ));
-    }
-    let n = Interval::point(f64::from(degree))?;
-    let sum = a.add(b)?;
-    let twice = two.mul(n)?.add(sum)?;
-    let denominator = two.mul(n)?.mul(n.add(sum)?)?.mul(twice.sub(two)?)?;
-    Ok((
-        twice
-            .sub(one)?
-            .mul(twice)?
-            .mul(twice.sub(two)?)?
-            .div(denominator)?,
-        twice
-            .sub(one)?
-            .mul(a.mul(a)?.sub(b.mul(b)?)?)?
-            .div(denominator)?,
-        two.mul(n.add(a)?.sub(one)?)?
-            .mul(n.add(b)?.sub(one)?)?
-            .mul(twice)?
-            .div(denominator)?,
-    ))
 }

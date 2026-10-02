@@ -17,13 +17,9 @@
 //! These are logical resource bounds, not process-RSS or wall-clock guarantees.
 //! Unsupported width or exhausted budgets return an error without publishing
 //! a partially replaced program.
-use crate::model::{Occurrence, SemanticOperation};
-#[allow(unused_imports)]
-use crate::{
-    BoundParityPasses, ExactPasses, NumericalPasses, OracleExport, ParityPasses, TerminalPasses,
-};
 use crate::{Control, ControlState, Error, Gate, OccurrenceId, QuantumRegion, QubitId, Result};
 use crate::{ProvenanceGraph, ProvenanceId};
+use quest_language::quantum::model::{Occurrence, SemanticOperation};
 use std::{collections::BTreeMap, sync::Arc};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

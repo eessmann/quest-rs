@@ -1,5 +1,4 @@
 //! One-original-rotation approximate MITM proposals for the deterministic beam.
-use crate::model::{Occurrence, SemanticOperation};
 use crate::workers::{
     ProvenanceBudget, WorkerError, admit_output, candidate_replacement, rotation,
 };
@@ -7,12 +6,8 @@ use crate::{
     BoundAngleTarget, Control, ControlState, Error, Gate, OccurrenceId, ProvenanceGraph,
     ProvenanceId, QuantumRegion, QubitId,
 };
-#[allow(unused_imports)]
-use crate::{
-    BoundParityPasses, ExactPasses, LinearPasses, NumericalPasses, OracleExport, ParityPasses,
-    TerminalPasses,
-};
-use quest_math::{AngleTarget, ControlledApproxCertificate, Limits, Rational};
+use quest_language::quantum::model::{Occurrence, SemanticOperation};
+use quest_math::{AngleTarget, ControlledApproxCertificate, Limits, RBig};
 use quest_optimizer_client::{Client, MitmResult};
 use quest_optimizer_protocol::MitmLimits;
 use std::{mem::size_of, sync::Arc};
@@ -133,9 +128,7 @@ impl ApproximateBeamPasses for QuantumRegion {
             .validate(1)
             .map_err(|_| quest_optimizer_client::Error::Limits)?;
         let epsilon = quest_math::dyadic_from_bits(epsilon_bits, proof_limits)?;
-        if epsilon <= Rational::from_integer(0.into())
-            || epsilon >= Rational::from_integer(1.into())
-        {
+        if epsilon <= RBig::from(0) || epsilon >= RBig::from(1) {
             return Err(quest_optimizer_client::Error::Limits.into());
         }
         if self.occurrences().len() > 16_384 || self.occurrences().len() > max_output {

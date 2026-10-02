@@ -1,0 +1,7 @@
+{
+  "repository": "/path/to/quest-rs",
+  "baseline_repository": "/path/to/quest-rs/target/static-numerical-baseline",
+  "trials": 3,
+  "allocator": "Rust global System wrapper",
+  "clean_build": "empty Cargo artifact directory; operating-system caches not flushed"
+}

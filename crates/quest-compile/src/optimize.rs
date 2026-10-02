@@ -1,11 +1,9 @@
-#[allow(unused_imports)]
-use crate::{BoundParityPasses, LinearPasses, OracleExport, ParityPasses, TerminalPasses};
 use crate::{
     BoundRegion, Control, Error, Gate, Instruction, MatrixPolicy, NumericalOperator, OccurrenceId,
     Operation, QuantumRegion, QubitId, Result,
-    model::{Occurrence, SemanticOperation},
 };
 use crate::{ProvenanceGraph, ProvenanceId};
+use quest_language::quantum::model::{Occurrence, SemanticOperation};
 use std::{
     sync::Arc,
     time::{Duration, Instant},

@@ -8,7 +8,7 @@ use faer::{
     mat::AsMatRef,
     traits::Conjugate,
 };
-use quest_circuit::{NumericalOperator, OracleFragment, QuantumRegionBuilder};
+use quest_compile::{NumericalOperator, OracleFragment, QuantumRegionBuilder};
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
 #[derive(Debug)]
@@ -97,7 +97,7 @@ impl DenseEncodingBuilder<DenseNormalization> {
         let mut body = QuantumRegionBuilder::new(width, 0)?;
         let targets = (0..width)
             .map(|index| body.qubit(index))
-            .collect::<quest_circuit::Result<Vec<_>>>()?;
+            .collect::<quest_compile::Result<Vec<_>>>()?;
         body.numerical(
             NumericalOperator::from_view(dilation.as_ref(), self.policy.matrix_policy())?,
             &targets,

@@ -14,7 +14,7 @@ struct Template {
 /// Rejects encoding failures and the default template storage budget.
 pub fn encode(module: &TypedModule) -> Result<String, SemanticError> {
     let template = Template {
-        version: 1,
+        version: 2,
         syntax: module.syntax.clone(),
         program: module.program.program().clone(),
     };
@@ -36,7 +36,7 @@ pub fn load(encoded: &str, limits: CompileLimits) -> Result<TypedModule, Semanti
     }
     let template: Template = serde_json::from_str(encoded)
         .map_err(|error| SemanticError::invalid(format!("template decoding: {error}")))?;
-    if template.version != 1 {
+    if template.version != 2 {
         return Err(SemanticError::invalid(
             "unsupported frontend template version",
         ));

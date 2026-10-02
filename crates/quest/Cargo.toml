@@ -16,7 +16,7 @@ name = "quest"
 quest-sys.workspace = true
 cxx.workspace = true
 thiserror.workspace = true
-quest-circuit = { workspace = true }
+quest-compile = { workspace = true, features = ["macros", "synthesis"] }
 num-complex = { workspace = true }
 faer = { workspace = true, features = ["std", "linalg"] }
 ndarray = { workspace = true, features = ["std"], optional = true }
@@ -33,9 +33,9 @@ workspace = true
 
 [features]
 mpi = ["quest-sys/mpi"]
-serde = ["quest-circuit/serde"]
-codespan-reporting = ["quest-circuit/codespan-reporting"]
-workers = ["quest-circuit/workers"]
+serde = ["quest-compile/serde"]
+codespan-reporting = ["quest-compile/codespan-reporting"]
+workers = ["quest-compile/workers"]
 ndarray = ["dep:ndarray"]
 qsvt = ["dep:quest-qsvt"]
 

@@ -1,7 +1,7 @@
 use crate::interval::{Grid, Interval, floor_div};
-use crate::{AngleTarget, Axis, Cyclotomic, Error, Limits, Rational, Result, Sequence, Target};
-use num_bigint::BigInt;
-use num_traits::{Signed, Zero};
+use crate::{AngleTarget, Axis, Cyclotomic, Error, Limits, RBig, Result, Sequence, Target};
+use dashu_base::{Abs, BitTest};
+use dashu_int::IBig;
 /// A mathematical full-matrix certificate. The squared Frobenius bound also bounds
 /// the squared operator norm. Exact candidate, target and tolerance identities are owned.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -10,7 +10,8 @@ pub struct ApproxCertificate {
     candidate: Sequence,
     target: Target,
     epsilon_bits: u64,
-    bound_squared: Rational,
+    #[cfg_attr(feature = "serde", serde(with = "crate::encoding::rational"))]
+    bound_squared: RBig,
     precision_bits: usize,
 }
 impl ApproxCertificate {
@@ -27,7 +28,7 @@ impl ApproxCertificate {
         self.epsilon_bits
     }
     #[must_use]
-    pub const fn bound_squared(&self) -> &Rational {
+    pub const fn bound_squared(&self) -> &RBig {
         &self.bound_squared
     }
     #[must_use]
@@ -51,7 +52,7 @@ pub fn certify_rotation(
         ));
     }
     let epsilon = dyadic_from_bits(epsilon_bits, limits)?;
-    if epsilon <= Rational::zero() {
+    if epsilon <= RBig::ZERO {
         return Err(Error::Invalid(
             "tolerance must be positive and finite".into(),
         ));
@@ -115,7 +116,7 @@ fn rotation_interval_limits(gates: usize, limits: Limits) -> Result<Limits> {
 /// Decode finite binary64 bits exactly as a rational, without decimal or libm conversion.
 /// # Errors
 /// Rejects nonfinite bit patterns and resource excesses.
-pub fn dyadic_from_bits(bits: u64, limits: Limits) -> Result<Rational> {
+pub fn dyadic_from_bits(bits: u64, limits: Limits) -> Result<RBig> {
     let exponent = (bits >> 52) & 0x7ff;
     let fraction = bits & 0x000f_ffff_ffff_ffff;
     if exponent == 0x7ff {
@@ -127,7 +128,7 @@ pub fn dyadic_from_bits(bits: u64, limits: Limits) -> Result<Rational> {
         fraction | 0x0010_0000_0000_0000
     };
     if mantissa == 0 {
-        return Ok(Rational::zero());
+        return Ok(RBig::ZERO);
     }
     let shift = if exponent == 0 {
         -1074
@@ -137,27 +138,33 @@ pub fn dyadic_from_bits(bits: u64, limits: Limits) -> Result<Rational> {
             .checked_sub(1075)
             .ok_or_else(|| Error::Resource("float exponent".into()))?
     };
-    let mut numerator = BigInt::from(mantissa);
-    let mut denominator = BigInt::from(1);
+    let mut numerator = IBig::from(mantissa);
+    let mut denominator = IBig::from(1);
     if shift >= 0 {
         numerator = std::ops::Shl::shl(
             numerator,
-            u32::try_from(shift).map_err(|_| Error::Resource("float numerator shift".into()))?,
+            usize::try_from(shift).map_err(|_| Error::Resource("float numerator shift".into()))?,
         );
     } else {
-        denominator = std::ops::Shl::shl(denominator, shift.unsigned_abs());
+        denominator = std::ops::Shl::shl(
+            denominator,
+            usize::try_from(shift.unsigned_abs())
+                .map_err(|_| Error::Resource("float shift".into()))?,
+        );
     }
     if bits >> 63 != 0 {
         numerator = std::ops::Neg::neg(numerator);
     }
     check_rational(&numerator, &denominator, limits)?;
-    Ok(Rational::new(numerator, denominator))
+    Ok(RBig::from_parts_signed(numerator, denominator))
 }
-fn check_rational(numerator: &BigInt, denominator: &BigInt, limits: Limits) -> Result<()> {
+fn check_rational(numerator: &IBig, denominator: &IBig, limits: Limits) -> Result<()> {
     if denominator.is_zero() {
         return Err(Error::Invalid("zero rational denominator".into()));
     }
-    let bits = numerator.bits().max(denominator.bits());
+    let bits = u64::try_from(numerator.bit_len())
+        .unwrap_or(u64::MAX)
+        .max(u64::try_from(denominator.bit_len()).unwrap_or(u64::MAX));
     if bits > limits.coefficient_bits {
         return Err(crate::types::budget(
             "coefficient bits",
@@ -168,16 +175,16 @@ fn check_rational(numerator: &BigInt, denominator: &BigInt, limits: Limits) -> R
     crate::types::allocation(bits, 16, limits)
 }
 enum Input {
-    Radians(Rational),
-    Pi(Rational),
-    AffinePi { radians: Rational, pi: Rational },
+    Radians(RBig),
+    Pi(RBig),
+    AffinePi { radians: RBig, pi: RBig },
 }
 impl Input {
     fn new(angle: &AngleTarget, limits: Limits) -> Result<Self> {
         match angle {
             AngleTarget::DyadicRadians { bits } => Ok(Self::Radians(std::ops::Div::div(
                 dyadic_from_bits(*bits, limits)?,
-                BigInt::from(2),
+                IBig::from(2),
             ))),
             AngleTarget::RationalPi {
                 numerator,
@@ -185,14 +192,17 @@ impl Input {
             } => {
                 check_rational(numerator, denominator, limits)?;
                 let half = std::ops::Div::div(
-                    Rational::new(numerator.clone(), denominator.clone()),
-                    BigInt::from(2),
+                    RBig::from_parts_signed(numerator.clone(), denominator.clone()),
+                    IBig::from(2),
                 );
-                let period = std::ops::Mul::mul(half.denom(), 2);
-                let quotient = floor_div(&std::ops::Add::add(half.numer(), half.denom()), &period)?;
+                let period = IBig::from(std::ops::Mul::mul(half.denominator(), 2u8));
+                let quotient = floor_div(
+                    &std::ops::Add::add(half.numerator(), half.denominator()),
+                    &period,
+                )?;
                 Ok(Self::Pi(std::ops::Sub::sub(
                     half,
-                    Rational::from_integer(std::ops::Mul::mul(quotient, 2)),
+                    RBig::from(std::ops::Mul::mul(quotient, 2)),
                 )))
             }
             AngleTarget::AffinePi {
@@ -204,12 +214,12 @@ impl Input {
                 check_affine_leaf(radians_numerator, radians_denominator, limits)?;
                 check_affine_leaf(pi_numerator, pi_denominator, limits)?;
                 let radians = std::ops::Div::div(
-                    Rational::new(radians_numerator.clone(), radians_denominator.clone()),
-                    BigInt::from(2),
+                    RBig::from_parts_signed(radians_numerator.clone(), radians_denominator.clone()),
+                    IBig::from(2),
                 );
                 let pi = std::ops::Div::div(
-                    Rational::new(pi_numerator.clone(), pi_denominator.clone()),
-                    BigInt::from(2),
+                    RBig::from_parts_signed(pi_numerator.clone(), pi_denominator.clone()),
+                    IBig::from(2),
                 );
                 check_affine_intermediate(&radians, limits)?;
                 check_affine_intermediate(&pi, limits)?;
@@ -222,15 +232,18 @@ impl Input {
         match self {
             Self::Pi(coefficient) => grid.mul(&grid.rational(coefficient)?, &pi),
             Self::Radians(value) => {
-                let midpoint = Rational::new(
+                let midpoint = RBig::from_parts_signed(
                     std::ops::Add::add(&pi.lower, &pi.upper),
                     std::ops::Mul::mul(&grid.scale, 2),
                 );
                 let quotient = std::ops::Div::div(
                     std::ops::Add::add(value, &midpoint),
-                    std::ops::Mul::mul(&midpoint, BigInt::from(2)),
+                    std::ops::Mul::mul(&midpoint, IBig::from(2)),
                 );
-                let periods = floor_div(quotient.numer(), quotient.denom())?;
+                let periods = floor_div(
+                    quotient.numerator(),
+                    &IBig::from(quotient.denominator().clone()),
+                )?;
                 Ok(grid
                     .rational(value)?
                     .sub(&pi.scaled(&std::ops::Mul::mul(periods, 2))))
@@ -247,11 +260,12 @@ impl Input {
                 let numerator =
                     std::ops::Add::add(std::ops::Add::add(&raw.lower, &raw.upper), &pi_sum);
                 let periods = floor_div(&numerator, &std::ops::Mul::mul(&pi_sum, 2))?;
-                check_affine_bits(periods.bits(), grid.limits)?;
-                let reduced_coefficient = std::ops::Sub::sub(
-                    coefficient,
-                    Rational::from_integer(std::ops::Mul::mul(periods, 2)),
-                );
+                check_affine_bits(
+                    u64::try_from(periods.bit_len()).unwrap_or(u64::MAX),
+                    grid.limits,
+                )?;
+                let reduced_coefficient =
+                    std::ops::Sub::sub(coefficient, RBig::from(std::ops::Mul::mul(periods, 2)));
                 check_affine_intermediate(&reduced_coefficient, grid.limits)?;
                 let reduced =
                     radians_grid.add(&grid.mul(&grid.rational(&reduced_coefficient)?, &pi)?);
@@ -261,11 +275,13 @@ impl Input {
         }
     }
 }
-fn check_affine_leaf(numerator: &BigInt, denominator: &BigInt, limits: Limits) -> Result<()> {
+fn check_affine_leaf(numerator: &IBig, denominator: &IBig, limits: Limits) -> Result<()> {
     if denominator.is_zero() {
         return Err(Error::Invalid("zero affine-pi denominator".into()));
     }
-    let bits = numerator.bits().max(denominator.bits());
+    let bits = u64::try_from(numerator.bit_len())
+        .unwrap_or(u64::MAX)
+        .max(u64::try_from(denominator.bit_len()).unwrap_or(u64::MAX));
     let cap = limits.coefficient_bits.min(16_384);
     if bits > cap {
         return Err(crate::types::budget("coefficient bits", bits, cap));
@@ -292,11 +308,18 @@ fn check_affine_bits(bits: u64, limits: Limits) -> Result<()> {
     }
     crate::types::allocation(bits, 32, limits)
 }
-fn check_affine_intermediate(value: &Rational, limits: Limits) -> Result<()> {
-    check_affine_bits(value.numer().bits().max(value.denom().bits()), limits)
+fn check_affine_intermediate(value: &RBig, limits: Limits) -> Result<()> {
+    check_affine_bits(
+        u64::try_from(value.numerator().bit_len())
+            .unwrap_or(u64::MAX)
+            .max(u64::try_from(value.denominator().bit_len()).unwrap_or(u64::MAX)),
+        limits,
+    )
 }
 fn check_affine_interval(value: &Interval, grid: &Grid) -> Result<()> {
-    let bits = value.lower.bits().max(value.upper.bits());
+    let bits = u64::try_from(value.lower.bit_len())
+        .unwrap_or(u64::MAX)
+        .max(u64::try_from(value.upper.bit_len()).unwrap_or(u64::MAX));
     let precision_bits = crate::types::size(grid.bits)?;
     let cap = grid
         .limits
@@ -344,14 +367,14 @@ impl ComplexInterval {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DyadicBox8 {
     bits: usize,
-    lower: [BigInt; 8],
-    upper: [BigInt; 8],
+    lower: [IBig; 8],
+    upper: [IBig; 8],
 }
 impl DyadicBox8 {
     /// Construct a point box in scaled integer coordinates.
     /// # Errors
     /// Rejects unsupported precision.
-    pub fn point(bits: usize, coordinates: [BigInt; 8]) -> Result<Self> {
+    pub fn point(bits: usize, coordinates: [IBig; 8]) -> Result<Self> {
         if bits == 0 || bits > 4096 {
             return Err(Error::Invalid("MITM box precision".into()));
         }
@@ -369,7 +392,7 @@ impl DyadicBox8 {
             return Err(Error::Invalid("MITM enclosure requires one qubit".into()));
         }
         let grid = Grid::new(bits, limits)?;
-        let root_half = grid.root_two()?.divided(&BigInt::from(2))?;
+        let root_half = grid.root_two()?.divided(&IBig::from(2))?;
         let mut entries = Vec::new();
         entries
             .try_reserve_exact(4)
@@ -412,7 +435,7 @@ impl DyadicBox8 {
     /// Return a closed coordinate interval in scaled integer units.
     /// # Errors
     /// Rejects a coordinate outside 0..8.
-    pub fn coordinate(&self, index: usize) -> Result<(&BigInt, &BigInt)> {
+    pub fn coordinate(&self, index: usize) -> Result<(&IBig, &IBig)> {
         Ok((
             self.lower
                 .get(index)
@@ -441,11 +464,11 @@ impl DyadicBox8 {
     /// A boundary contact has zero gap and must not be pruned.
     /// # Errors
     /// Rejects mixed scales.
-    pub fn gap_squared(&self, other: &Self) -> Result<BigInt> {
+    pub fn gap_squared(&self, other: &Self) -> Result<IBig> {
         if self.bits != other.bits {
             return Err(Error::Invalid("MITM box scale".into()));
         }
-        let mut sum = BigInt::zero();
+        let mut sum = IBig::ZERO;
         for (((self_lower, self_upper), other_lower), other_upper) in self
             .lower
             .iter()
@@ -455,7 +478,7 @@ impl DyadicBox8 {
         {
             let gap = std::ops::Sub::sub(self_lower, other_upper)
                 .max(std::ops::Sub::sub(other_lower, self_upper))
-                .max(BigInt::zero());
+                .max(IBig::ZERO);
             std::ops::AddAssign::add_assign(&mut sum, std::ops::Mul::mul(&gap, &gap));
         }
         Ok(sum)
@@ -466,8 +489,12 @@ impl DyadicBox8 {
     pub fn retained_bytes(&self) -> Result<usize> {
         let mut bytes = std::mem::size_of::<Self>();
         for value in self.lower.iter().chain(&self.upper) {
-            let limbs = usize::try_from(value.bits().div_ceil(64))
-                .map_err(|_| Error::Resource("MITM box storage".into()))?;
+            let limbs = usize::try_from(
+                u64::try_from(value.bit_len())
+                    .unwrap_or(u64::MAX)
+                    .div_ceil(64),
+            )
+            .map_err(|_| Error::Resource("MITM box storage".into()))?;
             bytes = bytes
                 .checked_add(
                     limbs
@@ -503,7 +530,7 @@ pub fn adjoint_times_rotation_enclosure(
     let input = Input::new(&target.angle, limits)?;
     let grid = Grid::new(bits, limits)?;
     let target_entries = rotation_entries(&input, target.axis, &grid)?;
-    let root_half = grid.root_two()?.divided(&BigInt::from(2))?;
+    let root_half = grid.root_two()?.divided(&IBig::from(2))?;
     let mut exact = Vec::new();
     exact
         .try_reserve_exact(4)
@@ -581,7 +608,11 @@ fn cyclotomic_interval(
         .add(&root_half.scaled(&std::ops::Sub::sub(b, d)));
     let imaginary = Interval::point(std::ops::Shl::shl(c, grid.bits))
         .add(&root_half.scaled(&std::ops::Add::add(b, d)));
-    let denominator = std::ops::Shl::shl(BigInt::from(1), value.denominator_exponent());
+    let denominator = std::ops::Shl::shl(
+        IBig::from(1),
+        usize::try_from(value.denominator_exponent())
+            .map_err(|_| Error::Resource("ring denominator shift".into()))?,
+    );
     Ok(ComplexInterval {
         real: real.divided(&denominator)?,
         imaginary: imaginary.divided(&denominator)?,
@@ -591,13 +622,13 @@ fn difference_bounds(
     candidate: &[Cyclotomic],
     target: &[ComplexInterval],
     grid: &Grid,
-) -> Result<(Rational, Rational)> {
+) -> Result<(RBig, RBig)> {
     if candidate.len() != target.len() {
         return Err(Error::Invalid("matrix comparison dimension".into()));
     }
-    let root_half = grid.root_two()?.divided(&BigInt::from(2))?;
-    let mut lower = BigInt::zero();
-    let mut upper = BigInt::zero();
+    let root_half = grid.root_two()?.divided(&IBig::from(2))?;
+    let mut lower = IBig::ZERO;
+    let mut upper = IBig::ZERO;
     for (candidate, target) in candidate.iter().zip(target) {
         let candidate = cyclotomic_interval(candidate, &root_half, grid)?;
         for difference in [
@@ -605,10 +636,10 @@ fn difference_bounds(
             candidate.imaginary.sub(&target.imaginary),
         ] {
             let high = difference.magnitude();
-            let low = if difference.lower <= BigInt::zero() && difference.upper >= BigInt::zero() {
-                BigInt::zero()
+            let low = if difference.lower <= IBig::ZERO && difference.upper >= IBig::ZERO {
+                IBig::ZERO
             } else {
-                difference.lower.abs().min(difference.upper.abs())
+                (&difference.lower).abs().min((&difference.upper).abs())
             };
             std::ops::AddAssign::add_assign(&mut lower, std::ops::Mul::mul(&low, &low));
             std::ops::AddAssign::add_assign(&mut upper, std::ops::Mul::mul(&high, &high));
@@ -616,7 +647,7 @@ fn difference_bounds(
     }
     let denominator = std::ops::Mul::mul(&grid.scale, &grid.scale);
     Ok((
-        Rational::new(lower, denominator.clone()),
-        Rational::new(upper, denominator),
+        RBig::from_parts_signed(lower, denominator.clone()),
+        RBig::from_parts_signed(upper, denominator),
     ))
 }

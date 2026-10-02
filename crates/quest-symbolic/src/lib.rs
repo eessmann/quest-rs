@@ -9,6 +9,7 @@
 //! The project-owned affine engine canonicalizes algebra. Source nodes remain shared and immutable so
 //! cancellation cannot discard a parameter or a finite-conversion obligation.
 
+use dashu_base::BitTest;
 mod affine;
 mod source;
 
@@ -17,13 +18,11 @@ use std::fmt;
 use std::sync::Arc;
 
 use affine::{Affine, Context, Limits, Owner as CoreOwner, Symbol as CoreSymbol};
-use num_bigint::BigInt;
-use num_rational::Ratio;
-use num_traits::Zero;
+use dashu_int::IBig;
 use source::{Kind, Linear, MAX_INPUT_BINDINGS, Source, rational_bytes};
 
 pub use affine::ExactError;
-pub type Rational = Ratio<BigInt>;
+pub use dashu_ratio::RBig;
 
 /// Quest's parameter namespace, independent of the algebra engine's type.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -134,7 +133,7 @@ impl Expr {
             })
             .and_then(|x| x.checked_add(self.source.retained_bytes().ok()?))
             .ok_or(Error::SourceLimit)?;
-        let add = |bytes: &mut usize, coefficient: &Rational| -> Result<()> {
+        let add = |bytes: &mut usize, coefficient: &RBig| -> Result<()> {
             *bytes = bytes
                 .checked_add(rational_bytes(coefficient)?)
                 .ok_or(Error::SourceLimit)?;
@@ -144,20 +143,21 @@ impl Expr {
         add(&mut bytes, self.affine.pi_coefficient())?;
         for (_, coefficient) in self.affine.terms() {
             bytes = bytes
-                .checked_add(const { 2 * std::mem::size_of::<(CoreSymbol, Rational)>() })
+                .checked_add(const { 2 * std::mem::size_of::<(CoreSymbol, RBig)>() })
                 .ok_or(Error::SourceLimit)?;
             add(&mut bytes, coefficient)?;
         }
         add(&mut bytes, &self.summary.radians)?;
         add(&mut bytes, &self.summary.pi)?;
         for coefficient in self.summary.terms.values() {
-            bytes = bytes
-                .checked_add(
-                    const {
-                        std::mem::size_of::<(Symbol, Rational)>() + 5 * std::mem::size_of::<usize>()
-                    },
-                )
-                .ok_or(Error::SourceLimit)?;
+            bytes =
+                bytes
+                    .checked_add(
+                        const {
+                            std::mem::size_of::<(Symbol, RBig)>() + 5 * std::mem::size_of::<usize>()
+                        },
+                    )
+                    .ok_or(Error::SourceLimit)?;
             add(&mut bytes, coefficient)?;
         }
         Ok(bytes)
@@ -174,14 +174,14 @@ impl Expr {
         clippy::needless_pass_by_value,
         reason = "Constructors take ownership of admitted coefficients"
     )]
-    pub fn radians(value: Rational) -> Result<Self> {
-        let value = normalize(&value)?;
+    pub fn radians(value: RBig) -> Result<Self> {
+        let value = admit_rational(&value)?;
         let context = Context::new(Owner::new(0).core());
-        let affine = context.assemble(value.clone(), Rational::zero(), vec![])?;
+        let affine = context.assemble(value.clone(), RBig::ZERO, vec![])?;
         Ok(Self {
             context,
             affine,
-            source: Source::leaf(Kind::Radians(normalize(&value)?)),
+            source: Source::leaf(Kind::Radians(admit_rational(&value)?)),
             summary: Arc::new(Linear {
                 radians: value,
                 ..Linear::default()
@@ -193,14 +193,14 @@ impl Expr {
         clippy::needless_pass_by_value,
         reason = "Constructors take ownership of admitted coefficients"
     )]
-    pub fn pi(value: Rational) -> Result<Self> {
-        let value = normalize(&value)?;
+    pub fn pi(value: RBig) -> Result<Self> {
+        let value = admit_rational(&value)?;
         let context = Context::new(Owner::new(0).core());
-        let affine = context.assemble(Rational::zero(), value.clone(), vec![])?;
+        let affine = context.assemble(RBig::ZERO, value.clone(), vec![])?;
         Ok(Self {
             context,
             affine,
-            source: Source::leaf(Kind::Pi(normalize(&value)?)),
+            source: Source::leaf(Kind::Pi(admit_rational(&value)?)),
             summary: Arc::new(Linear {
                 pi: value,
                 ..Linear::default()
@@ -212,15 +212,18 @@ impl Expr {
         clippy::needless_pass_by_value,
         reason = "Constructors take ownership of admitted coefficients"
     )]
-    pub fn affine(radians: Rational, pi: Rational) -> Result<Self> {
-        let radians = normalize(&radians)?;
-        let pi = normalize(&pi)?;
+    pub fn affine(radians: RBig, pi: RBig) -> Result<Self> {
+        let radians = admit_rational(&radians)?;
+        let pi = admit_rational(&pi)?;
         let context = Context::new(Owner::new(0).core());
         let affine = context.assemble(radians.clone(), pi.clone(), vec![])?;
         Ok(Self {
             context,
             affine,
-            source: Source::leaf(Kind::Affine(normalize(&radians)?, normalize(&pi)?)),
+            source: Source::leaf(Kind::Affine(
+                admit_rational(&radians)?,
+                admit_rational(&pi)?,
+            )),
             summary: Arc::new(Linear {
                 radians,
                 pi,
@@ -237,7 +240,7 @@ impl Expr {
             affine,
             source: Source::leaf(Kind::Parameter(symbol)),
             summary: Arc::new(Linear {
-                terms: BTreeMap::from([(symbol, Rational::from_integer(1.into()))]),
+                terms: BTreeMap::from([(symbol, RBig::ONE)]),
                 ..Linear::default()
             }),
         })
@@ -245,10 +248,10 @@ impl Expr {
     pub const fn owner(&self) -> Owner {
         Owner::new(self.affine.owner().id())
     }
-    pub fn constant(&self) -> &Rational {
+    pub fn constant(&self) -> &RBig {
         self.affine.constant()
     }
-    pub fn pi_coefficient(&self) -> &Rational {
+    pub fn pi_coefficient(&self) -> &RBig {
         self.affine.pi_coefficient()
     }
     /// Independently maintained exact source summary for a constant expression.
@@ -258,13 +261,13 @@ impl Expr {
     /// A constant summary does not erase cancelled symbols' ownership, finite
     /// binding requirements, or the original source conversion obligations.
     #[must_use]
-    pub fn independent_constant_summary(&self) -> Option<(&Rational, &Rational)> {
+    pub fn independent_constant_summary(&self) -> Option<(&RBig, &RBig)> {
         self.summary
             .terms
             .is_empty()
             .then_some((&self.summary.radians, &self.summary.pi))
     }
-    pub fn terms(&self) -> impl Iterator<Item = (Symbol, &Rational)> {
+    pub fn terms(&self) -> impl Iterator<Item = (Symbol, &RBig)> {
         self.affine
             .terms()
             .map(|(symbol, value)| (Symbol::from_core(*symbol), value))
@@ -282,11 +285,7 @@ impl Expr {
             context: self.context.clone(),
             affine,
             source,
-            summary: Arc::new(
-                (*self.summary)
-                    .clone()
-                    .scale(&Rational::from_integer((-1).into()))?,
-            ),
+            summary: Arc::new((*self.summary).clone().scale(&RBig::NEG_ONE)?),
         };
         result.verify_inductive()?;
         Ok(result)
@@ -318,17 +317,21 @@ impl Expr {
         result.verify_inductive()?;
         Ok(result)
     }
-    pub fn scale_ratio(&self, numerator: BigInt, denominator: BigInt) -> Result<Self> {
+    pub fn scale_ratio(&self, numerator: IBig, denominator: IBig) -> Result<Self> {
         if denominator.is_zero() {
             return Err(Error::ZeroDenominator);
         }
-        if numerator.bits().max(denominator.bits()) > Limits::default().max_coefficient_bits {
+        if u64::try_from(numerator.bit_len())
+            .unwrap_or(u64::MAX)
+            .max(u64::try_from(denominator.bit_len()).unwrap_or(u64::MAX))
+            > Limits::default().max_coefficient_bits
+        {
             return Err(Error::Exact(ExactError::CoefficientLimit));
         }
         let affine = self
             .affine
             .scale_ratio(numerator.clone(), denominator.clone())?;
-        let factor = Rational::new(numerator, denominator);
+        let factor = RBig::from_parts_signed(numerator, denominator);
         let source = Source::scale(&self.source, factor.clone())?;
         let result = Self {
             context: self.context.clone(),
@@ -394,7 +397,7 @@ impl Expr {
     /// Check every original pi conversion, including cancelled leaves.
     pub fn check_pi_leaves<E>(
         &self,
-        check: impl FnMut(&Rational) -> std::result::Result<(), E>,
+        check: impl FnMut(&RBig) -> std::result::Result<(), E>,
     ) -> std::result::Result<(), E> {
         self.source.pi_leaves(check)
     }
@@ -410,7 +413,7 @@ impl Expr {
         }
     }
     /// Unmodified pi source leaf retaining its original conversion obligation.
-    pub fn pi_leaf(&self) -> Option<&Rational> {
+    pub fn pi_leaf(&self) -> Option<&RBig> {
         if let Kind::Pi(value) = &self.source.kind {
             Some(value)
         } else {
@@ -418,7 +421,7 @@ impl Expr {
         }
     }
     /// A pi source leaf or its direct negation retains `RationalPi` identity.
-    pub fn pi_identity(&self) -> Option<Rational> {
+    pub fn pi_identity(&self) -> Option<RBig> {
         match &self.source.kind {
             Kind::Pi(value) => Some(value.clone()),
             Kind::Negative(child) => match &child.kind {
@@ -458,15 +461,15 @@ impl Expr {
         Ok(())
     }
     /// Bind exact rational-radian values and independently check the canonicalizer result.
-    pub fn bind(&self, bindings: &[(Symbol, Rational)]) -> Result<(Rational, Rational)> {
+    pub fn bind(&self, bindings: &[(Symbol, RBig)]) -> Result<(RBig, RBig)> {
         self.bind_checked(bindings, |_, _| Ok(()))
     }
     /// Bind while checking the finite-conversion obligation of every original source node.
     pub fn bind_checked<E: From<Error>>(
         &self,
-        bindings: &[(Symbol, Rational)],
-        check: impl FnMut(&Rational, &Rational) -> std::result::Result<(), E>,
-    ) -> std::result::Result<(Rational, Rational), E> {
+        bindings: &[(Symbol, RBig)],
+        check: impl FnMut(&RBig, &RBig) -> std::result::Result<(), E>,
+    ) -> std::result::Result<(RBig, RBig), E> {
         if bindings.len() > MAX_INPUT_BINDINGS {
             return Err(Error::SourceLimit.into());
         }
@@ -477,15 +480,13 @@ impl Expr {
             if !needed.contains(symbol) {
                 continue;
             }
-            if value.denom().is_zero() {
-                return Err(Error::ZeroDenominator.into());
-            }
-            let bits = value
-                .numer()
-                .bits()
-                .checked_add(value.denom().bits())
+            let bits = u64::try_from(value.numerator().bit_len())
+                .unwrap_or(u64::MAX)
+                .checked_add(u64::try_from(value.denominator().bit_len()).unwrap_or(u64::MAX))
                 .ok_or(Error::SourceLimit)?;
-            if value.numer().bits().max(value.denom().bits())
+            if u64::try_from(value.numerator().bit_len())
+                .unwrap_or(u64::MAX)
+                .max(u64::try_from(value.denominator().bit_len()).unwrap_or(u64::MAX))
                 > Limits::default().max_coefficient_bits
             {
                 return Err(Error::Exact(ExactError::CoefficientLimit).into());
@@ -497,7 +498,7 @@ impl Expr {
             if estimated_bytes > Limits::default().max_bytes {
                 return Err(Error::Exact(ExactError::StorageLimit).into());
             }
-            if values.insert(*symbol, normalize(value)?).is_some() {
+            if values.insert(*symbol, admit_rational(value)?).is_some() {
                 return Err(Error::DuplicateBinding.into());
             }
         }
@@ -511,7 +512,7 @@ impl Expr {
             .map(|(symbol, value)| {
                 Ok((
                     symbol.core(),
-                    context.assemble(value.clone(), Rational::zero(), vec![])?,
+                    context.assemble(value.clone(), RBig::ZERO, vec![])?,
                 ))
             })
             .collect::<Result<Vec<_>>>()?;
@@ -530,14 +531,15 @@ impl Expr {
     }
 }
 
-fn normalize(value: &Rational) -> Result<Rational> {
-    if value.denom().is_zero() {
-        return Err(Error::ZeroDenominator);
-    }
-    if value.numer().bits().max(value.denom().bits()) > Limits::default().max_coefficient_bits {
+fn admit_rational(value: &RBig) -> Result<RBig> {
+    if u64::try_from(value.numerator().bit_len())
+        .unwrap_or(u64::MAX)
+        .max(u64::try_from(value.denominator().bit_len()).unwrap_or(u64::MAX))
+        > Limits::default().max_coefficient_bits
+    {
         return Err(Error::Exact(ExactError::CoefficientLimit));
     }
-    Ok(Rational::new(value.numer().clone(), value.denom().clone()))
+    Ok(value.clone())
 }
 fn rehome(value: &Affine, context: &Context) -> Result<Affine> {
     if value
@@ -558,13 +560,13 @@ fn rehome(value: &Affine, context: &Context) -> Result<Affine> {
 
 #[cfg(test)]
 mod tests {
-    use super::{Error, Expr, Owner, Rational, Symbol};
+    use super::{Error, Expr, Owner, RBig, Symbol};
+    use dashu_int::IBig;
     use googletest::{Result, prelude::*};
-    use num_bigint::BigInt;
 
     #[gtest]
     fn independent_replay_rejects_incorrect_canonicalizer_coefficients() -> Result<()> {
-        let original = Expr::pi(Rational::from_integer(1.into()))?;
+        let original = Expr::pi(RBig::ONE)?;
         let forged = Expr {
             context: original.context.clone(),
             affine: original.context.zero()?,
@@ -606,27 +608,24 @@ mod tests {
         let a = Symbol::new(Owner::new(7), 1);
         let b = Symbol::new(Owner::new(7), 2);
         let expression = Expr::parameter(a)?;
-        let value = Rational::from_integer(3.into());
+        let value = RBig::from(3);
         expect_eq!(
-            expression.bind(&[(a, value.clone()), (b, Rational::from_integer(5.into()))])?,
-            (value, Rational::from_integer(0.into()))
+            expression.bind(&[(a, value.clone()), (b, RBig::from(5))])?,
+            (value, RBig::ZERO)
         );
-        let constant = Expr::pi(Rational::from_integer(1.into()))?;
+        let constant = Expr::pi(RBig::ONE)?;
         expect_eq!(
-            constant.bind(&[(a, Rational::from_integer(2.into()))])?,
-            (
-                Rational::from_integer(0.into()),
-                Rational::from_integer(1.into())
-            )
+            constant.bind(&[(a, RBig::from(2))])?,
+            (RBig::ZERO, RBig::ONE)
         );
         Ok(())
     }
 
     #[gtest]
     fn independent_replay_admits_exact_cancellation_at_width_limit() -> Result<()> {
-        let denominator = std::ops::Shl::shl(BigInt::from(1), 16_000usize);
-        let positive = Expr::radians(Rational::new(1.into(), denominator.clone()))?;
-        let negative = Expr::radians(Rational::new((-1).into(), denominator))?;
+        let denominator = std::ops::Shl::shl(IBig::from(1), 16_000usize);
+        let positive = Expr::radians(RBig::from_parts_signed(1.into(), denominator.clone()))?;
+        let negative = Expr::radians(RBig::from_parts_signed((-1).into(), denominator))?;
         let zero = positive.add(&negative)?;
         expect_true!(zero.is_zero());
         zero.verify()?;

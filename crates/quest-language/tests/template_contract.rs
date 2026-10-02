@@ -35,3 +35,17 @@ fn serialized_scalar_cannot_bypass_checked_widths_and_payloads() {
         serde_json::from_str::<ScalarValue>(r#"{"ty":"Bool","data":{"Bits":1}}"#).is_err()
     );
 }
+
+#[gtest]
+fn previous_template_version_is_rejected_without_legacy_decode() -> Result<()> {
+    let source = SourceSnapshot::new(SourceId::new(2), "template", "qubit q; h q;");
+    let module = semantic::admit(syntax::parse_source(&source)?, CompileLimits::default())?;
+    let encoded = template::encode(&module)?;
+    let mut value: serde_json::Value = serde_json::from_str(&encoded)?;
+    expect_eq!(value["version"].as_u64(), Some(2));
+    value["version"] = 1.into();
+    expect_true!(
+        template::load(&serde_json::to_string(&value)?, CompileLimits::default()).is_err()
+    );
+    Ok(())
+}

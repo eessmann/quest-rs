@@ -1,5 +1,5 @@
+use dashu_int::IBig;
 use googletest::{Result, prelude::*};
-use num_bigint::BigInt;
 use quest_math::{AngleTarget, Axis, Gate, Limits, Operation, Sequence, Target, certify_rotation};
 fn operation(gate: Gate) -> Operation {
     Operation {
@@ -12,8 +12,8 @@ fn target(axis: Axis, numerator: i64, denominator: i64) -> Target {
     Target {
         axis,
         angle: AngleTarget::RationalPi {
-            numerator: BigInt::from(numerator),
-            denominator: BigInt::from(denominator),
+            numerator: IBig::from(numerator),
+            denominator: IBig::from(denominator),
         },
     }
 }
@@ -99,7 +99,7 @@ fn large_nondyadic_affine_radians_require_refinement_and_respect_budget() -> Res
     let huge = Target {
         axis: Axis::X,
         angle: AngleTarget::AffinePi {
-            radians_numerator: std::ops::Add::add(std::ops::Shl::shl(BigInt::from(1), 400usize), 1),
+            radians_numerator: std::ops::Add::add(std::ops::Shl::shl(IBig::from(1), 400usize), 1),
             radians_denominator: 3.into(),
             pi_numerator: 0.into(),
             pi_denominator: 1.into(),
@@ -132,7 +132,7 @@ fn large_nondyadic_affine_radians_require_refinement_and_respect_budget() -> Res
     let negative_huge = Target {
         axis: Axis::Y,
         angle: AngleTarget::AffinePi {
-            radians_numerator: std::ops::Add::add(std::ops::Shl::shl(BigInt::from(1), 400usize), 1),
+            radians_numerator: std::ops::Add::add(std::ops::Shl::shl(IBig::from(1), 400usize), 1),
             radians_denominator: (-3).into(),
             pi_numerator: (-1).into(),
             pi_denominator: (-10).into(),
@@ -258,10 +258,13 @@ fn golden_frobenius_bound_for_t_minus_identity_is_two_minus_sqrt_two() -> Result
         0.766f64.to_bits(),
         Limits::default(),
     )?;
-    let denominator = BigInt::from(100_000_000_000_000_000u64);
-    let lower =
-        quest_math::Rational::new(BigInt::from(58_578_643_762_690_494u64), denominator.clone());
-    let upper = quest_math::Rational::new(BigInt::from(58_578_643_762_690_496u64), denominator);
+    let denominator = IBig::from(100_000_000_000_000_000u64);
+    let lower = quest_math::RBig::from_parts_signed(
+        IBig::from(58_578_643_762_690_494u64),
+        denominator.clone(),
+    );
+    let upper =
+        quest_math::RBig::from_parts_signed(IBig::from(58_578_643_762_690_496u64), denominator);
     expect_true!(certificate.bound_squared() >= &lower);
     expect_true!(certificate.bound_squared() <= &upper);
     expect_true!(
@@ -304,9 +307,9 @@ fn exact_dyadic_decoding_preserves_subnormals_and_rejects_nonfinite_payloads() -
     let smallest = quest_math::dyadic_from_bits(1, limits)?;
     expect_eq!(
         smallest,
-        quest_math::Rational::new(
-            BigInt::from(1),
-            std::ops::Shl::shl(BigInt::from(1), 1074usize)
+        quest_math::RBig::from_parts_signed(
+            IBig::from(1),
+            std::ops::Shl::shl(IBig::from(1), 1074usize)
         )
     );
     expect_eq!(

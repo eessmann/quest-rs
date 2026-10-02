@@ -3,7 +3,7 @@
 The typed Rust builder makes common category errors unrepresentable in its API. An integer local accepts an integer expression of its declared width; a loop requires a boolean expression; a quantum reference cannot initialize a classical local. Const width markers are still checked: unsupported widths do not become valid because they appear as Rust generic arguments.
 
 ```rust
-{{#include ../../../crates/quest-circuit/tests/tutorials.rs:typed_builder}}
+{{#include ../../../crates/quest-compile/tests/tutorials.rs:typed_builder}}
 ```
 
 The closure constructs a loop body once. It does not execute the quantum loop in Rust. Reads in its condition and body become language expressions referring to the same local; the interpreter evaluates them as execution proceeds. Handles carry builder ownership, and attempts to mix handles from separate builders return errors. Hygienic internal names preserve handle identity across lexical shadowing.
