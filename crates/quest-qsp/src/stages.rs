@@ -312,7 +312,8 @@ pub struct AdmittedTarget<M> {
     pub(crate) _mode: PhantomData<M>,
 }
 impl<M> AdmittedTarget<M> {
-    /// Complete the target through binary64 FFT Weiss factorization.
+    /// Complete the target through binary64 FFT Weiss factorization, retaining
+    /// the ratio only for the algorithm selected by [`Policy::algorithm`].
     ///
     /// # Errors
     /// Reports numerical failure, resource limits or an unestablished residual.
@@ -331,17 +332,20 @@ impl<M> AdmittedTarget<M> {
                 .ok_or(Error::Budget("completion retained storage"))?,
         )?;
         let (a_star, ratio, residual, grid) = kernel::complete(&self.target, working, execution)?;
-        let ratio = WeissRatio {
-            coefficients: ratio,
-            target: Arc::clone(&self.target),
-            norm_upper: self.norm_upper,
-            grid,
-            _mode: PhantomData,
+        let payload = match ratio {
+            kernel::CompletionData::InverseNlft => CompletionPayload::InverseNlft,
+            kernel::CompletionData::Rhw(coefficients) => CompletionPayload::Rhw(WeissRatio {
+                coefficients,
+                target: Arc::clone(&self.target),
+                norm_upper: self.norm_upper,
+                grid,
+                _mode: PhantomData,
+            }),
         };
         Ok(CompletedPolynomial {
             admitted: self,
             a_star,
-            ratio,
+            payload,
             residual,
             grid,
         })
@@ -408,25 +412,46 @@ impl<M> WeissRatio<M> {
     }
 }
 
-/// Completed outer factor; this numerical result is not a final certificate.
+#[derive(Debug)]
+enum CompletionPayload<M> {
+    InverseNlft,
+    Rhw(WeissRatio<M>),
+}
+
+/// Completed outer factor with payload for the selected synthesis algorithm.
+/// This numerical result is not a final certificate.
 #[derive(Debug)]
 pub struct CompletedPolynomial<M> {
     admitted: AdmittedTarget<M>,
     a_star: Vec<Complex64>,
-    ratio: WeissRatio<M>,
+    payload: CompletionPayload<M>,
     residual: f64,
     grid: usize,
 }
 impl<M> CompletedPolynomial<M> {
-    /// Typed ratio retaining target, grid, gauge and contractivity provenance.
+    /// RHW ratio retaining target, grid, gauge and contractivity provenance.
+    /// Inverse NLFT completion does not compute or retain a ratio.
     #[must_use]
-    pub const fn weiss_ratio(&self) -> &WeissRatio<M> {
-        &self.ratio
+    pub const fn weiss_ratio(&self) -> Option<&WeissRatio<M>> {
+        match &self.payload {
+            CompletionPayload::InverseNlft => None,
+            CompletionPayload::Rhw(ratio) => Some(ratio),
+        }
+    }
+
+    /// Algorithm for which this completion retains its synthesis payload.
+    #[must_use]
+    pub const fn algorithm(&self) -> SynthesisAlgorithm {
+        match &self.payload {
+            CompletionPayload::InverseNlft => SynthesisAlgorithm::InverseNlftDivideConquer,
+            CompletionPayload::Rhw(_) => SynthesisAlgorithm::RhwHalfCholesky,
+        }
     }
 
     fn working_policy(&self) -> Result<Policy> {
-        // Retained target/source/complement plus the overlapping reflection,
-        // phase, control and convention-conversion vectors while freezing.
+        // Retained target/source/complement and the selected ratio, plus the
+        // overlapping reflection, phase, control and convention-conversion
+        // vectors while freezing.
         let retained = self
             .admitted
             .target
@@ -434,6 +459,12 @@ impl<M> CompletedPolynomial<M> {
             .checked_mul(10)
             .and_then(|n| n.checked_add(self.admitted.source.len()))
             .and_then(|n| n.checked_add(self.a_star.len()))
+            .and_then(|n| {
+                n.checked_add(
+                    self.weiss_ratio()
+                        .map_or(0, |ratio| ratio.coefficients.len()),
+                )
+            })
             .ok_or(Error::Budget("synthesis retained storage"))?;
         crate::workspace_policy(self.admitted.policy, retained)
     }
@@ -491,11 +522,9 @@ impl CompletedPolynomial<UnitCircleResponse> {
         execution: ExecutionPolicy<'_>,
     ) -> Result<FrozenCandidate<UnitCircleResponse>> {
         let mut working = self.working_policy()?;
-        let (gamma, work_used) = match working.algorithm {
-            SynthesisAlgorithm::RhwHalfCholesky => {
-                kernel::half_cholesky(self.ratio.coefficients(), working)?
-            }
-            SynthesisAlgorithm::InverseNlftDivideConquer => {
+        let (gamma, work_used) = match &self.payload {
+            CompletionPayload::Rhw(ratio) => kernel::half_cholesky(ratio.coefficients(), working)?,
+            CompletionPayload::InverseNlft => {
                 kernel::inverse(&self.a_star, &self.admitted.target, working, execution)?
             }
         };
@@ -542,11 +571,9 @@ impl CompletedPolynomial<RealParityWx> {
         execution: ExecutionPolicy<'_>,
     ) -> Result<FrozenCandidate<RealParityWx>> {
         let mut working = self.working_policy()?;
-        let (gamma, work_used) = match working.algorithm {
-            SynthesisAlgorithm::RhwHalfCholesky => {
-                kernel::half_cholesky(self.ratio.coefficients(), working)?
-            }
-            SynthesisAlgorithm::InverseNlftDivideConquer => {
+        let (gamma, work_used) = match &self.payload {
+            CompletionPayload::Rhw(ratio) => kernel::half_cholesky(ratio.coefficients(), working)?,
+            CompletionPayload::InverseNlft => {
                 kernel::inverse(&self.a_star, &self.admitted.target, working, execution)?
             }
         };

@@ -1269,45 +1269,6 @@ impl BoundRegion {
     }
 }
 
-#[cfg(test)]
-mod plan_order_tests {
-    use super::QuantumRegionBuilder;
-    use super::{Error, Gate};
-    use googletest::{Result, prelude::*};
-
-    #[gtest]
-    fn plan_rejects_reordered_mandatory_edge() -> Result<()> {
-        let mut builder = QuantumRegionBuilder::new(1, 0)?;
-        let qubit = builder.qubit(0)?;
-        builder.gate(Gate::H, &[qubit], &[])?;
-        builder.gate(Gate::X, &[qubit], &[])?;
-        let mut bound = builder.finish()?.bind(&[])?;
-        bound.instructions.swap(0, 1);
-        expect_true!(matches!(bound.plan(), Err(Error::Cycle)));
-        Ok(())
-    }
-
-    #[gtest]
-    fn distinct_parameter_bindings_have_distinct_bound_snapshots() -> Result<()> {
-        let mut builder = QuantumRegionBuilder::new(1, 0)?;
-        let parameter = builder.parameter("theta")?;
-        builder.gate(
-            Gate::Rz(super::Angle::parameter(parameter)?),
-            &[builder.qubit(0)?],
-            &[],
-        )?;
-        let source = builder.finish()?;
-        let zero = source.clone().bind(&[(parameter, 0.0)])?;
-        let pi = source.bind(&[(parameter, std::f64::consts::PI)])?;
-        expect_eq!(zero.source_snapshot_id(), pi.source_snapshot_id());
-        expect_ne!(zero.snapshot_id(), pi.snapshot_id());
-        let clone = zero.clone();
-        expect_eq!(zero.snapshot_id(), clone.snapshot_id());
-        let _plan = clone.plan()?;
-        Ok(())
-    }
-}
-
 #[derive(Debug, Clone)]
 pub struct RegionPlan(BoundRegion);
 impl RegionPlan {
@@ -1619,5 +1580,44 @@ impl QuantumRegionBuilder {
             }
         };
         self.validate_operation(&semantic, depth)
+    }
+}
+
+#[cfg(test)]
+mod plan_order_tests {
+    use super::QuantumRegionBuilder;
+    use super::{Error, Gate};
+    use googletest::{Result, prelude::*};
+
+    #[gtest]
+    fn plan_rejects_reordered_mandatory_edge() -> Result<()> {
+        let mut builder = QuantumRegionBuilder::new(1, 0)?;
+        let qubit = builder.qubit(0)?;
+        builder.gate(Gate::H, &[qubit], &[])?;
+        builder.gate(Gate::X, &[qubit], &[])?;
+        let mut bound = builder.finish()?.bind(&[])?;
+        bound.instructions.swap(0, 1);
+        expect_true!(matches!(bound.plan(), Err(Error::Cycle)));
+        Ok(())
+    }
+
+    #[gtest]
+    fn distinct_parameter_bindings_have_distinct_bound_snapshots() -> Result<()> {
+        let mut builder = QuantumRegionBuilder::new(1, 0)?;
+        let parameter = builder.parameter("theta")?;
+        builder.gate(
+            Gate::Rz(super::Angle::parameter(parameter)?),
+            &[builder.qubit(0)?],
+            &[],
+        )?;
+        let source = builder.finish()?;
+        let zero = source.clone().bind(&[(parameter, 0.0)])?;
+        let pi = source.bind(&[(parameter, std::f64::consts::PI)])?;
+        expect_eq!(zero.source_snapshot_id(), pi.source_snapshot_id());
+        expect_ne!(zero.snapshot_id(), pi.snapshot_id());
+        let clone = zero.clone();
+        expect_eq!(zero.snapshot_id(), clone.snapshot_id());
+        let _plan = clone.plan()?;
+        Ok(())
     }
 }

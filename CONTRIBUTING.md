@@ -45,6 +45,51 @@ cargo run --locked -p xtask -- check-native-consumers
 mdbook build docs/book
 ```
 
+For Linux all-feature acceptance, use either a system-installed MPI/SUBCOMM
+QuEST with matching MPICH and serial HDF5, or `devenv --clean shell`, which
+selects these dependencies together. Run:
+
+```sh
+cargo build --workspace --all-features --locked
+cargo nextest run --workspace --all-features
+cargo test --doc --workspace --all-features --locked
+cargo nextest run -p quest-qsp --all-features --release --run-ignored only
+cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
+cargo run --locked -p quest-rs --example minimal
+```
+
+`devenv --clean test` runs the first four commands and the minimal example.
+Formatting, binding freshness and installed native consumer checks from the
+preceding list remain part of acceptance. Preserve failures and identify the
+exact Rust, QuEST, MPI and HDF5 installations in the verification record.
+
+Keep separate, initially empty Cargo target directories for the two Linux
+environments. For Fedora's installed MPICH, an isolated system shell can be
+started with the following command (replace the QuEST prefix):
+
+```sh
+env -i HOME="$HOME" USER="$USER" LANG=C.UTF-8 \
+  PATH="$HOME/.cargo/bin:/usr/lib64/mpich/bin:/usr/bin:/bin" \
+  QUEST_ROOT=/path/to/installed/quest MPICC=/usr/lib64/mpich/bin/mpicc \
+  CMAKE_PREFIX_PATH=/usr/lib64/mpich \
+  PKG_CONFIG_PATH=/usr/lib64/mpich/lib/pkgconfig CC=/usr/bin/cc CXX=/usr/bin/c++ \
+  CARGO_TARGET_DIR="$PWD/target/system-all-features" \
+  bash --noprofile --norc
+```
+
+This clears inherited Nix, HDF5 and loader overrides; Fedora's serial HDF5 is
+discovered automatically. Use the corresponding package paths on other hosts.
+For the Nix lane, set its target directory inside the clean shell:
+
+```sh
+devenv shell --clean -- bash -c \
+  'export CARGO_TARGET_DIR="$PWD/target/devenv-all-features"; exec bash --noprofile --norc'
+```
+
+Run the acceptance commands above from each shell. The explicit `--` separates
+devenv options from the invoked command. Native ABI checks verify that QuEST's
+loaded MPI library matches the compiler wrapper selected by `MPICC`.
+
 Nextest does not run doctests; run them separately. Native consumer checks
 default to CPU. Use `--backends cpu,omp,gpu` when those native backends and host
 devices are available. Run the feature combinations affected by a change; MPI
@@ -55,10 +100,18 @@ before running the MPI integration tests:
 
 ```fish
 set -gx MPICC /path/to/mpich/bin/mpicc
+fish_add_path --prepend /path/to/mpich/bin
 cargo nextest run -p quest-sys --features mpi --test mpi --locked
 ```
 
-Replace the placeholder with the wrapper from the MPI installation used by QuEST.
+Replace the placeholder with the wrapper and launcher directory from the MPI
+installation used by QuEST. rsmpi rejects an ambiguous or mismatched selection;
+unset `MPI_PKG_CONFIG`, `CRAY_MPICH_DIR`, `CFLAGS`, `CPPFLAGS` and
+`BINDGEN_EXTRA_CLANG_ARGS` when selecting MPI through `MPICC`. The clean Linux
+devenv supplies the absolute development-output wrapper and matching binary-output
+launcher itself. System serial HDF5 can be autodetected with `HDF5_DIR` unset;
+devenv selects its pinned serial package explicitly. QuEST's installed runtime
+paths must resolve native dependencies with loader overrides cleared.
 
 MPI tests require local networking, including the two- and four-rank subprocess
 tests; run them outside a sandbox that blocks local MPI communication.

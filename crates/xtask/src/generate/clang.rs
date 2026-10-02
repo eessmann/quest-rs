@@ -35,6 +35,14 @@ impl QuestRoot {
     }
 }
 
+#[cfg(test)]
+pub fn fixture_root(path: PathBuf) -> QuestRoot {
+    QuestRoot {
+        path,
+        source: "QUEST_ROOT".to_owned(),
+    }
+}
+
 pub fn collect_quest_api(package: &quest_build::NativePackage) -> Result<Vec<ApiItem>, DynError> {
     let include_root = package.prefix.join("include");
     let quest_h = include_root.join("quest.h");

@@ -1,0 +1,14 @@
+{
+  "all_trials_succeeded": true,
+  "sources_unchanged": true,
+  "workloads_valid": true,
+  "validated_workload_records": 72,
+  "labels": [
+    "baseline",
+    "a",
+    "ab",
+    "abc"
+  ],
+  "trials": 3,
+  "errors": []
+}

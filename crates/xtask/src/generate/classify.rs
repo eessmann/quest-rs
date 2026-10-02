@@ -54,7 +54,11 @@ fn classify_item(item: &ApiItem, registry: &AdapterRegistry) -> (CoverageStatus,
     if type_text(item).contains("MPI_Comm") {
         return (
             CoverageStatus::GatedMpi,
-            "MPI_Comm requires a dedicated mpi Cargo feature and type strategy".to_owned(),
+            if item.name == "initCustomMpiCommQuESTEnv" {
+                "emitted in hand-written mpi bridge with the mpi Cargo feature and native MPI subcommunicator support".to_owned()
+            } else {
+                "MPI_Comm requires a dedicated mpi Cargo feature and type strategy".to_owned()
+            },
         );
     }
 

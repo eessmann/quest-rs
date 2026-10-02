@@ -1,0 +1,123 @@
+{
+  "baseline_commit": "d19de2a0fd605b46bbc57e87fee36ba811a7d2b2",
+  "all_required_checks_passed": true,
+  "lanes": {
+    "system": {
+      "build": {
+        "receipt": "receipts/acceptance4-system-build.json",
+        "exit_code": 0,
+        "receipt_original_sha256": "377623a85f2c7523d42e109b8e634e3b37cf4b6275bfa3e953bcbca5be78a617"
+      },
+      "nextest": {
+        "receipt": "receipts/acceptance4-system-nextest.json",
+        "exit_code": 0,
+        "receipt_original_sha256": "e5c338f9170863ebbab088279b24b98e7ef7daef9e3fd9fa67622bf0ba2c07ce",
+        "passed": 1120,
+        "skipped": 3,
+        "binaries": 167
+      },
+      "doctest": {
+        "receipt": "receipts/acceptance4-system-docs.json",
+        "exit_code": 0,
+        "receipt_original_sha256": "cb6fd1ac755eae39b1ae3fa3cf02429a4d63143e909fa99599ab1137bfd4369e",
+        "passed": 65,
+        "failed": 0,
+        "ignored": 1
+      },
+      "release": {
+        "receipt": "receipts/acceptance2-system-release.json",
+        "exit_code": 0,
+        "receipt_original_sha256": "e46d97f80d0dd6b7fe9dc95c6950f271b600ab97485cb1abf4a97b270233751c",
+        "passed": 3,
+        "skipped_by_selection": 118
+      },
+      "clippy": {
+        "receipt": "receipts/acceptance4-system-clippy.json",
+        "exit_code": 0,
+        "receipt_original_sha256": "05920b91a5965cefaf9ad84623a2ee8769375d5812c566b7f565cc328ae3ae6d"
+      },
+      "fmt": {
+        "receipt": "receipts/acceptance4-system-fmt.json",
+        "exit_code": 0,
+        "receipt_original_sha256": "f7a76f22618a772490952fd5d68e21f51303ac72c03ab473123c77c664514084"
+      },
+      "bindings": {
+        "receipt": "receipts/acceptance4-system-bindings.json",
+        "exit_code": 0,
+        "receipt_original_sha256": "53a6b9db3493808dfbaa62b74f9a8ad1ffa42cb0829fbf42f17896472a2d50f6"
+      },
+      "consumers": {
+        "receipt": "receipts/final-system-consumers.json",
+        "exit_code": 0,
+        "receipt_original_sha256": "77bd83f2a3555e6ecae58f4193b08ff0d00a8b7a689249ee185f2d18625b229a"
+      },
+      "mpi": {
+        "receipt": "receipts/acceptance2-system-mpi.json",
+        "exit_code": 0,
+        "receipt_original_sha256": "1c6335c426282ce2d7ae97435fd5d0dcee32178cb9e8475b94132f743ad9563a"
+      }
+    },
+    "devenv": {
+      "build": {
+        "receipt": "receipts/acceptance3-devenv-build.json",
+        "exit_code": 0,
+        "receipt_original_sha256": "116ae17091572d3ce66de44e73235d97b35a12f3a37a9cfcf33b88ca4f081f4a"
+      },
+      "nextest": {
+        "receipt": "receipts/acceptance3-devenv-nextest.json",
+        "exit_code": 0,
+        "receipt_original_sha256": "d38aa865b69433d848bf5ecab4e5ed9326297d8b023b7c689905c959a848df9d",
+        "passed": 1120,
+        "skipped": 3,
+        "binaries": 167
+      },
+      "doctest": {
+        "receipt": "receipts/acceptance3-devenv-doctest.json",
+        "exit_code": 0,
+        "receipt_original_sha256": "1bd249a5af58ed7c788faaee50ed1cc5fff444b6f3c2f7988f267d21c585c91e",
+        "passed": 65,
+        "failed": 0,
+        "ignored": 1
+      },
+      "release": {
+        "receipt": "receipts/acceptance2-devenv-ignored-release.json",
+        "exit_code": 0,
+        "receipt_original_sha256": "e03c2e250e017952edea9548b3a33bccc60a680c5eee1fd16809ae72cd52deda",
+        "passed": 3,
+        "skipped_by_selection": 118
+      },
+      "clippy": {
+        "receipt": "receipts/acceptance3-devenv-clippy.json",
+        "exit_code": 0,
+        "receipt_original_sha256": "2b8f99856d3ed70bf69c1dd336191ac19be6c3efe3a0f661523f472137c184a1"
+      },
+      "fmt": {
+        "receipt": "receipts/acceptance3-devenv-fmt.json",
+        "exit_code": 0,
+        "receipt_original_sha256": "6a7a209badc016f6c4aad0d7f7f6cd000d982deb9ffe257a2dd08dc7dc85ec54"
+      },
+      "bindings": {
+        "receipt": "receipts/acceptance2-devenv-bindings.json",
+        "exit_code": 0,
+        "receipt_original_sha256": "07c33b9057e19839292c01ebeb5ecf82fba9e47a86d6590ab48627a0866b046f"
+      },
+      "consumers": {
+        "receipt": "receipts/final-devenv-consumers.json",
+        "exit_code": 0,
+        "receipt_original_sha256": "22c06cc70ce7f31a4e68aa1bcfc020808d6a18ad7ac59b64ff901f8bfcbed459"
+      },
+      "mpi2": {
+        "receipt": "receipts/acceptance-devenv-mpi-ranks2.json",
+        "exit_code": 0,
+        "receipt_original_sha256": "02e7ed10fd3c2718b79b05839f5f0016598e1a5e7f0499b9b396104a2abe731f"
+      },
+      "mpi4": {
+        "receipt": "receipts/acceptance-devenv-mpi-ranks4.json",
+        "exit_code": 0,
+        "receipt_original_sha256": "04fc4a448d2c4be88a8c1a1e68dad0d66bb3e701424d196f676714086109e829"
+      }
+    }
+  },
+  "final_source_inventory": "source-sha256.json",
+  "common_system_devenv_source_hashes_match": 472
+}

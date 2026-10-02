@@ -1,0 +1,53 @@
+{
+  "baseline_commit": "d19de2a0fd605b46bbc57e87fee36ba811a7d2b2",
+  "patch_base": "all patches apply independently to baseline with git apply",
+  "variants": {
+    "a": {
+      "patch": "snapshots/a.patch.gz",
+      "sha256": "134348fd2c267a87651dedbe72cb821e9e0fbf9c28a948b957d38ad8d303d898",
+      "changed_files": [
+        "crates/quest-qsp/README.md",
+        "crates/quest-qsp/src/kernel.rs",
+        "crates/quest-qsp/src/offline/kernels.rs",
+        "crates/quest-qsp/src/offline/mod.rs",
+        "crates/quest-qsp/src/stages.rs",
+        "crates/quest-qsp/tests/completion_outer.rs",
+        "crates/quest-qsp/tests/rhw.rs"
+      ],
+      "uncompressed_sha256": "97143ae45b13c5b46bd871c0fa60c495a11f56491e97df16947b54c0a94832bc"
+    },
+    "ab": {
+      "patch": "snapshots/ab.patch.gz",
+      "sha256": "23d25a90605bfe7a0337b1fb2ab01bd6d930c8f474a3a471033e9a8bd422c1bd",
+      "changed_files": [
+        "crates/quest-qsp/README.md",
+        "crates/quest-qsp/src/kernel.rs",
+        "crates/quest-qsp/src/offline/kernels.rs",
+        "crates/quest-qsp/src/offline/mod.rs",
+        "crates/quest-qsp/src/stages.rs",
+        "crates/quest-qsp/tests/completion_outer.rs",
+        "crates/quest-qsp/tests/rhw.rs"
+      ],
+      "uncompressed_sha256": "37a865c8085ff86ffa9fae633b1ac5f6b682b7df3fdffed313c1ab9b468d4bba"
+    },
+    "abc": {
+      "patch": "snapshots/abc.patch.gz",
+      "sha256": "74ca432fd8795038980df9bceb2f7606b1eaef36130ea198b0aaf3672f8c7435",
+      "changed_files": [
+        "crates/quest-numerics/src/fft/shared.rs",
+        "crates/quest-numerics/src/fft.rs",
+        "crates/quest-numerics/src/lib.rs",
+        "crates/quest-numerics/tests/shared_convolution.rs",
+        "crates/quest-qsp/README.md",
+        "crates/quest-qsp/src/kernel.rs",
+        "crates/quest-qsp/src/offline/fft.rs",
+        "crates/quest-qsp/src/offline/kernels.rs",
+        "crates/quest-qsp/src/offline/mod.rs",
+        "crates/quest-qsp/src/stages.rs",
+        "crates/quest-qsp/tests/completion_outer.rs",
+        "crates/quest-qsp/tests/rhw.rs"
+      ],
+      "uncompressed_sha256": "cacc54ba90bc1e4405f126b66d304542607a982972a72c90f5d76a6881a50961"
+    }
+  }
+}

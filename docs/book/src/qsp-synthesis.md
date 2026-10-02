@@ -12,6 +12,13 @@ support real-parity Wx phases and complex unit-circle generalized QSP controls.
 Recorded algorithms in compiled artifacts retain their original meaning;
 loading an RHW artifact does not select or run a different solver. A bounded dense RHW factorization is retained as an internal test oracle.
 
+`complete()` and `complete_with()` honor the selected algorithm. NLFT completion
+computes the outer complement without constructing or retaining the Weiss ratio;
+RHW completion includes that ratio. `CompletedPolynomial::algorithm()` identifies
+the retained payload, and `weiss_ratio()` returns `None` for NLFT or
+`Some(&WeissRatio)` for RHW. Callers that need the ratio must select RHW before
+completion. Offline synthesis makes the same internal distinction.
+
 RHW completion publishes Fourier coefficients of `b/a` with target identity,
 positive-real-constant gauge, grid and contractivity evidence. The structured
 Half-Cholesky recurrence uses complex rank-two generator rotations and shifted

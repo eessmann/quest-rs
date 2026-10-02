@@ -238,9 +238,9 @@ pub fn decode(bytes: &[u8]) -> Result<FrozenInput> {
         return Err(Error::Input("trailing application wire data"));
     }
     Ok(FrozenInput {
-        verification_tolerance,
         workflow,
         route,
+        verification_tolerance,
         block,
         qsp,
         input,

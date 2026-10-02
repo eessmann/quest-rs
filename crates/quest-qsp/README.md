@@ -98,8 +98,11 @@ strict contractivity margin, algorithm, FFT backend, maximum grid and numerical 
 execution policy. Both algorithms are available in `OfflinePolicy` too.
 `FrozenCandidate::algorithm()` and `synthesis_precision()` retain these separate
 identities, including the successful offline working precision.
-`CompletedPolynomial::weiss_ratio()` retains coefficients of `b/a`, the exact
-admitted target, positive-real-constant outer gauge, grid and contractivity bound.
+`CompletedPolynomial::algorithm()` identifies the selected completion payload.
+`CompletedPolynomial::weiss_ratio()` returns `Some(&WeissRatio)` for RHW, retaining
+coefficients of `b/a`, the exact admitted target, positive-real-constant outer
+gauge, grid and contractivity bound. It returns `None` for inverse NLFT; completion
+skips ratio sampling, exponentiation and its fifth FFT for that algorithm.
 Half-Cholesky uses the complex rank-two displacement recurrence in quadratic
 work and linear storage; the bounded dense block solver is test-only.
 Defaults use tolerance `1e-11`, margin `1e-12` and `FftBackend::Scalar`.

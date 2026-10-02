@@ -1,6 +1,7 @@
-use crate::{Complex64, Control, Error, Policy, Result, finite, zeros};
+use crate::{Complex64, Control, Error, Policy, Result, SynthesisAlgorithm, finite, zeros};
 use quest_numerics::{
     ConvolutionWorkspace, ExecutionPolicy, FftDirection, FftWorkspace, Normalization,
+    SharedConvolutionWorkspace,
 };
 use std::{
     collections::BTreeMap,
@@ -29,17 +30,21 @@ pub fn controls(gamma: &[Complex64]) -> Result<Vec<Control>> {
         .try_reserve_exact(gamma.len())
         .map_err(|_| Error::Budget("controls"))?;
     for value in gamma {
-        finite(*value, "reflection normalization")?;
-        let scale = 1.0_f64.max(value.re.abs()).max(value.im.abs());
-        let real = value.re / scale;
-        let imag = value.im / scale;
-        let one = 1.0 / scale;
-        let norm = one.hypot(real).hypot(imag);
-        let diagonal = Complex64::new(one / norm, 0.0);
-        let off = Complex64::new(real / norm, imag / norm);
-        output.push([[diagonal, off], [off.conj().neg(), diagonal]]);
+        output.push(control(*value)?);
     }
     Ok(output)
+}
+
+fn control(value: Complex64) -> Result<Control> {
+    finite(value, "reflection normalization")?;
+    let scale = 1.0_f64.max(value.re.abs()).max(value.im.abs());
+    let real = value.re / scale;
+    let imag = value.im / scale;
+    let one = 1.0 / scale;
+    let norm = one.hypot(real).hypot(imag);
+    let diagonal = Complex64::new(one / norm, 0.0);
+    let off = Complex64::new(real / norm, imag / norm);
+    Ok([[diagonal, off], [off.conj().neg(), diagonal]])
 }
 
 /// Reconstruct the actual exported phase trigonometry. A tan/normalization
@@ -125,6 +130,98 @@ impl<'pool> Convolutions<'pool> {
     }
 }
 
+// Inverse groups retain two immutable RHS spectra only within each session.
+// Ordinary convolutions used by completion/certification keep their footprint.
+struct SharedConvolutions<'pool> {
+    execution: ExecutionPolicy<'pool>,
+    plans: BTreeMap<usize, SharedConvolutionWorkspace>,
+    policy: Policy,
+    bytes: usize,
+    work_used: usize,
+}
+impl<'pool> SharedConvolutions<'pool> {
+    const fn new(policy: Policy, execution: ExecutionPolicy<'pool>) -> Self {
+        Self {
+            execution,
+            plans: BTreeMap::new(),
+            policy,
+            bytes: 0,
+            work_used: 0,
+        }
+    }
+    fn windows(
+        &mut self,
+        left: [&[Complex64]; 4],
+        right: [&[Complex64]; 2],
+        windows: [(usize, usize); 4],
+    ) -> Result<[Vec<Complex64>; 4]> {
+        let size = left
+            .iter()
+            .chain(right.iter())
+            .map(|values| values.len())
+            .max()
+            .and_then(usize::checked_next_power_of_two)
+            .ok_or(Error::Budget("convolution support"))?;
+        if !self.plans.contains_key(&size) {
+            let limits = quest_numerics::Limits {
+                max_bytes: self
+                    .policy
+                    .limits
+                    .max_bytes
+                    .checked_sub(self.bytes)
+                    .ok_or(Error::Budget("plan storage"))?,
+                ..self.policy.limits
+            };
+            let plan = SharedConvolutionWorkspace::new_with_policy(
+                size,
+                size,
+                self.policy.backend,
+                limits,
+                self.execution,
+            )?;
+            let usage = plan.resource_usage();
+            self.bytes = self
+                .bytes
+                .checked_add(usage.buffer_bytes)
+                .and_then(|n| n.checked_add(usage.planner_bytes_estimate))
+                .ok_or(Error::Budget("plan storage"))?;
+            self.plans.insert(size, plan);
+        }
+        let plan = self
+            .plans
+            .get_mut(&size)
+            .ok_or(Error::Budget("missing convolution plan"))?;
+        let mut session = plan.session(right, self.execution);
+        let mut output: [Vec<Complex64>; 4] = std::array::from_fn(|_| Vec::new());
+        for (((left, (offset, count)), out), index) in left
+            .into_iter()
+            .zip(windows)
+            .zip(&mut output)
+            .zip([0, 1, 1, 0])
+        {
+            // Charge each lazy cold/warm product before its numerical execution.
+            self.work_used = self
+                .work_used
+                .checked_add(session.work_for(index)?)
+                .ok_or(Error::Budget("convolution work"))?;
+            if self.work_used > self.policy.limits.max_work {
+                return Err(Error::Budget("convolution work"));
+            }
+            let values = session.product(left, index)?;
+            *out = zeros(count, self.policy.limits)?;
+            for (index, value) in out.iter_mut().enumerate() {
+                *value = at(
+                    values,
+                    offset
+                        .checked_add(index)
+                        .ok_or(Error::Budget("NLFT product window"))?,
+                );
+            }
+        }
+        Ok(output)
+    }
+}
+
 fn at(values: &[Complex64], index: usize) -> Complex64 {
     values
         .get(index)
@@ -135,6 +232,11 @@ fn reverse_conjugate(values: &[Complex64]) -> Vec<Complex64> {
     values.iter().rev().map(Complex64::conj).collect()
 }
 
+pub enum CompletionData<C> {
+    InverseNlft,
+    Rhw(Vec<C>),
+}
+
 #[expect(
     clippy::too_many_lines,
     reason = "Ordered Weiss transforms and shared retry budget kept together"
@@ -143,7 +245,7 @@ pub fn complete(
     target: &[Complex64],
     policy: Policy,
     execution: ExecutionPolicy<'_>,
-) -> Result<(Vec<Complex64>, Vec<Complex64>, f64, usize)> {
+) -> Result<(Vec<Complex64>, CompletionData<Complex64>, f64, usize)> {
     if target.is_empty() {
         return Err(Error::Target("empty target"));
     }
@@ -155,12 +257,17 @@ pub fn complete(
         .max(32);
     let mut last_residual = None;
     let mut remaining = policy;
+    let (transforms, grid_vectors, coefficient_vectors) = match policy.algorithm {
+        SynthesisAlgorithm::InverseNlftDivideConquer => (4, 2, 1),
+        SynthesisAlgorithm::RhwHalfCholesky => (5, 3, 2),
+    };
     while grid <= policy.max_completion_grid {
         let work = grid
             .checked_mul(
                 usize::try_from(grid.ilog2().max(1)).map_err(|_| Error::Budget("FFT work"))?,
             )
-            .and_then(|n| n.checked_mul(32))
+            .and_then(|n| n.checked_mul(8))
+            .and_then(|n| n.checked_mul(transforms))
             .ok_or(Error::Budget("FFT work"))?;
         let rest = remaining
             .limits
@@ -172,8 +279,13 @@ pub fn complete(
         let (mut a_star, ratio) = {
             let workspace = crate::workspace_policy(
                 policy,
-                grid.checked_mul(3)
-                    .and_then(|v| target.len().checked_mul(2).and_then(|n| v.checked_add(n)))
+                grid.checked_mul(grid_vectors)
+                    .and_then(|v| {
+                        target
+                            .len()
+                            .checked_mul(coefficient_vectors)
+                            .and_then(|n| v.checked_add(n))
+                    })
                     .ok_or(Error::Budget("Weiss payload"))?,
             )?;
             let mut values = zeros(grid, policy.limits)?;
@@ -183,7 +295,10 @@ pub fn complete(
                 .copy_from_slice(target);
             let mut fft = FftWorkspace::new(grid, policy.backend, workspace.limits)?;
             fft.transform(&mut values, FftDirection::Inverse, Normalization::None)?;
-            let mut ratio_samples = values.clone();
+            let ratio_samples = match policy.algorithm {
+                SynthesisAlgorithm::InverseNlftDivideConquer => None,
+                SynthesisAlgorithm::RhwHalfCholesky => Some(values.clone()),
+            };
             pointwise(&mut values, execution, |_, value| {
                 let norm = value.re.hypot(value.im);
                 let remainder = (-norm).mul_add(norm, 1.0);
@@ -211,18 +326,20 @@ pub fn complete(
             fft.transform(&mut values, FftDirection::Inverse, Normalization::None)?;
             // G* is anti-analytic. RHW needs b/a = b exp(-G*), not
             // the outer complement coefficients consumed by inverse NLFT.
-            for (sample, exponent) in ratio_samples.iter_mut().zip(&values) {
-                *sample = finite(sample.mul(exponent.neg().exp()), "Weiss ratio")?;
-            }
-            fft.transform(
-                &mut ratio_samples,
-                FftDirection::Forward,
-                Normalization::ByLength,
-            )?;
-            let ratio = ratio_samples
-                .get(..target.len())
-                .ok_or(Error::Budget("Weiss ratio support"))?
-                .to_vec();
+            let ratio = if let Some(mut samples) = ratio_samples {
+                for (sample, exponent) in samples.iter_mut().zip(&values) {
+                    *sample = finite(sample.mul(exponent.neg().exp()), "Weiss ratio")?;
+                }
+                fft.transform(&mut samples, FftDirection::Forward, Normalization::ByLength)?;
+                CompletionData::Rhw(
+                    samples
+                        .get(..target.len())
+                        .ok_or(Error::Budget("Weiss ratio support"))?
+                        .to_vec(),
+                )
+            } else {
+                CompletionData::InverseNlft
+            };
             pointwise(&mut values, execution, |_, value| {
                 finite(value.exp(), "Weiss exponential")
             })?;
@@ -297,6 +414,32 @@ struct InverseNode {
     eta: Vec<Complex64>,
 }
 
+fn midpoint_from_windows(windows: [Vec<Complex64>; 4]) -> Result<(Vec<Complex64>, Vec<Complex64>)> {
+    let [mut a, xb, mut b, xa] = windows;
+    // All products have succeeded. Reuse two compact windows as the outputs,
+    // retaining the original per-index a-then-b validation order.
+    for (index, (a, b)) in a.iter_mut().zip(&mut b).enumerate() {
+        *a = finite((*a).add(at(&xb, index)), "NLFT midpoint")?;
+        *b = finite((*b).sub(at(&xa, index)), "NLFT midpoint")?;
+    }
+    Ok((a, b))
+}
+fn transfer_from_windows(windows: [Vec<Complex64>; 4]) -> Result<InverseNode> {
+    let [ex, mut xi, mut eta, xx] = windows;
+    for (index, (x, e)) in xi.iter_mut().zip(&mut eta).enumerate() {
+        // sharp(p)=z^m conjugate(p), so reversed coefficients begin at 1.
+        let shifted_first = index
+            .checked_sub(1)
+            .map_or(Complex64::new(0.0, 0.0), |i| at(&ex, i));
+        let shifted_second = index
+            .checked_sub(1)
+            .map_or(Complex64::new(0.0, 0.0), |i| at(&xx, i));
+        *x = finite(shifted_first.add(*x), "NLFT reconstruction")?;
+        *e = finite((*e).sub(shifted_second), "NLFT reconstruction")?;
+    }
+    Ok(InverseNode { xi, eta })
+}
+
 pub fn inverse(
     a_star: &[Complex64],
     b: &[Complex64],
@@ -308,8 +451,8 @@ pub fn inverse(
     }
     let policy = payload_allowance(policy, b.len())?;
     let mut gamma = zeros(b.len(), policy.limits)?;
-    let mut work = Convolutions::new(policy, execution);
-    inverse_node(a_star, b, &mut gamma, &mut work)?;
+    let mut work = SharedConvolutions::new(policy, execution);
+    inverse_node(a_star, b, &mut gamma, &mut work, false)?;
     Ok((gamma, work.work_used))
 }
 
@@ -317,8 +460,9 @@ fn inverse_node(
     a_star: &[Complex64],
     b: &[Complex64],
     gamma: &mut [Complex64],
-    work: &mut Convolutions<'_>,
-) -> Result<InverseNode> {
+    work: &mut SharedConvolutions<'_>,
+    transfer: bool,
+) -> Result<Option<InverseNode>> {
     let count = b.len();
     if count == 1 {
         let pivot = at(a_star, 0);
@@ -329,14 +473,14 @@ fn inverse_node(
         *gamma
             .first_mut()
             .ok_or(Error::Target("empty reflection support"))? = reflection;
-        let matrices = controls(&[reflection])?;
-        let [[scale, xi], _] = *matrices
-            .first()
-            .ok_or(Error::Target("empty leaf control"))?;
-        return Ok(InverseNode {
+        if !transfer {
+            return Ok(None);
+        }
+        let [[scale, xi], _] = control(reflection)?;
+        return Ok(Some(InverseNode {
             xi: vec![xi],
             eta: vec![scale],
-        });
+        }));
     }
     let lower_len = count / 2;
     let upper_len = count
@@ -352,48 +496,45 @@ fn inverse_node(
         b.get(..upper_len).ok_or(Error::Budget("NLFT prefix"))?,
         gamma_upper,
         work,
-    )?;
-    let mut midpoint_a = zeros(lower_len, work.policy.limits)?;
-    let mut midpoint_b = zeros(lower_len, work.policy.limits)?;
+        true,
+    )?
+    .ok_or(Error::Target("missing upper transfer"))?;
     let eta_conj = reverse_conjugate(&upper.eta);
     let xi_conj = reverse_conjugate(&upper.xi);
-    let ea = work.product(&eta_conj, a_star)?;
-    let xb = work.product(&xi_conj, b)?;
-    let eb = work.product(&upper.eta, b)?;
-    let xa = work.product(&upper.xi, a_star)?;
     let conjugate_offset = upper_len
         .checked_sub(1)
         .ok_or(Error::Budget("NLFT offset"))?;
-    for (index, (a, b)) in midpoint_a.iter_mut().zip(&mut midpoint_b).enumerate() {
-        let a_index = conjugate_offset
-            .checked_add(index)
-            .ok_or(Error::Budget("NLFT midpoint"))?;
-        let b_index = upper_len
-            .checked_add(index)
-            .ok_or(Error::Budget("NLFT midpoint"))?;
-        *a = finite(at(&ea, a_index).add(at(&xb, a_index)), "NLFT midpoint")?;
-        *b = finite(at(&eb, b_index).sub(at(&xa, b_index)), "NLFT midpoint")?;
-    }
+    let (midpoint_a, midpoint_b) = midpoint_from_windows(work.windows(
+        [&eta_conj, &xi_conj, &upper.eta, &upper.xi],
+        [a_star, b],
+        [
+            (conjugate_offset, lower_len),
+            (conjugate_offset, lower_len),
+            (upper_len, lower_len),
+            (upper_len, lower_len),
+        ],
+    )?)?;
     // Second-half inverse depends on the completed first-half midpoint update.
-    let lower = inverse_node(&midpoint_a, &midpoint_b, gamma_lower, work)?;
-    let ex = work.product(&eta_conj, &lower.xi)?;
-    let xe = work.product(&upper.xi, &lower.eta)?;
-    let ee = work.product(&upper.eta, &lower.eta)?;
-    let xx = work.product(&xi_conj, &lower.xi)?;
-    let mut xi = zeros(count, work.policy.limits)?;
-    let mut eta = zeros(count, work.policy.limits)?;
-    for (index, (x, e)) in xi.iter_mut().zip(&mut eta).enumerate() {
-        // sharp(p)=z^m conjugate(p), so reversed coefficients begin at 1.
-        let shifted_first = index
-            .checked_sub(1)
-            .map_or(Complex64::new(0.0, 0.0), |i| at(&ex, i));
-        let shifted_second = index
-            .checked_sub(1)
-            .map_or(Complex64::new(0.0, 0.0), |i| at(&xx, i));
-        *x = finite(shifted_first.add(at(&xe, index)), "NLFT reconstruction")?;
-        *e = finite(at(&ee, index).sub(shifted_second), "NLFT reconstruction")?;
+    let lower = inverse_node(&midpoint_a, &midpoint_b, gamma_lower, work, true)?
+        .ok_or(Error::Target("missing lower transfer"))?;
+    drop((midpoint_a, midpoint_b));
+    // Both children remain full transfer producers; only the caller's root
+    // discards transfer reconstruction after its reflections are established.
+    if !transfer {
+        return Ok(None);
     }
-    Ok(InverseNode { xi, eta })
+    let shifted_count = count.checked_sub(1).ok_or(Error::Budget("NLFT offset"))?;
+    let node = transfer_from_windows(work.windows(
+        [&eta_conj, &upper.xi, &upper.eta, &xi_conj],
+        [&lower.xi, &lower.eta],
+        [
+            (0, shifted_count),
+            (0, count),
+            (0, count),
+            (0, shifted_count),
+        ],
+    )?)?;
+    Ok(Some(node))
 }
 
 pub fn response_residual(
@@ -836,6 +977,337 @@ mod rhw_tests {
                 );
             }
         }
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+#[expect(
+    clippy::arithmetic_side_effects,
+    clippy::panic_in_result_fn,
+    reason = "Bounded deterministic inverse fixtures and independent pre-optimization oracle"
+)]
+mod inverse_tests {
+    use super::*;
+
+    fn fixture(count: usize) -> (Vec<Complex64>, Vec<Complex64>) {
+        let a = (0..count)
+            .map(|index| {
+                if index == 0 {
+                    Complex64::new(0.95, 0.0)
+                } else {
+                    Complex64::new(0.001 * f64::from(u32::try_from(index).unwrap()), -0.0005)
+                }
+            })
+            .collect();
+        let b = (0..count)
+            .map(|index| Complex64::new(0.01 / f64::from(u32::try_from(index + 1).unwrap()), 0.002))
+            .collect();
+        (a, b)
+    }
+    fn bits(values: &[Complex64]) -> Vec<(u64, u64)> {
+        values
+            .iter()
+            .map(|value| (value.re.to_bits(), value.im.to_bits()))
+            .collect()
+    }
+    fn full_transfer_oracle(
+        a_star: &[Complex64],
+        b: &[Complex64],
+        gamma: &mut [Complex64],
+        work: &mut Convolutions<'_>,
+    ) -> Result<InverseNode> {
+        let count = b.len();
+        if count == 1 {
+            let pivot = at(a_star, 0);
+            if pivot == Complex64::new(0.0, 0.0) {
+                return Err(Error::SingularPivot);
+            }
+            let reflection = finite(at(b, 0).div(pivot), "inverse NLFT pivot")?;
+            *gamma
+                .first_mut()
+                .ok_or(Error::Target("empty reflection support"))? = reflection;
+            let matrices = controls(&[reflection])?;
+            let [[scale, xi], _] = *matrices
+                .first()
+                .ok_or(Error::Target("empty leaf control"))?;
+            return Ok(InverseNode {
+                xi: vec![xi],
+                eta: vec![scale],
+            });
+        }
+        let lower_len = count / 2;
+        let upper_len = count
+            .checked_sub(lower_len)
+            .ok_or(Error::Budget("NLFT split"))?;
+        let (gamma_upper, gamma_lower) = gamma
+            .split_at_mut_checked(upper_len)
+            .ok_or(Error::Budget("NLFT split"))?;
+        let upper = full_transfer_oracle(
+            a_star
+                .get(..upper_len)
+                .ok_or(Error::Budget("NLFT prefix"))?,
+            b.get(..upper_len).ok_or(Error::Budget("NLFT prefix"))?,
+            gamma_upper,
+            work,
+        )?;
+        let mut midpoint_a = zeros(lower_len, work.policy.limits)?;
+        let mut midpoint_b = zeros(lower_len, work.policy.limits)?;
+        let eta_conj = reverse_conjugate(&upper.eta);
+        let xi_conj = reverse_conjugate(&upper.xi);
+        let ea = work.product(&eta_conj, a_star)?;
+        let xb = work.product(&xi_conj, b)?;
+        let eb = work.product(&upper.eta, b)?;
+        let xa = work.product(&upper.xi, a_star)?;
+        let conjugate_offset = upper_len
+            .checked_sub(1)
+            .ok_or(Error::Budget("NLFT offset"))?;
+        for (index, (a, b)) in midpoint_a.iter_mut().zip(&mut midpoint_b).enumerate() {
+            let a_index = conjugate_offset
+                .checked_add(index)
+                .ok_or(Error::Budget("NLFT midpoint"))?;
+            let b_index = upper_len
+                .checked_add(index)
+                .ok_or(Error::Budget("NLFT midpoint"))?;
+            *a = finite(at(&ea, a_index).add(at(&xb, a_index)), "NLFT midpoint")?;
+            *b = finite(at(&eb, b_index).sub(at(&xa, b_index)), "NLFT midpoint")?;
+        }
+        // Second-half inverse depends on the completed first-half midpoint update.
+        let lower = full_transfer_oracle(&midpoint_a, &midpoint_b, gamma_lower, work)?;
+        let ex = work.product(&eta_conj, &lower.xi)?;
+        let xe = work.product(&upper.xi, &lower.eta)?;
+        let ee = work.product(&upper.eta, &lower.eta)?;
+        let xx = work.product(&xi_conj, &lower.xi)?;
+        let mut xi = zeros(count, work.policy.limits)?;
+        let mut eta = zeros(count, work.policy.limits)?;
+        for (index, (x, e)) in xi.iter_mut().zip(&mut eta).enumerate() {
+            // sharp(p)=z^m conjugate(p), so reversed coefficients begin at 1.
+            let shifted_first = index
+                .checked_sub(1)
+                .map_or(Complex64::new(0.0, 0.0), |i| at(&ex, i));
+            let shifted_second = index
+                .checked_sub(1)
+                .map_or(Complex64::new(0.0, 0.0), |i| at(&xx, i));
+            *x = finite(shifted_first.add(at(&xe, index)), "NLFT reconstruction")?;
+            *e = finite(at(&ee, index).sub(shifted_second), "NLFT reconstruction")?;
+        }
+        Ok(InverseNode { xi, eta })
+    }
+
+    fn shared_savings(count: usize, transfer: bool) -> usize {
+        if count == 1 {
+            return 0;
+        }
+        let upper = count.div_ceil(2);
+        let lower = count / 2;
+        let transform = |size: usize| {
+            let length = if size == 1 { 1 } else { 2 * size };
+            8 * length * usize::try_from(length.ilog2().max(1)).unwrap()
+        };
+        shared_savings(upper, true)
+            + shared_savings(lower, true)
+            + 2 * transform(count.next_power_of_two())
+            + if transfer {
+                2 * transform(upper.next_power_of_two())
+            } else {
+                0
+            }
+    }
+    #[test]
+    fn reflections_only_root_matches_full_transfer_bits_and_shared_work() -> Result<()> {
+        for count in [1, 2, 3, 5, 8, 17, 32, 65] {
+            let (a, b) = fixture(count);
+            let policy = Policy::default();
+            let (actual, actual_work) = inverse(&a, &b, policy, ExecutionPolicy::Sequential)?;
+            let mut expected = zeros(count, policy.limits)?;
+            let mut work = Convolutions::new(
+                payload_allowance(policy, count)?,
+                ExecutionPolicy::Sequential,
+            );
+            let original_transfer = full_transfer_oracle(&a, &b, &mut expected, &mut work)?;
+            let mut full_gamma = zeros(count, policy.limits)?;
+            let mut shared = SharedConvolutions::new(
+                payload_allowance(policy, count)?,
+                ExecutionPolicy::Sequential,
+            );
+            let shared_transfer = inverse_node(&a, &b, &mut full_gamma, &mut shared, true)?
+                .ok_or(Error::Target("fixture transfer"))?;
+            assert_eq!(bits(&shared_transfer.xi), bits(&original_transfer.xi));
+            assert_eq!(bits(&shared_transfer.eta), bits(&original_transfer.eta));
+            assert_eq!(bits(&full_gamma), bits(&expected));
+            assert_eq!(
+                shared.work_used + shared_savings(count, true),
+                work.work_used
+            );
+            assert_eq!(bits(&actual), bits(&expected), "count={count}");
+            let omitted = if count == 1 {
+                0
+            } else {
+                let size = count.div_ceil(2).next_power_of_two();
+                4 * ConvolutionWorkspace::new(size, size, policy.backend, policy.limits)?
+                    .resource_usage()
+                    .work_units
+            };
+            assert_eq!(
+                actual_work + omitted + shared_savings(count, false),
+                work.work_used,
+                "count={count}"
+            );
+            let mut limited = policy;
+            limited.limits.max_work = actual_work;
+            assert_eq!(
+                bits(&inverse(&a, &b, limited, ExecutionPolicy::Sequential)?.0),
+                bits(&actual)
+            );
+            if actual_work > 0 {
+                limited.limits.max_work = actual_work - 1;
+                assert!(matches!(
+                    inverse(&a, &b, limited, ExecutionPolicy::Sequential),
+                    Err(Error::Budget("convolution work"))
+                ));
+            }
+        }
+        Ok(())
+    }
+    #[test]
+    fn shared_inverse_matches_each_available_backend_and_is_repeatable() -> Result<()> {
+        for backend in [
+            quest_numerics::FftBackend::Scalar,
+            quest_numerics::FftBackend::Simd,
+        ] {
+            let policy = Policy {
+                backend,
+                ..Policy::default()
+            };
+            if matches!(
+                ConvolutionWorkspace::new(1, 1, backend, policy.limits),
+                Err(quest_numerics::Error::BackendUnavailable)
+            ) {
+                continue;
+            }
+            for count in [1, 3, 8, 17, 65, 128, 256] {
+                let (a, b) = fixture(count);
+                let actual = inverse(&a, &b, policy, ExecutionPolicy::Sequential)?;
+                let repeated = inverse(&a, &b, policy, ExecutionPolicy::Sequential)?;
+                assert_eq!(bits(&actual.0), bits(&repeated.0));
+                assert_eq!(actual.1, repeated.1);
+                let mut expected = zeros(count, policy.limits)?;
+                full_transfer_oracle(
+                    &a,
+                    &b,
+                    &mut expected,
+                    &mut Convolutions::new(
+                        payload_allowance(policy, count)?,
+                        ExecutionPolicy::Sequential,
+                    ),
+                )?;
+                assert_eq!(bits(&actual.0), bits(&expected));
+            }
+        }
+        Ok(())
+    }
+    #[cfg(feature = "rayon")]
+    #[test]
+    fn shared_inverse_preserves_bits_and_admission_in_one_two_four_worker_pools()
+    -> std::result::Result<(), Box<dyn std::error::Error>> {
+        let count = 1025;
+        let mut a = vec![Complex64::new(0.0, 0.0); count];
+        a[0] = Complex64::new(0.95, 0.0);
+        let b = vec![Complex64::new(0.000_01, 0.000_002); count];
+        let policy = Policy::default();
+        let sequential = inverse(&a, &b, policy, ExecutionPolicy::Sequential)?;
+        for workers in [1, 2, 4] {
+            let pool = rayon::ThreadPoolBuilder::new()
+                .num_threads(workers)
+                .build()?;
+            let execution = ExecutionPolicy::Rayon(&pool);
+            let actual = inverse(&a, &b, policy, execution)?;
+            let mut expected = zeros(count, policy.limits)?;
+            full_transfer_oracle(
+                &a,
+                &b,
+                &mut expected,
+                &mut Convolutions::new(payload_allowance(policy, count)?, execution),
+            )?;
+            assert_eq!(bits(&actual.0), bits(&expected));
+            assert_eq!(bits(&actual.0), bits(&sequential.0));
+            assert_eq!(actual.1, sequential.1);
+            let mut limited = policy;
+            limited.limits.max_work = actual.1;
+            assert_eq!(
+                bits(&inverse(&a, &b, limited, execution)?.0),
+                bits(&actual.0)
+            );
+            limited.limits.max_work -= 1;
+            assert!(matches!(
+                inverse(&a, &b, limited, execution),
+                Err(Error::Budget("convolution work"))
+            ));
+        }
+        Ok(())
+    }
+    #[test]
+    fn compact_windows_become_outputs_without_new_vector_storage() -> Result<()> {
+        let input = vec![Complex64::new(0.25, -0.0); 2];
+        let mut work = SharedConvolutions::new(Policy::default(), ExecutionPolicy::Sequential);
+        let windows = work.windows(
+            [&input, &input, &input, &input],
+            [&input, &input],
+            [(0, 2); 4],
+        )?;
+        let midpoint_storage = [
+            (windows[0].as_ptr(), windows[0].capacity()),
+            (windows[2].as_ptr(), windows[2].capacity()),
+        ];
+        let (a, b) = midpoint_from_windows(windows)?;
+        assert_eq!((a.as_ptr(), a.capacity()), midpoint_storage[0]);
+        assert_eq!((b.as_ptr(), b.capacity()), midpoint_storage[1]);
+        let windows = work.windows(
+            [&input, &input, &input, &input],
+            [&input, &input],
+            [(0, 1), (0, 2), (0, 2), (0, 1)],
+        )?;
+        let transfer_storage = [
+            (windows[1].as_ptr(), windows[1].capacity()),
+            (windows[2].as_ptr(), windows[2].capacity()),
+        ];
+        let node = transfer_from_windows(windows)?;
+        assert_eq!((node.xi.as_ptr(), node.xi.capacity()), transfer_storage[0]);
+        assert_eq!(
+            (node.eta.as_ptr(), node.eta.capacity()),
+            transfer_storage[1]
+        );
+        Ok(())
+    }
+    #[test]
+    fn root_storage_boundary_and_singleton_pivot_checks() -> Result<()> {
+        let (a, b) = fixture(2);
+        let mut policy = Policy::default();
+        let plan =
+            SharedConvolutionWorkspace::new(2, 2, policy.backend, policy.limits)?.resource_usage();
+        policy.limits.max_bytes =
+            64 * 2 * size_of::<Complex64>() + plan.buffer_bytes + plan.planner_bytes_estimate;
+        inverse(&a, &b, policy, ExecutionPolicy::Sequential)?;
+        policy.limits.max_bytes -= 1;
+        assert!(inverse(&a, &b, policy, ExecutionPolicy::Sequential).is_err());
+        assert!(matches!(
+            inverse(
+                &[Complex64::new(0.0, 0.0)],
+                &[b[0]],
+                Policy::default(),
+                ExecutionPolicy::Sequential
+            ),
+            Err(Error::SingularPivot)
+        ));
+        assert!(matches!(
+            inverse(
+                &[a[0]],
+                &[Complex64::new(f64::INFINITY, 0.0)],
+                Policy::default(),
+                ExecutionPolicy::Sequential
+            ),
+            Err(Error::NonFinite("inverse NLFT pivot"))
+        ));
         Ok(())
     }
 }

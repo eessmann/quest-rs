@@ -553,10 +553,21 @@ impl Context {
         let levels = usize::try_from(count.max(1).ilog2())
             .map_err(|_| OfflineError::Budget("offline levels"))?
             .saturating_add(1);
+        // Keep the conservative common recursive/FFT allowance, then reserve
+        // the selected RHW payload explicitly: complex grid samples and the
+        // retained complex ratio coefficients can coexist while extracting it.
+        let ratio_scalars = match policy.algorithm {
+            crate::SynthesisAlgorithm::InverseNlftDivideConquer => 0,
+            crate::SynthesisAlgorithm::RhwHalfCholesky => grid
+                .checked_add(count)
+                .and_then(|n| n.checked_mul(2))
+                .ok_or(OfflineError::Budget("offline ratio storage"))?,
+        };
         let storage = count
             .checked_mul(levels)
             .and_then(|n| n.checked_mul(32))
             .and_then(|n| grid.checked_mul(32).and_then(|g| n.checked_add(g)))
+            .and_then(|n| n.checked_add(ratio_scalars))
             .and_then(|n| n.checked_mul(scalar_bytes))
             .ok_or(OfflineError::Budget("offline memory"))?;
         if storage > policy.max_bytes {
@@ -817,11 +828,11 @@ fn solve<M: CertificationMode>(
             let target = original(source, &mut context)?;
             let norm = contractivity(&target, &mut context)?;
             let (astar, ratio, residual, grid) = kernels::completion(&target, &mut context)?;
-            let gamma = match policy.algorithm {
-                crate::SynthesisAlgorithm::RhwHalfCholesky => {
+            let gamma = match ratio {
+                crate::kernel::CompletionData::Rhw(ratio) => {
                     kernels::half_cholesky(&ratio, &mut context)?
                 }
-                crate::SynthesisAlgorithm::InverseNlftDivideConquer => {
+                crate::kernel::CompletionData::InverseNlft => {
                     kernels::inverse(&astar, &target, &mut context)?
                 }
             };

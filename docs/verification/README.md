@@ -8,6 +8,7 @@ and [tutorial validation guide](../book/src/validation.md) for current commands.
 
 | Record | Scope |
 | --- | --- |
+| [All-feature QSP optimization, 2026-10-02](2026-10-02-qsp-optimization.md) | Installed-system and clean-devenv validation, algorithm-specific completion, root transfer pruning and shared FFT measurements |
 | [Dashu migration, 2026-10-02](2026-10-02-dashu-migration.md) | Pure-Rust arbitrary precision, canonical exact interchange, dependency cleanup and numerical/performance validation |
 | [Static architecture, 2026-10-02](2026-10-02-static-architecture.md) | Generic functions/arithmetic, MP intervals, unified Remez/root coverage, compiler/native consolidation and matched performance |
 | [Mathematical audit, 2026-10-01](2026-10-01-mathematical-audit.md) | Paper and C++ capability comparison, QSP/QSVT defaults, mathematical contracts and nightly generic interfaces |

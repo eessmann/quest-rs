@@ -56,6 +56,16 @@ configuration fingerprint. The generated API inventory and unsupported reasons
 are in `generated/api_coverage.json`; generated counts are not a promise that
 every native feature is supported by the facade.
 
+The common inventory stays identical across MPI and non-MPI packages. The
+reviewed header-conditional `initCustomMpiCommQuESTEnv` declaration is inventoried
+in `generated/api_coverage_mpi.json`, emitted and checked only when the selected
+native package enables both MPI and subcommunicators. That check also detects a
+removed or renamed declaration. Its `MPI_Comm` canonical type and overload key
+use the logical public typedef so integer and opaque-pointer MPI handles produce
+the same coverage receipt; native ABI compatibility is checked separately by the
+build probes. New declarations remain in the common inventory until their
+conditional requirements have been reviewed.
+
 Edit the adapter registry and generator templates together, then regenerate with
 `cargo run -p xtask -- generate-quest-bindings`. `--check` verifies freshness.
 Generation requires libclang and the checked-in reviewed `generated_adapters.json`

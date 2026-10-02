@@ -160,8 +160,9 @@ fn seeded_offset_and_near_boundary_rhw_exports_are_independently_certified()
             .unit_circle_response(&target)?
             .admit()?
             .complete()?;
-        assert_eq!(completed.weiss_ratio().grid(), completed.completion_grid());
-        assert!(completed.weiss_ratio().contractivity_upper_bound() < 1.0);
+        let ratio = completed.weiss_ratio().ok_or("missing RHW ratio")?;
+        assert_eq!(ratio.grid(), completed.completion_grid());
+        assert!(ratio.contractivity_upper_bound() < 1.0);
         let frozen = completed.synthesize()?;
         let certified = CertificationBuilder::new()
             .candidate(frozen)

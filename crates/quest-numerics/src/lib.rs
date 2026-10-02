@@ -10,7 +10,10 @@ mod interval;
 pub mod observer;
 mod policy;
 
-pub use fft::{ConvolutionWorkspace, FftBackend, FftDirection, FftWorkspace, Normalization};
+pub use fft::{
+    ConvolutionWorkspace, FftBackend, FftDirection, FftWorkspace, Normalization,
+    SharedConvolutionSession, SharedConvolutionWorkspace,
+};
 pub use interval::Interval;
 pub use num_complex::Complex64;
 pub use policy::{Error, ExecutionPolicy, Limits, ResourceUsage, Result};

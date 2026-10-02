@@ -43,13 +43,17 @@ The bridge requires CMake 3.28+, a C++20 compiler, QuEST 4.3.x with binary64
 precision and deprecated APIs disabled. Pure circuit and macro builds need
 neither QuEST nor libclang nor external BLAS. The full workspace also builds
 the QSVT application and requires **serial HDF5**; parallel HDF5 is rejected.
+On Linux, `--all-features` additionally requires an MPI/SUBCOMM-enabled QuEST
+installation and an absolute `MPICC` path from the same MPI installation.
 
 Build directly with installed packages. For a Linux installation using
 GCC 16, CUDA 13.4 and system MPICH, select QuEST in Fish:
 
 ```fish
 set -gxa --path CMAKE_PREFIX_PATH /path/to/installed/quest/lib64/cmake/QuEST
-cargo build --workspace --locked
+set -gx MPICC /usr/lib64/mpich/bin/mpicc
+fish_add_path --prepend /usr/lib64/mpich/bin
+cargo build --workspace --all-features --locked
 cargo run --locked --example minimal
 ```
 
@@ -64,7 +68,10 @@ set -gxa --path PKG_CONFIG_PATH /path/to/installed/hdf5/lib/pkgconfig/
 ```
 
 These settings append to the existing package search paths, including system
-MPICH. The default system `cc` and `c++` use GCC 16; no compiler override is
+MPICH. Use the wrapper and launcher directory matching your QuEST installation;
+the MPICH paths above are Fedora's system installation. Leave `HDF5_DIR` unset
+to use system serial HDF5. The default system `cc` and `c++` use GCC 16; no
+compiler override is
 needed. The installed QuEST library resolves its dependencies through its own
 runtime paths, so `LD_LIBRARY_PATH` is unnecessary. Run the workspace validation
 commands below in this native environment.
@@ -74,27 +81,39 @@ For other installations, select package roots explicitly:
 ```sh
 export QUEST_ROOT=/path/to/installed/quest
 export HDF5_DIR=/path/to/installed/serial-hdf5
-cargo build --workspace --locked
+export MPICC=/path/to/matching-mpich/bin/mpicc
+export PATH=/path/to/matching-mpich/bin:$PATH
+cargo build --workspace --all-features --locked
 cargo run --locked --example minimal
 ```
 
 The optional standalone [devenv](devenv.nix) provisions the configured Rust toolchain,
 compiler, CMake, libclang, serial HDF5 and an installed shared CPU/OpenMP QuEST
-package without MPI or GPU. Its inputs are pinned in `devenv.lock`, including
+package. Linux enables MPI and SUBCOMM using the same MPICH package for QuEST,
+rsmpi and `mpiexec`; GPU backends are disabled. Darwin retains its CPU/OpenMP
+configuration without MPI. Its inputs are pinned in `devenv.lock`, including
 `eessmann/QuEST`'s `cmake-packaging` source at commit `5035520`. From the
 repository root:
 
 ```sh
-devenv shell                 # enter the development shell
+devenv --clean shell         # enter without inherited native package overrides
 devenv build outputs.quest   # build the installed QuEST package
-devenv test                  # run the native minimal example
+devenv --clean test          # all-feature workspace checks and the minimal example
 ```
 
 The shell selects the built package with `QUEST_ROOT` and serial HDF5 with
-`HDF5_DIR`. Use `devenv update quest-src` to intentionally refresh the QuEST
+`HDF5_DIR`. On Linux it also sets `MPICC` to MPICH's development output wrapper
+and puts the matching launcher output first in `PATH`. The QuEST derivation
+checks independent shared-library loading and an installed CMake consumer with
+CPU-only initialization and loader overrides cleared. On Linux, `devenv test`
+runs the all-feature build, workspace nextest,
+doctests, ignored release QSP tests and minimal native example. The full Linux
+all-feature recipe needs local MPI networking for its two- and four-rank tests;
+Darwin retains its minimal-example test and still needs separate feature and
+native validation.
+Use `devenv update quest-src` to intentionally refresh the QuEST
 source lock. If native shell integration is already configured, `devenv allow`
-can activate it in this directory; no `.envrc` is required. Run the workspace
-validation commands below from the shell to test more than the minimal example.
+can activate it in this directory; no `.envrc` is required.
 
 For ARM64 Grace Hopper nodes using manual/Spack dependencies, follow the
 [no-Nix setup and GPU validation recipe](docs/grace-hopper.md). Select the

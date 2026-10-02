@@ -1,0 +1,17 @@
+{
+  "a": {
+    "compressed_patch_hash_verified": true,
+    "git_apply_exit": 0,
+    "reconstructed_crates_match": true
+  },
+  "ab": {
+    "compressed_patch_hash_verified": true,
+    "git_apply_exit": 0,
+    "reconstructed_crates_match": true
+  },
+  "abc": {
+    "compressed_patch_hash_verified": true,
+    "git_apply_exit": 0,
+    "reconstructed_crates_match": true
+  }
+}

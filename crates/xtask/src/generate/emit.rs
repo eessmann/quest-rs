@@ -7,12 +7,16 @@ use super::DynError;
 use super::clang::QuestRoot;
 use super::model::{
     AdapterEntry, AdapterManifest, AdapterRegistry, AdapterSourceKind, ApiItem, CoverageManifest,
-    macro_value,
+    macro_value, overload_key,
 };
 
 const GENERATOR_NAME: &str = "xtask generate-quest-bindings";
 const ADAPTER_MANIFEST_PATH: &str = "crates/quest-sys/generated/generated_adapters.json";
 const COVERAGE_MANIFEST_PATH: &str = "crates/quest-sys/generated/api_coverage.json";
+const MPI_COVERAGE_MANIFEST_PATH: &str = "crates/quest-sys/generated/api_coverage_mpi.json";
+// Explicitly reviewed header-conditional declarations. New declarations remain
+// in the common inventory until their native requirements have been reviewed.
+const MPI_SUBCOMM_APIS: &[&str] = &["initCustomMpiCommQuESTEnv"];
 const GENERATED_RUST_PATH: &str = "crates/quest-sys/src/generated_api.rs";
 const GENERATED_HEADER_PATH: &str =
     "crates/quest-sys/src/cxx_bindings/include/quest_generated_bindings.hpp";
@@ -248,7 +252,7 @@ pub fn render_outputs(
     registry: &AdapterRegistry,
 ) -> Result<Vec<GeneratedOutput>, DynError> {
     let (rust, header, cpp) = render_source_templates(registry)?;
-    Ok(vec![
+    let mut outputs = vec![
         GeneratedOutput {
             path: GENERATED_RUST_PATH,
             contents: rust,
@@ -265,11 +269,9 @@ pub fn render_outputs(
             path: ADAPTER_MANIFEST_PATH,
             contents: render_adapter_manifest(registry)?,
         },
-        GeneratedOutput {
-            path: COVERAGE_MANIFEST_PATH,
-            contents: render_coverage_manifest(quest_root, items)?,
-        },
-    ])
+    ];
+    outputs.extend(render_coverage_outputs(quest_root, items)?);
+    Ok(outputs)
 }
 
 pub fn write_or_check(
@@ -317,11 +319,62 @@ fn render_adapter_manifest(registry: &AdapterRegistry) -> Result<String, DynErro
     Ok(out)
 }
 
-fn render_coverage_manifest(quest_root: &QuestRoot, items: &[ApiItem]) -> Result<String, DynError> {
+fn render_coverage_outputs(
+    quest_root: &QuestRoot,
+    items: &[ApiItem],
+) -> Result<Vec<GeneratedOutput>, DynError> {
     let config = fs::read_to_string(quest_root.path().join("include/quest/include/config.h"))?;
+    let mpi_subcomm_enabled = macro_value(&config, "QUEST_COMPILE_MPI").as_deref() == Some("1")
+        && macro_value(&config, "QUEST_COMPILE_SUBCOMM").as_deref() == Some("1");
+    let (mpi, common): (Vec<_>, Vec<_>) = items
+        .iter()
+        .cloned()
+        .partition(|item| MPI_SUBCOMM_APIS.contains(&item.name.as_str()));
+    if !mpi_subcomm_enabled && !mpi.is_empty() {
+        return Err(
+            "MPI subcommunicator API observed without QUEST_COMPILE_MPI and QUEST_COMPILE_SUBCOMM"
+                .into(),
+        );
+    }
+    let mut outputs = vec![GeneratedOutput {
+        path: COVERAGE_MANIFEST_PATH,
+        contents: render_coverage_manifest(quest_root, &config, &common)?,
+    }];
+    if mpi_subcomm_enabled {
+        let mut mpi = mpi;
+        for item in &mut mpi {
+            // Coverage describes the public MPI typedef, independent of its
+            // provider's int/opaque-pointer handle ABI. Keep parsed ABI data
+            // untouched; native build probes still validate the actual ABI.
+            if item.result_type == "MPI_Comm" {
+                item.result_canonical_type.clone_from(&item.result_type);
+            }
+            for argument in &mut item.arguments {
+                if argument.ty == "MPI_Comm" {
+                    argument.canonical_type.clone_from(&argument.ty);
+                }
+            }
+            item.overload_key =
+                overload_key(&item.name, &item.result_canonical_type, &item.arguments);
+        }
+        mpi.sort_by(|left, right| left.overload_key.cmp(&right.overload_key));
+        // Emit even when empty so removed/renamed declarations fail freshness.
+        outputs.push(GeneratedOutput {
+            path: MPI_COVERAGE_MANIFEST_PATH,
+            contents: render_coverage_manifest(quest_root, &config, &mpi)?,
+        });
+    }
+    Ok(outputs)
+}
+
+fn render_coverage_manifest(
+    quest_root: &QuestRoot,
+    config: &str,
+    items: &[ApiItem],
+) -> Result<String, DynError> {
     let version =
-        macro_value(&config, "QUEST_VERSION_STRING").unwrap_or_else(|| "unknown".to_owned());
-    let deprecated = macro_value(&config, "QUEST_INCLUDE_DEPRECATED_FUNCTIONS")
+        macro_value(config, "QUEST_VERSION_STRING").unwrap_or_else(|| "unknown".to_owned());
+    let deprecated = macro_value(config, "QUEST_INCLUDE_DEPRECATED_FUNCTIONS")
         .unwrap_or_else(|| "unknown".to_owned());
 
     let mut counts = BTreeMap::<String, usize>::new();
@@ -350,7 +403,172 @@ fn render_coverage_manifest(quest_root: &QuestRoot, items: &[ApiItem]) -> Result
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::generate::clang::fixture_root;
     use googletest::prelude::*;
+
+    fn coverage_fixture(
+        mpi: bool,
+        subcomm: bool,
+    ) -> googletest::Result<(tempfile::TempDir, QuestRoot, AdapterRegistry)> {
+        let dir = tempfile::tempdir().or_fail()?;
+        let config = dir.path().join("include/quest/include/config.h");
+        fs::create_dir_all(config.parent().or_fail()?).or_fail()?;
+        fs::write(config, format!(
+            "#define QUEST_VERSION_STRING \"4.3.0\"\n#define QUEST_INCLUDE_DEPRECATED_FUNCTIONS 0\n#define QUEST_COMPILE_MPI {}\n#define QUEST_COMPILE_SUBCOMM {}\n", u8::from(mpi), u8::from(subcomm)
+        )).or_fail()?;
+        let root = fixture_root(dir.path().to_path_buf());
+        let registry = load_adapter_registry(&find_fixture_workspace()?).or_fail()?;
+        Ok((dir, root, registry))
+    }
+
+    fn find_fixture_workspace() -> googletest::Result<std::path::PathBuf> {
+        Ok(Path::new(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .and_then(Path::parent)
+            .or_fail()?
+            .to_path_buf())
+    }
+
+    fn mpi_item(canonical_comm: &str) -> googletest::Result<ApiItem> {
+        serde_json::from_value(serde_json::json!({
+            "name": "initCustomMpiCommQuESTEnv",
+            "overload_key": format!("initCustomMpiCommQuESTEnv({canonical_comm}, int, int) -> void"),
+            "header": "quest/include/experimental.h", "line": 72,
+            "linkage": "External", "availability": "Available",
+            "result_type": "void", "result_canonical_type": "void",
+            "arguments": [
+                {"name": "questComm", "ty": "MPI_Comm", "canonical_type": canonical_comm},
+                {"name": "useGpuAccel", "ty": "int", "canonical_type": "int"},
+                {"name": "useMultithread", "ty": "int", "canonical_type": "int"}
+            ],
+            "signature": "void initCustomMpiCommQuESTEnv(MPI_Comm, int, int)",
+            "status": "gated-mpi", "reason": "fixture"
+        })).or_fail()
+    }
+
+    #[gtest]
+    fn conditional_mpi_coverage_keeps_common_inventory_stable() -> googletest::Result<()> {
+        let (_cpu_dir, cpu, registry) = coverage_fixture(false, false)?;
+        let (_mpi_dir, mpi, _) = coverage_fixture(true, true)?;
+        let mut common_item = mpi_item("int")?;
+        common_item.name = "initCommonEnv".to_owned();
+        common_item.arguments[0].ty = "int".to_owned();
+        common_item.overload_key = "initCommonEnv(int, int, int) -> void".to_owned();
+        common_item.signature = "void initCommonEnv(int, int, int)".to_owned();
+        common_item.status = "manual".to_owned();
+        let common =
+            render_outputs(&cpu, std::slice::from_ref(&common_item), &registry).or_fail()?;
+        let with_mpi =
+            render_outputs(&mpi, &[common_item, mpi_item("int")?], &registry).or_fail()?;
+        let main = |outputs: &[GeneratedOutput]| -> googletest::Result<String> {
+            Ok(outputs
+                .iter()
+                .find(|out| out.path == COVERAGE_MANIFEST_PATH)
+                .or_fail()?
+                .contents
+                .clone())
+        };
+        verify_that!(main(&with_mpi)?.as_str(), eq(main(&common)?.as_str()))?;
+        let inventory: serde_json::Value = serde_json::from_str(&main(&with_mpi)?).or_fail()?;
+        verify_that!(inventory["items"].as_array().or_fail()?.len(), eq(1))?;
+        verify_that!(
+            inventory["items"][0]["name"].as_str().or_fail()?,
+            eq("initCommonEnv")
+        )?;
+        verify_that!(
+            with_mpi
+                .iter()
+                .any(|out| out.path == "crates/quest-sys/generated/api_coverage_mpi.json"),
+            eq(true)
+        )
+    }
+
+    #[gtest]
+    fn conditional_mpi_coverage_checks_drift_even_when_api_disappears() -> googletest::Result<()> {
+        let (dir, root, registry) = coverage_fixture(true, true)?;
+        let original = render_outputs(&root, &[mpi_item("int")?], &registry).or_fail()?;
+        for output in original {
+            write_or_check(
+                false,
+                &dir.path().join(output.path),
+                output.path,
+                output.contents,
+            )
+            .or_fail()?;
+        }
+        let mut changed = mpi_item("int")?;
+        changed.arguments[1].ty = "long".to_owned();
+        changed.arguments[1].canonical_type = "long".to_owned();
+        // A renamed conditional API must appear as unreviewed main inventory.
+        let mut renamed = mpi_item("int")?;
+        renamed.name = "replacementMpiEnv".to_owned();
+        renamed.overload_key = "replacementMpiEnv(int, int, int) -> void".to_owned();
+        for items in [vec![], vec![changed], vec![renamed]] {
+            let fresh = render_outputs(&root, &items, &registry).or_fail()?;
+            verify_that!(
+                fresh.into_iter().any(|output| write_or_check(
+                    true,
+                    &dir.path().join(output.path),
+                    output.path,
+                    output.contents
+                )
+                .is_err()),
+                eq(true)
+            )?;
+        }
+        // A package without subcommunicators cannot check this conditional API.
+        fs::write(dir.path().join(MPI_COVERAGE_MANIFEST_PATH), "stale").or_fail()?;
+        for (mpi, subcomm) in [(false, false), (true, false)] {
+            let (_dir, cpu, _) = coverage_fixture(mpi, subcomm)?;
+            for output in render_outputs(&cpu, &[], &registry).or_fail()? {
+                write_or_check(
+                    true,
+                    &dir.path().join(output.path),
+                    output.path,
+                    output.contents,
+                )
+                .or_fail()?;
+            }
+        }
+        Ok(())
+    }
+
+    #[gtest]
+    fn conditional_mpi_coverage_uses_logical_communicator_types() -> googletest::Result<()> {
+        let (_dir, root, registry) = coverage_fixture(true, true)?;
+        let int_item = mpi_item("int")?;
+        let opaque_item = mpi_item("struct ompi_communicator_t *")?;
+        let int_outputs =
+            render_outputs(&root, std::slice::from_ref(&int_item), &registry).or_fail()?;
+        let opaque_outputs =
+            render_outputs(&root, std::slice::from_ref(&opaque_item), &registry).or_fail()?;
+        let find_mpi = |outputs: Vec<GeneratedOutput>| -> googletest::Result<String> {
+            Ok(outputs
+                .into_iter()
+                .find(|out| out.path == "crates/quest-sys/generated/api_coverage_mpi.json")
+                .or_fail()?
+                .contents)
+        };
+        let manifest = find_mpi(int_outputs)?;
+        verify_that!(manifest.as_str(), eq(find_mpi(opaque_outputs)?.as_str()))?;
+        let value: serde_json::Value = serde_json::from_str(&manifest).or_fail()?;
+        verify_that!(
+            value["items"][0]["overload_key"].as_str().or_fail()?,
+            eq("initCustomMpiCommQuESTEnv(MPI_Comm, int, int) -> void")
+        )?;
+        verify_that!(
+            value["items"][0]["arguments"][0]["canonical_type"]
+                .as_str()
+                .or_fail()?,
+            eq("MPI_Comm")
+        )?;
+        // Manifest normalization must not change the parser's ABI evidence.
+        verify_that!(int_item.arguments[0].canonical_type.as_str(), eq("int"))?;
+        verify_that!(
+            opaque_item.arguments[0].canonical_type.as_str(),
+            eq("struct ompi_communicator_t *")
+        )
+    }
 
     #[gtest]
     fn check_generated_file_detects_stale_contents() -> googletest::Result<()> {
@@ -515,6 +733,7 @@ mod tests {
             "crates/quest/build.rs",
             "crates/quest-sys/build.rs",
             "crates/quest-sys/generated/api_coverage.json",
+            "crates/quest-sys/generated/api_coverage_mpi.json",
             "crates/quest-sys/generated/generated_adapters.json",
             "crates/xtask/src/generate/clang.rs",
             "crates/xtask/src/generate/classify.rs",

@@ -5,6 +5,9 @@ use rustfft::{Fft, FftPlannerScalar};
 use crate::policy::{check_limit, checked_len, finite, zeros};
 use crate::{Complex64, Error, ExecutionPolicy, Limits, ResourceUsage, Result};
 
+mod shared;
+pub use shared::{SharedConvolutionSession, SharedConvolutionWorkspace};
+
 /// Arithmetic implementation chosen at workspace construction.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum FftBackend {
