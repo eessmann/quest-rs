@@ -6,129 +6,129 @@ use quest_compile::*;
 
 #[gtest]
 fn rejects_foreign_operands_without_consuming_an_occurrence() -> Result<()> {
-    let mut a = QuantumRegionBuilder::new(2, 1)?;
-    let b = QuantumRegionBuilder::new(2, 1)?;
-    expect_true!(a.gate(Gate::X, &[b.qubit(0)?], &[]).is_err());
-    let id = a.gate(Gate::X, &[a.qubit(0)?], &[])?;
-    expect_eq!(id.index(), 0);
-    Ok(())
+	let mut a = QuantumRegionBuilder::new(2, 1)?;
+	let b = QuantumRegionBuilder::new(2, 1)?;
+	expect_true!(a.gate(Gate::X, &[b.qubit(0)?], &[]).is_err());
+	let id = a.gate(Gate::X, &[a.qubit(0)?], &[])?;
+	expect_eq!(id.index(), 0);
+	Ok(())
 }
 
 #[gtest]
 fn controlled_full_turn_rotation_keeps_relative_phase() -> Result<()> {
-    let mut b = QuantumRegionBuilder::new(2, 0)?;
-    let q0 = b.qubit(0)?;
-    let q1 = b.qubit(1)?;
-    b.gate(
-        Gate::Rz(Angle::pi(2, 1)?),
-        &[q1],
-        &[Control::new(q0, ControlState::One)],
-    )?;
-    let (program, report) = b.finish()?.optimize_exact()?;
-    expect_eq!(report.removed.len(), 0);
-    let plan = program.bind(&[])?.plan()?;
-    expect_eq!(plan.instructions().len(), 1);
-    Ok(())
+	let mut b = QuantumRegionBuilder::new(2, 0)?;
+	let q0 = b.qubit(0)?;
+	let q1 = b.qubit(1)?;
+	b.gate(
+		Gate::Rz(Angle::pi(2, 1)?),
+		&[q1],
+		&[Control::new(q0, ControlState::One)],
+	)?;
+	let (program, report) = b.finish()?.optimize_exact()?;
+	expect_eq!(report.removed.len(), 0);
+	let plan = program.bind(&[])?.plan()?;
+	expect_eq!(plan.instructions().len(), 1);
+	Ok(())
 }
 
 #[gtest]
 fn stochastic_and_classical_hazards_preserve_order() -> Result<()> {
-    let mut b = QuantumRegionBuilder::new(2, 1)?;
-    let q0 = b.qubit(0)?;
-    let q1 = b.qubit(1)?;
-    let c = b.bit(0)?;
-    let first = b.measure(q0, c)?;
-    let second = b.measure(q1, c)?;
-    let p = b.finish()?;
-    expect_true!(p.has_dependency(first, second)?);
-    expect_eq!(p.schedule(), &[first, second]);
-    Ok(())
+	let mut b = QuantumRegionBuilder::new(2, 1)?;
+	let q0 = b.qubit(0)?;
+	let q1 = b.qubit(1)?;
+	let c = b.bit(0)?;
+	let first = b.measure(q0, c)?;
+	let second = b.measure(q1, c)?;
+	let p = b.finish()?;
+	expect_true!(p.has_dependency(first, second)?);
+	expect_eq!(p.schedule(), &[first, second]);
+	Ok(())
 }
 
 #[gtest]
 fn missing_nonfinite_and_duplicate_bindings_are_rejected() -> Result<()> {
-    let mut b = QuantumRegionBuilder::new(1, 0)?;
-    let t = b.parameter("theta")?;
-    b.gate(Gate::Rx(Angle::parameter(t)?), &[b.qubit(0)?], &[])?;
-    let p = b.finish()?;
-    expect_true!(p.clone().bind(&[]).is_err());
-    expect_true!(p.clone().bind(&[(t, f64::INFINITY)]).is_err());
-    expect_true!(p.clone().bind(&[(t, 1.0), (t, 2.0)]).is_err());
-    expect_eq!(p.bind(&[(t, 0.5)])?.plan()?.instructions().len(), 1);
-    Ok(())
+	let mut b = QuantumRegionBuilder::new(1, 0)?;
+	let t = b.parameter("theta")?;
+	b.gate(Gate::Rx(Angle::parameter(t)?), &[b.qubit(0)?], &[])?;
+	let p = b.finish()?;
+	expect_true!(p.clone().bind(&[]).is_err());
+	expect_true!(p.clone().bind(&[(t, f64::INFINITY)]).is_err());
+	expect_true!(p.clone().bind(&[(t, 1.0), (t, 2.0)]).is_err());
+	expect_eq!(p.bind(&[(t, 0.5)])?.plan()?.instructions().len(), 1);
+	Ok(())
 }
 
 #[gtest]
 fn exact_cancellation_stops_at_measurement() -> Result<()> {
-    let mut b = QuantumRegionBuilder::new(1, 1)?;
-    let q = b.qubit(0)?;
-    b.gate(Gate::X, &[q], &[])?;
-    b.measure(q, b.bit(0)?)?;
-    b.gate(Gate::X, &[q], &[])?;
-    let (p, r) = b.finish()?.optimize_exact()?;
-    expect_eq!(p.schedule().len(), 3);
-    expect_eq!(r.removed.len(), 0);
-    expect_true!(p.into_unitary().is_err());
-    Ok(())
+	let mut b = QuantumRegionBuilder::new(1, 1)?;
+	let q = b.qubit(0)?;
+	b.gate(Gate::X, &[q], &[])?;
+	b.measure(q, b.bit(0)?)?;
+	b.gate(Gate::X, &[q], &[])?;
+	let (p, r) = b.finish()?.optimize_exact()?;
+	expect_eq!(p.schedule().len(), 3);
+	expect_eq!(r.removed.len(), 0);
+	expect_true!(p.into_unitary().is_err());
+	Ok(())
 }
 
 #[gtest]
 fn arbitrary_rational_angles_validate_and_normalize_raw_ratios() -> Result<()> {
-    use quest_compile::RBig;
-    for numerator in [0, 1] {
-        expect_true!(matches!(
-            Angle::pi(numerator, 0),
-            Err(quest_compile::language::angle::Error::ZeroDenominator)
-        ));
-    }
-    expect_eq!(
-        Angle::rational_pi(RBig::from_parts_signed(2.into(), (-4).into()))?,
-        Angle::pi(-1, 2)?
-    );
-    Ok(())
+	use quest_compile::RBig;
+	for numerator in [0, 1] {
+		expect_true!(matches!(
+			Angle::pi(numerator, 0),
+			Err(quest_compile::language::angle::Error::ZeroDenominator)
+		));
+	}
+	expect_eq!(
+		Angle::rational_pi(RBig::from_parts_signed(2.into(), (-4).into()))?,
+		Angle::pi(-1, 2)?
+	);
+	Ok(())
 }
 
 #[gtest]
 fn channel_admission_counts_existing_payloads_and_residual_scratch() -> Result<()> {
-    let matrix = BoundGate::Id.matrix(MatrixPolicy::default())?;
-    let mut b = QuantumRegionBuilder::with_limits(
-        1,
-        0,
-        ProgramLimits {
-            max_matrix_bytes: 256,
-            ..ProgramLimits::default()
-        },
-    )?;
-    let q = b.qubit(0)?;
-    b.numerical(matrix.clone(), &[q], &[])?;
-    // The resident 128-byte payload, new payload and completeness sum require
-    // 384 bytes during admission, although the final two payloads would fit.
-    expect_true!(matches!(
-        b.channel(vec![matrix], &[q], 1e-12),
-        Err(Error::Budget(_))
-    ));
-    expect_eq!(b.gate(Gate::X, &[q], &[])?.index(), 1);
-    Ok(())
+	let matrix = BoundGate::Id.matrix(MatrixPolicy::default())?;
+	let mut b = QuantumRegionBuilder::with_limits(
+		1,
+		0,
+		ProgramLimits {
+			max_matrix_bytes: 256,
+			..ProgramLimits::default()
+		},
+	)?;
+	let q = b.qubit(0)?;
+	b.numerical(matrix.clone(), &[q], &[])?;
+	// The resident 128-byte payload, new payload and completeness sum require
+	// 384 bytes during admission, although the final two payloads would fit.
+	expect_true!(matches!(
+		b.channel(vec![matrix], &[q], 1e-12),
+		Err(Error::Budget(_))
+	));
+	expect_eq!(b.gate(Gate::X, &[q], &[])?.index(), 1);
+	Ok(())
 }
 
 #[gtest]
 fn upgraded_bigint_rationals_keep_large_ratio_and_subnormal_conversion() -> Result<()> {
-    use dashu_int::IBig;
-    use quest_compile::RBig;
-    let denominator = std::ops::Shl::shl(IBig::from(1), 1200usize);
-    let numerator = std::ops::Add::add(&denominator, IBig::from(1));
-    let angle = Angle::rational_pi(RBig::from_parts_signed(numerator, denominator))?;
-    let mut builder = QuantumRegionBuilder::new(1, 0)?;
-    builder.gate(Gate::Rz(angle), &[builder.qubit(0)?], &[])?;
-    let bound = builder.finish()?.bind(&[])?;
-    if let Operation::Gate {
-        gate: BoundGate::Rz(value),
-        ..
-    } = bound.instructions()[0].operation()
-    {
-        expect_eq!(*value, std::f64::consts::PI);
-    } else {
-        fail!("expected Rz")?;
-    }
-    Ok(())
+	use dashu_int::IBig;
+	use quest_compile::RBig;
+	let denominator = std::ops::Shl::shl(IBig::from(1), 1200usize);
+	let numerator = std::ops::Add::add(&denominator, IBig::from(1));
+	let angle = Angle::rational_pi(RBig::from_parts_signed(numerator, denominator))?;
+	let mut builder = QuantumRegionBuilder::new(1, 0)?;
+	builder.gate(Gate::Rz(angle), &[builder.qubit(0)?], &[])?;
+	let bound = builder.finish()?.bind(&[])?;
+	if let Operation::Gate {
+		gate: BoundGate::Rz(value),
+		..
+	} = bound.instructions()[0].operation()
+	{
+		expect_eq!(*value, std::f64::consts::PI);
+	} else {
+		fail!("expected Rz")?;
+	}
+	Ok(())
 }

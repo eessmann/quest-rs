@@ -4,8 +4,8 @@
 //! operators are immutable faer matrices; `QuEST` owns simulation storage.
 #![forbid(unsafe_code)]
 #![cfg_attr(
-    not(all(feature = "mpi", quest_native_mpi)),
-    doc = "The collective API requires both the optional MPI feature and native MPI/SUBCOMM support.
+	not(all(feature = "mpi", quest_native_mpi)),
+	doc = "The collective API requires both the optional MPI feature and native MPI/SUBCOMM support.
 ```compile_fail
 use quest::collective::CollectiveEnvironment;
 ```"
@@ -32,7 +32,7 @@ pub use quest_compile::language::vm::{ClassicalValue, InterpreterLimits, RunInpu
 pub use structured_execution::{PreparedProgram, SampleResult};
 
 pub use environment::{
-    Capabilities, Environment, EnvironmentBuilder, EnvironmentView, ExecutionMode,
+	Capabilities, Environment, EnvironmentBuilder, EnvironmentView, ExecutionMode,
 };
 pub use error::{Error, Result, StructuredExecutionError};
 pub use faer;

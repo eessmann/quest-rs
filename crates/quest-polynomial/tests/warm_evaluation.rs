@@ -1,11 +1,11 @@
 use googletest::prelude::*;
 use quest_numerics::arithmetic::{F64Backend, Interval64Backend};
 use quest_polynomial::{
-    Chebyshev, Complex64, GenericFunction, Interval, Limits, Polynomial, function,
+	Chebyshev, Complex64, GenericFunction, Interval, Limits, Polynomial, function,
 };
 use std::{
-    alloc::{GlobalAlloc, Layout, System},
-    sync::atomic::{AtomicBool, AtomicUsize, Ordering},
+	alloc::{GlobalAlloc, Layout, System},
+	sync::atomic::{AtomicBool, AtomicUsize, Ordering},
 };
 struct CountingAllocator;
 static TRACK: AtomicBool = AtomicBool::new(false);
@@ -14,48 +14,48 @@ static ALLOCATIONS: AtomicUsize = AtomicUsize::new(0);
 static ALLOCATOR: CountingAllocator = CountingAllocator;
 // SAFETY: Every allocation and deallocation is delegated unchanged to System.
 unsafe impl GlobalAlloc for CountingAllocator {
-    unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-        if TRACK.load(Ordering::Relaxed) {
-            ALLOCATIONS.fetch_add(1, Ordering::Relaxed);
-        }
-        // SAFETY: The caller supplied the allocator contract's valid layout.
-        unsafe { System.alloc(layout) }
-    }
-    unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
-        // SAFETY: The caller supplies the pointer and matching original layout.
-        unsafe { System.dealloc(ptr, layout) }
-    }
+	unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
+		if TRACK.load(Ordering::Relaxed) {
+			ALLOCATIONS.fetch_add(1, Ordering::Relaxed);
+		}
+		// SAFETY: The caller supplied the allocator contract's valid layout.
+		unsafe { System.alloc(layout) }
+	}
+	unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
+		// SAFETY: The caller supplies the pointer and matching original layout.
+		unsafe { System.dealloc(ptr, layout) }
+	}
 }
 #[gtest]
 #[expect(
-    clippy::arithmetic_side_effects,
-    reason = "Operators construct an expression before allocator tracking starts"
+	clippy::arithmetic_side_effects,
+	reason = "Operators construct an expression before allocator tracking starts"
 )]
 fn warmed_scalar_interval_and_derivative_evaluation_allocate_nothing() -> Result<()> {
-    let function = function!(|x| (x * x + 1.0).ln());
-    let polynomial = Polynomial::new(
-        Chebyshev,
-        vec![Complex64::new(0.3, 0.0); 32],
-        Limits::default(),
-    )?;
-    let interval = Interval::new(0.2, 0.3)?;
-    let execute = || -> quest_polynomial::Result<()> {
-        for _ in 0..32 {
-            std::hint::black_box(function.evaluate(&mut F64Backend, 0.3)?);
-            std::hint::black_box(function.jet(&mut F64Backend, 0.3)?);
-            std::hint::black_box(function.evaluate(&mut Interval64Backend, interval)?);
-            std::hint::black_box(function.jet(&mut Interval64Backend, interval)?);
-            std::hint::black_box(polynomial.evaluate_real(0.3)?);
-            std::hint::black_box(polynomial.jet_interval(interval)?);
-        }
-        Ok(())
-    };
-    execute()?;
-    ALLOCATIONS.store(0, Ordering::SeqCst);
-    TRACK.store(true, Ordering::SeqCst);
-    let result = execute();
-    TRACK.store(false, Ordering::SeqCst);
-    result?;
-    expect_that!(ALLOCATIONS.load(Ordering::SeqCst), eq(0));
-    Ok(())
+	let function = function!(|x| (x * x + 1.0).ln());
+	let polynomial = Polynomial::new(
+		Chebyshev,
+		vec![Complex64::new(0.3, 0.0); 32],
+		Limits::default(),
+	)?;
+	let interval = Interval::new(0.2, 0.3)?;
+	let execute = || -> quest_polynomial::Result<()> {
+		for _ in 0..32 {
+			std::hint::black_box(function.evaluate(&mut F64Backend, 0.3)?);
+			std::hint::black_box(function.jet(&mut F64Backend, 0.3)?);
+			std::hint::black_box(function.evaluate(&mut Interval64Backend, interval)?);
+			std::hint::black_box(function.jet(&mut Interval64Backend, interval)?);
+			std::hint::black_box(polynomial.evaluate_real(0.3)?);
+			std::hint::black_box(polynomial.jet_interval(interval)?);
+		}
+		Ok(())
+	};
+	execute()?;
+	ALLOCATIONS.store(0, Ordering::SeqCst);
+	TRACK.store(true, Ordering::SeqCst);
+	let result = execute();
+	TRACK.store(false, Ordering::SeqCst);
+	result?;
+	expect_that!(ALLOCATIONS.load(Ordering::SeqCst), eq(0));
+	Ok(())
 }

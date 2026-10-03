@@ -5,323 +5,323 @@ use quest_compile::prelude::*;
 use quest_compile::{Constructed, Program, StructuredQuantumOptions};
 
 fn gates(program: &quest_compile::Program<quest_compile::Verified>) -> usize {
-    program
-        .ssa()
-        .blocks()
-        .iter()
-        .flat_map(|block| &block.instructions)
-        .filter(|item| matches!(item.kind, InstructionKind::Gate { .. }))
-        .count()
+	program
+		.ssa()
+		.blocks()
+		.iter()
+		.flat_map(|block| &block.instructions)
+		.filter(|item| matches!(item.kind, InstructionKind::Gate { .. }))
+		.count()
 }
 #[gtest]
 fn exact_quantum_windows_cancel_across_constant_indices_and_keep_loop_cfg() -> Result<()> {
-    let source = "qubit[3] q; int i=0; while(i<3) { h q[0]; x q[2]; h q[0]; cx q[0],q[1]; cx q[0],q[1]; i+=1; }";
-    let original = Program::<Constructed>::parse(source, "loop.qasm")?.verify()?;
-    let blocks = original.ssa().blocks().len();
-    let input_snapshot = original.ssa().snapshot();
-    let (optimized, report) = original.optimize_quantum(StructuredQuantumOptions::default())?;
-    expect_eq!(report.input_snapshot, input_snapshot);
-    expect_eq!(report.output_snapshot, optimized.ssa().snapshot());
-    expect_ne!(report.input_snapshot, report.output_snapshot);
-    expect_eq!(gates(&optimized), 1);
-    expect_eq!(optimized.ssa().blocks().len(), blocks);
-    expect_eq!(report.before_gates, 5);
-    expect_eq!(report.after_gates, 1);
-    optimized.lower()?.plan()?;
-    Ok(())
+	let source = "qubit[3] q; int i=0; while(i<3) { h q[0]; x q[2]; h q[0]; cx q[0],q[1]; cx q[0],q[1]; i+=1; }";
+	let original = Program::<Constructed>::parse(source, "loop.qasm")?.verify()?;
+	let blocks = original.ssa().blocks().len();
+	let input_snapshot = original.ssa().snapshot();
+	let (optimized, report) = original.optimize_quantum(StructuredQuantumOptions::default())?;
+	expect_eq!(report.input_snapshot, input_snapshot);
+	expect_eq!(report.output_snapshot, optimized.ssa().snapshot());
+	expect_ne!(report.input_snapshot, report.output_snapshot);
+	expect_eq!(gates(&optimized), 1);
+	expect_eq!(optimized.ssa().blocks().len(), blocks);
+	expect_eq!(report.before_gates, 5);
+	expect_eq!(report.after_gates, 1);
+	optimized.lower()?.plan()?;
+	Ok(())
 }
 #[gtest]
 fn float_parameters_only_allow_structural_inverse_and_never_ideal_pi_folding() -> Result<()> {
-    let source = "qubit q; rz(pi) q; rz(pi) q; barrier q; rx(0.2) q; inv @ rx(0.2) q;";
-    let original = Program::<Constructed>::parse(source, "float.qasm")?.verify()?;
-    let (optimized, _) = original.optimize_quantum(StructuredQuantumOptions::default())?;
-    expect_eq!(gates(&optimized), 2);
-    Ok(())
+	let source = "qubit q; rz(pi) q; rz(pi) q; barrier q; rx(0.2) q; inv @ rx(0.2) q;";
+	let original = Program::<Constructed>::parse(source, "float.qasm")?.verify()?;
+	let (optimized, _) = original.optimize_quantum(StructuredQuantumOptions::default())?;
+	expect_eq!(gates(&optimized), 2);
+	Ok(())
 }
 
 #[derive(Default)]
 struct ExactBackend {
-    operations: Vec<quest_math::Operation>,
-    effects: Vec<&'static str>,
+	operations: Vec<quest_math::Operation>,
+	effects: Vec<&'static str>,
 }
 impl quest_compile::language::vm::QuantumBackend for ExactBackend {
-    type Error = std::io::Error;
-    fn apply_gate(
-        &mut self,
-        request: quest_compile::language::vm::GateRequest<'_>,
-    ) -> std::result::Result<(), Self::Error> {
-        use quest_compile::language::GateKind as G;
-        use quest_math::Gate as M;
-        let gate = match (request.gate, request.inverse) {
-            (G::Id, _) => return Ok(()),
-            (G::H, _) => M::H,
-            (G::X | G::Cx | G::Ccx, _) => M::X,
-            (G::Y | G::Cy, _) => M::Y,
-            (G::Z | G::Cz, _) => M::Z,
-            (G::Swap, _) => M::Swap,
-            (G::S, false) | (G::Sdg, true) => M::S,
-            (G::Sdg, false) | (G::S, true) => M::Sdg,
-            (G::T, false) | (G::Tdg, true) => M::T,
-            (G::Tdg, false) | (G::T, true) => M::Tdg,
-            _ => return Err(std::io::Error::other("unsupported exact fixture gate")),
-        };
-        self.operations.push(quest_math::Operation {
-            gate,
-            targets: request.targets.to_vec(),
-            controls: request
-                .controls
-                .iter()
-                .map(|control| quest_math::Control {
-                    qubit: control.qubit,
-                    positive: control.positive,
-                })
-                .collect(),
-        });
-        Ok(())
-    }
-    fn measure(&mut self, _qubit: usize) -> std::result::Result<bool, Self::Error> {
-        self.effects.push("measure");
-        Ok(false)
-    }
-    fn reset(&mut self, _qubit: usize) -> std::result::Result<(), Self::Error> {
-        self.effects.push("reset");
-        Ok(())
-    }
-    fn barrier(&mut self, _qubits: &[usize]) -> std::result::Result<(), Self::Error> {
-        self.effects.push("barrier");
-        Ok(())
-    }
+	type Error = std::io::Error;
+	fn apply_gate(
+		&mut self,
+		request: quest_compile::language::vm::GateRequest<'_>,
+	) -> std::result::Result<(), Self::Error> {
+		use quest_compile::language::GateKind as G;
+		use quest_math::Gate as M;
+		let gate = match (request.gate, request.inverse) {
+			(G::Id, _) => return Ok(()),
+			(G::H, _) => M::H,
+			(G::X | G::Cx | G::Ccx, _) => M::X,
+			(G::Y | G::Cy, _) => M::Y,
+			(G::Z | G::Cz, _) => M::Z,
+			(G::Swap, _) => M::Swap,
+			(G::S, false) | (G::Sdg, true) => M::S,
+			(G::Sdg, false) | (G::S, true) => M::Sdg,
+			(G::T, false) | (G::Tdg, true) => M::T,
+			(G::Tdg, false) | (G::T, true) => M::Tdg,
+			_ => return Err(std::io::Error::other("unsupported exact fixture gate")),
+		};
+		self.operations.push(quest_math::Operation {
+			gate,
+			targets: request.targets.to_vec(),
+			controls: request
+				.controls
+				.iter()
+				.map(|control| quest_math::Control {
+					qubit: control.qubit,
+					positive: control.positive,
+				})
+				.collect(),
+		});
+		Ok(())
+	}
+	fn measure(&mut self, _qubit: usize) -> std::result::Result<bool, Self::Error> {
+		self.effects.push("measure");
+		Ok(false)
+	}
+	fn reset(&mut self, _qubit: usize) -> std::result::Result<(), Self::Error> {
+		self.effects.push("reset");
+		Ok(())
+	}
+	fn barrier(&mut self, _qubits: &[usize]) -> std::result::Result<(), Self::Error> {
+		self.effects.push("barrier");
+		Ok(())
+	}
 }
 fn execute(
-    program: &quest_compile::Program<quest_compile::Verified>,
+	program: &quest_compile::Program<quest_compile::Verified>,
 ) -> Result<(ExactBackend, quest_compile::language::vm::RunOutput)> {
-    use quest_compile::language::vm::{Interpreter, RunInputs};
-    let mut backend = ExactBackend::default();
-    let output =
-        Interpreter::default().run(program.ssa(), &mut backend, &RunInputs::default(), &[])?;
-    Ok((backend, output))
+	use quest_compile::language::vm::{Interpreter, RunInputs};
+	let mut backend = ExactBackend::default();
+	let output =
+		Interpreter::default().run(program.ssa(), &mut backend, &RunInputs::default(), &[])?;
+	Ok((backend, output))
 }
 #[gtest]
 fn vm_executed_loop_windows_and_signed_controls_have_exact_full_matrix_equality() -> Result<()> {
-    let source = "qubit[3] q; output int i=0; while(i<3) { h q[0]; x q[2]; h q[0]; cx q[0],q[1]; cx q[0],q[1]; negctrl @ y q[1],q[2]; negctrl @ y q[1],q[2]; i+=1; }";
-    let original = Program::<Constructed>::parse(source, "vm-loop.qasm")?.verify()?;
-    let (optimized, report) = original
-        .clone()
-        .optimize_quantum(StructuredQuantumOptions::default())?;
-    let (before, before_output) = execute(&original)?;
-    let (after, after_output) = execute(&optimized)?;
-    expect_eq!(before_output.outputs, after_output.outputs);
-    expect_gt!(report.before_gates, report.after_gates);
-    quest_math::verify_exact(
-        &quest_math::Sequence {
-            qubits: 3,
-            operations: before.operations,
-        },
-        &quest_math::Sequence {
-            qubits: 3,
-            operations: after.operations,
-        },
-        quest_math::Limits::default(),
-    )?;
-    Ok(())
+	let source = "qubit[3] q; output int i=0; while(i<3) { h q[0]; x q[2]; h q[0]; cx q[0],q[1]; cx q[0],q[1]; negctrl @ y q[1],q[2]; negctrl @ y q[1],q[2]; i+=1; }";
+	let original = Program::<Constructed>::parse(source, "vm-loop.qasm")?.verify()?;
+	let (optimized, report) = original
+		.clone()
+		.optimize_quantum(StructuredQuantumOptions::default())?;
+	let (before, before_output) = execute(&original)?;
+	let (after, after_output) = execute(&optimized)?;
+	expect_eq!(before_output.outputs, after_output.outputs);
+	expect_gt!(report.before_gates, report.after_gates);
+	quest_math::verify_exact(
+		&quest_math::Sequence {
+			qubits: 3,
+			operations: before.operations,
+		},
+		&quest_math::Sequence {
+			qubits: 3,
+			operations: after.operations,
+		},
+		quest_math::Limits::default(),
+	)?;
+	Ok(())
 }
 #[gtest]
 fn parity_scalar_omega_is_encoded_as_a_proved_exact_clifford_word() -> Result<()> {
-    let source = format!("qubit q; {}", "x q; t q; x q; t q; ".repeat(9));
-    let original = Program::<Constructed>::parse(&source, "scalar.qasm")?.verify()?;
-    let (optimized, report) = original
-        .clone()
-        .optimize_quantum(StructuredQuantumOptions::default())?;
-    expect_eq!(report.after_gates, 6);
-    let (before, _) = execute(&original)?;
-    let (after, _) = execute(&optimized)?;
-    let target = quest_math::Sequence {
-        qubits: 1,
-        operations: vec![quest_math::Operation {
-            gate: quest_math::Gate::W,
-            targets: vec![],
-            controls: vec![],
-        }],
-    };
-    for operations in [before.operations, after.operations] {
-        quest_math::verify_exact(
-            &quest_math::Sequence {
-                qubits: 1,
-                operations,
-            },
-            &target,
-            quest_math::Limits::default(),
-        )?;
-    }
-    Ok(())
+	let source = format!("qubit q; {}", "x q; t q; x q; t q; ".repeat(9));
+	let original = Program::<Constructed>::parse(&source, "scalar.qasm")?.verify()?;
+	let (optimized, report) = original
+		.clone()
+		.optimize_quantum(StructuredQuantumOptions::default())?;
+	expect_eq!(report.after_gates, 6);
+	let (before, _) = execute(&original)?;
+	let (after, _) = execute(&optimized)?;
+	let target = quest_math::Sequence {
+		qubits: 1,
+		operations: vec![quest_math::Operation {
+			gate: quest_math::Gate::W,
+			targets: vec![],
+			controls: vec![],
+		}],
+	};
+	for operations in [before.operations, after.operations] {
+		quest_math::verify_exact(
+			&quest_math::Sequence {
+				qubits: 1,
+				operations,
+			},
+			&target,
+			quest_math::Limits::default(),
+		)?;
+	}
+	Ok(())
 }
 #[gtest]
 fn dynamic_indices_reference_parameters_and_effects_guard_windows() -> Result<()> {
-    let source = "def pair(qubit a, qubit b) { x a; x b; } qubit[2] q; input int index; x q[index]; x q[index]; pair(q[0],q[1]); barrier q; bit b=measure q[0]; reset q[1];";
-    let original = Program::<Constructed>::parse(source, "guards.qasm")?.verify()?;
-    let before = original.ssa().program().clone();
-    let (optimized, report) = original.optimize_quantum(StructuredQuantumOptions::default())?;
-    expect_eq!(optimized.ssa().program(), &before);
-    expect_eq!(report.before_gates, report.after_gates);
-    Ok(())
+	let source = "def pair(qubit a, qubit b) { x a; x b; } qubit[2] q; input int index; x q[index]; x q[index]; pair(q[0],q[1]); barrier q; bit b=measure q[0]; reset q[1];";
+	let original = Program::<Constructed>::parse(source, "guards.qasm")?.verify()?;
+	let before = original.ssa().program().clone();
+	let (optimized, report) = original.optimize_quantum(StructuredQuantumOptions::default())?;
+	expect_eq!(optimized.ssa().program(), &before);
+	expect_eq!(report.before_gates, report.after_gates);
+	Ok(())
 }
 
 #[gtest]
 fn exclusive_scalar_quantum_parameter_body_can_cancel_inverse_gates() -> Result<()> {
-    let source = "def flip(qubit q) { h q; h q; } qubit q; flip(q);";
-    let original = Program::<Constructed>::parse(source, "parameter.qasm")?.verify()?;
-    let (optimized, report) = original.optimize_quantum(StructuredQuantumOptions::default())?;
-    expect_eq!(report.before_gates, 2);
-    expect_eq!(report.after_gates, 0);
-    optimized.lower()?.plan()?;
-    Ok(())
+	let source = "def flip(qubit q) { h q; h q; } qubit q; flip(q);";
+	let original = Program::<Constructed>::parse(source, "parameter.qasm")?.verify()?;
+	let (optimized, report) = original.optimize_quantum(StructuredQuantumOptions::default())?;
+	expect_eq!(report.before_gates, 2);
+	expect_eq!(report.after_gates, 0);
+	optimized.lower()?.plan()?;
+	Ok(())
 }
 #[gtest]
 fn posttransform_compile_and_work_limits_are_enforced() -> Result<()> {
-    let original = Program::<Constructed>::parse("qubit q; h q; h q;", "limits.qasm")?.verify()?;
-    for options in [
-        StructuredQuantumOptions {
-            work: 0,
-            ..StructuredQuantumOptions::default()
-        },
-        StructuredQuantumOptions {
-            storage_bytes: 0,
-            ..StructuredQuantumOptions::default()
-        },
-        StructuredQuantumOptions {
-            compile: quest_compile::language::semantic::CompileLimits {
-                blocks: 0,
-                ..quest_compile::language::semantic::CompileLimits::default()
-            },
-            ..StructuredQuantumOptions::default()
-        },
-    ] {
-        expect_true!(original.clone().optimize_quantum(options).is_err());
-    }
-    Ok(())
+	let original = Program::<Constructed>::parse("qubit q; h q; h q;", "limits.qasm")?.verify()?;
+	for options in [
+		StructuredQuantumOptions {
+			work: 0,
+			..StructuredQuantumOptions::default()
+		},
+		StructuredQuantumOptions {
+			storage_bytes: 0,
+			..StructuredQuantumOptions::default()
+		},
+		StructuredQuantumOptions {
+			compile: quest_compile::language::semantic::CompileLimits {
+				blocks: 0,
+				..quest_compile::language::semantic::CompileLimits::default()
+			},
+			..StructuredQuantumOptions::default()
+		},
+	] {
+		expect_true!(original.clone().optimize_quantum(options).is_err());
+	}
+	Ok(())
 }
 
 #[gtest]
 fn exclusive_straight_cfg_chain_cancels_inverse_gates_and_preserves_vm() -> Result<()> {
-    let original =
-        Program::<Constructed>::parse("qubit q; h q; if(true) {} h q;", "chain.qasm")?.verify()?;
-    let (optimized, report) = original
-        .clone()
-        .optimize_quantum(StructuredQuantumOptions::default())?;
-    expect_eq!(report.before_gates, 2);
-    expect_eq!(report.after_gates, 0);
-    let (before, before_output) = execute(&original)?;
-    let (after, after_output) = execute(&optimized)?;
-    expect_eq!(before_output.outputs, after_output.outputs);
-    quest_math::verify_exact(
-        &quest_math::Sequence {
-            qubits: 1,
-            operations: before.operations,
-        },
-        &quest_math::Sequence {
-            qubits: 1,
-            operations: after.operations,
-        },
-        quest_math::Limits::default(),
-    )?;
-    Ok(())
+	let original =
+		Program::<Constructed>::parse("qubit q; h q; if(true) {} h q;", "chain.qasm")?.verify()?;
+	let (optimized, report) = original
+		.clone()
+		.optimize_quantum(StructuredQuantumOptions::default())?;
+	expect_eq!(report.before_gates, 2);
+	expect_eq!(report.after_gates, 0);
+	let (before, before_output) = execute(&original)?;
+	let (after, after_output) = execute(&optimized)?;
+	expect_eq!(before_output.outputs, after_output.outputs);
+	quest_math::verify_exact(
+		&quest_math::Sequence {
+			qubits: 1,
+			operations: before.operations,
+		},
+		&quest_math::Sequence {
+			qubits: 1,
+			operations: after.operations,
+		},
+		quest_math::Limits::default(),
+	)?;
+	Ok(())
 }
 
 #[gtest]
 fn branching_join_blocks_cross_edge_cancellation() -> Result<()> {
-    let original = Program::<Constructed>::parse(
-        "input bool flag; qubit q; if(flag) { h q; } h q;",
-        "join.qasm",
-    )?
-    .verify()?;
-    let (optimized, report) = original.optimize_quantum(StructuredQuantumOptions::default())?;
-    expect_eq!(report.before_gates, 2);
-    expect_eq!(report.after_gates, 2);
-    optimized.lower()?.plan()?;
-    Ok(())
+	let original = Program::<Constructed>::parse(
+		"input bool flag; qubit q; if(flag) { h q; } h q;",
+		"join.qasm",
+	)?
+	.verify()?;
+	let (optimized, report) = original.optimize_quantum(StructuredQuantumOptions::default())?;
+	expect_eq!(report.before_gates, 2);
+	expect_eq!(report.after_gates, 2);
+	optimized.lower()?.plan()?;
+	Ok(())
 }
 
 #[gtest]
 fn loop_backedge_blocks_cross_iteration_inverse_cancellation() -> Result<()> {
-    let original = Program::<Constructed>::parse(
-        "qubit q; int n=2; while(n>0) { h q; n-=1; } h q;",
-        "loop-fence.qasm",
-    )?
-    .verify()?;
-    let (optimized, report) = original
-        .clone()
-        .optimize_quantum(StructuredQuantumOptions::default())?;
-    expect_eq!(report.before_gates, 2);
-    expect_eq!(report.after_gates, 2);
-    let (before, before_output) = execute(&original)?;
-    let (after, after_output) = execute(&optimized)?;
-    expect_eq!(before_output.outputs, after_output.outputs);
-    quest_math::verify_exact(
-        &quest_math::Sequence {
-            qubits: 1,
-            operations: before.operations,
-        },
-        &quest_math::Sequence {
-            qubits: 1,
-            operations: after.operations,
-        },
-        quest_math::Limits::default(),
-    )?;
-    Ok(())
+	let original = Program::<Constructed>::parse(
+		"qubit q; int n=2; while(n>0) { h q; n-=1; } h q;",
+		"loop-fence.qasm",
+	)?
+	.verify()?;
+	let (optimized, report) = original
+		.clone()
+		.optimize_quantum(StructuredQuantumOptions::default())?;
+	expect_eq!(report.before_gates, 2);
+	expect_eq!(report.after_gates, 2);
+	let (before, before_output) = execute(&original)?;
+	let (after, after_output) = execute(&optimized)?;
+	expect_eq!(before_output.outputs, after_output.outputs);
+	quest_math::verify_exact(
+		&quest_math::Sequence {
+			qubits: 1,
+			operations: before.operations,
+		},
+		&quest_math::Sequence {
+			qubits: 1,
+			operations: after.operations,
+		},
+		quest_math::Limits::default(),
+	)?;
+	Ok(())
 }
 
 #[cfg(feature = "macros")]
 #[gtest]
 fn macro_captures_and_original_export_sources_survive_quantum_replacement() -> Result<()> {
-    let mut reads = Vec::new();
-    let source = quest_compile::circuit! {
-        qubit q;
-        rx(${{ reads.push(()); 0.2 }}) q;
-        h q; h q;
-    }?;
-    expect_eq!(reads.len(), 1);
-    let original = source.verify()?;
-    let original_plan = original.clone().lower()?.plan()?;
-    let (optimized, report) = original.optimize_quantum(StructuredQuantumOptions::default())?;
-    let plan = optimized.lower()?.plan()?;
-    expect_eq!(report.before_gates, 3);
-    expect_eq!(report.after_gates, 1);
-    expect_eq!(plan.syntax(), original_plan.syntax());
-    expect_eq!(plan.captures(), original_plan.captures());
-    expect_eq!(plan.locations().len(), original_plan.locations().len());
-    expect_eq!(
-        plan.sources().iter().count(),
-        original_plan.sources().iter().count()
-    );
-    let rewrite = report
-        .rewrites
-        .first()
-        .ok_or_else(|| std::io::Error::other("missing cancellation provenance"))?;
-    expect_eq!(rewrite.inputs.len(), 2);
-    expect_true!(rewrite.outputs.is_empty());
-    expect_true!(rewrite.inputs.iter().all(|input| input.span.is_some()));
-    Ok(())
+	let mut reads = Vec::new();
+	let source = quest_compile::circuit! {
+		qubit q;
+		rx(${{ reads.push(()); 0.2 }}) q;
+		h q; h q;
+	}?;
+	expect_eq!(reads.len(), 1);
+	let original = source.verify()?;
+	let original_plan = original.clone().lower()?.plan()?;
+	let (optimized, report) = original.optimize_quantum(StructuredQuantumOptions::default())?;
+	let plan = optimized.lower()?.plan()?;
+	expect_eq!(report.before_gates, 3);
+	expect_eq!(report.after_gates, 1);
+	expect_eq!(plan.syntax(), original_plan.syntax());
+	expect_eq!(plan.captures(), original_plan.captures());
+	expect_eq!(plan.locations().len(), original_plan.locations().len());
+	expect_eq!(
+		plan.sources().iter().count(),
+		original_plan.sources().iter().count()
+	);
+	let rewrite = report
+		.rewrites
+		.first()
+		.ok_or_else(|| std::io::Error::other("missing cancellation provenance"))?;
+	expect_eq!(rewrite.inputs.len(), 2);
+	expect_true!(rewrite.outputs.is_empty());
+	expect_true!(rewrite.inputs.iter().all(|input| input.span.is_some()));
+	Ok(())
 }
 
 #[gtest]
 fn classical_constants_enable_quantum_windows_without_crossing_trapping_work() -> Result<()> {
-    let original = Program::<Constructed>::parse(
-        "qubit[2] q; int index=1; h q[index]; h q[index];",
-        "classical-then-quantum.qasm",
-    )?
-    .verify()?;
-    let (classical, _) =
-        original.optimize_classical(quest_compile::classical::OptimizationLimits::default())?;
-    let (optimized, report) = classical.optimize_quantum(StructuredQuantumOptions::default())?;
-    expect_eq!(report.after_gates, 0);
-    optimized.lower()?.plan()?;
-    let guarded = Program::<Constructed>::parse(
-        "qubit q; input int divisor; h q; int value=1/divisor; h q;",
-        "trap.qasm",
-    )?
-    .verify()?;
-    let (unchanged, report) = guarded.optimize_quantum(StructuredQuantumOptions::default())?;
-    expect_eq!(report.after_gates, 2);
-    unchanged.lower()?.plan()?;
-    Ok(())
+	let original = Program::<Constructed>::parse(
+		"qubit[2] q; int index=1; h q[index]; h q[index];",
+		"classical-then-quantum.qasm",
+	)?
+	.verify()?;
+	let (classical, _) =
+		original.optimize_classical(quest_compile::classical::OptimizationLimits::default())?;
+	let (optimized, report) = classical.optimize_quantum(StructuredQuantumOptions::default())?;
+	expect_eq!(report.after_gates, 0);
+	optimized.lower()?.plan()?;
+	let guarded = Program::<Constructed>::parse(
+		"qubit q; input int divisor; h q; int value=1/divisor; h q;",
+		"trap.qasm",
+	)?
+	.verify()?;
+	let (unchanged, report) = guarded.optimize_quantum(StructuredQuantumOptions::default())?;
+	expect_eq!(report.after_gates, 2);
+	unchanged.lower()?.plan()?;
+	Ok(())
 }

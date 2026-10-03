@@ -8,29 +8,29 @@ pub const UPSTREAM_COMMIT: &str = "c717508162a0eac892fa32134716fe77a284e835";
 /// An explicit resolver for the bundled library; all other requests fail.
 #[derive(Debug, Clone)]
 pub struct StandardLibrary {
-    source: SourceSnapshot,
+	source: SourceSnapshot,
 }
 impl StandardLibrary {
-    /// Allocate a source identity that is distinct from the caller's source IDs.
-    #[must_use]
-    pub fn new(id: SourceId) -> Self {
-        Self {
-            source: SourceSnapshot::new(id, "stdgates.inc", STANDARD_GATES),
-        }
-    }
+	/// Allocate a source identity that is distinct from the caller's source IDs.
+	#[must_use]
+	pub fn new(id: SourceId) -> Self {
+		Self {
+			source: SourceSnapshot::new(id, "stdgates.inc", STANDARD_GATES),
+		}
+	}
 }
 impl IncludeResolver for StandardLibrary {
-    fn resolve(
-        &mut self,
-        _: &SourceSnapshot,
-        path: &str,
-    ) -> std::result::Result<SourceSnapshot, ResolveError> {
-        if path == "stdgates.inc" {
-            Ok(self.source.clone())
-        } else {
-            Err(ResolveError::new(
-                "only the pinned stdgates.inc is available",
-            ))
-        }
-    }
+	fn resolve(
+		&mut self,
+		_: &SourceSnapshot,
+		path: &str,
+	) -> std::result::Result<SourceSnapshot, ResolveError> {
+		if path == "stdgates.inc" {
+			Ok(self.source.clone())
+		} else {
+			Err(ResolveError::new(
+				"only the pinned stdgates.inc is available",
+			))
+		}
+	}
 }

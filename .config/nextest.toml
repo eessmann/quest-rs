@@ -1,4 +1,5 @@
 nextest-version = { required = "0.9.55" }
+experimental = ["benchmarks"]
 
 [profile.default]
 fail-fast = true

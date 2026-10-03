@@ -2,12 +2,12 @@
 //! supplied by one backend and every executed node is charged at runtime.
 use quest_numerics::arithmetic::{ArithmeticError, Backend, ExactConstant};
 use std::{
-    marker::Destruct,
-    ops::{Add, Div, Mul, Neg, Sub},
+	marker::Destruct,
+	ops::{Add, Div, Mul, Neg, Sub},
 };
 
 pub(crate) mod sealed {
-    pub trait Sealed {}
+	pub trait Sealed {}
 }
 /// Library expressions are sealed: an arbitrary implementation cannot manufacture
 /// structural consistency evidence.
@@ -23,89 +23,89 @@ pub(crate) mod sealed {
 /// }
 /// ```
 pub trait Expression: sealed::Sealed {
-    const METADATA: ExpressionMetadata;
-    /// Evaluate using exactly the operations of the selected backend.
-    /// # Errors
-    /// Propagates arithmetic, domain, input-shape and budget failures.
-    fn eval<B: Backend>(
-        &self,
-        backend: &mut B,
-        inputs: &[B::Scalar],
-    ) -> Result<B::Scalar, B::Error>;
+	const METADATA: ExpressionMetadata;
+	/// Evaluate using exactly the operations of the selected backend.
+	/// # Errors
+	/// Propagates arithmetic, domain, input-shape and budget failures.
+	fn eval<B: Backend>(
+		&self,
+		backend: &mut B,
+		inputs: &[B::Scalar],
+	) -> Result<B::Scalar, B::Error>;
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct ExpressionMetadata {
-    pub nodes: usize,
-    pub depth: usize,
-    pub operations: usize,
-    pub positive_jet_arguments: usize,
-    pub nonzero_denominators: usize,
-    pub inputs: usize,
+	pub nodes: usize,
+	pub depth: usize,
+	pub operations: usize,
+	pub positive_jet_arguments: usize,
+	pub nonzero_denominators: usize,
+	pub inputs: usize,
 }
 impl ExpressionMetadata {
-    #[must_use]
-    pub const fn leaf() -> Self {
-        Self {
-            nodes: 1,
-            depth: 1,
-            operations: 0,
-            positive_jet_arguments: 0,
-            nonzero_denominators: 0,
-            inputs: 0,
-        }
-    }
-    #[must_use]
-    pub const fn variable(index: usize) -> Self {
-        Self {
-            inputs: index.saturating_add(1),
-            ..Self::leaf()
-        }
-    }
-    #[must_use]
-    pub const fn unary(a: Self) -> Self {
-        Self {
-            nodes: a.nodes.saturating_add(1),
-            depth: a.depth.saturating_add(1),
-            operations: a.operations.saturating_add(1),
-            ..a
-        }
-    }
-    #[must_use]
-    pub const fn positive_jet(mut self) -> Self {
-        self.positive_jet_arguments = self.positive_jet_arguments.saturating_add(1);
-        self
-    }
-    #[must_use]
-    pub const fn denominator(mut self) -> Self {
-        self.nonzero_denominators = self.nonzero_denominators.saturating_add(1);
-        self
-    }
-    #[must_use]
-    pub const fn binary(a: Self, b: Self) -> Self {
-        Self {
-            nodes: a.nodes.saturating_add(b.nodes).saturating_add(1),
-            depth: (if a.depth > b.depth { a.depth } else { b.depth }).saturating_add(1),
-            operations: a.operations.saturating_add(b.operations).saturating_add(1),
-            positive_jet_arguments: a
-                .positive_jet_arguments
-                .saturating_add(b.positive_jet_arguments),
-            nonzero_denominators: a
-                .nonzero_denominators
-                .saturating_add(b.nonzero_denominators),
-            inputs: if a.inputs > b.inputs {
-                a.inputs
-            } else {
-                b.inputs
-            },
-        }
-    }
+	#[must_use]
+	pub const fn leaf() -> Self {
+		Self {
+			nodes: 1,
+			depth: 1,
+			operations: 0,
+			positive_jet_arguments: 0,
+			nonzero_denominators: 0,
+			inputs: 0,
+		}
+	}
+	#[must_use]
+	pub const fn variable(index: usize) -> Self {
+		Self {
+			inputs: index.saturating_add(1),
+			..Self::leaf()
+		}
+	}
+	#[must_use]
+	pub const fn unary(a: Self) -> Self {
+		Self {
+			nodes: a.nodes.saturating_add(1),
+			depth: a.depth.saturating_add(1),
+			operations: a.operations.saturating_add(1),
+			..a
+		}
+	}
+	#[must_use]
+	pub const fn positive_jet(mut self) -> Self {
+		self.positive_jet_arguments = self.positive_jet_arguments.saturating_add(1);
+		self
+	}
+	#[must_use]
+	pub const fn denominator(mut self) -> Self {
+		self.nonzero_denominators = self.nonzero_denominators.saturating_add(1);
+		self
+	}
+	#[must_use]
+	pub const fn binary(a: Self, b: Self) -> Self {
+		Self {
+			nodes: a.nodes.saturating_add(b.nodes).saturating_add(1),
+			depth: (if a.depth > b.depth { a.depth } else { b.depth }).saturating_add(1),
+			operations: a.operations.saturating_add(b.operations).saturating_add(1),
+			positive_jet_arguments: a
+				.positive_jet_arguments
+				.saturating_add(b.positive_jet_arguments),
+			nonzero_denominators: a
+				.nonzero_denominators
+				.saturating_add(b.nonzero_denominators),
+			inputs: if a.inputs > b.inputs {
+				a.inputs
+			} else {
+				b.inputs
+			},
+		}
+	}
 }
 /// Const-capable structural introspection; this does not execute arithmetic or
 /// remove numerical resource obligations.
 pub const trait StaticExpression: Expression {
-    fn static_metadata(&self) -> ExpressionMetadata {
-        Self::METADATA
-    }
+	fn static_metadata(&self) -> ExpressionMetadata {
+		Self::METADATA
+	}
 }
 #[derive(Clone, Copy, Debug)]
 pub struct Typed<E>(pub(crate) E);
@@ -117,23 +117,23 @@ pub struct ConstantNode(f64);
 pub struct ExactNode(ExactConstant);
 #[must_use]
 pub const fn variable<const I: usize>() -> Typed<VariableNode<I>> {
-    Typed(VariableNode)
+	Typed(VariableNode)
 }
 #[must_use]
 pub const fn constant(value: f64) -> Typed<ConstantNode> {
-    Typed(ConstantNode(value))
+	Typed(ConstantNode(value))
 }
 #[must_use]
 pub const fn exact(value: ExactConstant) -> Typed<ExactNode> {
-    Typed(ExactNode(value))
+	Typed(ExactNode(value))
 }
 impl<E: Expression> sealed::Sealed for Typed<E> {}
 impl<E: Expression> Expression for Typed<E> {
-    const METADATA: ExpressionMetadata = E::METADATA;
-    #[inline]
-    fn eval<B: Backend>(&self, b: &mut B, inputs: &[B::Scalar]) -> Result<B::Scalar, B::Error> {
-        self.0.eval(b, inputs)
-    }
+	const METADATA: ExpressionMetadata = E::METADATA;
+	#[inline]
+	fn eval<B: Backend>(&self, b: &mut B, inputs: &[B::Scalar]) -> Result<B::Scalar, B::Error> {
+		self.0.eval(b, inputs)
+	}
 }
 const impl<E: Expression> StaticExpression for Typed<E> {}
 impl<const I: usize> sealed::Sealed for VariableNode<I> {}
@@ -143,29 +143,29 @@ const impl<const I: usize> StaticExpression for VariableNode<I> {}
 const impl StaticExpression for ConstantNode {}
 const impl StaticExpression for ExactNode {}
 impl<const I: usize> Expression for VariableNode<I> {
-    const METADATA: ExpressionMetadata = ExpressionMetadata::variable(I);
-    fn eval<B: Backend>(&self, b: &mut B, inputs: &[B::Scalar]) -> Result<B::Scalar, B::Error> {
-        b.visit()?;
-        let input = inputs
-            .get(I)
-            .ok_or_else(|| B::Error::from(ArithmeticError::Domain("expression input shape")))?;
-        b.validate(input)?;
-        Ok(input.clone())
-    }
+	const METADATA: ExpressionMetadata = ExpressionMetadata::variable(I);
+	fn eval<B: Backend>(&self, b: &mut B, inputs: &[B::Scalar]) -> Result<B::Scalar, B::Error> {
+		b.visit()?;
+		let input = inputs
+			.get(I)
+			.ok_or_else(|| B::Error::from(ArithmeticError::Domain("expression input shape")))?;
+		b.validate(input)?;
+		Ok(input.clone())
+	}
 }
 impl Expression for ConstantNode {
-    const METADATA: ExpressionMetadata = ExpressionMetadata::leaf();
-    fn eval<B: Backend>(&self, b: &mut B, _: &[B::Scalar]) -> Result<B::Scalar, B::Error> {
-        b.visit()?;
-        b.point(self.0)
-    }
+	const METADATA: ExpressionMetadata = ExpressionMetadata::leaf();
+	fn eval<B: Backend>(&self, b: &mut B, _: &[B::Scalar]) -> Result<B::Scalar, B::Error> {
+		b.visit()?;
+		b.point(self.0)
+	}
 }
 impl Expression for ExactNode {
-    const METADATA: ExpressionMetadata = ExpressionMetadata::leaf();
-    fn eval<B: Backend>(&self, b: &mut B, _: &[B::Scalar]) -> Result<B::Scalar, B::Error> {
-        b.visit()?;
-        b.constant(&self.0)
-    }
+	const METADATA: ExpressionMetadata = ExpressionMetadata::leaf();
+	fn eval<B: Backend>(&self, b: &mut B, _: &[B::Scalar]) -> Result<B::Scalar, B::Error> {
+		b.visit()?;
+		b.constant(&self.0)
+	}
 }
 macro_rules! binary_node {
     ($node:ident,$trait:ident,$method:ident $(,$requirement:ident)?) => {
@@ -219,30 +219,30 @@ unary_node!(Sine, sin);
 unary_node!(Cosine, cos);
 unary_node!(SquareRoot, sqrt, positive_jet);
 const impl<E: [const] Destruct> Neg for Typed<E> {
-    type Output = Typed<Negative<E>>;
-    fn neg(self) -> Self::Output {
-        Typed(Negative(self.0))
-    }
+	type Output = Typed<Negative<E>>;
+	fn neg(self) -> Self::Output {
+		Typed(Negative(self.0))
+	}
 }
 /// Constant-only and expression bodies share the same macro grammar.
 pub const trait IntoTyped {
-    type Output: Expression;
-    fn into_typed(self) -> Self::Output;
+	type Output: Expression;
+	fn into_typed(self) -> Self::Output;
 }
 const impl<E: Expression> IntoTyped for Typed<E> {
-    type Output = Self;
-    fn into_typed(self) -> Self {
-        self
-    }
+	type Output = Self;
+	fn into_typed(self) -> Self {
+		self
+	}
 }
 const impl IntoTyped for f64 {
-    type Output = Typed<ConstantNode>;
-    fn into_typed(self) -> Self::Output {
-        constant(self)
-    }
+	type Output = Typed<ConstantNode>;
+	fn into_typed(self) -> Self::Output {
+		constant(self)
+	}
 }
 pub const fn capture<T: [const] IntoTyped>(value: T) -> T::Output {
-    value.into_typed()
+	value.into_typed()
 }
 
 /// Construct a concrete expression without an interpreted tree or runtime

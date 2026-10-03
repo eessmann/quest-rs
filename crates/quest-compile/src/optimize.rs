@@ -1,836 +1,835 @@
 use crate::{
-    BoundRegion, Control, Error, Gate, Instruction, MatrixPolicy, NumericalOperator, OccurrenceId,
-    Operation, QuantumRegion, QubitId, Result,
+	BoundRegion, Control, Error, Gate, Instruction, MatrixPolicy, NumericalOperator, OccurrenceId,
+	Operation, QuantumRegion, QubitId, Result,
 };
 use crate::{ProvenanceGraph, ProvenanceId};
 use quest_language::quantum::model::{Occurrence, SemanticOperation};
 use std::{
-    sync::Arc,
-    time::{Duration, Instant},
+	sync::Arc,
+	time::{Duration, Instant},
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RewriteKind {
-    Identity,
-    InverseCancellation,
-    ExactAngleMerge,
-    NumericalFusion,
+	Identity,
+	InverseCancellation,
+	ExactAngleMerge,
+	NumericalFusion,
 }
 #[derive(Debug, Clone)]
 pub struct Rewrite {
-    pub kind: RewriteKind,
-    /// Immediate history inputs; expand source leaves explicitly through the report graph.
-    pub inputs: Vec<ProvenanceId>,
-    pub provenance: ProvenanceId,
-    pub output: Option<OccurrenceId>,
+	pub kind: RewriteKind,
+	/// Immediate history inputs; expand source leaves explicitly through the report graph.
+	pub inputs: Vec<ProvenanceId>,
+	pub provenance: ProvenanceId,
+	pub output: Option<OccurrenceId>,
 }
 #[derive(Debug, Clone)]
 pub struct OptimizationReport {
-    pub before_operations: usize,
-    pub after_operations: usize,
-    pub before_depth: usize,
-    pub after_depth: usize,
-    pub removed: Vec<ProvenanceId>,
-    pub provenance: Arc<ProvenanceGraph>,
-    pub work: usize,
-    pub rewrites: Vec<Rewrite>,
-    pub elapsed: Duration,
-    pub matrix_bytes: usize,
-    /// Conservative peak payload and temporary matrix allocation during the
-    /// pass; shared immutable inputs are counted once per occurrence.
-    pub peak_matrix_bytes: usize,
-    /// Numeric fusion changes rounding; no certified approximation bound is claimed.
-    pub numerical_rounding_changed: bool,
-    pub simulator_before: Option<SimulatorCost>,
-    pub simulator_after: Option<SimulatorCost>,
+	pub before_operations: usize,
+	pub after_operations: usize,
+	pub before_depth: usize,
+	pub after_depth: usize,
+	pub removed: Vec<ProvenanceId>,
+	pub provenance: Arc<ProvenanceGraph>,
+	pub work: usize,
+	pub rewrites: Vec<Rewrite>,
+	pub elapsed: Duration,
+	pub matrix_bytes: usize,
+	/// Conservative peak payload and temporary matrix allocation during the
+	/// pass; shared immutable inputs are counted once per occurrence.
+	pub peak_matrix_bytes: usize,
+	/// Numeric fusion changes rounding; no certified approximation bound is claimed.
+	pub numerical_rounding_changed: bool,
+	pub simulator_before: Option<SimulatorCost>,
+	pub simulator_after: Option<SimulatorCost>,
 }
 impl OptimizationReport {
-    const fn new(before: usize, depth: usize, provenance: Arc<ProvenanceGraph>) -> Self {
-        Self {
-            before_operations: before,
-            after_operations: before,
-            before_depth: depth,
-            after_depth: depth,
-            removed: vec![],
-            provenance,
-            work: 0,
-            rewrites: vec![],
-            elapsed: Duration::ZERO,
-            matrix_bytes: 0,
-            peak_matrix_bytes: 0,
-            numerical_rounding_changed: false,
-            simulator_before: None,
-            simulator_after: None,
-        }
-    }
+	const fn new(before: usize, depth: usize, provenance: Arc<ProvenanceGraph>) -> Self {
+		Self {
+			before_operations: before,
+			after_operations: before,
+			before_depth: depth,
+			after_depth: depth,
+			removed: vec![],
+			provenance,
+			work: 0,
+			rewrites: vec![],
+			elapsed: Duration::ZERO,
+			matrix_bytes: 0,
+			peak_matrix_bytes: 0,
+			numerical_rounding_changed: false,
+			simulator_before: None,
+			simulator_after: None,
+		}
+	}
 }
 
 fn semantic_matrix_bytes(occurrences: &[Occurrence]) -> Result<usize> {
-    occurrences.iter().try_fold(0usize, |sum, o| {
-        let bytes = match &o.operation {
-            SemanticOperation::Numerical { matrix, .. } => matrix.bytes(),
-            SemanticOperation::Channel { kraus, .. } => {
-                kraus.iter().try_fold(0usize, |sum, k| {
-                    sum.checked_add(k.bytes())
-                        .ok_or(Error::Budget("program matrices"))
-                })?
-            }
-            _ => 0,
-        };
-        sum.checked_add(bytes)
-            .ok_or(Error::Budget("program matrices"))
-    })
+	occurrences.iter().try_fold(0usize, |sum, o| {
+		let bytes = match &o.operation {
+			SemanticOperation::Numerical { matrix, .. } => matrix.bytes(),
+			SemanticOperation::Channel { kraus, .. } => {
+				kraus.iter().try_fold(0usize, |sum, k| {
+					sum.checked_add(k.bytes())
+						.ok_or(Error::Budget("program matrices"))
+				})?
+			}
+			_ => 0,
+		};
+		sum.checked_add(bytes)
+			.ok_or(Error::Budget("program matrices"))
+	})
 }
 
 fn identity(op: &SemanticOperation) -> bool {
-    match op {
-        SemanticOperation::Gate { gate: Gate::Id, .. } => true,
-        SemanticOperation::Gate {
-            gate: Gate::Rx(a) | Gate::Ry(a) | Gate::Rz(a) | Gate::Phase(a),
-            ..
-        } => a.is_zero(),
-        SemanticOperation::GlobalPhase { angle, .. } => angle.is_zero(),
-        _ => false,
-    }
+	match op {
+		SemanticOperation::Gate { gate: Gate::Id, .. } => true,
+		SemanticOperation::Gate {
+			gate: Gate::Rx(a) | Gate::Ry(a) | Gate::Rz(a) | Gate::Phase(a),
+			..
+		} => a.is_zero(),
+		SemanticOperation::GlobalPhase { angle, .. } => angle.is_zero(),
+		_ => false,
+	}
 }
 
 fn combine(
-    a: &SemanticOperation,
-    b: &SemanticOperation,
+	a: &SemanticOperation,
+	b: &SemanticOperation,
 ) -> Option<(RewriteKind, Option<SemanticOperation>)> {
-    match (a, b) {
-        (
-            SemanticOperation::Gate {
-                gate: x,
-                targets: tx,
-                controls: cx,
-            },
-            SemanticOperation::Gate {
-                gate: y,
-                targets: ty,
-                controls: cy,
-            },
-        ) if tx == ty && cx == cy => {
-            if x.angles().all(crate::Angle::safe_inverse)
-                && y.angles().all(crate::Angle::safe_inverse)
-                && x.adjoint()
-                    .ok()
-                    .and_then(|adjoint| adjoint.equivalent_checked(y).ok())
-                    == Some(true)
-            {
-                return Some((RewriteKind::InverseCancellation, None));
-            }
-            let gate = match (x, y) {
-                (Gate::Rx(a), Gate::Rx(b)) => Gate::Rx(a.plus_exact(b)?),
-                (Gate::Ry(a), Gate::Ry(b)) => Gate::Ry(a.plus_exact(b)?),
-                (Gate::Rz(a), Gate::Rz(b)) => Gate::Rz(a.plus_exact(b)?),
-                (Gate::Phase(a), Gate::Phase(b)) => Gate::Phase(a.plus_exact(b)?),
-                _ => return None,
-            };
-            let op = SemanticOperation::Gate {
-                gate,
-                targets: tx.clone(),
-                controls: cx.clone(),
-            };
-            Some((
-                RewriteKind::ExactAngleMerge,
-                if identity(&op) { None } else { Some(op) },
-            ))
-        }
-        (
-            SemanticOperation::GlobalPhase {
-                angle: a,
-                controls: ca,
-            },
-            SemanticOperation::GlobalPhase {
-                angle: b,
-                controls: cb,
-            },
-        ) if ca == cb => {
-            let angle = a.plus_exact(b)?;
-            Some((
-                RewriteKind::ExactAngleMerge,
-                if angle.is_zero() {
-                    None
-                } else {
-                    Some(SemanticOperation::GlobalPhase {
-                        angle,
-                        controls: ca.clone(),
-                    })
-                },
-            ))
-        }
-        _ => None,
-    }
+	match (a, b) {
+		(
+			SemanticOperation::Gate {
+				gate: x,
+				targets: tx,
+				controls: cx,
+			},
+			SemanticOperation::Gate {
+				gate: y,
+				targets: ty,
+				controls: cy,
+			},
+		) if tx == ty && cx == cy => {
+			if x.angles().all(crate::Angle::safe_inverse)
+				&& y.angles().all(crate::Angle::safe_inverse)
+				&& x.adjoint()
+					.ok()
+					.and_then(|adjoint| adjoint.equivalent_checked(y).ok())
+					== Some(true)
+			{
+				return Some((RewriteKind::InverseCancellation, None));
+			}
+			let gate = match (x, y) {
+				(Gate::Rx(a), Gate::Rx(b)) => Gate::Rx(a.plus_exact(b)?),
+				(Gate::Ry(a), Gate::Ry(b)) => Gate::Ry(a.plus_exact(b)?),
+				(Gate::Rz(a), Gate::Rz(b)) => Gate::Rz(a.plus_exact(b)?),
+				(Gate::Phase(a), Gate::Phase(b)) => Gate::Phase(a.plus_exact(b)?),
+				_ => return None,
+			};
+			let op = SemanticOperation::Gate {
+				gate,
+				targets: tx.clone(),
+				controls: cx.clone(),
+			};
+			Some((
+				RewriteKind::ExactAngleMerge,
+				if identity(&op) { None } else { Some(op) },
+			))
+		}
+		(
+			SemanticOperation::GlobalPhase {
+				angle: a,
+				controls: ca,
+			},
+			SemanticOperation::GlobalPhase {
+				angle: b,
+				controls: cb,
+			},
+		) if ca == cb => {
+			let angle = a.plus_exact(b)?;
+			Some((
+				RewriteKind::ExactAngleMerge,
+				if angle.is_zero() {
+					None
+				} else {
+					Some(SemanticOperation::GlobalPhase {
+						angle,
+						controls: ca.clone(),
+					})
+				},
+			))
+		}
+		_ => None,
+	}
 }
 
 fn commutes(a: &SemanticOperation, b: &SemanticOperation) -> bool {
-    if !matches!(
-        a,
-        SemanticOperation::Gate { .. } | SemanticOperation::GlobalPhase { .. }
-    ) || !matches!(
-        b,
-        SemanticOperation::Gate { .. } | SemanticOperation::GlobalPhase { .. }
-    ) {
-        return false;
-    }
-    if diagonal(a) && diagonal(b) {
-        return true;
-    }
-    !a.qubits().any(|wire| b.qubits().any(|other| other == wire))
+	if !matches!(
+		a,
+		SemanticOperation::Gate { .. } | SemanticOperation::GlobalPhase { .. }
+	) || !matches!(
+		b,
+		SemanticOperation::Gate { .. } | SemanticOperation::GlobalPhase { .. }
+	) {
+		return false;
+	}
+	if diagonal(a) && diagonal(b) {
+		return true;
+	}
+	!a.qubits().any(|wire| b.qubits().any(|other| other == wire))
 }
 const fn diagonal(operation: &SemanticOperation) -> bool {
-    matches!(
-        operation,
-        SemanticOperation::GlobalPhase { .. }
-            | SemanticOperation::Gate {
-                gate: Gate::Id
-                    | Gate::Z
-                    | Gate::S
-                    | Gate::Sdg
-                    | Gate::T
-                    | Gate::Tdg
-                    | Gate::Rz(_)
-                    | Gate::Phase(_),
-                ..
-            }
-    )
+	matches!(
+		operation,
+		SemanticOperation::GlobalPhase { .. }
+			| SemanticOperation::Gate {
+				gate: Gate::Id
+					| Gate::Z
+					| Gate::S
+					| Gate::Sdg
+					| Gate::T
+					| Gate::Tdg
+					| Gate::Rz(_)
+					| Gate::Phase(_),
+				..
+			}
+	)
 }
 fn commuting_candidate(
-    output: &[Occurrence],
-    operation: &SemanticOperation,
-    work: &mut crate::linear::Work,
+	output: &[Occurrence],
+	operation: &SemanticOperation,
+	work: &mut crate::linear::Work,
 ) -> Result<Option<(usize, RewriteKind, Option<SemanticOperation>)>> {
-    // Bounded search prevents quadratic work on very large independent circuits.
-    for (index, previous) in output.iter().enumerate().rev().take(128) {
-        work.charge(1)?;
-        // Candidate proof may perform one newly rounded exact-angle conversion.
-        // Charge it before the proof; prior constant evidence is shared.
-        work.charge(1)?;
-        if let Some((kind, combined)) = combine(&previous.operation, operation) {
-            return Ok(Some((index, kind, combined)));
-        }
-        if !commutes(&previous.operation, operation) {
-            break;
-        }
-    }
-    Ok(None)
+	// Bounded search prevents quadratic work on very large independent circuits.
+	for (index, previous) in output.iter().enumerate().rev().take(128) {
+		work.charge(1)?;
+		// Candidate proof may perform one newly rounded exact-angle conversion.
+		// Charge it before the proof; prior constant evidence is shared.
+		work.charge(1)?;
+		if let Some((kind, combined)) = combine(&previous.operation, operation) {
+			return Ok(Some((index, kind, combined)));
+		}
+		if !commutes(&previous.operation, operation) {
+			break;
+		}
+	}
+	Ok(None)
 }
 
 /// Bounded exact rewrites. Storage covers retained history and report forecasts;
 /// source matrix payloads and allocator metadata are excluded.
 #[derive(Debug, Clone, Copy)]
 pub struct ExactOptions {
-    pub max_work: usize,
-    pub max_bytes: usize,
+	pub max_work: usize,
+	pub max_bytes: usize,
 }
 impl Default for ExactOptions {
-    fn default() -> Self {
-        Self {
-            max_work: 4_000_000,
-            max_bytes: 64 * 1024 * 1024,
-        }
-    }
+	fn default() -> Self {
+		Self {
+			max_work: 4_000_000,
+			max_bytes: 64 * 1024 * 1024,
+		}
+	}
 }
 
 /// Compiler extension over shared semantic capabilities.
 pub trait ExactPasses: Sized {
-    /// # Errors
-    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
-    fn optimize_exact(self) -> Result<(Self, OptimizationReport)>;
-    /// # Errors
-    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
-    fn optimize_exact_with_options(
-        self,
-        options: ExactOptions,
-    ) -> Result<(Self, OptimizationReport)>;
+	/// # Errors
+	/// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+	fn optimize_exact(self) -> Result<(Self, OptimizationReport)>;
+	/// # Errors
+	/// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+	fn optimize_exact_with_options(
+		self,
+		options: ExactOptions,
+	) -> Result<(Self, OptimizationReport)>;
 }
 impl ExactPasses for QuantumRegion {
-    /// Guarded exact algebra with a bounded dependency search. Disjoint symbolic
-    /// unitaries and diagonal gates may commute. Effects, barriers and unknown
-    /// matrix payloads stop the search. Explicit user order constraints
-    /// conservatively disable these rewrites. Successful finite bindings stay
-    /// valid; source conversion obligations prevent unsafe cancellation.
-    /// # Errors
-    /// Rejects invalid identifiers or cyclic dependencies when rebuilding the optimized program.
-    fn optimize_exact(self) -> Result<(Self, OptimizationReport)> {
-        self.optimize_exact_with_options(ExactOptions::default())
-    }
-    /// Apply exact rewrites within explicit work and provenance/report storage bounds.
-    /// # Errors
-    /// Rejects exhausted budgets or invalid rebuilt dependencies, without publishing partial edits.
-    fn optimize_exact_with_options(
-        self,
-        options: ExactOptions,
-    ) -> Result<(Self, OptimizationReport)> {
-        let mut work = crate::linear::Work {
-            used: 0,
-            maximum: options.max_work,
-        };
-        work.charge(self.occurrences().len())?;
-        work.charge(self.provenance_arc().copy_work()?)?;
-        let report_bytes = self
-            .occurrences()
-            .len()
-            .checked_mul(const { 2 * size_of::<Rewrite>() + 8 * size_of::<ProvenanceId>() })
-            .ok_or(Error::Budget("exact report storage"))?;
-        let graph_limit = options
-            .max_bytes
-            .checked_sub(report_bytes)
-            .ok_or(Error::Budget("exact report storage"))?
-            .min(self.limits().max_provenance_bytes);
-        let start = Instant::now();
-        let mut report = OptimizationReport::new(
-            self.occurrences().len(),
-            self.dependency_depth(),
-            Arc::clone(self.provenance_arc()),
-        );
-        let mut provenance = ProvenanceGraph::edit(Arc::clone(self.provenance_arc()), graph_limit)?;
-        report.matrix_bytes = semantic_matrix_bytes(self.occurrences())?;
-        report.peak_matrix_bytes = report.matrix_bytes;
-        if !self.explicit_edges().is_empty() {
-            report.elapsed = start.elapsed();
-            report.work = work.used;
-            return Ok((self, report));
-        }
-        let mut output: Vec<Occurrence> = vec![];
-        for mut op in self.occurrences().iter().cloned() {
-            if identity(&op.operation) {
-                work.charge(1)?;
-                let history = provenance.rewrite(&[op.provenance], graph_limit)?;
-                report.removed.push(op.provenance);
-                report.rewrites.push(Rewrite {
-                    kind: RewriteKind::Identity,
-                    inputs: vec![op.provenance],
-                    provenance: history,
-                    output: None,
-                });
-                continue;
-            }
-            if let Some((index, kind, combined)) =
-                commuting_candidate(&output, &op.operation, &mut work)?
-            {
-                // The index comes from this unchanged output slice.
-                work.charge(output.len().saturating_sub(index))?;
-                let previous = output.remove(index);
-                let inputs = vec![previous.provenance, op.provenance];
-                work.charge(inputs.len())?;
-                let history = provenance.rewrite(&inputs, graph_limit)?;
-                let output_id = combined.as_ref().map(|_| previous.id);
-                report.rewrites.push(Rewrite {
-                    kind,
-                    inputs: inputs.clone(),
-                    provenance: history,
-                    output: output_id,
-                });
-                if let Some(operation) = combined {
-                    op = Occurrence {
-                        id: previous.id,
-                        provenance: history,
-                        source: previous.source,
-                        operation,
-                    };
-                } else {
-                    report.removed.extend(inputs);
-                    continue;
-                }
-            }
-            output.push(op);
-        }
-        report.after_operations = output.len();
-        report.elapsed = start.elapsed();
-        report.work = work.used;
-        report.provenance = Arc::new(provenance);
-        let p = Self::from_parts(
-            self.owner(),
-            self.num_qubits(),
-            self.num_bits(),
-            self.parameter_storage().clone(),
-            output,
-            self.explicit_edges().clone(),
-            self.limits(),
-            Arc::clone(&report.provenance),
-        )?;
-        report.after_depth = p.dependency_depth();
-        report.elapsed = start.elapsed();
-        Ok((p, report))
-    }
+	/// Guarded exact algebra with a bounded dependency search. Disjoint symbolic
+	/// unitaries and diagonal gates may commute. Effects, barriers and unknown
+	/// matrix payloads stop the search. Explicit user order constraints
+	/// conservatively disable these rewrites. Successful finite bindings stay
+	/// valid; source conversion obligations prevent unsafe cancellation.
+	/// # Errors
+	/// Rejects invalid identifiers or cyclic dependencies when rebuilding the optimized program.
+	fn optimize_exact(self) -> Result<(Self, OptimizationReport)> {
+		self.optimize_exact_with_options(ExactOptions::default())
+	}
+	/// Apply exact rewrites within explicit work and provenance/report storage bounds.
+	/// # Errors
+	/// Rejects exhausted budgets or invalid rebuilt dependencies, without publishing partial edits.
+	fn optimize_exact_with_options(
+		self,
+		options: ExactOptions,
+	) -> Result<(Self, OptimizationReport)> {
+		let mut work = crate::linear::Work {
+			used: 0,
+			maximum: options.max_work,
+		};
+		work.charge(self.occurrences().len())?;
+		work.charge(self.provenance_arc().copy_work()?)?;
+		let report_bytes = self
+			.occurrences()
+			.len()
+			.checked_mul(const { 2 * size_of::<Rewrite>() + 8 * size_of::<ProvenanceId>() })
+			.ok_or(Error::Budget("exact report storage"))?;
+		let graph_limit = options
+			.max_bytes
+			.checked_sub(report_bytes)
+			.ok_or(Error::Budget("exact report storage"))?
+			.min(self.limits().max_provenance_bytes);
+		let start = Instant::now();
+		let mut report = OptimizationReport::new(
+			self.occurrences().len(),
+			self.dependency_depth(),
+			Arc::clone(self.provenance_arc()),
+		);
+		let mut provenance = ProvenanceGraph::edit(Arc::clone(self.provenance_arc()), graph_limit)?;
+		report.matrix_bytes = semantic_matrix_bytes(self.occurrences())?;
+		report.peak_matrix_bytes = report.matrix_bytes;
+		if !self.explicit_edges().is_empty() {
+			report.elapsed = start.elapsed();
+			report.work = work.used;
+			return Ok((self, report));
+		}
+		let mut output: Vec<Occurrence> = vec![];
+		for mut op in self.occurrences().iter().cloned() {
+			if identity(&op.operation) {
+				work.charge(1)?;
+				let history = provenance.rewrite(&[op.provenance], graph_limit)?;
+				report.removed.push(op.provenance);
+				report.rewrites.push(Rewrite {
+					kind: RewriteKind::Identity,
+					inputs: vec![op.provenance],
+					provenance: history,
+					output: None,
+				});
+				continue;
+			}
+			if let Some((index, kind, combined)) =
+				commuting_candidate(&output, &op.operation, &mut work)?
+			{
+				// The index comes from this unchanged output slice.
+				work.charge(output.len().saturating_sub(index))?;
+				let previous = output.remove(index);
+				let inputs = vec![previous.provenance, op.provenance];
+				work.charge(inputs.len())?;
+				let history = provenance.rewrite(&inputs, graph_limit)?;
+				let output_id = combined.as_ref().map(|_| previous.id);
+				report.rewrites.push(Rewrite {
+					kind,
+					inputs: inputs.clone(),
+					provenance: history,
+					output: output_id,
+				});
+				if let Some(operation) = combined {
+					op = Occurrence {
+						id: previous.id,
+						provenance: history,
+						source: previous.source,
+						operation,
+					};
+				} else {
+					report.removed.extend(inputs);
+					continue;
+				}
+			}
+			output.push(op);
+		}
+		report.after_operations = output.len();
+		report.elapsed = start.elapsed();
+		report.work = work.used;
+		report.provenance = Arc::new(provenance);
+		let p = Self::from_parts(
+			self.owner(),
+			self.num_qubits(),
+			self.num_bits(),
+			self.parameter_storage().clone(),
+			output,
+			self.explicit_edges().clone(),
+			self.limits(),
+			Arc::clone(&report.provenance),
+		)?;
+		report.after_depth = p.dependency_depth();
+		report.elapsed = start.elapsed();
+		Ok((p, report))
+	}
 }
 
 /// Heuristic execution model; these scores are not benchmark timings.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum SimulatorProfile {
-    #[default]
-    StateVector,
-    DensityMatrix,
+	#[default]
+	StateVector,
+	DensityMatrix,
 }
 /// Work is normalized per state amplitude or density entry, avoiding exponential
 /// register-size arithmetic. Depth and T-count are informational metrics.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub struct SimulatorCost {
-    pub native_calls: usize,
-    pub state_passes: usize,
-    pub arithmetic_per_element: usize,
-    pub preparation_bytes: usize,
-    pub maximum_matrix_qubits: usize,
-    pub t_count: usize,
-    pub dependency_depth: usize,
+	pub native_calls: usize,
+	pub state_passes: usize,
+	pub arithmetic_per_element: usize,
+	pub preparation_bytes: usize,
+	pub maximum_matrix_qubits: usize,
+	pub t_count: usize,
+	pub dependency_depth: usize,
 }
 const fn is_diagonal(operation: &Operation) -> bool {
-    match operation {
-        Operation::Numerical { matrix, .. } => matrix.is_diagonal(),
-        Operation::Gate { gate, .. } => matches!(
-            gate,
-            crate::BoundGate::Id
-                | crate::BoundGate::Z
-                | crate::BoundGate::S
-                | crate::BoundGate::Sdg
-                | crate::BoundGate::T
-                | crate::BoundGate::Tdg
-                | crate::BoundGate::Phase(_)
-                | crate::BoundGate::Rz(_)
-        ),
-        Operation::GlobalPhase { .. } => true,
-        _ => false,
-    }
+	match operation {
+		Operation::Numerical { matrix, .. } => matrix.is_diagonal(),
+		Operation::Gate { gate, .. } => matches!(
+			gate,
+			crate::BoundGate::Id
+				| crate::BoundGate::Z
+				| crate::BoundGate::S
+				| crate::BoundGate::Sdg
+				| crate::BoundGate::T
+				| crate::BoundGate::Tdg
+				| crate::BoundGate::Phase(_)
+				| crate::BoundGate::Rz(_)
+		),
+		Operation::GlobalPhase { .. } => true,
+		_ => false,
+	}
 }
 fn operation_work(operation: &Operation) -> Result<usize> {
-    if is_diagonal(operation) {
-        return Ok(1);
-    }
-    let width = operands(operation).map_or(0, |(targets, _)| targets.len());
-    1usize
-        .checked_shl(u32::try_from(width).map_err(|_| Error::Budget("cost width"))?)
-        .ok_or(Error::Budget("cost width"))
+	if is_diagonal(operation) {
+		return Ok(1);
+	}
+	let width = operands(operation).map_or(0, |(targets, _)| targets.len());
+	1usize
+		.checked_shl(u32::try_from(width).map_err(|_| Error::Budget("cost width"))?)
+		.ok_or(Error::Budget("cost width"))
 }
 fn score(
-    work: usize,
-    passes: usize,
-    preparation: usize,
-    profile: SimulatorProfile,
+	work: usize,
+	passes: usize,
+	preparation: usize,
+	profile: SimulatorProfile,
 ) -> Option<usize> {
-    let (traffic_weight, arithmetic_weight) = match profile {
-        SimulatorProfile::StateVector => (64usize, 1usize),
-        SimulatorProfile::DensityMatrix => (128, 2),
-    };
-    passes
-        .checked_mul(traffic_weight)?
-        .checked_add(work.checked_mul(arithmetic_weight)?)?
-        .checked_add(preparation / 1024)
+	let (traffic_weight, arithmetic_weight) = match profile {
+		SimulatorProfile::StateVector => (64usize, 1usize),
+		SimulatorProfile::DensityMatrix => (128, 2),
+	};
+	passes
+		.checked_mul(traffic_weight)?
+		.checked_add(work.checked_mul(arithmetic_weight)?)?
+		.checked_add(preparation / 1024)
 }
 fn profitable(
-    a: &Operation,
-    b: &Operation,
-    width: usize,
-    bytes: usize,
-    profile: SimulatorProfile,
+	a: &Operation,
+	b: &Operation,
+	width: usize,
+	bytes: usize,
+	profile: SimulatorProfile,
 ) -> bool {
-    let Some(original) = operation_work(a)
-        .ok()
-        .and_then(|a| operation_work(b).ok().and_then(|b| a.checked_add(b)))
-        .and_then(|work| score(work, 2, 0, profile))
-    else {
-        return false;
-    };
-    let work = if is_diagonal(a) && is_diagonal(b) {
-        Some(1)
-    } else {
-        u32::try_from(width)
-            .ok()
-            .and_then(|w| 1usize.checked_shl(w))
-    };
-    work.and_then(|w| score(w, 1, bytes, profile))
-        .is_some_and(|candidate| candidate < original)
+	let Some(original) = operation_work(a)
+		.ok()
+		.and_then(|a| operation_work(b).ok().and_then(|b| a.checked_add(b)))
+		.and_then(|work| score(work, 2, 0, profile))
+	else {
+		return false;
+	};
+	let work = if is_diagonal(a) && is_diagonal(b) {
+		Some(1)
+	} else {
+		u32::try_from(width)
+			.ok()
+			.and_then(|w| 1usize.checked_shl(w))
+	};
+	work.and_then(|w| score(w, 1, bytes, profile))
+		.is_some_and(|candidate| candidate < original)
 }
 
 #[derive(Debug, Clone, Copy)]
 pub struct FusionOptions {
-    pub max_qubits: usize,
-    pub max_matrix_bytes: usize,
-    pub max_fused_operations: usize,
-    pub max_provenance_bytes: usize,
-    /// Bounds instruction visits and history copying/appending, independently of matrix work.
-    pub max_provenance_work: usize,
+	pub max_qubits: usize,
+	pub max_matrix_bytes: usize,
+	pub max_fused_operations: usize,
+	pub max_provenance_bytes: usize,
+	/// Bounds instruction visits and history copying/appending, independently of matrix work.
+	pub max_provenance_work: usize,
 }
 impl Default for FusionOptions {
-    fn default() -> Self {
-        Self {
-            max_qubits: 4,
-            max_matrix_bytes: 1024 * 1024,
-            max_fused_operations: 32,
-            max_provenance_bytes: 64 * 1024 * 1024,
-            max_provenance_work: 4_000_000,
-        }
-    }
+	fn default() -> Self {
+		Self {
+			max_qubits: 4,
+			max_matrix_bytes: 1024 * 1024,
+			max_fused_operations: 32,
+			max_provenance_bytes: 64 * 1024 * 1024,
+			max_provenance_work: 4_000_000,
+		}
+	}
 }
 
 fn operands(op: &Operation) -> Option<(&[QubitId], &[Control])> {
-    match op {
-        Operation::Gate {
-            targets, controls, ..
-        }
-        | Operation::Numerical {
-            targets, controls, ..
-        } => Some((targets, controls)),
-        _ => None,
-    }
+	match op {
+		Operation::Gate {
+			targets, controls, ..
+		}
+		| Operation::Numerical {
+			targets, controls, ..
+		} => Some((targets, controls)),
+		_ => None,
+	}
 }
 fn realize(op: &Operation, policy: MatrixPolicy) -> Result<NumericalOperator> {
-    match op {
-        Operation::Gate { gate, .. } => gate.matrix(policy),
-        Operation::Numerical { matrix, .. } => Ok(matrix.clone()),
-        _ => Err(Error::NotUnitary),
-    }
+	match op {
+		Operation::Gate { gate, .. } => gate.matrix(policy),
+		Operation::Numerical { matrix, .. } => Ok(matrix.clone()),
+		_ => Err(Error::NotUnitary),
+	}
 }
 
 #[expect(
-    clippy::redundant_pub_crate,
-    reason = "Internal fusion helper must not enter the public glob export"
+	clippy::redundant_pub_crate,
+	reason = "Internal fusion helper must not enter the public glob export"
 )]
 pub(crate) fn union_interface(
-    a: &Operation,
-    b: &Operation,
-    max_width: usize,
+	a: &Operation,
+	b: &Operation,
+	max_width: usize,
 ) -> Option<(Vec<QubitId>, Vec<Control>)> {
-    let (ta, ca) = operands(a)?;
-    let (tb, cb) = operands(b)?;
-    let controls = if ca == cb { ca.to_vec() } else { vec![] };
-    let mut targets = Vec::new();
-    for qubit in ta
-        .iter()
-        .copied()
-        .chain(
-            ca.iter()
-                .filter(|c| !controls.contains(c))
-                .map(|c| c.qubit()),
-        )
-        .chain(tb.iter().copied())
-        .chain(
-            cb.iter()
-                .filter(|c| !controls.contains(c))
-                .map(|c| c.qubit()),
-        )
-    {
-        if !targets.contains(&qubit) {
-            if targets.len() >= max_width {
-                return None;
-            }
-            targets.try_reserve(1).ok()?;
-            targets.push(qubit);
-        }
-    }
-    Some((targets, controls))
+	let (ta, ca) = operands(a)?;
+	let (tb, cb) = operands(b)?;
+	let controls = if ca == cb { ca.to_vec() } else { vec![] };
+	let mut targets = Vec::new();
+	for qubit in ta
+		.iter()
+		.copied()
+		.chain(
+			ca.iter()
+				.filter(|c| !controls.contains(c))
+				.map(|c| c.qubit()),
+		)
+		.chain(tb.iter().copied())
+		.chain(
+			cb.iter()
+				.filter(|c| !controls.contains(c))
+				.map(|c| c.qubit()),
+		) {
+		if !targets.contains(&qubit) {
+			if targets.len() >= max_width {
+				return None;
+			}
+			targets.try_reserve(1).ok()?;
+			targets.push(qubit);
+		}
+	}
+	Some((targets, controls))
 }
 #[expect(
-    clippy::redundant_pub_crate,
-    reason = "Internal fusion helper must not enter the public glob export"
+	clippy::redundant_pub_crate,
+	reason = "Internal fusion helper must not enter the public glob export"
 )]
 pub(crate) fn realize_on(
-    op: &Operation,
-    targets: &[QubitId],
-    retained: &[Control],
-    policy: MatrixPolicy,
+	op: &Operation,
+	targets: &[QubitId],
+	retained: &[Control],
+	policy: MatrixPolicy,
 ) -> Result<NumericalOperator> {
-    let (original, controls) = operands(op).ok_or(Error::NotUnitary)?;
-    let matrix = realize(op, policy)?;
-    if original == targets && controls == retained {
-        return Ok(matrix);
-    }
-    let positions = original
-        .iter()
-        .map(|q| targets.iter().position(|t| t == q).ok_or(Error::InvalidId))
-        .collect::<Result<Vec<_>>>()?;
-    let controls = controls
-        .iter()
-        .filter(|c| !retained.contains(c))
-        .map(|c| {
-            Ok((
-                targets
-                    .iter()
-                    .position(|q| *q == c.qubit())
-                    .ok_or(Error::InvalidId)?,
-                c.state() == crate::ControlState::One,
-            ))
-        })
-        .collect::<Result<Vec<_>>>()?;
-    Ok(matrix.embedded(&positions, &controls, targets.len(), policy)?)
+	let (original, controls) = operands(op).ok_or(Error::NotUnitary)?;
+	let matrix = realize(op, policy)?;
+	if original == targets && controls == retained {
+		return Ok(matrix);
+	}
+	let positions = original
+		.iter()
+		.map(|q| targets.iter().position(|t| t == q).ok_or(Error::InvalidId))
+		.collect::<Result<Vec<_>>>()?;
+	let controls = controls
+		.iter()
+		.filter(|c| !retained.contains(c))
+		.map(|c| {
+			Ok((
+				targets
+					.iter()
+					.position(|q| *q == c.qubit())
+					.ok_or(Error::InvalidId)?,
+				c.state() == crate::ControlState::One,
+			))
+		})
+		.collect::<Result<Vec<_>>>()?;
+	Ok(matrix.embedded(&positions, &controls, targets.len(), policy)?)
 }
 
 fn matrix_bytes(operation: &Operation) -> Result<usize> {
-    match operation {
-        Operation::Numerical { matrix, .. } => Ok(matrix.bytes()),
-        Operation::Channel { kraus, .. } => kraus.iter().try_fold(0usize, |sum, k| {
-            sum.checked_add(k.bytes())
-                .ok_or(Error::Budget("program matrices"))
-        }),
-        Operation::Conditional { operation, .. } => matrix_bytes(operation),
-        _ => Ok(0),
-    }
+	match operation {
+		Operation::Numerical { matrix, .. } => Ok(matrix.bytes()),
+		Operation::Channel { kraus, .. } => kraus.iter().try_fold(0usize, |sum, k| {
+			sum.checked_add(k.bytes())
+				.ok_or(Error::Budget("program matrices"))
+		}),
+		Operation::Conditional { operation, .. } => matrix_bytes(operation),
+		_ => Ok(0),
+	}
 }
 
 /// Compiler extension over shared semantic capabilities.
 pub trait NumericalPasses: Sized {
-    /// # Errors
-    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
-    fn simulator_cost(&self, profile: SimulatorProfile) -> Result<SimulatorCost>;
-    /// # Errors
-    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
-    fn fuse(self, options: FusionOptions) -> Result<(Self, OptimizationReport)>;
-    /// # Errors
-    /// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
-    fn fuse_with_profile(
-        self,
-        options: FusionOptions,
-        profile: SimulatorProfile,
-    ) -> Result<(Self, OptimizationReport)>;
+	/// # Errors
+	/// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+	fn simulator_cost(&self, profile: SimulatorProfile) -> Result<SimulatorCost>;
+	/// # Errors
+	/// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+	fn fuse(self, options: FusionOptions) -> Result<(Self, OptimizationReport)>;
+	/// # Errors
+	/// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
+	fn fuse_with_profile(
+		self,
+		options: FusionOptions,
+		profile: SimulatorProfile,
+	) -> Result<(Self, OptimizationReport)>;
 }
 impl NumericalPasses for BoundRegion {
-    /// Report hardware-independent estimates; native timing remains empirical.
-    /// # Errors
-    /// Rejects overflow in aggregate resource/work quantities.
-    fn simulator_cost(&self, profile: SimulatorProfile) -> Result<SimulatorCost> {
-        let mut cost = SimulatorCost {
-            dependency_depth: self.dependency_depth(),
-            ..SimulatorCost::default()
-        };
-        for instruction in self.instructions().iter().cloned() {
-            let operation = &instruction.operation;
-            if matches!(operation, Operation::Barrier { .. }) {
-                continue;
-            }
-            cost.native_calls = cost
-                .native_calls
-                .checked_add(1)
-                .ok_or(Error::Budget("native call cost"))?;
-            let multiplier = if profile == SimulatorProfile::DensityMatrix {
-                2
-            } else {
-                1
-            };
-            cost.state_passes = cost
-                .state_passes
-                .checked_add(multiplier)
-                .ok_or(Error::Budget("state traffic cost"))?;
-            cost.arithmetic_per_element = operation_work(operation)?
-                .checked_mul(multiplier)
-                .and_then(|work| cost.arithmetic_per_element.checked_add(work))
-                .ok_or(Error::Budget("arithmetic cost"))?;
-            cost.preparation_bytes = cost
-                .preparation_bytes
-                .checked_add(matrix_bytes(operation)?)
-                .ok_or(Error::Budget("preparation cost"))?;
-            if let Operation::Numerical { matrix, .. } = operation {
-                cost.maximum_matrix_qubits = cost.maximum_matrix_qubits.max(matrix.num_qubits());
-            }
-            if matches!(
-                operation,
-                Operation::Gate {
-                    gate: crate::BoundGate::T | crate::BoundGate::Tdg,
-                    ..
-                }
-            ) {
-                cost.t_count = cost
-                    .t_count
-                    .checked_add(1)
-                    .ok_or(Error::Budget("T-count"))?;
-            }
-        }
-        Ok(cost)
-    }
-    /// Fuse with the default state-vector cost profile.
-    /// # Errors
-    /// Rejects invalid identifiers and resource-accounting overflow.
-    fn fuse(self, options: FusionOptions) -> Result<(Self, OptimizationReport)> {
-        self.fuse_with_profile(options, SimulatorProfile::StateVector)
-    }
-    /// Fuse adjacent operations over a bounded union of ordered operands.
-    /// Shared controls remain external; differing signed controls are embedded.
-    /// Effects and conditionals terminate blocks. The numerical
-    /// result carries all original occurrence identities as provenance.
-    /// # Errors
-    /// Rejects invalid retained identifiers or resource-accounting overflow; configured fusion limits skip candidates.
-    #[expect(
-        clippy::too_many_lines,
-        reason = "Fusion admission and retained-memory accounting remain visible in one transaction"
-    )]
-    fn fuse_with_profile(
-        mut self,
-        options: FusionOptions,
-        profile: SimulatorProfile,
-    ) -> Result<(Self, OptimizationReport)> {
-        let start = Instant::now();
-        let mut work = crate::linear::Work {
-            used: 0,
-            maximum: options.max_provenance_work,
-        };
-        work.charge(self.instructions().len())?;
-        work.charge(self.provenance_arc().copy_work()?)?;
-        let mut report = OptimizationReport::new(
-            self.instructions().len(),
-            self.dependency_depth(),
-            Arc::clone(self.provenance_arc()),
-        );
-        let report_bytes = self
-            .instructions()
-            .len()
-            .checked_mul(const { 2 * size_of::<Rewrite>() + 8 * size_of::<ProvenanceId>() })
-            .ok_or(Error::Budget("fusion report storage"))?;
-        let graph_limit = options
-            .max_provenance_bytes
-            .checked_sub(report_bytes)
-            .ok_or(Error::Budget("fusion provenance storage"))?
-            .min(self.limits().max_provenance_bytes);
-        let mut provenance = ProvenanceGraph::edit(Arc::clone(self.provenance_arc()), graph_limit)?;
-        let mut representatives = self
-            .instructions()
-            .iter()
-            .map(|item| (item.id, item.id))
-            .collect::<std::collections::BTreeMap<_, _>>();
-        report.simulator_before = Some(self.simulator_cost(profile)?);
-        let policy = MatrixPolicy {
-            max_bytes: options.max_matrix_bytes.min(self.limits().max_matrix_bytes),
-        };
-        // Counts all retained input and output payloads, including operations
-        // not visited yet. Shared payloads are conservatively counted per use.
-        let mut resident_bytes = self.instructions().iter().try_fold(0usize, |sum, i| {
-            sum.checked_add(matrix_bytes(&i.operation)?)
-                .ok_or(Error::Budget("program matrices"))
-        })?;
-        report.peak_matrix_bytes = resident_bytes;
-        let mut output: Vec<Instruction> = vec![];
-        let mut block_len = 0usize;
-        for instruction in self.instructions().iter().cloned() {
-            let candidate = output.last().and_then(|previous| {
-                if block_len >= options.max_fused_operations {
-                    return None;
-                }
-                union_interface(
-                    &previous.operation,
-                    &instruction.operation,
-                    options.max_qubits,
-                )
-            });
-            if let Some((targets, controls)) = candidate {
-                let dim = 1usize
-                    .checked_shl(
-                        u32::try_from(targets.len()).map_err(|_| Error::Budget("fusion width"))?,
-                    )
-                    .ok_or(Error::Budget("fusion width"))?;
-                // Admission failure due to configured width/memory is a skipped
-                // optimization, not a failure of the already valid program.
-                let previous = output.last().ok_or(Error::InvalidId)?;
-                let previous_bytes = matrix_bytes(&previous.operation)?;
-                let instruction_bytes = matrix_bytes(&instruction.operation)?;
-                let same_interface = operands(&previous.operation)
-                    == Some((targets.as_slice(), controls.as_slice()))
-                    && operands(&instruction.operation)
-                        == Some((targets.as_slice(), controls.as_slice()));
-                let temporaries = if same_interface {
-                    match (previous_bytes == 0, instruction_bytes == 0) {
-                        (true, true) => 3,
-                        (false, false) => 1,
-                        _ => 2,
-                    }
-                } else {
-                    4
-                }; // Two embedded matrices, result, and a base-gate realization.
-                let admitted = policy.check(dim, temporaries.max(3)).ok().filter(|bytes| {
-                    bytes
-                        .checked_mul(temporaries)
-                        .and_then(|extra| resident_bytes.checked_add(extra))
-                        .is_some_and(|peak| peak <= self.limits().max_matrix_bytes)
-                });
-                if let Some(result_bytes) = admitted.filter(|bytes| {
-                    profitable(
-                        &previous.operation,
-                        &instruction.operation,
-                        targets.len(),
-                        *bytes,
-                        profile,
-                    )
-                }) {
-                    report.peak_matrix_bytes = report.peak_matrix_bytes.max(
-                        result_bytes
-                            .checked_mul(temporaries)
-                            .and_then(|extra| resident_bytes.checked_add(extra))
-                            .ok_or(Error::Budget("fusion peak"))?,
-                    );
-                    let left = realize_on(&instruction.operation, &targets, &controls, policy)?;
-                    let right = realize_on(&previous.operation, &targets, &controls, policy)?;
-                    // Numeric overflow does not invalidate the unfused input.
-                    let matrix = match left.product(&right, policy).map_err(Error::from) {
-                        Ok(matrix) => matrix,
-                        Err(Error::NonFinite | Error::Budget(_)) => {
-                            output.push(instruction);
-                            block_len = 1;
-                            continue;
-                        }
-                        Err(error) => return Err(error),
-                    };
-                    resident_bytes = resident_bytes
-                        .checked_sub(previous_bytes)
-                        .and_then(|bytes| bytes.checked_sub(instruction_bytes))
-                        .and_then(|bytes| bytes.checked_add(result_bytes))
-                        .ok_or(Error::Budget("fusion retained matrices"))?;
-                    let previous = output.pop().ok_or(Error::InvalidId)?;
-                    let inputs = vec![previous.provenance, instruction.provenance];
-                    work.charge(inputs.len())?;
-                    let history = provenance.rewrite(&inputs, graph_limit)?;
-                    representatives.insert(instruction.id, previous.id);
-                    report.rewrites.push(Rewrite {
-                        kind: RewriteKind::NumericalFusion,
-                        inputs,
-                        provenance: history,
-                        output: Some(previous.id),
-                    });
-                    report.numerical_rounding_changed = true;
-                    output.push(Instruction {
-                        id: previous.id,
-                        provenance: history,
-                        source: previous.source,
-                        angle_targets: Arc::from([]),
-                        operation: Operation::Numerical {
-                            matrix,
-                            targets: targets.into(),
-                            controls: controls.into(),
-                        },
-                    });
-                    block_len = block_len
-                        .checked_add(1)
-                        .ok_or(Error::Budget("fusion block length"))?;
-                    continue;
-                }
-            }
-            output.push(instruction);
-            block_len = 1;
-        }
-        report.work = work.used;
-        report.matrix_bytes = resident_bytes;
-        // Fusion always retains the first ID in each adjacent block. Resolve
-        // only this pass's occurrence mapping, not historical source identities.
-        report.provenance = Arc::new(provenance);
+	/// Report hardware-independent estimates; native timing remains empirical.
+	/// # Errors
+	/// Rejects overflow in aggregate resource/work quantities.
+	fn simulator_cost(&self, profile: SimulatorProfile) -> Result<SimulatorCost> {
+		let mut cost = SimulatorCost {
+			dependency_depth: self.dependency_depth(),
+			..SimulatorCost::default()
+		};
+		for instruction in self.instructions().iter().cloned() {
+			let operation = &instruction.operation;
+			if matches!(operation, Operation::Barrier { .. }) {
+				continue;
+			}
+			cost.native_calls = cost
+				.native_calls
+				.checked_add(1)
+				.ok_or(Error::Budget("native call cost"))?;
+			let multiplier = if profile == SimulatorProfile::DensityMatrix {
+				2
+			} else {
+				1
+			};
+			cost.state_passes = cost
+				.state_passes
+				.checked_add(multiplier)
+				.ok_or(Error::Budget("state traffic cost"))?;
+			cost.arithmetic_per_element = operation_work(operation)?
+				.checked_mul(multiplier)
+				.and_then(|work| cost.arithmetic_per_element.checked_add(work))
+				.ok_or(Error::Budget("arithmetic cost"))?;
+			cost.preparation_bytes = cost
+				.preparation_bytes
+				.checked_add(matrix_bytes(operation)?)
+				.ok_or(Error::Budget("preparation cost"))?;
+			if let Operation::Numerical { matrix, .. } = operation {
+				cost.maximum_matrix_qubits = cost.maximum_matrix_qubits.max(matrix.num_qubits());
+			}
+			if matches!(
+				operation,
+				Operation::Gate {
+					gate: crate::BoundGate::T | crate::BoundGate::Tdg,
+					..
+				}
+			) {
+				cost.t_count = cost
+					.t_count
+					.checked_add(1)
+					.ok_or(Error::Budget("T-count"))?;
+			}
+		}
+		Ok(cost)
+	}
+	/// Fuse with the default state-vector cost profile.
+	/// # Errors
+	/// Rejects invalid identifiers and resource-accounting overflow.
+	fn fuse(self, options: FusionOptions) -> Result<(Self, OptimizationReport)> {
+		self.fuse_with_profile(options, SimulatorProfile::StateVector)
+	}
+	/// Fuse adjacent operations over a bounded union of ordered operands.
+	/// Shared controls remain external; differing signed controls are embedded.
+	/// Effects and conditionals terminate blocks. The numerical
+	/// result carries all original occurrence identities as provenance.
+	/// # Errors
+	/// Rejects invalid retained identifiers or resource-accounting overflow; configured fusion limits skip candidates.
+	#[expect(
+		clippy::too_many_lines,
+		reason = "Fusion admission and retained-memory accounting remain visible in one transaction"
+	)]
+	fn fuse_with_profile(
+		mut self,
+		options: FusionOptions,
+		profile: SimulatorProfile,
+	) -> Result<(Self, OptimizationReport)> {
+		let start = Instant::now();
+		let mut work = crate::linear::Work {
+			used: 0,
+			maximum: options.max_provenance_work,
+		};
+		work.charge(self.instructions().len())?;
+		work.charge(self.provenance_arc().copy_work()?)?;
+		let mut report = OptimizationReport::new(
+			self.instructions().len(),
+			self.dependency_depth(),
+			Arc::clone(self.provenance_arc()),
+		);
+		let report_bytes = self
+			.instructions()
+			.len()
+			.checked_mul(const { 2 * size_of::<Rewrite>() + 8 * size_of::<ProvenanceId>() })
+			.ok_or(Error::Budget("fusion report storage"))?;
+		let graph_limit = options
+			.max_provenance_bytes
+			.checked_sub(report_bytes)
+			.ok_or(Error::Budget("fusion provenance storage"))?
+			.min(self.limits().max_provenance_bytes);
+		let mut provenance = ProvenanceGraph::edit(Arc::clone(self.provenance_arc()), graph_limit)?;
+		let mut representatives = self
+			.instructions()
+			.iter()
+			.map(|item| (item.id, item.id))
+			.collect::<std::collections::BTreeMap<_, _>>();
+		report.simulator_before = Some(self.simulator_cost(profile)?);
+		let policy = MatrixPolicy {
+			max_bytes: options.max_matrix_bytes.min(self.limits().max_matrix_bytes),
+		};
+		// Counts all retained input and output payloads, including operations
+		// not visited yet. Shared payloads are conservatively counted per use.
+		let mut resident_bytes = self.instructions().iter().try_fold(0usize, |sum, i| {
+			sum.checked_add(matrix_bytes(&i.operation)?)
+				.ok_or(Error::Budget("program matrices"))
+		})?;
+		report.peak_matrix_bytes = resident_bytes;
+		let mut output: Vec<Instruction> = vec![];
+		let mut block_len = 0usize;
+		for instruction in self.instructions().iter().cloned() {
+			let candidate = output.last().and_then(|previous| {
+				if block_len >= options.max_fused_operations {
+					return None;
+				}
+				union_interface(
+					&previous.operation,
+					&instruction.operation,
+					options.max_qubits,
+				)
+			});
+			if let Some((targets, controls)) = candidate {
+				let dim = 1usize
+					.checked_shl(
+						u32::try_from(targets.len()).map_err(|_| Error::Budget("fusion width"))?,
+					)
+					.ok_or(Error::Budget("fusion width"))?;
+				// Admission failure due to configured width/memory is a skipped
+				// optimization, not a failure of the already valid program.
+				let previous = output.last().ok_or(Error::InvalidId)?;
+				let previous_bytes = matrix_bytes(&previous.operation)?;
+				let instruction_bytes = matrix_bytes(&instruction.operation)?;
+				let same_interface = operands(&previous.operation)
+					== Some((targets.as_slice(), controls.as_slice()))
+					&& operands(&instruction.operation)
+						== Some((targets.as_slice(), controls.as_slice()));
+				let temporaries = if same_interface {
+					match (previous_bytes == 0, instruction_bytes == 0) {
+						(true, true) => 3,
+						(false, false) => 1,
+						_ => 2,
+					}
+				} else {
+					4
+				}; // Two embedded matrices, result, and a base-gate realization.
+				let admitted = policy.check(dim, temporaries.max(3)).ok().filter(|bytes| {
+					bytes
+						.checked_mul(temporaries)
+						.and_then(|extra| resident_bytes.checked_add(extra))
+						.is_some_and(|peak| peak <= self.limits().max_matrix_bytes)
+				});
+				if let Some(result_bytes) = admitted.filter(|bytes| {
+					profitable(
+						&previous.operation,
+						&instruction.operation,
+						targets.len(),
+						*bytes,
+						profile,
+					)
+				}) {
+					report.peak_matrix_bytes = report.peak_matrix_bytes.max(
+						result_bytes
+							.checked_mul(temporaries)
+							.and_then(|extra| resident_bytes.checked_add(extra))
+							.ok_or(Error::Budget("fusion peak"))?,
+					);
+					let left = realize_on(&instruction.operation, &targets, &controls, policy)?;
+					let right = realize_on(&previous.operation, &targets, &controls, policy)?;
+					// Numeric overflow does not invalidate the unfused input.
+					let matrix = match left.product(&right, policy).map_err(Error::from) {
+						Ok(matrix) => matrix,
+						Err(Error::NonFinite | Error::Budget(_)) => {
+							output.push(instruction);
+							block_len = 1;
+							continue;
+						}
+						Err(error) => return Err(error),
+					};
+					resident_bytes = resident_bytes
+						.checked_sub(previous_bytes)
+						.and_then(|bytes| bytes.checked_sub(instruction_bytes))
+						.and_then(|bytes| bytes.checked_add(result_bytes))
+						.ok_or(Error::Budget("fusion retained matrices"))?;
+					let previous = output.pop().ok_or(Error::InvalidId)?;
+					let inputs = vec![previous.provenance, instruction.provenance];
+					work.charge(inputs.len())?;
+					let history = provenance.rewrite(&inputs, graph_limit)?;
+					representatives.insert(instruction.id, previous.id);
+					report.rewrites.push(Rewrite {
+						kind: RewriteKind::NumericalFusion,
+						inputs,
+						provenance: history,
+						output: Some(previous.id),
+					});
+					report.numerical_rounding_changed = true;
+					output.push(Instruction {
+						id: previous.id,
+						provenance: history,
+						source: previous.source,
+						angle_targets: Arc::from([]),
+						operation: Operation::Numerical {
+							matrix,
+							targets: targets.into(),
+							controls: controls.into(),
+						},
+					});
+					block_len = block_len
+						.checked_add(1)
+						.ok_or(Error::Budget("fusion block length"))?;
+					continue;
+				}
+			}
+			output.push(instruction);
+			block_len = 1;
+		}
+		report.work = work.used;
+		report.matrix_bytes = resident_bytes;
+		// Fusion always retains the first ID in each adjacent block. Resolve
+		// only this pass's occurrence mapping, not historical source identities.
+		report.provenance = Arc::new(provenance);
 
-        let dependencies = self
-            .dependencies()
-            .iter()
-            .map(|edge| {
-                let before = *representatives.get(&edge.before).ok_or(Error::InvalidId)?;
-                let after = *representatives.get(&edge.after).ok_or(Error::InvalidId)?;
-                Ok(crate::DependencyEdge {
-                    before,
-                    after,
-                    kind: edge.kind,
-                })
-            })
-            .collect::<Result<Vec<_>>>()?
-            .into_iter()
-            .filter(|edge| edge.before != edge.after)
-            .collect();
-        report.after_operations = output.len();
-        self = self.replace_compiled(output, dependencies, Arc::clone(&report.provenance))?;
-        report.simulator_after = Some(self.simulator_cost(profile)?);
-        report.after_depth = self.dependency_depth();
-        report.elapsed = start.elapsed();
-        Ok((self, report))
-    }
+		let dependencies = self
+			.dependencies()
+			.iter()
+			.map(|edge| {
+				let before = *representatives.get(&edge.before).ok_or(Error::InvalidId)?;
+				let after = *representatives.get(&edge.after).ok_or(Error::InvalidId)?;
+				Ok(crate::DependencyEdge {
+					before,
+					after,
+					kind: edge.kind,
+				})
+			})
+			.collect::<Result<Vec<_>>>()?
+			.into_iter()
+			.filter(|edge| edge.before != edge.after)
+			.collect();
+		report.after_operations = output.len();
+		self = self.replace_compiled(output, dependencies, Arc::clone(&report.provenance))?;
+		report.simulator_after = Some(self.simulator_cost(profile)?);
+		report.after_depth = self.dependency_depth();
+		report.elapsed = start.elapsed();
+		Ok((self, report))
+	}
 }

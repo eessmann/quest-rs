@@ -9,25 +9,25 @@ license = "MIT"
 repository = "https://github.com/eessmann/quest-rs"
 
 [workspace.dependencies]
-dashu-base = { version = "=0.6.1", default-features = false, features = ["std"] }
-dashu-int = { version = "=0.6.2", default-features = false, features = ["std"] }
-dashu-ratio = { version = "=0.6.1", default-features = false, features = ["std"] }
-dashu-float = { version = "=0.6.2", default-features = false, features = ["std"] }
+dashu-base = { version = "0.6", default-features = false, features = ["std"] }
+dashu-int = { version = "0.6", default-features = false, features = ["std"] }
+dashu-ratio = { version = "0.6", default-features = false, features = ["std"] }
+dashu-float = { version = "0.6", default-features = false, features = ["std"] }
 quest = { package = "quest-rs", path = "crates/quest", version = "0.1" }
-clap = { version = "4.6.6", default-features = false }
-mpi = { version = "0.8.2", default-features = false }
-rustfft = { version = "=6.4.1", default-features = false }
-maryada = { version = "=0.2.1", default-features = false }
-rayon = { version = "=1.12.0", default-features = false }
-hdf5-metno = { version = "=0.14.1", default-features = false }
+clap = { version = "4.6", features = ["wrap_help", "suggestions"] }
+mpi = { version = "0.8", features = ["user-operations"] }
+rustfft = { version = "6.4", features = [] }
+maryada = { version = "0.2", features = [] }
+rayon = { version = "1.12", features = [] }
+hdf5-metno = { version = "0.15", features = [] }
 quest-numerics = { path = "crates/quest-numerics", version = "0.1" }
 quest-polynomial = { path = "crates/quest-polynomial", version = "0.1" }
 quest-qsp = { path = "crates/quest-qsp", version = "0.1" }
 quest-qsvt = { path = "crates/quest-qsvt", version = "0.1" }
 quest-qsvt-io = { path = "crates/quest-qsvt-io", version = "0.1" }
-criterion = { version = "0.8.2", default-features = false }
-quizx = "=0.3.0"
-rustix = { version = "1", default-features = false }
+criterion = { version = "0.8", features = [] }
+quizx = "0.3"
+rustix = { version = "1", features = [] }
 quest-optimizer-client = { path = "crates/quest-optimizer-client", version = "0.1" }
 quest-optimizer-protocol = { path = "crates/quest-optimizer-protocol", version = "0.1" }
 quest-math = { path = "crates/quest-math", version = "0.1" }
@@ -40,20 +40,20 @@ quest-build = { path = "crates/quest-build", version = "0.1" }
 quest-compile = { path = "crates/quest-compile", version = "0.1", default-features = false }
 quest-symbolic = { path = "crates/quest-symbolic", version = "0.1" }
 quest-macros = { path = "crates/quest-macros", version = "0.1" }
-clang = { version = "2.1", default-features = false }
-cxx = { version = "1", default-features = false }
-cxx-build = { version = "1", default-features = false }
-serde = { version = "1", default-features = false }
+clang = { version = "2.1", features = [] }
+cxx = { version = "1", features = ["c++20"] }
+cxx-build = { version = "1", features = ["parallel"] }
+serde = { version = "1", features = [] }
 serde_json = "1"
 thiserror = "2"
 googletest = "0.14"
 
-faer = { version = "0.24.4", default-features = false }
+faer = { version = "0.24", features = [] }
 num-complex = "0.4"
 num-traits = "0.2"
-ndarray = { version = "0.17", default-features = false }
+ndarray = { version = "0.17", features = [] }
 codespan-reporting = "0.13"
-petgraph = { version = "0.8", default-features = false }
+petgraph = { version = "0.8", features = [] }
 syn = "3"
 quote = "1"
 proc-macro2 = "1"

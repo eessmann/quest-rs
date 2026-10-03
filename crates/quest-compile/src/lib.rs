@@ -24,25 +24,25 @@ pub use capture::{AngleCapture, CapturedAngle, capture_angle};
 mod builder;
 pub use builder::ProgramBuilder;
 pub use quest_language::semantic::builder::{
-    Array, ArrayFunction, ArrayRef, ArraySubroutine, Bit, Bool, Expr, Float, Function,
-    GateDefinition, Int, Local, Modifier, Procedure, Qubit, QubitArrayParameter, QubitParameter,
-    RankedArray, RankedArrayRef, Signature, Subroutine, Uint, ValueParameter,
+	Array, ArrayFunction, ArrayRef, ArraySubroutine, Bit, Bool, Expr, Float, Function,
+	GateDefinition, Int, Local, Modifier, Procedure, Qubit, QubitArrayParameter, QubitParameter,
+	RankedArray, RankedArrayRef, Signature, Subroutine, Uint, ValueParameter,
 };
 pub mod dispatch_recipe;
 mod oracle;
 pub use quest_language::quantum::{
-    NeedsOracleTolerance, OracleBuilder, OracleFragment, OracleTolerance,
+	NeedsOracleTolerance, OracleBuilder, OracleFragment, OracleTolerance,
 };
 
 mod linear;
 pub use linear::{
-    Cnot, LinearCandidateStrategy, LinearOptions, LinearReport, LinearRewrite, LinearSynthesis,
-    synthesize_cnot,
+	Cnot, LinearCandidateStrategy, LinearOptions, LinearReport, LinearRewrite, LinearSynthesis,
+	synthesize_cnot,
 };
 mod parity;
 pub use parity::{
-    AffinePhaseOperation, ParityOptions, ParityReport, ParitySynthesis, fold_parity,
-    fold_parity_candidate,
+	AffinePhaseOperation, ParityOptions, ParityReport, ParitySynthesis, fold_parity,
+	fold_parity_candidate,
 };
 mod beam;
 mod matrix;
@@ -56,7 +56,7 @@ mod terminal;
 pub use terminal::*;
 
 pub use quest_language::quantum::provenance::{
-    ExpansionLimits, ProvenanceGraph, ProvenanceId, ProvenanceNode,
+	ExpansionLimits, ProvenanceGraph, ProvenanceId, ProvenanceNode,
 };
 
 mod structured;
@@ -70,8 +70,8 @@ pub use quest_language::rational::RBig;
 pub use quest_qasm as qasm;
 pub use structured::*;
 pub use structured_optimize::{
-    StructuredOccurrence, StructuredQuantumError, StructuredQuantumOptions,
-    StructuredQuantumReport, StructuredQuantumRewrite,
+	StructuredOccurrence, StructuredQuantumError, StructuredQuantumOptions,
+	StructuredQuantumReport, StructuredQuantumRewrite,
 };
 pub use structured_pipeline::*;
 
@@ -126,14 +126,14 @@ pub use workers::ZxPasses;
 
 /// Compiler extension traits for shared semantic regions.
 pub mod prelude {
-    #[cfg(any(feature = "workers", feature = "synthesis"))]
-    pub use crate::RotationSynthesisPasses;
-    #[cfg(feature = "workers")]
-    pub use crate::{ApproximateBeamPasses, MeetInTheMiddlePasses, ZxPasses};
-    pub use crate::{
-        BoundParityPasses, ExactPasses, LinearPasses, NumericalPasses, OracleExport, ParityPasses,
-        TerminalPasses,
-    };
+	#[cfg(any(feature = "workers", feature = "synthesis"))]
+	pub use crate::RotationSynthesisPasses;
+	#[cfg(feature = "workers")]
+	pub use crate::{ApproximateBeamPasses, MeetInTheMiddlePasses, ZxPasses};
+	pub use crate::{
+		BoundParityPasses, ExactPasses, LinearPasses, NumericalPasses, OracleExport, ParityPasses,
+		TerminalPasses,
+	};
 }
 
 #[cfg(any(feature = "workers", feature = "synthesis"))]

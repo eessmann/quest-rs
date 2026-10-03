@@ -8,8 +8,8 @@ pub mod provenance;
 pub use crate as language;
 pub use crate::rational;
 pub use crate::{
-    matrix::{MatrixPolicy, NumericalOperator, UnitaryAdmission},
-    rational::RBig,
+	matrix::{MatrixPolicy, NumericalOperator, UnitaryAdmission},
+	rational::RBig,
 };
 pub use error::{Error, Result};
 pub use model::*;
@@ -17,7 +17,7 @@ pub use oracle::*;
 pub use program::*;
 pub use provenance::*;
 pub mod matrix {
-    pub use crate::matrix::*;
+	pub use crate::matrix::*;
 }
 
 mod storage;
