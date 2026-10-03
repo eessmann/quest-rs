@@ -2,14 +2,17 @@
 name = "quest-qsvt-io"
 version = "0.1.0"
 edition.workspace = true
-license.workspace = true
+license = "MIT AND CC-BY-SA-4.0"
 repository.workspace = true
 description = "QSP and QSVT scientific interchange formats"
 
 [dependencies]
 thiserror.workspace = true
 num-complex.workspace = true
-hdf5-metno = { workspace = true, optional = true, features = ["complex"] }
+hdf5-metno = { workspace = true, features = ["complex"] }
+serde = { workspace = true, features = ["derive"] }
+sha2.workspace = true
+tempfile.workspace = true
 quest-qsp.workspace = true
 quest-polynomial.workspace = true
 serde_json = { workspace = true, features = ["float_roundtrip"] }
@@ -17,13 +20,11 @@ faer = { workspace = true, default-features = false, features = ["std", "linalg"
 
 [dev-dependencies]
 googletest.workspace = true
-tempfile.workspace = true
 
 [lints]
 workspace = true
 
 [features]
-hdf5 = ["dep:hdf5-metno"]
 certification = ["quest-qsp/artifact"]
 offline-synthesis = ["quest-qsp/offline-synthesis"]
 

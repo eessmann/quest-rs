@@ -185,26 +185,73 @@ fn prepare_work_directory(requested: Option<PathBuf>) -> Result<PathBuf, DynErro
 
 fn read_toolchain(path: &Path) -> Result<String, DynError> {
 	let contents = fs::read_to_string(path)?;
-	for line in contents.lines().map(str::trim) {
-		let Some(value) = line.strip_prefix("channel") else {
-			continue;
-		};
-		let Some(value) = value.trim_start().strip_prefix('=') else {
-			continue;
-		};
-		let value = value.trim();
-		if let Some(value) = value
-			.strip_prefix('"')
-			.and_then(|value| value.strip_suffix('"'))
-		{
-			return Ok(value.to_owned());
-		}
-	}
-	Err(format!(
-		"{} does not define a quoted toolchain channel",
-		path.display()
-	)
-	.into())
+	let document: ToolchainDocument = toml::from_str(&contents)?;
+	Ok(document.toolchain.channel)
+}
+
+#[derive(serde::Deserialize, serde::Serialize)]
+struct ToolchainDocument {
+	toolchain: ToolchainSettings,
+}
+
+#[derive(serde::Deserialize, serde::Serialize)]
+struct ToolchainSettings {
+	channel: String,
+	#[serde(skip_serializing_if = "Option::is_none")]
+	profile: Option<String>,
+}
+
+#[derive(serde::Serialize)]
+struct ConsumerManifest {
+	#[serde(skip_serializing_if = "Option::is_none")]
+	workspace: Option<ConsumerWorkspace>,
+	#[serde(skip_serializing_if = "Option::is_none")]
+	package: Option<ConsumerPackage>,
+	#[serde(skip_serializing_if = "std::collections::BTreeMap::is_empty")]
+	dependencies: std::collections::BTreeMap<String, ConsumerDependency>,
+	#[serde(
+		rename = "build-dependencies",
+		skip_serializing_if = "std::collections::BTreeMap::is_empty"
+	)]
+	build_dependencies: std::collections::BTreeMap<String, ConsumerDependency>,
+}
+
+#[derive(serde::Serialize)]
+struct ConsumerWorkspace {
+	resolver: String,
+	members: Vec<String>,
+}
+
+#[derive(serde::Serialize)]
+struct ConsumerPackage {
+	name: String,
+	version: &'static str,
+	edition: &'static str,
+	publish: bool,
+}
+
+#[derive(Clone, serde::Serialize)]
+struct ConsumerDependency {
+	#[serde(skip_serializing_if = "Option::is_none")]
+	package: Option<&'static str>,
+	path: String,
+}
+
+fn consumer_dependency(
+	path: &Path,
+	package: Option<&'static str>,
+) -> Result<ConsumerDependency, DynError> {
+	Ok(ConsumerDependency {
+		package,
+		path: path
+			.to_str()
+			.ok_or_else(|| format!("Cargo dependency path is not UTF-8: {}", path.display()))?
+			.to_owned(),
+	})
+}
+
+fn write_toml(path: &Path, document: &impl serde::Serialize) -> Result<(), DynError> {
+	write_file(path, &toml::to_string_pretty(document)?)
 }
 
 fn cargo_command(work: &Path, quest_prefix: &Path, compiler: &Path) -> Command {
@@ -241,60 +288,66 @@ fn write_consumer_workspace(
 	let quest = repository.join("crates/quest");
 	let quest_sys = repository.join("crates/quest-sys");
 	let quest_build = repository.join("crates/quest-build");
-	write_file(
+	write_toml(
 		&work.join("Cargo.toml"),
-		"[workspace]\nresolver = \"3\"\nmembers = [\"direct\", \"facade\", \"wrapper\", \"wrapped\", \"renamed\"]\n",
+		&ConsumerManifest {
+			workspace: Some(ConsumerWorkspace {
+				resolver: "3".to_owned(),
+				members: ["direct", "facade", "wrapper", "wrapped", "renamed"]
+					.map(str::to_owned)
+					.to_vec(),
+			}),
+			package: None,
+			dependencies: std::collections::BTreeMap::new(),
+			build_dependencies: std::collections::BTreeMap::new(),
+		},
 	)?;
-	write_file(
+	write_toml(
 		&work.join("rust-toolchain.toml"),
-		&format!(
-			"[toolchain]\nchannel = {}\nprofile = \"minimal\"\n",
-			toml_string(toolchain)?
-		),
+		&ToolchainDocument {
+			toolchain: ToolchainSettings {
+				channel: toolchain.to_owned(),
+				profile: Some("minimal".to_owned()),
+			},
+		},
 	)?;
 
-	let build_dependency = format!(
-		"\n[build-dependencies]\nquest-build = {{ path = {} }}\n",
-		toml_path(&quest_build)?
-	);
+	let build_dependency = consumer_dependency(&quest_build, None)?;
 	let build_script =
 		"fn main() -> quest_build::Result<()> { quest_build::emit_final_target_runtime_paths() }\n";
-	let quest_dependency = format!(
-		"quest = {{ package = \"quest-rs\", path = {} }}\n",
-		toml_path(&quest)?
-	);
-	let quest_sys_dependency = format!("quest-sys = {{ path = {} }}\n", toml_path(&quest_sys)?);
+	let quest_dependency = consumer_dependency(&quest, Some("quest-rs"))?;
+	let quest_sys_dependency = consumer_dependency(&quest_sys, None)?;
 
 	write_package(
 		work,
 		"direct",
-		&quest_sys_dependency,
-		Some(build_dependency.as_str()),
+		("quest-sys", quest_sys_dependency),
+		Some(&build_dependency),
 		Some(build_script),
 	)?;
 	write_package(
 		work,
 		"facade",
-		&quest_dependency,
-		Some(build_dependency.as_str()),
+		("quest", quest_dependency.clone()),
+		Some(&build_dependency),
 		Some(build_script),
 	)?;
-	write_package(work, "wrapper", &quest_dependency, None, None)?;
+	write_package(work, "wrapper", ("quest", quest_dependency), None, None)?;
 	write_package(
 		work,
 		"wrapped",
-		"quest-consumer-wrapper = { path = \"../wrapper\" }\n",
-		Some(build_dependency.as_str()),
+		(
+			"quest-consumer-wrapper",
+			consumer_dependency(Path::new("../wrapper"), None)?,
+		),
+		Some(&build_dependency),
 		Some(build_script),
 	)?;
 	write_package(
 		work,
 		"renamed",
-		&format!(
-			"quantum = {{ package = \"quest-rs\", path = {} }}\n",
-			toml_path(&quest)?
-		),
-		Some(build_dependency.as_str()),
+		("quantum", consumer_dependency(&quest, Some("quest-rs"))?),
+		Some(&build_dependency),
 		Some(build_script),
 	)?;
 
@@ -335,15 +388,25 @@ fn write_consumer_workspace(
 fn write_package(
 	work: &Path,
 	name: &str,
-	dependencies: &str,
-	build_dependencies: Option<&str>,
+	dependency: (&str, ConsumerDependency),
+	build_dependency: Option<&ConsumerDependency>,
 	build_script: Option<&str>,
 ) -> Result<(), DynError> {
-	let manifest = format!(
-		"[package]\nname = \"quest-consumer-{name}\"\nversion = \"0.0.0\"\nedition = \"2024\"\npublish = false\n\n[dependencies]\n{dependencies}{}",
-		build_dependencies.unwrap_or_default()
-	);
-	write_file(&work.join(name).join("Cargo.toml"), &manifest)?;
+	let manifest = ConsumerManifest {
+		workspace: None,
+		package: Some(ConsumerPackage {
+			name: format!("quest-consumer-{name}"),
+			version: "0.0.0",
+			edition: "2024",
+			publish: false,
+		}),
+		dependencies: std::collections::BTreeMap::from([(dependency.0.to_owned(), dependency.1)]),
+		build_dependencies: build_dependency
+			.map(|dependency| ("quest-build".to_owned(), dependency.clone()))
+			.into_iter()
+			.collect(),
+	};
+	write_toml(&work.join(name).join("Cargo.toml"), &manifest)?;
 	if let Some(build_script) = build_script {
 		write_file(&work.join(name).join("build.rs"), build_script)?;
 	}
@@ -356,17 +419,6 @@ fn write_file(path: &Path, contents: &str) -> Result<(), DynError> {
 	}
 	fs::write(path, contents)?;
 	Ok(())
-}
-
-fn toml_path(path: &Path) -> Result<String, DynError> {
-	let value = path
-		.to_str()
-		.ok_or_else(|| format!("Cargo dependency path is not UTF-8: {}", path.display()))?;
-	toml_string(value)
-}
-
-fn toml_string(value: &str) -> Result<String, DynError> {
-	serde_json::to_string(value).map_err(Into::into)
 }
 
 fn facade_source(crate_name: &str) -> String {
@@ -909,6 +961,58 @@ mod tests {
 	use std::ffi::OsStr;
 	use std::fs;
 	use std::process::Command;
+
+	#[gtest]
+	fn toolchain_channel_uses_toml_syntax_and_section() -> googletest::Result<()> {
+		let temporary = tempfile::tempdir().or_fail()?;
+		let path = temporary.path().join("rust-toolchain.toml");
+		for contents in [
+			"[unrelated]\nchannel = 'wrong'\n[toolchain]\nchannel = 'nightly' # valid comment\n",
+			"[toolchain]\nchannel = \"nightl\\u0079\"\ncomponents = ['rustfmt']\n",
+		] {
+			fs::write(&path, contents).or_fail()?;
+			expect_that!(read_toolchain(&path).or_fail()?, eq("nightly"));
+		}
+		for contents in [
+			"[unrelated]\nchannel = \"nightly\"\n",
+			"[toolchain]\nchannel = \"nightly\"\nchannel = \"stable\"\n",
+		] {
+			fs::write(&path, contents).or_fail()?;
+			expect_that!(read_toolchain(&path).is_err(), eq(true));
+		}
+		Ok(())
+	}
+
+	#[gtest]
+	fn consumer_manifest_preserves_dependency_names_and_paths() -> googletest::Result<()> {
+		let temporary = tempfile::tempdir().or_fail()?;
+		let dependency = Path::new("/tmp/dependency 😀 with \"quotes\" and \\backslash");
+		write_package(
+			temporary.path(),
+			"renamed",
+			(
+				"quantum",
+				consumer_dependency(dependency, Some("quest-rs")).or_fail()?,
+			),
+			None,
+			None,
+		)
+		.or_fail()?;
+		let contents = fs::read_to_string(temporary.path().join("renamed/Cargo.toml")).or_fail()?;
+		let manifest: toml::Value = toml::from_str(&contents).or_fail()?;
+		let quantum = manifest
+			.get("dependencies")
+			.and_then(|value| value.get("quantum"))
+			.or_fail()?;
+		expect_that!(
+			quantum.get("path").and_then(toml::Value::as_str),
+			some(eq(dependency.to_str().or_fail()?))
+		);
+		verify_that!(
+			quantum.get("package").and_then(toml::Value::as_str),
+			some(eq("quest-rs"))
+		)
+	}
 
 	#[gtest]
 	fn fixture_is_a_separate_workspace_with_all_consumer_shapes() -> googletest::Result<()> {

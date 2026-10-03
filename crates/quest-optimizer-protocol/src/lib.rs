@@ -156,6 +156,7 @@ pub enum WireError {
 struct BoundedBytes {
 	bytes: Vec<u8>,
 	limit: usize,
+	exceeded: bool,
 }
 impl std::io::Write for BoundedBytes {
 	fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
@@ -164,10 +165,22 @@ impl std::io::Write for BoundedBytes {
 			.len()
 			.checked_add(bytes.len())
 			.filter(|length| *length <= self.limit)
-			.ok_or_else(|| std::io::Error::other("message byte budget"))?;
-		self.bytes
-			.try_reserve_exact(length.saturating_sub(self.bytes.len()))
-			.map_err(std::io::Error::other)?;
+			.ok_or_else(|| {
+				self.exceeded = true;
+				std::io::Error::other("message byte budget")
+			})?;
+		if length > self.bytes.capacity() {
+			let capacity = self
+				.bytes
+				.capacity()
+				.saturating_mul(2)
+				.max(64)
+				.max(length)
+				.min(self.limit);
+			self.bytes
+				.try_reserve_exact(capacity.saturating_sub(self.bytes.len()))
+				.map_err(std::io::Error::other)?;
+		}
 		self.bytes.extend_from_slice(bytes);
 		Ok(bytes.len())
 	}
@@ -182,8 +195,15 @@ pub fn encode(value: &impl Serialize, limit: usize) -> Result<Vec<u8>, WireError
 	let mut output = BoundedBytes {
 		bytes: Vec::new(),
 		limit,
+		exceeded: false,
 	};
-	serde_json::to_writer(&mut output, value)?;
+	if let Err(error) = serde_json::to_writer(&mut output, value) {
+		return Err(if output.exceeded {
+			WireError::Budget
+		} else {
+			WireError::Json(error)
+		});
+	}
 	Ok(output.bytes)
 }
 /// Decode only a bounded complete message, retaining serde's nesting limit.

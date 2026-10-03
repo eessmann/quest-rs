@@ -9,6 +9,18 @@ from pathlib import Path
 import platform
 import shutil
 import subprocess
+import tomli_w
+
+
+def render_manifest(source, label, extra_bin):
+    return tomli_w.dumps({
+        "package": {"name": "numeric-performance-" + label, "version": "0.0.0", "edition": "2024"},
+        "workspace": {},
+        "dependencies": {"quest-polynomial": {"path": str(source / "crates/quest-polynomial")},
+                         "quest-numerics": {"path": str(source / "crates/quest-numerics")}, "csv": "1.4"},
+        "profile": {"release": {"lto": "thin"}},
+        "bin": [{"name": extra_bin, "path": "src/extra.rs"}],
+    })
 
 
 def sha(path):
@@ -47,21 +59,7 @@ def main():
         extra_source = "baseline_typed.rs" if label == "baseline" else "mp.rs"
         extra_bin = "numeric-performance-baseline-typed" if label == "baseline" else "numeric-performance-mp"
         shutil.copyfile(fixture / extra_source, package / "src/extra.rs")
-        manifest = f'''[package]
-name = "numeric-performance-{label}"
-version = "0.0.0"
-edition = "2024"
-[workspace]
-[dependencies]
-quest-polynomial = {{ path = {json.dumps(str(source / "crates/quest-polynomial"))} }}
-quest-numerics = {{ path = {json.dumps(str(source / "crates/quest-numerics"))} }}
-[profile.release]
-lto = "thin"
-[[bin]]
-name = "{extra_bin}"
-path = "src/extra.rs"
-'''
-        (package / "Cargo.toml").write_text(manifest)
+        (package / "Cargo.toml").write_text(render_manifest(source, label, extra_bin))
         shutil.copyfile(source / "Cargo.lock", package / "Cargo.lock")
         shutil.copyfile(source / "Cargo.lock", receipts / f"{label}-input-Cargo.lock")
 

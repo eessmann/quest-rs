@@ -19,4 +19,5 @@
 - [Conditional QSVT bounds and numerical observations](qsvt-analysis.md)
 - [Native QSVT and postselection](qsvt-runtime.md)
 - [QSVT applications and file interchange](qsvt-applications.md)
+- [Format handling and catalog provenance](format-handling.md)
 - [Build and validate the tutorials](validation.md)

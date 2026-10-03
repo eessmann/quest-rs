@@ -5,6 +5,18 @@ use quest_optimizer_protocol::{
 };
 
 #[gtest]
+fn encoded_byte_limit_preserves_budget_error_and_exact_boundary() -> Result<()> {
+	let value = "quotes: \" newline: \n unicode: 😀";
+	let expected = serde_json::to_vec(value)?;
+	expect_eq!(encode(&value, expected.len())?, expected);
+	expect_true!(matches!(
+		encode(&value, expected.len().saturating_sub(1)),
+		Err(quest_optimizer_protocol::WireError::Budget)
+	));
+	Ok(())
+}
+
+#[gtest]
 fn versioned_mitm_request_round_trips_and_rejects_excess_limits() -> Result<()> {
 	expect_eq!(VERSION, 3);
 	let limits = MitmLimits::for_qubits(1)?;

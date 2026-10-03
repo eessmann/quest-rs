@@ -158,7 +158,18 @@ fn exact_synthesis(bits: usize) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    println!("workload,precision,iterations,ns_per_iteration,allocations,peak_live_extra_bytes");
+    let mut writer = csv::WriterBuilder::new()
+        .terminator(csv::Terminator::Any(b'\n'))
+        .from_writer(std::io::stdout().lock());
+    writer.write_record([
+        "workload",
+        "precision",
+        "iterations",
+        "ns_per_iteration",
+        "allocations",
+        "peak_live_extra_bytes",
+    ])?;
+    writer.flush()?;
     for bits in [128, 256] {
         for (name, run, count) in [
             (
@@ -172,10 +183,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         ] {
             run(bits)?;
             let (ns, allocations, peak) = allocator::sample(count, || run(black_box(bits)))?;
-            println!(
-                "{name},{bits},{count},{:.3},{allocations},{peak}",
-                ns as f64 / count as f64
-            );
+            writer.serialize((
+                name,
+                bits,
+                count,
+                format!("{:.3}", ns as f64 / count as f64),
+                allocations,
+                peak,
+            ))?;
+            writer.flush()?;
         }
     }
     Ok(())

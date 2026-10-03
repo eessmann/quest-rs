@@ -10,7 +10,7 @@ then continue to the [native runtime guide](https://github.com/eessmann/quest-rs
 The [QSP crate](https://github.com/eessmann/quest-rs/blob/main/crates/quest-qsp/README.md)
 owns phase/control sequences, synthesis, and independent certification;
 [quest-qsvt-io](https://github.com/eessmann/quest-rs/blob/main/crates/quest-qsvt-io/README.md)
-owns JSON, inverse catalogs, and optional HDF5 interchange.
+owns JSON, inverse catalogs, and serial HDF5 interchange.
 
 ## Quickstart: encode a matrix and inspect its transform
 

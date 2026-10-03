@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.28)
+project(quest_reference_report_tests LANGUAGES CXX)
+find_package(glaze CONFIG REQUIRED)
+add_executable(reference_report_tests report_serialization.cpp)
+target_compile_features(reference_report_tests PRIVATE cxx_std_23)
+target_link_libraries(reference_report_tests PRIVATE glaze::glaze)
+enable_testing()
+add_test(NAME reference_report_serialization COMMAND reference_report_tests)

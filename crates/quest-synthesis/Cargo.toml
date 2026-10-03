@@ -13,5 +13,8 @@ dashu-int.workspace = true
 dashu-ratio.workspace = true
 thiserror.workspace = true
 
+[dev-dependencies]
+csv.workspace = true
+
 [lints]
 workspace = true

@@ -1,11 +1,24 @@
 # Matched-accuracy numerical measurements
 
+The active launcher requires Python 3.11+ and `tomli-w` to serialize scratch
+Cargo manifests. From the repository root, install its declared dependency in
+an isolated environment:
+
+```sh
+python3 -m venv /tmp/quest-measurement-tools
+/tmp/quest-measurement-tools/bin/python -m pip install -r docs/verification/fixtures/requirements.txt
+```
+
+Use that environment's Python for the launcher and its Python regression tests.
+Generated packages also use the Rust `csv` crate; fetch their dependencies before
+an offline build when the Cargo cache does not already contain them.
+
 Run from the current repository's project-local `devenv` after stopping other
 builds and measurements. Supply an untouched checkout or archive of baseline
 `001a2b656a5a80a60659a408f87f57670309a09b` and a fresh output directory:
 
 ```sh
-devenv shell -- python3 docs/verification/fixtures/static-architecture/numerical/run.py \
+devenv shell -- /tmp/quest-measurement-tools/bin/python docs/verification/fixtures/static-architecture/numerical/run.py \
   --repository "$PWD" \
   --baseline-repository /path/to/baseline \
   --output /path/to/fresh-numerical-results

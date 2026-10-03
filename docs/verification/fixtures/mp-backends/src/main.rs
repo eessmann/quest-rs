@@ -146,7 +146,7 @@ fn measure(
     mode: &str,
     workload: &str,
     count: usize,
-) {
+) -> Result<(), Box<dyn std::error::Error>> {
     for _ in 0..8 {
         f();
     }
@@ -157,17 +157,43 @@ fn measure(
     }
     let wall = start_wall.elapsed().as_nanos();
     let cpu = cpu_ns() - start_cpu;
-    println!(
-        "{trial},{p},{backend},{mode},{workload},{count},{cpu},{wall},{:.3},{:.3}",
-        cpu as f64 / count as f64,
-        wall as f64 / count as f64
-    );
+    let mut writer = csv::WriterBuilder::new()
+        .terminator(csv::Terminator::Any(b'\n'))
+        .from_writer(std::io::stdout().lock());
+    writer.serialize((
+        trial,
+        p,
+        backend,
+        mode,
+        workload,
+        count,
+        cpu,
+        wall,
+        format!("{:.3}", cpu as f64 / count as f64),
+        format!("{:.3}", wall as f64 / count as f64),
+    ))?;
+    writer.flush()?;
+    Ok(())
 }
 
-fn main() {
-    println!(
-        "trial,bits,backend,allocation,workload,iterations,cpu_ns,wall_ns,cpu_ns_per_iteration,wall_ns_per_iteration"
-    );
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let mut writer = csv::WriterBuilder::new()
+        .terminator(csv::Terminator::Any(b'\n'))
+        .from_writer(std::io::stdout().lock());
+    writer.write_record([
+        "trial",
+        "bits",
+        "backend",
+        "allocation",
+        "workload",
+        "iterations",
+        "cpu_ns",
+        "wall_ns",
+        "cpu_ns_per_iteration",
+        "wall_ns_per_iteration",
+    ])?;
+    writer.flush()?;
+    drop(writer);
     for trial in 0..3 {
         for p in [128, 256, 512] {
             let input = inputs(p);
@@ -190,7 +216,7 @@ fn main() {
                     "fresh",
                     name,
                     200_000,
-                );
+                )?;
             }
             let down = Context::<Down>::new(p);
             let up = Context::<Up>::new(p);
@@ -217,7 +243,7 @@ fn main() {
                     "fresh",
                     name,
                     2_000,
-                );
+                )?;
             }
             let a = matrix(&b, &input);
             measure(
@@ -230,7 +256,7 @@ fn main() {
                 "fresh",
                 "matmul16",
                 50,
-            );
+            )?;
             measure(
                 || {
                     black_box(qr(&b, black_box(&a)));
@@ -241,7 +267,8 @@ fn main() {
                 "fresh",
                 "qr16",
                 50,
-            );
+            )?;
         }
     }
+    Ok(())
 }

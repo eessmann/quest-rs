@@ -29,7 +29,7 @@ commands and repository conventions.
 | [`quest-polynomial`](crates/quest-polynomial/README.md) | Typed polynomial bases, function expressions and approximation |
 | [`quest-qsp`](crates/quest-qsp/README.md) | Real-parity Wx and unit-circle QSP, RHW/Half-Cholesky and inverse NLFT, with frozen-export certification |
 | [`quest-qsvt`](crates/quest-qsvt/README.md) | Native-independent encodings, projectors, transforms and analysis |
-| [`quest-qsvt-io`](crates/quest-qsvt-io/README.md) | JSON and optional serial HDF5 interchange |
+| [`quest-qsvt-io`](crates/quest-qsvt-io/README.md) | JSON, PennyLane catalogs, and serial HDF5 interchange |
 | [`quest-qsvt-cli`](crates/quest-qsvt-cli/README.md) | Synthesis, inverse catalogs, solve, embedded and overlap applications |
 
 ## Build

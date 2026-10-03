@@ -3,7 +3,9 @@
 The little-endian binary64 phase files were generated on 2026-09-11 from
 `quest-qsvt` revision `7fe7f740579b03c52a8cf48be6a31268b029c19f` using
 `benchmarks/reference/cpp_qsp.cpp` in this workspace. The inputs are the matching
-inverse Chebyshev catalog families in `quest-qsvt-io/data/inverse`.
+inverse Chebyshev catalog families now preserved unchanged in
+`quest-qsvt-io/data/pennylane/inverse.h5`. Their coefficient words match the
+historical inputs exactly; these phase fixtures retain their original C++ provenance.
 
 The adapter and required interval/disc-norm support were compiled freshly from
 that clean source revision with GCC 16, `-O3 -march=native -frounding-math

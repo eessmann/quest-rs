@@ -1,6 +1,6 @@
 //! Emit one measured JSON result per catalog family, retaining unsuccessful cases.
 use quest_qsp::{FrozenCandidate, RealParityWx, SynthesisBuilder};
-use quest_qsvt_io::{IoPolicy, catalog_families};
+use quest_qsvt_io::{InverseCatalog, IoPolicy};
 use std::time::Instant;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -8,7 +8,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 	if certify && !cfg!(feature = "certification") {
 		return Err("--certify requires the certification feature".into());
 	}
-	for family in catalog_families() {
+	let catalog = InverseCatalog::bundled(IoPolicy::default())?;
+	for family in catalog.families() {
 		let started = Instant::now();
 		let polynomial = family.polynomial(IoPolicy::default())?;
 		let mut admission_seconds = 0.0;

@@ -50,9 +50,25 @@ fn measure(
     let ns = t.elapsed().as_nanos();
     let count = ALLOCS.load(Ordering::Relaxed) - a;
     let peak = PEAK.load(Ordering::Relaxed).saturating_sub(base);
-    println!("{name},{n},{ns},{count},{peak},{output}");
+    let mut writer = csv::WriterBuilder::new()
+        .terminator(csv::Terminator::Any(b'\n'))
+        .from_writer(std::io::stdout().lock());
+    writer.serialize((name, n, ns, count, peak, output))?;
+    writer.flush()?;
     Ok(())
 }
-fn header() {
-    println!("workload,iterations,nanoseconds,allocations,peak_live_extra_bytes,output_scalars");
+fn header() -> Result<(), Box<dyn std::error::Error>> {
+    let mut writer = csv::WriterBuilder::new()
+        .terminator(csv::Terminator::Any(b'\n'))
+        .from_writer(std::io::stdout().lock());
+    writer.write_record([
+        "workload",
+        "iterations",
+        "nanoseconds",
+        "allocations",
+        "peak_live_extra_bytes",
+        "output_scalars",
+    ])?;
+    writer.flush()?;
+    Ok(())
 }

@@ -2,7 +2,7 @@ include!(concat!(env!("CARGO_MANIFEST_DIR"), "/../allocator.rs"));
 use quest_polynomial::Interval;
 use std::hint::black_box;
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    header();
+    header()?;
     let function = black_box(quest_polynomial::function!(|x| (x.clone() * x + 1.0).ln()));
     measure("canonical_construct", 10_000, || {
         black_box(quest_polynomial::function!(|x| (x.clone() * x + 1.0).ln()));
@@ -59,8 +59,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         assert!(r.images()[0].contains(-1.0));
         assert!(r.images()[1].contains(1.0));
         assert_eq!(r.images()[0].lower(), -2.0);
-        assert!((r.images()[0].upper()+0.25).abs()<1e-14);
-        assert!((r.images()[1].lower()-0.25).abs()<1e-14);
+        assert!((r.images()[0].upper() + 0.25).abs() < 1e-14);
+        assert!((r.images()[1].lower() - 0.25).abs() < 1e-14);
         assert_eq!(r.images()[1].upper(), 2.0);
         let n = r.images().len() * 2;
         black_box(r);

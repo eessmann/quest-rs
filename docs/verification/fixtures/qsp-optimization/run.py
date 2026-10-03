@@ -1,6 +1,20 @@
 #!/usr/bin/env python3
 """Build immutable QSP variants, then measure all variants without concurrent builds."""
 import argparse, hashlib, json, os, pathlib, shutil, signal, subprocess, time, tomllib
+import tomli_w
+
+
+def render_manifest(source):
+    dependencies = {"serde_json": "1"}
+    for name in ["quest-polynomial", "quest-qsp"]:
+        dependency = {"path": str(source / "crates" / name)}
+        if name == "quest-qsp":
+            dependency["features"] = ["offline-synthesis"]
+        dependencies[name] = dependency
+    return tomli_w.dumps({
+        "package": {"name": "qsp-optimization-observer", "version": "0.0.0", "edition": "2024"},
+        "workspace": {}, "dependencies": dependencies, "profile": {"release": {"lto": "thin"}},
+    })
 
 
 def sha(path):
@@ -179,12 +193,7 @@ def build(args):
     fixture=pathlib.Path(__file__).resolve().parent
     for name in ['main.rs','allocator.rs']:
         shutil.copyfile(fixture/name, package/'src'/name)
-    manifest='[package]\nname="qsp-optimization-observer"\nversion="0.0.0"\nedition="2024"\n[workspace]\n[dependencies]\nserde_json="1"\n'
-    for name in ['quest-polynomial','quest-qsp']:
-        features=',features=["offline-synthesis"]' if name=='quest-qsp' else ''
-        manifest+=name+'={path='+json.dumps(str(source/'crates'/name))+features+'}\n'
-    manifest+='[profile.release]\nlto="thin"\n'
-    (package/'Cargo.toml').write_text(manifest)
+    (package/'Cargo.toml').write_text(render_manifest(source))
     shutil.copyfile(source/'Cargo.lock',package/'Cargo.lock')
     # Never share incremental Cargo state across immutable variants: path and
     # mtime-preserving copies can otherwise resolve stale workspace artifacts.

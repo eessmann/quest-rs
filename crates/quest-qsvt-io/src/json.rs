@@ -3,7 +3,10 @@ use quest_polynomial::{
 	Chebyshev, Conversion, Hermite, Jacobi, Laguerre, Laurent, Monomial, Polynomial,
 };
 use quest_qsp::{ControlSequence, PhaseSequence, WxLaurent, WxSymmetric};
-use serde_json::{Value, json};
+use serde_json::Value;
+
+mod transport;
+use transport::{Basis, Envelope, Kind};
 
 #[derive(Debug, Clone)]
 pub enum QspInput {
@@ -148,83 +151,7 @@ impl PolynomialInput {
 	}
 }
 
-fn array<'a>(value: &'a Value, key: &str) -> Result<&'a [Value]> {
-	value
-		.get(key)
-		.and_then(Value::as_array)
-		.map(Vec::as_slice)
-		.ok_or(Error::Format("missing array field"))
-}
-fn real(value: &Value) -> Result<f64> {
-	let number = value
-		.as_f64()
-		.ok_or(Error::Format("expected real number"))?;
-	if number.is_finite() {
-		Ok(number)
-	} else {
-		Err(Error::NonFinite)
-	}
-}
-fn reals(values: &[Value]) -> Result<Vec<f64>> {
-	values.iter().map(real).collect()
-}
-fn complex(value: &Value) -> Result<Complex64> {
-	if let Some(values) = value.as_array() {
-		let [re, im] = values.as_slice() else {
-			return Err(Error::Format("complex pair requires two components"));
-		};
-		finite(Complex64::new(real(re)?, real(im)?))
-	} else {
-		Ok(Complex64::new(real(value)?, 0.0))
-	}
-}
-fn complex_words(value: &Value) -> Result<Complex64> {
-	let pair = value.as_array().ok_or(Error::Format("matrix word pair"))?;
-	let [re, im] = pair.as_slice() else {
-		return Err(Error::Format("matrix word pair"));
-	};
-	Ok(Complex64::new(
-		f64::from_bits(re.as_u64().ok_or(Error::Format("matrix real word"))?),
-		f64::from_bits(im.as_u64().ok_or(Error::Format("matrix imaginary word"))?),
-	))
-}
-fn read_controls(
-	value: &Value,
-	policy: IoPolicy,
-	key: &str,
-	convention: &str,
-	component: impl Fn(&Value) -> Result<Complex64>,
-) -> Result<ControlSequence> {
-	if value.get("convention").and_then(Value::as_str) != Some(convention) {
-		return Err(Error::Format("frozen controls require a convention tag"));
-	}
-	let raw = array(value, key)?;
-	bounded(raw, policy)?;
-	let mut matrices = Vec::new();
-	matrices
-		.try_reserve_exact(raw.len())
-		.map_err(|_| Error::Budget("control matrices"))?;
-	for matrix in raw {
-		let rows = matrix
-			.as_array()
-			.ok_or(Error::Format("control matrix rows"))?;
-		let [first, last] = rows.as_slice() else {
-			return Err(Error::Format("control matrix is not 2 by 2"));
-		};
-		let row = |value: &Value| -> Result<[Complex64; 2]> {
-			let cells = value
-				.as_array()
-				.ok_or(Error::Format("control matrix columns"))?;
-			let [left, right] = cells.as_slice() else {
-				return Err(Error::Format("control matrix is not 2 by 2"));
-			};
-			Ok([component(left)?, component(right)?])
-		};
-		matrices.push([row(first)?, row(last)?]);
-	}
-	Ok(ControlSequence::builder().matrices(matrices).build()?)
-}
-fn bounded(values: &[Value], policy: IoPolicy) -> Result<()> {
+fn bounded<T>(values: &[T], policy: IoPolicy) -> Result<()> {
 	if values.len() > policy.max_coefficients {
 		return Err(Error::Budget("coefficient count"));
 	}
@@ -322,137 +249,100 @@ fn read_qsp_json_impl(
 	{
 		return Err(Error::Budget("JSON decoded storage"));
 	}
-	let value: Value = serde_json::from_str(source)?;
-	if value.get("payload").is_some() || value.get("sha256").is_some() {
-		drop(value);
-		return compiled_at_tolerance(source, policy, verification_tolerance);
+	let mut envelope: Envelope = serde_json::from_str(source)?;
+	let kind = envelope.kind(execution)?;
+	// Dynamic metadata was syntax-admitted above. Only a polynomial retains it,
+	// by decoding the original representation after domain admission below.
+	envelope.metadata.clear();
+	match kind {
+		Kind::Compiled => compiled_at_tolerance(source, policy, verification_tolerance),
+		Kind::Phases => {
+			let angles = envelope.angles.required("missing phase angles")?;
+			bounded(&angles, policy)?;
+			match envelope.convention.optional().as_deref() {
+				Some("pyqsp-wx-symmetric") => {
+					Ok(QspInput::Symmetric(PhaseSequence::builder(angles).build()?))
+				}
+				Some("pyqsp-wx-laurent") => {
+					Ok(QspInput::Laurent(PhaseSequence::builder(angles).build()?))
+				}
+				_ => Err(Error::Format("missing or unsupported phase convention")),
+			}
+		}
+		Kind::Matrices => read_controls(envelope, policy),
+		Kind::Angles => {
+			let psi = envelope.psi.required("missing psi source angles")?;
+			let phi = envelope.phi.required("missing phi source angles")?;
+			bounded(&psi, policy)?;
+			bounded(&phi, policy)?;
+			Ok(QspInput::GeneralizedAngles(GeneralizedAngleInput::new(
+				psi, phi,
+			)?))
+		}
+		Kind::Polynomial => read_polynomial(envelope, source, policy).map(QspInput::Polynomial),
 	}
-	if value.get("control_words").is_some() && value.get("controls").is_some() {
-		return Err(Error::Format("competing frozen matrix representations"));
-	}
-	if (value.get("psi_words").is_some() || value.get("phi_words").is_some())
-		&& (value.get("psi").is_some() || value.get("phi").is_some())
-	{
-		return Err(Error::Format("competing source angle representations"));
-	}
-	if execution
-		&& (value.get("psi").is_some()
-			|| value.get("phi").is_some()
-			|| value.get("controls").is_some())
-		&& value.get("control_words").is_none()
-	{
-		return Err(Error::Format(
-			"execution controls require frozen matrix words",
-		));
-	}
-	if execution
-		&& (value.get("psi").is_some() || value.get("phi").is_some())
-		&& value.get("psi_words").is_none()
-	{
-		return Err(Error::Format(
-			"execution angle provenance requires exact words",
-		));
-	}
-	if value.get("theta").is_some() || value.get("lambda").is_some() {
-		return Err(Error::Format(
-			"obsolete theta/lambda; use paper-native psi/phi",
-		));
-	}
-	if value.get("angles").is_some() {
-		let angles = array(&value, "angles")?;
-		bounded(angles, policy)?;
-		return match value.get("convention").and_then(Value::as_str) {
-			Some("pyqsp-wx-symmetric") => Ok(QspInput::Symmetric(
-				PhaseSequence::builder(reals(angles)?).build()?,
-			)),
-			Some("pyqsp-wx-laurent") => Ok(QspInput::Laurent(
-				PhaseSequence::builder(reals(angles)?).build()?,
-			)),
-			_ => Err(Error::Format("missing or unsupported phase convention")),
-		};
-	}
-	if value.get("control_words").is_some() {
-		let controls = read_controls(
-			&value,
-			policy,
-			"control_words",
-			"gqsp-matrix-words-v1",
-			complex_words,
-		)?;
-		return with_optional_angle_provenance(&value, policy, controls);
-	}
-	if value.get("controls").is_some() {
-		let controls = read_controls(
-			&value,
-			policy,
-			"controls",
-			"gqsp-matrix-upper-left-v1",
-			complex,
-		)?;
-		return with_optional_angle_provenance(&value, policy, controls);
-	}
-	if value.get("psi").is_some() || value.get("phi").is_some() {
-		let psi = array(&value, "psi")?;
-		let phi = array(&value, "phi")?;
-		bounded(psi, policy)?;
-		bounded(phi, policy)?;
-		return Ok(QspInput::GeneralizedAngles(GeneralizedAngleInput::new(
-			reals(psi)?,
-			reals(phi)?,
-		)?));
-	}
-	read_polynomial(value, policy).map(QspInput::Polynomial)
 }
-fn with_optional_angle_provenance(
-	value: &Value,
-	policy: IoPolicy,
-	controls: ControlSequence,
-) -> Result<QspInput> {
-	if value.get("psi_words").is_some() || value.get("phi_words").is_some() {
-		let psi = array(value, "psi_words")?;
-		let phi = array(value, "phi_words")?;
-		bounded(psi, policy)?;
-		bounded(phi, policy)?;
-		let words = |values: &[Value]| -> Result<Vec<f64>> {
-			values
-				.iter()
-				.map(|value| {
-					value
-						.as_u64()
-						.map(f64::from_bits)
-						.ok_or(Error::Format("source angle word"))
+fn read_controls(envelope: Envelope, policy: IoPolicy) -> Result<QspInput> {
+	let matrices = if let Some(raw) = envelope.control_words.optional() {
+		if envelope.convention.optional().as_deref() != Some("gqsp-matrix-words-v1") {
+			return Err(Error::Format("frozen controls require a convention tag"));
+		}
+		bounded(&raw, policy)?;
+		raw.into_iter()
+			.map(|matrix| {
+				matrix.map(|row| {
+					row.map(|[re, im]| Complex64::new(f64::from_bits(re), f64::from_bits(im)))
 				})
-				.collect()
-		};
-		return Ok(QspInput::GeneralizedAngles(
-			GeneralizedAngleInput::with_frozen_controls(words(psi)?, words(phi)?, controls)?,
-		));
+			})
+			.collect()
+	} else {
+		if envelope.convention.optional().as_deref() != Some("gqsp-matrix-upper-left-v1") {
+			return Err(Error::Format("frozen controls require a convention tag"));
+		}
+		let raw = envelope.controls.required("missing frozen controls")?;
+		bounded(&raw, policy)?;
+		raw.into_iter()
+			.map(|matrix| matrix.map(|row| row.map(|component| component.0)))
+			.collect()
+	};
+	let controls = ControlSequence::builder().matrices(matrices).build()?;
+	let provenance = if envelope.psi_words.present() || envelope.phi_words.present() {
+		let psi = envelope.psi_words.required("missing psi source words")?;
+		let phi = envelope.phi_words.required("missing phi source words")?;
+		bounded(&psi, policy)?;
+		bounded(&phi, policy)?;
+		Some((
+			psi.into_iter().map(f64::from_bits).collect(),
+			phi.into_iter().map(f64::from_bits).collect(),
+		))
+	} else if envelope.psi.present() || envelope.phi.present() {
+		let psi = envelope.psi.required("missing psi source angles")?;
+		let phi = envelope.phi.required("missing phi source angles")?;
+		bounded(&psi, policy)?;
+		bounded(&phi, policy)?;
+		Some((psi, phi))
+	} else {
+		None
+	};
+	match provenance {
+		Some((psi, phi)) => Ok(QspInput::GeneralizedAngles(
+			GeneralizedAngleInput::with_frozen_controls(psi, phi, controls)?,
+		)),
+		None => Ok(QspInput::GeneralizedMatrices(controls)),
 	}
-	if value.get("psi").is_some() || value.get("phi").is_some() {
-		let psi = array(value, "psi")?;
-		let phi = array(value, "phi")?;
-		bounded(psi, policy)?;
-		bounded(phi, policy)?;
-		return Ok(QspInput::GeneralizedAngles(
-			GeneralizedAngleInput::with_frozen_controls(reals(psi)?, reals(phi)?, controls)?,
-		));
-	}
-	Ok(QspInput::GeneralizedMatrices(controls))
 }
-fn read_polynomial(value: Value, policy: IoPolicy) -> Result<PolynomialInput> {
-	let raw = array(&value, "coefficients")?;
-	bounded(raw, policy)?;
-	let mut coefficients = raw.iter().map(complex).collect::<Result<Vec<_>>>()?;
-	let basis = value
-		.get("basis")
-		.and_then(Value::as_str)
-		.unwrap_or("Chebyshev");
-	let offset = value.get("minimum_order").map_or(Ok(0), |v| {
-		v.as_i64()
-			.and_then(|n| i32::try_from(n).ok())
-			.ok_or(Error::Format("minimum_order requires signed32"))
-	})?;
-	if basis != "Laurent" && offset != 0 {
+fn read_polynomial(envelope: Envelope, source: &str, policy: IoPolicy) -> Result<PolynomialInput> {
+	let raw = envelope
+		.coefficients
+		.required("missing polynomial coefficients")?;
+	bounded(&raw, policy)?;
+	let mut coefficients = raw
+		.into_iter()
+		.map(|component| finite(component.0))
+		.collect::<Result<Vec<_>>>()?;
+	let basis = envelope.basis.optional().unwrap_or_default();
+	let offset = envelope.minimum_order.optional().unwrap_or(0);
+	if !matches!(basis, Basis::Laurent) && offset != 0 {
 		let prefix = usize::try_from(offset)
 			.map_err(|_| Error::Format("negative support requires Laurent basis"))?;
 		let count = prefix
@@ -470,45 +360,44 @@ fn read_polynomial(value: Value, policy: IoPolicy) -> Result<PolynomialInput> {
 		padded.extend(coefficients);
 		coefficients = padded;
 	}
-	let parameters = value.get("parameters").map_or(Ok(Vec::new()), |v| {
-		v.as_array()
-			.ok_or(Error::Format("parameters must be an array"))
-			.and_then(|v| reals(v))
-	})?;
+	let parameters = envelope.parameters.optional().unwrap_or_default();
+	if parameters.iter().any(|value| !value.is_finite()) {
+		return Err(Error::NonFinite);
+	}
 	let limits = policy.polynomial_limits();
 	let polynomial = match (basis, parameters.as_slice()) {
-		("Monomial", []) => {
+		(Basis::Monomial, []) => {
 			AdmittedPolynomial::Monomial(Polynomial::new(Monomial, coefficients, limits)?)
 		}
-		("Chebyshev", []) => {
+		(Basis::Chebyshev, []) => {
 			AdmittedPolynomial::Chebyshev(Polynomial::new(Chebyshev, coefficients, limits)?)
 		}
-		("Laurent", []) => AdmittedPolynomial::Laurent(Polynomial::new(
+		(Basis::Laurent, []) => AdmittedPolynomial::Laurent(Polynomial::new(
 			Laurent::new(offset),
 			coefficients,
 			limits,
 		)?),
-		("Hermite", []) => AdmittedPolynomial::Hermite(Polynomial::new(
+		(Basis::Hermite, []) => AdmittedPolynomial::Hermite(Polynomial::new(
 			Hermite::physicists(),
 			coefficients,
 			limits,
 		)?),
-		("Laguerre", []) => AdmittedPolynomial::Laguerre(Polynomial::new(
+		(Basis::Laguerre, []) => AdmittedPolynomial::Laguerre(Polynomial::new(
 			Laguerre::new(0.0)?,
 			coefficients,
 			limits,
 		)?),
-		("Laguerre", [alpha]) => AdmittedPolynomial::Laguerre(Polynomial::new(
+		(Basis::Laguerre, [alpha]) => AdmittedPolynomial::Laguerre(Polynomial::new(
 			Laguerre::new(*alpha)?,
 			coefficients,
 			limits,
 		)?),
-		("Jacobi", []) => AdmittedPolynomial::Jacobi(Polynomial::new(
+		(Basis::Jacobi, []) => AdmittedPolynomial::Jacobi(Polynomial::new(
 			Jacobi::new(0.0, 0.0)?,
 			coefficients,
 			limits,
 		)?),
-		("Jacobi", [alpha, beta]) => AdmittedPolynomial::Jacobi(Polynomial::new(
+		(Basis::Jacobi, [alpha, beta]) => AdmittedPolynomial::Jacobi(Polynomial::new(
 			Jacobi::new(*alpha, *beta)?,
 			coefficients,
 			limits,
@@ -517,7 +406,7 @@ fn read_polynomial(value: Value, policy: IoPolicy) -> Result<PolynomialInput> {
 	};
 	Ok(PolynomialInput {
 		polynomial,
-		original: value,
+		original: serde_json::from_str(source)?,
 	})
 }
 
@@ -527,34 +416,34 @@ fn read_polynomial(value: Value, policy: IoPolicy) -> Result<PolynomialInput> {
 /// # Errors
 /// Returns JSON serialization errors.
 pub fn write_qsp_json(input: &QspInput) -> Result<String> {
-	let value = match input {
+	let encoded = match input {
 		#[cfg(feature = "certification")]
 		QspInput::Compiled(p) => return Ok(p.json().to_owned()),
-		QspInput::Symmetric(p) => json!({"convention":p.convention(),"angles":p.values()}),
-		QspInput::Laurent(p) => json!({"convention":p.convention(),"angles":p.values()}),
-		QspInput::GeneralizedAngles(angles) => json!({"psi":angles.psi,"phi":angles.phi}),
-		QspInput::GeneralizedMatrices(p) => frozen_controls_json(p),
-		QspInput::Polynomial(p) => p.original.clone(),
+		QspInput::Symmetric(p) => serde_json::to_string_pretty(&transport::Phases {
+			convention: p.convention(),
+			angles: p.values(),
+		})?,
+		QspInput::Laurent(p) => serde_json::to_string_pretty(&transport::Phases {
+			convention: p.convention(),
+			angles: p.values(),
+		})?,
+		QspInput::GeneralizedAngles(angles) => {
+			serde_json::to_string_pretty(&transport::SourceAngles {
+				psi: angles.psi(),
+				phi: angles.phi(),
+			})?
+		}
+		QspInput::GeneralizedMatrices(p) => serde_json::to_string_pretty(&transport::Controls {
+			convention: "gqsp-matrix-upper-left-v1",
+			controls: p
+				.matrices()
+				.iter()
+				.map(|matrix| matrix.map(|row| row.map(|value| [value.re, value.im])))
+				.collect(),
+		})?,
+		QspInput::Polynomial(p) => serde_json::to_string_pretty(&p.original)?,
 	};
-	Ok(serde_json::to_string_pretty(&value)?)
-}
-
-fn frozen_controls_json(controls: &ControlSequence) -> Value {
-	let matrices: Vec<_> = controls
-		.matrices()
-		.iter()
-		.map(|matrix| matrix.map(|row| row.map(|v| [v.re, v.im])))
-		.collect();
-	json!({"convention":"gqsp-matrix-upper-left-v1","controls":matrices})
-}
-
-fn frozen_control_words_json(controls: &ControlSequence) -> Value {
-	let words: Vec<_> = controls
-		.matrices()
-		.iter()
-		.map(|matrix| matrix.map(|row| row.map(|v| [v.re.to_bits(), v.im.to_bits()])))
-		.collect();
-	json!({"convention":"gqsp-matrix-words-v1","control_words":words})
+	Ok(encoded)
 }
 
 /// Serialize execution authority, preserving exact admitted matrix words and
@@ -563,25 +452,24 @@ fn frozen_control_words_json(controls: &ControlSequence) -> Value {
 /// # Errors
 /// Returns JSON serialization errors.
 pub fn write_qsp_execution_json(input: &QspInput) -> Result<String> {
-	if let QspInput::GeneralizedAngles(angles) = input {
-		let mut value = frozen_control_words_json(angles.controls());
-		let object = value
-			.as_object_mut()
-			.ok_or(Error::Format("frozen control object"))?;
-		object.insert(
-			"psi_words".into(),
-			json!(angles.psi().iter().map(|x| x.to_bits()).collect::<Vec<_>>()),
-		);
-		object.insert(
-			"phi_words".into(),
-			json!(angles.phi().iter().map(|x| x.to_bits()).collect::<Vec<_>>()),
-		);
-		return Ok(serde_json::to_string_pretty(&value)?);
-	}
-	if let QspInput::GeneralizedMatrices(controls) = input {
-		return Ok(serde_json::to_string_pretty(&frozen_control_words_json(
-			controls,
-		))?);
-	}
-	write_qsp_json(input)
+	let (controls, provenance) = match input {
+		QspInput::GeneralizedAngles(angles) => (angles.controls(), Some(angles)),
+		QspInput::GeneralizedMatrices(controls) => (controls, None),
+		_ => return write_qsp_json(input),
+	};
+	let payload = transport::ExecutionControls {
+		convention: "gqsp-matrix-words-v1",
+		control_words: controls
+			.matrices()
+			.iter()
+			.map(|matrix| {
+				matrix.map(|row| row.map(|value| [value.re.to_bits(), value.im.to_bits()]))
+			})
+			.collect(),
+		psi_words: provenance
+			.map(|angles| angles.psi().iter().map(|value| value.to_bits()).collect()),
+		phi_words: provenance
+			.map(|angles| angles.phi().iter().map(|value| value.to_bits()).collect()),
+	};
+	Ok(serde_json::to_string_pretty(&payload)?)
 }

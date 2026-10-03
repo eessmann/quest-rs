@@ -1,5 +1,16 @@
 # Staged QSP optimization measurements
 
+The active launcher requires Python 3.11+ and `tomli-w` to serialize scratch
+Cargo manifests. From the repository root, install its declared dependency in
+an isolated environment:
+
+```sh
+python3 -m venv /tmp/quest-measurement-tools
+/tmp/quest-measurement-tools/bin/python -m pip install -r docs/verification/fixtures/requirements.txt
+```
+
+Use that environment's Python for the launcher and its Python regression tests.
+
 Requires Python 3.11+, the repository's Rust toolchain and GNU `/usr/bin/time`.
 
 This fixture compares immutable source snapshots of baseline, completion-only A,
@@ -19,11 +30,11 @@ config files and their build, target, and unstable tables, plus compiler/target
 environment overrides. This includes target-specific `target-cpu=native` flags.
 
 ```sh
-python3 run.py build baseline /path/to/baseline /path/to/observations
-python3 run.py build a /path/to/a /path/to/observations
-python3 run.py build ab /path/to/ab /path/to/observations
-python3 run.py build abc /path/to/abc /path/to/observations
-python3 run.py run /path/to/observations baseline a ab abc
+/tmp/quest-measurement-tools/bin/python run.py build baseline /path/to/baseline /path/to/observations
+/tmp/quest-measurement-tools/bin/python run.py build a /path/to/a /path/to/observations
+/tmp/quest-measurement-tools/bin/python run.py build ab /path/to/ab /path/to/observations
+/tmp/quest-measurement-tools/bin/python run.py build abc /path/to/abc /path/to/observations
+/tmp/quest-measurement-tools/bin/python run.py run /path/to/observations baseline a ab abc
 ```
 
 The driver copies each input into a private source tree. Because offline
@@ -81,7 +92,7 @@ work with that accounting correction in mind, not as an instruction count.
 Lightweight controller and allocator checks (no Cargo builds):
 
 ```sh
-python3 -m unittest discover -s . -p test_run.py
+/tmp/quest-measurement-tools/bin/python -m unittest discover -s . -p test_run.py
 rustc --edition=2024 allocator_probe.rs -o /tmp/qsp-allocation-probe
 /tmp/qsp-allocation-probe
 ```
@@ -91,7 +102,7 @@ its summary without rerunning observers:
 
 ```sh
 python3 summarize.py /path/to/observations
-python3 -m unittest discover -s . -p test_summarize.py
+/tmp/quest-measurement-tools/bin/python -m unittest discover -s . -p test_summarize.py
 ```
 
 `summarize.py` requires all three campaign gates to be true and exactly 72

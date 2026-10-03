@@ -1,4 +1,3 @@
-#![cfg(feature = "hdf5")]
 use googletest::prelude::*;
 use hdf5_metno::{
 	File, H5Type, Location,

@@ -13,6 +13,7 @@ quest-numerics.workspace = true
 faer = { workspace = true, default-features = false, features = ["std", "linalg"] }
 
 [dev-dependencies]
+csv.workspace = true
 googletest.workspace = true
 
 [lints]

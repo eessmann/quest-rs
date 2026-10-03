@@ -20,7 +20,7 @@ fn run() -> Result<(), generate::DynError> {
 		CommandKind::CheckNativeConsumers { work_dir, backends } => {
 			native_consumers::run(work_dir, &backends)
 		}
-		CommandKind::GenerateQsvtCatalog { source, check } => qsvt_catalog::run(&source, check),
+		CommandKind::QsvtCatalog { fetch } => qsvt_catalog::run(fetch),
 		CommandKind::Help => {
 			eprintln!("{USAGE}");
 			Ok(())
@@ -28,7 +28,7 @@ fn run() -> Result<(), generate::DynError> {
 	}
 }
 
-const USAGE: &str = "usage: cargo run -p xtask -- generate-quest-bindings [--check]\n       cargo run -p xtask -- check-native-consumers [--work-dir PATH] [--backends cpu,omp,gpu]\n       cargo run -p xtask -- generate-qsvt-catalog --source CPP_REPOSITORY [--check]";
+const USAGE: &str = "usage: cargo run -p xtask -- generate-quest-bindings [--check]\n       cargo run -p xtask -- check-native-consumers [--work-dir PATH] [--backends cpu,omp,gpu]\n       cargo run -p xtask -- fetch-qsvt-catalog\n       cargo run -p xtask -- check-qsvt-catalog";
 
 #[derive(Debug, Eq, PartialEq)]
 enum CommandKind {
@@ -39,9 +39,8 @@ enum CommandKind {
 		work_dir: Option<PathBuf>,
 		backends: Vec<native_consumers::Backend>,
 	},
-	GenerateQsvtCatalog {
-		source: PathBuf,
-		check: bool,
+	QsvtCatalog {
+		fetch: bool,
 	},
 	Help,
 }
@@ -54,26 +53,13 @@ fn parse_command(
 		return Ok(CommandKind::Help);
 	};
 	match command.to_str() {
-		Some("generate-qsvt-catalog") => {
-			if arguments.next().as_deref() != Some(std::ffi::OsStr::new("--source")) {
-				return Err(format!(
-					"catalog generation requires --source CPP_REPOSITORY\n{USAGE}"
-				)
-				.into());
-			}
-			let source = arguments
-				.next()
-				.map(PathBuf::from)
-				.ok_or("missing catalog source path")?;
-			let check = match arguments.next().as_deref() {
-				None => false,
-				Some(flag) if flag == "--check" => true,
-				Some(_) => return Err("unexpected catalog generation argument".into()),
-			};
+		Some(command @ ("fetch-qsvt-catalog" | "check-qsvt-catalog")) => {
 			if arguments.next().is_some() {
-				return Err("unexpected trailing catalog arguments".into());
+				return Err("catalog maintenance commands take no arguments".into());
 			}
-			Ok(CommandKind::GenerateQsvtCatalog { source, check })
+			Ok(CommandKind::QsvtCatalog {
+				fetch: command == "fetch-qsvt-catalog",
+			})
 		}
 		Some("generate-quest-bindings") => match arguments.next().as_deref() {
 			None => Ok(CommandKind::GenerateQuestBindings { check: false }),
@@ -128,6 +114,18 @@ mod tests {
 	use googletest::prelude::*;
 	use std::ffi::OsString;
 	use std::path::PathBuf;
+
+	#[gtest]
+	fn catalog_commands_are_explicit_and_reject_the_old_cpp_source() {
+		for command in ["fetch-qsvt-catalog", "check-qsvt-catalog"] {
+			expect_true!(parse_command([OsString::from(command)]).is_ok());
+			expect_true!(parse_command([command, "--source", "cpp"].map(OsString::from)).is_err());
+		}
+		expect_true!(
+			parse_command(["generate-qsvt-catalog", "--source", "cpp"].map(OsString::from))
+				.is_err()
+		);
+	}
 
 	#[gtest]
 	fn check_native_consumers_accepts_an_optional_work_directory() -> googletest::Result<()> {

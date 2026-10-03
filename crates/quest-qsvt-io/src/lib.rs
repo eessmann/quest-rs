@@ -2,7 +2,7 @@
 //! QSP and QSVT scientific interchange formats.
 //!
 //! IO admits shape, finite values and convention tags. Catalog provenance and
-//! file metadata are not mathematical certificates. HDF5 is optional and serial;
+//! file metadata are not mathematical certificates. HDF5 is required and serial;
 //! distributed applications call these APIs on the coordinating root only.
 
 mod catalog;
@@ -10,13 +10,10 @@ mod catalog;
 mod compiled;
 #[cfg(feature = "certification")]
 pub use compiled::{CompiledInput, read_compiled_qsp_json};
-#[cfg(feature = "hdf5")]
 pub mod hdf5;
 mod json;
 mod sparse;
-#[rustfmt::skip]
-mod catalog_data;
-pub use catalog::{CatalogFamily, catalog_families, find_catalog_family};
+pub use catalog::{CatalogFamily, CatalogSource, InverseCatalog};
 pub use json::{
 	GeneralizedAngleInput, PolynomialConversion, PolynomialInput, QspInput,
 	read_qsp_execution_json, read_qsp_execution_json_with_tolerance, read_qsp_json,
@@ -34,7 +31,6 @@ pub enum Error {
 	#[cfg(feature = "certification")]
 	#[error(transparent)]
 	Artifact(#[from] quest_qsp::artifact::ArtifactError),
-	#[cfg(feature = "hdf5")]
 	#[error(transparent)]
 	Hdf5(#[from] hdf5_metno::Error),
 	#[error(transparent)]

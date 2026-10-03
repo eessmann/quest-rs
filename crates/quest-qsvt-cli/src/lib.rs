@@ -88,7 +88,6 @@ pub enum Command {
 	/// Construct frozen binary64 phases or matrices; certification is a separate stage.
 	Synthesize(SynthesisArgs),
 	/// Export a reproducible matrix for embedded or solve workflows.
-	#[cfg(feature = "hdf5")]
 	MatrixPreset(MatrixPresetArgs),
 	/// Run explicitly requested arbitrary-precision construction and certify its frozen export.
 	#[cfg(feature = "offline-synthesis")]
@@ -330,7 +329,6 @@ pub struct CatalogSolveArgs {
 	#[arg(long, default_value_t = 1e-11)]
 	pub tolerance: f64,
 }
-#[cfg(feature = "hdf5")]
 #[derive(Debug, Clone, Copy, ValueEnum)]
 pub enum MatrixPreset {
 	Diagonal,
@@ -338,7 +336,6 @@ pub enum MatrixPreset {
 	General,
 }
 /// Deterministic, seeded matrix fixtures, exported in the normal interchange format.
-#[cfg(feature = "hdf5")]
 #[derive(Debug, Clone, Args)]
 pub struct MatrixPresetArgs {
 	#[arg(long, value_enum)]
@@ -480,7 +477,6 @@ impl Cli {
 fn dispatch(command: Command, context: &mut Context<'_>) -> Result<Value> {
 	match command {
 		Command::Synthesize(args) => synthesis::run(&args, context, false),
-		#[cfg(feature = "hdf5")]
 		Command::MatrixPreset(args) => synthesis::matrix_preset(&args, context),
 		#[cfg(feature = "offline-synthesis")]
 		Command::OfflineSynthesize(args) => synthesis::run(&args, context, true),

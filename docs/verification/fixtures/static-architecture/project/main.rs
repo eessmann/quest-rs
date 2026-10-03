@@ -6,7 +6,7 @@ type AnyResult<T> = Result<T, Box<dyn std::error::Error>>;
 fn qsp() -> AnyResult<()> {
     use quest_polynomial::{Laurent, Limits, Polynomial};
     use quest_qsp::{Complex64, Policy, SynthesisAlgorithm, SynthesisBuilder};
-    header();
+    header()?;
     for degree in [256_i32, 1024] {
         let denominator = f64::from(degree) * 4.0;
         let coefficients = (0..=degree)
@@ -96,7 +96,7 @@ fn finite_source() -> AnyResult<quest_compile::QuantumRegion> {
 }
 fn compiler() -> AnyResult<()> {
     use quest_compile::{Constructed, Program};
-    header();
+    header()?;
     let constructed = construct()?;
     let plan = constructed.clone().verify()?.lower()?.plan()?;
     assert_eq!(plan.num_qubits(), 4);
@@ -199,7 +199,7 @@ fn native() -> AnyResult<()> {
     eprintln!(
         "native CPU width=10 operations=259 signed_matrix_profiles=2 alias_pairs=128 environment_prepared_admitted_bytes={admitted_bytes}; Rust allocator excludes native C++ allocations"
     );
-    header();
+    header()?;
     measure("native_shared_matrix_oracle_preparation", 128, || {
         let p = environment.prepare(black_box(plan.clone()))?;
         Ok(black_box(p.plan().num_qubits()))

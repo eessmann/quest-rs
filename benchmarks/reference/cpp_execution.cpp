@@ -1,4 +1,5 @@
 // Public-API execution reference from pinned quest-qsvt source, CPU/local only.
+#include "reference_reports.hpp"
 #include <algorithm>
 #include <array>
 #include <backend/quest_executor.hpp>
@@ -9,7 +10,6 @@
 #include <encoding/projected_unitary_encoding.hpp>
 #include <expected>
 #include <hadamard.hpp>
-#include <iomanip>
 #include <iostream>
 #include <optional>
 #include <standard_qsvt.hpp>
@@ -21,13 +21,13 @@ using Clock = std::chrono::steady_clock;
 using Complex = std::complex<double>;
 using qsvt_tools::backend::quest::QuESTExecutor;
 template <class T, class E>
-T require(std::expected<T, E> result, const char* stage) {
+T require(std::expected<T, E> result, const char *stage) {
   if (!result)
     throw std::runtime_error(stage);
   return std::move(*result);
 }
 template <class E>
-void require(std::expected<void, E> result, const char* stage) {
+void require(std::expected<void, E> result, const char *stage) {
   if (!result)
     throw std::runtime_error(stage);
 }
@@ -43,7 +43,7 @@ struct Register {
   explicit Register(int qubits)
       : value(createCustomQureg(qubits, 0, 0, 0, 0)) {}
   ~Register() { destroyQureg(value); }
-  Register(const Register&) = delete;
+  Register(const Register &) = delete;
 };
 auto fixture() {
   Eigen::MatrixXcd oracle(2, 2);
@@ -69,8 +69,8 @@ auto fixture() {
 // The scalar fixture's admitted input and output are single coordinate states.
 // Derive those coordinates from public layout metadata, not a guessed
 // convention.
-std::size_t coordinate(const qsvt_tools::LogicalSubspaceLayout& layout) {
-  const auto& basis = layout.isometry()->value();
+std::size_t coordinate(const qsvt_tools::LogicalSubspaceLayout &layout) {
+  const auto &basis = layout.isometry()->value();
   if (basis.cols() != 1)
     throw std::runtime_error("fixture is not scalar");
   std::size_t physical = 0;
@@ -105,7 +105,7 @@ struct Projection {
 double elapsed(Clock::time_point start) {
   return std::chrono::duration<double>(Clock::now() - start).count();
 }
-}  // namespace
+} // namespace
 int main() {
   try {
     Environment environment;
@@ -170,29 +170,24 @@ int main() {
       require(overlap.observe(), "timed Hadamard observation");
       hadamard += elapsed(start);
     }
-    std::cout
-        << std::setprecision(17)
-        << "{\"source_revision\":\"7fe7f740579b03c52a8cf48be6a31268b029c19f\","
-           "\"cpu_local\":true,\"repetitions\":"
-        << repetitions << ",\"response_real\":" << response.real()
-        << ",\"response_imag\":" << response.imag()
-        << ",\"retained_mass\":" << mass
-        << ",\"hadamard_real\":" << observation.overlap.real()
-        << ",\"hadamard_imag\":" << observation.overlap.imag()
-        << ",\"hadamard_total_success_probability\":"
-        << observation.total_success_probability
-        << ",\"hadamard_active_probability_absolute\":"
-        << observation.active_probability_absolute
-        << ",\"construction_seconds\":" << construction / repetitions
-        << ",\"combined_lowering_native_prepare_seconds\":"
-        << preparation / repetitions
-        << ",\"execution_with_coordinate_projections_seconds\":"
-        << execution / repetitions
-        << ",\"native_condition_seconds\":" << conditioning / repetitions
-        << ",\"hadamard_observation_seconds\":" << hadamard / repetitions
-        << "}\n";
+    ReferenceExecutionReport report{"7fe7f740579b03c52a8cf48be6a31268b029c19f",
+                                    true,
+                                    repetitions,
+                                    response.real(),
+                                    response.imag(),
+                                    mass,
+                                    observation.overlap.real(),
+                                    observation.overlap.imag(),
+                                    observation.total_success_probability,
+                                    observation.active_probability_absolute,
+                                    construction / repetitions,
+                                    preparation / repetitions,
+                                    execution / repetitions,
+                                    conditioning / repetitions,
+                                    hadamard / repetitions};
+    write_reference_report(std::cout, report);
     return 0;
-  } catch (const std::exception& e) {
+  } catch (const std::exception &e) {
     std::cerr << e.what() << '\n';
     return 1;
   }

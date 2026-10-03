@@ -6,11 +6,11 @@ Successful commands print a JSON report. Admission, IO, construction and native
 failures return an error and a nonzero exit status. Catalogue checks retain a
 result for every selected family; any failure makes the process exit nonzero.
 
-The default features are `native`, `hdf5`, and `certification`. Set `QUEST_ROOT`
+The default features are `native` and `certification`. Serial HDF5 is required for all builds. Set `QUEST_ROOT`
 to the installed QuEST package and `HDF5_DIR` to a serial HDF5 installation.
 The final executable embeds their runtime search paths through `quest-build`.
 A build with `--no-default-features` supports production synthesis and catalogue
-inspection without native QuEST, HDF5, or arbitrary precision. `offline-synthesis` is an explicit
+inspection without native QuEST or arbitrary precision. It still requires serial HDF5. `offline-synthesis` is an explicit
 additional feature; it is never selected after a production failure.
 
 ## Feature matrix
@@ -19,11 +19,10 @@ additional feature; it is never selected after a production failure.
 | --- | --- |
 | `--no-default-features` | Binary64 synthesis, catalogue list/check, traces |
 | `certification` | Independent arbitrary precision verification of frozen exports |
-| `hdf5` | Serial HDF5 interchange support |
-| `native` (includes `hdf5`) | Local embedded transforms, Hadamard overlap, physical solve |
+| `native` | Local embedded transforms, Hadamard overlap, physical solve |
 | `rayon` | Caller-owned catalogue and binary64 synthesis worker pool |
 | `mpi` (includes `native`) | Root-driven distributed embedded and overlap, without state gathering |
-| defaults | `native`, `hdf5`, `certification` |
+| defaults | `native`, `certification` |
 | `offline-synthesis` | Explicit arbitrary precision construction followed by export certification |
 
 ## Synthesis and catalogue
@@ -71,8 +70,12 @@ A basis-conversion error bound is reported separately; certification of the
 converted target does not silently certify the earlier conversion.
 `offline-synthesize` always independently certifies its final binary64 export.
 
-There are exactly 21 frozen catalogue families from C++ revision
-`568725f2bd488a03a4f98cdf92de924f17b2834a`. Selection requires the exact stored
+There are exactly 21 frozen catalogue families from the official
+[PennyLane inverse dataset](https://pennylane.ai/datasets/inverse). The unchanged
+HDF5 snapshot is embedded and decoded once per catalogue command. Loading
+requires a writable temporary directory; all HDF5 handles and temporary files
+are released before numerical work. Reports include the dataset source URL,
+SHA-256 and retrieval metadata in `source`, replacing the C++ `source_revision`. Selection requires the exact stored
 `--kappa` and binary64 `--epsilon` pair. No nearby family is substituted. Omit
 both selectors to list or check all 21. `check` actually constructs each target
 and optionally certifies it; an epsilon label is provenance, not a certificate.

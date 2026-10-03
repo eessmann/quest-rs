@@ -67,12 +67,41 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 	if max_difference != 0.0 {
 		return Err("prepare-once and prepare-per-run outputs differ".into());
 	}
-	println!(
-		"qubits,layers,gates,native_prepared_gates,repetitions,compilation_ns,preparation_ns,execution_total_ns,prepare_per_run_total_ns,modeled_plan_bytes,modeled_prepared_bytes,modeled_register_bytes,run_storage_cap_bytes,max_output_difference"
-	);
-	println!(
-		"{qubits},{layers},{},{native_prepared_gates},{repetitions},{compilation_ns},{preparation_ns},{execution_ns},{prepare_per_run_ns},{modeled_plan_bytes},{prepared_bytes},{register_bytes},{run_storage_cap},{max_difference}",
-		3 * qubits * layers
-	);
+	let mut output = csv::WriterBuilder::new()
+		.terminator(csv::Terminator::Any(b'\n'))
+		.from_writer(std::io::stdout().lock());
+	output.write_record([
+		"qubits",
+		"layers",
+		"gates",
+		"native_prepared_gates",
+		"repetitions",
+		"compilation_ns",
+		"preparation_ns",
+		"execution_total_ns",
+		"prepare_per_run_total_ns",
+		"modeled_plan_bytes",
+		"modeled_prepared_bytes",
+		"modeled_register_bytes",
+		"run_storage_cap_bytes",
+		"max_output_difference",
+	])?;
+	output.serialize((
+		qubits,
+		layers,
+		3 * qubits * layers,
+		native_prepared_gates,
+		repetitions,
+		compilation_ns,
+		preparation_ns,
+		execution_ns,
+		prepare_per_run_ns,
+		modeled_plan_bytes,
+		prepared_bytes,
+		register_bytes,
+		run_storage_cap,
+		max_difference.to_string(),
+	))?;
+	output.flush()?;
 	Ok(())
 }

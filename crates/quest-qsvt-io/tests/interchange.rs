@@ -125,6 +125,169 @@ fn frozen_execution_rejects_competing_matrix_and_angle_authorities() -> Result<(
 }
 
 #[gtest]
+fn interchange_rejects_duplicate_known_fields_before_payload_admission() {
+	for text in [
+		r#"{"coefficients":[0.2],"coefficients":[0.3]}"#,
+		r#"{"coefficients":[0.2],"basis":"Monomial","basis":"Chebyshev"}"#,
+		r#"{"coefficients":[0.2],"minimum_order":0,"minimum_order":1}"#,
+		r#"{"coefficients":[0.2],"parameters":[],"parameters":[]}"#,
+		r#"{"convention":"pyqsp-wx-symmetric","angles":[0.2],"angles":[0.3]}"#,
+		r#"{"convention":"pyqsp-wx-symmetric","convention":"pyqsp-wx-laurent","angles":[0.2]}"#,
+		r#"{"psi":[0.2],"psi":[0.3],"phi":[0.4]}"#,
+		r#"{"psi":[0.2],"phi":[0.3],"phi":[0.4]}"#,
+	] {
+		expect_true!(read_qsp_json(text, IoPolicy::default()).is_err(), "{text}");
+	}
+}
+
+#[gtest]
+fn interchange_rejects_competing_payload_families_and_orphan_angle_words() {
+	for text in [
+		r#"{"convention":"pyqsp-wx-symmetric","angles":[0.2],"coefficients":[0.3]}"#,
+		r#"{"convention":"pyqsp-wx-symmetric","angles":[0.2],"psi":[0.3],"phi":[0.4]}"#,
+		r#"{"coefficients":[0.2],"psi":[0.3],"phi":[0.4]}"#,
+		r#"{"coefficients":[0.2],"psi_words":[0],"phi_words":[0]}"#,
+		r#"{"psi_words":[0],"phi_words":[0]}"#,
+		r#"{"convention":"gqsp-matrix-upper-left-v1","controls":[[[1,0],[0,1]]],"coefficients":[0.2]}"#,
+	] {
+		expect_true!(read_qsp_json(text, IoPolicy::default()).is_err(), "{text}");
+	}
+}
+
+#[gtest]
+fn interchange_known_null_fields_cannot_hide_competing_payloads() {
+	for text in [
+		r#"{"convention":"pyqsp-wx-symmetric","angles":[0.2],"coefficients":null}"#,
+		r#"{"coefficients":[0.2],"psi_words":null,"phi_words":null}"#,
+		r#"{"coefficients":[0.2],"basis":null}"#,
+	] {
+		expect_true!(read_qsp_json(text, IoPolicy::default()).is_err(), "{text}");
+	}
+}
+
+#[gtest]
+fn interchange_rejects_overdeep_or_unrepresentable_unknown_metadata() {
+	let nested = format!(
+		"{{\"convention\":\"pyqsp-wx-symmetric\",\"angles\":[0.2],\"metadata\":{}0{}}}",
+		"[".repeat(130),
+		"]".repeat(130),
+	);
+	expect_true!(read_qsp_json(&nested, IoPolicy::default()).is_err());
+	expect_true!(
+		read_qsp_json(
+			r#"{"convention":"pyqsp-wx-symmetric","angles":[0.2],"metadata":1e999}"#,
+			IoPolicy::default(),
+		)
+		.is_err()
+	);
+}
+
+#[gtest]
+fn polynomial_metadata_defaults_parameters_and_support_survive_interchange() -> Result<()> {
+	for source in [
+		r#"{"coefficients":[0.2,[0.1,-0.0]],"metadata":{"label":"quoted \"name\"","tags":["μ",null]}}"#,
+		r#"{"coefficients":[0.2],"basis":"Laguerre","parameters":[0.5],"minimum_order":2,"label":"L"}"#,
+		r#"{"coefficients":[[0.2,0.1]],"basis":"Jacobi","parameters":[0.3,0.5]}"#,
+		r#"{"coefficients":[0.2,0.1],"basis":"Laurent","minimum_order":-1}"#,
+	] {
+		let input = read_qsp_json(source, IoPolicy::default())?;
+		let original: serde_json::Value = serde_json::from_str(source)?;
+		let restored: serde_json::Value = serde_json::from_str(&write_qsp_json(&input)?)?;
+		expect_that!(restored, eq(&original));
+	}
+	let QspInput::Polynomial(defaulted) =
+		read_qsp_json(r#"{"coefficients":[0.2,0.1]}"#, IoPolicy::default())?
+	else {
+		return fail!("wrong polynomial payload");
+	};
+	expect_that!(
+		defaulted.to_chebyshev()?.polynomial().coefficients(),
+		eq([Complex64::new(0.2, 0.0), Complex64::new(0.1, 0.0)].as_slice())
+	);
+	Ok(())
+}
+
+#[gtest]
+fn frozen_controls_remain_authority_when_source_angles_differ() -> Result<()> {
+	let source = r#"{"convention":"gqsp-matrix-upper-left-v1","controls":[[[1,0],[0,1]]],"psi":[0.2],"phi":[0.3]}"#;
+	let input = read_qsp_json(source, IoPolicy::default())?;
+	let frozen = write_qsp_execution_json(&input)?;
+	let QspInput::GeneralizedAngles(loaded) =
+		read_qsp_execution_json(&frozen, IoPolicy::default())?
+	else {
+		return fail!("source provenance lost");
+	};
+	expect_that!(loaded.psi(), eq([0.2].as_slice()));
+	expect_that!(loaded.phi(), eq([0.3].as_slice()));
+	expect_that!(
+		loaded.controls().matrices(),
+		eq([[
+			[Complex64::new(1.0, 0.0), Complex64::new(0.0, 0.0)],
+			[Complex64::new(0.0, 0.0), Complex64::new(1.0, 0.0)],
+		]]
+		.as_slice())
+	);
+	Ok(())
+}
+
+#[gtest]
+fn frozen_payload_duplicate_fields_are_rejected_for_both_readers() -> Result<()> {
+	let angles = QspInput::GeneralizedAngles(GeneralizedAngleInput::new(vec![0.2], vec![0.3])?);
+	let encoded = write_qsp_execution_json(&angles)?;
+	let value: serde_json::Value = serde_json::from_str(&encoded)?;
+	for key in ["control_words", "psi_words", "phi_words"] {
+		let component = value
+			.get(key)
+			.ok_or_else(|| std::io::Error::other("missing frozen field"))?;
+		let duplicate = format!(
+			"{{\"{key}\":{component},{}",
+			encoded.trim_start_matches('{')
+		);
+		expect_true!(
+			read_qsp_json(&duplicate, IoPolicy::default()).is_err(),
+			"{key}"
+		);
+		expect_true!(
+			read_qsp_execution_json(&duplicate, IoPolicy::default()).is_err(),
+			"{key}"
+		);
+	}
+	let matrices = r#"{"convention":"gqsp-matrix-upper-left-v1","controls":[[[1,0],[0,1]]],"controls":[[[1,0],[0,1]]]}"#;
+	expect_true!(read_qsp_json(matrices, IoPolicy::default()).is_err());
+	Ok(())
+}
+
+#[gtest]
+fn typed_interchange_retains_shape_support_and_count_admission() {
+	for source in [
+		r#"{"coefficients":[[0.2]]}"#,
+		r#"{"coefficients":[[0.2,0.3,0.4]]}"#,
+		r#"{"coefficients":[0.2],"minimum_order":-1}"#,
+		r#"{"coefficients":[0.2],"minimum_order":2147483648}"#,
+		r#"{"coefficients":[0.2],"basis":"Jacobi","parameters":[0.3]}"#,
+		r#"{"convention":"gqsp-matrix-upper-left-v1","controls":[[[1,0]]] }"#,
+		r#"{"convention":"gqsp-matrix-words-v1","control_words":[[[[4607182418800017408,0],[0,0]],[[0,0],[4607182418800017408,0]]]],"psi_words":[18442240474082181120],"phi_words":[0]}"#,
+	] {
+		expect_true!(
+			read_qsp_json(source, IoPolicy::default()).is_err(),
+			"{source}"
+		);
+	}
+	let policy = IoPolicy {
+		max_coefficients: 1,
+		..IoPolicy::default()
+	};
+	expect_true!(matches!(
+		read_qsp_json(r#"{"coefficients":[0.2,0.3]}"#, policy),
+		Err(quest_qsvt_io::Error::Budget(_))
+	));
+	expect_true!(matches!(
+		read_qsp_json(r#"{"coefficients":[0.2],"minimum_order":1}"#, policy),
+		Err(quest_qsvt_io::Error::Budget(_))
+	));
+}
+
+#[gtest]
 fn execution_matrix_words_preserve_subnormal_and_signed_zero_bits() -> Result<()> {
 	let tiny = f64::from_bits(1);
 	let controls = quest_qsp::ControlSequence::builder()

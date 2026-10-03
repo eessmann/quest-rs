@@ -50,15 +50,27 @@ fn report_reference(
 		.reference(vec![C::new(1.0, 0.0)])
 		.prepare()?;
 	let observed = overlap.run()?;
-	eprintln!(
-		"{{\"fixture\":\"complex_scalar_degree3\",\"amplitude\":[{},{}],\"mass\":{},\"overlap\":[{},{}],\"overlap_mass\":{}}}",
+	if [
 		amplitude.re,
 		amplitude.im,
 		mass,
 		observed.overlap().re,
 		observed.overlap().im,
-		observed.retained_mass()
-	);
+		observed.retained_mass(),
+	]
+	.iter()
+	.any(|value| !value.is_finite())
+	{
+		return Err("non-finite QSVT reference report value".into());
+	}
+	let report = serde_json::json!({
+		"fixture": "complex_scalar_degree3",
+		"amplitude": [amplitude.re, amplitude.im],
+		"mass": mass,
+		"overlap": [observed.overlap().re, observed.overlap().im],
+		"overlap_mass": observed.retained_mass(),
+	});
+	eprintln!("{}", serde_json::to_string(&report)?);
 	Ok(())
 }
 fn main() -> Result<(), Box<dyn std::error::Error>> {

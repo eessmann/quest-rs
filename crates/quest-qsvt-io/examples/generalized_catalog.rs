@@ -1,104 +1,51 @@
 //! Explicit generalized catalog acceptance. Requires the certification feature.
-//! Every original Chebyshev shard is converted with checked exact binary64 halves,
+//! Every original Chebyshev family is converted with checked exact binary64 halves,
 //! then synthesized through generalized controls and independently certified.
 use quest_polynomial::{Laurent, Limits, Polynomial};
 use quest_qsp::certification::{CertificationBuilder, CertificationPolicy};
 use quest_qsp::{Complex64, SynthesisBuilder};
+use quest_qsvt_io::{CatalogFamily, InverseCatalog, IoPolicy};
 use std::{
 	ops::{Add, Mul},
 	time::Instant,
 };
-#[derive(Clone, Copy)]
-struct Family {
-	name: &'static str,
-	bytes: &'static [u8],
+
+#[derive(serde::Serialize)]
+struct SuccessReport<'a> {
+	family: String,
+	mode: &'a str,
+	degree: Option<i32>,
+	status: &'static str,
+	completion_grid: usize,
+	response_upper: f64,
+	completion_upper: f64,
+	conversion_upper: f64,
+	reconstruction_upper: f64,
+	unitarity_upper: f64,
+	certification_attempts: usize,
+	conversion_seconds: f64,
+	admission_seconds: f64,
+	completion_seconds: f64,
+	synthesis_seconds: f64,
+	certification_seconds: f64,
+	total_seconds: f64,
 }
-const FAMILIES: &[Family] = &[
-	Family {
-		name: "coeffs_kappa_5_eps_0p001",
-		bytes: include_bytes!("../data/inverse/coeffs_kappa_5_eps_0p001.bin"),
-	},
-	Family {
-		name: "coeffs_kappa_5_eps_0p01",
-		bytes: include_bytes!("../data/inverse/coeffs_kappa_5_eps_0p01.bin"),
-	},
-	Family {
-		name: "coeffs_kappa_5_eps_0p1",
-		bytes: include_bytes!("../data/inverse/coeffs_kappa_5_eps_0p1.bin"),
-	},
-	Family {
-		name: "coeffs_kappa_50_eps_0p001",
-		bytes: include_bytes!("../data/inverse/coeffs_kappa_50_eps_0p001.bin"),
-	},
-	Family {
-		name: "coeffs_kappa_50_eps_0p01",
-		bytes: include_bytes!("../data/inverse/coeffs_kappa_50_eps_0p01.bin"),
-	},
-	Family {
-		name: "coeffs_kappa_50_eps_0p1",
-		bytes: include_bytes!("../data/inverse/coeffs_kappa_50_eps_0p1.bin"),
-	},
-	Family {
-		name: "coeffs_kappa_100_eps_0p001",
-		bytes: include_bytes!("../data/inverse/coeffs_kappa_100_eps_0p001.bin"),
-	},
-	Family {
-		name: "coeffs_kappa_100_eps_0p01",
-		bytes: include_bytes!("../data/inverse/coeffs_kappa_100_eps_0p01.bin"),
-	},
-	Family {
-		name: "coeffs_kappa_100_eps_0p1",
-		bytes: include_bytes!("../data/inverse/coeffs_kappa_100_eps_0p1.bin"),
-	},
-	Family {
-		name: "coeffs_kappa_250_eps_0p001",
-		bytes: include_bytes!("../data/inverse/coeffs_kappa_250_eps_0p001.bin"),
-	},
-	Family {
-		name: "coeffs_kappa_250_eps_0p01",
-		bytes: include_bytes!("../data/inverse/coeffs_kappa_250_eps_0p01.bin"),
-	},
-	Family {
-		name: "coeffs_kappa_250_eps_0p1",
-		bytes: include_bytes!("../data/inverse/coeffs_kappa_250_eps_0p1.bin"),
-	},
-	Family {
-		name: "coeffs_kappa_500_eps_0p001",
-		bytes: include_bytes!("../data/inverse/coeffs_kappa_500_eps_0p001.bin"),
-	},
-	Family {
-		name: "coeffs_kappa_500_eps_0p01",
-		bytes: include_bytes!("../data/inverse/coeffs_kappa_500_eps_0p01.bin"),
-	},
-	Family {
-		name: "coeffs_kappa_500_eps_0p1",
-		bytes: include_bytes!("../data/inverse/coeffs_kappa_500_eps_0p1.bin"),
-	},
-	Family {
-		name: "coeffs_kappa_1000_eps_0p001",
-		bytes: include_bytes!("../data/inverse/coeffs_kappa_1000_eps_0p001.bin"),
-	},
-	Family {
-		name: "coeffs_kappa_1000_eps_0p01",
-		bytes: include_bytes!("../data/inverse/coeffs_kappa_1000_eps_0p01.bin"),
-	},
-	Family {
-		name: "coeffs_kappa_1000_eps_0p1",
-		bytes: include_bytes!("../data/inverse/coeffs_kappa_1000_eps_0p1.bin"),
-	},
-	Family {
-		name: "coeffs_kappa_1500_eps_0p001",
-		bytes: include_bytes!("../data/inverse/coeffs_kappa_1500_eps_0p001.bin"),
-	},
-	Family {
-		name: "coeffs_kappa_1500_eps_0p01",
-		bytes: include_bytes!("../data/inverse/coeffs_kappa_1500_eps_0p01.bin"),
-	},
-	Family {
-		name: "coeffs_kappa_1500_eps_0p1",
-		bytes: include_bytes!("../data/inverse/coeffs_kappa_1500_eps_0p1.bin"),
-	},
-];
+
+#[derive(serde::Serialize)]
+struct FailureReport<'a> {
+	family: String,
+	mode: &'a str,
+	status: &'static str,
+	stage: &'a str,
+}
+
+fn family_name(family: &CatalogFamily) -> String {
+	format!(
+		"kappa_{}_epsilon_{}",
+		family.kappa(),
+		family.epsilon_label()
+	)
+}
 #[derive(Debug, thiserror::Error)]
 #[error("{stage}: {source}")]
 struct Failure {
@@ -113,15 +60,8 @@ impl Failure {
 		}
 	}
 }
-fn target(family: Family, complex: bool) -> Result<Polynomial<Laurent>, Failure> {
-	let (chunks, tail) = family.bytes.as_chunks::<8>();
-	if !tail.is_empty() || chunks.is_empty() {
-		return Err(Failure::new("source", "invalid binary64 shard"));
-	}
-	let source: Vec<_> = chunks
-		.iter()
-		.map(|bytes| f64::from_le_bytes(*bytes))
-		.collect();
+fn target(family: &CatalogFamily, complex: bool) -> Result<Polynomial<Laurent>, Failure> {
+	let source = family.coefficients();
 	let degree = source.iter().rposition(|value| *value != 0.0).unwrap_or(0);
 	let count = degree
 		.checked_add(1)
@@ -166,7 +106,7 @@ fn target(family: Family, complex: bool) -> Result<Polynomial<Laurent>, Failure>
 	Polynomial::new(Laurent::new(0), target, Limits::default())
 		.map_err(|error| Failure::new("source", error))
 }
-fn run(family: Family, complex: bool) -> Result<(), Failure> {
+fn run(family: &CatalogFamily, complex: bool) -> Result<(), Failure> {
 	let total = Instant::now();
 	let target = target(family, complex)?;
 	let converted = total.elapsed().as_secs_f64();
@@ -220,43 +160,84 @@ fn run(family: Family, complex: bool) -> Result<(), Failure> {
 	} else {
 		"real_canonical_family"
 	};
+	let response_upper = report.response().upper_f64();
+	let completion_upper = report.completion().upper_f64();
+	let conversion_upper = report.conversion().upper_f64();
+	let reconstruction_upper = report.reconstruction().upper_f64();
+	let unitarity_upper = report.unitarity().upper_f64();
+	if [
+		response_upper,
+		completion_upper,
+		conversion_upper,
+		reconstruction_upper,
+		unitarity_upper,
+	]
+	.iter()
+	.any(|value| !value.is_finite())
+	{
+		return Err(Failure::new(
+			"report",
+			"non-finite certification report bound",
+		));
+	}
+	let output = SuccessReport {
+		family: family_name(family),
+		mode,
+		degree: target.degree(),
+		status: "certified",
+		completion_grid: grid,
+		response_upper,
+		completion_upper,
+		conversion_upper,
+		reconstruction_upper,
+		unitarity_upper,
+		certification_attempts: report.attempts().len(),
+		conversion_seconds: converted,
+		admission_seconds: admission,
+		completion_seconds: completion,
+		synthesis_seconds: synthesis,
+		certification_seconds: certification,
+		total_seconds: total.elapsed().as_secs_f64(),
+	};
 	println!(
-		"{{\"family\":\"{}\",\"mode\":\"{mode}\",\"degree\":{},\"status\":\"certified\",\"completion_grid\":{grid},\"response_upper\":{:.17e},\"completion_upper\":{:.17e},\"conversion_upper\":{:.17e},\"reconstruction_upper\":{:.17e},\"unitarity_upper\":{:.17e},\"certification_attempts\":{},\"conversion_seconds\":{converted},\"admission_seconds\":{admission},\"completion_seconds\":{completion},\"synthesis_seconds\":{synthesis},\"certification_seconds\":{certification},\"total_seconds\":{}}}",
-		family.name,
-		target
-			.degree()
-			.map_or_else(|| "null".to_owned(), |n| n.to_string()),
-		report.response().upper_f64(),
-		report.completion().upper_f64(),
-		report.conversion().upper_f64(),
-		report.reconstruction().upper_f64(),
-		report.unitarity().upper_f64(),
-		report.attempts().len(),
-		total.elapsed().as_secs_f64()
+		"{}",
+		serde_json::to_string(&output).map_err(|error| Failure::new("report", error))?
 	);
 	Ok(())
 }
 fn main() -> Result<(), Box<dyn std::error::Error>> {
 	let mut failures = 0_usize;
-	for &family in FAMILIES {
+	let catalog = InverseCatalog::bundled(IoPolicy::default())?;
+	for family in catalog.families() {
 		if let Err(error) = run(family, false) {
-			eprintln!("{}: {error}", family.name);
+			eprintln!("{}: {error}", family_name(family));
 			println!(
-				"{{\"family\":\"{}\",\"mode\":\"real_canonical_family\",\"status\":\"failed\",\"stage\":\"{}\"}}",
-				family.name, error.stage
+				"{}",
+				serde_json::to_string(&FailureReport {
+					family: family_name(family),
+					mode: "real_canonical_family",
+					status: "failed",
+					stage: error.stage,
+				})?
 			);
 			failures = failures.saturating_add(1);
 		}
 	}
-	let largest = FAMILIES
+	let largest = catalog
+		.families()
 		.iter()
-		.max_by_key(|family| family.bytes.len())
+		.max_by_key(|family| family.coefficients().len())
 		.ok_or("empty catalog")?;
-	if let Err(error) = run(*largest, true) {
-		eprintln!("complex {}: {error}", largest.name);
+	if let Err(error) = run(largest, true) {
+		eprintln!("complex {}: {error}", family_name(largest));
 		println!(
-			"{{\"family\":\"{}\",\"mode\":\"complex_rotation_binary64\",\"status\":\"failed\",\"stage\":\"{}\"}}",
-			largest.name, error.stage
+			"{}",
+			serde_json::to_string(&FailureReport {
+				family: family_name(largest),
+				mode: "complex_rotation_binary64",
+				status: "failed",
+				stage: error.stage,
+			})?
 		);
 		failures = failures.saturating_add(1);
 	}
@@ -264,4 +245,65 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 		return Err(format!("{failures} generalized catalog cases failed without fallback").into());
 	}
 	Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+	use super::{FailureReport, SuccessReport};
+	use googletest::prelude::*;
+
+	#[gtest]
+	fn failure_report_preserves_escaped_labels() -> googletest::Result<()> {
+		let report = FailureReport {
+			family: "family \"quoted\"\n😀".to_owned(),
+			mode: "real_canonical_family",
+			status: "failed",
+			stage: "stage\nwith\\escape",
+		};
+		let value: serde_json::Value =
+			serde_json::from_str(&serde_json::to_string(&report).or_fail()?).or_fail()?;
+		expect_that!(
+			value.get("family").and_then(serde_json::Value::as_str),
+			some(eq(report.family.as_str()))
+		);
+		verify_that!(
+			value.get("stage").and_then(serde_json::Value::as_str),
+			some(eq(report.stage))
+		)
+	}
+
+	#[gtest]
+	fn success_report_retains_numeric_bounds_and_nullable_degree() -> googletest::Result<()> {
+		let bound = f64::from_bits(0x3cb0_0000_0000_0001);
+		let report = SuccessReport {
+			family: "family".to_owned(),
+			mode: "real_canonical_family",
+			degree: None,
+			status: "certified",
+			completion_grid: 8,
+			response_upper: bound,
+			completion_upper: bound,
+			conversion_upper: bound,
+			reconstruction_upper: bound,
+			unitarity_upper: bound,
+			certification_attempts: 1,
+			conversion_seconds: 0.0,
+			admission_seconds: 0.0,
+			completion_seconds: 0.0,
+			synthesis_seconds: 0.0,
+			certification_seconds: 0.0,
+			total_seconds: 0.0,
+		};
+		let value: serde_json::Value =
+			serde_json::from_str(&serde_json::to_string(&report).or_fail()?).or_fail()?;
+		expect_that!(value.get("degree"), some(eq(&serde_json::Value::Null)));
+		verify_that!(
+			value
+				.get("response_upper")
+				.and_then(serde_json::Value::as_f64)
+				.or_fail()?
+				.to_bits(),
+			eq(bound.to_bits())
+		)
+	}
 }

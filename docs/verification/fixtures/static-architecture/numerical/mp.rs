@@ -5,7 +5,7 @@ use quest_polynomial::{
 };
 use std::hint::black_box;
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    header();
+    header()?;
     measure("mp256_rational_third_degree0_uniform1e-50", 10, || {
         let precision = Precision {
             bits: 256,

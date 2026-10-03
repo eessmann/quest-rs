@@ -9,6 +9,21 @@ import pathlib
 import platform
 import subprocess
 import shutil
+import tomli_w
+
+
+def render_manifest(repository, name, dependencies):
+    entries = {alias: {"package": "quest-rs" if alias == "quest" else crate,
+                       "path": str(repository / "crates" / crate)}
+               for alias, crate in dependencies.items()}
+    entries["faer"] = {"version": "=0.24.4", "default-features": False, "features": ["std", "linalg"]}
+    entries["csv"] = "1.4"
+    return tomli_w.dumps({
+        "package": {"name": name, "version": "0.0.0", "edition": "2024"},
+        "workspace": {}, "dependencies": entries,
+        "build-dependencies": {"quest-build": {"path": str(repository / "crates/quest-build")}},
+        "profile": {"release": {"lto": "thin"}}, "bin": [{"name": name, "path": "main.rs"}],
+    })
 
 
 def repository_inputs(repository):
@@ -62,16 +77,11 @@ def main():
         package = output / 'packages' / label
         package.mkdir(parents=True)
         name = 'project-performance-' + label
-        manifest = '[package]\nname=' + json.dumps(name) + '\nversion="0.0.0"\nedition="2024"\n[workspace]\n[dependencies]\n'
-        for alias, crate in dependencies.items():
+        for crate in dependencies.values():
             path = repository / 'crates' / crate
             if not (path / 'Cargo.toml').is_file():
                 parser.error(f'missing crate manifest: {path}')
-            native_name = 'quest-rs' if alias == 'quest' else crate
-            manifest += alias + ' = { package=' + json.dumps(native_name) + ', path=' + json.dumps(str(path)) + ' }\n'
-        manifest += 'faer = { version="=0.24.4", default-features=false, features=["std","linalg"] }\n'
-        manifest += '[build-dependencies]\nquest-build = { path=' + json.dumps(str(repository / 'crates/quest-build')) + ' }\n'
-        manifest += '[profile.release]\nlto="thin"\n[[bin]]\nname=' + json.dumps(name) + '\npath=' + json.dumps('main.rs') + '\n'
+        manifest = render_manifest(repository, name, dependencies)
         (package / 'main.rs').write_bytes((fixture / 'main.rs').read_bytes())
         (package / 'Cargo.toml').write_text(manifest)
         (package / 'Cargo.lock').write_bytes((repository / 'Cargo.lock').read_bytes())

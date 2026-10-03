@@ -819,14 +819,29 @@ fn bounded_json(value: &impl Serialize, limit: usize) -> Result<String> {
 	}
 	impl std::io::Write for Writer {
 		fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
-			if self
+			let Some(length) = self
 				.bytes
 				.len()
 				.checked_add(bytes.len())
-				.is_none_or(|n| n > self.limit)
-			{
+				.filter(|n| *n <= self.limit)
+			else {
 				self.exceeded = true;
 				return Err(std::io::Error::other("artifact byte limit"));
+			};
+			if length > self.bytes.capacity() {
+				let capacity = self
+					.bytes
+					.capacity()
+					.saturating_mul(2)
+					.max(64)
+					.max(length)
+					.min(self.limit);
+				self.bytes
+					.try_reserve_exact(capacity.saturating_sub(self.bytes.len()))
+					.map_err(|error| {
+						self.exceeded = true;
+						std::io::Error::other(error)
+					})?;
 			}
 			self.bytes.extend_from_slice(bytes);
 			Ok(bytes.len())

@@ -44,18 +44,37 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 		result.sequence().operations.len(),
 		options.limits,
 	)?;
-	println!(
-		"digits,epsilon_bits,gates,t_count,synthesis_and_acceptance_ns,independent_replay_ns,logical_work,working_precision_bits,grid_exponent,modeled_matrix_output_reservation_bytes,request_max_bytes,seed"
-	);
-	println!(
-		"{digits},{},{},{t_count},{synthesis_and_acceptance_ns},{independent_replay_ns},{},{},{},{matrix_output_reservation},{},{}",
+	let mut output = csv::WriterBuilder::new()
+		.terminator(csv::Terminator::Any(b'\n'))
+		.from_writer(std::io::stdout().lock());
+	output.write_record([
+		"digits",
+		"epsilon_bits",
+		"gates",
+		"t_count",
+		"synthesis_and_acceptance_ns",
+		"independent_replay_ns",
+		"logical_work",
+		"working_precision_bits",
+		"grid_exponent",
+		"modeled_matrix_output_reservation_bytes",
+		"request_max_bytes",
+		"seed",
+	])?;
+	output.serialize((
+		digits,
 		epsilon.to_bits(),
 		result.sequence().operations.len(),
+		t_count,
+		synthesis_and_acceptance_ns,
+		independent_replay_ns,
 		result.work(),
 		result.working_precision_bits(),
 		result.grid_exponent(),
+		matrix_output_reservation,
 		options.limits.bytes,
-		result.seed()
-	);
+		result.seed(),
+	))?;
+	output.flush()?;
 	Ok(())
 }

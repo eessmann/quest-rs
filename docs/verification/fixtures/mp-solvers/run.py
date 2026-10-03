@@ -8,6 +8,20 @@ from pathlib import Path
 import platform
 import shutil
 import subprocess
+import tomli_w
+
+
+def render_manifest(root):
+    dependencies = {"csv": "1.4"}
+    for name in ["quest-numerics", "quest-polynomial", "quest-qsp", "quest-math", "quest-synthesis"]:
+        dependency = {"path": str(root / "crates" / name)}
+        if name == "quest-qsp":
+            dependency["features"] = ["offline-synthesis"]
+        dependencies[name] = dependency
+    return tomli_w.dumps({
+        "package": {"name": "mp-solvers", "version": "0.0.0", "edition": "2024"},
+        "workspace": {}, "dependencies": dependencies, "profile": {"release": {"lto": "thin"}},
+    })
 
 
 def sha(path):
@@ -51,12 +65,7 @@ def main():
         (package / "src").mkdir(parents=True)
         shutil.copyfile(fixture / "main.rs", package / "src/main.rs")
         shutil.copyfile(fixture / "allocator.rs", package / "src/allocator.rs")
-        manifest = '[package]\nname="mp-solvers"\nversion="0.0.0"\nedition="2024"\n[workspace]\n[dependencies]\n'
-        for name in ["quest-numerics", "quest-polynomial", "quest-qsp", "quest-math", "quest-synthesis"]:
-            features = ', features=["offline-synthesis"]' if name == "quest-qsp" else ""
-            manifest += name + "={path=" + json.dumps(str(root / "crates" / name)) + features + "}\n"
-        manifest += '[profile.release]\nlto="thin"\n'
-        (package / "Cargo.toml").write_text(manifest)
+        (package / "Cargo.toml").write_text(render_manifest(root))
         shutil.copyfile(root / "Cargo.lock", package / "Cargo.lock")
         shutil.copyfile(root / "Cargo.lock", receipts / (label + "-input.lock"))
         env["CARGO_TARGET_DIR"] = str(output / "build" / label)

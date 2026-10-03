@@ -674,10 +674,14 @@ pub fn solve(args: &SolveArgs, context: &mut Context<'_>) -> Result<Value> {
 	let (frozen, input_report) = crate::synthesis::freeze_input(&args.transform, context)?;
 	finish_solve(args, context, input, frozen, input_report)
 }
-pub fn catalog_solve(args: &crate::CatalogSolveArgs, context: &mut Context<'_>) -> Result<Value> {
-	let family = quest_qsvt_io::find_catalog_family(args.kappa, args.epsilon).ok_or(
-		Error::Input("no exact catalogue family matches kappa and epsilon"),
-	)?;
+pub fn catalog_solve(
+	catalog: &quest_qsvt_io::InverseCatalog,
+	args: &crate::CatalogSolveArgs,
+	context: &mut Context<'_>,
+) -> Result<Value> {
+	let family = catalog.find(args.kappa, args.epsilon).ok_or(Error::Input(
+		"no exact catalogue family matches kappa and epsilon",
+	))?;
 	let solve = SolveArgs {
 		matrix: args.matrix.clone(),
 		rhs: args.rhs.clone(),
@@ -695,8 +699,14 @@ pub fn catalog_solve(args: &crate::CatalogSolveArgs, context: &mut Context<'_>) 
 		},
 	};
 	let input = read_solve(&solve, context)?;
-	let (frozen, report, _) =
-		crate::synthesis::freeze_catalog(args, input.sigma_max, input.sigma_min, context)?;
+	let (frozen, report, _) = crate::synthesis::freeze_catalog(
+		family,
+		catalog.source(),
+		args,
+		input.sigma_max,
+		input.sigma_min,
+		context,
+	)?;
 	finish_solve(&solve, context, input, frozen, report)
 }
 fn finish_solve(

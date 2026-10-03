@@ -153,6 +153,19 @@ fn catalog_lists_exact_twenty_one_families_and_rejects_nearby_selection() -> goo
 	let report = Cli::try_parse_from(["qsvt", "catalog", "list"])?.run()?;
 	expect_eq!(
 		report
+			.pointer("/families/0/source/dataset")
+			.and_then(serde_json::Value::as_str),
+		Some("inverse")
+	);
+	expect_eq!(
+		report
+			.pointer("/families/0/source/sha256")
+			.and_then(serde_json::Value::as_str),
+		Some("dccb518a24395d73af9ab701a922431f4600f553e904cc57507b49863a6d30a3")
+	);
+	expect_true!(report.pointer("/families/0/source_revision").is_none());
+	expect_eq!(
+		report
 			.pointer("/families")
 			.unwrap_or(&serde_json::Value::Null)
 			.as_array()

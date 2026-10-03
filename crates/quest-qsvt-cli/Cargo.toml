@@ -20,7 +20,7 @@ quest-numerics = { workspace = true, features = ["trace-json"] }
 quest-compile.workspace = true
 faer = { workspace = true, default-features = false, features = ["std", "linalg"] }
 quest = { workspace = true, features = ["qsvt"], optional = true }
-hdf5-metno = { workspace = true, features = ["complex"], optional = true }
+hdf5-metno = { workspace = true, features = ["complex"] }
 rayon = { workspace = true, optional = true }
 
 [dev-dependencies]
@@ -34,9 +34,8 @@ workspace = true
 quest-build.workspace = true
 
 [features]
-default = ["native", "hdf5", "certification"]
-native = ["dep:quest", "hdf5"]
-hdf5 = ["quest-qsvt-io/hdf5", "dep:hdf5-metno"]
+default = ["native", "certification"]
+native = ["dep:quest"]
 certification = ["quest-qsvt/certification", "quest-qsp/artifact", "quest-qsvt-io/certification"]
 offline-synthesis = ["certification", "quest-qsp/offline-synthesis", "quest-qsvt-io/offline-synthesis"]
 rayon = ["dep:rayon", "quest-qsp/rayon", "quest-numerics/rayon"]

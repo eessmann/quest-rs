@@ -7,9 +7,8 @@ use quest_qsp::{
 	AdmittedTarget, CompletedPolynomial, FrozenCandidate, Policy, RealParityWx, SynthesisAlgorithm,
 	SynthesisBuilder, UnitCircleResponse,
 };
-use quest_qsvt_io::{CatalogFamily, IoPolicy, QspInput};
+use quest_qsvt_io::{CatalogFamily, CatalogSource, InverseCatalog, IoPolicy, QspInput};
 use serde_json::{Value, json};
-#[cfg(feature = "hdf5")]
 use std::ops::{Add, Div, Mul, Sub};
 use std::time::Instant;
 
@@ -322,26 +321,28 @@ pub fn run(args: &SynthesisArgs, context: &mut Context<'_>, offline: bool) -> Re
 	)?;
 	Ok(report)
 }
-fn selected(selection: &FamilySelection) -> Result<Vec<&'static CatalogFamily>> {
+fn selected<'a>(
+	catalog: &'a InverseCatalog,
+	selection: &FamilySelection,
+) -> Result<Vec<&'a CatalogFamily>> {
 	match (selection.kappa, selection.epsilon) {
-		(None, None) => Ok(quest_qsvt_io::catalog_families().iter().collect()),
-		(Some(kappa), Some(epsilon)) => Ok(vec![
-			quest_qsvt_io::find_catalog_family(kappa, epsilon).ok_or(Error::Input(
-				"no exact catalogue family matches kappa and epsilon",
-			))?,
-		]),
+		(None, None) => Ok(catalog.families().iter().collect()),
+		(Some(kappa), Some(epsilon)) => Ok(vec![catalog.find(kappa, epsilon).ok_or(
+			Error::Input("no exact catalogue family matches kappa and epsilon"),
+		)?]),
 		_ => Err(Error::Input("kappa and epsilon must be supplied together")),
 	}
 }
-fn family_report(family: &CatalogFamily) -> Value {
+fn family_report(family: &CatalogFamily, source: &CatalogSource) -> Value {
 	json!({"kappa":family.kappa(), "epsilon_label":family.epsilon_label(), "degree":family.degree(),
-        "reciprocal_scale":family.reciprocal_scale(), "source_revision":family.source_revision(),
+        "reciprocal_scale":family.reciprocal_scale(), "source":source,
         "label_is_certificate":false})
 }
 pub fn catalog(command: CatalogCommand, context: &mut Context<'_>) -> Result<Value> {
+	let catalog = InverseCatalog::bundled(IoPolicy::default())?;
 	match command {
 		CatalogCommand::List(selection) => Ok(
-			json!({"families":selected(&selection)?.into_iter().map(family_report).collect::<Vec<_>>() }),
+			json!({"families":selected(&catalog, &selection)?.into_iter().map(|family| family_report(family, catalog.source())).collect::<Vec<_>>() }),
 		),
 		CatalogCommand::Check {
 			family,
@@ -351,16 +352,17 @@ pub fn catalog(command: CatalogCommand, context: &mut Context<'_>) -> Result<Val
 		} => {
 			policy(tolerance, algorithm.solver())?;
 			check_families(
-				&selected(&family)?,
+				&selected(&catalog, &family)?,
+				catalog.source(),
 				requested,
 				tolerance,
 				algorithm,
 				context,
 			)
 		}
-		CatalogCommand::Synthesize(args) => catalog_synthesize(&args, context),
+		CatalogCommand::Synthesize(args) => catalog_synthesize(&catalog, &args, context),
 		#[cfg(feature = "native")]
-		CatalogCommand::Solve(args) => crate::execution::catalog_solve(&args, context),
+		CatalogCommand::Solve(args) => crate::execution::catalog_solve(&catalog, &args, context),
 	}
 }
 struct FamilyJob {
@@ -370,6 +372,7 @@ struct FamilyJob {
 }
 fn family_job(
 	family: &CatalogFamily,
+	source: &CatalogSource,
 	requested: bool,
 	tolerance: f64,
 	algorithm: crate::Algorithm,
@@ -386,7 +389,7 @@ fn family_job(
 		#[cfg(feature = "rayon")]
 		pool: None,
 	};
-	let mut report = family_report(family);
+	let mut report = family_report(family, source);
 	crate::set(&mut report, "algorithm", json!(algorithm.name()))?;
 	let result = (|| {
 		let polynomial = family.polynomial(IoPolicy::default())?;
@@ -422,6 +425,7 @@ fn family_job(
 }
 fn check_families(
 	families: &[&CatalogFamily],
+	source: &CatalogSource,
 	requested: bool,
 	tolerance: f64,
 	algorithm: crate::Algorithm,
@@ -429,7 +433,9 @@ fn check_families(
 ) -> Result<Value> {
 	use quest_numerics::observer::Observer;
 	let clock = context.clock;
-	let run = |family: &&CatalogFamily| family_job(family, requested, tolerance, algorithm, clock);
+	let run = |family: &&CatalogFamily| {
+		family_job(family, source, requested, tolerance, algorithm, clock)
+	};
 	#[cfg(feature = "rayon")]
 	let jobs: Vec<_> = context.pool.map_or_else(
 		|| families.iter().map(run).collect(),
@@ -565,11 +571,8 @@ mod tests {
 	use googletest::prelude::*;
 	#[gtest]
 	fn catalogue_pool_preserves_family_order_and_failure_order() -> googletest::Result<()> {
-		let families: Vec<_> = quest_qsvt_io::catalog_families()
-			.iter()
-			.take(3)
-			.rev()
-			.collect();
+		let catalog = InverseCatalog::bundled(IoPolicy::default())?;
+		let families: Vec<_> = catalog.families().iter().take(3).rev().collect();
 		let pool = rayon::ThreadPoolBuilder::new().num_threads(3).build()?;
 		let clock = quest_numerics::observer::MonotonicClock::new();
 		for tolerance in [1e-11, 1e-18] {
@@ -585,6 +588,7 @@ mod tests {
 				};
 				let mut report = check_families(
 					&families,
+					catalog.source(),
 					false,
 					tolerance,
 					crate::Algorithm::default(),
@@ -696,12 +700,13 @@ pub fn freeze_input(
 	Ok((candidate.into_execution()?, report))
 }
 
-fn exact_family(kappa: u32, epsilon: f64) -> Result<&'static CatalogFamily> {
-	quest_qsvt_io::find_catalog_family(kappa, epsilon).ok_or(Error::Input(
+fn exact_family(catalog: &InverseCatalog, kappa: u32, epsilon: f64) -> Result<&CatalogFamily> {
+	catalog.find(kappa, epsilon).ok_or(Error::Input(
 		"no exact catalogue family matches kappa and epsilon",
 	))
 }
 fn catalog_synthesize(
+	catalog: &InverseCatalog,
 	args: &crate::CatalogSynthesisArgs,
 	context: &mut Context<'_>,
 ) -> Result<Value> {
@@ -710,7 +715,7 @@ fn catalog_synthesize(
 			"--certify requires --export compiled to retain evidence",
 		));
 	}
-	let family = exact_family(args.kappa, args.epsilon)?;
+	let family = exact_family(catalog, args.kappa, args.epsilon)?;
 	let (candidate, mut report) = catalog_candidate(
 		family,
 		args.tolerance,
@@ -718,7 +723,11 @@ fn catalog_synthesize(
 		args.certify,
 		context,
 	)?;
-	crate::set(&mut report, "catalogue", family_report(family))?;
+	crate::set(
+		&mut report,
+		"catalogue",
+		family_report(family, catalog.source()),
+	)?;
 	context.measure("write", Stage::Construction, || {
 		std::fs::write(&args.output, candidate.export(args.export)?)?;
 		Ok(())
@@ -740,12 +749,13 @@ fn catalog_candidate(
 }
 #[cfg(feature = "native")]
 pub fn freeze_catalog(
+	family: &CatalogFamily,
+	source: &CatalogSource,
 	args: &crate::CatalogSolveArgs,
 	sigma_max: f64,
 	sigma_min: f64,
 	context: &mut Context<'_>,
 ) -> Result<(QspInput, Value, f64)> {
-	let family = exact_family(args.kappa, args.epsilon)?;
 	// Compare in normalized coordinates: multiplication by sigma_max could overflow.
 	if sigma_min / sigma_max < 1.0 / f64::from(family.kappa()) {
 		return Err(Error::Input(
@@ -759,14 +769,13 @@ pub fn freeze_catalog(
 		args.certify,
 		context,
 	)?;
-	crate::set(&mut report, "catalogue", family_report(family))?;
+	crate::set(&mut report, "catalogue", family_report(family, source))?;
 	Ok((
 		candidate.into_execution()?,
 		report,
 		family.reciprocal_scale(),
 	))
 }
-#[cfg(feature = "hdf5")]
 pub fn matrix_preset(args: &crate::MatrixPresetArgs, context: &mut Context<'_>) -> Result<Value> {
 	use crate::MatrixPreset;
 	use num_complex::Complex64 as C;
@@ -859,7 +868,6 @@ pub fn matrix_preset(args: &crate::MatrixPresetArgs, context: &mut Context<'_>) 
 		json!({"preset":format!("{:?}",args.preset),"rows":args.rows,"cols":args.cols,"seed":args.seed,"scale":args.scale,"generator":"splitmix64-v1"}),
 	)
 }
-#[cfg(feature = "hdf5")]
 fn preset_sample(state: &mut u64) -> f64 {
 	// SplitMix64; map the leading 53 bits exactly to [0,1).
 	*state = state.wrapping_add(0x9e37_79b9_7f4a_7c15);

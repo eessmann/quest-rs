@@ -3,7 +3,7 @@ use quest_numerics::arithmetic::{Backend, ExactConstant, F64Backend, First, Inte
 use quest_polynomial::{Accuracy, ExactDomain, GenericFunction, Interval, RemezRequest};
 use std::hint::black_box;
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    header();
+    header()?;
     let function = black_box(quest_polynomial::function!(|x| (x * x + 1.0).ln()));
     measure("canonical_construct", 10_000, || {
         black_box(quest_polynomial::function!(|x| (x * x + 1.0).ln()));

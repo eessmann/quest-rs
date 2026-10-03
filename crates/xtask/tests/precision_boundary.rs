@@ -51,8 +51,15 @@ fn numerical_arithmetic_and_native_execution_keep_precision_boundaries() -> Resu
 #[gtest]
 fn packaged_high_degree_qsp_fixture_matches_the_canonical_catalog() -> Result<()> {
 	let root = Path::new(env!("CARGO_MANIFEST_DIR"));
-	let canonical =
-		std::fs::read(root.join("../quest-qsvt-io/data/inverse/coeffs_kappa_1500_eps_0p001.bin"))?;
+	let catalog = quest_qsvt_io::InverseCatalog::bundled(quest_qsvt_io::IoPolicy::default())?;
+	let family = catalog
+		.find(1500, 0.001)
+		.ok_or_else(|| std::io::Error::other("missing catalog fixture"))?;
+	let canonical: Vec<u8> = family
+		.coefficients()
+		.iter()
+		.flat_map(|value| value.to_le_bytes())
+		.collect();
 	let packaged = std::fs::read(root.join("../quest-qsp/tests/data/inverse-degree-8105.bin"))?;
 	expect_eq!(packaged, canonical);
 	Ok(())

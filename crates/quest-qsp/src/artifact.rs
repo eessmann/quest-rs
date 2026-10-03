@@ -1,5 +1,6 @@
 //! Versioned exact-bit compiled artifacts. Historical receipts are untrusted data;
 //! only [`load_certified`] constructs fresh independent accuracy evidence.
+mod json;
 use crate::certification::{
 	CertificationBuilder, CertificationError, CertificationPolicy, Certified, ConvolutionMethod,
 };
@@ -8,6 +9,7 @@ use crate::{
 	SynthesisAlgorithm, SynthesisPrecision, UnitCircleResponse,
 };
 use serde::{Deserialize, Serialize};
+#[cfg(test)]
 use sha2::{Digest, Sha256};
 use std::{marker::PhantomData, sync::Arc};
 
@@ -293,16 +295,8 @@ fn encode<M: ArtifactMode>(
 		contractivity_upper: candidate.admitted.norm_upper.to_bits(),
 		historical_receipt: receipt,
 	};
-	let canonical = serde_json::to_vec(&payload)?;
-	if canonical.len() > limits.max_bytes {
-		return Err(ArtifactError::Budget("encoded payload"));
-	}
-	let sha256 = Sha256::digest(&canonical).into();
-	let output = serde_json::to_vec(&Envelope { payload, sha256 })?;
-	if output.len() > limits.max_bytes {
-		return Err(ArtifactError::Budget("encoded envelope"));
-	}
-	Ok(output)
+	let sha256 = json::digest(&payload, limits.max_bytes)?;
+	json::bytes(&Envelope { payload, sha256 }, limits.max_bytes)
 }
 /// Export complete frozen data as versioned JSON with exact IEEE bits and SHA256.
 /// The digest detects accidental changes; it does not authenticate provenance.
@@ -619,7 +613,7 @@ pub fn load_compiled(bytes: &[u8], policy: LoadPolicy) -> ArtifactResult<LoadedC
 	if let Some(receipt) = &p.historical_receipt {
 		validate_receipt(receipt)?;
 	}
-	let hash: [u8; 32] = Sha256::digest(serde_json::to_vec(&p)?).into();
+	let hash = json::digest(&p, policy.storage.max_bytes)?;
 	if hash != envelope.sha256 {
 		return Err(ArtifactError::Invalid("payload SHA256 mismatch"));
 	}

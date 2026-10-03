@@ -1,7 +1,7 @@
 use googletest::prelude::*;
 use num_complex::Complex64 as C;
 use quest_qsp::SynthesisBuilder;
-use quest_qsvt_io::{IoPolicy, catalog_families};
+use quest_qsvt_io::{InverseCatalog, IoPolicy};
 use std::ops::{Add, Mul, Sub};
 
 fn matrix(phases: &[f64], x: f64) -> [[C; 2]; 2] {
@@ -34,8 +34,10 @@ fn canonical_full_phase_matches_pinned_cpp_through_degree_8105() -> Result<()> {
 		(1581, include_bytes!("data/cpp-phases-k250-e0p001.bin")),
 		(8105, include_bytes!("data/cpp-phases-k1500-e0p001.bin")),
 	];
+	let catalog = InverseCatalog::bundled(IoPolicy::default())?;
 	for (degree, bytes) in fixtures {
-		let family = catalog_families()
+		let family = catalog
+			.families()
 			.iter()
 			.find(|f| f.degree() == degree)
 			.ok_or_else(|| std::io::Error::other("missing reference catalog family"))?;

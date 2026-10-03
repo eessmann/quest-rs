@@ -5,8 +5,6 @@ fn main() -> Result<(), quest_build::BuildError> {
 		native.emit_native_capability_cfg();
 		native.emit_runtime_paths()?;
 	}
-	if std::env::var_os("CARGO_FEATURE_HDF5").is_some() {
-		quest_build::emit_serial_hdf5_runtime_paths()?;
-	}
+	quest_build::emit_serial_hdf5_runtime_paths()?;
 	Ok(())
 }

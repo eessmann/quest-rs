@@ -1,0 +1,2 @@
+# Active measurement launchers use a TOML serializer for scratch Cargo manifests.
+tomli-w>=1.2,<2

@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "dataset": "inverse",
+  "source_page": "https://pennylane.ai/datasets/inverse",
+  "download_url": "https://cloud.pennylane.ai/datasets/v2/download/inverse",
+  "resolved_url": "https://datasets.cloud.pennylane.ai/datasets/h5/phaseangles/inverse/inverse.h5",
+  "retrieved_on": "2026-10-03",
+  "file": "inverse.h5",
+  "size_bytes": 970233,
+  "sha256": "dccb518a24395d73af9ab701a922431f4600f553e904cc57507b49863a6d30a3",
+  "coefficient_path": "/poly/{epsilon}/{kappa}",
+  "basis": "Chebyshev",
+  "coefficient_order": "ascending",
+  "target": "1 / (2 * kappa * x)",
+  "kappas": [
+    5,
+    50,
+    100,
+    250,
+    500,
+    1000,
+    1500
+  ],
+  "epsilons": [
+    "0.001",
+    "0.01",
+    "0.1"
+  ],
+  "author": "Guillermo Alonso",
+  "license": "CC BY-SA 4.0",
+  "license_url": "https://creativecommons.org/licenses/by-sa/4.0/"
+}

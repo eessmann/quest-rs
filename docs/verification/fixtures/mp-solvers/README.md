@@ -1,11 +1,24 @@
 # Complete arbitrary-precision workloads
 
+The active launcher requires Python 3.11+ and `tomli-w` to serialize scratch
+Cargo manifests. From the repository root, install its declared dependency in
+an isolated environment:
+
+```sh
+python3 -m venv /tmp/quest-measurement-tools
+/tmp/quest-measurement-tools/bin/python -m pip install -r docs/verification/fixtures/requirements.txt
+```
+
+Use that environment's Python for the launcher and its Python regression tests.
+Generated packages also use the Rust `csv` crate; fetch their dependencies before
+an offline build when the Cargo cache does not already contain them.
+
 Run this fixture inside the repository's pinned `devenv shell`, after correctness
 checks and without competing builds. Supply the immutable pre-port source archive
 from the Dashu evidence directory, extracted into a separate scratch directory.
 
 ```sh
-devenv shell -- python3 docs/verification/fixtures/mp-solvers/run.py \
+devenv shell -- /tmp/quest-measurement-tools/bin/python docs/verification/fixtures/mp-solvers/run.py \
   --baseline /path/to/extracted/pre-port-source \
   --repository . --output /path/to/new/receipts
 ```
