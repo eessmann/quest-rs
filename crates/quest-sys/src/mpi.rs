@@ -492,6 +492,34 @@ pub struct MpiCollectiveLane<'communicator> {
 	_exclusive: RefMut<'communicator, ()>,
 }
 impl MpiCollectiveLane<'_> {
+	/// Send bounded coordination data on the exclusive private lane.
+	/// Every participant must follow the same application protocol.
+	pub fn send_bytes(&mut self, data: &[u8], destination: i32, tag: i32) -> QuestResult<()> {
+		MpiThreadView {
+			communicator: self.communicator,
+		}
+		.send(data, destination, tag)
+	}
+	/// Receive bounded coordination data on the exclusive private lane.
+	pub fn receive_bytes(&mut self, data: &mut [u8], source: i32, tag: i32) -> QuestResult<usize> {
+		MpiThreadView {
+			communicator: self.communicator,
+		}
+		.receive(data, source, tag)
+	}
+	/// Exchange bounded coordination buffers without exposing communicator ownership.
+	pub fn send_receive_bytes(
+		&mut self,
+		send: &[u8],
+		peer: i32,
+		tag: i32,
+		receive: &mut [u8],
+	) -> QuestResult<usize> {
+		MpiThreadView {
+			communicator: self.communicator,
+		}
+		.send_receive(send, peer, tag, receive, peer, tag)
+	}
 	pub fn broadcast_bytes(&mut self, root: i32, data: &mut [u8]) -> QuestResult<()> {
 		broadcast(self.communicator, root, data)
 	}

@@ -3,11 +3,25 @@
 
 pub mod analysis;
 mod pauli;
+pub mod reciprocal;
+pub mod replay_transform;
 pub use pauli::{PauliDecomposition, PauliLimits, decompose_pauli};
 mod dense;
 mod encoding;
+mod matching;
+mod matching_shard;
 mod materialize;
 mod matrix;
+pub use matching_shard::{MatchingColumn, MatchingHeader, MatchingShard};
+mod replay;
+mod structured;
+pub use structured::{ShiftRegister, TensorShiftEncoding};
+mod structured_stencil;
+pub use matching::{
+	Matching, MatchingEdge, MatchingEncoding, MatchingErrorMetadata, MatchingResources,
+};
+pub use replay::{ReplayGate, ReplayKind};
+pub use structured_stencil::{StructuredStencilEncoding, StructuredStencilTerm};
 mod projection;
 mod response;
 mod routes;
@@ -41,6 +55,8 @@ pub type Result<T> = std::result::Result<T, Error>;
 #[derive(Debug, thiserror::Error)]
 #[non_exhaustive]
 pub enum Error {
+	#[error(transparent)]
+	Numerics(#[from] quest_numerics::Error),
 	#[error(transparent)]
 	Polynomial(#[from] quest_polynomial::Error),
 	#[error(transparent)]

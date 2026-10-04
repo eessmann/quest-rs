@@ -382,3 +382,20 @@ fn sparse_builder_rejects_retained_spare_capacity() {
 		});
 	expect_true!(matches!(sparse, Err(quest_qsvt_io::Error::Budget(_))));
 }
+
+#[gtest]
+fn sparse_io_exposes_canonical_numerical_storage() -> Result<()> {
+	let sparse = SparseMatrix::builder(1, 2)
+		.entries(
+			vec![Complex64::new(1.0, 0.0), Complex64::new(2.0, 0.0)],
+			vec![1, 1],
+			vec![0, 2],
+		)
+		.build(IoPolicy::default())?;
+	expect_that!(sparse.as_numerics().nnz(), eq(1));
+	expect_that!(
+		sparse.as_numerics().data(),
+		eq(&[Complex64::new(3.0, 0.0)][..])
+	);
+	Ok(())
+}

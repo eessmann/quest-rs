@@ -1,0 +1,35 @@
+{
+  "id": "shedding3d",
+  "dimension": 3,
+  "geometry": "[-20,30]x[-40,40]x[-2,2] minus stationary cylinder x^2+y^2<=0.25, axis z (D=1, span=4D)",
+  "reynolds": [
+    300
+  ],
+  "reference_velocity": 1,
+  "reference_length": 1,
+  "boundaries": [
+    "inlet x=-20: u=(1,0,0)",
+    "far field y=+-40: partial_n u=0 (Neumann)",
+    "outlet x=30: convective outlet condition; not replaced by natural traction",
+    "no slip stationary cylinder",
+    "periodic z between -2 and 2, span 4D"
+  ],
+  "initial_condition": "uniform incoming stream with no-slip cylinder and a mesh-consistent divergence-free spanwise perturbation before statistical admission; exact source initial transient is not specified; stationary unforced-cylinder statistics only",
+  "time_window": [
+    0,
+    2000
+  ],
+  "measurement_window": [
+    1000,
+    2000
+  ],
+  "observables": [
+    "Cd=2*Fx/(rho*U_inf^2*D*span), complete cylinder traction",
+    "Cl=2*Fy/(rho*U_inf^2*D*span)",
+    "St=f_lift*D/U_inf",
+    "spanwise fluctuation energy",
+    "divergence and full momentum residual"
+  ],
+  "provenance": "Kim et al., JFM1001 A24, DOI10.1017/jfm.2024.1079, stationary-cylinder validation in section2.1/Table1: Re300, span4D, Neumann far field, convective outflow, 200 shedding cycles. Absolute start/end times are project computational budgets; at least200 measured cycles and transient rejection are separate acceptance conditions. Convective outlet/Neumann far-field execution is not currently supported.",
+  "measurement_minimum_cycles": 200
+}

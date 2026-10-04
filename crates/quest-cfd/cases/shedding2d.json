@@ -1,0 +1,31 @@
+{
+  "id": "shedding2d",
+  "dimension": 2,
+  "geometry": "[0,2.2]x[0,0.41] minus disk center (0.2,0.2), diameter 0.1",
+  "reynolds": [
+    100
+  ],
+  "reference_velocity": 1,
+  "reference_length": 0.1,
+  "boundaries": [
+    "inlet u_x=6*y*(0.41-y)/0.41^2, u_y=0 (mean 1, peak 1.5)",
+    "no slip on cylinder and channel walls",
+    "outlet (nu*grad(u)-p*I)*n=0; unsymmetrized traction convention"
+  ],
+  "initial_condition": "u=0 in interior with prescribed inlet boundary; no-slip cylinder; outlet fixes pressure level",
+  "time_window": [
+    0,
+    8
+  ],
+  "measurement_window": [
+    4,
+    8
+  ],
+  "observables": [
+    "Cd=2*Fx/(rho*U_mean^2*D), full pressure plus viscous traction",
+    "Cl=2*Fy/(rho*U_mean^2*D)",
+    "St=f_lift*D/U_mean from measured periodic lift",
+    "pressure difference p(0.15,0.2)-p(0.25,0.2)"
+  ],
+  "provenance": "DFG 2D-2 Re100 geometry/inflow; fixed project observation window. https://www.featflow.de/en/benchmarks/cfdbenchmarking/flow/dfg_benchmark2_re100.html"
+}

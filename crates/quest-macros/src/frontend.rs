@@ -8,9 +8,23 @@ use quest_language::{
 };
 use quote::{quote, quote_spanned};
 use std::{
-	collections::BTreeMap,
+	collections::{BTreeMap, BTreeSet},
 	path::{Component, Path, PathBuf},
 };
+
+fn oracle_captures(module: &syntax::Module) -> BTreeSet<usize> {
+	module
+		.statements
+		.iter()
+		.filter_map(|statement| {
+			if let syntax::StatementKind::Oracle { capture, .. } = &statement.kind {
+				Some(*capture)
+			} else {
+				None
+			}
+		})
+		.collect()
+}
 
 struct Location {
 	span: SourceSpan,
@@ -169,17 +183,7 @@ impl Frontend {
 	fn emit(self) -> syn::Result<TokenStream> {
 		let mut module = syntax::parse_tokens(&self.tokens, ParseLimits::default())
 			.map_err(|error| self.error(error.span, error))?;
-		let oracle_captures = module
-			.statements
-			.iter()
-			.filter_map(|statement| {
-				if let syntax::StatementKind::Oracle { capture, .. } = &statement.kind {
-					Some(*capture)
-				} else {
-					None
-				}
-			})
-			.collect::<std::collections::BTreeSet<_>>();
+		let oracle_captures = oracle_captures(&module);
 		// Oracle identities inhabit a separate typed namespace. Compact only scalar
 		// captures, preserving source evaluation order without dummy floating values.
 		let scalar_indices = (0..self.captures.len())

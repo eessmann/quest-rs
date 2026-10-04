@@ -368,15 +368,10 @@ fn capacity(transform: &ValidatedTransform, ranks: i32) -> crate::Result<()> {
 		// Coordinates always use a projector/diagonal. An admitted isometry uses
 		// a dense canonical VV† even if its entries happen to be sparse.
 		let dense = match projection.space() {
-			quest_qsvt::ProjectionSpace::Left(s) => {
-				!matches!(s.kind(), quest_qsvt::ProjectorKind::Coordinates(_))
-			}
-			quest_qsvt::ProjectionSpace::Right(s) => {
-				!matches!(s.kind(), quest_qsvt::ProjectorKind::Coordinates(_))
-			}
+			quest_qsvt::ProjectionSpace::Left(s) => !s.is_coordinate_space(),
+			quest_qsvt::ProjectionSpace::Right(s) => !s.is_coordinate_space(),
 			quest_qsvt::ProjectionSpace::Joint { left, right } => {
-				!matches!(left.kind(), quest_qsvt::ProjectorKind::Coordinates(_))
-					|| !matches!(right.kind(), quest_qsvt::ProjectorKind::Coordinates(_))
+				!left.is_coordinate_space() || !right.is_coordinate_space()
 			}
 		};
 		if dense && projection.targets().len().max(1) > local {

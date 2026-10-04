@@ -1,0 +1,28 @@
+[package]
+name = "quest-cfd"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[dependencies]
+dashu-int.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+thiserror.workspace = true
+quest-numerics.workspace = true
+quest-qsvt = { workspace = true, features = ["certification"] }
+quest-qsp = { workspace = true, features = ["certification"] }
+clap = { workspace = true, features = ["derive"] }
+
+quest = { workspace = true, optional = true, features = ["qsvt"] }
+
+[lints]
+workspace = true
+
+[features]
+quantum = ["dep:quest"]
+
+[build-dependencies]
+quest-build.workspace = true

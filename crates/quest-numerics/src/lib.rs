@@ -9,6 +9,11 @@ mod fft;
 mod interval;
 pub mod observer;
 mod policy;
+pub mod sparse;
+pub use sparse::{
+	MissingEntries, SparseFormat, SparseLimits, SparseMatrix, SparseMatrixBuilder, SparseNorms,
+	SuppliedEntries,
+};
 
 pub use fft::{
 	ConvolutionWorkspace, FftBackend, FftDirection, FftWorkspace, Normalization,

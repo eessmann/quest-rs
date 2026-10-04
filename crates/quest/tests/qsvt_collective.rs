@@ -44,6 +44,61 @@ fn transform(value: Complex64) -> googletest::Result<quest_qsvt::ValidatedTransf
 		)
 		.build()?)
 }
+
+#[gtest]
+fn collective_compact_range_projection_and_descriptor_disagreement() -> googletest::Result<()> {
+	ranks(
+		"collective_compact_range_projection_and_descriptor_disagreement",
+		"2",
+		|| {
+			use quest_compile::{OracleFragment, QuantumRegionBuilder};
+			use quest_qsvt::{
+				EncodingBuilder, ExplicitUnitaryPremise, Left, LogicalSpace, OperandLayout, Right,
+			};
+			let runtime = MpiRuntime::initialize()?;
+			let comm = runtime.world()?;
+			let environment = CollectiveEnvironment::builder(&comm)?.build()?;
+			let build = |start| -> quest_qsvt::Result<_> {
+				let policy = NumericalPolicy::default();
+				let oracle =
+					OracleFragment::builder(QuantumRegionBuilder::new(3, 0)?.finish()?.bind(&[])?)
+						.matrix_tolerance(1e-12)?
+						.build()?;
+				let encoding = EncodingBuilder::new()
+					.oracle(oracle)
+					.left(LogicalSpace::<Left>::logical_range(8, start..7, policy)?)
+					.right(LogicalSpace::<Right>::logical_range(8, start..7, policy)?)
+					.normalization(1.0)?
+					.unitarity_assumption(ExplicitUnitaryPremise::new("identity circuit")?)
+					.build()?;
+				TransformBuilder::new()
+					.encoding(encoding)
+					.operands(OperandLayout::canonical(3, false)?.with_idle_high_qubits(1)?)
+					.standard(
+						quest_qsp::PhaseSequence::<quest_qsp::WxSymmetric>::builder(vec![
+							std::f64::consts::FRAC_PI_4,
+						])
+						.build()?,
+					)
+					.build()
+			};
+			let mismatched = build(if comm.rank()? == 0 { 1 } else { 2 })?;
+			expect_true!(environment.qsvt().transform(mismatched).prepare().is_err());
+			let transform = build(1)?;
+			let mut prepared = environment.qsvt().transform(transform).prepare()?;
+			let mut register = environment.state_vector(QubitCount::new(5)?)?;
+			register.init_plus()?;
+			let result = prepared.run(&mut register)?;
+			expect_that!(result.mass().retained(), near(3.0 / 32.0, 1e-12));
+			let conditioned = result.condition()?;
+			expect_that!(
+				conditioned.register().total_probability()?,
+				near(1.0, 1e-12)
+			);
+			Ok(())
+		},
+	)
+}
 #[gtest]
 fn collective_qsvt_mass_conditioning_and_complex_hadamard() -> googletest::Result<()> {
 	ranks(

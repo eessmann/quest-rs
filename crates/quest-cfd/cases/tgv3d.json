@@ -1,0 +1,32 @@
+{
+  "id": "tgv3d",
+  "dimension": 3,
+  "geometry": "[0,2*pi]^3",
+  "reynolds": [
+    100,
+    1600
+  ],
+  "reference_velocity": 1,
+  "reference_length": 1,
+  "boundaries": [
+    "periodic x",
+    "periodic y",
+    "periodic z"
+  ],
+  "initial_condition": "u=(sin(x)*cos(y)*cos(z),-cos(x)*sin(y)*cos(z),0); pressure from incompressible constraint with zero mean",
+  "time_window": [
+    0,
+    20
+  ],
+  "measurement_window": [
+    0,
+    20
+  ],
+  "observables": [
+    "volume-mean kinetic energy",
+    "dissipation nu*integral(|grad(u)|^2)/volume",
+    "volume-mean enstrophy",
+    "divergence and full momentum residual"
+  ],
+  "provenance": "Standard incompressible Taylor-Green initial data; no claim of an analytic time-dependent 3D solution."
+}

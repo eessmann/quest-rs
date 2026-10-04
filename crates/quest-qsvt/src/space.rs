@@ -1,6 +1,6 @@
 use crate::{Complex64, Error, NumericalPolicy, Result, matrix};
 use faer::{Mat, MatRef, mat::AsMatRef, traits::Conjugate};
-use std::{marker::PhantomData, sync::Arc};
+use std::{marker::PhantomData, ops::Range, sync::Arc};
 
 /// Marker for the logical row/output space of a projected encoding.
 #[derive(Debug, Clone, Copy)]
@@ -14,6 +14,13 @@ pub struct Right;
 pub enum ProjectorKind {
 	/// Exact computational coordinates in the caller's logical basis order.
 	Coordinates(Arc<Vec<usize>>),
+	/// Fixed physical bits and a contiguous range of packed free-bit values.
+	/// Free bits are packed in ascending physical bit order.
+	Compact {
+		fixed_mask: usize,
+		fixed_value: usize,
+		logical_range: Range<usize>,
+	},
 	/// A supplied numerical isometry; coherent projector formed as `VV†`.
 	Isometry,
 	/// A separately supplied dense coherent projector payload.
@@ -34,6 +41,193 @@ pub struct LogicalSpace<Side> {
 	_side: PhantomData<Side>,
 }
 impl<Side> LogicalSpace<Side> {
+	/// Fix physical bits to the supplied values, with every remaining bit free.
+	/// Logical basis order is increasing packed free-bit value: the lowest free
+	/// physical bit is logical bit zero. No coordinate array is allocated.
+	/// # Errors
+	/// Rejects invalid dimensions/masks/values and retained-storage budgets.
+	pub fn bit_constraints(
+		dimension: usize,
+		fixed_mask: usize,
+		fixed_value: usize,
+		policy: NumericalPolicy,
+	) -> Result<Self> {
+		let free_dimension = Self::free_dimension(dimension, fixed_mask, fixed_value)?;
+		Self::constrained_range(
+			dimension,
+			fixed_mask,
+			fixed_value,
+			0..free_dimension,
+			policy,
+		)
+	}
+	/// Select a contiguous computational-coordinate range in increasing order.
+	/// # Errors
+	/// Rejects empty/out-of-bounds ranges, invalid dimensions or storage budgets.
+	pub fn logical_range(
+		dimension: usize,
+		range: Range<usize>,
+		policy: NumericalPolicy,
+	) -> Result<Self> {
+		Self::constrained_range(dimension, 0, 0, range, policy)
+	}
+	/// Select a contiguous range of packed free-bit values under fixed bits.
+	/// For example, fixing bit 1 to one in an eight-dimensional register embeds
+	/// packed values 0,1,2,3 as physical coordinates 2,3,6,7 respectively.
+	/// # Errors
+	/// Rejects invalid fixed bits, empty/out-of-bounds ranges or storage budgets.
+	pub fn constrained_range(
+		dimension: usize,
+		fixed_mask: usize,
+		fixed_value: usize,
+		logical_range: Range<usize>,
+		policy: NumericalPolicy,
+	) -> Result<Self> {
+		let free_dimension = Self::free_dimension(dimension, fixed_mask, fixed_value)?;
+		if logical_range.start >= logical_range.end || logical_range.end > free_dimension {
+			return Err(Error::Space("invalid compact logical range"));
+		}
+		if size_of::<[usize; 4]>() > policy.max_bytes {
+			return Err(Error::Budget("compact logical space storage"));
+		}
+		Ok(Self {
+			isometry: None,
+			dimension,
+			logical_dimension: logical_range.end.saturating_sub(logical_range.start),
+			kind: ProjectorKind::Compact {
+				fixed_mask,
+				fixed_value,
+				logical_range,
+			},
+			residual: 0.0,
+			_side: PhantomData,
+		})
+	}
+	const fn free_dimension(
+		dimension: usize,
+		fixed_mask: usize,
+		fixed_value: usize,
+	) -> Result<usize> {
+		if dimension == 0
+			|| !dimension.is_power_of_two()
+			|| fixed_mask >= dimension
+			|| fixed_value & !fixed_mask != 0
+		{
+			return Err(Error::Space("invalid compact bit constraints"));
+		}
+		Ok(dimension >> fixed_mask.count_ones())
+	}
+	/// Whether the ordered embedding consists of exact computational coordinates.
+	#[must_use]
+	pub const fn is_coordinate_space(&self) -> bool {
+		matches!(
+			self.kind,
+			ProjectorKind::Coordinates(_) | ProjectorKind::Compact { .. }
+		)
+	}
+	/// Physical coordinate of an ordered logical basis vector; dense embeddings
+	/// and out-of-range logical indices return `None`.
+	#[must_use]
+	pub fn coordinate_at(&self, logical: usize) -> Option<usize> {
+		if logical >= self.logical_dimension {
+			return None;
+		}
+		match &self.kind {
+			ProjectorKind::Coordinates(indices) => indices.get(logical).copied(),
+			ProjectorKind::Compact {
+				fixed_mask,
+				fixed_value,
+				logical_range,
+			} => Some(
+				*fixed_value
+					| deposit(
+						logical_range.start.checked_add(logical)?,
+						self.dimension.saturating_sub(1) & !fixed_mask,
+					),
+			),
+			_ => None,
+		}
+	}
+	/// Exact coordinate membership, or `None` for numerical embeddings.
+	#[must_use]
+	pub fn contains_coordinate(&self, physical: usize) -> Option<bool> {
+		match &self.kind {
+			ProjectorKind::Coordinates(indices) => Some(indices.contains(&physical)),
+			ProjectorKind::Compact {
+				fixed_mask,
+				fixed_value,
+				logical_range,
+			} => Some(
+				physical < self.dimension
+					&& physical & fixed_mask == *fixed_value
+					&& logical_range.contains(&extract(
+						physical,
+						self.dimension.saturating_sub(1) & !fixed_mask,
+					)),
+			),
+			_ => None,
+		}
+	}
+	/// Disjoint bit cubes `(fixed_mask, fixed_value)` covering this projector.
+	/// Compact ranges require at most twice the physical width; complete fixed-bit
+	/// spaces require one cube. Explicit coordinates retain their supplied order.
+	/// # Errors
+	/// Rejects descriptor allocation failure.
+	pub fn coordinate_cubes(&self) -> Result<Option<Vec<(usize, usize)>>> {
+		let mut cubes = Vec::new();
+		match &self.kind {
+			ProjectorKind::Coordinates(indices) => {
+				cubes
+					.try_reserve_exact(indices.len())
+					.map_err(|_| Error::Budget("coordinate cubes"))?;
+				cubes.extend(
+					indices
+						.iter()
+						.map(|&index| (self.dimension.saturating_sub(1), index)),
+				);
+			}
+			ProjectorKind::Compact {
+				fixed_mask,
+				fixed_value,
+				logical_range,
+			} => {
+				if logical_range.start == 0
+					&& logical_range.end == self.dimension >> fixed_mask.count_ones()
+				{
+					cubes
+						.try_reserve_exact(1)
+						.map_err(|_| Error::Budget("compact coordinate cube"))?;
+					cubes.push((*fixed_mask, *fixed_value));
+					return Ok(Some(cubes));
+				}
+				cubes
+					.try_reserve_exact(
+						usize::try_from(self.dimension.ilog2())
+							.map_err(|_| Error::Budget("compact width"))?
+							.saturating_mul(2)
+							.saturating_add(1),
+					)
+					.map_err(|_| Error::Budget("compact coordinate cubes"))?;
+				let free_mask = self.dimension.saturating_sub(1) & !fixed_mask;
+				let mut start = logical_range.start;
+				while start < logical_range.end {
+					let remaining = logical_range.end.saturating_sub(start);
+					let exponent = start.trailing_zeros().min(remaining.ilog2());
+					let size = 1usize << exponent;
+					let varying = deposit(size.saturating_sub(1), free_mask);
+					cubes.push((
+						self.dimension.saturating_sub(1) & !varying,
+						*fixed_value | deposit(start, free_mask),
+					));
+					start = start
+						.checked_add(size)
+						.ok_or(Error::Budget("compact range decomposition"))?;
+				}
+			}
+			_ => return Ok(None),
+		}
+		Ok(Some(cubes))
+	}
 	/// Exact computational coordinates in caller order.
 	///
 	/// # Errors
@@ -180,24 +374,15 @@ impl<Side> LogicalSpace<Side> {
 		if let Some(basis) = self.dense_isometry() {
 			return matrix::snapshot(basis, policy);
 		}
-		match &self.kind {
-			ProjectorKind::Coordinates(indices) => matrix::allocate(
-				self.dimension,
-				self.logical_dimension,
-				policy,
-				|row, col| {
-					Complex64::new(
-						if indices.get(col) == Some(&row) {
-							1.0
-						} else {
-							0.0
-						},
-						0.0,
-					)
-				},
-			),
-			_ => Err(Error::Space("missing isometry storage")),
+		if !self.is_coordinate_space() {
+			return Err(Error::Space("missing isometry storage"));
 		}
+		matrix::allocate(
+			self.dimension,
+			self.logical_dimension,
+			policy,
+			|row, col| Complex64::new(f64::from(self.coordinate_at(col) == Some(row)), 0.0),
+		)
 	}
 	/// Retained payload bytes; coordinate storage does not scale with dimension.
 	/// # Errors
@@ -221,6 +406,7 @@ impl<Side> LogicalSpace<Side> {
 				.and_then(|entries| entries.checked_mul(size_of::<Complex64>()))
 				.ok_or(Error::Budget("projector bytes"))?,
 			ProjectorKind::Isometry => 0,
+			ProjectorKind::Compact { .. } => size_of::<[usize; 4]>(),
 		};
 		basis
 			.checked_add(projector)
@@ -249,13 +435,13 @@ impl<Side> LogicalSpace<Side> {
 			ProjectorKind::Dense(projector) => {
 				matrix::snapshot(projector.as_ref().as_ref(), policy)
 			}
-			ProjectorKind::Coordinates(indices) => matrix::allocate(
+			ProjectorKind::Coordinates(_) | ProjectorKind::Compact { .. } => matrix::allocate(
 				self.physical_dimension(),
 				self.physical_dimension(),
 				policy,
 				|row, col| {
 					Complex64::new(
-						if row == col && indices.contains(&row) {
+						if row == col && self.contains_coordinate(row) == Some(true) {
 							1.0
 						} else {
 							0.0
@@ -272,4 +458,31 @@ impl<Side> LogicalSpace<Side> {
 			}
 		}
 	}
+}
+
+// Scatter/gather packed logical bits without allocating per-coordinate storage.
+const fn deposit(mut packed: usize, mut mask: usize) -> usize {
+	let mut value = 0;
+	while mask != 0 {
+		let bit = 1usize << mask.trailing_zeros();
+		if packed & 1 != 0 {
+			value |= bit;
+		}
+		packed >>= 1;
+		mask &= mask.wrapping_sub(1);
+	}
+	value
+}
+const fn extract(value: usize, mut mask: usize) -> usize {
+	let mut packed = 0;
+	let mut local = 0u32;
+	while mask != 0 {
+		let bit = 1usize << mask.trailing_zeros();
+		if value & bit != 0 {
+			packed |= 1usize << local;
+		}
+		local = local.saturating_add(1);
+		mask &= mask.wrapping_sub(1);
+	}
+	packed
 }

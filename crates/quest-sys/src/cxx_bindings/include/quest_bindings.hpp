@@ -262,6 +262,19 @@ rust::Vec<QuestComplex> get_qureg_amps(const Qureg& qureg,
                                        std::int64_t start_index,
                                        std::int64_t num_amps);
 double calc_total_prob(const Qureg& qureg);
+void read_local_qureg_amps(const Qureg& qureg, std::int64_t start,
+                          rust::Slice<QuestComplex> output);
+void write_local_qureg_amps(Qureg& qureg, std::int64_t start,
+                           rust::Slice<const QuestComplex> values);
+void project_qureg_basis_cubes(Qureg& qureg, rust::Slice<const std::int32_t> targets,
+                              rust::Slice<const std::uint64_t> masks,
+                              rust::Slice<const std::uint64_t> values);
+void read_local_indexed_qureg_amps(const Qureg& qureg,
+                                  rust::Slice<const std::int64_t> indices,
+                                  rust::Slice<QuestComplex> output);
+void write_local_indexed_qureg_amps(Qureg& qureg,
+                                   rust::Slice<const std::int64_t> indices,
+                                   rust::Slice<const QuestComplex> values);
 void add_qureg(Qureg& out, const Qureg& source);
 
 void set_density_qureg_amps(Qureg& qureg,

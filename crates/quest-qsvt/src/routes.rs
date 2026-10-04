@@ -128,21 +128,22 @@ impl Circuit {
 		controls: &[(usize, bool)],
 		phase: Option<f64>,
 	) -> Result<()> {
-		if let crate::ProjectorKind::Coordinates(indices) = space.kind() {
+		if let Some(cubes) = space.coordinate_cubes()? {
 			let (base, selected) = phase
 				.map_or((std::f64::consts::PI, std::f64::consts::PI), |angle| {
 					(-angle, 2.0 * angle)
 				});
 			self.phase(base, controls)?;
-			for &coordinate in indices.iter() {
+			for (mut mask, value) in cubes {
 				let mut selected_controls = controls.to_vec();
-				for (local, &target) in targets.iter().enumerate() {
-					let mask = 1usize
-						.checked_shl(
-							u32::try_from(local).map_err(|_| Error::Budget("projector bit"))?,
-						)
-						.ok_or(Error::Budget("projector bit"))?;
-					selected_controls.push((target, coordinate & mask != 0));
+				while mask != 0 {
+					let local = usize::try_from(mask.trailing_zeros())
+						.map_err(|_| Error::Budget("projector bit"))?;
+					let target = *targets
+						.get(local)
+						.ok_or(Error::Encoding("projector target width"))?;
+					selected_controls.push((target, value & (1usize << local) != 0));
+					mask &= mask.wrapping_sub(1);
 				}
 				self.phase(selected, &selected_controls)?;
 			}

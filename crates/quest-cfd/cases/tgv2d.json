@@ -1,0 +1,30 @@
+{
+  "id": "tgv2d",
+  "dimension": 2,
+  "geometry": "[0,2*pi]^2",
+  "reynolds": [
+    100
+  ],
+  "reference_velocity": 1,
+  "reference_length": 1,
+  "boundaries": [
+    "periodic x",
+    "periodic y"
+  ],
+  "initial_condition": "u=(sin(x)*cos(y),-cos(x)*sin(y)); p=(cos(2*x)+cos(2*y))/4, zero mean",
+  "time_window": [
+    0,
+    10
+  ],
+  "measurement_window": [
+    0,
+    10
+  ],
+  "observables": [
+    "volume-mean kinetic energy 0.5*integral(|u|^2)/volume",
+    "volume-mean enstrophy 0.5*integral(curl(u)^2)/volume",
+    "L2 velocity error against exp(-2*nu*t)*u0",
+    "zero-mean pressure error against exp(-4*nu*t)*p0"
+  ],
+  "provenance": "Analytic incompressible Taylor-Green solution; reference length 1 is inverse wave number, not box extent."
+}

@@ -11,6 +11,8 @@ use crate::execution::PreparedRegion;
 pub mod collective;
 mod continuation;
 mod hadamard;
+pub mod matching;
+pub mod matching_transform;
 mod projection;
 mod reporting;
 use crate::{Complex64, Environment, Register, StateVector};
@@ -427,16 +429,21 @@ impl<'register, 'env> ConditionedResult<'_, 'register, 'env> {
 	}
 }
 fn decode(register: &Register<'_, StateVector>, projection: &Projection) -> Result<Mat<Complex64>> {
-	if let Some(indices) = projection::coordinate_indices(projection.space())? {
-		let _reservation = register.resources().reserve(bytes_for(indices.len(), 3)?)?;
-		let mut result = crate::register::matrix(indices.len(), 1)?;
+	if projection.space().is_coordinate_space() {
+		let dimension = projection.logical_dimension();
+		let _reservation = register.resources().reserve(bytes_for(dimension, 3)?)?;
+		let mut result = crate::register::matrix(dimension, 1)?;
 		let mut base = 0usize;
 		for control in projection.controls() {
 			if control.value {
 				base |= physical_bit(control.qubit)?;
 			}
 		}
-		for (row, local) in indices.into_iter().enumerate() {
+		for row in 0..dimension {
+			let local = projection
+				.space()
+				.coordinate_at(row)
+				.ok_or(crate::Error::Value("projection coordinate"))?;
 			let mut physical = base;
 			for (bit, &target) in projection.targets().iter().enumerate() {
 				if local & physical_bit(bit)? != 0 {

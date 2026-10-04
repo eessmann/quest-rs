@@ -128,43 +128,48 @@ impl<'env> AdmittedOverlap<'env> {
 		)?;
 		let dimension = count.dimension();
 		let local = super::physical_bit(width)?;
-		let preparation_bytes = bytes_for(
-			dimension
-				.checked_mul(
-					transform
-						.input()
-						.logical_dimension()
-						.checked_add(transform.output().logical_dimension())
-						.ok_or(crate::Error::Overflow)?,
-				)
-				.ok_or(crate::Error::Overflow)?,
-			4,
-		)?;
+		let branches = local.checked_mul(2).ok_or(crate::Error::Overflow)?;
+		let coordinate_inputs = transform.input().space().is_coordinate_space()
+			&& transform.output().space().is_coordinate_space();
+		let preparation_bytes = if coordinate_inputs {
+			// Only the unpacked and packed state buffers coexist; no isometry.
+			bytes_for(dimension, 2)?
+		} else {
+			bytes_for(
+				dimension
+					.checked_mul(
+						transform
+							.input()
+							.logical_dimension()
+							.checked_add(transform.output().logical_dimension())
+							.ok_or(crate::Error::Overflow)?,
+					)
+					.ok_or(crate::Error::Overflow)?,
+				4,
+			)?
+		};
 		let reservation = resources.reserve(preparation_bytes)?;
 		let policy = quest_qsvt::NumericalPolicy {
 			max_bytes: preparation_bytes,
 		};
-		let input_basis = transform.input().materialize_isometry(width, policy)?;
-		let reference_basis = transform.output().materialize_isometry(width, policy)?;
 		let mut amplitudes = reserve_vec(dimension)?;
-		let inverse_root_two = std::f64::consts::FRAC_1_SQRT_2;
-		for row in 0..local {
-			let mut value = Complex64::new(0.0, 0.0);
-			for (col, &coefficient) in reference_values.iter().enumerate() {
-				value = value.add(reference_basis[(row, col)].mul(coefficient));
-			}
-			amplitudes.push(value.mul(inverse_root_two));
-		}
-		for row in 0..local {
-			let mut value = Complex64::new(0.0, 0.0);
-			for (col, &coefficient) in input_values.iter().enumerate() {
-				value = value.add(input_basis[(row, col)].mul(coefficient));
-			}
-			amplitudes.push(value.mul(inverse_root_two));
-		}
 		amplitudes.resize(dimension, Complex64::new(0.0, 0.0));
-		drop(input_basis);
-		drop(reference_basis);
+		pack_branch(
+			amplitudes.get_mut(..local).ok_or(crate::Error::Overflow)?,
+			transform.output(),
+			reference_values,
+			width,
+			policy,
+		)?;
+		pack_branch(
+			amplitudes
+				.get_mut(local..branches)
+				.ok_or(crate::Error::Overflow)?,
+			transform.input(),
+			input_values,
+			width,
+			policy,
+		)?;
 		let amplitudes = crate::register::pack(amplitudes.into_iter(), dimension)?;
 		let initial = Register::<StateVector>::admit_allocation(resources, count)?;
 		let working = Register::<StateVector>::admit_allocation(resources, count)?;
@@ -219,6 +224,41 @@ impl<'env> AdmittedOverlap<'env> {
 		drop(self.reservation);
 		Ok(result)
 	}
+}
+// Scatter exact coordinate embeddings; numerical embeddings retain their admitted
+// dense definition. Caller-owned overlap vectors and the state buffer are explicit.
+fn pack_branch(
+	amplitudes: &mut [Complex64],
+	projection: &quest_qsvt::Projection,
+	coefficients: &[Complex64],
+	width: usize,
+	policy: quest_qsvt::NumericalPolicy,
+) -> Result<()> {
+	if amplitudes.len() != super::physical_bit(width)? {
+		return Err(crate::Error::Value("overlap preparation branch width").into());
+	}
+	let scale = std::f64::consts::FRAC_1_SQRT_2;
+	if projection.space().is_coordinate_space() {
+		for (logical, &coefficient) in coefficients.iter().enumerate() {
+			let physical = projection
+				.coordinate_at(logical)?
+				.ok_or(crate::Error::Value("overlap preparation coordinate"))?;
+			*amplitudes
+				.get_mut(physical)
+				.ok_or(crate::Error::Value("overlap preparation register width"))? =
+				coefficient.mul(scale);
+		}
+	} else {
+		let basis = projection.materialize_isometry(width, policy)?;
+		for (row, amplitude) in amplitudes.iter_mut().enumerate() {
+			let mut value = Complex64::new(0.0, 0.0);
+			for (col, &coefficient) in coefficients.iter().enumerate() {
+				value = value.add(basis[(row, col)].mul(coefficient));
+			}
+			*amplitude = value.mul(scale);
+		}
+	}
+	Ok(())
 }
 fn check_vector(vector: &[Complex64], dimension: usize) -> Result<()> {
 	if vector.len() != dimension {

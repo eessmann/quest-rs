@@ -1,0 +1,32 @@
+{
+  "id": "cavity3d",
+  "dimension": 3,
+  "geometry": "[0,1]^3",
+  "reynolds": [
+    100,
+    1000
+  ],
+  "reference_velocity": 1,
+  "reference_length": 1,
+  "boundaries": [
+    "u=(1,0,0) on open lid y=1",
+    "u=0 on all other walls",
+    "wall-intersection traces take the stationary-wall value; lid discontinuity is not smoothed"
+  ],
+  "initial_condition": "u=0; mean-zero pressure recovered from momentum constraints",
+  "time_window": [
+    0,
+    100
+  ],
+  "measurement_window": [
+    80,
+    100
+  ],
+  "observables": [
+    "velocity along geometric centerlines",
+    "volume-integrated kinetic energy",
+    "full momentum and divergence residual",
+    "steady residual recorded; reaching final time does not certify steady state"
+  ],
+  "provenance": "Project-frozen square/cubic lid-driven cavity; U_ref=lid speed, L_ref=cavity edge."
+}

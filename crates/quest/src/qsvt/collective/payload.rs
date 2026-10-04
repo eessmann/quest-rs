@@ -194,6 +194,17 @@ impl Encoder {
 				self.word(0)?;
 				self.words(indices)?;
 			}
+			ProjectorKind::Compact {
+				fixed_mask,
+				fixed_value,
+				logical_range,
+			} => {
+				self.word(3)?;
+				self.word(*fixed_mask)?;
+				self.word(*fixed_value)?;
+				self.word(logical_range.start)?;
+				self.word(logical_range.end)?;
+			}
 			ProjectorKind::Isometry => self.word(1)?,
 			ProjectorKind::Dense(matrix) => {
 				self.word(2)?;

@@ -23,6 +23,7 @@ ndarray = { workspace = true, features = ["std"], optional = true }
 quest-qsvt = { workspace = true, optional = true }
 
 [dev-dependencies]
+quest-numerics.workspace = true
 serde_json.workspace = true
 csv.workspace = true
 criterion.workspace = true

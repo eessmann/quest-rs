@@ -156,6 +156,32 @@ mod ffi {
 			num_amps: i64,
 		) -> Result<Vec<QuestComplex>>;
 		fn calc_total_prob(qureg: &Qureg) -> Result<f64>;
+		fn read_local_qureg_amps(
+			qureg: &Qureg,
+			start: i64,
+			output: &mut [QuestComplex],
+		) -> Result<()>;
+		fn write_local_qureg_amps(
+			qureg: Pin<&mut Qureg>,
+			start: i64,
+			values: &[QuestComplex],
+		) -> Result<()>;
+		fn project_qureg_basis_cubes(
+			qureg: Pin<&mut Qureg>,
+			targets: &[i32],
+			masks: &[u64],
+			values: &[u64],
+		) -> Result<()>;
+		fn read_local_indexed_qureg_amps(
+			qureg: &Qureg,
+			indices: &[i64],
+			output: &mut [QuestComplex],
+		) -> Result<()>;
+		fn write_local_indexed_qureg_amps(
+			qureg: Pin<&mut Qureg>,
+			indices: &[i64],
+			values: &[QuestComplex],
+		) -> Result<()>;
 		fn set_density_qureg_amps(
 			qureg: Pin<&mut Qureg>,
 			start_row: i64,
@@ -392,6 +418,71 @@ pub fn get_qureg_amps(
 
 pub fn calc_total_prob(qureg: &Qureg) -> QuestResult<f64> {
 	map_quest_result(ffi::calc_total_prob(qureg))
+}
+
+/// Copy a bounded range of this rank's CPU statevector partition into caller storage.
+/// No MPI collective, global gather, or temporary full-state allocation occurs.
+/// # Errors
+/// Rejects GPU/density registers and ranges outside the local partition.
+pub fn read_local_qureg_amps(
+	qureg: &Qureg,
+	start: i64,
+	output: &mut [QuestComplex],
+) -> QuestResult<()> {
+	map_quest_result(ffi::read_local_qureg_amps(qureg, start, output))
+}
+
+/// Replace a bounded range of this rank's CPU statevector partition.
+///
+/// All values are validated before any amplitude changes. Distributed callers
+/// coordinate validation and invocation order through their owning runtime.
+/// # Errors
+/// Rejects GPU/density registers, nonfinite values and invalid local ranges.
+pub fn write_local_qureg_amps(
+	qureg: Pin<&mut Qureg>,
+	start: i64,
+	values: &[QuestComplex],
+) -> QuestResult<()> {
+	map_quest_result(ffi::write_local_qureg_amps(qureg, start, values))
+}
+
+/// Retain the union of target-local bit cubes without renormalizing.
+///
+/// Target order defines mask-bit order. An empty union clears the state.
+/// Work and storage depend on local amplitudes and the supplied cube list;
+/// this operation performs no MPI collective.
+/// # Errors
+/// Rejects GPU/density registers, repeated targets and invalid masks/values.
+pub fn project_qureg_basis_cubes(
+	qureg: Pin<&mut Qureg>,
+	targets: &[i32],
+	masks: &[u64],
+	values: &[u64],
+) -> QuestResult<()> {
+	map_quest_result(ffi::project_qureg_basis_cubes(
+		qureg, targets, masks, values,
+	))
+}
+
+/// Read a bounded list of local CPU indices in one lifecycle admission.
+/// # Errors
+/// Rejects GPU/density registers, mismatched lengths and invalid indices before copying.
+pub fn read_local_indexed_qureg_amps(
+	qureg: &Qureg,
+	indices: &[i64],
+	output: &mut [QuestComplex],
+) -> QuestResult<()> {
+	map_quest_result(ffi::read_local_indexed_qureg_amps(qureg, indices, output))
+}
+/// Write a bounded list of local CPU indices in one lifecycle admission.
+/// # Errors
+/// Rejects GPU/density registers, mismatched lengths, invalid indices or nonfinite values before mutation.
+pub fn write_local_indexed_qureg_amps(
+	qureg: Pin<&mut Qureg>,
+	indices: &[i64],
+	values: &[QuestComplex],
+) -> QuestResult<()> {
+	map_quest_result(ffi::write_local_indexed_qureg_amps(qureg, indices, values))
 }
 
 /// Copy a rectangular row-major buffer into a density register.

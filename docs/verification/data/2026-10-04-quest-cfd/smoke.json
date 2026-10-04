@@ -1,0 +1,241 @@
+{
+  "date": "2026-10-04",
+  "native": "QuEST 4.3.0 CPU",
+  "ranks": 1,
+  "omp_num_threads": 1,
+  "concurrent_runs": true,
+  "hardware_quantum_execution": false,
+  "physical_convergence_established": false,
+  "runs": [
+    {
+      "arguments": [
+        "solve",
+        "--case",
+        "smoke",
+        "--backend",
+        "scalar-reference"
+      ],
+      "peak_rss_kib": 271408,
+      "report": {
+        "construction": {
+          "case": "smoke",
+          "configuration_boundary": "central periodic numerical closure; truncation leakage requires refinement",
+          "configuration_bounds": [
+            -1.0,
+            1.0
+          ],
+          "configuration_cells_per_axis": 2,
+          "configuration_dimension": 1024,
+          "configuration_order": 1,
+          "full_dg_diagnostics": {
+            "constraint_rank": 7,
+            "constraint_residual": 4.440892098500626e-16,
+            "independent_dimension": 5,
+            "local_velocity_dimension": 12,
+            "mass_orthogonality_residual": 6.661338147750939e-16
+          },
+          "generator_nonzeros": 5482,
+          "history_dimension": 2048,
+          "history_nonzeros": 15060,
+          "horizon": 0.01,
+          "independent_coordinates": 5,
+          "initial_observables": {
+            "boundary_probability": 1.0000000000000024,
+            "coordinate_means": [
+              0.0644443583017098,
+              -0.03729205902341732,
+              0.02405066030850018,
+              0.04223233892476249,
+              -0.012915641439471149
+            ],
+            "coordinate_variances": [
+              0.06029128314645362,
+              0.03592766545994587,
+              0.023891347866497166,
+              0.04045570282407573,
+              0.015109323413099807
+            ],
+            "mean_kinetic_energy": 0.09187395709966066,
+            "probability": 1.0000000000000024
+          },
+          "normal_equations": false,
+          "quantum_execution": false,
+          "regularization_width": 1.2,
+          "spectral_bound_rejection": null,
+          "spectral_bounds": {
+            "evidence": "temporal DG1 coercivity and causal inverse bound",
+            "lower": 0.5,
+            "upper": 1.0620868511305122
+          },
+          "status": "construction-only",
+          "time_order": 1
+        },
+        "final_observables": {
+          "boundary_probability": 1.0000098178925807,
+          "coordinate_means": [
+            0.0644443583017089,
+            -0.03429384033359499,
+            0.02405066030850028,
+            0.03901253079242818,
+            -0.010219861290832966
+          ],
+          "coordinate_variances": [
+            0.060291283146452976,
+            0.033154854783703766,
+            0.023891347866497412,
+            0.03756339774177509,
+            0.01078573546694191
+          ],
+          "mean_kinetic_energy": 0.08661030959601246,
+          "probability": 1.0000098178925807
+        },
+        "physical_convergence_established": false,
+        "solve": {
+          "alpha": 8.0,
+          "approximation_error_bound": 1.100641529171203e-06,
+          "backend": "bounded scalar simulation of the complete matching QSVT unitary",
+          "conversion_roundoff_estimate": 0.0,
+          "history_dimension": 2048,
+          "physical_rescaling": 15.86663165262245,
+          "polynomial_degree": 401,
+          "projector_response_bound": 2.923167956882678e-14,
+          "qubits": 17,
+          "reciprocal_scale": 0.00787816864579068,
+          "relative_residual": 5.259931201567061e-06,
+          "residual_tolerance": 0.01,
+          "retained_physical_coordinates": 5,
+          "rhs_norm": 1.000000000000001,
+          "spectral_lower": 0.5,
+          "spectral_upper": 1.0620868511305122,
+          "status": "quantum-circuit-reference-executed",
+          "success_probability": 0.007947567868901486,
+          "timings": {
+            "backend_preparation_seconds": 0.0,
+            "certification_seconds": 21.598412303,
+            "execution_seconds": 0.728969646,
+            "preprocessing_seconds": 0.20191657,
+            "readout_seconds": 0.000330303,
+            "rhs_preparation_seconds": 0.000733935,
+            "synthesis_seconds": 0.001428649,
+            "transfer_seconds": 0.0
+          }
+        }
+      }
+    },
+    {
+      "arguments": [
+        "solve",
+        "--case",
+        "smoke",
+        "--backend",
+        "quest-cpu"
+      ],
+      "peak_rss_kib": 273076,
+      "report": {
+        "construction": {
+          "case": "smoke",
+          "configuration_boundary": "central periodic numerical closure; truncation leakage requires refinement",
+          "configuration_bounds": [
+            -1.0,
+            1.0
+          ],
+          "configuration_cells_per_axis": 2,
+          "configuration_dimension": 1024,
+          "configuration_order": 1,
+          "full_dg_diagnostics": {
+            "constraint_rank": 7,
+            "constraint_residual": 4.440892098500626e-16,
+            "independent_dimension": 5,
+            "local_velocity_dimension": 12,
+            "mass_orthogonality_residual": 6.661338147750939e-16
+          },
+          "generator_nonzeros": 5482,
+          "history_dimension": 2048,
+          "history_nonzeros": 15060,
+          "horizon": 0.01,
+          "independent_coordinates": 5,
+          "initial_observables": {
+            "boundary_probability": 1.0000000000000024,
+            "coordinate_means": [
+              0.0644443583017098,
+              -0.03729205902341732,
+              0.02405066030850018,
+              0.04223233892476249,
+              -0.012915641439471149
+            ],
+            "coordinate_variances": [
+              0.06029128314645362,
+              0.03592766545994587,
+              0.023891347866497166,
+              0.04045570282407573,
+              0.015109323413099807
+            ],
+            "mean_kinetic_energy": 0.09187395709966066,
+            "probability": 1.0000000000000024
+          },
+          "normal_equations": false,
+          "quantum_execution": false,
+          "regularization_width": 1.2,
+          "spectral_bound_rejection": null,
+          "spectral_bounds": {
+            "evidence": "temporal DG1 coercivity and causal inverse bound",
+            "lower": 0.5,
+            "upper": 1.0620868511305122
+          },
+          "status": "construction-only",
+          "time_order": 1
+        },
+        "final_observables": {
+          "boundary_probability": 1.0000098178915797,
+          "coordinate_means": [
+            0.06444435830170851,
+            -0.03429384033359412,
+            0.024050660308500053,
+            0.03901253079242862,
+            -0.0102198612908327
+          ],
+          "coordinate_variances": [
+            0.060291283146452705,
+            0.03315485478370299,
+            0.023891347866497204,
+            0.037563397741775535,
+            0.010785735466941743
+          ],
+          "mean_kinetic_energy": 0.0866103095960119,
+          "probability": 1.0000098178915797
+        },
+        "physical_convergence_established": false,
+        "solve": {
+          "alpha": 8.0,
+          "approximation_error_bound": 1.100641529171203e-06,
+          "backend": "QuEST CPU execution of the complete matching QSVT unitary",
+          "conversion_roundoff_estimate": 0.0,
+          "history_dimension": 2048,
+          "physical_rescaling": 15.86663165262245,
+          "polynomial_degree": 401,
+          "projector_response_bound": 2.923167956882678e-14,
+          "qubits": 17,
+          "reciprocal_scale": 0.00787816864579068,
+          "relative_residual": 5.259930722315734e-06,
+          "residual_tolerance": 0.01,
+          "retained_physical_coordinates": 5,
+          "rhs_norm": 1.000000000000001,
+          "spectral_lower": 0.5,
+          "spectral_upper": 1.0620868511305122,
+          "status": "quantum-circuit-reference-executed",
+          "success_probability": 0.007947567868893514,
+          "timings": {
+            "backend_preparation_seconds": 0.045302475,
+            "certification_seconds": 21.675558748,
+            "execution_seconds": 5.779361035,
+            "preprocessing_seconds": 0.198037346,
+            "readout_seconds": 0.0025202460000000003,
+            "rhs_preparation_seconds": 0.000705115,
+            "synthesis_seconds": 0.001325978,
+            "transfer_seconds": 0.002193214
+          }
+        }
+      }
+    }
+  ]
+}

@@ -198,6 +198,47 @@ impl<'comm, 'runtime> CollectiveEnvironment<'comm, 'runtime> {
 			id: self.identifier(),
 		})
 	}
+	/// Allocate a forced distributed CPU state using per-rank state/workspace
+	/// accounting. Initialization and observation remain local to each partition.
+	/// # Errors
+	/// Rejects mismatched widths, GPU execution, insufficient local storage or native failures.
+	pub fn state_vector_local(
+		&self,
+		count: QubitCount,
+	) -> Result<CollectiveRegister<'_, 'comm, 'runtime>> {
+		let mut lane = self.begin(
+			40,
+			self.next_id.get(),
+			u64::try_from(count.get()).unwrap_or(u64::MAX),
+			0,
+		)?;
+		let admission = (|| {
+			if self.resources.capabilities().gpu {
+				return Err(Error::Unsupported(
+					"local-partition state allocation on GPU",
+				));
+			}
+			let ranks = usize::try_from(self.size()?).map_err(|_| Error::Overflow)?;
+			if count.dimension() < ranks {
+				return Err(Error::Value(
+					"distributed register requires an amplitude per rank",
+				));
+			}
+			let entries = count
+				.dimension()
+				.checked_div(ranks)
+				.ok_or(Error::Overflow)?;
+			self.resources
+				.reserve(crate::values::bytes_for(entries, 4)?)
+		})();
+		let admission = agree_result(&mut lane, admission)?;
+		let inner = fatal(|| Register::allocate_admitted(admission, count));
+		Ok(CollectiveRegister {
+			inner,
+			environment: self,
+			id: self.identifier(),
+		})
+	}
 	/// Prepare a common executable program with a static coherent MPI schedule.
 	/// Runtime inputs, branching and irreversible quantum effects are rejected
 	/// collectively before native allocation.
@@ -298,6 +339,76 @@ pub struct CollectiveRegister<'env, 'comm, 'runtime> {
 	pub(crate) id: u64,
 }
 impl CollectiveRegister<'_, '_, '_> {
+	/// Replace a bounded slice of this rank's CPU partition. The caller supplies
+	/// local amplitudes only; no complete-state broadcast or gather occurs.
+	/// # Errors
+	/// Rejects nonfinite values, invalid local ranges, GPU execution and budgets collectively.
+	pub fn write_local_amplitudes(&mut self, start: usize, values: &[Complex64]) -> Result<()> {
+		let mut lane = self.environment.begin(41, self.id, 0, 0)?;
+		let admission = (|| {
+			if self.deployment().is_gpu_accelerated()
+				|| start
+					.checked_add(values.len())
+					.is_none_or(|end| end > self.deployment().local_amplitudes())
+				|| values
+					.iter()
+					.any(|value| !value.re.is_finite() || !value.im.is_finite())
+			{
+				return Err(Error::Value("invalid local amplitude slice"));
+			}
+			let reservation = self
+				.environment
+				.resources
+				.reserve(crate::values::bytes_for(values.len(), 1)?)?;
+			let values = crate::register::pack(values.iter().copied(), values.len())?;
+			Ok((
+				reservation,
+				values,
+				i64::try_from(start).map_err(|_| Error::Overflow)?,
+			))
+		})();
+		let (_reservation, values, start) = agree_result(&mut lane, admission)?;
+		fatal(|| {
+			quest_sys::write_local_qureg_amps(self.inner.pin(), start, &values)
+				.context("writing collective local partition")
+		});
+		Ok(())
+	}
+	/// Read a bounded CPU partition slice, without complete-state replication.
+	/// # Errors
+	/// Rejects invalid local ranges, GPU execution and budgets collectively.
+	pub fn read_local_amplitudes(&self, start: usize, count: usize) -> Result<Vec<Complex64>> {
+		let mut lane = self.environment.begin(42, self.id, 0, 0)?;
+		let admission = (|| {
+			if self.deployment().is_gpu_accelerated()
+				|| start
+					.checked_add(count)
+					.is_none_or(|end| end > self.deployment().local_amplitudes())
+			{
+				return Err(Error::Value("invalid local amplitude slice"));
+			}
+			let reservation = self
+				.environment
+				.resources
+				.reserve(crate::values::bytes_for(count, 2)?)?;
+			let mut values = reserve_vec(count)?;
+			values.resize(count, quest_sys::QuestComplex { re: 0.0, im: 0.0 });
+			Ok((
+				reservation,
+				values,
+				i64::try_from(start).map_err(|_| Error::Overflow)?,
+			))
+		})();
+		let (_reservation, mut values, start) = agree_result(&mut lane, admission)?;
+		fatal(|| {
+			quest_sys::read_local_qureg_amps(&self.inner.native, start, &mut values)
+				.context("reading collective local partition")
+		});
+		Ok(values
+			.into_iter()
+			.map(|value| Complex64::new(value.re, value.im))
+			.collect())
+	}
 	/// Actual native deployment of this register on the calling rank.
 	#[must_use]
 	pub const fn deployment(&self) -> crate::RegisterDeployment {

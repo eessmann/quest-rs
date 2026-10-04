@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["crates/quest", "crates/quest-sys", "crates/quest-build", "crates/quest-compile", "crates/quest-symbolic", "crates/quest-macros", "crates/xtask", "crates/quest-language", "crates/quest-qasm", "crates/quest-math", "crates/quest-synthesis", "crates/quest-optimizer-protocol", "crates/quest-optimizer-worker", "crates/quest-optimizer-client", "crates/quest-numerics", "crates/quest-polynomial", "crates/quest-qsp", "crates/quest-qsvt", "crates/quest-qsvt-io", "crates/quest-qsvt-cli"]
+members = ["crates/quest", "crates/quest-sys", "crates/quest-build", "crates/quest-compile", "crates/quest-symbolic", "crates/quest-macros", "crates/xtask", "crates/quest-language", "crates/quest-qasm", "crates/quest-math", "crates/quest-synthesis", "crates/quest-optimizer-protocol", "crates/quest-optimizer-worker", "crates/quest-optimizer-client", "crates/quest-numerics", "crates/quest-polynomial", "crates/quest-qsp", "crates/quest-qsvt", "crates/quest-qsvt-io", "crates/quest-qsvt-cli", "crates/quest-cfd"]
 default-members = ["crates/quest"]
 
 [workspace.package]

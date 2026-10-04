@@ -1,0 +1,78 @@
+{
+  "date": "2026-10-04",
+  "base_commit": "77ae6879dfd3245bee78fe5d9a122f4a2ae6b95c",
+  "scope": "working tree; not committed or pushed",
+  "native": {
+    "quest": "4.3.0",
+    "mpi": "MPICH 4.2.2",
+    "cpu": true,
+    "mpi_subcommunicator_abi_verified": true,
+    "multi_host": false,
+    "new_fused_accelerator_path": "explicitly unsupported"
+  },
+  "checks": [
+    {
+      "command": "cargo nextest run --workspace --all-features --no-fail-fast",
+      "status": "passed",
+      "passed": 1237,
+      "skipped": 3,
+      "elapsed_seconds": 93.937
+    },
+    {
+      "command": "cargo test --workspace --all-features --doc",
+      "status": "passed",
+      "passed": 65,
+      "ignored": 1
+    },
+    {
+      "command": "cargo clippy --workspace --all-features --all-targets --no-deps -- -D warnings",
+      "status": "passed"
+    },
+    {
+      "command": "cargo fmt --all --check",
+      "status": "passed"
+    },
+    {
+      "command": "cargo run --locked -p xtask -- generate-quest-bindings --check",
+      "status": "passed"
+    },
+    {
+      "command": "git diff --check",
+      "status": "passed"
+    },
+    {
+      "command": "cargo build --release -p quest-cfd --no-default-features",
+      "status": "passed"
+    },
+    {
+      "command": "cargo build --release -p quest-cfd --features quantum",
+      "status": "passed"
+    }
+  ],
+  "corrections_proved_by_regressions": [
+    "source manifest record count and payload digest reject missing or changed shards",
+    "MPI overlap preparation bounds each logical branch independently of register padding",
+    "unequal-volume closed meshes use volume-weighted pressure gauge",
+    "solver passes remaining modeled budget to synthesis/certification/native stages",
+    "temporal quadrature mass underflow rejects before allocation",
+    "unavailable long-history spectral enclosure preserves valid operator construction",
+    "binding generator formats Rust with repository rustfmt configuration before freshness comparison"
+  ],
+  "infrastructure_notes": [
+    "Initial debug targets exhausted temporary storage; fresh nonincremental stripped validation targets were used.",
+    "MPI tests require local socket access and were executed outside the socket-restricted sandbox.",
+    "Existing nightly generic_const_exprs/next-solver compatibility warning remains.",
+    "Managed allocation budgets exclude allocator/library/opaque third-party scratch; they are not RSS caps."
+  ],
+  "not_established": [
+    "complete plan implementation",
+    "converged physical benchmark campaigns",
+    "higher physical BDM orders",
+    "approved 3D wake boundary execution",
+    "complete paper-specific structured base/PREP/UNPREP",
+    "distributed stored-sparse matching preprocessing/loading",
+    "full nonlinear KvN convergence and complete physical observable error budget",
+    "forced allocator failure and malformed transport payload fault injection",
+    "large-count jobs and multi-host beyond-node-RAM acceptance"
+  ]
+}

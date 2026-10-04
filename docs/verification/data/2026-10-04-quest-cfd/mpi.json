@@ -1,0 +1,72 @@
+{
+  "date": "2026-10-04",
+  "hosts": 1,
+  "state_amplitudes": 512,
+  "query_batches": 2,
+  "maximum_batch_pairs": 64,
+  "maximum_amplitude_records_per_rank": 128,
+  "transport_bytes_scope": "one adjoint query, count and payload bytes only; excludes collective/native/protocol overhead",
+  "timing_scope": "single diagnostic sample of forward plus adjoint, includes intermediate differential readback; not a scaling benchmark",
+  "runs": [
+    {
+      "parts": 1,
+      "max_scalar_pair_seconds": 0.000655834,
+      "max_batch_pair_seconds": 0.000473702,
+      "total_sent_bytes": 0,
+      "total_received_bytes": 0,
+      "max_sent_bytes": 0,
+      "max_received_bytes": 0,
+      "scope": "world communicator"
+    },
+    {
+      "parts": 2,
+      "max_scalar_pair_seconds": 0.001240278,
+      "max_batch_pair_seconds": 0.000662154,
+      "total_sent_bytes": 15456,
+      "total_received_bytes": 15456,
+      "max_sent_bytes": 7728,
+      "max_received_bytes": 7728,
+      "scope": "world communicator"
+    },
+    {
+      "parts": 4,
+      "max_scalar_pair_seconds": 0.001696801,
+      "max_batch_pair_seconds": 0.000451483,
+      "total_sent_bytes": 23616,
+      "total_received_bytes": 23616,
+      "max_sent_bytes": 5904,
+      "max_received_bytes": 5904,
+      "scope": "world communicator"
+    },
+    {
+      "parts": 2,
+      "max_scalar_pair_seconds": 0.001236118,
+      "max_batch_pair_seconds": 0.000657294,
+      "total_sent_bytes": 15456,
+      "total_received_bytes": 15456,
+      "max_sent_bytes": 7728,
+      "max_received_bytes": 7728,
+      "scope": "split communicator"
+    },
+    {
+      "parts": 2,
+      "max_scalar_pair_seconds": 0.001190997,
+      "max_batch_pair_seconds": 0.000645234,
+      "total_sent_bytes": 15456,
+      "total_received_bytes": 15456,
+      "max_sent_bytes": 7728,
+      "max_received_bytes": 7728,
+      "scope": "split communicator"
+    },
+    {
+      "parts": 8,
+      "max_scalar_pair_seconds": 0.003446182,
+      "max_batch_pair_seconds": 0.000713954,
+      "total_sent_bytes": 29568,
+      "total_received_bytes": 29568,
+      "max_sent_bytes": 6096,
+      "max_received_bytes": 6096,
+      "scope": "world communicator"
+    }
+  ]
+}

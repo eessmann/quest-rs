@@ -2416,6 +2416,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "quest-cfd"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "dashu-int",
+ "quest-build",
+ "quest-numerics",
+ "quest-qsp",
+ "quest-qsvt",
+ "quest-rs",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+]
+
+[[package]]
 name = "quest-compile"
 version = "0.1.0"
 dependencies = [
@@ -2637,6 +2653,7 @@ dependencies = [
  "hdf5-metno",
  "num-complex",
  "quest-build",
+ "quest-numerics",
  "quest-polynomial",
  "quest-qsp",
  "serde",
@@ -2659,6 +2676,7 @@ dependencies = [
  "num-complex",
  "quest-build",
  "quest-compile",
+ "quest-numerics",
  "quest-qsp",
  "quest-qsvt",
  "quest-sys",

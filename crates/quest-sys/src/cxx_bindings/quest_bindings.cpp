@@ -858,6 +858,114 @@ double calc_total_prob(const Qureg& qureg) {
   return static_cast<double>(::calcTotalProb(qureg.raw()));
 }
 
+namespace {
+void require_local_cpu_state(const ::Qureg& raw) {
+  if (raw.isDensityMatrix || raw.isGpuAccelerated || raw.numQubits < 0 ||
+      raw.numQubits >= 63 || raw.numAmpsPerNode <= 0 || raw.cpuAmps == nullptr) {
+    throw std::invalid_argument("local state adapter requires a CPU statevector");
+  }
+}
+
+void require_local_range(const ::Qureg& raw, std::int64_t start, std::size_t count) {
+  require_local_cpu_state(raw);
+  if (start < 0 || start > raw.numAmpsPerNode ||
+      count > static_cast<std::uint64_t>(raw.numAmpsPerNode - start)) {
+    throw std::invalid_argument("local amplitude range exceeds this rank's partition");
+  }
+}
+}  // namespace
+
+void read_local_qureg_amps(const Qureg& qureg, std::int64_t start,
+                          rust::Slice<QuestComplex> output) {
+  const auto admission = admit_native_call();
+  const auto raw = qureg.raw();
+  require_local_range(raw, start, output.size());
+  for (std::size_t i = 0; i < output.size(); ++i)
+    output[i] = from_qcomp(raw.cpuAmps[start + static_cast<qindex>(i)]);
+}
+
+void write_local_qureg_amps(Qureg& qureg, std::int64_t start,
+                           rust::Slice<const QuestComplex> values) {
+  const auto admission = admit_native_call();
+  const auto raw = qureg.raw();
+  require_local_range(raw, start, values.size());
+  for (const auto& value : values) {
+    if (!std::isfinite(value.re) || !std::isfinite(value.im))
+      throw std::invalid_argument("local amplitude must be finite");
+  }
+  for (std::size_t i = 0; i < values.size(); ++i)
+    raw.cpuAmps[start + static_cast<qindex>(i)] = qcomp{values[i].re, values[i].im};
+}
+
+void project_qureg_basis_cubes(Qureg& qureg, rust::Slice<const std::int32_t> targets,
+                              rust::Slice<const std::uint64_t> masks,
+                              rust::Slice<const std::uint64_t> values) {
+  const auto admission = admit_native_call();
+  const auto raw = qureg.raw();
+  require_local_cpu_state(raw);
+  if (targets.size() > static_cast<std::size_t>(raw.numQubits) || masks.size() != values.size())
+    throw std::invalid_argument("invalid coordinate projector dimensions");
+  std::uint64_t occupied = 0;
+  for (const auto target : targets) {
+    if (target < 0 || target >= raw.numQubits)
+      throw std::invalid_argument("coordinate projector target out of range");
+    const auto bit = std::uint64_t{1} << target;
+    if (occupied & bit)
+      throw std::invalid_argument("coordinate projector repeats a target");
+    occupied |= bit;
+  }
+  const auto allowed = (std::uint64_t{1} << targets.size()) - 1;
+  for (std::size_t cube = 0; cube < masks.size(); ++cube) {
+    if ((masks[cube] & ~allowed) || (values[cube] & ~masks[cube]))
+      throw std::invalid_argument("invalid coordinate projector mask/value");
+  }
+  const auto start = static_cast<std::uint64_t>(raw.rank) *
+                     static_cast<std::uint64_t>(raw.numAmpsPerNode);
+  for (qindex local = 0; local < raw.numAmpsPerNode; ++local) {
+    const auto global = start + static_cast<std::uint64_t>(local);
+    std::uint64_t packed = 0;
+    for (std::size_t bit = 0; bit < targets.size(); ++bit)
+      packed |= ((global >> targets[bit]) & 1) << bit;
+    bool retained = false;
+    for (std::size_t cube = 0; cube < masks.size(); ++cube)
+      retained = retained || ((packed & masks[cube]) == values[cube]);
+    if (!retained) raw.cpuAmps[local] = qcomp{0, 0};
+  }
+}
+
+void read_local_indexed_qureg_amps(const Qureg& qureg,
+                                  rust::Slice<const std::int64_t> indices,
+                                  rust::Slice<QuestComplex> output) {
+  const auto admission = admit_native_call();
+  const auto raw = qureg.raw();
+  require_local_cpu_state(raw);
+  if (indices.size() != output.size())
+    throw std::invalid_argument("indexed amplitude dimensions differ");
+  for (const auto index : indices)
+    if (index < 0 || index >= raw.numAmpsPerNode)
+      throw std::invalid_argument("indexed amplitude exceeds local partition");
+  for (std::size_t i = 0; i < indices.size(); ++i)
+    output[i] = from_qcomp(raw.cpuAmps[indices[i]]);
+}
+
+void write_local_indexed_qureg_amps(Qureg& qureg,
+                                   rust::Slice<const std::int64_t> indices,
+                                   rust::Slice<const QuestComplex> values) {
+  const auto admission = admit_native_call();
+  const auto raw = qureg.raw();
+  require_local_cpu_state(raw);
+  if (indices.size() != values.size())
+    throw std::invalid_argument("indexed amplitude dimensions differ");
+  for (const auto index : indices)
+    if (index < 0 || index >= raw.numAmpsPerNode)
+      throw std::invalid_argument("indexed amplitude exceeds local partition");
+  for (const auto& value : values)
+    if (!std::isfinite(value.re) || !std::isfinite(value.im))
+      throw std::invalid_argument("indexed amplitude must be finite");
+  for (std::size_t i = 0; i < indices.size(); ++i)
+    raw.cpuAmps[indices[i]] = qcomp{values[i].re, values[i].im};
+}
+
 void add_qureg(Qureg& out, const Qureg& source) {
   const auto admission = admit_native_call();
   qcomp coefficients[] = {qcomp{1, 0}, qcomp{1, 0}};

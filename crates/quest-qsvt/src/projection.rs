@@ -116,6 +116,63 @@ pub enum ProjectionSpace {
 	},
 }
 impl ProjectionSpace {
+	/// Exact computational embedding, including left-before-right joint order.
+	#[must_use]
+	pub const fn is_coordinate_space(&self) -> bool {
+		match self {
+			Self::Left(space) => space.is_coordinate_space(),
+			Self::Right(space) => space.is_coordinate_space(),
+			Self::Joint { left, right } => {
+				left.is_coordinate_space() && right.is_coordinate_space()
+			}
+		}
+	}
+	/// Physical target-local coordinate at this logical index.
+	#[must_use]
+	pub fn coordinate_at(&self, logical: usize) -> Option<usize> {
+		match self {
+			Self::Left(space) => space.coordinate_at(logical),
+			Self::Right(space) => space.coordinate_at(logical),
+			Self::Joint { left, right } => {
+				if logical < left.logical_dimension() {
+					left.coordinate_at(logical)
+				} else {
+					right
+						.coordinate_at(logical.checked_sub(left.logical_dimension())?)?
+						.checked_add(left.physical_dimension())
+				}
+			}
+		}
+	}
+	/// Disjoint fixed-bit cubes for exact coordinate projectors.
+	/// # Errors
+	/// Rejects descriptor allocation or joint-dimension overflow.
+	pub fn coordinate_cubes(&self) -> Result<Option<Vec<(usize, usize)>>> {
+		match self {
+			Self::Left(space) => space.coordinate_cubes(),
+			Self::Right(space) => space.coordinate_cubes(),
+			Self::Joint { left, right } => {
+				let (Some(mut a), Some(b)) = (left.coordinate_cubes()?, right.coordinate_cubes()?)
+				else {
+					return Ok(None);
+				};
+				let selector = left.physical_dimension();
+				selector
+					.checked_mul(2)
+					.ok_or(Error::Budget("joint coordinate dimension"))?;
+				a.try_reserve_exact(b.len())
+					.map_err(|_| Error::Budget("joint coordinate cubes"))?;
+				for (mask, _) in &mut a {
+					*mask |= selector;
+				}
+				a.extend(
+					b.into_iter()
+						.map(|(mask, value)| (mask | selector, value | selector)),
+				);
+				Ok(Some(a))
+			}
+		}
+	}
 	#[must_use]
 	pub const fn logical_dimension(&self) -> usize {
 		match self {
@@ -145,6 +202,27 @@ pub struct Projection {
 	controls: Vec<ProjectionControl>,
 }
 impl Projection {
+	/// Full-register computational coordinate, preserving target order and controls.
+	/// Numerical embeddings return `None`.
+	/// # Errors
+	/// Rejects positions beyond native-independent index width.
+	pub fn coordinate_at(&self, logical: usize) -> Result<Option<usize>> {
+		let Some(local) = self.space.coordinate_at(logical) else {
+			return Ok(None);
+		};
+		let mut physical = 0usize;
+		for control in &self.controls {
+			if control.value {
+				physical |= bit(control.qubit)?;
+			}
+		}
+		for (position, &target) in self.targets.iter().enumerate() {
+			if local & bit(position)? != 0 {
+				physical |= bit(target)?;
+			}
+		}
+		Ok(Some(physical))
+	}
 	#[must_use]
 	pub fn source(
 		encoding: &ProjectedEncoding,
