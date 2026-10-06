@@ -1,0 +1,150 @@
+{
+  "schema": "quest-cirrus-large-count-v1",
+  "status": "completed",
+  "base_source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+  "native_quest_revision": "503552065045eaf89baba85e6cd6aad728525554",
+  "scope": "Actual logical-byte slices larger than INT_MAX, transferred through checked int-count frames; no MPI-4 large-count call or matching-kernel/capacity claim",
+  "overlay_lock_change": "Only add existing serde_json to quest-sys dev dependencies; registry packages and versions unchanged",
+  "example_extra_rustc_flags": [
+    "-C",
+    "opt-level=2"
+  ],
+  "local_validation": {
+    "mpi_regression_ranks": 4,
+    "split_communicator_ranks": 2,
+    "regression_passed": true,
+    "small_example_ranks": 2,
+    "small_example_bytes": 1048593,
+    "strict_clippy_passed": true,
+    "scoped_rustfmt_passed": true
+  },
+  "setup_failures": [
+    {
+      "job_id": "537272",
+      "compiler": "gnu",
+      "stage": "admission before compilation",
+      "status": "failed",
+      "error": "PermissionError: cp -a preserved the immutable baseline source modes in the new overlay copy",
+      "mpi_payload_executed": false,
+      "correction": "Make only the new independent source copy user-writable before applying the three-file overlay",
+      "probe_log_sha256": "9d06eaadfdbbedc69a93ac50a8ce663f94a517609bc40378c2529556bb05fb8d"
+    },
+    {
+      "job_id": "537273",
+      "compiler": "cray",
+      "stage": "admission before compilation",
+      "status": "failed",
+      "error": "PermissionError: cp -a preserved the immutable baseline source modes in the new overlay copy",
+      "mpi_payload_executed": false,
+      "correction": "Make only the new independent source copy user-writable before applying the three-file overlay",
+      "probe_log_sha256": "7d5e0a6a3dbeae2b917d5ce61978084e04816dd1a47ea0f1ad540eca96d73ec8"
+    }
+  ],
+  "runs": [
+    {
+      "job_id": "537276",
+      "compiler": "gnu",
+      "scope": "actual chunked logical-byte transport only; no matching, MPI-4 large-count call, or capacity closure claim",
+      "hosts": [
+        "cs-n0000",
+        "cs-n0001"
+      ],
+      "logical_bytes_per_rank": 2147483664,
+      "total_bidirectional_payload_bytes": 4294967328,
+      "rank_max_transfer_seconds": [
+        0.10879751,
+        0.088471245
+      ],
+      "maximum_rank_peak_rss_bytes": 2281435136,
+      "maximum_rank_peak_as_bytes": 2417692672,
+      "launcher_seconds": 9.227009280119091,
+      "source_hashes": {
+        "crates/quest-sys/src/mpi.rs": "169ffa6145d5aa23bbfe7bb790a174556ce1873f5c97a205a15b0a5883c70401",
+        "crates/quest-sys/examples/mpi_large_count.rs": "a43100ba07d84fdfce96b6966a342cbfde43d5481ea9db86ab2e76b0a44f0e49",
+        "crates/quest-sys/Cargo.toml": "7cb6a8daa9a017b7aa75869014a2eb0a359b04a7949347e25eecb6e675c4137e"
+      },
+      "completion_sha256": "6b6ec8d432482b7df52a841c39288d838577108730eb54fa490920962139fa67",
+      "recipe_sha256": "689077e5f379abe563154304742d4e8a6631eca03460d615533ba92c16a8c2e1",
+      "executable_sha256": "c3ea3570f7c6ff7c2e32da92989850c9a3491350136694164339042c4cbc7615",
+      "receipt": "job-537276-completion.json",
+      "allocation": {
+        "nodes": 2,
+        "mpi_ranks": 2,
+        "ranks_per_node": 1,
+        "exclusive": true,
+        "physical_cpus_per_rank": 288,
+        "partition": "standard",
+        "qos": "short",
+        "walltime_minutes": 20
+      },
+      "process_as_cap_bytes": 8589934592,
+      "base_build_profile_sha256": "ff5b86538552c11c3b5564e6400279b4ec9a9e6a351ea005ed4751667abe7a35",
+      "supervision": {
+        "schema_version": 1,
+        "exit_status": 0,
+        "timed_out": false,
+        "log_truncated": false,
+        "owned_step": "537276.0",
+        "cleanup": null,
+        "error": null,
+        "elapsed_seconds": 9.227009280119091
+      }
+    },
+    {
+      "job_id": "537277",
+      "compiler": "cray",
+      "scope": "actual chunked logical-byte transport only; no matching, MPI-4 large-count call, or capacity closure claim",
+      "hosts": [
+        "cs-n0000",
+        "cs-n0001"
+      ],
+      "logical_bytes_per_rank": 2147483664,
+      "total_bidirectional_payload_bytes": 4294967328,
+      "rank_max_transfer_seconds": [
+        0.113788816,
+        0.155425115
+      ],
+      "maximum_rank_peak_rss_bytes": 2287325184,
+      "maximum_rank_peak_as_bytes": 2377068544,
+      "launcher_seconds": 10.16034916206263,
+      "source_hashes": {
+        "crates/quest-sys/src/mpi.rs": "169ffa6145d5aa23bbfe7bb790a174556ce1873f5c97a205a15b0a5883c70401",
+        "crates/quest-sys/examples/mpi_large_count.rs": "a43100ba07d84fdfce96b6966a342cbfde43d5481ea9db86ab2e76b0a44f0e49",
+        "crates/quest-sys/Cargo.toml": "7cb6a8daa9a017b7aa75869014a2eb0a359b04a7949347e25eecb6e675c4137e"
+      },
+      "completion_sha256": "424660d79c9b549ea1140eecef8a27fa9075aea7e276ff7412e3a48f7be3c669",
+      "recipe_sha256": "689077e5f379abe563154304742d4e8a6631eca03460d615533ba92c16a8c2e1",
+      "executable_sha256": "5a8b8aba4b166a3cfde865a4ad135bc9ab3445ea0958ecc2f180f1c58b621a73",
+      "receipt": "job-537277-completion.json",
+      "allocation": {
+        "nodes": 2,
+        "mpi_ranks": 2,
+        "ranks_per_node": 1,
+        "exclusive": true,
+        "physical_cpus_per_rank": 288,
+        "partition": "standard",
+        "qos": "short",
+        "walltime_minutes": 20
+      },
+      "process_as_cap_bytes": 8589934592,
+      "base_build_profile_sha256": "c7828fb7c4d397c8cfdee3d39d14002ba5aa05f6e93c7c15665811967f03b292",
+      "supervision": {
+        "schema_version": 1,
+        "exit_status": 0,
+        "timed_out": false,
+        "log_truncated": false,
+        "owned_step": "537277.0",
+        "cleanup": null,
+        "error": null,
+        "elapsed_seconds": 10.16034916206263
+      }
+    }
+  ],
+  "limitations": [
+    "No full-workspace rerun for the transport-only overlay",
+    "The matching routing workspace remains bounded to 128 amplitude records / 5120 bytes and was not rerouted",
+    "Per-frame MPI count remains at most INT_MAX; no MPI-4 _c call was exercised",
+    "This is not a beyond-memory capacity result",
+    "Timing includes metadata admission and MPI exchange, excludes pattern generation and full-byte verification; one trial per direction, not a throughput benchmark"
+  ]
+}

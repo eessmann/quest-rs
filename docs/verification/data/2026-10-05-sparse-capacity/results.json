@@ -1,0 +1,1774 @@
+{
+  "schema_version": 1,
+  "build_profile": "debug",
+  "staged": {
+    "scope": "single-host local experiment; no multi-host acceptance",
+    "cap_kind": "per-rank Linux RLIMIT_AS hard/soft address space",
+    "process_address_space_cap_bytes": 2147483648,
+    "model_rank_budget_bytes": 16777216,
+    "model_node_budget_bytes": 134217728,
+    "cases": [
+      {
+        "dimension": 64,
+        "ranks": 1,
+        "repetitions": 3,
+        "sum_rank_rss_high_water_bound_bytes": 307585024,
+        "stage_max_seconds": {
+          "preprocessing": 0.002550589,
+          "persistence": 0.006622048,
+          "load": 0.00543928,
+          "prepare": 0.000365963,
+          "execution": 0.002134356
+        },
+        "execution_sent_bytes": 0,
+        "execution_received_bytes": 0,
+        "producer_sent_payload_bytes": 0,
+        "rank_receipts": [
+          {
+            "address_space_high_water_bytes": 1081659392,
+            "baseline_address_space_bytes": 1080078336,
+            "baseline_rss_bytes": 300134400,
+            "colors": 2,
+            "dimension": 64,
+            "execution_batches": 12,
+            "execution_coordination_calls": 0,
+            "execution_local_pair_candidates": 1536,
+            "execution_received_bytes": 0,
+            "execution_roundtrip_seconds": [
+              0.000760456,
+              0.000685554,
+              0.000687756
+            ],
+            "execution_sent_bytes": 0,
+            "global_input_entries": 128,
+            "global_native_amplitudes": 512,
+            "loaded_retained_upper_bound_bytes": 17408,
+            "local_input_entries": 128,
+            "local_native_amplitudes": 512,
+            "maximum_sample_error": 2.7755575615628914e-17,
+            "model_node_budget_bytes": 134217728,
+            "model_peak_bytes": 16777216,
+            "model_peak_kind": "conservative admitted stage envelope, not measured peak",
+            "model_rank_budget_bytes": 16777216,
+            "native_live_reserved_bytes": 106168,
+            "norm": 0.9999999999999999,
+            "persisted_recipe_single_replay_communication_upper_bound_bytes": 0,
+            "persistence_load_measured_communication": "not instrumented; recipe replay bound is not a load measurement",
+            "process_address_space_cap_bytes": 2147483648,
+            "producer_global_edges": 128,
+            "producer_managed_peak_upper_bound_bytes": 8467456,
+            "producer_sent_payload_bytes": 0,
+            "rank": 0,
+            "ranks": 1,
+            "repetitions": 3,
+            "rss_high_water_bytes": 307585024,
+            "stages": {
+              "execution": {
+                "address_space_endpoint_bytes": 1081659392,
+                "address_space_high_water_bytes": 1081659392,
+                "rss_endpoint_bytes": 307585024,
+                "rss_high_water_bytes": 307585024,
+                "seconds": 0.002134356
+              },
+              "load": {
+                "address_space_endpoint_bytes": 1081643008,
+                "address_space_high_water_bytes": 1081643008,
+                "rss_endpoint_bytes": 306831360,
+                "rss_high_water_bytes": 306831360,
+                "seconds": 0.00543928
+              },
+              "persistence": {
+                "address_space_endpoint_bytes": 1081106432,
+                "address_space_high_water_bytes": 1081106432,
+                "rss_endpoint_bytes": 306302976,
+                "rss_high_water_bytes": 306302976,
+                "seconds": 0.006622048
+              },
+              "prepare": {
+                "address_space_endpoint_bytes": 1081659392,
+                "address_space_high_water_bytes": 1081659392,
+                "rss_endpoint_bytes": 307453952,
+                "rss_high_water_bytes": 307453952,
+                "seconds": 0.000365963
+              },
+              "preprocessing": {
+                "address_space_endpoint_bytes": 1080078336,
+                "address_space_high_water_bytes": 1080246272,
+                "rss_endpoint_bytes": 301719552,
+                "rss_high_water_bytes": 301719552,
+                "seconds": 0.002550589
+              }
+            }
+          }
+        ],
+        "launcher_seconds": 0.5774411339989456
+      },
+      {
+        "dimension": 256,
+        "ranks": 2,
+        "repetitions": 3,
+        "sum_rank_rss_high_water_bound_bytes": 621060096,
+        "stage_max_seconds": {
+          "preprocessing": 0.004254381,
+          "persistence": 0.005220418,
+          "load": 0.030646226,
+          "prepare": 0.000701886,
+          "execution": 0.010998531
+        },
+        "execution_sent_bytes": 433152,
+        "execution_received_bytes": 433152,
+        "producer_sent_payload_bytes": 409600,
+        "rank_receipts": [
+          {
+            "address_space_high_water_bytes": 1084424192,
+            "baseline_address_space_bytes": 1083424768,
+            "baseline_rss_bytes": 302325760,
+            "colors": 2,
+            "dimension": 256,
+            "execution_batches": 48,
+            "execution_coordination_calls": 384,
+            "execution_local_pair_candidates": 3072,
+            "execution_received_bytes": 226816,
+            "execution_roundtrip_seconds": [
+              0.003700087,
+              0.003614797,
+              0.003681557
+            ],
+            "execution_sent_bytes": 206336,
+            "global_input_entries": 512,
+            "global_native_amplitudes": 2048,
+            "loaded_retained_upper_bound_bytes": 30720,
+            "local_input_entries": 256,
+            "local_native_amplitudes": 1024,
+            "maximum_sample_error": 1.3877787807814457e-17,
+            "model_node_budget_bytes": 134217728,
+            "model_peak_bytes": 16777216,
+            "model_peak_kind": "conservative admitted stage envelope, not measured peak",
+            "model_rank_budget_bytes": 16777216,
+            "native_live_reserved_bytes": 178888,
+            "norm": 0.9999999999999999,
+            "persisted_recipe_single_replay_communication_upper_bound_bytes": 1169040,
+            "persistence_load_measured_communication": "not instrumented; recipe replay bound is not a load measurement",
+            "process_address_space_cap_bytes": 2147483648,
+            "producer_global_edges": 512,
+            "producer_managed_peak_upper_bound_bytes": 8525824,
+            "producer_sent_payload_bytes": 204800,
+            "rank": 0,
+            "ranks": 2,
+            "repetitions": 3,
+            "rss_high_water_bytes": 310390784,
+            "stages": {
+              "execution": {
+                "address_space_endpoint_bytes": 1084424192,
+                "address_space_high_water_bytes": 1084424192,
+                "rss_endpoint_bytes": 310390784,
+                "rss_high_water_bytes": 310390784,
+                "seconds": 0.010997771
+              },
+              "load": {
+                "address_space_endpoint_bytes": 1084391424,
+                "address_space_high_water_bytes": 1084391424,
+                "rss_endpoint_bytes": 309653504,
+                "rss_high_water_bytes": 309653504,
+                "seconds": 0.030646006
+              },
+              "persistence": {
+                "address_space_endpoint_bytes": 1084391424,
+                "address_space_high_water_bytes": 1084391424,
+                "rss_endpoint_bytes": 309477376,
+                "rss_high_water_bytes": 309477376,
+                "seconds": 0.005220208
+              },
+              "prepare": {
+                "address_space_endpoint_bytes": 1084424192,
+                "address_space_high_water_bytes": 1084424192,
+                "rss_endpoint_bytes": 310239232,
+                "rss_high_water_bytes": 310239232,
+                "seconds": 0.000701576
+              },
+              "preprocessing": {
+                "address_space_endpoint_bytes": 1083424768,
+                "address_space_high_water_bytes": 1083592704,
+                "rss_endpoint_bytes": 304812032,
+                "rss_high_water_bytes": 304812032,
+                "seconds": 0.004253051
+              }
+            }
+          },
+          {
+            "address_space_high_water_bytes": 1084948480,
+            "baseline_address_space_bytes": 1083416576,
+            "baseline_rss_bytes": 302190592,
+            "colors": 2,
+            "dimension": 256,
+            "execution_batches": 48,
+            "execution_coordination_calls": 384,
+            "execution_local_pair_candidates": 3072,
+            "execution_received_bytes": 206336,
+            "execution_roundtrip_seconds": [
+              0.003698097,
+              0.003636337,
+              0.003660487
+            ],
+            "execution_sent_bytes": 226816,
+            "global_input_entries": 512,
+            "global_native_amplitudes": 2048,
+            "loaded_retained_upper_bound_bytes": 30720,
+            "local_input_entries": 256,
+            "local_native_amplitudes": 1024,
+            "maximum_sample_error": 6.938893903907228e-18,
+            "model_node_budget_bytes": 134217728,
+            "model_peak_bytes": 16777216,
+            "model_peak_kind": "conservative admitted stage envelope, not measured peak",
+            "model_rank_budget_bytes": 16777216,
+            "native_live_reserved_bytes": 178888,
+            "norm": 0.9999999999999999,
+            "persisted_recipe_single_replay_communication_upper_bound_bytes": 1169040,
+            "persistence_load_measured_communication": "not instrumented; recipe replay bound is not a load measurement",
+            "process_address_space_cap_bytes": 2147483648,
+            "producer_global_edges": 512,
+            "producer_managed_peak_upper_bound_bytes": 8525824,
+            "producer_sent_payload_bytes": 204800,
+            "rank": 1,
+            "ranks": 2,
+            "repetitions": 3,
+            "rss_high_water_bytes": 310669312,
+            "stages": {
+              "execution": {
+                "address_space_endpoint_bytes": 1084948480,
+                "address_space_high_water_bytes": 1084948480,
+                "rss_endpoint_bytes": 310669312,
+                "rss_high_water_bytes": 310669312,
+                "seconds": 0.010998531
+              },
+              "load": {
+                "address_space_endpoint_bytes": 1084915712,
+                "address_space_high_water_bytes": 1084915712,
+                "rss_endpoint_bytes": 309919744,
+                "rss_high_water_bytes": 309919744,
+                "seconds": 0.030646226
+              },
+              "persistence": {
+                "address_space_endpoint_bytes": 1084387328,
+                "address_space_high_water_bytes": 1084387328,
+                "rss_endpoint_bytes": 309264384,
+                "rss_high_water_bytes": 309264384,
+                "seconds": 0.005220418
+              },
+              "prepare": {
+                "address_space_endpoint_bytes": 1084948480,
+                "address_space_high_water_bytes": 1084948480,
+                "rss_endpoint_bytes": 310480896,
+                "rss_high_water_bytes": 310480896,
+                "seconds": 0.000701886
+              },
+              "preprocessing": {
+                "address_space_endpoint_bytes": 1083416576,
+                "address_space_high_water_bytes": 1083584512,
+                "rss_endpoint_bytes": 304635904,
+                "rss_high_water_bytes": 304635904,
+                "seconds": 0.004254381
+              }
+            }
+          }
+        ],
+        "launcher_seconds": 0.6137233619992912
+      },
+      {
+        "dimension": 1024,
+        "ranks": 4,
+        "repetitions": 3,
+        "sum_rank_rss_high_water_bound_bytes": 1255927808,
+        "stage_max_seconds": {
+          "preprocessing": 0.009411829,
+          "persistence": 0.00543782,
+          "load": 0.221513192,
+          "prepare": 0.002411047,
+          "execution": 0.041524886
+        },
+        "execution_sent_bytes": 2654208,
+        "execution_received_bytes": 2654208,
+        "producer_sent_payload_bytes": 1638400,
+        "rank_receipts": [
+          {
+            "address_space_high_water_bytes": 1088733184,
+            "baseline_address_space_bytes": 1086586880,
+            "baseline_rss_bytes": 303169536,
+            "colors": 2,
+            "dimension": 1024,
+            "execution_batches": 192,
+            "execution_coordination_calls": 4608,
+            "execution_local_pair_candidates": 6144,
+            "execution_received_bytes": 755712,
+            "execution_roundtrip_seconds": [
+              0.013930922,
+              0.013888223,
+              0.013703121
+            ],
+            "execution_sent_bytes": 714752,
+            "global_input_entries": 2048,
+            "global_native_amplitudes": 8192,
+            "loaded_retained_upper_bound_bytes": 57344,
+            "local_input_entries": 512,
+            "local_native_amplitudes": 2048,
+            "maximum_sample_error": 6.938893903907228e-18,
+            "model_node_budget_bytes": 134217728,
+            "model_peak_bytes": 16777216,
+            "model_peak_kind": "conservative admitted stage envelope, not measured peak",
+            "model_rank_budget_bytes": 16777216,
+            "native_live_reserved_bytes": 324312,
+            "norm": 0.9999999999999999,
+            "persisted_recipe_single_replay_communication_upper_bound_bytes": 17750256,
+            "persistence_load_measured_communication": "not instrumented; recipe replay bound is not a load measurement",
+            "process_address_space_cap_bytes": 2147483648,
+            "producer_global_edges": 2048,
+            "producer_managed_peak_upper_bound_bytes": 8642560,
+            "producer_sent_payload_bytes": 409600,
+            "rank": 0,
+            "ranks": 4,
+            "repetitions": 3,
+            "rss_high_water_bytes": 313778176,
+            "stages": {
+              "execution": {
+                "address_space_endpoint_bytes": 1088733184,
+                "address_space_high_water_bytes": 1088733184,
+                "rss_endpoint_bytes": 313778176,
+                "rss_high_water_bytes": 313778176,
+                "seconds": 0.041524086
+              },
+              "load": {
+                "address_space_endpoint_bytes": 1087598592,
+                "address_space_high_water_bytes": 1087598592,
+                "rss_endpoint_bytes": 311742464,
+                "rss_high_water_bytes": 311742464,
+                "seconds": 0.221513182
+              },
+              "persistence": {
+                "address_space_endpoint_bytes": 1087598592,
+                "address_space_high_water_bytes": 1087598592,
+                "rss_endpoint_bytes": 311603200,
+                "rss_high_water_bytes": 311603200,
+                "seconds": 0.00543762
+              },
+              "prepare": {
+                "address_space_endpoint_bytes": 1087664128,
+                "address_space_high_water_bytes": 1087664128,
+                "rss_endpoint_bytes": 312381440,
+                "rss_high_water_bytes": 312381440,
+                "seconds": 0.002411047
+              },
+              "preprocessing": {
+                "address_space_endpoint_bytes": 1086722048,
+                "address_space_high_water_bytes": 1086754816,
+                "rss_endpoint_bytes": 307015680,
+                "rss_high_water_bytes": 307015680,
+                "seconds": 0.009411829
+              }
+            }
+          },
+          {
+            "address_space_high_water_bytes": 1088729088,
+            "baseline_address_space_bytes": 1086578688,
+            "baseline_rss_bytes": 303407104,
+            "colors": 2,
+            "dimension": 1024,
+            "execution_batches": 192,
+            "execution_coordination_calls": 4608,
+            "execution_local_pair_candidates": 6144,
+            "execution_received_bytes": 755712,
+            "execution_roundtrip_seconds": [
+              0.013932052,
+              0.013881502,
+              0.013708122
+            ],
+            "execution_sent_bytes": 714752,
+            "global_input_entries": 2048,
+            "global_native_amplitudes": 8192,
+            "loaded_retained_upper_bound_bytes": 57344,
+            "local_input_entries": 512,
+            "local_native_amplitudes": 2048,
+            "maximum_sample_error": 6.938893903907228e-18,
+            "model_node_budget_bytes": 134217728,
+            "model_peak_bytes": 16777216,
+            "model_peak_kind": "conservative admitted stage envelope, not measured peak",
+            "model_rank_budget_bytes": 16777216,
+            "native_live_reserved_bytes": 324312,
+            "norm": 0.9999999999999999,
+            "persisted_recipe_single_replay_communication_upper_bound_bytes": 17750256,
+            "persistence_load_measured_communication": "not instrumented; recipe replay bound is not a load measurement",
+            "process_address_space_cap_bytes": 2147483648,
+            "producer_global_edges": 2048,
+            "producer_managed_peak_upper_bound_bytes": 8642560,
+            "producer_sent_payload_bytes": 409600,
+            "rank": 1,
+            "ranks": 4,
+            "repetitions": 3,
+            "rss_high_water_bytes": 313761792,
+            "stages": {
+              "execution": {
+                "address_space_endpoint_bytes": 1088729088,
+                "address_space_high_water_bytes": 1088729088,
+                "rss_endpoint_bytes": 313761792,
+                "rss_high_water_bytes": 313761792,
+                "seconds": 0.041524246
+              },
+              "load": {
+                "address_space_endpoint_bytes": 1087594496,
+                "address_space_high_water_bytes": 1087594496,
+                "rss_endpoint_bytes": 311881728,
+                "rss_high_water_bytes": 311881728,
+                "seconds": 0.221512952
+              },
+              "persistence": {
+                "address_space_endpoint_bytes": 1087594496,
+                "address_space_high_water_bytes": 1087594496,
+                "rss_endpoint_bytes": 311738368,
+                "rss_high_water_bytes": 311738368,
+                "seconds": 0.00543763
+              },
+              "prepare": {
+                "address_space_endpoint_bytes": 1087660032,
+                "address_space_high_water_bytes": 1087660032,
+                "rss_endpoint_bytes": 312475648,
+                "rss_high_water_bytes": 312475648,
+                "seconds": 0.002410647
+              },
+              "preprocessing": {
+                "address_space_endpoint_bytes": 1086578688,
+                "address_space_high_water_bytes": 1086746624,
+                "rss_endpoint_bytes": 307179520,
+                "rss_high_water_bytes": 307179520,
+                "seconds": 0.009409149
+              }
+            }
+          },
+          {
+            "address_space_high_water_bytes": 1088729088,
+            "baseline_address_space_bytes": 1086578688,
+            "baseline_rss_bytes": 303550464,
+            "colors": 2,
+            "dimension": 1024,
+            "execution_batches": 192,
+            "execution_coordination_calls": 4608,
+            "execution_local_pair_candidates": 6144,
+            "execution_received_bytes": 571392,
+            "execution_roundtrip_seconds": [
+              0.013924662,
+              0.013917213,
+              0.01367194
+            ],
+            "execution_sent_bytes": 612352,
+            "global_input_entries": 2048,
+            "global_native_amplitudes": 8192,
+            "loaded_retained_upper_bound_bytes": 57344,
+            "local_input_entries": 512,
+            "local_native_amplitudes": 2048,
+            "maximum_sample_error": 3.469446951953614e-18,
+            "model_node_budget_bytes": 134217728,
+            "model_peak_bytes": 16777216,
+            "model_peak_kind": "conservative admitted stage envelope, not measured peak",
+            "model_rank_budget_bytes": 16777216,
+            "native_live_reserved_bytes": 324312,
+            "norm": 0.9999999999999999,
+            "persisted_recipe_single_replay_communication_upper_bound_bytes": 17750256,
+            "persistence_load_measured_communication": "not instrumented; recipe replay bound is not a load measurement",
+            "process_address_space_cap_bytes": 2147483648,
+            "producer_global_edges": 2048,
+            "producer_managed_peak_upper_bound_bytes": 8642560,
+            "producer_sent_payload_bytes": 409600,
+            "rank": 2,
+            "ranks": 4,
+            "repetitions": 3,
+            "rss_high_water_bytes": 314044416,
+            "stages": {
+              "execution": {
+                "address_space_endpoint_bytes": 1088729088,
+                "address_space_high_water_bytes": 1088729088,
+                "rss_endpoint_bytes": 314044416,
+                "rss_high_water_bytes": 314044416,
+                "seconds": 0.041524886
+              },
+              "load": {
+                "address_space_endpoint_bytes": 1087594496,
+                "address_space_high_water_bytes": 1087594496,
+                "rss_endpoint_bytes": 312025088,
+                "rss_high_water_bytes": 312025088,
+                "seconds": 0.221513092
+              },
+              "persistence": {
+                "address_space_endpoint_bytes": 1087594496,
+                "address_space_high_water_bytes": 1087594496,
+                "rss_endpoint_bytes": 311881728,
+                "rss_high_water_bytes": 311881728,
+                "seconds": 0.00543743
+              },
+              "prepare": {
+                "address_space_endpoint_bytes": 1087660032,
+                "address_space_high_water_bytes": 1087660032,
+                "rss_endpoint_bytes": 312590336,
+                "rss_high_water_bytes": 312590336,
+                "seconds": 0.002411007
+              },
+              "preprocessing": {
+                "address_space_endpoint_bytes": 1086578688,
+                "address_space_high_water_bytes": 1086746624,
+                "rss_endpoint_bytes": 307404800,
+                "rss_high_water_bytes": 307404800,
+                "seconds": 0.009411269
+              }
+            }
+          },
+          {
+            "address_space_high_water_bytes": 1088729088,
+            "baseline_address_space_bytes": 1086578688,
+            "baseline_rss_bytes": 303669248,
+            "colors": 2,
+            "dimension": 1024,
+            "execution_batches": 192,
+            "execution_coordination_calls": 4608,
+            "execution_local_pair_candidates": 6144,
+            "execution_received_bytes": 571392,
+            "execution_roundtrip_seconds": [
+              0.013918022,
+              0.013919423,
+              0.01367159
+            ],
+            "execution_sent_bytes": 612352,
+            "global_input_entries": 2048,
+            "global_native_amplitudes": 8192,
+            "loaded_retained_upper_bound_bytes": 57344,
+            "local_input_entries": 512,
+            "local_native_amplitudes": 2048,
+            "maximum_sample_error": 3.469446951953614e-18,
+            "model_node_budget_bytes": 134217728,
+            "model_peak_bytes": 16777216,
+            "model_peak_kind": "conservative admitted stage envelope, not measured peak",
+            "model_rank_budget_bytes": 16777216,
+            "native_live_reserved_bytes": 324312,
+            "norm": 0.9999999999999999,
+            "persisted_recipe_single_replay_communication_upper_bound_bytes": 17750256,
+            "persistence_load_measured_communication": "not instrumented; recipe replay bound is not a load measurement",
+            "process_address_space_cap_bytes": 2147483648,
+            "producer_global_edges": 2048,
+            "producer_managed_peak_upper_bound_bytes": 8642560,
+            "producer_sent_payload_bytes": 409600,
+            "rank": 3,
+            "ranks": 4,
+            "repetitions": 3,
+            "rss_high_water_bytes": 314343424,
+            "stages": {
+              "execution": {
+                "address_space_endpoint_bytes": 1088729088,
+                "address_space_high_water_bytes": 1088729088,
+                "rss_endpoint_bytes": 314343424,
+                "rss_high_water_bytes": 314343424,
+                "seconds": 0.041524606
+              },
+              "load": {
+                "address_space_endpoint_bytes": 1087594496,
+                "address_space_high_water_bytes": 1087594496,
+                "rss_endpoint_bytes": 312279040,
+                "rss_high_water_bytes": 312279040,
+                "seconds": 0.221513192
+              },
+              "persistence": {
+                "address_space_endpoint_bytes": 1087594496,
+                "address_space_high_water_bytes": 1087594496,
+                "rss_endpoint_bytes": 312037376,
+                "rss_high_water_bytes": 312037376,
+                "seconds": 0.00543782
+              },
+              "prepare": {
+                "address_space_endpoint_bytes": 1087660032,
+                "address_space_high_water_bytes": 1087660032,
+                "rss_endpoint_bytes": 312934400,
+                "rss_high_water_bytes": 312934400,
+                "seconds": 0.002410797
+              },
+              "preprocessing": {
+                "address_space_endpoint_bytes": 1086578688,
+                "address_space_high_water_bytes": 1086746624,
+                "rss_endpoint_bytes": 307396608,
+                "rss_high_water_bytes": 307396608,
+                "seconds": 0.009409539
+              }
+            }
+          }
+        ],
+        "launcher_seconds": 0.8536281599990616
+      },
+      {
+        "dimension": 64,
+        "ranks": 8,
+        "repetitions": 3,
+        "sum_rank_rss_high_water_bound_bytes": 2527768576,
+        "stage_max_seconds": {
+          "preprocessing": 0.002910952,
+          "persistence": 0.00407219,
+          "load": 0.04204359,
+          "prepare": 0.000885357,
+          "execution": 0.004085111
+        },
+        "execution_sent_bytes": 231168,
+        "execution_received_bytes": 231168,
+        "producer_sent_payload_bytes": 102400,
+        "rank_receipts": [
+          {
+            "address_space_high_water_bytes": 1091747840,
+            "baseline_address_space_bytes": 1090805760,
+            "baseline_rss_bytes": 304230400,
+            "colors": 2,
+            "dimension": 64,
+            "execution_batches": 24,
+            "execution_coordination_calls": 1344,
+            "execution_local_pair_candidates": 192,
+            "execution_received_bytes": 32896,
+            "execution_roundtrip_seconds": [
+              0.001424001,
+              0.001299309,
+              0.0013526
+            ],
+            "execution_sent_bytes": 31616,
+            "global_input_entries": 128,
+            "global_native_amplitudes": 512,
+            "loaded_retained_upper_bound_bytes": 5760,
+            "local_input_entries": 16,
+            "local_native_amplitudes": 64,
+            "maximum_sample_error": 2.7755575615628914e-17,
+            "model_node_budget_bytes": 134217728,
+            "model_peak_bytes": 16777216,
+            "model_peak_kind": "conservative admitted stage envelope, not measured peak",
+            "model_rank_budget_bytes": 16777216,
+            "native_live_reserved_bytes": 42552,
+            "norm": 0.9999999999999998,
+            "persisted_recipe_single_replay_communication_upper_bound_bytes": 3698352,
+            "persistence_load_measured_communication": "not instrumented; recipe replay bound is not a load measurement",
+            "process_address_space_cap_bytes": 2147483648,
+            "producer_global_edges": 128,
+            "producer_managed_peak_upper_bound_bytes": 8416384,
+            "producer_sent_payload_bytes": 12800,
+            "rank": 0,
+            "ranks": 8,
+            "repetitions": 3,
+            "rss_high_water_bytes": 316248064,
+            "stages": {
+              "execution": {
+                "address_space_endpoint_bytes": 1091747840,
+                "address_space_high_water_bytes": 1091747840,
+                "rss_endpoint_bytes": 316248064,
+                "rss_high_water_bytes": 316248064,
+                "seconds": 0.00408377
+              },
+              "load": {
+                "address_space_endpoint_bytes": 1091747840,
+                "address_space_high_water_bytes": 1091747840,
+                "rss_endpoint_bytes": 315420672,
+                "rss_high_water_bytes": 315420672,
+                "seconds": 0.04204327
+              },
+              "persistence": {
+                "address_space_endpoint_bytes": 1091211264,
+                "address_space_high_water_bytes": 1091739648,
+                "rss_endpoint_bytes": 314441728,
+                "rss_high_water_bytes": 314441728,
+                "seconds": 0.00407195
+              },
+              "prepare": {
+                "address_space_endpoint_bytes": 1091747840,
+                "address_space_high_water_bytes": 1091747840,
+                "rss_endpoint_bytes": 315932672,
+                "rss_high_water_bytes": 315932672,
+                "seconds": 0.000885357
+              },
+              "preprocessing": {
+                "address_space_endpoint_bytes": 1090805760,
+                "address_space_high_water_bytes": 1090973696,
+                "rss_endpoint_bytes": 310259712,
+                "rss_high_water_bytes": 310259712,
+                "seconds": 0.002909192
+              }
+            }
+          },
+          {
+            "address_space_high_water_bytes": 1091743744,
+            "baseline_address_space_bytes": 1090797568,
+            "baseline_rss_bytes": 304177152,
+            "colors": 2,
+            "dimension": 64,
+            "execution_batches": 24,
+            "execution_coordination_calls": 1344,
+            "execution_local_pair_candidates": 192,
+            "execution_received_bytes": 32896,
+            "execution_roundtrip_seconds": [
+              0.001423851,
+              0.001292089,
+              0.00136382
+            ],
+            "execution_sent_bytes": 31616,
+            "global_input_entries": 128,
+            "global_native_amplitudes": 512,
+            "loaded_retained_upper_bound_bytes": 5760,
+            "local_input_entries": 16,
+            "local_native_amplitudes": 64,
+            "maximum_sample_error": 2.7755575615628914e-17,
+            "model_node_budget_bytes": 134217728,
+            "model_peak_bytes": 16777216,
+            "model_peak_kind": "conservative admitted stage envelope, not measured peak",
+            "model_rank_budget_bytes": 16777216,
+            "native_live_reserved_bytes": 42552,
+            "norm": 0.9999999999999998,
+            "persisted_recipe_single_replay_communication_upper_bound_bytes": 3698352,
+            "persistence_load_measured_communication": "not instrumented; recipe replay bound is not a load measurement",
+            "process_address_space_cap_bytes": 2147483648,
+            "producer_global_edges": 128,
+            "producer_managed_peak_upper_bound_bytes": 8416384,
+            "producer_sent_payload_bytes": 12800,
+            "rank": 1,
+            "ranks": 8,
+            "repetitions": 3,
+            "rss_high_water_bytes": 316194816,
+            "stages": {
+              "execution": {
+                "address_space_endpoint_bytes": 1091743744,
+                "address_space_high_water_bytes": 1091743744,
+                "rss_endpoint_bytes": 316182528,
+                "rss_high_water_bytes": 316182528,
+                "seconds": 0.004084341
+              },
+              "load": {
+                "address_space_endpoint_bytes": 1091743744,
+                "address_space_high_water_bytes": 1091743744,
+                "rss_endpoint_bytes": 315006976,
+                "rss_high_water_bytes": 315006976,
+                "seconds": 0.0420432
+              },
+              "persistence": {
+                "address_space_endpoint_bytes": 1091076096,
+                "address_space_high_water_bytes": 1091604480,
+                "rss_endpoint_bytes": 314257408,
+                "rss_high_water_bytes": 314257408,
+                "seconds": 0.00407194
+              },
+              "prepare": {
+                "address_space_endpoint_bytes": 1091743744,
+                "address_space_high_water_bytes": 1091743744,
+                "rss_endpoint_bytes": 315793408,
+                "rss_high_water_bytes": 315793408,
+                "seconds": 0.000884817
+              },
+              "preprocessing": {
+                "address_space_endpoint_bytes": 1090797568,
+                "address_space_high_water_bytes": 1090965504,
+                "rss_endpoint_bytes": 310013952,
+                "rss_high_water_bytes": 310013952,
+                "seconds": 0.002903762
+              }
+            }
+          },
+          {
+            "address_space_high_water_bytes": 1091743744,
+            "baseline_address_space_bytes": 1090797568,
+            "baseline_rss_bytes": 303554560,
+            "colors": 2,
+            "dimension": 64,
+            "execution_batches": 24,
+            "execution_coordination_calls": 1344,
+            "execution_local_pair_candidates": 192,
+            "execution_received_bytes": 32896,
+            "execution_roundtrip_seconds": [
+              0.001424061,
+              0.001292139,
+              0.00135984
+            ],
+            "execution_sent_bytes": 31616,
+            "global_input_entries": 128,
+            "global_native_amplitudes": 512,
+            "loaded_retained_upper_bound_bytes": 5760,
+            "local_input_entries": 16,
+            "local_native_amplitudes": 64,
+            "maximum_sample_error": 2.7755575615628914e-17,
+            "model_node_budget_bytes": 134217728,
+            "model_peak_bytes": 16777216,
+            "model_peak_kind": "conservative admitted stage envelope, not measured peak",
+            "model_rank_budget_bytes": 16777216,
+            "native_live_reserved_bytes": 42552,
+            "norm": 0.9999999999999998,
+            "persisted_recipe_single_replay_communication_upper_bound_bytes": 3698352,
+            "persistence_load_measured_communication": "not instrumented; recipe replay bound is not a load measurement",
+            "process_address_space_cap_bytes": 2147483648,
+            "producer_global_edges": 128,
+            "producer_managed_peak_upper_bound_bytes": 8416384,
+            "producer_sent_payload_bytes": 12800,
+            "rank": 2,
+            "ranks": 8,
+            "repetitions": 3,
+            "rss_high_water_bytes": 315555840,
+            "stages": {
+              "execution": {
+                "address_space_endpoint_bytes": 1091743744,
+                "address_space_high_water_bytes": 1091743744,
+                "rss_endpoint_bytes": 315555840,
+                "rss_high_water_bytes": 315555840,
+                "seconds": 0.00408351
+              },
+              "load": {
+                "address_space_endpoint_bytes": 1091743744,
+                "address_space_high_water_bytes": 1091743744,
+                "rss_endpoint_bytes": 314503168,
+                "rss_high_water_bytes": 314503168,
+                "seconds": 0.04204322
+              },
+              "persistence": {
+                "address_space_endpoint_bytes": 1091076096,
+                "address_space_high_water_bytes": 1091604480,
+                "rss_endpoint_bytes": 313790464,
+                "rss_high_water_bytes": 313790464,
+                "seconds": 0.00407144
+              },
+              "prepare": {
+                "address_space_endpoint_bytes": 1091743744,
+                "address_space_high_water_bytes": 1091743744,
+                "rss_endpoint_bytes": 315342848,
+                "rss_high_water_bytes": 315342848,
+                "seconds": 0.000884767
+              },
+              "preprocessing": {
+                "address_space_endpoint_bytes": 1090797568,
+                "address_space_high_water_bytes": 1090965504,
+                "rss_endpoint_bytes": 309661696,
+                "rss_high_water_bytes": 309661696,
+                "seconds": 0.002903772
+              }
+            }
+          },
+          {
+            "address_space_high_water_bytes": 1091743744,
+            "baseline_address_space_bytes": 1090797568,
+            "baseline_rss_bytes": 304160768,
+            "colors": 2,
+            "dimension": 64,
+            "execution_batches": 24,
+            "execution_coordination_calls": 1344,
+            "execution_local_pair_candidates": 192,
+            "execution_received_bytes": 32896,
+            "execution_roundtrip_seconds": [
+              0.001424171,
+              0.001289759,
+              0.00136714
+            ],
+            "execution_sent_bytes": 31616,
+            "global_input_entries": 128,
+            "global_native_amplitudes": 512,
+            "loaded_retained_upper_bound_bytes": 5760,
+            "local_input_entries": 16,
+            "local_native_amplitudes": 64,
+            "maximum_sample_error": 2.7755575615628914e-17,
+            "model_node_budget_bytes": 134217728,
+            "model_peak_bytes": 16777216,
+            "model_peak_kind": "conservative admitted stage envelope, not measured peak",
+            "model_rank_budget_bytes": 16777216,
+            "native_live_reserved_bytes": 42552,
+            "norm": 0.9999999999999998,
+            "persisted_recipe_single_replay_communication_upper_bound_bytes": 3698352,
+            "persistence_load_measured_communication": "not instrumented; recipe replay bound is not a load measurement",
+            "process_address_space_cap_bytes": 2147483648,
+            "producer_global_edges": 128,
+            "producer_managed_peak_upper_bound_bytes": 8416384,
+            "producer_sent_payload_bytes": 12800,
+            "rank": 3,
+            "ranks": 8,
+            "repetitions": 3,
+            "rss_high_water_bytes": 315715584,
+            "stages": {
+              "execution": {
+                "address_space_endpoint_bytes": 1091743744,
+                "address_space_high_water_bytes": 1091743744,
+                "rss_endpoint_bytes": 315715584,
+                "rss_high_water_bytes": 315715584,
+                "seconds": 0.00408399
+              },
+              "load": {
+                "address_space_endpoint_bytes": 1091743744,
+                "address_space_high_water_bytes": 1091743744,
+                "rss_endpoint_bytes": 314814464,
+                "rss_high_water_bytes": 314814464,
+                "seconds": 0.0420413
+              },
+              "persistence": {
+                "address_space_endpoint_bytes": 1091076096,
+                "address_space_high_water_bytes": 1091604480,
+                "rss_endpoint_bytes": 314068992,
+                "rss_high_water_bytes": 314068992,
+                "seconds": 0.00407219
+              },
+              "prepare": {
+                "address_space_endpoint_bytes": 1091743744,
+                "address_space_high_water_bytes": 1091743744,
+                "rss_endpoint_bytes": 315379712,
+                "rss_high_water_bytes": 315379712,
+                "seconds": 0.000884267
+              },
+              "preprocessing": {
+                "address_space_endpoint_bytes": 1090797568,
+                "address_space_high_water_bytes": 1090965504,
+                "rss_endpoint_bytes": 310087680,
+                "rss_high_water_bytes": 310087680,
+                "seconds": 0.002905662
+              }
+            }
+          },
+          {
+            "address_space_high_water_bytes": 1091743744,
+            "baseline_address_space_bytes": 1090797568,
+            "baseline_rss_bytes": 304218112,
+            "colors": 2,
+            "dimension": 64,
+            "execution_batches": 24,
+            "execution_coordination_calls": 1344,
+            "execution_local_pair_candidates": 192,
+            "execution_received_bytes": 24896,
+            "execution_roundtrip_seconds": [
+              0.001422221,
+              0.001296269,
+              0.00135514
+            ],
+            "execution_sent_bytes": 26176,
+            "global_input_entries": 128,
+            "global_native_amplitudes": 512,
+            "loaded_retained_upper_bound_bytes": 5760,
+            "local_input_entries": 16,
+            "local_native_amplitudes": 64,
+            "maximum_sample_error": 1.3877787807814457e-17,
+            "model_node_budget_bytes": 134217728,
+            "model_peak_bytes": 16777216,
+            "model_peak_kind": "conservative admitted stage envelope, not measured peak",
+            "model_rank_budget_bytes": 16777216,
+            "native_live_reserved_bytes": 42552,
+            "norm": 0.9999999999999998,
+            "persisted_recipe_single_replay_communication_upper_bound_bytes": 3698352,
+            "persistence_load_measured_communication": "not instrumented; recipe replay bound is not a load measurement",
+            "process_address_space_cap_bytes": 2147483648,
+            "producer_global_edges": 128,
+            "producer_managed_peak_upper_bound_bytes": 8416384,
+            "producer_sent_payload_bytes": 12800,
+            "rank": 4,
+            "ranks": 8,
+            "repetitions": 3,
+            "rss_high_water_bytes": 315826176,
+            "stages": {
+              "execution": {
+                "address_space_endpoint_bytes": 1091743744,
+                "address_space_high_water_bytes": 1091743744,
+                "rss_endpoint_bytes": 315813888,
+                "rss_high_water_bytes": 315813888,
+                "seconds": 0.00408419
+              },
+              "load": {
+                "address_space_endpoint_bytes": 1091743744,
+                "address_space_high_water_bytes": 1091743744,
+                "rss_endpoint_bytes": 314699776,
+                "rss_high_water_bytes": 314699776,
+                "seconds": 0.04204357
+              },
+              "persistence": {
+                "address_space_endpoint_bytes": 1091076096,
+                "address_space_high_water_bytes": 1091604480,
+                "rss_endpoint_bytes": 313901056,
+                "rss_high_water_bytes": 313901056,
+                "seconds": 0.004071
+              },
+              "prepare": {
+                "address_space_endpoint_bytes": 1091743744,
+                "address_space_high_water_bytes": 1091743744,
+                "rss_endpoint_bytes": 315396096,
+                "rss_high_water_bytes": 315396096,
+                "seconds": 0.000884597
+              },
+              "preprocessing": {
+                "address_space_endpoint_bytes": 1090797568,
+                "address_space_high_water_bytes": 1090965504,
+                "rss_endpoint_bytes": 309719040,
+                "rss_high_water_bytes": 309719040,
+                "seconds": 0.002910952
+              }
+            }
+          },
+          {
+            "address_space_high_water_bytes": 1091743744,
+            "baseline_address_space_bytes": 1090797568,
+            "baseline_rss_bytes": 304590848,
+            "colors": 2,
+            "dimension": 64,
+            "execution_batches": 24,
+            "execution_coordination_calls": 1344,
+            "execution_local_pair_candidates": 192,
+            "execution_received_bytes": 24896,
+            "execution_roundtrip_seconds": [
+              0.001421741,
+              0.001305059,
+              0.00134677
+            ],
+            "execution_sent_bytes": 26176,
+            "global_input_entries": 128,
+            "global_native_amplitudes": 512,
+            "loaded_retained_upper_bound_bytes": 5760,
+            "local_input_entries": 16,
+            "local_native_amplitudes": 64,
+            "maximum_sample_error": 1.3877787807814457e-17,
+            "model_node_budget_bytes": 134217728,
+            "model_peak_bytes": 16777216,
+            "model_peak_kind": "conservative admitted stage envelope, not measured peak",
+            "model_rank_budget_bytes": 16777216,
+            "native_live_reserved_bytes": 42552,
+            "norm": 0.9999999999999998,
+            "persisted_recipe_single_replay_communication_upper_bound_bytes": 3698352,
+            "persistence_load_measured_communication": "not instrumented; recipe replay bound is not a load measurement",
+            "process_address_space_cap_bytes": 2147483648,
+            "producer_global_edges": 128,
+            "producer_managed_peak_upper_bound_bytes": 8416384,
+            "producer_sent_payload_bytes": 12800,
+            "rank": 5,
+            "ranks": 8,
+            "repetitions": 3,
+            "rss_high_water_bytes": 316346368,
+            "stages": {
+              "execution": {
+                "address_space_endpoint_bytes": 1091743744,
+                "address_space_high_water_bytes": 1091743744,
+                "rss_endpoint_bytes": 316346368,
+                "rss_high_water_bytes": 316346368,
+                "seconds": 0.004085111
+              },
+              "load": {
+                "address_space_endpoint_bytes": 1091743744,
+                "address_space_high_water_bytes": 1091743744,
+                "rss_endpoint_bytes": 315338752,
+                "rss_high_water_bytes": 315338752,
+                "seconds": 0.04204359
+              },
+              "persistence": {
+                "address_space_endpoint_bytes": 1091076096,
+                "address_space_high_water_bytes": 1091604480,
+                "rss_endpoint_bytes": 314613760,
+                "rss_high_water_bytes": 314613760,
+                "seconds": 0.00407172
+              },
+              "prepare": {
+                "address_space_endpoint_bytes": 1091743744,
+                "address_space_high_water_bytes": 1091743744,
+                "rss_endpoint_bytes": 316125184,
+                "rss_high_water_bytes": 316125184,
+                "seconds": 0.000883917
+              },
+              "preprocessing": {
+                "address_space_endpoint_bytes": 1090797568,
+                "address_space_high_water_bytes": 1090965504,
+                "rss_endpoint_bytes": 310468608,
+                "rss_high_water_bytes": 310468608,
+                "seconds": 0.002905622
+              }
+            }
+          },
+          {
+            "address_space_high_water_bytes": 1091743744,
+            "baseline_address_space_bytes": 1090797568,
+            "baseline_rss_bytes": 303501312,
+            "colors": 2,
+            "dimension": 64,
+            "execution_batches": 24,
+            "execution_coordination_calls": 1344,
+            "execution_local_pair_candidates": 192,
+            "execution_received_bytes": 24896,
+            "execution_roundtrip_seconds": [
+              0.001422021,
+              0.001296359,
+              0.00135559
+            ],
+            "execution_sent_bytes": 26176,
+            "global_input_entries": 128,
+            "global_native_amplitudes": 512,
+            "loaded_retained_upper_bound_bytes": 5760,
+            "local_input_entries": 16,
+            "local_native_amplitudes": 64,
+            "maximum_sample_error": 1.3877787807814457e-17,
+            "model_node_budget_bytes": 134217728,
+            "model_peak_bytes": 16777216,
+            "model_peak_kind": "conservative admitted stage envelope, not measured peak",
+            "model_rank_budget_bytes": 16777216,
+            "native_live_reserved_bytes": 42552,
+            "norm": 0.9999999999999998,
+            "persisted_recipe_single_replay_communication_upper_bound_bytes": 3698352,
+            "persistence_load_measured_communication": "not instrumented; recipe replay bound is not a load measurement",
+            "process_address_space_cap_bytes": 2147483648,
+            "producer_global_edges": 128,
+            "producer_managed_peak_upper_bound_bytes": 8416384,
+            "producer_sent_payload_bytes": 12800,
+            "rank": 6,
+            "ranks": 8,
+            "repetitions": 3,
+            "rss_high_water_bytes": 315633664,
+            "stages": {
+              "execution": {
+                "address_space_endpoint_bytes": 1091743744,
+                "address_space_high_water_bytes": 1091743744,
+                "rss_endpoint_bytes": 315633664,
+                "rss_high_water_bytes": 315633664,
+                "seconds": 0.00408375
+              },
+              "load": {
+                "address_space_endpoint_bytes": 1091743744,
+                "address_space_high_water_bytes": 1091743744,
+                "rss_endpoint_bytes": 314466304,
+                "rss_high_water_bytes": 314466304,
+                "seconds": 0.0420433
+              },
+              "persistence": {
+                "address_space_endpoint_bytes": 1091076096,
+                "address_space_high_water_bytes": 1091604480,
+                "rss_endpoint_bytes": 313696256,
+                "rss_high_water_bytes": 313696256,
+                "seconds": 0.00407151
+              },
+              "prepare": {
+                "address_space_endpoint_bytes": 1091743744,
+                "address_space_high_water_bytes": 1091743744,
+                "rss_endpoint_bytes": 315195392,
+                "rss_high_water_bytes": 315195392,
+                "seconds": 0.000884537
+              },
+              "preprocessing": {
+                "address_space_endpoint_bytes": 1090797568,
+                "address_space_high_water_bytes": 1090965504,
+                "rss_endpoint_bytes": 309583872,
+                "rss_high_water_bytes": 309583872,
+                "seconds": 0.002908672
+              }
+            }
+          },
+          {
+            "address_space_high_water_bytes": 1091743744,
+            "baseline_address_space_bytes": 1090797568,
+            "baseline_rss_bytes": 304365568,
+            "colors": 2,
+            "dimension": 64,
+            "execution_batches": 24,
+            "execution_coordination_calls": 1344,
+            "execution_local_pair_candidates": 192,
+            "execution_received_bytes": 24896,
+            "execution_roundtrip_seconds": [
+              0.001421741,
+              0.001304509,
+              0.00134815
+            ],
+            "execution_sent_bytes": 26176,
+            "global_input_entries": 128,
+            "global_native_amplitudes": 512,
+            "loaded_retained_upper_bound_bytes": 5760,
+            "local_input_entries": 16,
+            "local_native_amplitudes": 64,
+            "maximum_sample_error": 1.3877787807814457e-17,
+            "model_node_budget_bytes": 134217728,
+            "model_peak_bytes": 16777216,
+            "model_peak_kind": "conservative admitted stage envelope, not measured peak",
+            "model_rank_budget_bytes": 16777216,
+            "native_live_reserved_bytes": 42552,
+            "norm": 0.9999999999999998,
+            "persisted_recipe_single_replay_communication_upper_bound_bytes": 3698352,
+            "persistence_load_measured_communication": "not instrumented; recipe replay bound is not a load measurement",
+            "process_address_space_cap_bytes": 2147483648,
+            "producer_global_edges": 128,
+            "producer_managed_peak_upper_bound_bytes": 8416384,
+            "producer_sent_payload_bytes": 12800,
+            "rank": 7,
+            "ranks": 8,
+            "repetitions": 3,
+            "rss_high_water_bytes": 316248064,
+            "stages": {
+              "execution": {
+                "address_space_endpoint_bytes": 1091743744,
+                "address_space_high_water_bytes": 1091743744,
+                "rss_endpoint_bytes": 316248064,
+                "rss_high_water_bytes": 316248064,
+                "seconds": 0.00408431
+              },
+              "load": {
+                "address_space_endpoint_bytes": 1091743744,
+                "address_space_high_water_bytes": 1091743744,
+                "rss_endpoint_bytes": 315363328,
+                "rss_high_water_bytes": 315363328,
+                "seconds": 0.04204201
+              },
+              "persistence": {
+                "address_space_endpoint_bytes": 1091076096,
+                "address_space_high_water_bytes": 1091604480,
+                "rss_endpoint_bytes": 314630144,
+                "rss_high_water_bytes": 314630144,
+                "seconds": 0.00407159
+              },
+              "prepare": {
+                "address_space_endpoint_bytes": 1091743744,
+                "address_space_high_water_bytes": 1091743744,
+                "rss_endpoint_bytes": 316076032,
+                "rss_high_water_bytes": 316076032,
+                "seconds": 0.000884337
+              },
+              "preprocessing": {
+                "address_space_endpoint_bytes": 1090797568,
+                "address_space_high_water_bytes": 1090965504,
+                "rss_endpoint_bytes": 310542336,
+                "rss_high_water_bytes": 310542336,
+                "seconds": 0.002907742
+              }
+            }
+          }
+        ],
+        "launcher_seconds": 0.666663943000458
+      }
+    ],
+    "complete": true
+  },
+  "tighter_process_cap": {
+    "scope": "single-host local experiment; no multi-host acceptance",
+    "cap_kind": "per-rank Linux RLIMIT_AS hard/soft address space",
+    "process_address_space_cap_bytes": 1207959552,
+    "model_rank_budget_bytes": 16777216,
+    "model_node_budget_bytes": 134217728,
+    "cases": [
+      {
+        "dimension": 1024,
+        "ranks": 4,
+        "repetitions": 3,
+        "sum_rank_rss_high_water_bound_bytes": 1251942400,
+        "stage_max_seconds": {
+          "preprocessing": 0.009293158,
+          "persistence": 0.00547967,
+          "load": 0.217993196,
+          "prepare": 0.002449128,
+          "execution": 0.041804398
+        },
+        "execution_sent_bytes": 2654208,
+        "execution_received_bytes": 2654208,
+        "producer_sent_payload_bytes": 1638400,
+        "rank_receipts": [
+          {
+            "address_space_high_water_bytes": 1088327680,
+            "baseline_address_space_bytes": 1085128704,
+            "baseline_rss_bytes": 302718976,
+            "colors": 2,
+            "dimension": 1024,
+            "execution_batches": 192,
+            "execution_coordination_calls": 4608,
+            "execution_local_pair_candidates": 6144,
+            "execution_received_bytes": 755712,
+            "execution_roundtrip_seconds": [
+              0.014017433,
+              0.013984464,
+              0.013799971
+            ],
+            "execution_sent_bytes": 714752,
+            "global_input_entries": 2048,
+            "global_native_amplitudes": 8192,
+            "loaded_retained_upper_bound_bytes": 57344,
+            "local_input_entries": 512,
+            "local_native_amplitudes": 2048,
+            "maximum_sample_error": 6.938893903907228e-18,
+            "model_node_budget_bytes": 134217728,
+            "model_peak_bytes": 16777216,
+            "model_peak_kind": "conservative admitted stage envelope, not measured peak",
+            "model_rank_budget_bytes": 16777216,
+            "native_live_reserved_bytes": 324312,
+            "norm": 0.9999999999999999,
+            "persisted_recipe_single_replay_communication_upper_bound_bytes": 17750256,
+            "persistence_load_measured_communication": "not instrumented; recipe replay bound is not a load measurement",
+            "process_address_space_cap_bytes": 1207959552,
+            "producer_global_edges": 2048,
+            "producer_managed_peak_upper_bound_bytes": 8642560,
+            "producer_sent_payload_bytes": 409600,
+            "rank": 0,
+            "ranks": 4,
+            "repetitions": 3,
+            "rss_high_water_bytes": 313495552,
+            "stages": {
+              "execution": {
+                "address_space_endpoint_bytes": 1088327680,
+                "address_space_high_water_bytes": 1088327680,
+                "rss_endpoint_bytes": 313495552,
+                "rss_high_water_bytes": 313495552,
+                "seconds": 0.041804078
+              },
+              "load": {
+                "address_space_endpoint_bytes": 1087193088,
+                "address_space_high_water_bytes": 1087193088,
+                "rss_endpoint_bytes": 311435264,
+                "rss_high_water_bytes": 311435264,
+                "seconds": 0.217992546
+              },
+              "persistence": {
+                "address_space_endpoint_bytes": 1087193088,
+                "address_space_high_water_bytes": 1087193088,
+                "rss_endpoint_bytes": 311242752,
+                "rss_high_water_bytes": 311242752,
+                "seconds": 0.00547967
+              },
+              "prepare": {
+                "address_space_endpoint_bytes": 1087258624,
+                "address_space_high_water_bytes": 1087258624,
+                "rss_endpoint_bytes": 312098816,
+                "rss_high_water_bytes": 312098816,
+                "seconds": 0.002448818
+              },
+              "preprocessing": {
+                "address_space_endpoint_bytes": 1086316544,
+                "address_space_high_water_bytes": 1086349312,
+                "rss_endpoint_bytes": 306749440,
+                "rss_high_water_bytes": 306749440,
+                "seconds": 0.009291468
+              }
+            }
+          },
+          {
+            "address_space_high_water_bytes": 1088323584,
+            "baseline_address_space_bytes": 1086173184,
+            "baseline_rss_bytes": 302592000,
+            "colors": 2,
+            "dimension": 1024,
+            "execution_batches": 192,
+            "execution_coordination_calls": 4608,
+            "execution_local_pair_candidates": 6144,
+            "execution_received_bytes": 755712,
+            "execution_roundtrip_seconds": [
+              0.014017353,
+              0.013983124,
+              0.013801221
+            ],
+            "execution_sent_bytes": 714752,
+            "global_input_entries": 2048,
+            "global_native_amplitudes": 8192,
+            "loaded_retained_upper_bound_bytes": 57344,
+            "local_input_entries": 512,
+            "local_native_amplitudes": 2048,
+            "maximum_sample_error": 6.938893903907228e-18,
+            "model_node_budget_bytes": 134217728,
+            "model_peak_bytes": 16777216,
+            "model_peak_kind": "conservative admitted stage envelope, not measured peak",
+            "model_rank_budget_bytes": 16777216,
+            "native_live_reserved_bytes": 324312,
+            "norm": 0.9999999999999999,
+            "persisted_recipe_single_replay_communication_upper_bound_bytes": 17750256,
+            "persistence_load_measured_communication": "not instrumented; recipe replay bound is not a load measurement",
+            "process_address_space_cap_bytes": 1207959552,
+            "producer_global_edges": 2048,
+            "producer_managed_peak_upper_bound_bytes": 8642560,
+            "producer_sent_payload_bytes": 409600,
+            "rank": 1,
+            "ranks": 4,
+            "repetitions": 3,
+            "rss_high_water_bytes": 312926208,
+            "stages": {
+              "execution": {
+                "address_space_endpoint_bytes": 1088323584,
+                "address_space_high_water_bytes": 1088323584,
+                "rss_endpoint_bytes": 312926208,
+                "rss_high_water_bytes": 312926208,
+                "seconds": 0.041803908
+              },
+              "load": {
+                "address_space_endpoint_bytes": 1087188992,
+                "address_space_high_water_bytes": 1087188992,
+                "rss_endpoint_bytes": 310980608,
+                "rss_high_water_bytes": 310980608,
+                "seconds": 0.217991816
+              },
+              "persistence": {
+                "address_space_endpoint_bytes": 1087188992,
+                "address_space_high_water_bytes": 1087188992,
+                "rss_endpoint_bytes": 310816768,
+                "rss_high_water_bytes": 310816768,
+                "seconds": 0.00547903
+              },
+              "prepare": {
+                "address_space_endpoint_bytes": 1087254528,
+                "address_space_high_water_bytes": 1087254528,
+                "rss_endpoint_bytes": 311635968,
+                "rss_high_water_bytes": 311635968,
+                "seconds": 0.002448998
+              },
+              "preprocessing": {
+                "address_space_endpoint_bytes": 1086173184,
+                "address_space_high_water_bytes": 1086341120,
+                "rss_endpoint_bytes": 306171904,
+                "rss_high_water_bytes": 306171904,
+                "seconds": 0.009290258
+              }
+            }
+          },
+          {
+            "address_space_high_water_bytes": 1088323584,
+            "baseline_address_space_bytes": 1086173184,
+            "baseline_rss_bytes": 302501888,
+            "colors": 2,
+            "dimension": 1024,
+            "execution_batches": 192,
+            "execution_coordination_calls": 4608,
+            "execution_local_pair_candidates": 6144,
+            "execution_received_bytes": 571392,
+            "execution_roundtrip_seconds": [
+              0.014009283,
+              0.014018224,
+              0.013762391
+            ],
+            "execution_sent_bytes": 612352,
+            "global_input_entries": 2048,
+            "global_native_amplitudes": 8192,
+            "loaded_retained_upper_bound_bytes": 57344,
+            "local_input_entries": 512,
+            "local_native_amplitudes": 2048,
+            "maximum_sample_error": 3.469446951953614e-18,
+            "model_node_budget_bytes": 134217728,
+            "model_peak_bytes": 16777216,
+            "model_peak_kind": "conservative admitted stage envelope, not measured peak",
+            "model_rank_budget_bytes": 16777216,
+            "native_live_reserved_bytes": 324312,
+            "norm": 0.9999999999999999,
+            "persisted_recipe_single_replay_communication_upper_bound_bytes": 17750256,
+            "persistence_load_measured_communication": "not instrumented; recipe replay bound is not a load measurement",
+            "process_address_space_cap_bytes": 1207959552,
+            "producer_global_edges": 2048,
+            "producer_managed_peak_upper_bound_bytes": 8642560,
+            "producer_sent_payload_bytes": 409600,
+            "rank": 2,
+            "ranks": 4,
+            "repetitions": 3,
+            "rss_high_water_bytes": 312995840,
+            "stages": {
+              "execution": {
+                "address_space_endpoint_bytes": 1088323584,
+                "address_space_high_water_bytes": 1088323584,
+                "rss_endpoint_bytes": 312995840,
+                "rss_high_water_bytes": 312995840,
+                "seconds": 0.041804048
+              },
+              "load": {
+                "address_space_endpoint_bytes": 1087188992,
+                "address_space_high_water_bytes": 1087188992,
+                "rss_endpoint_bytes": 310759424,
+                "rss_high_water_bytes": 310759424,
+                "seconds": 0.217993196
+              },
+              "persistence": {
+                "address_space_endpoint_bytes": 1087188992,
+                "address_space_high_water_bytes": 1087188992,
+                "rss_endpoint_bytes": 310579200,
+                "rss_high_water_bytes": 310579200,
+                "seconds": 0.00547879
+              },
+              "prepare": {
+                "address_space_endpoint_bytes": 1087254528,
+                "address_space_high_water_bytes": 1087254528,
+                "rss_endpoint_bytes": 311459840,
+                "rss_high_water_bytes": 311459840,
+                "seconds": 0.002448728
+              },
+              "preprocessing": {
+                "address_space_endpoint_bytes": 1086173184,
+                "address_space_high_water_bytes": 1086341120,
+                "rss_endpoint_bytes": 306155520,
+                "rss_high_water_bytes": 306155520,
+                "seconds": 0.009293158
+              }
+            }
+          },
+          {
+            "address_space_high_water_bytes": 1088323584,
+            "baseline_address_space_bytes": 1086173184,
+            "baseline_rss_bytes": 302182400,
+            "colors": 2,
+            "dimension": 1024,
+            "execution_batches": 192,
+            "execution_coordination_calls": 4608,
+            "execution_local_pair_candidates": 6144,
+            "execution_received_bytes": 571392,
+            "execution_roundtrip_seconds": [
+              0.014009163,
+              0.014019274,
+              0.013760831
+            ],
+            "execution_sent_bytes": 612352,
+            "global_input_entries": 2048,
+            "global_native_amplitudes": 8192,
+            "loaded_retained_upper_bound_bytes": 57344,
+            "local_input_entries": 512,
+            "local_native_amplitudes": 2048,
+            "maximum_sample_error": 3.469446951953614e-18,
+            "model_node_budget_bytes": 134217728,
+            "model_peak_bytes": 16777216,
+            "model_peak_kind": "conservative admitted stage envelope, not measured peak",
+            "model_rank_budget_bytes": 16777216,
+            "native_live_reserved_bytes": 324312,
+            "norm": 0.9999999999999999,
+            "persisted_recipe_single_replay_communication_upper_bound_bytes": 17750256,
+            "persistence_load_measured_communication": "not instrumented; recipe replay bound is not a load measurement",
+            "process_address_space_cap_bytes": 1207959552,
+            "producer_global_edges": 2048,
+            "producer_managed_peak_upper_bound_bytes": 8642560,
+            "producer_sent_payload_bytes": 409600,
+            "rank": 3,
+            "ranks": 4,
+            "repetitions": 3,
+            "rss_high_water_bytes": 312524800,
+            "stages": {
+              "execution": {
+                "address_space_endpoint_bytes": 1088323584,
+                "address_space_high_water_bytes": 1088323584,
+                "rss_endpoint_bytes": 312524800,
+                "rss_high_water_bytes": 312524800,
+                "seconds": 0.041804398
+              },
+              "load": {
+                "address_space_endpoint_bytes": 1087188992,
+                "address_space_high_water_bytes": 1087188992,
+                "rss_endpoint_bytes": 310587392,
+                "rss_high_water_bytes": 310587392,
+                "seconds": 0.217991996
+              },
+              "persistence": {
+                "address_space_endpoint_bytes": 1087188992,
+                "address_space_high_water_bytes": 1087188992,
+                "rss_endpoint_bytes": 310431744,
+                "rss_high_water_bytes": 310431744,
+                "seconds": 0.00547896
+              },
+              "prepare": {
+                "address_space_endpoint_bytes": 1087254528,
+                "address_space_high_water_bytes": 1087254528,
+                "rss_endpoint_bytes": 311152640,
+                "rss_high_water_bytes": 311152640,
+                "seconds": 0.002449128
+              },
+              "preprocessing": {
+                "address_space_endpoint_bytes": 1086173184,
+                "address_space_high_water_bytes": 1086341120,
+                "rss_endpoint_bytes": 305795072,
+                "rss_high_water_bytes": 305795072,
+                "seconds": 0.009292418
+              }
+            }
+          }
+        ],
+        "launcher_seconds": 0.8552805319995969
+      }
+    ],
+    "complete": true
+  },
+  "insufficient_process_cap": {
+    "scope": "single-host local experiment; no multi-host acceptance",
+    "cap_kind": "per-rank Linux RLIMIT_AS hard/soft address space",
+    "process_address_space_cap_bytes": 134217728,
+    "model_rank_budget_bytes": 16777216,
+    "model_node_budget_bytes": 134217728,
+    "cases": [],
+    "complete": false,
+    "failure": "case 0 MPI exit 127; see local launcher.log"
+  },
+  "original_run_identities": {
+    "binary_sha256": null,
+    "source_tree_sha256": null,
+    "note": "Original ledger did not record these identities; independent receipt revalidation does not reconstruct build provenance."
+  },
+  "independent_review_rerun": {
+    "scope": "single-host local experiment; no multi-host acceptance",
+    "cap_kind": "per-rank Linux RLIMIT_AS hard/soft address space",
+    "process_address_space_cap_bytes": 2147483648,
+    "model_rank_budget_bytes": 16777216,
+    "model_node_budget_bytes": 134217728,
+    "cases": [
+      {
+        "dimension": 64,
+        "ranks": 2,
+        "repetitions": 2,
+        "sum_rank_rss_high_water_bound_bytes": 619622400,
+        "stage_max_seconds": {
+          "preprocessing": 0.001469169,
+          "persistence": 0.0048027,
+          "load": 0.009047067,
+          "prepare": 0.000350063,
+          "execution": 0.001744431
+        },
+        "execution_sent_bytes": 72192,
+        "execution_received_bytes": 72192,
+        "producer_sent_payload_bytes": 102400,
+        "rank_receipts": [
+          {
+            "address_space_high_water_bytes": 1084362752,
+            "baseline_address_space_bytes": 1083424768,
+            "baseline_rss_bytes": 301617152,
+            "colors": 2,
+            "dimension": 64,
+            "execution_batches": 8,
+            "execution_coordination_calls": 64,
+            "execution_local_pair_candidates": 512,
+            "execution_received_bytes": 36096,
+            "execution_roundtrip_seconds": [
+              0.000912005,
+              0.000813176
+            ],
+            "execution_sent_bytes": 36096,
+            "global_input_entries": 128,
+            "global_native_amplitudes": 512,
+            "loaded_retained_upper_bound_bytes": 10752,
+            "local_input_entries": 64,
+            "local_native_amplitudes": 256,
+            "maximum_sample_error": 1.3877787807814457e-17,
+            "model_node_budget_bytes": 134217728,
+            "model_peak_bytes": 16777216,
+            "model_peak_kind": "conservative admitted stage envelope, not measured peak",
+            "model_rank_budget_bytes": 16777216,
+            "native_live_reserved_bytes": 69816,
+            "norm": 0.9999999999999999,
+            "persisted_recipe_single_replay_communication_upper_bound_bytes": 293520,
+            "persistence_load_measured_communication": "not instrumented; recipe replay bound is not a load measurement",
+            "process_address_space_cap_bytes": 2147483648,
+            "producer_global_edges": 128,
+            "producer_managed_peak_upper_bound_bytes": 8438272,
+            "producer_sent_payload_bytes": 51200,
+            "rank": 0,
+            "ranks": 2,
+            "repetitions": 2,
+            "rss_high_water_bytes": 309805056,
+            "stages": {
+              "execution": {
+                "address_space_endpoint_bytes": 1084362752,
+                "address_space_high_water_bytes": 1084362752,
+                "rss_endpoint_bytes": 309805056,
+                "rss_high_water_bytes": 309805056,
+                "seconds": 0.001744041
+              },
+              "load": {
+                "address_space_endpoint_bytes": 1084362752,
+                "address_space_high_water_bytes": 1084362752,
+                "rss_endpoint_bytes": 309047296,
+                "rss_high_water_bytes": 309047296,
+                "seconds": 0.009046497
+              },
+              "persistence": {
+                "address_space_endpoint_bytes": 1084362752,
+                "address_space_high_water_bytes": 1084362752,
+                "rss_endpoint_bytes": 308883456,
+                "rss_high_water_bytes": 308883456,
+                "seconds": 0.00480268
+              },
+              "prepare": {
+                "address_space_endpoint_bytes": 1084362752,
+                "address_space_high_water_bytes": 1084362752,
+                "rss_endpoint_bytes": 309628928,
+                "rss_high_water_bytes": 309628928,
+                "seconds": 0.000349993
+              },
+              "preprocessing": {
+                "address_space_endpoint_bytes": 1083424768,
+                "address_space_high_water_bytes": 1083592704,
+                "rss_endpoint_bytes": 304300032,
+                "rss_high_water_bytes": 304300032,
+                "seconds": 0.001469069
+              }
+            }
+          },
+          {
+            "address_space_high_water_bytes": 1084358656,
+            "baseline_address_space_bytes": 1083416576,
+            "baseline_rss_bytes": 301936640,
+            "colors": 2,
+            "dimension": 64,
+            "execution_batches": 8,
+            "execution_coordination_calls": 64,
+            "execution_local_pair_candidates": 512,
+            "execution_received_bytes": 36096,
+            "execution_roundtrip_seconds": [
+              0.000910825,
+              0.000832456
+            ],
+            "execution_sent_bytes": 36096,
+            "global_input_entries": 128,
+            "global_native_amplitudes": 512,
+            "loaded_retained_upper_bound_bytes": 10752,
+            "local_input_entries": 64,
+            "local_native_amplitudes": 256,
+            "maximum_sample_error": 1.3877787807814457e-17,
+            "model_node_budget_bytes": 134217728,
+            "model_peak_bytes": 16777216,
+            "model_peak_kind": "conservative admitted stage envelope, not measured peak",
+            "model_rank_budget_bytes": 16777216,
+            "native_live_reserved_bytes": 69816,
+            "norm": 0.9999999999999999,
+            "persisted_recipe_single_replay_communication_upper_bound_bytes": 293520,
+            "persistence_load_measured_communication": "not instrumented; recipe replay bound is not a load measurement",
+            "process_address_space_cap_bytes": 2147483648,
+            "producer_global_edges": 128,
+            "producer_managed_peak_upper_bound_bytes": 8438272,
+            "producer_sent_payload_bytes": 51200,
+            "rank": 1,
+            "ranks": 2,
+            "repetitions": 2,
+            "rss_high_water_bytes": 309817344,
+            "stages": {
+              "execution": {
+                "address_space_endpoint_bytes": 1084358656,
+                "address_space_high_water_bytes": 1084358656,
+                "rss_endpoint_bytes": 309817344,
+                "rss_high_water_bytes": 309817344,
+                "seconds": 0.001744431
+              },
+              "load": {
+                "address_space_endpoint_bytes": 1084358656,
+                "address_space_high_water_bytes": 1084358656,
+                "rss_endpoint_bytes": 309039104,
+                "rss_high_water_bytes": 309039104,
+                "seconds": 0.009047067
+              },
+              "persistence": {
+                "address_space_endpoint_bytes": 1084358656,
+                "address_space_high_water_bytes": 1084358656,
+                "rss_endpoint_bytes": 308830208,
+                "rss_high_water_bytes": 308830208,
+                "seconds": 0.0048027
+              },
+              "prepare": {
+                "address_space_endpoint_bytes": 1084358656,
+                "address_space_high_water_bytes": 1084358656,
+                "rss_endpoint_bytes": 309657600,
+                "rss_high_water_bytes": 309657600,
+                "seconds": 0.000350063
+              },
+              "preprocessing": {
+                "address_space_endpoint_bytes": 1083416576,
+                "address_space_high_water_bytes": 1083584512,
+                "rss_endpoint_bytes": 304340992,
+                "rss_high_water_bytes": 304340992,
+                "seconds": 0.001469169
+              }
+            }
+          }
+        ],
+        "launcher_seconds": 0.5697824640010367
+      }
+    ],
+    "complete": true
+  },
+  "independent_review_identity": {
+    "sha256": {
+      "executable": "617e7083a2dff3ca681f30d1ce565dae7e3becdbad9fcc5183f2c75def793bde",
+      "native_example_source": "1e02704d1cc4110d720b6b6770c17d89d8fcf9f03c15a29d3f811cc26f8c1d94",
+      "runner_source": "33bb7236bfdfd2cfaaca93c67ac73504823d5abe669d10080d8925eb38cbb7b1"
+    },
+    "scope": "Binary and fixture source hashes observed equal before/after the independent rerun. Fixture source observation is not dependency/build-tree attestation.",
+    "source_tree_sha256": null,
+    "launcher": "MPICH Hydra localhost, two ranks"
+  },
+  "strict_revalidation": {
+    "successful_original_cases": 5,
+    "successful_new_review_cases": 1,
+    "validator_regression_tests": 9,
+    "original_failed_completion_retained": true,
+    "scope": "Exact known receipt/stage schema; bounded strict JSON; typed counters; finite timing/error/memory values; source/native layout and rank coverage; aggregate routing conservation."
+  }
+}

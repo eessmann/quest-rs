@@ -133,6 +133,17 @@ impl OracleInventory {
 		Ok(new_body_count)
 	}
 
+	pub(crate) fn admit_native_unitaries(&self, epsilon: f64) -> Result<()> {
+		for body in &self.bodies {
+			for operation in body.operations() {
+				if let Operation::Numerical { matrix, .. } = operation {
+					crate::execution::admit_native_unitary(matrix, epsilon)?;
+				}
+			}
+		}
+		Ok(())
+	}
+
 	pub(crate) fn include(
 		&mut self,
 		fragment: &OracleFragment,

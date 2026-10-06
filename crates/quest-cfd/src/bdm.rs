@@ -266,7 +266,23 @@ fn sip_matrix() -> Matrix {
 	a
 }
 
+fn retained_payload_bytes(constraints: usize, chart: usize) -> Result<usize, CfdError> {
+	constraints
+		.checked_add(chart)
+		.and_then(|n| n.checked_mul(size_of::<Coefficients>()))
+		.and_then(|n| n.checked_add(size_of::<PeriodicBdm1>()))
+		.ok_or(CfdError::InvalidInput(
+			"periodic BDM retained capacity overflow",
+		))
+}
 impl PeriodicBdm1 {
+	/// Actual retained fixed matrices and complete constraint/chart vector capacities.
+	/// Excludes allocator metadata and temporary assembly/evaluation storage.
+	/// # Errors
+	/// Rejects checked capacity-byte overflow.
+	pub fn retained_bytes(&self) -> Result<usize, CfdError> {
+		retained_payload_bytes(self.constraints.capacity(), self.chart.capacity())
+	}
 	/// Assemble the complete periodic BDM1/P0 system with central convection and SIP viscosity.
 	///
 	/// # Errors
@@ -543,4 +559,29 @@ pub fn solve(mut a: Vec<Vec<f64>>, mut b: Vec<f64>) -> Result<Vec<f64>, CfdError
 		}
 	}
 	Ok(b)
+}
+
+#[cfg(test)]
+#[allow(
+	clippy::panic_in_result_fn,
+	reason = "Actual-capacity regression uses assertions on a fallible test fixture"
+)]
+mod retained_payload_tests {
+	use super::*;
+	#[test]
+	fn complete_fixed_source_accounts_actual_capacities() -> Result<(), CfdError> {
+		let mut model = PeriodicBdm1::assemble(0.01)?;
+		let previous = model.retained_bytes()?;
+		let capacity = model.chart.capacity();
+		model
+			.chart
+			.try_reserve_exact(100)
+			.map_err(|_| CfdError::InvalidInput("test reserve"))?;
+		assert_eq!(
+			model.retained_bytes()? - previous,
+			(model.chart.capacity() - capacity) * size_of::<Coefficients>()
+		);
+		assert!(retained_payload_bytes(usize::MAX, 1).is_err());
+		Ok(())
+	}
 }

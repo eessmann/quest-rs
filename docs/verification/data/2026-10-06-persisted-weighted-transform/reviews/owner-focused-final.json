@@ -1,0 +1,122 @@
+{
+  "schema": "quest-persisted-weighted-consumer-focused-v1",
+  "scope": "implementation checks only; no N32 seven-job campaign",
+  "rust_source_manifest": "persisted-weighted-transform-consumer-rust-source-fix-2.json",
+  "python_source_manifest": "persisted-weighted-transform-consumer-python-source-supervisor-fix-1.json",
+  "source_manifest_sha256": "a1a1a1edc4700731aa83249450a2257a6a839b4a8827c74a70ef00a7157f9e58",
+  "logs": [
+    {
+      "path": "<private-artifacts>/quest-persisted-consumer-fix-1-pure-final.log",
+      "bytes": 2070,
+      "sha256": "c77063b6d320a740211b350c65d4050cef9f287655682d333044d9f4affe3e3c",
+      "summary_lines": [
+        "test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-consumer-fix-1-cold-final.log",
+      "bytes": 1354,
+      "sha256": "ab7c7cab82644d1720af7ffbc08608ab67bd9c304c42332be6fd77dbc338e6b2",
+      "summary_lines": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.23s"
+      ]
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-consumer-final-handoff-clippy.log",
+      "bytes": 1017,
+      "sha256": "f7752031f13b9e2c520c1e1f4ae757ad529cad158ef8cc5e09a9a02825086737",
+      "summary_lines": []
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-consumer-independent-fix-pure.log",
+      "bytes": 2070,
+      "sha256": "1ae9c077db2c12fce3c2abd46a4dea28123ccdaa252fc244a9a5807c8d4c07c3",
+      "summary_lines": [
+        "test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-consumer-independent-fix-cold.log",
+      "bytes": 1354,
+      "sha256": "3606903a57b328b43cee8433d6e374ad17a321720863c04d5b2ce68b863e5c3b",
+      "summary_lines": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.17s"
+      ]
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-consumer-independent-fix-clippy.log",
+      "bytes": 926,
+      "sha256": "2ece08a8420eb8f013539667dc8feadd3ed6569bd56d7bc117b230281db72493",
+      "summary_lines": []
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-consumer-json-independent-behavior-red.log",
+      "bytes": 428,
+      "sha256": "b1cac3b3e788ca6114040ed0c91022c75a2de6cc9f5fa2dc89734cd8f02f5f7f",
+      "summary_lines": []
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-consumer-json-independent-move-green.log",
+      "bytes": 329,
+      "sha256": "4e88f985709ea8b7558832f02b2cff4e5f4ff0d814f6531d91e3d481f63be4b9",
+      "summary_lines": []
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-runner-independent-tests.log",
+      "bytes": 113,
+      "sha256": "8e0a41aef6e6a7eab75b09946564b87114046d8efa604a1ed9cbdbf9fd3f65b7",
+      "summary_lines": [
+        "Ran 14 tests in 0.081s",
+        "OK"
+      ]
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-runner-independent-probes.log",
+      "bytes": 665,
+      "sha256": "c19a4a92386235d37375d8cb533191d12297ce3e0146c4cdad5fec8bd4dfbf8c",
+      "summary_lines": []
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-consumer-supervisor-final-green.log",
+      "bytes": 115,
+      "sha256": "3e08c13427e9a3157ab54f123a42ee2f3191ac74b864e64ad0a01b2e486fdb5d",
+      "summary_lines": [
+        "Ran 16 tests in 1.121s",
+        "OK"
+      ]
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-supervisor-between-jobs-red.log",
+      "bytes": 163,
+      "sha256": "0820efcaa0a9b24a7d8348d7c3ec7424ec8b116b27a0b544b3f9021dc0efc245",
+      "summary_lines": [
+        "{\"uncaught_exception\": \"DriverTimeout\", \"receipt_exists\": false, \"receipt_status\": null, \"retained_outcomes\": 0, \"synthetic_collect_calls\": 1, \"physical_jobs\": 0}"
+      ]
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-supervisor-between-jobs-green.log",
+      "bytes": 163,
+      "sha256": "3c7d4626efa2d22abb7e3782cdf92dc9fb3251f98806f6d74d6fa6fba0c094fd",
+      "summary_lines": [
+        "{\"uncaught_exception\": null, \"receipt_exists\": true, \"receipt_status\": \"driver-timeout\", \"retained_outcomes\": 7, \"synthetic_collect_calls\": 1, \"physical_jobs\": 0}"
+      ]
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-consumer-supervisor-boundary-green.log",
+      "bytes": 116,
+      "sha256": "39bc226b92abaa2d1038b8f9a20f9fa11fc53c73ba920526e8f04ff4b77a655c",
+      "summary_lines": [
+        ".................",
+        "----------------------------------------------------------------------",
+        "Ran 17 tests in 1.153s",
+        "",
+        "OK"
+      ]
+    }
+  ],
+  "rust_pure_tests": 9,
+  "python_groups": 17,
+  "cold_dimension": 4,
+  "cold_jobs": 7,
+  "production_campaign_run": false
+}

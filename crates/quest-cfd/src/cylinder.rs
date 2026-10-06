@@ -32,12 +32,12 @@ pub struct CylinderReference {
 }
 
 #[derive(Clone, Debug)]
-struct PlanarMesh {
-	vertices: Vec<[f64; 3]>,
-	cells: Vec<Vec<usize>>,
-	boundaries: Vec<BoundaryFacet>,
-	deviation: f64,
-	segments: usize,
+pub(crate) struct PlanarMesh {
+	pub(crate) vertices: Vec<[f64; 3]>,
+	pub(crate) cells: Vec<Vec<usize>>,
+	pub(crate) boundaries: Vec<BoundaryFacet>,
+	pub(crate) deviation: f64,
+	pub(crate) segments: usize,
 }
 
 fn planar(id: &str, angular: u32, layers: u32) -> Result<PlanarMesh, CfdError> {
@@ -91,6 +91,18 @@ fn planar(id: &str, angular: u32, layers: u32) -> Result<PlanarMesh, CfdError> {
 	}
 	let layers =
 		usize::try_from(layers).map_err(|_| CfdError::InvalidInput("layer count overflow"))?;
+	let cells = ring_cells(count, layers);
+	let (boundaries, deviation) = planar_boundaries(id, &vertices, &angles, layers, radius, bounds);
+	Ok(PlanarMesh {
+		vertices,
+		cells,
+		boundaries,
+		deviation,
+		segments: count,
+	})
+}
+
+fn ring_cells(count: usize, layers: usize) -> Vec<Vec<usize>> {
 	let mut cells = Vec::new();
 	for layer in 0..layers {
 		for i in 0..count {
@@ -103,15 +115,12 @@ fn planar(id: &str, angular: u32, layers: u32) -> Result<PlanarMesh, CfdError> {
 			cells.push(vec![a, d, b]);
 		}
 	}
-	let (boundaries, deviation) = planar_boundaries(id, &vertices, &angles, layers, radius, bounds);
-	Ok(PlanarMesh {
-		vertices,
-		cells,
-		boundaries,
-		deviation,
-		segments: count,
-	})
+	cells
 }
+
+#[path = "cylinder_geometry.rs"]
+mod explicit_rectangle;
+pub(crate) use explicit_rectangle::{ExplicitGeometryEvidence, explicit_planar};
 
 type ExtrudedMesh = (
 	Vec<[f64; 3]>,
@@ -252,6 +261,8 @@ pub struct CylinderSnapshot {
 	pub drag_coefficient: f64,
 	/// Lift coefficient using the same normalization.
 	pub lift_coefficient: f64,
+	/// Front-minus-back pressure, with incident-cell P0 trace averaging at each probe.
+	pub pressure_difference: f64,
 	/// Geometric error of the circle approximation.
 	pub maximum_geometry_deviation: f64,
 	/// Full prescribed normal and divergence residual.
@@ -259,11 +270,34 @@ pub struct CylinderSnapshot {
 }
 
 impl CylinderReference {
+	fn observation_normalization(&self) -> Result<f64, CfdError> {
+		self.manifest.validate()?;
+		self.manifest.viscosity(self.reynolds)?;
+		if self.manifest.id != "shedding2d" || self.manifest.dimension != 2 {
+			return Err(CfdError::Unsupported(
+				"pressure probe geometry is only implemented for DFG2D2".into(),
+			));
+		}
+		let normalization =
+			0.5 * self.manifest.reference_velocity.powi(2) * self.manifest.reference_length;
+		if !normalization.is_finite()
+			|| normalization <= 0.
+			|| !self.maximum_geometry_deviation.is_finite()
+			|| self.maximum_geometry_deviation < 0.
+		{
+			return Err(CfdError::InvalidInput(
+				"invalid cylinder observation normalization or geometry",
+			));
+		}
+		Ok(normalization)
+	}
+
 	/// Run the exact same full DG ODE by classical RK4 for a bounded reference interval.
 	///
 	/// # Errors
 	/// Rejects invalid steps, frozen-window violations or any numerical failure.
 	pub fn reference(&self, dt: f64, steps: u32) -> Result<CylinderSnapshot, CfdError> {
+		self.observation_normalization()?;
 		let time = dt * f64::from(steps);
 		if !time.is_finite() || time > self.manifest.time_window[1] {
 			return Err(CfdError::InvalidInput(
@@ -275,25 +309,68 @@ impl CylinderReference {
 			dt,
 			usize::try_from(steps).map_err(|_| CfdError::InvalidInput("step count overflow"))?,
 		)?;
-		let pressure = self.model.reconstruct_pressure(&state)?;
+		let mut snapshot = self.snapshot_at(&state, time)?;
+		snapshot.method =
+			"classical RK4; full BDM1/P0 on an explicitly polygonal cylinder mesh".into();
+		Ok(snapshot)
+	}
+	/// Observe a caller-owned complete classical state at an admitted physical time.
+	///
+	/// Pressure probes use the frozen DFG front/back points and average incident
+	/// fluid P0 traces. A single snapshot has no shedding-frequency information.
+	/// # Errors
+	/// Rejects malformed states, unknown probe geometry, times or physical recovery failures.
+	pub fn snapshot_at(&self, state: &[f64], time: f64) -> Result<CylinderSnapshot, CfdError> {
+		let normalization = self.observation_normalization()?;
+		if !time.is_finite()
+			|| time < self.manifest.time_window[0]
+			|| time > self.manifest.time_window[1]
+		{
+			return Err(CfdError::InvalidInput(
+				"cylinder snapshot outside frozen time window",
+			));
+		}
+		let pressure = self.model.reconstruct_pressure(state)?;
+		let pressure_probes = self
+			.model
+			.sample_pressures(&pressure.cell_pressure, &[[0.15, 0.2, 0.], [0.25, 0.2, 0.]])?;
+		let pressure_difference = pressure_probes[0] - pressure_probes[1];
+		if !pressure_difference.is_finite() {
+			return Err(CfdError::InvalidInput("pressure difference overflow"));
+		}
 		let cylinder_force =
 			self.model
-				.boundary_force(&state, &pressure.cell_pressure, "cylinder")?;
-		let span = if self.manifest.dimension == 3 { 4. } else { 1. };
-		let normalization =
-			0.5 * self.manifest.reference_velocity.powi(2) * self.manifest.reference_length * span;
+				.boundary_force(state, &pressure.cell_pressure, "cylinder")?;
+		let mean_kinetic_energy = self.model.energy(state)? / self.model.volume();
+		let drag_coefficient = cylinder_force[0] / normalization;
+		let lift_coefficient = cylinder_force[1] / normalization;
+		let boundary_residual = self.model.boundary_residual(state)?;
+		if [
+			mean_kinetic_energy,
+			drag_coefficient,
+			lift_coefficient,
+			boundary_residual,
+		]
+		.iter()
+		.any(|v| !v.is_finite())
+		{
+			return Err(CfdError::InvalidInput("nonfinite cylinder observation"));
+		}
 		Ok(CylinderSnapshot {
-			method: "classical RK4; full BDM1/P0 on an explicitly polygonal cylinder mesh".into(),
+			method:
+				"classical supplied full BDM1/P0 state on an explicitly polygonal cylinder mesh"
+					.into(),
 			case: self.manifest.id.clone(),
 			time,
 			independent_dimension: self.model.dimension(),
 			pressure,
-			mean_kinetic_energy: self.model.energy(&state)? / self.model.volume(),
+			mean_kinetic_energy,
 			cylinder_force,
-			drag_coefficient: cylinder_force[0] / normalization,
-			lift_coefficient: cylinder_force[1] / normalization,
+			drag_coefficient,
+			lift_coefficient,
+			pressure_difference,
 			maximum_geometry_deviation: self.maximum_geometry_deviation,
-			boundary_residual: self.model.boundary_residual(&state)?,
+			boundary_residual,
 		})
 	}
 }

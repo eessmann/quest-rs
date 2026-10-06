@@ -1,0 +1,29 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "quest-rs",
+    "--features",
+    "qsvt-io,mpi",
+    "--test",
+    "persisted_weighted_transform",
+    "--example",
+    "persisted_weighted_transform",
+    "--locked",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "status": 0,
+  "seconds": 12.671905037001125,
+  "before": {
+    "crates/quest/examples/persisted_weighted_transform/execution.rs": "53c1091181933c1bbe5d92e9232397d44ee0f2eeeca9c08c23141995d164535b",
+    "crates/quest/tests/persisted_weighted_transform.rs": "a4dd4689a0f933e3f4ffb9a5fd19a93f3e314520921fee10b60991daad7a8d72"
+  },
+  "after": {
+    "crates/quest/examples/persisted_weighted_transform/execution.rs": "53c1091181933c1bbe5d92e9232397d44ee0f2eeeca9c08c23141995d164535b",
+    "crates/quest/tests/persisted_weighted_transform.rs": "a4dd4689a0f933e3f4ffb9a5fd19a93f3e314520921fee10b60991daad7a8d72"
+  },
+  "log_sha256": "7612a8fc8e7a1f024bd6035204bae87b07ff2806fbef1c831a201c250eff7514"
+}

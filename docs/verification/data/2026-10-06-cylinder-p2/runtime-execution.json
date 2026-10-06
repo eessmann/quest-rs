@@ -1,0 +1,116 @@
+{
+  "schema": "quest-cylinder-p2-runtime-execution-v1",
+  "captured_utc": "2026-10-06T02:27:46.021281+00:00",
+  "command": [
+    "/usr/bin/time",
+    "-v",
+    "/usr/bin/timeout",
+    "180s",
+    "/usr/bin/prlimit",
+    "--as=536870912",
+    "--",
+    "target/debug/examples/cylinder_p2_snapshot"
+  ],
+  "exit_code": 0,
+  "wrapper_elapsed_seconds": 0.48619622100522975,
+  "address_space_cap_bytes": 536870912,
+  "timeout_seconds": 180,
+  "binary_sha256": "e645ddf125e6bc2050c0d9c9bffe4b0deb2566873e8fc2a6ea85962269f8a0cd",
+  "source_files": [
+    {
+      "path": "crates/quest-cfd/src/cylinder.rs",
+      "sha256": "8ccdab8f716505e57a157d7786ecb04063448d4769e532b5e4692dad20595b51"
+    },
+    {
+      "path": "crates/quest-cfd/src/cylinder_geometry.rs",
+      "sha256": "6b3d97823e51ea4d2b0ca6f28cba8c0817fb2c2b7cc0ab0351f3cc54e873320c"
+    },
+    {
+      "path": "crates/quest-cfd/src/cylinder_high_order.rs",
+      "sha256": "9b3d01eb11d6a81fcea9736a1afffd2b31fe121ca83c52c5eb5e38cba43d72cd"
+    },
+    {
+      "path": "crates/quest-cfd/src/lib.rs",
+      "sha256": "4261c2ee864e59874e0b806defabde7ba9a5306646685637a6e6b979b9a3825a"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/operators.rs",
+      "sha256": "759dae49ed8ea0c29bbd941220b84ef4b9f10964c2b45ed2b767b4a9d1d23f44"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/observables.rs",
+      "sha256": "dfb792b4ac3eddc58f1fffeab91e6c749695c90dcd761aad96856442487cf477"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/boundary.rs",
+      "sha256": "8feb38ec440d3e404c330181249a0a02794f39348e5fd117719d7ada91b4d3bd"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/pressure_observables.rs",
+      "sha256": "467bc1a5bd8d7daa748aa861772a8ad409d5ce3dafdc5a96b21cc07a8a40295a"
+    },
+    {
+      "path": "crates/quest-cfd/tests/cylinder_high_order.rs",
+      "sha256": "a1b2e202fc7330398f03c66fa58f02f4ecb2170ab4edad49885f0f9cf5b03823"
+    },
+    {
+      "path": "crates/quest-cfd/tests/mixed_physical_observations.rs",
+      "sha256": "e6d2bfa789ff8afeab5d2c5afb05f3db84f38a7448b1c44130b3ab2f075f408b"
+    },
+    {
+      "path": "crates/quest-cfd/examples/cylinder_p2_snapshot.rs",
+      "sha256": "a8beaa508c4d4b1c8613c2251575ca0ed8e941aa66583abe82e605b68939e946"
+    },
+    {
+      "path": "crates/quest-cfd/docs/cylinder-high-order.md",
+      "sha256": "76d3fa7156bae901c7a143cc3fc8bdfd177156802364fd6dce400e95921fabe8"
+    },
+    {
+      "path": "crates/quest-cfd/docs/mixed-traction.md",
+      "sha256": "08340a59243e1ad5be89f59c17d3852db6050d56d45ad6b02ad1d37cd9897575"
+    }
+  ],
+  "source_manifest_sha256": "f68dc9d9b4af9b6f6cbba819b1b9933b60c62580a6787aff48e460721dfa1dbd",
+  "source_unchanged_before_after": true,
+  "output_sha256": "df31ccef904e6d7ae59c0ea71f8cbd763d79674a858161dac799b9ba72a92986",
+  "log_sha256": "b95d9f02e41cb698741986674aaf6ce0e81bda443386514573aebc0e96baecd2",
+  "limitations": [
+    "Existing example binary built by implementation owner on the frozen source; hashes identify source and binary but are not independent build attestation.",
+    "Complete supplied-state initial-lifting snapshot; no evolution or quantum execution.",
+    "Managed numerical bounds differ from OS address-space cap and measured RSS.",
+    "Focused source manifest is separate from the full checkpoint06 build manifest; integrated acceptance is recorded separately."
+  ],
+  "status": "completed",
+  "geometry_matches_exact_proof_input": true,
+  "measured_peak_rss_kib": 6416,
+  "independent_review": {
+    "status": "approved bounded supplied-state snapshot",
+    "integration_tests_passed": 37,
+    "private_cylinder_tests_passed": 2,
+    "strict_clippy_passed": true,
+    "last_coordinate_index": 53,
+    "last_coordinate_perturbation": 0.001,
+    "mass_orthogonality_energy_increment_error": 7.35e-17,
+    "logs": [
+      {
+        "basename": "quest-cylinder-p2-independent-tests.log",
+        "sha256": "c4e79d8a3d6409446f92a578dc799f9521fc860900557018d129c9e4c7229632"
+      },
+      {
+        "basename": "quest-cylinder-p2-independent-unit.log",
+        "sha256": "80de1e4097f05259549285ccf73ae4d4ee19a79909cc000a204d0cc0fc738d68"
+      },
+      {
+        "basename": "quest-cylinder-p2-independent-clippy.log",
+        "sha256": "fd3d7b6ce8b952e1ac2a31229c105ceb596cf8b320221ac94d72dddef7ef3e93"
+      },
+      {
+        "basename": "quest-cylinder-stage-c-independent-last-coordinate.json",
+        "sha256": "ce5517c3c4d77985716f56d3549e7652fd6296c5ca65037e45f643ab869b3411"
+      }
+    ]
+  },
+  "geometry_sha256": "e4e5d45032e4d7b10241b91b4514f539c5b3e3698daca40251ece587db5cfb3e",
+  "runtime_result": "runtime-snapshot.json",
+  "measurement_log": "runtime-execution.log"
+}

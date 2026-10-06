@@ -152,9 +152,7 @@ fn matching_transform_native_matches_portable_with_padding_spectators_and_adjoin
 fn matching_transform_collective_matches_portable_on_local_partitions() -> googletest::Result<()> {
 	use quest::collective::{CollectiveEnvironment, MpiRuntime};
 	if std::env::var("QUEST_TRANSFORM_RANKS").is_err() {
-		let status = std::process::Command::new("timeout")
-			.args(["90s", "mpiexec", "-n", "2"])
-			.arg(std::env::current_exe()?)
+		let status = quest_test_support::mpi::MpiTest::new(2, std::time::Duration::from_secs(90))?
 			.args([
 				"--exact",
 				"matching_transform_collective_matches_portable_on_local_partitions",
@@ -168,6 +166,7 @@ fn matching_transform_collective_matches_portable_on_local_partitions() -> googl
 	}
 	let runtime = MpiRuntime::initialize()?;
 	let comm = runtime.world()?;
+	quest_test_support::mpi::assert_rank_count(comm.size()?)?;
 	let environment = CollectiveEnvironment::builder(&comm)?.build()?;
 	let policy = NumericalPolicy::default();
 	let encoding = source()?;

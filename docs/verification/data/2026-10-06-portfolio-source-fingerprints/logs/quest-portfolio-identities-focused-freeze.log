@@ -1,0 +1,115 @@
+warning: `feature(generic_const_exprs)` is not supported with the next-generation trait solver
+ --> crates/quest-polynomial/src/lib.rs:1:30
+  |
+1 | #![feature(const_trait_impl, generic_const_exprs)]
+  |                              ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `-Znext-solver=globally` is currently enabled by default for testing
+  = note: reverted the setting to `-Znext-solver=coherence` for this crate
+  = note: the currently stable trait solver will be used for this crate
+  = note: see issues #160895 <https://github.com/rust-lang/rust/issues/160895> for more information
+
+warning: `quest-polynomial` (lib) generated 1 warning
+   Compiling quest-qsvt v0.1.0 (<workspace>/crates/quest-qsvt)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.19s
+     Running tests/commutative_identities.rs (target/debug/build/quest-qsvt/905dd51803251e97/out/commutative_identities-905dd51803251e97)
+
+running 7 tests
+test all_offset_owners_are_admitted_before_first_arithmetic_record ... ok
+test disjoint_shift_offset_cancellations_do_not_alias_permutations ... ok
+test cached_legacy_ids_retain_original_hash_cost_and_admit_stack ... ok
+test legacy_stencil_distinct_shifts_bind_complex_phases ... ok
+test arithmetic_stencil_complex_signs_bind_base_and_prep ... ok
+test weighted_distinct_children_bind_signed_complex_weights ... ok
+test record_hash_work_is_admitted_before_portfolio_compilation ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/lcu_plan.rs (target/debug/build/quest-qsvt/58d9f7852ccc4361/out/lcu_plan-58d9f7852ccc4361)
+
+running 5 tests
+test mapped_selector_preserves_visitor_error_and_rejects_layout_before_emission ... ok
+test selector_admits_capacity_shared_work_and_returned_payload ... ok
+test selector_rejects_zero_nonfinite_and_incompatible_inputs ... ok
+test selector_retains_underflowing_nonzero_term_and_identity_of_zero_inputs ... ok
+test shared_selector_matches_independent_whole_unitary_and_standalone_adjoint ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/owned_replay.rs (target/debug/build/quest-qsvt/2dfb3a3bf2892f8d/out/owned_replay-2dfb3a3bf2892f8d)
+
+running 8 tests
+test conversion_admission_charges_owned_phase_capacity_for_both_constructors ... ok
+test owning_contract_checks_clean_workspace_and_admission_before_mutation ... ok
+test finite_large_projector_phases_do_not_overflow_during_lowering ... ok
+test stencil_operator_identity_is_separate_from_color_order_construction ... ok
+test schedules_reject_descriptor_mismatches_and_preserve_compact_large_spaces ... ok
+test generic_transform_remaps_all_steps_and_signed_controls ... ok
+test external_source_with_rectangular_offset_projectors_drives_shared_schedule ... ok
+test arithmetic_stencil_schedule_matches_portable_whole_unitary_in_both_orientations ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/portfolio_comparison.rs (target/debug/build/quest-qsvt/058eba9a43a4cf74/out/portfolio_comparison-058eba9a43a4cf74)
+
+running 1 test
+test same_circulant_block_and_counted_costs_across_eligible_portfolio ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/portfolio_composition.rs (target/debug/build/quest-qsvt/939b10d357ea680f/out/portfolio_composition-939b10d357ea680f)
+
+running 4 tests
+test paired_complex_coefficient_signs_change_lcu_operator_identity ... ok
+test composition_identifies_term_order_and_rejects_incompatible_or_unadmitted_sources ... ok
+test weighted_complex_lcu_extracts_sum_and_preserves_every_failure_branch ... ok
+test tensor_and_kronecker_sum_use_independent_clean_workspaces ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/portfolio_resource_curves.rs (target/debug/build/quest-qsvt/e0c840edd02119aa/out/portfolio_resource_curves-e0c840edd02119aa)
+
+running 3 tests
+test independent_gate_limit_and_constructor_byte_limit_remain_active ... ok
+test constructed_resource_curves_count_both_orientations_with_real_layouts ... ok
+test shared_count_budget_rejects_before_a_second_orientation_without_free_work ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/portfolio_review_regressions.rs (target/debug/build/quest-qsvt/e9b8314d4873ddd9/out/portfolio_review_regressions-e9b8314d4873ddd9)
+
+running 6 tests
+test lcu_validates_zero_weight_input_descriptors_before_any_child_scan ... ok
+test lcu_rejects_known_metadata_work_before_opaque_child_callbacks ... ok
+test tensor_dry_runs_share_a_work_allowance_before_and_during_child_replay ... ok
+test lcu_metadata_preparation_and_child_scans_share_compile_and_gate_allowances ... ok
+test underflowed_lcu_mass_retains_and_charges_the_whole_unitary_branch ... ok
+test kronecker_sum_bridges_distinct_generic_left_and_right_workspaces ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/portfolio_structured.rs (target/debug/build/quest-qsvt/655c95f032b4ea67/out/portfolio_structured-655c95f032b4ea67)
+
+running 2 tests
+test tensor_zero_boundary_flags_union_of_invalid_axes_and_reports_actual_costs ... ok
+test arithmetic_base_and_justified_prep_encode_toeplitz_and_circulants ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+
+     Running tests/structured.rs (target/debug/build/quest-qsvt/2fae247de0d3b8fd/out/structured-2fae247de0d3b8fd)
+
+running 3 tests
+test mapped_shift_replay_respects_controls_and_exact_inverse ... ok
+test structured_shift_width_is_compact_and_invalid_ranges_fail ... ok
+test tensor_shift_gate_arithmetic_matches_modular_indices ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/structured_stencil.rs (target/debug/build/quest-qsvt/a00588d523428796/out/structured_stencil-a00588d523428796)
+
+running 2 tests
+test zero_stencil_large_width_and_resource_failures ... ok
+test weighted_complex_stencil_and_whole_unitary_match_independent_formula ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

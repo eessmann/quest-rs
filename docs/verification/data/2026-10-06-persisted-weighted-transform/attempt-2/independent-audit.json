@@ -1,0 +1,118 @@
+{
+  "schema": "quest-persisted-weighted-attempt-2-independent-audit-v1",
+  "verdict": "approved-retained-publication-plus-compile-validator-failure-evidence-only",
+  "reruns": 0,
+  "source_files": 970,
+  "source_aggregate_sha256": "cb8a3463cb74ebda074f3e86b947c462a2b714e83f671b1ba104723842056843",
+  "source_manifest_file_sha256": "f23156126a0635452ca33a406ff2dd523cd269d70a1cbb1896670ad40a7c7bfb",
+  "consumer_manifest_files": 14,
+  "consumer_manifest_sha256": "fac76f206b3d7aca6e0b9c89e1b021c864084ed6c9724f617a35320d896ccdb1",
+  "actual_local_packages": [
+    "crates/quest-build/Cargo.toml",
+    "crates/quest-compile/Cargo.toml",
+    "crates/quest-language/Cargo.toml",
+    "crates/quest-macros/Cargo.toml",
+    "crates/quest-math/Cargo.toml",
+    "crates/quest-numerics/Cargo.toml",
+    "crates/quest-polynomial/Cargo.toml",
+    "crates/quest-qasm/Cargo.toml",
+    "crates/quest-qsp/Cargo.toml",
+    "crates/quest-qsvt-io/Cargo.toml",
+    "crates/quest-qsvt/Cargo.toml",
+    "crates/quest-symbolic/Cargo.toml",
+    "crates/quest-synthesis/Cargo.toml",
+    "crates/quest-sys/Cargo.toml",
+    "crates/quest/Cargo.toml",
+    "crates/vendor/mathcore/Cargo.toml"
+  ],
+  "compiler_records": 373,
+  "all_compiler_packages": 230,
+  "native_files": 29,
+  "tool_executable_records": 5,
+  "snapshots_verified": 4,
+  "binary_sha256": "2bdc5ca75c018f9f5fe40b33d08050bb313f5b41b14901252ecaa4774426cf87",
+  "receipt_sha256": "e1d70846a4f0252cac1e3133a0137aef4f64d42b0e3fc19b882cdb9638dc0130",
+  "compile_raw_sha256": "e0a089496ede2f418afeae36329a88876dcd4e866ea780cb902533a875d5eee2",
+  "outcomes": {
+    "publication_complete": 1,
+    "native_compile_child_completed": 1,
+    "compile_validator_failure": 1,
+    "dependent_replays_not_run": 5,
+    "inverse_requests_executed": 0
+  },
+  "immutable_published_files": 27,
+  "published_hdf5_files": 24,
+  "publication_ranks": 8,
+  "compile_degree": 33,
+  "compiled_alpha": 1.2500000000000002,
+  "validator_failure": {
+    "error": "bounded integer",
+    "location": "children application_payload_ceiling requires >=1 but three P1 child receipts correctly declare0; metadata-only reproduction on saved row",
+    "first_failed_integer": {
+      "value": 0,
+      "lower": 1,
+      "upper": 18446744073709551615
+    },
+    "native_child_returncode": 0,
+    "native_child_status": "completed"
+  },
+  "caps": {
+    "address_space_bytes": 2147483648,
+    "stdout_bytes": 4194304,
+    "stderr_bytes": 4194304,
+    "read_chunk_bytes": 65536,
+    "process_file_size_limit": null,
+    "seconds": 180
+  },
+  "elapsed_seconds": {
+    "publish_child": 0.6188711380018503,
+    "compile_child": 0.5439512239972828,
+    "campaign_driver": 1.340972830003011,
+    "outer_execution": 1.5742339680000441
+  },
+  "scope_qualifications": [
+    "970-file source identity is audited workspace superset, not exact sixteen-package compiler input closure",
+    "rustc/cargo executable hashes identify rustup launcher; versions/profile separately recorded; no hermetic or dependent-library closure claim",
+    "publication and phase compilation completion do not imply native inverse execution",
+    "exact published file hashes checked without HDF5 matrix extraction or full classical solution",
+    "nominal coefficient/phase diagnostics are not a uniform implemented-source/native error certificate",
+    "no replay calls, inverse result, accuracy, readout, full-state or multihost evidence from this attempt"
+  ],
+  "evidence": [
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-attempt-2-independent-audit.py",
+      "bytes": 11082,
+      "sha256": "5e807bea69e036c1071e552cc8229dfb406a96c1a2b35d9b6014cdce1980a756"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-attempt-2-independent-audit.log",
+      "bytes": 3429,
+      "sha256": "bd736bc0811e3fdc1758552b58ac34d4ee6f9b4a20e91764823f6794713edc0e"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-attempt-2-independent-audit-results.json",
+      "bytes": 3429,
+      "sha256": "bd736bc0811e3fdc1758552b58ac34d4ee6f9b4a20e91764823f6794713edc0e"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-final-build-2-attestation.json",
+      "bytes": 2537,
+      "sha256": "402ffda301f248570d877eee8e30b38199ac805ca6c63d8888e7a5ad697891d9"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-final-execution-2.json",
+      "bytes": 2823,
+      "sha256": "0498958feb75ca6960bacdfd4654dbf386e5e6121ac91c075d5bd58210a6e7a3"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-2/receipt.json",
+      "bytes": 172673,
+      "sha256": "e1d70846a4f0252cac1e3133a0137aef4f64d42b0e3fc19b882cdb9638dc0130"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-2/dataset/receipt-compile-world1-rank0.json",
+      "bytes": 11131,
+      "sha256": "e0a089496ede2f418afeae36329a88876dcd4e866ea780cb902533a875d5eee2"
+    }
+  ]
+}

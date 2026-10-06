@@ -1,0 +1,863 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-06",
+  "scope": "Whole-archive file-kind admission and HDF5 discovery parity",
+  "source_sha256": {
+    "crates/quest-build/src/context.rs": "bd38e47ffd73036ea7479426d33fe9130e8240aff68d22c192e09a0a2eb6ea40",
+    "crates/quest-build/src/hdf5.rs": "ed7eeaef5ba99319d891478fccacd5533ca53b25a3f02063fbebf9ca11be87b6",
+    "crates/quest-build/src/lib.rs": "c0ca6994c0ceff00f369fc89014a7e2ac6decd5803a2a77dd40c3b878d5f874b",
+    "crates/quest-build/src/link.rs": "0127dd4eb99f9faaa3c53e8f6836be59aa092e3940ddc410294fde9e9eb018ff",
+    "crates/quest-build/src/package.rs": "dac40ab1c7b5f0e221bfe71bfa5468e49c23784b5bbbec2097ced2f090f6bc1a",
+    "crates/quest-build/src/probe.rs": "f868670ace1c4ddd6b170a8ec73c1cac6acea3df8c23e6579c61a817d15add38",
+    "crates/quest-build/src/rsmpi.rs": "81b034d1f036dccea79ce1b4bf8ad5c71c48b0fc370c1c6df370c7f8453bc373",
+    "crates/quest-build/native/CMakeLists.txt": "e4dc87205989d4a96883213b996300eda5f617449d386390f7fa0844fdb741b7",
+    "crates/quest-build/native/abi.cpp": "11d8e382c1ebf1bdbfa7f329bb7443b8902e624f1abde219f9b815bf5b34f25c",
+    "crates/quest-build/native/mpi_abi.c": "901a162a18b4214c37c84f80e92aa2f69ca09569603ea75bf7bae8d74dac22df",
+    "crates/quest-build/native/query.cpp": "2b9d8d3dac7ad333266c5ceda1c09f6e202f2d643a45c86d14412a46aebf5be6",
+    "crates/quest-build/Cargo.toml": "297e5578b486476530dc52c46e89d7daaf7e8fe0636d7f822a0b66d180617255",
+    "crates/quest-build/README.md": "4f56b062ac9994f003ca494fe144f0ac2579e6057037f1c1a4a98a249fb04692"
+  },
+  "package_verification": [
+    {
+      "command": "cargo test -p quest-build --all-features",
+      "exit_code": 0,
+      "passed": 62,
+      "failed": 0,
+      "doctests": 0
+    },
+    {
+      "command": "cargo clippy -p quest-build --all-targets --all-features --no-deps -- -D warnings",
+      "exit_code": 0
+    }
+  ],
+  "link_evidence": [
+    {
+      "path": "target/link-kind-20261006-evidence/red.log",
+      "bytes": 892,
+      "sha256": "f5e26ecb16996fb992b5929218ee7f1d694f3564a39f2f566095ecb0d5ace868",
+      "exit_code": 101
+    },
+    {
+      "path": "target/link-kind-20261006-evidence/green-regression.log",
+      "bytes": 501,
+      "sha256": "25309e895b678b47c6753139181179f68400ebe209d07a79b8e2bfc9880619ec",
+      "exit_code": 0
+    },
+    {
+      "path": "target/link-kind-20261006-evidence/green-link-tests.log",
+      "bytes": 1302,
+      "sha256": "181950fac58295ec1100a55e13b866f30e09ae9b02bebecd23546f95274cb4e0",
+      "exit_code": 0
+    },
+    {
+      "path": "target/link-kind-20261006-evidence/green-probe-test.log",
+      "bytes": 493,
+      "sha256": "da1e96a3fc00b589d80fda56ccb5633b0d0db87fdf5c453a38998962c0d52f22",
+      "exit_code": 0
+    },
+    {
+      "path": "target/link-kind-20261006-evidence/green-quest-build.log",
+      "bytes": 5674,
+      "sha256": "65d18cdb322f11279a6d9b0c30f4415832bdb87b56736562db19c5f38acf4b49",
+      "exit_code": 0
+    },
+    {
+      "path": "target/link-kind-20261006-evidence/clippy.log",
+      "bytes": 2687,
+      "sha256": "d558ea0feb099bcf53913af7af0d6731a99473ff136e1b4c157e0a3decf78757",
+      "exit_code": 101
+    },
+    {
+      "path": "target/link-kind-20261006-evidence/clippy-final.log",
+      "bytes": 847,
+      "sha256": "286a2d530b8a25669b1597cf963f30a4697e8be3619dc477b6d428511fdb81ea",
+      "exit_code": 101
+    },
+    {
+      "path": "target/link-kind-20261006-evidence/final-quest-build.log",
+      "bytes": 5812,
+      "sha256": "900a744d115dfe4528928d21c37771d67f350bdab06ea937754f34c310fe37e3",
+      "exit_code": 0
+    },
+    {
+      "path": "target/link-kind-20261006-evidence/final-clippy.log",
+      "bytes": 172,
+      "sha256": "98dcd5f32ca71e6f1f7e1177034495c6b476b1640b06af17276c2276925c7ad1",
+      "exit_code": 0
+    }
+  ],
+  "cluster_snapshot_excludes_delta": "d8c05b505d90989f405ce79f18abdf7566eb8f68ed6be81b735e7804e7ed993a",
+  "downstream": {
+    "native_installation": "Clang-built QuEST 4.3.0 with SDK RUNPATH; unchanged native source",
+    "mpi": "matching system MPICH",
+    "io_tests": 54,
+    "io_doctests": 2,
+    "quest_sys_mpi_tests": 51,
+    "quest_sys_mpi_skipped": 0,
+    "workspace_all_feature_check": "passed",
+    "binding_freshness": "passed",
+    "cpu_openmp_numerical_consumers": 10,
+    "native_doctor": "passed",
+    "formatting": "passed"
+  },
+  "limits": {
+    "current_delta_cirrus": "Full GNU and Cray Torc builds completed 0:0 for snapshot 565f59cc...2602; workspace and MPI runtime acceptance is not established by these build receipts. These builds exclude the later HDF5 empty-link-path correction recorded separately; its combined corrected snapshot requires new full acceptance.",
+    "macos": "not run",
+    "full_workspace_tests": "The Clang campaign retains two unresolved installed-CMake module-open failures. A separate complete local GNU campaign passed all twelve stages and does not establish a cause or repair for those Clang failures.",
+    "native_source_modified": false,
+    "new_unsafe_rust": false,
+    "new_dependencies": false,
+    "lint_exceptions": false,
+    "existing_warning": "quest-polynomial nightly generic_const_exprs trait-solver compatibility"
+  },
+  "hdf5_and_downstream_log_identities": [
+    {
+      "path": "target/hdf5-discovery-20261006-evidence/quest-build-hdf5-clippy.log",
+      "sha256": "0dc76975f1af8433fbee5caa64918670e7682ad82471c638f6cb7747484ea56a"
+    },
+    {
+      "path": "target/hdf5-discovery-20261006-evidence/quest-build-hdf5-green.log",
+      "sha256": "a540eb3c6b5170f24ee09ffad34a482d04756da5788cbc4c61847a100e8e94ea"
+    },
+    {
+      "path": "target/hdf5-discovery-20261006-evidence/quest-build-hdf5-package.log",
+      "sha256": "87de1399f5d424451d51e5e12ae0ca04b596b9b4d9937978ed297b00788ce972"
+    },
+    {
+      "path": "target/hdf5-discovery-20261006-evidence/quest-build-hdf5-red.log",
+      "sha256": "9128602323f5598a3d211f5b8ce59f079d07d3f6358925afdb0a6697ec712fab"
+    },
+    {
+      "path": "target/portable-discovery-20261006/bindings.log",
+      "sha256": "faab25ccc8f9c30845d457bc516dd96c6b59820c69f83939c5d0d2ca86b4f442"
+    },
+    {
+      "path": "target/portable-discovery-20261006/consumers.log",
+      "sha256": "a25388a4f9ee42c757a58e7559b6d7a15cdf30ceae63263b02525674e39606d4"
+    },
+    {
+      "path": "target/portable-discovery-20261006/doctor.log",
+      "sha256": "e97b449f00f778677f7afa3415655c8bcde63a3765337358a44f14b52944c8d7"
+    },
+    {
+      "path": "target/portable-discovery-20261006/formatting.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "target/portable-discovery-20261006/io-tests.log",
+      "sha256": "61f1939f4fe108613d130786ecef8965cf649dd226f04180dee3e269c8747553"
+    },
+    {
+      "path": "target/portable-discovery-20261006/native-mpi-tests.log",
+      "sha256": "289f9e0e6a809dc44dee2aae9a72334e49674dc8733dc1d80352264fa5484f93"
+    },
+    {
+      "path": "target/portable-discovery-20261006/workspace-check.log",
+      "sha256": "a9e21e175c9a200f77f2205d7c1e6b226aa05105a6f88b401ab05ccbef2c6fb6"
+    }
+  ],
+  "workspace_campaign": {
+    "recorded_at_utc": "2026-10-06T18:30:20+00:00",
+    "state": "finished_with_failures",
+    "driver_exit_code": 1,
+    "driver": {
+      "path": "target/portable-discovery-20261006/verify-workspace.sh",
+      "bytes": 1514,
+      "sha256": "af6101940c5c77db750b738fe824823f6d245b512e669133ae8d67a7fe340a1f"
+    },
+    "completion_status": {
+      "path": "target/portable-discovery-20261006/workspace-completed.status",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    "environment": {
+      "native_installation": "Clang-built QuEST 4.3.0 with SDK RUNPATH; unchanged native source",
+      "mpi": "matching system MPICH",
+      "CC": "/usr/bin/clang",
+      "CXX": "/usr/bin/clang++",
+      "CLANG": "/usr/bin/clang",
+      "QUEST_ROOT": "<repository>/target/native-clang-20261006/sdk-install",
+      "CARGO_TARGET_DIR": "<repository>/target/native-clang-20261006/cargo",
+      "TMPDIR": "<repository>/target/native-clang-20261006/tmp",
+      "CARGO_BUILD_JOBS": 8,
+      "OMP_NUM_THREADS": 2,
+      "nextest_test_threads": 4
+    },
+    "stages": [
+      {
+        "name": "all-feature-tests",
+        "command": "cargo nextest run --locked --offline --workspace --all-features --test-threads=4 --no-fail-fast --status-level=fail --final-status-level=fail",
+        "state": "finished",
+        "exit_code": 100,
+        "log": {
+          "path": "target/portable-discovery-20261006/all-feature-tests.log",
+          "bytes": 9794,
+          "sha256": "ae173bedead5bd42eee1a1c1a44194a2e3043dd6dd3ec2a354faf22b0e83e4a6"
+        },
+        "status_file": {
+          "path": "target/portable-discovery-20261006/all-feature-tests.status",
+          "bytes": 4,
+          "sha256": "eea8254c7500ba3de996aa8ad6af399183f04e17d4a8102fde539dbc93a90012"
+        },
+        "run_id": "2a95f230-8afb-476b-9def-4ea54f9c13ee",
+        "summary": "Summary [ 384.459s] 1708 tests run: 1706 passed (1 slow), 2 failed, 6 skipped",
+        "run": 1708,
+        "passed": 1706,
+        "failed": 2,
+        "skipped": 6,
+        "binaries": 289
+      },
+      {
+        "name": "default-tests",
+        "command": "cargo nextest run --locked --offline --workspace --test-threads=4 --no-fail-fast --status-level=fail --final-status-level=fail",
+        "state": "finished",
+        "exit_code": 0,
+        "log": {
+          "path": "target/portable-discovery-20261006/default-tests.log",
+          "bytes": 3263,
+          "sha256": "ccc638a7e9d3a5dfc9712f643bd4de2465536f3d911a71460c10f7be4da068b1"
+        },
+        "status_file": {
+          "path": "target/portable-discovery-20261006/default-tests.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        },
+        "run_id": "27274960-65c7-4b01-b6fd-dc455addd76d",
+        "summary": "Summary [ 112.197s] 1515 tests run: 1515 passed, 1 skipped",
+        "run": 1515,
+        "passed": 1515,
+        "failed": 0,
+        "skipped": 1,
+        "binaries": 289
+      },
+      {
+        "name": "all-feature-doctests",
+        "command": "cargo test --locked --offline --workspace --all-features --doc",
+        "state": "finished",
+        "exit_code": 0,
+        "log": {
+          "path": "target/portable-discovery-20261006/all-feature-doctests.log",
+          "bytes": 11707,
+          "sha256": "3a402faf892192e0bf04844a101e62389a9fd998a3b269ec602ed7b931e3cae6"
+        },
+        "status_file": {
+          "path": "target/portable-discovery-20261006/all-feature-doctests.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        },
+        "passed": 65,
+        "failed": 0,
+        "ignored": 1,
+        "crate_summaries": 25
+      },
+      {
+        "name": "default-doctests",
+        "command": "cargo test --locked --offline --workspace --doc",
+        "state": "finished",
+        "exit_code": 0,
+        "log": {
+          "path": "target/portable-discovery-20261006/default-doctests.log",
+          "bytes": 10415,
+          "sha256": "b9b5c14140ee050438b3b9dbdda16dc834fdf1d70df7e5db9aa975e45aa9289a"
+        },
+        "status_file": {
+          "path": "target/portable-discovery-20261006/default-doctests.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        },
+        "passed": 55,
+        "failed": 0,
+        "ignored": 1,
+        "crate_summaries": 25
+      },
+      {
+        "name": "all-feature-clippy",
+        "command": "cargo clippy --locked --offline --workspace --all-features --all-targets -- -D warnings",
+        "state": "finished",
+        "exit_code": 0,
+        "log": {
+          "path": "target/portable-discovery-20261006/all-feature-clippy.log",
+          "bytes": 3059,
+          "sha256": "7f9e8eb003fc894d1e6b2653b0e75cd621536b1f6a432385f833736103459b87"
+        },
+        "status_file": {
+          "path": "target/portable-discovery-20261006/all-feature-clippy.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      },
+      {
+        "name": "default-check",
+        "command": "cargo check --locked --offline --workspace",
+        "state": "finished",
+        "exit_code": 0,
+        "log": {
+          "path": "target/portable-discovery-20261006/default-check.log",
+          "bytes": 1550,
+          "sha256": "48c09dafab14ed3f584d1fe1700e1a9da7841097ab9f888ca74693227ec379d3"
+        },
+        "status_file": {
+          "path": "target/portable-discovery-20261006/default-check.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      }
+    ],
+    "acceptance": "Open: diagnostic focused passes do not supersede the two failed all-feature tests."
+  },
+  "local_gnu_followup": {
+    "report": "docs/verification/2026-10-06-native-gnu.md",
+    "summary": "docs/verification/data/2026-10-06-native-gnu/summary.json",
+    "source_manifest_sha256": "565f59ccd796712da5277c57a4203d0869f0ad67a26fdec47e99709b83dc2602",
+    "started_at_utc": "2026-10-06T18:50:23Z",
+    "finished_at_utc": "2026-10-06T19:05:06Z",
+    "exit_code": 0,
+    "stages_passed": 12,
+    "all_feature_tests": {
+      "passed": 1708,
+      "failed": 0,
+      "skipped": 6
+    },
+    "default_feature_tests": {
+      "passed": 1515,
+      "failed": 0,
+      "skipped": 1
+    },
+    "scope": "Local GNU CPU/OpenMP and MPI execution; distinct from the failed local Clang campaign and Cirrus validation.",
+    "supersedes_clang_failures": false
+  },
+  "cirrus_followup": {
+    "status": "focused workflow prepared but not submitted; superseded by full verification",
+    "source_file_count": 2584,
+    "source_manifest_sha256": "cc71c574b4ebcfa3a69e8d404642b15748b733fe9c8c430ad29406dde131043c",
+    "source_archive_sha256": "5ec5dbf1b4f3cab9faf53c57b7cf13cc633240d0c2f53bec3c27bbfab1e98c12",
+    "source_transfer_validation": "archive and manifest verified locally and remotely; remote source read-only",
+    "workflow": "docs/verification/fixtures/cirrus/torc-native-discovery.yaml",
+    "dry_run": "valid, zero errors or warnings; one job and one resource requirement",
+    "dry_run_receipt_sha256": "930a1a7f7a8744008b6760aa0b1e361200c5e8b1de546531a28abd3f2ba0263b",
+    "shell_checks": "bash syntax and ShellCheck warnings passed; two local JSON-serialization exceptions documented",
+    "stages": [
+      "discovery-tests",
+      "discovery-clippy",
+      "doctor",
+      "bindings"
+    ],
+    "target_scope": "fresh targets/discovery/<compiler>/<source-digest>",
+    "complete_build_prerequisite": false,
+    "submission_gate": "superseded by separately recorded full build jobs after approved obsolete-cache removal",
+    "available_storage_after_transfer_gib_approx": 13,
+    "limitations": [
+      "No GNU or Cray execution for this snapshot yet.",
+      "Successful focused checks would not establish the full current-source workspace or MPI matrix."
+    ]
+  },
+  "cirrus_full_followup": {
+    "status": "both full Torc builds completed successfully; runtime acceptance not established by build receipts",
+    "observed_at_utc": "2026-10-06T19:08:17Z",
+    "source_file_count": 2584,
+    "source_manifest_sha256": "565f59ccd796712da5277c57a4203d0869f0ad67a26fdec47e99709b83dc2602",
+    "source_archive_sha256": "b9256d7c0cbb72b7b2477b782c8e5666cde150564b261dd78f51cee5e2b80f5b",
+    "source_transfer_validation": "archive and manifest verified locally and remotely; remote source read-only",
+    "post_local_run_documentation": {
+      "path": "crates/quest-build/README.md",
+      "sha256": "8d980080c6c7d638d61d1cfcfc46a9db3b66f02dcb1d9c0b6a2089298a4e687c",
+      "change": "clarify module-environment versus opt-in loader-isolated consumer checks; no executable source changed"
+    },
+    "storage_cleanup": {
+      "authorization": "explicit user approval in this conversation",
+      "removed": "$WORK/quest-validation/2026-10-06-portable/targets",
+      "removed_cache_gib_approx": 42,
+      "available_gib_after_removal_approx": 52,
+      "preserved": [
+        "sources",
+        "native installations",
+        "logs",
+        "receipts",
+        "current Cargo targets"
+      ]
+    },
+    "workflow": "docs/verification/fixtures/cirrus/torc-native-build.yaml",
+    "dry_run": "valid, zero errors or warnings; one job and one resource requirement",
+    "dry_run_receipt_sha256": "7ea60ed175f4accc41522cdab8bd4212e319276af9abba2fb2110e6b188bb607",
+    "build_jobs": {
+      "gnu": 538177,
+      "cray": 538178
+    },
+    "build_dependency": "afterany:538141",
+    "build_nodes_per_job": 1,
+    "build_cpus_per_job": 8,
+    "build_walltime_seconds": 7200,
+    "qos": "lowpriority",
+    "native_revision": "503552065045eaf89baba85e6cd6aad728525554",
+    "native_source_modified": false,
+    "torc": {
+      "version": "0.41.0",
+      "cli_sha256": "ca7a5e6daa601a97a6f3cc7d6ac688ec18a015257b65dc277222bdf189e331ad",
+      "server_sha256": "2766f61186705f818e7770161bfa5ac59eecaf20a3bf47bc1534d55d9169221d",
+      "standalone": true,
+      "execution_mode": "direct",
+      "resource_limits_enabled": false
+    },
+    "native_stage_statuses_in_both_lanes": {
+      "doctor": 0,
+      "bindings": 0,
+      "default-build": 0,
+      "all-feature-build": 0,
+      "mpi-consumer-build": 0,
+      "source-after": 0,
+      "completed": 0,
+      "job-exit": 0
+    },
+    "build_lanes": [
+      {
+        "compiler": "gnu",
+        "slurm_job": 538177,
+        "slurm_state": "COMPLETED",
+        "slurm_exit": "0:0",
+        "allocation_seconds": 221,
+        "started_at_utc": "2026-10-06T19:04:00Z",
+        "ended_at_utc": "2026-10-06T19:07:41Z",
+        "workflow_id": 1,
+        "job_id": 1,
+        "run_id": 1,
+        "attempt_id": 1,
+        "job_status": "completed",
+        "result_status": "completed",
+        "return_code": 0,
+        "torc_run_status": 0,
+        "torc_job_exit_status": 0,
+        "structured_acceptance": true,
+        "task_minutes": 3.525183333333333,
+        "sampled_task_peak_bytes": 6882086912,
+        "restored_database_quick_check": "ok",
+        "workflow_export_sha256": "024f25869146f57c37c60e94ae4a6058bff477235c4b258c100fc4ad1984536e",
+        "database_and_logs_archive_sha256": "8acb013851b20a24f84df1432d8be1b722e4ef3af8f4ae63999176679f4ffb08"
+      },
+      {
+        "compiler": "cray",
+        "slurm_job": 538178,
+        "slurm_state": "COMPLETED",
+        "slurm_exit": "0:0",
+        "allocation_seconds": 220,
+        "started_at_utc": "2026-10-06T19:04:01Z",
+        "ended_at_utc": "2026-10-06T19:07:41Z",
+        "workflow_id": 1,
+        "job_id": 1,
+        "run_id": 1,
+        "attempt_id": 1,
+        "job_status": "completed",
+        "result_status": "completed",
+        "return_code": 0,
+        "torc_run_status": 0,
+        "torc_job_exit_status": 0,
+        "structured_acceptance": true,
+        "task_minutes": 3.5347999999999997,
+        "sampled_task_peak_bytes": 2928578560,
+        "restored_database_quick_check": "ok",
+        "workflow_export_sha256": "f8fb581cc8e8f2f1d7a00a9c673241dc4e90d239afde226f26f7c1d94c9c5c6b",
+        "database_and_logs_archive_sha256": "0190cd6aad46485125ffa69887505b512f2cf94ab503d1bb24afacc405dc78c3"
+      }
+    ],
+    "structured_validation": "Exactly one completed job/result per lane; return code zero; result workflow/job/run/attempt identities match the corresponding records.",
+    "receipt_archive": {
+      "path": "target/discovery-full-cirrus-20261006/build-receipts.tar.gz",
+      "bytes": 216542,
+      "sha256": "4d78d69b84a016d833b1c551c93f05cd9dae358bfad1c7c3a43dd0884b95486e",
+      "gzip_integrity": "passed, including both nested database/log archives"
+    },
+    "slurm_accounting": {
+      "path": "target/discovery-full-cirrus-20261006/build-accounting.txt",
+      "bytes": 4114,
+      "sha256": "d357dc3aea3501ae8ebcb008692f7d795255801096aa00fa4c781e1a51ef5827"
+    },
+    "runtime_jobs_submitted": false,
+    "planned_runtime": "ordinary unfiltered suites, serialized eight-node allocations after successful matching builds",
+    "acceptance": "Build acceptance passed in both lanes for the recorded snapshot; no workspace test or MPI consumer execution is claimed by these receipts.",
+    "resource_measurement_limit": "Task monitor samples are not enforced memory caps or simultaneous whole-node peaks."
+  },
+  "cmake_diagnosis": {
+    "conclusion": "Original installed-CMake module-open failures remain unexplained; no failing syscall or errno was reproduced.",
+    "original_failures": [
+      {
+        "test": "probe::tests::cmake_build_evaluates_target_requirements_and_paths_with_spaces",
+        "module": "/usr/share/cmake/Modules/CMakeParseImplicitIncludeInfo.cmake"
+      },
+      {
+        "test": "probe::tests::cargo_discovery_evaluates_the_selected_package_once",
+        "module": "/usr/share/cmake/Modules/Platform/Linker/GNU.cmake"
+      }
+    ],
+    "current_evidence": [
+      "Installed CMake 4.3.0 binary and both modules are readable and match RPM content digests. Owner/group/mtime differ in the sandbox overlay, not contents.",
+      "Current address-space/data/file-size limits are unlimited; file-descriptor limit 1048576. These snapshots cannot establish original failing-process limits or resource state.",
+      "Both direct focused tests pass concurrently inside the sandbox with the documented Clang SDK/TMPDIR/MPICH environment.",
+      "Both direct focused tests also pass under strace outside the sandbox. Both failing module paths open successfully there; no EACCES/EINTR/EMFILE/ENFILE/EIO/ESTALE/ENOMEM occurs in either trace.",
+      "Original failed tests keep unique TempDir ownership alive through synchronous configure; the single-evaluation parent waits for child output before dropping its own TempDir. No shared fixture path or premature drop identified."
+    ],
+    "limitations": [
+      "The original failure was not traced and emits no errno. Successful reruns cannot determine its cause.",
+      "Sandbox strace attempts were denied by ptrace restrictions before test bodies ran. Approved unsandboxed tracing changes the execution environment and timing.",
+      "Direct focused tests do not reproduce nextest scheduling or the full workspace workload.",
+      "No source/package changes, test skips, retries inside tests, workload restart or claim of repair."
+    ],
+    "receipt": {
+      "path": "target/portable-discovery-20261006/cmake-diagnosis/diagnosis.json",
+      "bytes": 4222,
+      "sha256": "704a0654dac8bc8beae02c8587b9ce1f1ffc8e31adc1d04e07bed2c13eefad0e"
+    },
+    "files": [
+      {
+        "path": "target/portable-discovery-20261006/cmake-diagnosis/focused-1.log",
+        "bytes": 146,
+        "sha256": "2421224bba335e2933fa1ec2f986b80c293e6bc8dfccae65943a2bcb5cc10b65"
+      },
+      {
+        "path": "target/portable-discovery-20261006/cmake-diagnosis/focused-1.strace",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "target/portable-discovery-20261006/cmake-diagnosis/focused-2.log",
+        "bytes": 146,
+        "sha256": "f1777d777b24176e459f686e8d82434b1ae043ec5b8238b7e5780217d79a59a9"
+      },
+      {
+        "path": "target/portable-discovery-20261006/cmake-diagnosis/focused-2.strace",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "target/portable-discovery-20261006/cmake-diagnosis/focused.json",
+        "bytes": 606,
+        "sha256": "4999232bd69c59b22655b48f6c9665dda093352c37c5ffcaed4e806bbfd62884"
+      },
+      {
+        "path": "target/portable-discovery-20261006/cmake-diagnosis/sandbox-1.log",
+        "bytes": 203,
+        "sha256": "d03fbc1eed86f0f9b716376eef82a96170958ca6c107e663b1c454918bb5d551"
+      },
+      {
+        "path": "target/portable-discovery-20261006/cmake-diagnosis/sandbox-2.log",
+        "bytes": 191,
+        "sha256": "f9fbb497f2d9d9e676b69168d2912895f2dcdb93e23f925f7caafcffa08f6360"
+      },
+      {
+        "path": "target/portable-discovery-20261006/cmake-diagnosis/sandbox.json",
+        "bytes": 437,
+        "sha256": "a0ade34e9c930d99c405fd3caebdcadef28660f4f727efd26449988dd85591db"
+      },
+      {
+        "path": "target/portable-discovery-20261006/cmake-diagnosis/system.json",
+        "bytes": 2262,
+        "sha256": "a02b677674bd18edbff613051057159e99a7093386d665b2480909a3be802399"
+      },
+      {
+        "path": "target/portable-discovery-20261006/cmake-diagnosis/trace-summary.json",
+        "bytes": 847,
+        "sha256": "cef158490486f39bef0afd02fc41390f07f28a66129204fe95bf580845f9b9c5"
+      },
+      {
+        "path": "target/portable-discovery-20261006/cmake-diagnosis/unsandboxed-1.log",
+        "bytes": 203,
+        "sha256": "1f58641b984aa1885b05b8ba2e96add396dd9abd1ab44747aa912c93c7a86507"
+      },
+      {
+        "path": "target/portable-discovery-20261006/cmake-diagnosis/unsandboxed-1.strace",
+        "bytes": 2105927,
+        "sha256": "083bc1af86ffc1927cd20a359df83eecc577d5baa7abc0b13a01ee19419bc25c"
+      },
+      {
+        "path": "target/portable-discovery-20261006/cmake-diagnosis/unsandboxed-2.log",
+        "bytes": 191,
+        "sha256": "77098ff72c043e7a5b133647e267911d812346bc3c164faf3cf20d0996ad38eb"
+      },
+      {
+        "path": "target/portable-discovery-20261006/cmake-diagnosis/unsandboxed-2.strace",
+        "bytes": 1928984,
+        "sha256": "9f9d4613c2888e416b9effd45cafd35a9c43c836dafd7f72fe5dc9e80d134735"
+      },
+      {
+        "path": "target/portable-discovery-20261006/cmake-diagnosis/unsandboxed.json",
+        "bytes": 738,
+        "sha256": "2465ddca879cdcbe04db8864aa8c852e6ae71615633398551b88b0ad460f748e"
+      }
+    ],
+    "test_binary": {
+      "path": "target/native-clang-20261006/cargo/debug/build/quest-build/6dc8ac611e7c4437/out/quest_build-6dc8ac611e7c4437",
+      "bytes": 29408288,
+      "sha256": "994447d44732e1f36fd38c1ce51a95f4369ce9a19d109d6b75f43bb4d2add1d0"
+    }
+  },
+  "hdf5_empty_link_path_correction": {
+    "scope": "Post-565f59/e68d5468 correction to HDF5 empty-library-path finalization; earlier source and campaign records above remain unchanged.",
+    "source": {
+      "path": "crates/quest-build/src/hdf5.rs",
+      "before_sha256": "ed7eeaef5ba99319d891478fccacd5533ca53b25a3f02063fbebf9ca11be87b6",
+      "after_sha256": "71fb027e017144ec73f78131bd0ab20a00eec86e42ff032bef239c33077ac357"
+    },
+    "dependency_contract": "Locked hdf5-metno-sys 0.12.4 LibrarySearcher::finalize derives lib/bin from the selected include directory parent when link_paths is empty.",
+    "defect": "Successful pkg-config discovery could supply a usable header and no -L paths; our helper returned an empty runtime-path list instead of checking the selected include root lib/bin.",
+    "correction": "Only an empty search list receives selected-header-derived lib/bin candidates; nonempty lists remain unchanged and candidates still require an actual platform shared-library file.",
+    "regression": "hdf5::tests::linux_pkg_config_empty_link_paths_use_selected_header_root",
+    "regression_scope": "Real pkg-config query with unrelated first include, selected second header, spaces, ordered lib/bin paths, and Linux colon-joined RUNPATH; file-presence fixtures do not establish HDF5 ABI or loader execution.",
+    "diagnostic": {
+      "binary_source_manifest_sha256": "565f59ccd796712da5277c57a4203d0869f0ad67a26fdec47e99709b83dc2602",
+      "method": "Existing GNU xtask __native-doctor-probe hdf5 with real installed HDF5 headers/library exposed empty pkg-config library_dirs. Explicit HDF5_DIR selected the same fixture library as a diagnostic control, not a proposed workaround.",
+      "logs": [
+        {
+          "path": "target/portability-review-20261006/hdf5-empty-links-pkg-config.log",
+          "bytes": 1918,
+          "sha256": "3fcba61ce5e0ca5294aba8c6bd8e41961d37ad8cc258e2d4e330371c9914ceb2"
+        },
+        {
+          "path": "target/portability-review-20261006/hdf5-empty-links-explicit.log",
+          "bytes": 1138,
+          "sha256": "3fee42e9b42ca8c40525e15677569ecd9ea249d273848ac89671a907d6e6cc00"
+        }
+      ]
+    },
+    "focused_environment": {
+      "cargo_target_dir": "target/hdf5-discovery-delta",
+      "tmpdir": "target/portability-review-20261006/tmp",
+      "native_installation": "existing GNU-built QuEST installation; unchanged",
+      "CC": "/usr/bin/gcc",
+      "CXX": "/usr/bin/g++",
+      "MPICC": "matching system MPICH wrapper",
+      "locked": true,
+      "offline": true
+    },
+    "checks": [
+      {
+        "name": "red regression",
+        "command": "cargo test --locked --offline -p quest-build --all-features hdf5::tests::linux_pkg_config_empty_link_paths_use_selected_header_root -- --exact --nocapture",
+        "exit_code": 101,
+        "passed": 0,
+        "failed": 1,
+        "filtered": 62,
+        "reason": "Expected selected lib/bin paths; actual selection was empty.",
+        "log": {
+          "path": "target/portability-review-20261006/hdf5-empty-links-red.log",
+          "bytes": 3239,
+          "sha256": "77c83c6c7ecf8057b5836033898320e467826bc749903e5828692b93d7a19eae"
+        },
+        "status": {
+          "path": "target/portability-review-20261006/hdf5-empty-links-red.status",
+          "bytes": 4,
+          "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c"
+        }
+      },
+      {
+        "name": "intermediate post-fix suite",
+        "command": "cargo test --locked --offline -p quest-build --all-features hdf5::tests:: -- --nocapture",
+        "exit_code": 101,
+        "passed": 7,
+        "failed": 1,
+        "filtered": 55,
+        "reason": "Selection was correct; new test expected separate Linux RUNPATH flags instead of the existing colon-joined argument. Only the test expectation was corrected.",
+        "log": {
+          "path": "target/portability-review-20261006/hdf5-empty-links-green.log",
+          "bytes": 5759,
+          "sha256": "8fbf8de3c3749dc17760e2394c800032315b1a14f8673f72e378170998d59877"
+        },
+        "status": {
+          "path": "target/portability-review-20261006/hdf5-empty-links-green.status",
+          "bytes": 4,
+          "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c"
+        }
+      },
+      {
+        "name": "final focused suite",
+        "command": "cargo test --locked --offline -p quest-build --all-features hdf5::tests:: -- --nocapture",
+        "exit_code": 0,
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0,
+        "filtered": 55,
+        "log": {
+          "path": "target/portability-review-20261006/hdf5-empty-links-green-final.log",
+          "bytes": 1074,
+          "sha256": "01cf78867085c7be75b069a4c34cd971a621d6cc697270f3dbf1f24c31befa01"
+        },
+        "status": {
+          "path": "target/portability-review-20261006/hdf5-empty-links-green-final.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      },
+      {
+        "name": "strict package Clippy",
+        "command": "cargo clippy --locked --offline -p quest-build --all-targets --all-features --no-deps -- -D warnings",
+        "exit_code": 0,
+        "log": {
+          "path": "target/portability-review-20261006/hdf5-empty-links-clippy.log",
+          "bytes": 172,
+          "sha256": "9431b1ea86908ff49eb8a1beecb9f016787ba64514d637ee050237b777dbd2cb"
+        },
+        "status": {
+          "path": "target/portability-review-20261006/hdf5-empty-links-clippy.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      },
+      {
+        "name": "complete package tests",
+        "command": "cargo test --locked --offline -p quest-build --all-features",
+        "environment": {
+          "CARGO_TARGET_DIR": "target/safe-supervisor-20261006/cargo",
+          "CC": "/usr/bin/gcc",
+          "CXX": "/usr/bin/g++"
+        },
+        "exit_code": 0,
+        "passed": 63,
+        "failed": 0,
+        "ignored": 0,
+        "filtered": 0,
+        "doctests": 0,
+        "log": {
+          "path": "target/safe-supervisor-20261006/quest-build.log",
+          "bytes": 7112,
+          "sha256": "ab3a7941b00eba5baee15a3846c162966bdb121abcce285dc1d80248c7d4376d"
+        },
+        "status": {
+          "path": "target/safe-supervisor-20261006/quest-build.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      },
+      {
+        "name": "changed-file formatting",
+        "command": "rustfmt --check --config-path .rustfmt.toml crates/quest-build/src/hdf5.rs",
+        "exit_code": 0
+      },
+      {
+        "name": "changed-file whitespace",
+        "command": "git diff --check -- crates/quest-build/src/hdf5.rs",
+        "exit_code": 0
+      }
+    ],
+    "delta_patch": {
+      "path": "target/portability-review-20261006/hdf5-empty-links-delta.patch",
+      "bytes": 3496,
+      "sha256": "e4159f9209a49bb01bdebfc8ceeca4168f6640ec865e0a1ba570967669581ae0"
+    },
+    "earlier_snapshots_excluding_correction": [
+      "565f59ccd796712da5277c57a4203d0869f0ad67a26fdec47e99709b83dc2602",
+      "e68d5468b006d0dd3c5bbb6420d9a5c5db5a5a0727aafd1b8bd93540055e32d0"
+    ],
+    "combined_corrected_snapshot": {
+      "source_manifest_sha256": "4e5b423ebf3db42db19c3f75481ad786a527117eecd4d41c8b9a9b9dcebd6cf1",
+      "source_archive_sha256": "50b5a4a7727754f77282c2597d46e1cf6709bee8506ae63b5c7d05310a08b526",
+      "acceptance": "Full workspace and cluster execution remain a separate gate; focused results do not establish it."
+    },
+    "native_source_modified": false,
+    "new_dependencies": false,
+    "new_unsafe_rust": false,
+    "lint_exceptions": false,
+    "supersedes_clang_failures": false
+  },
+  "concurrent_binding_discovery": {
+    "schema_version": 1,
+    "purpose": "Observe binding native-discovery directory isolation for two concurrent direct invocations sharing a Cargo target; no performance claim",
+    "source": {
+      "directory": "target/portable-locked-cirrus-20261006/frozen",
+      "manifest_sha256": "452a49852c4e23f018b82795c19a3fd183c781234f2914df2c0ab516d696918f",
+      "archive_sha256": "46636f8a311fa221d0754f4042a961e2191d756597ea2fe1ce97f50d1f2898a7",
+      "files_verified_before_and_after": 2594,
+      "before_exit_code": 0,
+      "after_exit_code": 0,
+      "modified": false
+    },
+    "executable": {
+      "path": "target/native-reviewed-gnu-20261006/cargo/debug/xtask",
+      "sha256": "62250dd4c81433f8b1c6ac1d48c4cb6b6a54ea0656991eb92c03774164f240c4",
+      "rebuilt_for_check": false
+    },
+    "native": {
+      "library": "$QUEST_ROOT/lib64/libQuEST.so.4.3.0",
+      "sha256": "2128fd71d6effd5ae463f9f92ff467032f09089a07cdb9ba7a5d565719b95396",
+      "package_config_sha256": "9e6dce8dd10d8b056ef06b66cf58671a172d87170528ca3e22882d925ce6ce65",
+      "modified": false
+    },
+    "environment": {
+      "CC": "/usr/bin/gcc",
+      "CXX": "/usr/bin/g++",
+      "CLANG": "/usr/bin/clang",
+      "MPICC": "/usr/lib64/mpich/bin/mpicc",
+      "CMAKE_PREFIX_PATH": "/usr/lib64/mpich",
+      "CARGO_TARGET_DIR": "target/native-reviewed-gnu-20261006/cargo",
+      "CARGO_BUILD_JOBS": 8,
+      "OMP_NUM_THREADS": 2,
+      "CARGO_PROFILE_DEV_DEBUG": 0,
+      "CARGO_PROFILE_TEST_DEBUG": 0,
+      "CARGO_INCREMENTAL": 0,
+      "full_receipt": "environment.txt",
+      "compiler_wrappers_added": false
+    },
+    "runs": [
+      {
+        "id": 1,
+        "command": "$EXISTING_GNU_XTASK generate-quest-bindings --check",
+        "started_utc": "2026-10-06T20:04:13.885970328Z",
+        "wait_completed_utc": "2026-10-06T20:04:16.117766693Z",
+        "observer_namespace_pid": 8,
+        "exit_code": 0,
+        "output_bytes": 0
+      },
+      {
+        "id": 2,
+        "command": "$EXISTING_GNU_XTASK generate-quest-bindings --check",
+        "started_utc": "2026-10-06T20:04:13.887296618Z",
+        "wait_completed_utc": "2026-10-06T20:04:16.118844831Z",
+        "observer_namespace_pid": 10,
+        "exit_code": 0,
+        "output_bytes": 0
+      }
+    ],
+    "observation": {
+      "method": "Ordinary Bash nullglob array directly under the shared Cargo target; both direct xtask PIDs passed kill -0 before and after glob inspection; ps captured both commands",
+      "timestamp_utc": "2026-10-06T20:04:14.128464054Z",
+      "initial_directory_count": 0,
+      "simultaneous_directory_count": 2,
+      "distinct_directories": [
+        "xtask-binding-native-discovery-I29SUW",
+        "xtask-binding-native-discovery-sT4g20"
+      ],
+      "both_entries_confirmed_directories": true,
+      "both_processes_alive": true,
+      "final_directory_count": 0,
+      "manual_cleanup": false,
+      "instrumentation_added": false,
+      "observer_script": "observe.sh",
+      "poll_iterations_while_both_alive": 201
+    },
+    "input_hashes_after_exit_code": 0,
+    "concurrent_check_exit_code": 0,
+    "final_worktree_checks": [
+      {
+        "command": "cargo fmt --all -- --check",
+        "exit_code": 0,
+        "receipt": "fmt.log"
+      },
+      {
+        "command": "git diff --check",
+        "exit_code": 0,
+        "receipt": "whitespace.log"
+      }
+    ],
+    "timing_limit": "Start timestamps precede each launch; wait-completed timestamps bound completion and are not precise process exit timestamps",
+    "acceptance_limit": "This executes two local concurrent binding freshness checks with an unchanged GNU native SDK. It establishes the observed isolation and normal RAII cleanup case; it does not establish speedup, failure-path cleanup, or additional platform acceptance.",
+    "artifact_index": "artifacts.sha256",
+    "raw_evidence_directory": "target/binding-concurrency-20261006-evidence",
+    "summary_receipt": {
+      "path": "target/binding-concurrency-20261006-evidence/summary.json",
+      "bytes": 3654,
+      "sha256": "8293a8adf6d323f55d5a1d948d648cd06eb71b64740ef11112744815fd670e6e"
+    },
+    "artifact_index_receipt": {
+      "path": "target/binding-concurrency-20261006-evidence/artifacts.sha256",
+      "files": 49,
+      "bytes": 4159,
+      "sha256": "7cf0b083e5f1b340638dcc1f9f0b3e24eca2f3d830d17b64d321af7e0a831d99"
+    }
+  }
+}

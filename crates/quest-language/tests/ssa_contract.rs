@@ -13,6 +13,25 @@ fn compile(
 }
 
 #[gtest]
+fn constant_boolean_short_circuit_skips_unexecuted_domain_errors() -> Result<()> {
+	for expression in ["false && (1 / 0 == 0)", "true || (1 / 0 == 0)"] {
+		let source = format!("const bool answer = {expression}; qubit q;");
+		compile(&source).map_err(|error| std::io::Error::other(error.to_string()))?;
+	}
+	for expression in ["true && (1 / 0 == 0)", "false || (1 / 0 == 0)"] {
+		let source = format!("const bool answer = {expression}; qubit q;");
+		verify_that!(compile(&source), err(anything()))?;
+	}
+	for expression in ["false && 1", "true || missing", "false && sin(true)"] {
+		verify_that!(
+			compile(&format!("const bool answer = {expression}; qubit q;")),
+			err(anything())
+		)?;
+	}
+	Ok(())
+}
+
+#[gtest]
 fn branch_heavy_region_verifies_with_linear_dominance_storage() -> Result<()> {
 	let mut source = String::from("input bool flag; qubit q;");
 	for _ in 0..150 {

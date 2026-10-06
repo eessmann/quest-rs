@@ -1,0 +1,107 @@
+warning: `feature(generic_const_exprs)` is not supported with the next-generation trait solver
+ --> crates/quest-polynomial/src/lib.rs:1:30
+  |
+1 | #![feature(const_trait_impl, generic_const_exprs)]
+  |                              ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `-Znext-solver=globally` is currently enabled by default for testing
+  = note: reverted the setting to `-Znext-solver=coherence` for this crate
+  = note: the currently stable trait solver will be used for this crate
+  = note: see issues #160895 <https://github.com/rust-lang/rust/issues/160895> for more information
+
+warning: `quest-polynomial` (lib) generated 1 warning
+    Checking quest-qsvt v0.1.0 (<workspace>/crates/quest-qsvt)
+error: used `panic!()` or assertion in a function that returns `Result`
+  --> crates/quest-qsvt/tests/matching_digest.rs:17:1
+   |
+17 | / fn opposite_phases_do_not_cancel_in_completed_record_admission() -> quest_qsvt::Result<()> {
+18 | |     for n in [4_usize, 8, 32] {
+19 | |         let original = columns(n, 1.0);
+20 | |         let changed = columns(n, -1.0);
+...  |
+43 | |     Ok(())
+44 | | }
+   | |_^
+   |
+   = help: `panic!()` or assertions should not be used in a function that returns `Result` as `Result` is expected to return an error instead of crashing
+note: return Err() instead of panicking
+  --> crates/quest-qsvt/tests/matching_digest.rs:35:3
+   |
+35 | /         assert!(
+36 | |             MatchingShard::from_parts(header, 0, 1, original, NumericalPolicy::default()).is_ok()
+37 | |         );
+   | |_________^
+38 | /         assert!(
+39 | |             MatchingShard::from_parts(header, 0, 1, changed, NumericalPolicy::default()).is_err(),
+40 | |             "opposite phases admitted for dimension {n}"
+41 | |         );
+   | |_________^
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/main/index.html#panic_in_result_fn
+   = note: requested on the command line with `-D clippy::panic-in-result-fn`
+
+error: used `panic!()` or assertion in a function that returns `Result`
+  --> crates/quest-qsvt/tests/matching_digest.rs:47:1
+   |
+47 | / fn digest_retains_signed_zero_and_partition_order_independence() -> quest_qsvt::Result<()> {
+48 | |     let mut original = columns(32, 1.0);
+49 | |     let digest = MatchingShard::summarize_records(&original)?.1;
+50 | |     original.reverse();
+...  |
+68 | |     Ok(())
+69 | | }
+   | |_^
+   |
+   = help: `panic!()` or assertions should not be used in a function that returns `Result` as `Result` is expected to return an error instead of crashing
+note: return Err() instead of panicking
+  --> crates/quest-qsvt/tests/matching_digest.rs:51:2
+   |
+51 |     assert_eq!(MatchingShard::summarize_records(&original)?.1, digest);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+62 |         assert_eq!(sum, digest);
+   |         ^^^^^^^^^^^^^^^^^^^^^^^
+...
+67 |     assert_ne!(MatchingShard::summarize_records(&original)?.1, digest);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/main/index.html#panic_in_result_fn
+
+error: used `panic!()` or assertion in a function that returns `Result`
+  --> crates/quest-qsvt/tests/matching_digest.rs:72:1
+   |
+72 | / fn digest_work_counts_padded_blocks_and_rejects_overflow() -> quest_qsvt::Result<()> {
+73 | |     assert_eq!(quest_qsvt::record_fingerprint_work(4)?, 8192);
+74 | |     assert_eq!(quest_qsvt::record_fingerprint_work(7)?, 16_384);
+75 | |     assert!(quest_qsvt::record_fingerprint_work(usize::MAX).is_err());
+...  |
+91 | |     Ok(())
+92 | | }
+   | |_^
+   |
+   = help: `panic!()` or assertions should not be used in a function that returns `Result` as `Result` is expected to return an error instead of crashing
+note: return Err() instead of panicking
+  --> crates/quest-qsvt/tests/matching_digest.rs:73:2
+   |
+73 |       assert_eq!(quest_qsvt::record_fingerprint_work(4)?, 8192);
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+74 |       assert_eq!(quest_qsvt::record_fingerprint_work(7)?, 16_384);
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+75 |       assert!(quest_qsvt::record_fingerprint_work(usize::MAX).is_err());
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+80 |       assert!(modeled_scratch <= quest_qsvt::RECORD_FINGERPRINT_SCRATCH_BYTES);
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+83 | /     assert_eq!(
+84 | |         quest_qsvt::record_fingerprint(1, same_words),
+85 | |         7_852_582_459_109_447_654
+86 | |     );
+   | |_____^
+87 | /     assert_ne!(
+88 | |         quest_qsvt::record_fingerprint(1, same_words),
+89 | |         quest_qsvt::record_fingerprint(2, same_words)
+90 | |     );
+   | |_____^
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/main/index.html#panic_in_result_fn
+
+error: could not compile `quest-qsvt` (test "matching_digest") due to 3 previous errors
+warning: build failed, waiting for other jobs to finish...

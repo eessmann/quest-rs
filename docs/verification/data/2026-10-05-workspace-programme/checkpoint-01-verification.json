@@ -1,0 +1,91 @@
+{
+  "schema": "quest.workspace-verification.checkpoint.v1",
+  "checkpoint": "01-generated-box-kvn",
+  "recorded_utc": "2026-10-05T21:47:21.769214+00:00",
+  "base_commit": "dd9a869ebe9952cf85a6411a180ed7b688f568fb",
+  "source_sha256": "cf86935872aab69c69d60a2025cfd0c42953822a9ba1fd29f9237e6326800063",
+  "source_file_count": 734,
+  "source_manifest": "checkpoint-01-source.json",
+  "source_unchanged_before_after": true,
+  "environment": {
+    "rust": "1.101.0-nightly (db8f076d2 2026-10-03)",
+    "quest": "4.3.0 installed, native source unchanged",
+    "mpi": "MPICH 4.2.2; QuEST, MPICC and mpiexec ABI matched",
+    "hdf5": "serial",
+    "execution": "local CPU native statevector; MPI socket-dependent tests allowed loopback networking"
+  },
+  "gates": [
+    {
+      "name": "all_features_tests",
+      "command": "cargo nextest run --workspace --all-features --test-threads 4 --no-fail-fast",
+      "exit_code": 0,
+      "log_sha256": "6d071bc0079d4b6ee4872aad0d55af00bd66335b6bc8b0bb52adc70c2d25c03e",
+      "seconds": 184.174,
+      "tests_run": 1447,
+      "passed": 1447,
+      "skipped": 4
+    },
+    {
+      "name": "default_tests",
+      "command": "cargo nextest run --workspace --test-threads 4 --no-fail-fast",
+      "exit_code": 0,
+      "log_sha256": "0b8c0298ee71dbbd748b084026aa9d2b20ede68b442b5a7a123203ced197ab52",
+      "seconds": 85.659,
+      "tests_run": 1296,
+      "passed": 1296,
+      "skipped": 1
+    },
+    {
+      "name": "doctests",
+      "command": "cargo test --workspace --all-features --doc",
+      "exit_code": 0,
+      "log_sha256": "1c1537f3eadb48b4aa427025b61c9d452fe7fdcbee2eea209f6e7ca184db6ff6",
+      "suites": 24,
+      "passed": 65,
+      "failed": 0,
+      "ignored": 1
+    },
+    {
+      "name": "clippy",
+      "command": "cargo clippy --workspace --all-features --all-targets -- -D warnings",
+      "exit_code": 0,
+      "log_sha256": "596143f2d70b650c732b10dc69bdcca7ae3ceb96c07e2aab1ca0525647e44747"
+    },
+    {
+      "name": "default_all_targets",
+      "command": "cargo check --workspace --all-targets",
+      "exit_code": 0,
+      "log_sha256": "f475b35a9f38ce1caf2fe0527a6ed69dfb256ca549e31e2ba373b190cc32f2b5"
+    },
+    {
+      "name": "format",
+      "command": "cargo fmt --all -- --check",
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "binding_freshness",
+      "command": "cargo run -p xtask -- generate-quest-bindings --check",
+      "exit_code": 0,
+      "log_sha256": "e50dbeef3076acd7c7e5fbee69f3617e267f09ac9f107ee399d9629e01477978"
+    },
+    {
+      "name": "offline_catalog",
+      "command": "cargo run -p xtask -- check-qsvt-catalog",
+      "exit_code": 0,
+      "log_sha256": "5306ea14505e7640a5e7aef019ce40db75e9629ca0899c7abc514d535e1733b7"
+    }
+  ],
+  "whitespace": {
+    "command": "git diff --check",
+    "exit_code": 0
+  },
+  "limitations": [
+    "Source manifest excludes Markdown and docs/verification; static audit is separate.",
+    "Recorded logs were local; their byte hashes preserve identity but are not independent build attestations.",
+    "Offline catalog validation predates final admission-only source fix; no catalog changes intervened.",
+    "Intentional skipped/ignored tests are not passing execution evidence.",
+    "New stages after this checkpoint require their own affected tests and final integrated gates.",
+    "No multi-host capacity, actual huge-count transfer, accelerator, hardware, speedup or physical-convergence acceptance is implied."
+  ]
+}

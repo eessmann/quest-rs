@@ -1,0 +1,119 @@
+{
+  "schema": "quest-cfd-resolved-nonlinear-box-attempt-v1",
+  "status": "rejected",
+  "complete": false,
+  "experiment_scope": "complete coarse243-node nonlinear KvN; attempted empirical inverse-signal separation, no convergence claim",
+  "horizon": 0.1,
+  "time_slabs": 1,
+  "temporal_order": 1,
+  "configuration_order": 2,
+  "configuration_nodes": 243,
+  "history_dimension": 486,
+  "physical_coordinates": 5,
+  "configuration_interval": [
+    -0.3,
+    0.3
+  ],
+  "configuration_cells_per_axis": 1,
+  "physical_extent": 1.7,
+  "physical_subdivisions": 1,
+  "physical_boundary": "periodic",
+  "viscosity": 0,
+  "bump_center": [
+    0.04,
+    -0.03,
+    0.02,
+    0.05,
+    -0.01
+  ],
+  "bump_width": 0.55,
+  "budgets": {
+    "native_managed_bytes_per_rank": 67108864,
+    "source_managed_bytes_per_rank": 536870912,
+    "source_managed_bytes_per_node": 1073741824,
+    "synthesis_bytes": 67108864,
+    "synthesis_work": 8589934592,
+    "certification_bytes_per_owner": 67108864,
+    "certification_precision_bits": [
+      256,
+      1024
+    ],
+    "approximation_tolerance": 1e-06,
+    "max_degree": 1023,
+    "child_timeout_seconds": 600,
+    "reference_max_dimension": 512,
+    "reference_bytes": 134217728,
+    "reference_work": 3000000000,
+    "source_max_drift_calls": 1000000,
+    "source_rank_work": 100000000000,
+    "source_aggregate_work": 800000000000,
+    "source_transport_bytes": 100000000000,
+    "source_local_disk_bytes": 268435456,
+    "producer_buffer_entries": 16384,
+    "rhs_query_work": 64000000000
+  },
+  "memory_scope": "managed envelopes; no RLIMIT_AS/RSS measurement or allocator/backend-adaptive-scratch cap imposed",
+  "acceptance": {
+    "signal_min": 0.0004,
+    "inverse_error_max": 2e-05,
+    "signal_over_error_plus_reference_allowance_min": 10,
+    "inverse_relative_residual_max": 1e-05,
+    "phase_certificate_required": true,
+    "all_sector_roundtrip_required": true
+  },
+  "rank_trials": [
+    {
+      "ranks": 1,
+      "status": "certification_admission_rejected",
+      "seconds": 28.13,
+      "error": "collective history runtime: certification resource budget: modeled verification memory",
+      "actual_native_inverse_replays": 0,
+      "nonlinear_rhs_action_norm": 1.166269712767888e-05,
+      "nonlinear_rhs_action_relative": 0.010703628813128266,
+      "actual_degree": null,
+      "signal": null,
+      "inverse_error": null,
+      "phase_certificate": null
+    },
+    {
+      "ranks": 2,
+      "status": "not_run_after_first_rank_rejection",
+      "seconds": null,
+      "actual_native_inverse_replays": null
+    }
+  ],
+  "wrapper_exit_code": 101,
+  "wrapper_seconds": 28.41,
+  "source_identity": {
+    "build_manifest": "source.json",
+    "build_source_sha256": "1faa3fa9e25caa22be390abacdb7934821c815ac5eba33edd7ff6883362bd2ab",
+    "build_source_files": 685,
+    "before_after_build_source_identical": true,
+    "binary_sha256": "132f37b6d8a95121a985c0f921fb102c12f1d9a2d8fc6d54330ed179f5f21869",
+    "copied_immutable_binary_used": true,
+    "installed_dependency_sha256": {
+      "libQuEST.so.4": "2128fd71d6effd5ae463f9f92ff467032f09089a07cdb9ba7a5d565719b95396",
+      "libmpi.so.12": "0df63252269108bde9fe3bd0765f3597a2db8534f2ba0475d2bb609028bacdb6"
+    },
+    "native_version": "QuEST4.3.0",
+    "mpi_abi": "MPICH4.2.2",
+    "owned_fixture_sha256": "d837e10e82feea8bc75c657a710d9169aa449be48c8fb0f823a5fc34af932059"
+  },
+  "verification": {
+    "pure_regressions_passed": 2,
+    "capacity_or_phase_off_retry_performed": false,
+    "two_rank_retry_performed": false,
+    "historical_short_window_receipts_preserved": true,
+    "generated_reference_comparison_numeric_receipt_available": false
+  },
+  "claims": {
+    "quantum_inverse_executed": false,
+    "resolved_nonlinear_response": false,
+    "unresolved_nonlinear_response_proven": false,
+    "configuration_boundary_resolved": false,
+    "same_physical_ensemble_across_rank_counts": false,
+    "physical_convergence_established": false,
+    "certified_sampling_probability_lower_bound": null
+  },
+  "primary_log_sha256": "9071e4444fe146240199a6df32af5dcb80f00760606ad4a0e70f784725a19fcc"
+}

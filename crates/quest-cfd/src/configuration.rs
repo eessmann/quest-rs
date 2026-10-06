@@ -209,6 +209,21 @@ impl ConfigurationGrid {
 	pub const fn axis_dimension(&self) -> usize {
 		self.nodes.len()
 	}
+	/// One retained one-dimensional central-DG derivative row, including duplicates.
+	#[must_use]
+	pub fn axis_derivative_row(&self, row: usize) -> Option<&[(usize, f64)]> {
+		self.derivative.get(row).map(Vec::as_slice)
+	}
+	/// One-dimensional quadrature weight used by the tensor mass.
+	#[must_use]
+	pub fn axis_weight(&self, node: usize) -> Option<f64> {
+		self.weights.get(node).copied()
+	}
+	/// One-dimensional physical coordinate; tensor coordinates repeat this axis grid.
+	#[must_use]
+	pub fn axis_node(&self, node: usize) -> Option<f64> {
+		self.nodes.get(node).copied()
+	}
 	/// Domain boundaries on every chart coordinate.
 	#[must_use]
 	pub const fn bounds(&self) -> (f64, f64) {
@@ -346,7 +361,9 @@ impl ConfigurationGrid {
 	/// Smooth compact regularization, returned as normalized mass-weighted amplitudes.
 	///
 	/// # Errors
-	/// Rejects an unresolved bump, incorrect dimension or invalid width/center.
+	/// Rejects zero/underflowed sampled support, incorrect dimension or invalid width/center.
+	/// Nonzero support alone does not prove resolution; use `configuration_diagnostics`
+	/// for an explicit distinct-node sampling policy and independent refinement.
 	pub fn initial_bump(&self, center: &[f64], width: f64) -> Result<Vec<Complex64>, CfdError> {
 		if center.len() != self.axes
 			|| !width.is_finite()
@@ -424,7 +441,7 @@ pub struct ConfigurationObservables {
 	pub mean_kinetic_energy: f64,
 }
 impl ConfigurationGrid {
-	/// Compute normalized moments, retaining probability and outer-cell leakage separately.
+	/// Compute normalized moments, retaining probability and outer-cell occupation separately.
 	/// # Errors
 	/// Rejects invalid/zero probability or a failed physical energy evaluation.
 	pub fn observables(

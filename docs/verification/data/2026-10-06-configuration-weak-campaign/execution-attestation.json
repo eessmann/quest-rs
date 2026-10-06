@@ -1,0 +1,19 @@
+{
+  "schema": "quest-weak-campaign-execution-attestation-v1",
+  "scope": "Exactly seven fixed children through reviewed runner, each at most once; no retry or substitution",
+  "runner_exit_code": 0,
+  "supervisor_elapsed_seconds": 2.0507265659980476,
+  "build_attestation_sha256": "32b1ddfc22012dae0845b3394ca7eab49bdfe34478114c1edf28bcf367d463d3",
+  "build_source_manifest_sha256": "38bd1e097ef65fd84a0160e566153965e1bad0ed0cb34147519049f2ce6a5759",
+  "owned_manifest_sha256": "a7a7215b481609d0e50eb413bcce657c960beadb3ac7c5139a481c0c5fe2d1a2",
+  "execution_before_sha256": "c5e009e5de2a4fac42f7e36adc917bc24802f765f1e68a98d4f6483f8f352cc1",
+  "execution_after_sha256": "c5e009e5de2a4fac42f7e36adc917bc24802f765f1e68a98d4f6483f8f352cc1",
+  "source_and_binary_and_runtime_unchanged": true,
+  "execution_script_sha256": "6fd6b902c7318fb3f618eb91b7a0ebfe7aafc3c6db779da6ea20669a00bcdd33",
+  "binary_sha256": "481156a3201148eaefdbfb59fadb434071c6d53bfc87f02bfcb20ab0e23e2335",
+  "runner_sha256": "3739bfe519301922d5118f742eaea5740ac846c658296b1664e0176ddaf6311c",
+  "shared_runner_helper_sha256": "eb7b5fbcfa333b4861fedff42f5925147f61d45ae81998237eb5da828fc5a148",
+  "raw_receipt_sha256": "bf677ee747da930647cb05a3c4d4174399cb475d126d3f2b454eff76f27677de",
+  "rows_retained": 7,
+  "campaign_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

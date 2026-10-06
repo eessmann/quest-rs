@@ -1,0 +1,382 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-06",
+  "scope": "Real Slurm deadline, owned-step cancellation, confirmed termination and allocation reuse using the safe supervisor from immutable source452. Children do not initialize MPI or run QuEST.",
+  "acceptance": "passed",
+  "source": {
+    "manifest": {
+      "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/source.sha256",
+      "bytes": 348034,
+      "sha256": "452a49852c4e23f018b82795c19a3fd183c781234f2914df2c0ab516d696918f"
+    },
+    "source_files": 2594,
+    "archive": {
+      "path": "target/portable-locked-cirrus-20261006/source.tar.gz",
+      "bytes": 11866989,
+      "sha256": "46636f8a311fa221d0754f4042a961e2191d756597ea2fe1ce97f50d1f2898a7"
+    },
+    "unchanged_probe": {
+      "path": "target/portable-locked-cirrus-20261006/frozen/docs/verification/fixtures/cirrus/supervisor-timeout.rs",
+      "bytes": 1673,
+      "sha256": "8a1239a73e330c17aefe62ce1e4950c0745b6813b88b3183ee3299efd20cae8e"
+    },
+    "probe_copy_matches_frozen": true,
+    "supervisor_source": {
+      "path": "target/portable-locked-cirrus-20261006/frozen/crates/quest-test-support/src/mpi.rs",
+      "bytes": 17951,
+      "sha256": "ed09ffda151e86895c544c97035c722267fc59d492525caf37c89503c4ddf7bd"
+    },
+    "supervisor_library": {
+      "path": "target/portable-locked-cirrus-20261006/frozen/crates/quest-test-support/src/lib.rs",
+      "bytes": 111,
+      "sha256": "a1cf6933dfcae1f499a137b925ba7fd048457464009bf6e83be42e95d2ff897c"
+    },
+    "sidecar_manifest": {
+      "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/probes/supervisor-timeout/sidecar.sha256",
+      "bytes": 309,
+      "sha256": "5593ebdfae64401c59b66867cc0caa28560eb23aa46bca2d1937e1b86b6a925b"
+    },
+    "sidecar_manifest_verified": true,
+    "deployment_archive": {
+      "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-sidecar.tar.gz",
+      "bytes": 7139,
+      "sha256": "1fdae1c63e3374ef5d36bbef174faf6690e5b907d45cd478e1da45594185da3c"
+    },
+    "source_before_and_after_passed": true,
+    "fixture_before_and_after_passed": true,
+    "terminal_source_and_fixture_rechecks_exit_zero": true
+  },
+  "submission": {
+    "job_id": 538261,
+    "submitted_once": true,
+    "dependency": "afterany:538236",
+    "receipt": {
+      "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-submission.txt",
+      "bytes": 2274,
+      "sha256": "9f8c4ee5861dcc52660cc7f6781773646966d9269daa934f17a3573366f2b16d"
+    },
+    "account": "d458",
+    "partition": "standard",
+    "qos": "short",
+    "exclusive": true,
+    "nodes": 2,
+    "tasks_per_node": 1,
+    "cpus_per_task": 288,
+    "omp_requested_threads": 288,
+    "walltime_seconds": 1200,
+    "cargo_jobs": 8,
+    "no_requeue": true,
+    "launcher_args": [
+      "--nodes=1-2",
+      "--ntasks-per-node=1",
+      "--cpus-per-task=288",
+      "--hint=nomultithread",
+      "--distribution=block:block",
+      "--cpu-bind=cores",
+      "--kill-on-bad-exit=1"
+    ],
+    "build": "Ordinary cargo build --locked --offline of a separate sidecar package, inside the allocation, referencing immutable source452",
+    "custom_launcher_or_gnu_timeout": false
+  },
+  "terminal": {
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed_seconds": 23,
+    "allocated_nodes": 2,
+    "allocated_cpus": 576,
+    "started_utc": "2026-10-06T21:02:13Z",
+    "ended_utc": "2026-10-06T21:02:36Z",
+    "all_stage_statuses": {
+      "build.status": 0,
+      "completed.status": 0,
+      "fixture-after.status": 0,
+      "job-exit.status": 0,
+      "placement-check.status": 0,
+      "placement.status": 0,
+      "source-after.status": 0,
+      "timeout.status": 0
+    },
+    "distinct_physical_placement_hosts": 2,
+    "deadline_step": {
+      "id": "538261.1",
+      "state": "CANCELLED",
+      "exit_code": "0:9",
+      "deadline_seconds": 5,
+      "supervisor_elapsed_seconds": 5.135090937,
+      "supervisor_exit_code": 137,
+      "timed_out": true,
+      "child_start_witness": "Passing unchanged probe assertion requires captured timeout-child-ready before cancellation; raw child stdout is not separately persisted",
+      "cancellation_accepted": true,
+      "termination_confirmed": true,
+      "cancelled_step_matches_captured_owned_step": true,
+      "stdout_truncated": false,
+      "stderr_truncated": false
+    },
+    "followup_step": {
+      "id": "538261.2",
+      "state": "COMPLETED",
+      "exit_code": "0:0",
+      "deadline_seconds": 15,
+      "supervisor_elapsed_seconds": 0.230695915,
+      "timed_out": false,
+      "distinct_step": true,
+      "allocation_reused": true,
+      "stdout_truncated": false,
+      "stderr_truncated": false
+    },
+    "total_probe_elapsed_seconds": 5.366,
+    "cleanup_assertion_bound_seconds": 20
+  },
+  "evidence": {
+    "archive": {
+      "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts.tar.gz",
+      "bytes": 124271,
+      "sha256": "5c572bf3bdad215d5d5be5d23c8bbb97f114cc195ae2506ae7e9bca4b64eff42"
+    },
+    "gzip_and_transfer_sha256_verified": true,
+    "observed_at_utc": "2026-10-06T21:04:11Z",
+    "artifacts": [
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/logs/supervisor-timeout-538261.log",
+        "bytes": 373,
+        "sha256": "a340e51422edb2e023da19a3f260402993ed69f7ca4d9c0b92dcc2bf6b7c5ac2"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/probes/supervisor-timeout/Cargo.lock",
+        "bytes": 6140,
+        "sha256": "73f59e6bf0455440493504b0bd6dc9935f08948e69ced79ca4f3a01f7b0901e0"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/probes/supervisor-timeout/Cargo.toml",
+        "bytes": 262,
+        "sha256": "901b591f41fe2ff57fed74099788dca18a04fc51fd5c7ddbdda74f56ebddbf8a"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/probes/supervisor-timeout/run.sbatch",
+        "bytes": 5806,
+        "sha256": "c683f60b1f85b0f748bfdc51d213626968b151d62e2bd34a1f60198bd82cec05"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/probes/supervisor-timeout/sidecar.sha256",
+        "bytes": 309,
+        "sha256": "5593ebdfae64401c59b66867cc0caa28560eb23aa46bca2d1937e1b86b6a925b"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/probes/supervisor-timeout/src/main.rs",
+        "bytes": 1673,
+        "sha256": "8a1239a73e330c17aefe62ce1e4950c0745b6813b88b3183ee3299efd20cae8e"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/build.command",
+        "bytes": 157,
+        "sha256": "70287bb6a19fab9df0828db9cc2b6ac91936feb0324952c071aec9b7298d9b0c"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/build.log",
+        "bytes": 653,
+        "sha256": "5b3b9db86dc1f17f50802bc93e0f4578107e0c8a0b99a5570ca56e1277274f99"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/build.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/cargo.txt",
+        "bytes": 45,
+        "sha256": "71de2de1f7d9ecf66030112aa59bf05781d6210a550634db5eba3920af9d08de"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/completed.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/cxx.txt",
+        "bytes": 247,
+        "sha256": "e4673156e9a9934b962434aa9b67482487548468d9b24bd433636bb31beb7b1d"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/executable.sha256",
+        "bytes": 203,
+        "sha256": "d599df7a26efc2caefa631dcc013fdd16e74e10046ac62e92f1b3219a7316f6c"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/fixture-after.command",
+        "bytes": 16,
+        "sha256": "456d5dc13f6486fc0cedecf574ba849c19e5c3501dd7cdb5945c24cc8aa316e1"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/fixture-after.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/fixture-after.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/fixture-before.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/fixture-digest",
+        "bytes": 65,
+        "sha256": "feba214c0a11dfe3b018793bb8f24afd5b254a6a42ac477e64143f3c7ef0b399"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/job-exit.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/modules.txt",
+        "bytes": 308,
+        "sha256": "8623b74f7226ee04c83cc4c021763741102179df3832d59bd93f3d505f641690"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/mpi-launcher-args.json",
+        "bytes": 154,
+        "sha256": "8095e77c3f3f97218b3c1ebb04d98bda52d08bf572e2277b463742afbeaae643"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/placement-check.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/placement.command",
+        "bytes": 164,
+        "sha256": "93519d69206efa7dd9c8fddc2909c76e23075fe8db144f8caa8f3176a9a13aa2"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/placement.log",
+        "bytes": 18,
+        "sha256": "fe77aa320d8d10167ba2d09dbfd6057268a4b2a58ff4d1901b5361d4d3d772dc"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/placement.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/rustc.txt",
+        "bytes": 214,
+        "sha256": "ba405b896c6b4a26674e9d3e7fc4956ed4b1c632ac70c6b7880c76157d124b25"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/selected-environment.txt",
+        "bytes": 881,
+        "sha256": "b37a71af858535bd2a1c6c05a2c6c1b807dc9a6de659d0218e1f2f1d09df5cda"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/sidecar.sha256",
+        "bytes": 309,
+        "sha256": "5593ebdfae64401c59b66867cc0caa28560eb23aa46bca2d1937e1b86b6a925b"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/source-after.command",
+        "bytes": 15,
+        "sha256": "ed9e31e168ecc53c1dfebf299db3670990663a496c9d8074ed415dd3186ea8ee"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/source-after.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/source-after.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/source-before.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/source-digest",
+        "bytes": 65,
+        "sha256": "76839b0623df3773cfba3821085305422522a5e475b5807ee4928d2dabe358d9"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/timeout.command",
+        "bytes": 138,
+        "sha256": "fd7837d6a9c901c1f646fa11c7f122fbfdfd5b7aad7224b4a343981d9dde905d"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/timeout.log",
+        "bytes": 1090,
+        "sha256": "ec64498c82770893c78ed62ad04574eda3f6204cfa5072047017ebe9f1c2ccbf"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/receipts/supervisor-timeout/538261/timeout.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/source.sha256",
+        "bytes": 348034,
+        "sha256": "452a49852c4e23f018b82795c19a3fd183c781234f2914df2c0ab516d696918f"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/supervisor-timeout-accounting-538261/fixture-check.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/supervisor-timeout-accounting-538261/fixture-check.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/supervisor-timeout-accounting-538261/job-and-steps.txt",
+        "bytes": 630,
+        "sha256": "657be0a69024692d6df2bfa6e0184f751648cb4f20dc0835cecc74c09ecf26a8"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/supervisor-timeout-accounting-538261/job.txt",
+        "bytes": 191,
+        "sha256": "d64a6e76d36c5fd887d65eb031a9b139e04f6c9a7c077cfbe89c492539eb0bd9"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/supervisor-timeout-accounting-538261/observed-at.txt",
+        "bytes": 21,
+        "sha256": "ca0a91fffc7d88ef07b5c17353421f67091b61edeb72f2bc81b1c284725c8be1"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/supervisor-timeout-accounting-538261/scontrol.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/supervisor-timeout-accounting-538261/scontrol.txt",
+        "bytes": 1739,
+        "sha256": "5be5b7f9faf74298b62c4f8af4ab16e633955e6af9660e0aefe82c10d0587cf0"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/supervisor-timeout-accounting-538261/source-check.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/supervisor-timeout-accounting-538261/source-check.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/portable-locked-cirrus-20261006/supervisor-timeout-receipts/supervisor-timeout-submission.txt",
+        "bytes": 2274,
+        "sha256": "9f8c4ee5861dcc52660cc7f6781773646966d9269daa934f17a3573366f2b16d"
+      }
+    ]
+  },
+  "limitations": [
+    "No numerical MPI, QuEST, OpenMP kernel-team, scaling or capacity claim",
+    "The two-rank children use Slurm task placement and ordinary shell/true executables",
+    "Expected cancelled step is preserved as CANCELLED0:9, not rewritten as a successful child exit",
+    "No probe retry or repetition"
+  ]
+}

@@ -330,6 +330,29 @@ pub struct Reservation<'a> {
 	pub(crate) environment: &'a RuntimeResources,
 	bytes: usize,
 }
+#[cfg(feature = "qsvt")]
+impl Reservation<'_> {
+	pub(crate) const fn bytes(&self) -> usize {
+		self.bytes
+	}
+	/// Reconcile an admitted owner with its actual retained payload capacity.
+	pub(crate) fn resize(&mut self, bytes: usize) -> Result<()> {
+		let current = self.environment.allocated.get();
+		let total = current
+			.checked_sub(self.bytes)
+			.and_then(|n| n.checked_add(bytes))
+			.ok_or(Error::Overflow)?;
+		if total > self.environment.budget.bytes() {
+			return Err(Error::Budget {
+				requested: total,
+				available: self.environment.budget.bytes(),
+			});
+		}
+		self.environment.allocated.set(total);
+		self.bytes = bytes;
+		Ok(())
+	}
+}
 // Each reservation releases exactly the bytes charged at construction.
 impl Drop for Reservation<'_> {
 	fn drop(&mut self) {

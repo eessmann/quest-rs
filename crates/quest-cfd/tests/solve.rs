@@ -28,6 +28,8 @@ fn qsvt_solves_causal_history_with_physical_scale_and_success_mass()
 	assert!(result.relative_residual < 0.01);
 	assert!(result.success_probability > 0.0 && result.success_probability <= 1.0);
 	assert!(result.projector_response_bound.is_some());
+	assert_eq!(result.rhs_preparation, "coherent amplitude-tree circuit");
+	assert!(result.rhs_preparation_gates > 0);
 	for i in 0..4 {
 		assert!((result.solution[i] - initial[i % 2]).norm() < 0.01);
 	}
@@ -60,6 +62,8 @@ fn native_qsvt_history_matches_physical_constant_reference()
 		solve_history_with_backend(&history, SolveBudget::default(), SolveBackend::QuestCpu)?;
 	assert!(result.relative_residual < 0.01);
 	assert!(result.backend.contains("QuEST CPU"));
+	assert_eq!(result.rhs_preparation, "coherent amplitude-tree circuit");
+	assert!(result.rhs_preparation_gates > 0);
 	for i in 0..4 {
 		assert!((result.solution[i] - initial[i % 2]).norm() < 0.01);
 	}

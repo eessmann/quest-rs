@@ -53,6 +53,16 @@ impl<E: Expression, const N: usize> Function<E, N> {
 	{
 		self.expression.static_metadata()
 	}
+	/// Capture the shared ordered expression for bounded symbolic construction.
+	/// # Errors
+	/// Rejects duplicate scoped symbols and expression resource limits.
+	pub fn dynamic(
+		&self,
+		symbols: &[mathcore::exact::Symbol; N],
+		limits: mathcore::dynamic::ExpressionLimits,
+	) -> Result<mathcore::dynamic::DynamicExpression, mathcore::arithmetic::ArithmeticError> {
+		mathcore::dynamic::DynamicExpression::from_typed(&self.expression, symbols, limits)
+	}
 	/// # Errors
 	/// Propagates domain, arithmetic and work-limit failures.
 	pub fn evaluate_inputs<B: Backend>(
@@ -146,6 +156,7 @@ impl<C: GenericFunction> GenericFunction for AssumedFunction<C> {
 }
 mod sealed {
 	pub trait Admitted {}
+	pub trait Vector {}
 }
 /// Targets admitted to numerical proof orchestration. Library expressions carry
 /// structural evidence; extensions retain their explicit consistency premise.
@@ -187,7 +198,7 @@ pub struct Assumed;
 pub struct System<E, const N: usize, const M: usize> {
 	expression: E,
 }
-pub trait VectorExpression<const M: usize>: crate::typed::sealed::Sealed {
+pub trait VectorExpression<const M: usize>: sealed::Vector {
 	const INPUTS: usize;
 	/// # Errors
 	/// Propagates input-shape, domain and backend failures.
@@ -242,12 +253,12 @@ impl<E: VectorExpression<M>, const N: usize, const M: usize> System<E, N, M> {
 }
 macro_rules! vector_expression {
     ($count:literal;$($name:ident:$index:tt),+)=>{
-        impl<$($name:Expression),+> crate::typed::sealed::Sealed for ($($name,)+){}
+        impl<$($name:Expression),+> sealed::Vector for ($($name,)+){}
         impl<$($name:Expression),+> VectorExpression<$count> for ($($name,)+){
             const INPUTS:usize={let mut n=0;$(if $name::METADATA.inputs>n{n=$name::METADATA.inputs;})+n};
             fn evaluate<B:Backend>(&self,b:&mut B,inputs:&[B::Scalar])->Result<[B::Scalar;$count],B::Error>{Ok([$(self.$index.eval(b,inputs)?),+])}
             fn evaluate_vec<B:Backend>(&self,b:&mut B,inputs:&[B::Scalar])->Result<Vec<B::Scalar>,B::Error>{
-                let mut values=Vec::new();values.try_reserve_exact($count).map_err(|_|B::Error::from(quest_numerics::arithmetic::ArithmeticError::Budget("system values")))?;
+                let mut values=Vec::new();values.try_reserve_exact($count).map_err(|_|B::Error::from(mathcore::arithmetic::ArithmeticError::Budget("system values")))?;
                 $(values.push(self.$index.eval(b,inputs)?);)+Ok(values)
             }
         }

@@ -1,0 +1,197 @@
+{
+  "scope": "Independent saved-only raw/source/provenance verification and80-digit separable moment reconstruction; no physical child or Rust code execution",
+  "receipt_sha256": "b969804f27e37ca8e6d8e973e45940996fe21a1e2f541478d5b9a6a059134f19",
+  "binary_sha256": "727ea4196c7c03fb20332dba5f0caa8467e5e64cf3d5ba1ece06b3152267227d",
+  "source_files_current_hash_verified": 509,
+  "actual_local_packages": 12,
+  "owned_manifest_files": 12,
+  "raw_stream_hashes_verified": 3,
+  "build_snapshot_sha256": "13f74e60158b1b8fa4f06b41702958216a8caeb006af0d3425103f87d0478197",
+  "execution_snapshot_sha256": "bf1a74ed21653419a7e4dd8df85be994d8009d00149b2997c68d05adbe6815e8",
+  "moments": {
+    "DG2c2": {
+      "mean": [
+        0.13148203371432224,
+        -0.029232725579283206,
+        0.003526022200076648,
+        0.04505134592642908,
+        -1.6568884918586438e-05
+      ],
+      "variance": [
+        0.04845349166750695,
+        0.013761810544847923,
+        0.0017505782674828907,
+        0.020496049193431762,
+        8.284167931345774e-06
+      ],
+      "energy_expectation": 0.05232717407625744,
+      "maximum_coefficient_probability": 0.01959202914842084,
+      "effective_coefficients": 63.15001352861199,
+      "supported_coefficients": 243,
+      "distinct_points": 32,
+      "sigma_over_spacing": [
+        0.44024307679965596,
+        0.234621487036869,
+        0.08367982474845154,
+        0.2863288263059223,
+        0.005756446102013211
+      ],
+      "max_mean_difference": 1.942890293094024e-16,
+      "max_variance_difference": 1.249000902703301e-16,
+      "energy_difference": 9.020562075079397e-17,
+      "effective_difference": 3.552713678800501e-14
+    },
+    "DG1c4": {
+      "mean": [
+        0.07569332979755218,
+        -0.015056505482597344,
+        0.001769249513098986,
+        0.023588360344952247,
+        -8.284579725541292e-06
+      ],
+      "variance": [
+        0.032117184722935094,
+        0.007301554383951188,
+        0.0008814945127098919,
+        0.011237769428712806,
+        4.142221228509417e-06
+      ],
+      "energy_expectation": 0.029028932429481576,
+      "maximum_coefficient_probability": 0.024420058336874734,
+      "effective_coefficients": 50.613187377008316,
+      "supported_coefficients": 1024,
+      "distinct_points": 32,
+      "sigma_over_spacing": [
+        0.3584253602798501,
+        0.1708982666260976,
+        0.05937994653786384,
+        0.2120166920665711,
+        0.004070489517740792
+      ],
+      "max_mean_difference": 9.71445146547012e-17,
+      "max_variance_difference": 6.938893903907228e-17,
+      "energy_difference": 6.938893903907228e-17,
+      "effective_difference": 1.9184653865522705e-13
+    }
+  },
+  "comparison": [
+    {
+      "coordinate": 0,
+      "G": [
+        9.683926446622717e-18,
+        -2.0365096637022057e-17
+      ],
+      "P": [
+        0.0,
+        0.0
+      ],
+      "E": [
+        9.683926446622717e-18,
+        -2.0365096637022057e-17
+      ],
+      "DeltaG": -3.0049023083644774e-17,
+      "DeltaP": 0.0,
+      "DeltaE": -3.0049023083644774e-17
+    },
+    {
+      "coordinate": 1,
+      "G": [
+        0.09741181003522373,
+        0.1891277135555971
+      ],
+      "P": [
+        0.03432765085198875,
+        0.06664737998125468
+      ],
+      "E": [
+        0.06308415918323498,
+        0.12248033357434242
+      ],
+      "DeltaG": 0.09171590352037337,
+      "DeltaP": 0.03231972912926593,
+      "DeltaE": 0.059396174391107434
+    },
+    {
+      "coordinate": 2,
+      "G": [
+        2.832880784695811e-19,
+        -5.804755834732123e-19
+      ],
+      "P": [
+        0.0,
+        0.0
+      ],
+      "E": [
+        2.832880784695811e-19,
+        -5.804755834732123e-19
+      ],
+      "DeltaG": -8.637636619427934e-19,
+      "DeltaP": 0.0,
+      "DeltaE": -8.637636619427934e-19
+    },
+    {
+      "coordinate": 3,
+      "G": [
+        -0.12084943021650382,
+        -0.23081007351130464
+      ],
+      "P": [
+        -0.05378106415815204,
+        -0.10271684921508915
+      ],
+      "E": [
+        -0.06706836605835179,
+        -0.1280932242962155
+      ],
+      "DeltaG": -0.10996064329480082,
+      "DeltaP": -0.04893578505693712,
+      "DeltaE": -0.061024858237863716
+    },
+    {
+      "coordinate": 4,
+      "G": [
+        0.0046270104038335265,
+        0.009229248858868692
+      ],
+      "P": [
+        -0.0032413479186160278,
+        -0.006227658368271422
+      ],
+      "E": [
+        0.007868358322449554,
+        0.015456907227140115
+      ],
+      "DeltaG": 0.004602238455035166,
+      "DeltaP": -0.002986310449655394,
+      "DeltaE": 0.007588548904690561
+    },
+    {
+      "coordinate": 5,
+      "G": [
+        -0.0557220626638904,
+        -0.10729175898144278
+      ],
+      "P": [
+        -0.044073981552825985,
+        -0.08472140969972207
+      ],
+      "E": [
+        -0.011648081111064412,
+        -0.022570349281720706
+      ],
+      "DeltaG": -0.05156969631755238,
+      "DeltaP": -0.040647428146896085,
+      "DeltaE": -0.010922268170656294
+    }
+  ],
+  "energy_defect_ratio": 1.9376881965804071,
+  "initial_nonlinear_mean_square": 1.8462063480932869e-06,
+  "outer_cell_occupation": 1.0,
+  "zero_exterior_trace": true,
+  "coordinate4_sigma_over_spacing": 0.005756446102013211,
+  "interpretation": "Nonzero G removes shell obstruction; defects larger under changed ensemble, not a pure h/p or convergence result",
+  "private_artifact_identities_verified": 24,
+  "analysis_sha256": "a049b918966b50cc5d56cc9d1fedec0dbdf61c44c6f2b07c20098157bfe69e3d",
+  "review_script_sha256": "f1c558c517c1bc95c46bd57a683f599504c2fa318cea89a43932cc7042f3c17f",
+  "review_log_sha256": "f2b9a64ae79759ca37a89e0088899edd5ff6d0242352e098a25bd20742722d3e"
+}

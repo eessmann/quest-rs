@@ -1,0 +1,24 @@
+warning: `feature(generic_const_exprs)` is not supported with the next-generation trait solver
+ --> <workspace>/crates/quest-polynomial/src/lib.rs:1:30
+  |
+1 | #![feature(const_trait_impl, generic_const_exprs)]
+  |                              ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `-Znext-solver=globally` is currently enabled by default for testing
+  = note: reverted the setting to `-Znext-solver=coherence` for this crate
+  = note: the currently stable trait solver will be used for this crate
+  = note: see issues #160895 <https://github.com/rust-lang/rust/issues/160895> for more information
+
+warning: `quest-polynomial` (lib) generated 1 warning
+   Compiling portfolio-identity-review v0.0.0 (<private-artifacts>/quest-portfolio-identity-review)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.38s
+     Running `target/debug/portfolio-identity-review`
+LcuPlan_iI_minus_iS4: sourceA=bed6264ddcbc6f7b sourceB=bed6264ddcbc6f7b constructionA=6c699f26766b0529 constructionB=d2e99af2675776a6 descriptor_equal=false alphaA=2.0000000000000004 alphaB=2.0000000000000004
+WeightedLcu_iI_minus_iS4: sourceA=bed6264ddcbc6f7b sourceB=bed6264ddcbc6f7b constructionA=6c699f26766b0529 constructionB=d2e99af2675776a6 descriptor_equal=false alphaA=2.0000000000000004 alphaB=2.0000000000000004
+independent A[0,0]: +i versus -i (offset1 contributes row1, not row0)
+ArithmeticStencil_Base: sourceA=30cb49d27ccd22c2 sourceB=30cb49d27ccd22c2 constructionA=d8f56f0bb32c7ba2 constructionB=0d04548240c7e9ab descriptor_equal=false alphaA=2 alphaB=2
+ArithmeticStencil_Prep: sourceA=30cb49d27ccd22c2 sourceB=30cb49d27ccd22c2 constructionA=ad8f7f7ea0e538c7 constructionB=e98c48880f8a342d descriptor_equal=false alphaA=2.0000000000000004 alphaB=2.0000000000000004
+StructuredStencil_iS12_minus_iS16: sourceA=278aa02461ad149d sourceB=278aa02461ad149d constructionA=5cd709451bcee108 constructionB=0bf79a66da0bcf3b descriptor_equal=false alphaA=2 alphaB=2
+independent structured A[12,0]: +i versus -i (offset16 contributes row16)
+TensorShift_two8bit_registers: sourceA=9ace4f320197be42 sourceB=9ace4f320197be42 constructionA=7187762a17ce6e12 constructionB=44973f5544d7cf39 descriptor_equal=false alphaA=1 alphaB=1
+independent permutation image0:33025 versus385; no basis/state enumeration

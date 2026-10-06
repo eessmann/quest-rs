@@ -1,0 +1,494 @@
+{
+  "schema": "persisted-weighted-attempt3-independent-audit-v1",
+  "verdict": "Approved saved-artifact integrity and bounded P1 numerical evidence; overall campaign remains incomplete due to four timeouts.",
+  "read_only_saved_artifacts": true,
+  "physical_or_native_runs": 0,
+  "source_builds": 0,
+  "current_tree_not_used_as_historical_identity": true,
+  "build_source_files": 975,
+  "actual_compiler_local_packages": 16,
+  "historical_consumer_files": 16,
+  "consumer_paths_outside_compiler_source_scope": [
+    "docs/research/persisted-weighted-transform.md"
+  ],
+  "immutable_dataset_files": 29,
+  "rank_receipts": 10,
+  "raw_streams": 14,
+  "before_after_snapshot_sha256": "525bcb4c3c8e3bee35ada4415f4a1764029c180dd723a8810508b8d68f452621",
+  "binary_sha256": "b0be8c8f588370348b8ec45e61da09c6b53b6de9186ff1ed60b52a1d67712b24",
+  "elapsed_wrapper_seconds": 722.8618813700014,
+  "elapsed_driver_seconds": 722.6245635080049,
+  "outcomes": [
+    {
+      "index": 0,
+      "mode": "publish",
+      "world_parts": 8,
+      "status": "completed",
+      "elapsed_seconds": 0.5891056570035289,
+      "stdout_bytes": 2376,
+      "stderr_bytes": 0,
+      "job_stage_known": true
+    },
+    {
+      "index": 1,
+      "mode": "compile",
+      "world_parts": 1,
+      "status": "completed",
+      "elapsed_seconds": 0.5505607180020888,
+      "stdout_bytes": 297,
+      "stderr_bytes": 0,
+      "job_stage_known": true
+    },
+    {
+      "index": 2,
+      "mode": "replay",
+      "world_parts": 1,
+      "status": "completed",
+      "elapsed_seconds": 0.7355873619962949,
+      "stdout_bytes": 295,
+      "stderr_bytes": 0,
+      "job_stage_known": true
+    },
+    {
+      "index": 3,
+      "mode": "replay",
+      "world_parts": 2,
+      "status": "timeout",
+      "elapsed_seconds": 180.00220031999925,
+      "stdout_bytes": 0,
+      "stderr_bytes": 0,
+      "job_stage_known": false
+    },
+    {
+      "index": 4,
+      "mode": "replay",
+      "world_parts": 4,
+      "status": "timeout",
+      "elapsed_seconds": 180.0010509240019,
+      "stdout_bytes": 0,
+      "stderr_bytes": 0,
+      "job_stage_known": false
+    },
+    {
+      "index": 5,
+      "mode": "replay",
+      "world_parts": 8,
+      "status": "timeout",
+      "elapsed_seconds": 180.00073789300222,
+      "stdout_bytes": 0,
+      "stderr_bytes": 0,
+      "job_stage_known": false
+    },
+    {
+      "index": 6,
+      "mode": "split",
+      "world_parts": 4,
+      "status": "timeout",
+      "elapsed_seconds": 180.0015368259992,
+      "stdout_bytes": 0,
+      "stderr_bytes": 0,
+      "job_stage_known": false
+    }
+  ],
+  "p1_calls": [
+    {
+      "index": 0,
+      "adjoint": false,
+      "residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "total_probability": 0.9999999999999915,
+      "success_probability": 0.02345076821797234,
+      "recovered_norm_squared": 2.4613926321583763,
+      "application_seconds": 0.062235935
+    },
+    {
+      "index": 1,
+      "adjoint": true,
+      "residual": 2.962203156364751e-05,
+      "relative_vector_error": 2.9622031563689144e-05,
+      "total_probability": 0.9999999999999899,
+      "success_probability": 0.023450768217972272,
+      "recovered_norm_squared": 2.4613926321583692,
+      "application_seconds": 0.062583747
+    },
+    {
+      "index": 2,
+      "adjoint": false,
+      "residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "total_probability": 0.9999999999999915,
+      "success_probability": 0.02345076821797234,
+      "recovered_norm_squared": 2.4613926321583763,
+      "application_seconds": 0.062200654
+    }
+  ],
+  "phase_scalar_reconstruction": {
+    "x": 0.5099019513592784,
+    "polynomial": 0.15313643661118856,
+    "wx_symmetric_imaginary_response": 0.1531364366111887,
+    "absolute_response_difference": 1.3877787807814457e-16,
+    "predicted_relative_error": 2.9622031557208217e-05
+  },
+  "source_identities": [
+    1017135645874412409,
+    4137702323942760639,
+    9519297731046934094
+  ],
+  "record_digests": [
+    6706022727555010557,
+    10627784019892735802,
+    14474623951579437146
+  ],
+  "timed_out_job_stage_unknown": true,
+  "tag_mismatch_is_separate_source_diagnosis": true,
+  "uniform_native_inverse_error_certificate": false,
+  "multihost_capacity_acceptance": false,
+  "cumulative_p1_work": 2945187072,
+  "artifacts": [
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-final-execution-3.json",
+      "bytes": 2804,
+      "sha256": "a472fb29272747e9ff711ace8fa14dfb59a193ba12c5e70dc26322377fda44cb"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-final-build-3-attestation.json",
+      "bytes": 2535,
+      "sha256": "8254c7b1c2eaa8435eba3d63149c2c7acc7653ec00a589faed063bd46ba3a4a7"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/receipt.json",
+      "bytes": 211059,
+      "sha256": "f6a2edd59755625155b401e3de859c838bbe85be836b31c431ba527e4e26cfca"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-final-build-3-before.json",
+      "bytes": 175246,
+      "sha256": "525bcb4c3c8e3bee35ada4415f4a1764029c180dd723a8810508b8d68f452621"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-final-build-3-after.json",
+      "bytes": 175246,
+      "sha256": "525bcb4c3c8e3bee35ada4415f4a1764029c180dd723a8810508b8d68f452621"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-final-execution-3-before.json",
+      "bytes": 175246,
+      "sha256": "525bcb4c3c8e3bee35ada4415f4a1764029c180dd723a8810508b8d68f452621"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-final-execution-3-after.json",
+      "bytes": 175246,
+      "sha256": "525bcb4c3c8e3bee35ada4415f4a1764029c180dd723a8810508b8d68f452621"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-final-build-3-source-before.json",
+      "bytes": 154028,
+      "sha256": "bcb6bc11a3ed518eabb4177f96fdd3547a69f7c3e8c2cfdd9fb612678ca89d67"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-final-build-3-source-after.json",
+      "bytes": 154028,
+      "sha256": "bcb6bc11a3ed518eabb4177f96fdd3547a69f7c3e8c2cfdd9fb612678ca89d67"
+    },
+    {
+      "path": "<workspace>/.superpowers/sdd/2026-10-05-sparse-mathcore-cfd/persisted-weighted-transform-consumer-source-fingerprint-v2.json",
+      "bytes": 3234,
+      "sha256": "06feb45c9e1a56e5e04ccfdacd91f20a4e23bf90a8c54c7e6b11f722c7f7e320"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-final-binary-3",
+      "bytes": 104013624,
+      "sha256": "b0be8c8f588370348b8ec45e61da09c6b53b6de9186ff1ed60b52a1d67712b24"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/binary",
+      "bytes": 104013624,
+      "sha256": "b0be8c8f588370348b8ec45e61da09c6b53b6de9186ff1ed60b52a1d67712b24"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-final-build-3-build.log",
+      "bytes": 380,
+      "sha256": "93004c325a9eada2b58413faa570553e66c304996b4e3ce10ff2bfe8c0189e1b"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-final-build-3-compiler-artifacts.jsonl",
+      "bytes": 301575,
+      "sha256": "7d99e898b66f3db10c40b93eae0d5879c4fd978fa09e4f0753b268fe277f7983"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-final-execution-3-runner.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/freeze.json",
+      "bytes": 5761,
+      "sha256": "d5a7aa8292b90e404afb8d65ef575447a63a17bd1e602bbe03e8404c2cbec36a"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/phases.json",
+      "bytes": 974,
+      "sha256": "51753f689cdca32c68a812c20df82e0b8b83643a8d587a6a12e8ac706d3de412"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/term-0/manifest.json",
+      "bytes": 8331,
+      "sha256": "6353075b2ff75f489ac6126402cb52de711ae8be8d5e5760c8076b87fc1dd1c6"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/term-0/matching-0000000000000000.h5",
+      "bytes": 6808,
+      "sha256": "3204b4ed9e248f2b5ae9b7861594accad295f433db30bc3ebe6843a2d6e6c132"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/term-0/matching-0000000000000001.h5",
+      "bytes": 6808,
+      "sha256": "f185c50afa2ba6a0e63f12c1a5dadf422f783db0c6c2b646826b300eacef957c"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/term-0/matching-0000000000000002.h5",
+      "bytes": 6808,
+      "sha256": "1c770c445e8ff8af44270e90fd90b0ce6e6d688688ab9dec8977c576801cc837"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/term-0/matching-0000000000000003.h5",
+      "bytes": 6808,
+      "sha256": "878e31aa3e70c3ad6e4dd1320c32a5b7bbf80420a7fb703fe967378d37262d8a"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/term-0/matching-0000000000000004.h5",
+      "bytes": 6808,
+      "sha256": "fe344d8803abb21a6c337873b36dfec383676841fc422413c3d861a799e68c95"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/term-0/matching-0000000000000005.h5",
+      "bytes": 6808,
+      "sha256": "b98e29e23fcea4ec30ad2d6dc4e36dabe76ac1bc9073b838080128c0fd47cd09"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/term-0/matching-0000000000000006.h5",
+      "bytes": 6808,
+      "sha256": "cee882986104f83e99cf5ee2e6c6349f84363f315e651deb9e43ebfec5c89141"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/term-0/matching-0000000000000007.h5",
+      "bytes": 6808,
+      "sha256": "71b3b83380062127ec419e6cc9f5c29974d91ba9feb55bb1bf8162a3c5d13191"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/term-1/manifest.json",
+      "bytes": 8332,
+      "sha256": "0ab2dab79da876c8468cc6e23555663801a05ad18546e6f918215d24ff5ccb22"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/term-1/matching-0000000000000000.h5",
+      "bytes": 6808,
+      "sha256": "d6639fc20c1f54505e7ab4309c34ef7e8391b8304e6e2d319492a3448fa4fce5"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/term-1/matching-0000000000000001.h5",
+      "bytes": 6808,
+      "sha256": "7819d3f2aebbd5230459ca000823554cbb130cdc54de8e8a6dfd02d0287bef08"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/term-1/matching-0000000000000002.h5",
+      "bytes": 6808,
+      "sha256": "862cb48fb2600e93fc721585bd8f6eb6408e60486f8eff55e9cf03c827cc965c"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/term-1/matching-0000000000000003.h5",
+      "bytes": 6808,
+      "sha256": "8d78565cf74c2889fd084b27d58f1f71724cda5cf4fa15b282e52e5695087c92"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/term-1/matching-0000000000000004.h5",
+      "bytes": 6808,
+      "sha256": "b53cca911831a08552bca6db971b5aaca44eb9b2d0661465a7fdc1f6387c5e6b"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/term-1/matching-0000000000000005.h5",
+      "bytes": 6808,
+      "sha256": "bc7eebba28b12d238e1bde0c7f6af993be798bbe46cf2824bab4fcbdf36a4eeb"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/term-1/matching-0000000000000006.h5",
+      "bytes": 6808,
+      "sha256": "da0a2ac674b90a9b4116d14c81576e59590b39660335fecf8564fda1a4ad181e"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/term-1/matching-0000000000000007.h5",
+      "bytes": 6808,
+      "sha256": "de85156cb05862055031a7c2b5194de6b39d71497bf9b7a34a7745d325104899"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/term-2/manifest.json",
+      "bytes": 8329,
+      "sha256": "c2598c49674058d9d7684e604d6e75b83c03f1b36e7678db97bd228b0d8dd605"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/term-2/matching-0000000000000000.h5",
+      "bytes": 6808,
+      "sha256": "0a262ed6c7dac21787b8489eb320de9430e28f6c115291533f762a125cf53175"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/term-2/matching-0000000000000001.h5",
+      "bytes": 6808,
+      "sha256": "8ba8f4c886c3b0456343f1368f62ce8f410cfd390e2446e01c829c505cc6fe57"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/term-2/matching-0000000000000002.h5",
+      "bytes": 6808,
+      "sha256": "66f2759fa138725a0a503563af558acb39398359293dfd2abd856013832c59fe"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/term-2/matching-0000000000000003.h5",
+      "bytes": 6808,
+      "sha256": "7a11a1ae93c947848ce3752ac298934c89883c013a22f268cdc4a5dce1f3c885"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/term-2/matching-0000000000000004.h5",
+      "bytes": 6808,
+      "sha256": "3528eb38cddd9faca8036ffb754f1e948f38aeb088703e34eec4e555732687b5"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/term-2/matching-0000000000000005.h5",
+      "bytes": 6808,
+      "sha256": "0140dfb1df4ad75da56d776a9667074419e3ef2a72054da6a9afbb524b1ca53a"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/term-2/matching-0000000000000006.h5",
+      "bytes": 6808,
+      "sha256": "9a3032335d9d5dc32ffede660df087dc562a70fe49b742202a7c9c08db6e8418"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/term-2/matching-0000000000000007.h5",
+      "bytes": 6808,
+      "sha256": "bb7efbdaedb570c431a95acf743b824920de6d078dadf851ba4673d779ef942c"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/freeze.json",
+      "bytes": 5761,
+      "sha256": "d5a7aa8292b90e404afb8d65ef575447a63a17bd1e602bbe03e8404c2cbec36a"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/job-0.stdout",
+      "bytes": 2376,
+      "sha256": "420b597127b5f913ac9e2cb166df22a8b639a34cc2a4db05924f804f04494127"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/job-0.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/receipt-publish-world8-rank0.json",
+      "bytes": 20912,
+      "sha256": "c1359498e1d5e54eb26a949a2caddf31c51593373771894981d012c4c9c02ebb"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/receipt-publish-world8-rank1.json",
+      "bytes": 20912,
+      "sha256": "bc654c087446c9df7c0581f1aead47795e35066278ca1ff05380de683783788b"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/receipt-publish-world8-rank2.json",
+      "bytes": 20912,
+      "sha256": "5b5aa00f6f1ca0bac56d1c4c600b0bbc6f12eedf93de452a489e023b39f561a3"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/receipt-publish-world8-rank3.json",
+      "bytes": 20912,
+      "sha256": "51f46bc8832a9465c6a0a683f59f943e547b4be6251016264cd83aa30269c5fa"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/receipt-publish-world8-rank4.json",
+      "bytes": 20912,
+      "sha256": "96e8bd96dc9191cd6f75ab3fc8091714edc6db9ef5a0b0a89e55c9261ec8cab8"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/receipt-publish-world8-rank5.json",
+      "bytes": 20912,
+      "sha256": "36f70f9e440e2c0bff0ed81a280585f13a6648a29d7021247469b7fa9a3721fe"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/receipt-publish-world8-rank6.json",
+      "bytes": 20912,
+      "sha256": "ef6bbfe24d1f7939254847e0789ade4908b4c27f6ced7ec5eab42b663cd854f2"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/receipt-publish-world8-rank7.json",
+      "bytes": 20912,
+      "sha256": "fb5fe50904550d10c646baf66586fdc56d2ec69791996be11d082ae2f74783d8"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/job-1.stdout",
+      "bytes": 297,
+      "sha256": "b003e86d9f8c85500e8e8836be4a0e45372109d804320f22efebfad2603659f9"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/job-1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/receipt-compile-world1-rank0.json",
+      "bytes": 11118,
+      "sha256": "fda7f21b11dd01070e81c2a548374094a8ed8443aa5c3556f55ca8238a4708ca"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/job-2.stdout",
+      "bytes": 295,
+      "sha256": "3ba9ca03935fc38dcae1de522b4b90347acb53b08932a663d48aae4d0f08ff52"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/job-2.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/dataset/receipt-replay-world1-rank0.json",
+      "bytes": 21413,
+      "sha256": "4effcb8ef4ab8100f8e0b6c2ca0f38c57198d59a8321135adcba94917fa9d591"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/job-3.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/job-3.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/job-4.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/job-4.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/job-5.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/job-5.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/job-6.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-3/job-6.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

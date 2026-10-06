@@ -1,0 +1,241 @@
+warning: quest-sys@0.2.0: Using QuEST 4.3.0 from <quest-install> with /usr/bin/c++
+warning: quest-sys@0.2.0: Verified rsmpi MPICC /usr/lib64/mpich/bin/mpicc matches QuEST MPI ABI and loaded library
+warning: `feature(generic_const_exprs)` is not supported with the next-generation trait solver
+ --> crates/quest-polynomial/src/lib.rs:1:30
+  |
+1 | #![feature(const_trait_impl, generic_const_exprs)]
+  |                              ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `-Znext-solver=globally` is currently enabled by default for testing
+  = note: reverted the setting to `-Znext-solver=coherence` for this crate
+  = note: the currently stable trait solver will be used for this crate
+  = note: see issues #160895 <https://github.com/rust-lang/rust/issues/160895> for more information
+
+warning: `quest-polynomial` (lib) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s
+   Doc-tests quest_build
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests quest_cfd
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests quest_compile
+
+running 1 test
+test crates/quest-compile/src/lib.rs - (line 8) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+all doctests ran in 0.29s; merged doctests compilation took 0.28s
+   Doc-tests quest_language
+
+running 7 tests
+test crates/quest-language/src/ssa/mod.rs - ssa::VerifiedProgram (line 559) - compile fail ... ok
+test crates/quest-language/src/semantic/mod.rs - semantic::TypedModule (line 190) - compile fail ... ok
+test crates/quest-language/src/ssa/mod.rs - ssa::VerifiedProgram (line 564) - compile fail ... ok
+test crates/quest-language/src/semantic/mod.rs - semantic::TypedModule (line 181) - compile fail ... ok
+test crates/quest-language/src/semantic/builder/mod.rs - semantic::builder (line 15) - compile fail ... ok
+test crates/quest-language/src/semantic/builder/mod.rs - semantic::builder (line 10) - compile fail ... ok
+test crates/quest-language/src/semantic/builder/mod.rs - semantic::builder (line 4) - compile fail ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+   Doc-tests quest_macros
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests quest_math
+
+running 1 test
+test crates/quest-math/src/../README.md - (line 8) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+all doctests ran in 0.12s; merged doctests compilation took 0.12s
+   Doc-tests mathcore
+
+running 1 test
+test crates/vendor/mathcore/src/typed.rs - typed::Expression (line 14) - compile fail ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+   Doc-tests quest_numerics
+
+running 1 test
+test crates/quest-numerics/src/observer.rs - observer (line 8) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 3 tests
+test crates/quest-numerics/src/arithmetic.rs - arithmetic::CertifyingBackend (line 86) - compile fail ... ok
+test crates/quest-numerics/src/roots.rs - roots::cover (line 260) - compile fail ... ok
+test crates/quest-numerics/src/shapes.rs - shapes::Matrix (line 5) - compile fail ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+all doctests ran in 0.18s; merged doctests compilation took 0.15s
+   Doc-tests quest_optimizer_client
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests quest_optimizer_protocol
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests quest_polynomial
+warning: `feature(generic_const_exprs)` is not supported with the next-generation trait solver
+ --> crates/quest-polynomial/src/lib.rs:1:30
+  |
+1 | #![feature(const_trait_impl, generic_const_exprs)]
+  |                              ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `-Znext-solver=globally` is currently enabled by default for testing
+  = note: reverted the setting to `-Znext-solver=coherence` for this crate
+  = note: the currently stable trait solver will be used for this crate
+  = note: see issues #160895 <https://github.com/rust-lang/rust/issues/160895> for more information
+
+warning: 1 warning emitted
+
+
+running 6 tests
+test crates/quest-polynomial/src/function.rs - function::Function (line 25) - compile fail ... ok
+test crates/quest-polynomial/src/remez.rs - remez::RemezRequest (line 126) - compile fail ... ok
+test crates/quest-polynomial/src/analysis.rs - analysis::Conversion (line 19) - compile fail ... ok
+test crates/quest-polynomial/src/function.rs - function::Function (line 20) - compile fail ... ok
+test crates/quest-polynomial/src/remez.rs - remez::RemezRequest (line 135) - compile fail ... ok
+test crates/quest-polynomial/src/remez.rs - remez::UniformErrorCertificate (line 82) - compile fail ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+   Doc-tests quest_qasm
+
+running 1 test
+test crates/quest-qasm/src/lib.rs - (line 8) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+all doctests ran in 0.26s; merged doctests compilation took 0.25s
+   Doc-tests quest_qsp
+
+running 6 tests
+test crates/quest-qsp/src/sequence.rs - sequence::PhaseSequence (line 52) ... ok
+test crates/quest-qsp/src/../README.md - (line 50) ... ok
+test crates/quest-qsp/src/../README.md - (line 14) ... ok
+test crates/quest-qsp/src/../README.md - (line 142) ... ok
+test crates/quest-qsp/src/certification/mod.rs - certification::CertificationBuilder (line 220) ... ok
+test crates/quest-qsp/src/offline/mod.rs - offline (line 29) ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+
+running 2 tests
+test crates/quest-qsp/src/certification/mod.rs - certification::CertificationBuilder (line 234) - compile fail ... ok
+test crates/quest-qsp/src/stages.rs - stages::SynthesisBuilder (line 132) - compile fail ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+all doctests ran in 0.33s; merged doctests compilation took 0.27s
+   Doc-tests quest_qsvt
+
+running 5 tests
+test crates/quest-qsvt/src/../docs/analysis.md - analysis (line 148) ... ok
+test crates/quest-qsvt/src/../docs/analysis.md - analysis (line 65) ... ok
+test crates/quest-qsvt/src/../README.md - (line 82) ... ok
+test crates/quest-qsvt/src/../README.md - (line 24) ... ok
+test crates/quest-qsvt/src/../README.md - (line 161) ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 10 tests
+test crates/quest-qsvt/src/response.rs - response::RouteResponse (line 334) - compile fail ... ok
+test crates/quest-qsvt/src/analysis.rs - analysis::NumericalObservations (line 398) - compile fail ... ok
+test crates/quest-qsvt/src/transform.rs - transform::TransformBuilder (line 283) - compile fail ... ok
+test crates/quest-qsvt/src/analysis.rs - analysis::AnalysisBuilder (line 488) - compile fail ... ok
+test crates/quest-qsvt/src/encoding.rs - encoding::EncodingBuilder (line 36) - compile fail ... ok
+test crates/quest-qsvt/src/analysis.rs - analysis::EncodingBoundBuilder (line 45) - compile fail ... ok
+test crates/quest-qsvt/src/transform.rs - transform::ValidatedTransform (line 76) - compile fail ... ok
+test crates/quest-qsvt/src/analysis.rs - analysis::StandardPremises (line 209) - compile fail ... ok
+test crates/quest-qsvt/src/encoding.rs - encoding::EncodingBuilder (line 32) - compile fail ... ok
+test crates/quest-qsvt/src/dense.rs - dense::DenseEncodingBuilder (line 18) - compile fail ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+all doctests ran in 0.43s; merged doctests compilation took 0.35s
+   Doc-tests quest_qsvt_cli
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests quest_qsvt_io
+
+running 2 tests
+test crates/quest-qsvt-io/src/json.rs - json::GeneralizedAngleInput (line 30) - compile fail ... ok
+test crates/quest-qsvt-io/src/json.rs - json::GeneralizedAngleInput (line 24) - compile fail ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+   Doc-tests quest
+
+running 3 tests
+test crates/quest/src/lib.rs - (line 67) ... ignored
+test crates/quest/src/lib.rs - (line 123) - compile ... ok
+test crates/quest/src/lib.rs - (line 76) - compile ... ok
+
+test result: ok. 2 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 12 tests
+test crates/quest/src/qsvt/collective.rs - qsvt::collective::ExecutionResult (line 130) - compile fail ... ok
+test crates/quest/src/collective.rs - collective (line 20) - compile fail ... ok
+test crates/quest/src/collective.rs - collective (line 11) - compile fail ... ok
+test crates/quest/src/qsvt/mod.rs - qsvt::ExecutionResult (line 358) - compile fail ... ok
+test crates/quest/src/qsvt/mod.rs - qsvt::PreparedTransform (line 204) - compile fail ... ok
+test crates/quest/src/qsvt/collective.rs - qsvt::collective::PreparedTransform (line 85) - compile fail ... ok
+test crates/quest/src/collective.rs - collective (line 30) - compile fail ... ok
+test crates/quest/src/collective.rs - collective (line 43) - compile fail ... ok
+test crates/quest/src/qsvt/collective.rs - qsvt::collective::PreparationBuilder (line 17) - compile fail ... ok
+test crates/quest/src/qsvt/mod.rs - qsvt::PreparationBuilder (line 69) - compile fail ... ok
+test crates/quest/src/qsvt/mod.rs - qsvt::AdmittedTransform (line 117) - compile fail ... ok
+test crates/quest/src/qsvt/mod.rs - qsvt::ExecutionResult (line 365) - compile fail ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+
+all doctests ran in 0.38s; merged doctests compilation took 0.30s
+   Doc-tests quest_symbolic
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests quest_synthesis
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests quest_sys
+
+running 5 tests
+test crates/quest-sys/src/mpi.rs - mpi (line 28) - compile fail ... ok
+test crates/quest-sys/src/mpi.rs - mpi (line 20) - compile fail ... ok
+test crates/quest-sys/src/mpi.rs - mpi (line 9) - compile fail ... ok
+test crates/quest-sys/src/mpi.rs - mpi (line 14) - compile fail ... ok
+test crates/quest-sys/src/lib.rs - (line 22) - compile fail ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+

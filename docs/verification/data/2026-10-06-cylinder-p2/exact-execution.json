@@ -1,0 +1,29 @@
+{
+  "schema": "quest-cylinder-p2-exact-execution-v1",
+  "status": "completed",
+  "date_utc": "2026-10-06",
+  "command": [
+    "/usr/bin/time",
+    "-v",
+    "/usr/bin/timeout",
+    "30s",
+    "/usr/bin/prlimit",
+    "--as=134217728",
+    "--",
+    "python3",
+    "-B",
+    "docs/verification/fixtures/quest-cfd/cylinder_p2_exact.py"
+  ],
+  "exit_code": 0,
+  "wrapper_elapsed_seconds": 0.05383681999956025,
+  "address_space_cap_bytes": 134217728,
+  "timeout_seconds": 30,
+  "peak_rss_kib": 19168,
+  "normal_and_optimized_non_timing_fields_agree": true,
+  "source_json_sha256": "e4e5d45032e4d7b10241b91b4514f539c5b3e3698daca40251ece587db5cfb3e",
+  "script_sha256": "962b1661ba8ada9a374460954372c486a879595e5947bb2e9d7c66f8a1b6ece9",
+  "helper_sha256": "80db36fa9e2759f32b3934fe0ba57e73f7373947add980ad974362fab60598bd",
+  "result_sha256": "02bc167e6bea21b2be0b9733ebf20ad241fbdf44d40413ab027d6fc875e6d485",
+  "measurement_log_sha256": "29811829dc170252e314cfc34a2b0d90cfe5b13c3b5ffc9ebe0deb58a081118c",
+  "scope": "fixed exact represented-coordinate constraint matrix; no rounded runtime, physical convergence or quantum execution certificate"
+}

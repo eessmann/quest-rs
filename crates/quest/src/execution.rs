@@ -17,7 +17,7 @@ use quest_compile::{
 use quest_compile::{Control, ControlState, Operation, RegionPlan};
 use std::collections::{BTreeMap, BTreeSet};
 
-pub type MatrixCacheKey = (usize, Vec<bool>);
+pub type MatrixCacheKey = (usize, Vec<bool>, [u64; 3]);
 
 pub fn matrix_cache_key(
 	matrix: &quest_compile::NumericalOperator,
@@ -26,11 +26,12 @@ pub fn matrix_cache_key(
 	(
 		matrix.view().as_ptr().addr(),
 		controls.into_iter().collect(),
+		matrix.evidence_identity(),
 	)
 }
 
 /// One transactional native pool per prepared owner. Keys use retained immutable
-/// source identity and the ordered signed-control profile, never target wires.
+/// source identity, numerical evidence, and ordered signed-control profile.
 #[derive(Default)]
 pub struct MatrixPreparation {
 	matrices: Vec<NativeMatrix>,
@@ -61,7 +62,7 @@ impl MatrixPreparation {
 	}
 }
 
-/// Size the same signed-control embedding that materialization uses. One
+/// Size the native matrix and signed controls that materialization uses. One
 /// admission set spans ordinary payloads and every reachable oracle profile.
 pub fn admit_matrix(
 	matrix: &quest_compile::NumericalOperator,
@@ -70,22 +71,28 @@ pub fn admit_matrix(
 	seen: &mut BTreeSet<MatrixCacheKey>,
 ) -> Result<usize> {
 	let recipe = MatrixRecipe::new(matrix, controls)?;
-	let dimension = recipe.dimension();
-	let entries = if recipe.is_diagonal() {
-		dimension
-	} else {
-		dimension.checked_mul(dimension).ok_or(Error::Overflow)?
-	};
+	let dimension = recipe.native_dimension();
+	let entries = crate::native_admission::matrix_elements(
+		if recipe.is_diagonal() {
+			crate::native_admission::MatrixKind::DiagMatr
+		} else {
+			crate::native_admission::MatrixKind::CompMatr
+		},
+		usize::try_from(dimension.ilog2()).map_err(|_| Error::Overflow)?,
+	)?;
 	let key_storage = controls
 		.len()
-		.checked_add(
-			const {
-				size_of::<MatrixCacheKey>()
-					+ 2 * size_of::<NativeMatrix>()
-					+ 12 * size_of::<usize>()
-					+ 256
-			},
-		)
+		.checked_mul(size_of::<i32>().saturating_add(1))
+		.and_then(|n| {
+			n.checked_add(
+				const {
+					size_of::<MatrixCacheKey>()
+						+ 2 * size_of::<NativeMatrix>()
+						+ 12 * size_of::<usize>()
+						+ 256
+				},
+			)
+		})
 		.ok_or(Error::Overflow)?;
 	let bytes = bytes_for(entries, if gpu { 16 } else { 12 })?
 		.checked_add(matrix.bytes())
@@ -96,6 +103,27 @@ pub fn admit_matrix(
 		Ok(bytes)
 	} else {
 		Ok(0)
+	}
+}
+
+/// Numerical evidence must meet the frozen native validation threshold before allocation.
+pub fn admit_native_unitary(matrix: &quest_compile::NumericalOperator, epsilon: f64) -> Result<()> {
+	if !matrix.is_diagonal()
+		&& let Some(evidence) = matrix.unitary_evidence()
+		&& (!epsilon.is_finite() || epsilon < 0.0 || evidence.residual() > epsilon)
+	{
+		return Err(Error::Value(
+			"unitary evidence exceeds native validation epsilon",
+		));
+	}
+	Ok(())
+}
+#[cfg(any(feature = "qsvt", all(feature = "mpi", quest_native_mpi)))]
+fn admit_operation_unitaries(operation: &Operation, epsilon: f64) -> Result<()> {
+	match operation {
+		Operation::Numerical { matrix, .. } => admit_native_unitary(matrix, epsilon),
+		Operation::Conditional { operation, .. } => admit_operation_unitaries(operation, epsilon),
+		_ => Ok(()),
 	}
 }
 
@@ -123,6 +151,12 @@ pub enum NativeMatrix {
 	Dense {
 		forward: UniquePtr<quest_sys::CompMatr>,
 		adjoint: UniquePtr<quest_sys::CompMatr>,
+	},
+	UnitaryDense {
+		forward: UniquePtr<quest_sys::CompMatr>,
+		adjoint: UniquePtr<quest_sys::CompMatr>,
+		states: Vec<i32>,
+		target_count: usize,
 	},
 	Diagonal {
 		forward: UniquePtr<quest_sys::DiagMatr>,
@@ -266,6 +300,10 @@ impl crate::environment::RuntimeResources {
 		let mut seen_matrices = BTreeSet::new();
 		for instruction in plan.instructions() {
 			inventory.include_operation(instruction.operation(), plan.num_qubits())?;
+		}
+		inventory.admit_native_unitaries(fingerprint.validation_epsilon)?;
+		for instruction in plan.instructions() {
+			admit_operation_unitaries(instruction.operation(), fingerprint.validation_epsilon)?;
 		}
 		let mut required = plan
 			.instructions()
@@ -672,6 +710,21 @@ pub fn prepare_numerical(
 	controls: &[bool],
 ) -> Result<NativeMatrix> {
 	let recipe = MatrixRecipe::new(numerical, controls)?;
+	if recipe.uses_native_controls() {
+		admit_native_unitary(
+			numerical,
+			quest_sys::get_qu_est_validation_epsilon()
+				.context("checking unitary matrix validation")?,
+		)?;
+		let mut states = reserve_vec(controls.len())?;
+		states.extend(controls.iter().copied().map(i32::from));
+		return Ok(NativeMatrix::UnitaryDense {
+			forward: native_matrix(numerical.view())?,
+			adjoint: native_matrix(numerical.view().adjoint())?,
+			states,
+			target_count: numerical.num_qubits(),
+		});
+	}
 	let dim = recipe.dimension();
 	if recipe.is_diagonal() {
 		let mut values = reserve_vec(dim)?;
@@ -727,6 +780,45 @@ pub fn execute_matrix<K: RegisterKind>(
 				quest_sys::rightapply_comp_matr(register.pin(), targets, adjoint)
 					.context("applying numerical adjoint to density")?;
 			}
+		}
+		NativeMatrix::UnitaryDense {
+			forward,
+			adjoint,
+			states,
+			target_count,
+		} => {
+			let target_wires = targets
+				.get(..*target_count)
+				.ok_or(Error::Value("unitary target count"))?;
+			let control_wires = targets
+				.get(*target_count..)
+				.ok_or(Error::Value("unitary control count"))?;
+			if control_wires.len() != states.len() {
+				return Err(Error::Value("unitary signed control count"));
+			}
+			for (index, &wire) in targets.iter().enumerate() {
+				register.check_qubit(usize::try_from(wire).map_err(|_| Error::Overflow)?)?;
+				if targets.get(..index).ok_or(Error::Overflow)?.contains(&wire) {
+					return Err(Error::Value("unitary controls and targets overlap"));
+				}
+			}
+			crate::native_admission::admit_dense_partition(
+				register.deployment().local_amplitudes(),
+				*target_count,
+			)?;
+			let matrix = if inverse { adjoint } else { forward };
+			if states.is_empty() {
+				quest_sys::apply_comp_matr(register.pin(), target_wires, matrix)
+			} else {
+				quest_sys::apply_multi_state_controlled_comp_matr(
+					register.pin(),
+					control_wires,
+					states,
+					target_wires,
+					matrix,
+				)
+			}
+			.context("applying individually admitted controlled unitary")?;
 		}
 		NativeMatrix::Diagonal { forward, adjoint } => {
 			let (forward, adjoint) = if inverse {
@@ -1066,6 +1158,38 @@ mod matrix_resource_tests {
 		let controls = vec![false; usize::try_from(usize::BITS)?];
 		expect_true!(admit_matrix(&scalar, &controls, false, &mut seen).is_err());
 		expect_eq!(seen.len(), before);
+		Ok(())
+	}
+}
+
+#[cfg(test)]
+mod unitary_resource_tests {
+	use super::*;
+	use googletest::prelude::*;
+	#[gtest]
+	fn evidence_separates_native_cache_and_original_target_storage() -> googletest::Result<()> {
+		let values = faer::Mat::from_fn(2, 2, |r, c| Complex64::new(f64::from(r != c), 0.));
+		let general = quest_compile::NumericalOperator::from_view(
+			&values,
+			quest_compile::MatrixPolicy::default(),
+		)?;
+		let unitary =
+			general
+				.clone()
+				.admit_unitary(1e-12, quest_compile::MatrixPolicy::default(), 64)?;
+		expect_ne!(
+			matrix_cache_key(&general, [false, true, true]),
+			matrix_cache_key(&unitary, [false, true, true])
+		);
+		let mut seen = BTreeSet::new();
+		let general_bytes = admit_matrix(&general, &[false, true, true], false, &mut seen)?;
+		let unitary_bytes = admit_matrix(&unitary, &[false, true, true], false, &mut seen)?;
+		expect_gt!(unitary_bytes, 0);
+		expect_lt!(unitary_bytes.saturating_mul(2), general_bytes);
+		expect_eq!(
+			admit_matrix(&unitary.clone(), &[false, true, true], false, &mut seen)?,
+			0
+		);
 		Ok(())
 	}
 }

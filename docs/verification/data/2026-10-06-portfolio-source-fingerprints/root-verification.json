@@ -1,0 +1,86 @@
+{
+  "scope": "Independent portfolio tests and selected strict Clippy;26 owned/helper/matching-source hashes checked before and after each command; not transitive build or scientific campaign",
+  "source_manifests": [
+    {
+      "name": "sparse-record-fingerprint-v2-source-final-2.json",
+      "sha256": "5ff27a818e1aa6e32e2a2f53690bccea5fdcf44036fd44c792c0186319abf41d"
+    },
+    {
+      "name": "portfolio-source-fingerprints-source.json",
+      "sha256": "5065fe0f67b69d6986906cfa18e907faf3ffdaea5057ba88a5ae1bb1dafcf5a5"
+    }
+  ],
+  "checks": [
+    {
+      "name": "tests",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "quest-qsvt",
+        "--test",
+        "commutative_identities",
+        "--test",
+        "lcu_plan",
+        "--test",
+        "owned_replay",
+        "--test",
+        "portfolio_composition",
+        "--test",
+        "portfolio_structured",
+        "--test",
+        "structured_stencil",
+        "--test",
+        "structured",
+        "--test",
+        "portfolio_comparison",
+        "--test",
+        "portfolio_resource_curves",
+        "--test",
+        "portfolio_review_regressions"
+      ],
+      "returncode": 0,
+      "seconds": 0.3697289470001124,
+      "log_identifier": "<private-artifacts>/quest-portfolio-fingerprint-root-tests.log",
+      "sha256": "c446ecb6781aecad7dde1854c4077eed8077ba2d550326f47ad19e2cf4722767"
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "-p",
+        "quest-qsvt",
+        "--lib",
+        "--test",
+        "commutative_identities",
+        "--test",
+        "lcu_plan",
+        "--test",
+        "owned_replay",
+        "--test",
+        "portfolio_composition",
+        "--test",
+        "portfolio_structured",
+        "--test",
+        "structured_stencil",
+        "--test",
+        "structured",
+        "--test",
+        "portfolio_comparison",
+        "--test",
+        "portfolio_resource_curves",
+        "--test",
+        "portfolio_review_regressions",
+        "--no-deps",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "returncode": 0,
+      "seconds": 0.13144442900374997,
+      "log_identifier": "<private-artifacts>/quest-portfolio-fingerprint-root-clippy.log",
+      "sha256": "a84744b5b4ce853725e7bfa664c858880c31b78a110ed287e4d82b197097bf38"
+    }
+  ]
+}

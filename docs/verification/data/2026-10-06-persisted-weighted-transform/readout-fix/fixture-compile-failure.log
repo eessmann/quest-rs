@@ -1,0 +1,29 @@
+   Compiling quest-sys v0.2.0 (<workspace>/crates/quest-sys)
+warning: `feature(generic_const_exprs)` is not supported with the next-generation trait solver
+ --> crates/quest-polynomial/src/lib.rs:1:30
+  |
+1 | #![feature(const_trait_impl, generic_const_exprs)]
+  |                              ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `-Znext-solver=globally` is currently enabled by default for testing
+  = note: reverted the setting to `-Znext-solver=coherence` for this crate
+  = note: the currently stable trait solver will be used for this crate
+  = note: see issues #160895 <https://github.com/rust-lang/rust/issues/160895> for more information
+
+warning: `quest-polynomial` (lib) generated 1 warning
+warning: quest-sys@0.2.0: Using QuEST 4.3.0 from <quest-install> with /usr/bin/c++
+warning: quest-sys@0.2.0: Verified rsmpi MPICC <matching-mpicc> matches QuEST MPI ABI and loaded library
+   Compiling quest-rs v0.1.0 (<workspace>/crates/quest)
+error[E0596]: cannot borrow `comm` as mutable, as it is not declared as mutable
+   --> crates/quest/tests/persisted_weighted_transform.rs:112:21
+    |
+112 |     let readout_comm = comm.duplicate()?;
+    |                        ^^^^ cannot borrow as mutable
+    |
+help: consider changing this to be mutable
+    |
+107 |     let mut comm = if std::env::var("QUEST_PERSISTED_READOUT_SPLIT").as_deref() == Ok("1") {
+    |         +++
+
+For more information about this error, try `rustc --explain E0596`.
+error: could not compile `quest-rs` (test "persisted_weighted_transform") due to 1 previous error

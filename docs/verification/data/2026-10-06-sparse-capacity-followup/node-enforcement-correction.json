@@ -1,0 +1,52 @@
+{
+  "schema": "quest-capacity-whole-node-acceptance-correction-v1",
+  "status": "implemented and locally validated after frozen remote snapshots",
+  "absent_from_source_snapshots": [
+    "8e02c49a7acf70a84f0c55aa40caba647024090a8cd72ffd3267bb72d8d3925b",
+    "9adbef476110e8425bacee15882c006464a6d95b6a54ccb2269621e29af68233"
+  ],
+  "source_files_sha256": {
+    "docs/verification/fixtures/cirrus/capacity.py": "123a81c72c34c6260393e5b9cb5cc90f5b40eb4c8a70ec04822c31020b3d58b1",
+    "docs/verification/fixtures/cirrus/capacity_test.py": "27737ffcd70d961a59aa17a4224409dd1123febe113e649a68ab4352147f4bb4"
+  },
+  "red": {
+    "original_bytes": 2049,
+    "rank_process_envelope_bytes_per_node": 2048,
+    "observed_before": "capacity_closed=true despite missing whole-node enforcement",
+    "expected_after": "capacity_closed=false; original_input_exceeds_rank_process_envelope=true"
+  },
+  "new_evidence_fields": {
+    "capacity_closed": false,
+    "whole_node_enforcement_verified": false,
+    "whole_node_enforced_memory_cap_bytes": null,
+    "rank_process_envelope_scope": "participating MPI rank processes only; excludes coordinator, launchers and external helpers; not a whole-node memory cap"
+  },
+  "validation": {
+    "python_fixture_tests": 72,
+    "fixture_groups": [
+      28,
+      35,
+      9
+    ],
+    "historical_completed_cases": 24,
+    "historical_cirrus_cases": 13,
+    "historical_rank_schemas": [
+      3,
+      4,
+      5
+    ],
+    "legacy_v1_tests": "unchanged and passing",
+    "historical_numerical_and_capacity_fields": "unchanged",
+    "independent_review": "passed; no material findings"
+  },
+  "evidence_sha256": {
+    "whole-node-acceptance-red.log": "2ef9852e9f983768962d55d9e7a2dfe714297f270a11532a2074ed9389b3ab3c",
+    "whole-node-acceptance-green.log": "2962e810bc5bfa1cef38fd9e4940fb27cd1d0605aa11466f68acaf5062238836",
+    "whole-node-acceptance-fixtures.log": "5ced1a981bf60f4ae209ae370d97542cfa3ea01c63a0920678bc0e70ecc9efa0",
+    "whole-node-acceptance-coordinators.log": "c64ec120b71fb26b46ac1eccb445134daad18f9c29ff2081d28bc23c61c21d3a",
+    "whole-node-acceptance-legacy.log": "cd464e4d013980665bd325c88afa42349092f57312191e2c3d29489feb40d9b1",
+    "whole-node-historical-revalidation.json": "610cd78ca0712bf8ebb028d92ea948e1c99a3b9a9fd77363bcc2f5d1b77dc4da"
+  },
+  "remaining_obligation": "Strict closure requires verified aggregate caps covering the relevant processes on every participating node, including coordinator, launchers and external helpers, with explicit memory-accounting scope. Current rank RLIMIT_AS and rank-PID sampling do not supply this proof.",
+  "remote_mutations": false
+}

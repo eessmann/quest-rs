@@ -1,0 +1,16 @@
+name: quest-native-build
+description: One compiler lane in an exclusive single-node Cirrus allocation.
+use_pending_failed: false
+execution_config:
+  mode: direct
+  limit_resources: false
+jobs:
+  - name: native-build
+    command: bash -l "$QUEST_SOURCE/docs/verification/fixtures/cirrus/native-validation.sbatch"
+    resource_requirements: build
+resource_requirements:
+  - name: build
+    num_cpus: 8
+    num_nodes: 1
+    memory: 32g
+    runtime: PT1H45M

@@ -1,0 +1,58 @@
+[
+  {
+    "index": 0,
+    "stream": "stdout",
+    "original_bytes": 403,
+    "original_sha256": "cbbb55b0103aee2307839d0669dbc07c007ecfc6afef2868f08904e4ae82d54e",
+    "normalized_text": "-- The CXX compiler identification is GNU 16.2.1\n-- Detecting CXX compiler ABI info\n-- Detecting CXX compiler ABI info - done\n-- Check for working CXX compiler: /usr/bin/c++ - skipped\n-- Detecting CXX compile features\n-- Detecting CXX compile features - done\n-- Configuring done (0.2s)\n-- Generating done (0.0s)\n-- Build files have been written to: <private-artifacts>/quest-checkpoint-08-cmake-diagnosis/concurrent-0\n"
+  },
+  {
+    "index": 0,
+    "stream": "stderr",
+    "original_bytes": 0,
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "normalized_text": ""
+  },
+  {
+    "index": 1,
+    "stream": "stdout",
+    "original_bytes": 403,
+    "original_sha256": "125e8ea89203a4bab0587793bfbf4fe50288fe33f7298dfeb8b97299f6923e7b",
+    "normalized_text": "-- The CXX compiler identification is GNU 16.2.1\n-- Detecting CXX compiler ABI info\n-- Detecting CXX compiler ABI info - done\n-- Check for working CXX compiler: /usr/bin/c++ - skipped\n-- Detecting CXX compile features\n-- Detecting CXX compile features - done\n-- Configuring done (0.2s)\n-- Generating done (0.0s)\n-- Build files have been written to: <private-artifacts>/quest-checkpoint-08-cmake-diagnosis/concurrent-1\n"
+  },
+  {
+    "index": 1,
+    "stream": "stderr",
+    "original_bytes": 0,
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "normalized_text": ""
+  },
+  {
+    "index": 2,
+    "stream": "stdout",
+    "original_bytes": 403,
+    "original_sha256": "035627a3fb16bf7ad1b7b06778b97e3562e8098dcb864fdd87cddbb6ad39150f",
+    "normalized_text": "-- The CXX compiler identification is GNU 16.2.1\n-- Detecting CXX compiler ABI info\n-- Detecting CXX compiler ABI info - done\n-- Check for working CXX compiler: /usr/bin/c++ - skipped\n-- Detecting CXX compile features\n-- Detecting CXX compile features - done\n-- Configuring done (0.2s)\n-- Generating done (0.0s)\n-- Build files have been written to: <private-artifacts>/quest-checkpoint-08-cmake-diagnosis/concurrent-2\n"
+  },
+  {
+    "index": 2,
+    "stream": "stderr",
+    "original_bytes": 0,
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "normalized_text": ""
+  },
+  {
+    "index": 3,
+    "stream": "stdout",
+    "original_bytes": 403,
+    "original_sha256": "11ed03e82d1bba25839195afcff05217e96301346e0f5de9c435e6610433ed96",
+    "normalized_text": "-- The CXX compiler identification is GNU 16.2.1\n-- Detecting CXX compiler ABI info\n-- Detecting CXX compiler ABI info - done\n-- Check for working CXX compiler: /usr/bin/c++ - skipped\n-- Detecting CXX compile features\n-- Detecting CXX compile features - done\n-- Configuring done (0.2s)\n-- Generating done (0.0s)\n-- Build files have been written to: <private-artifacts>/quest-checkpoint-08-cmake-diagnosis/concurrent-3\n"
+  },
+  {
+    "index": 3,
+    "stream": "stderr",
+    "original_bytes": 0,
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "normalized_text": ""
+  }
+]

@@ -1,0 +1,30 @@
+{
+  "schema": "quest-persisted-weighted-consumer-source-v1",
+  "files": [
+    {
+      "path": "docs/verification/fixtures/persisted-weighted-transform/fixtures/frame-rejected.json",
+      "bytes": 965,
+      "sha256": "e3e82848e0e626d78429c28f5b9d546a921be4b629a5adfc763dedeedb42735e"
+    },
+    {
+      "path": "docs/verification/fixtures/persisted-weighted-transform/fixtures/loader-rejected.json",
+      "bytes": 1046,
+      "sha256": "f1027fdf3ed72b4716d0bf3d15865b4dee6d56a36aea007f38c2385d0c2cf8be"
+    },
+    {
+      "path": "docs/verification/fixtures/persisted-weighted-transform/fixtures/provenance.json",
+      "bytes": 921,
+      "sha256": "bb09344cf8f6526b0c1eb4335e0e51d493c49b14b062e327ca4750b8f3fa084c"
+    },
+    {
+      "path": "docs/verification/fixtures/persisted-weighted-transform/run.py",
+      "bytes": 33484,
+      "sha256": "0313e0ba2ab937873d08012b6214ab442cc2a342bf1f786e547aa61fdb635e26"
+    },
+    {
+      "path": "docs/verification/fixtures/persisted-weighted-transform/test_run.py",
+      "bytes": 26875,
+      "sha256": "13848be805d42d71e527c8caca8e954fa8c9962a5eac66338d1633723ef9cb7b"
+    }
+  ]
+}

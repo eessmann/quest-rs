@@ -49,16 +49,22 @@ pub fn parse_backends(value: &str) -> Result<Vec<Backend>, DynError> {
 	Ok(backends)
 }
 
-pub fn run(requested_work_dir: Option<PathBuf>, backends: &[Backend]) -> Result<(), DynError> {
+pub fn run(
+	requested_work_dir: Option<PathBuf>,
+	backends: &[Backend],
+	loader_isolated: bool,
+) -> Result<(), DynError> {
 	let repository = crate::generate::find_workspace_root()?;
 	let work = prepare_work_directory(requested_work_dir)?;
-	let package = quest_build::discover_for_tooling(work.join("native-discovery"), None)?;
+	let context =
+		quest_build::NativeBuildContext::for_tooling(work.join("native-discovery"), None)?;
+	let package = context.discover()?;
 	let toolchain = read_toolchain(&repository.join("rust-toolchain.toml"))?;
 	write_consumer_workspace(&repository, &work, &toolchain)?;
 
 	let manifest = work.join("Cargo.toml");
 	let target = work.join("target");
-	let mut lock = cargo_command(&work, &package.prefix, &package.compiler);
+	let mut lock = cargo_command(&work, &package.prefix, &package.compiler_invocation);
 	lock.args(["generate-lockfile", "--offline", "--manifest-path"])
 		.arg(&manifest);
 	run_logged(
@@ -67,7 +73,7 @@ pub fn run(requested_work_dir: Option<PathBuf>, backends: &[Backend]) -> Result<
 		"consumer dependency locking",
 	)?;
 
-	let mut build = cargo_command(&work, &package.prefix, &package.compiler);
+	let mut build = cargo_command(&work, &package.prefix, &package.compiler_invocation);
 	build
 		.args([
 			"build",
@@ -81,62 +87,7 @@ pub fn run(requested_work_dir: Option<PathBuf>, backends: &[Backend]) -> Result<
 		.arg(&target);
 	run_logged(&mut build, &work.join("build.log"), "consumer build")?;
 
-	for (fixture, binary) in EXECUTABLES {
-		let executable = target.join("debug").join(binary);
-		#[cfg(target_os = "linux")]
-		inspect_elf(&work, fixture, &executable)?;
-		for backend in backends {
-			let kinds: &[&str] = if *fixture == "direct" {
-				&["sv", "dm"]
-			} else {
-				&[""]
-			};
-			for kind in kinds {
-				let mut execute = Command::new(&executable);
-				execute.current_dir(&work).arg(backend.as_str());
-				if !kind.is_empty() {
-					execute.arg(kind);
-				}
-				clean_loader_environment(&mut execute);
-				let case = if kind.is_empty() {
-					format!("{fixture}-{}", backend.as_str())
-				} else {
-					format!("{fixture}-{}-{kind}", backend.as_str())
-				};
-				run_logged(
-					&mut execute,
-					&work.join(format!("{case}-run.log")),
-					&format!("{case} consumer execution"),
-				)?;
-				println!("{case}: numerical and deployment checks passed");
-			}
-			if *fixture == "direct" {
-				let mut modes = Command::new(target.join("debug/native-modes"));
-				modes.current_dir(&work).arg(backend.as_str());
-				clean_loader_environment(&mut modes);
-				run_logged(
-					&mut modes,
-					&work.join(format!("direct-{}-modes-run.log", backend.as_str())),
-					&format!("direct {} mode consumer execution", backend.as_str()),
-				)?;
-			}
-		}
-		#[cfg(target_os = "macos")]
-		inspect_macho(
-			&work,
-			fixture,
-			&executable,
-			&package,
-			backends
-				.first()
-				.copied()
-				.ok_or("at least one native backend is required")?,
-		)?;
-		#[cfg(target_os = "linux")]
-		println!("{fixture}: RUNPATH and complete native closure passed");
-		#[cfg(target_os = "macos")]
-		println!("{fixture}: LC_RPATH and installed native closure passed");
-	}
+	check_executables(&work, &target, &package, backends, loader_isolated)?;
 
 	println!(
 		"Checked QuEST {} from {} with {}.",
@@ -148,6 +99,94 @@ pub fn run(requested_work_dir: Option<PathBuf>, backends: &[Backend]) -> Result<
 		"Preserved consumer fixture and evidence: {}",
 		work.display()
 	);
+	Ok(())
+}
+
+fn check_executables(
+	work: &Path,
+	target: &Path,
+	package: &quest_build::NativePackage,
+	backends: &[Backend],
+	loader_isolated: bool,
+) -> Result<(), DynError> {
+	#[cfg(not(target_os = "macos"))]
+	let _ = package;
+	for (fixture, binary) in EXECUTABLES {
+		let executable = target.join("debug").join(binary);
+		#[cfg(target_os = "linux")]
+		if loader_isolated {
+			inspect_elf(work, fixture, &executable)?;
+		}
+		for backend in backends {
+			let kinds: &[&str] = if *fixture == "direct" {
+				&["sv", "dm"]
+			} else {
+				&[""]
+			};
+			for kind in kinds {
+				let mut execute = Command::new(&executable);
+				execute.current_dir(work).arg(backend.as_str());
+				if !kind.is_empty() {
+					execute.arg(kind);
+				}
+				if loader_isolated {
+					clean_loader_environment(&mut execute);
+				}
+				let case = if kind.is_empty() {
+					format!("{fixture}-{}", backend.as_str())
+				} else {
+					format!("{fixture}-{}-{kind}", backend.as_str())
+				};
+				run_logged(
+					&mut execute,
+					&work.join(format!("{case}-run.log")),
+					&format!("{case} consumer execution"),
+				)?;
+				println!(
+					"{case}: numerical checks passed ({})",
+					if loader_isolated {
+						"loader-isolated"
+					} else {
+						"module environment"
+					}
+				);
+			}
+			if *fixture == "direct" {
+				let mut modes = Command::new(target.join("debug/native-modes"));
+				modes.current_dir(work).arg(backend.as_str());
+				if loader_isolated {
+					clean_loader_environment(&mut modes);
+				}
+				run_logged(
+					&mut modes,
+					&work.join(format!("direct-{}-modes-run.log", backend.as_str())),
+					&format!("direct {} mode consumer execution", backend.as_str()),
+				)?;
+			}
+		}
+		#[cfg(target_os = "macos")]
+		if loader_isolated {
+			inspect_macho(
+				work,
+				fixture,
+				&executable,
+				package,
+				backends
+					.first()
+					.copied()
+					.ok_or("at least one native backend is required")?,
+			)?;
+		}
+		#[cfg(target_os = "linux")]
+		if loader_isolated {
+			println!("{fixture}: RUNPATH and complete native closure passed (loader-isolated)");
+		}
+		#[cfg(target_os = "macos")]
+		if loader_isolated {
+			println!("{fixture}: LC_RPATH and installed native closure passed (loader-isolated)");
+		}
+	}
+
 	Ok(())
 }
 
@@ -264,7 +303,6 @@ fn cargo_command(work: &Path, quest_prefix: &Path, compiler: &Path) -> Command {
 		.env_remove("QuEST_DIR")
 		.env_remove("QUEST_NATIVE_CONFIG")
 		.env_remove("QUEST_RUNTIME_LIBRARY_PATH");
-	clean_loader_environment(&mut command);
 	if env::var_os("CARGO_BUILD_JOBS").is_none() {
 		command.env("CARGO_BUILD_JOBS", "4");
 	}
@@ -276,7 +314,12 @@ fn pin_native_environment<'a>(
 	quest_prefix: &Path,
 	compiler: &Path,
 ) -> &'a mut Command {
-	command.env("QUEST_ROOT", quest_prefix).env("CXX", compiler)
+	command.env("QUEST_ROOT", quest_prefix);
+	// Preserve wrapper arguments and module dispatch selected by the caller.
+	if env::var_os("CXX").is_none() {
+		command.env("CXX", compiler);
+	}
+	command
 }
 
 fn write_consumer_workspace(
@@ -1329,6 +1372,22 @@ mod tests {
 			.collect::<Vec<_>>();
 		expect_that!(command.get_program(), eq(OsStr::new("cargo")));
 		verify_that!(arguments, elements_are![eq("build")])
+	}
+
+	#[gtest]
+	fn consumer_compilation_preserves_module_loader_paths() {
+		let command = cargo_command(
+			Path::new("/tmp"),
+			Path::new("/opt/quest"),
+			Path::new("/opt/c++"),
+		);
+		for name in ["LD_LIBRARY_PATH", "DYLD_LIBRARY_PATH"] {
+			expect_false!(
+				command
+					.get_envs()
+					.any(|(key, value)| key == OsStr::new(name) && value.is_none())
+			);
+		}
 	}
 
 	#[gtest]

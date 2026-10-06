@@ -1,0 +1,83 @@
+{
+  "schema": "quest-cfd-full-window-burgers.v1",
+  "recorded_utc": "2026-10-05T22:59:48.316059+00:00",
+  "base_commit": "dd9a869ebe9952cf85a6411a180ed7b688f568fb",
+  "native_binary_sha256": "5d6a6727bcc9c1c0aa89e81cc72080f3382089ce87bbb2634ab5c7a55c88f8f4",
+  "earlier_attempt_binary_sha256": "2a623b60fbddde82c505ffa58868b3c34d4393e001abb26a5332d318d5f49840",
+  "critical_source_snapshot": [
+    {
+      "path": "crates/quest-cfd/src/history_spectrum.rs",
+      "sha256": "cda5c040557a438a4f0980ddd0b8ab72414ca54c188391a0314d1c993df23d29"
+    },
+    {
+      "path": "crates/quest-cfd/src/history.rs",
+      "sha256": "3a8887bbebbc9c9610cd7938932d45d195a30a553c82f7da447b4a99e8f4f457"
+    },
+    {
+      "path": "crates/quest-cfd/src/solve.rs",
+      "sha256": "27fb1c548e2d854db4124365683f151f7c9ca48158fe551b7ad51625545e338b"
+    },
+    {
+      "path": "crates/quest-cfd/src/main.rs",
+      "sha256": "5e2b322caf23c7f0da4494c4e98dffc35e7700b449c2c32e198d61912f836a2e"
+    }
+  ],
+  "source_scope": "critical spectral/solver/CLI files unchanged between final native binary construction and this snapshot; binary hash does not independently attest full build provenance",
+  "attempts": [
+    {
+      "attempt": 1,
+      "status": "rejected-or-failed",
+      "exit_code": 1,
+      "address_space_cap_bytes": 2147483648,
+      "timeout_seconds": 180,
+      "max_rss_kib": 26436,
+      "log_sha256": "59d70a995b5b613ff4a3213b2b78e53dd487edcefb956e3c616f90dc5239d3b2",
+      "stdout_sha256": "765753fe75a4a0a2294ae62138e17042afe77a985e864abd457a9bbedee08db0",
+      "reason": "case execution is unsupported: QSP certification admission: certification resource budget: modeled verification memory",
+      "optional_phase_certificate_requested": true
+    },
+    {
+      "attempt": 2,
+      "status": "rejected-or-failed",
+      "exit_code": 1,
+      "address_space_cap_bytes": 2147483648,
+      "timeout_seconds": 180,
+      "max_rss_kib": 26876,
+      "log_sha256": "282d48f3939ce72dbc2958e64c5c97db0baa7848dd800da740b85ae35b3f9a2d",
+      "stdout_sha256": "0150fb1511fd30388ab4f76dcb9c2cbdff93e1cf97cbd91fa3d17f34750b5767",
+      "reason": "case execution is unsupported: QuEST CPU backend requires building quest-cfd with --features quantum",
+      "optional_phase_certificate_requested": false
+    },
+    {
+      "attempt": 3,
+      "status": "quantum-circuit-reference-executed",
+      "exit_code": 0,
+      "address_space_cap_bytes": 2147483648,
+      "timeout_seconds": 180,
+      "max_rss_kib": 269436,
+      "log_sha256": "89c3451631c6e52aecc2432f02bd5c7a8bbee843119a675dd99f7a457158abfd",
+      "stdout_sha256": "717c8babba18ce81e245502322b51cf37af9d42abef6de5b2170bf8f88fdd38c",
+      "reason": null,
+      "optional_phase_certificate_requested": false
+    }
+  ],
+  "native_command": "quest-cfd solve --case burgers --lift carleman --carleman-order 2 --horizon 0.1 --time-cells 2 --max-degree 16383 --reference-spectral-bound --no-certify --backend quest-cpu",
+  "reference_command": "quest-cfd reference --case burgers --dt 0.000025 --steps 4000",
+  "quantum_vs_identical_full_dg_rk4_coordinate_error": 1.3547711215457771e-07,
+  "quantum_vs_identical_full_dg_rk4_relative_coordinate_error": 3.3488188799517526e-05,
+  "quantum_vs_same_direct_history_coordinate_error": 2.451467189225299e-10,
+  "direct_history_vs_full_dg_rk4_coordinate_error": 1.3523219757316862e-07,
+  "all_independent_physical_coordinates_retained": true,
+  "quantum_execution": true,
+  "continuum_convergence_established": false,
+  "combined_error_certificate": false,
+  "limitations": [
+    "Fixed four-cell DG1 physical mesh; full8-coordinate symmetric Carleman order2, twoDG1 temporal slabs.",
+    "Native run explicitly omits optional phase certificate after a certified attempt exceeded its managed memory envelope.",
+    "Second preliminary attempt used a copied binary without the quantum feature; it rejected before native execution. Final immutable binary was built with quantum and its native QuEST/MPICH links were checked.",
+    "Independent state-preparation error certificate and a total encoding/synthesis/execution/measurement bound remain unavailable.",
+    "Same-DG RK4 and direct-history comparisons are binary64 numerical references, not validated trajectory enclosures.",
+    "Cole-Hopf physical L2 error remains approximately2.07e-4 at this coarse mesh; small circuit residual is not physical convergence.",
+    "No repeated sampling, multi-host, accelerator, hardware or speedup claim."
+  ]
+}

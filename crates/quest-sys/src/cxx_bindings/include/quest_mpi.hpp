@@ -20,9 +20,7 @@ bool mpi_quest_is_quiescent() noexcept;
 #if QUEST_SYS_RSMPI_ENABLED
 bool mpi_available() noexcept;
 bool mpi_quest_can_initialize() noexcept;
-void mpi_validate_rsmpi_abi(std::size_t comm_size,
-                            std::size_t fint_size,
-                            std::size_t status_size,
+void mpi_validate_rsmpi_abi(rust::Slice<const std::size_t> layout,
                             std::uint32_t version,
                             std::uint32_t subversion,
                             std::int32_t multiple,

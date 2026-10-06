@@ -1,0 +1,121 @@
+{
+  "schema": "quest-prepared-routing-telemetry-focused-v1",
+  "recorded_date": "2026-10-06",
+  "status": "independently-approved-focused-stage",
+  "source_manifest": "source.json",
+  "source_manifest_sha256": "f36e4176ac8a8dda83bbf632ad78e05cfa9bae4a274a3494bd211fc8567b4638",
+  "source_aggregate_sha256": "814ecdea1f18c5b4e11bb68466cd1152fedc6a0f912b5f45c39d729b8fc44fe4",
+  "scoped_sources_unchanged_through_independent_checks": true,
+  "broad_checkpoint": "After checkpoint07; no new broad workspace acceptance",
+  "independent_checks": {
+    "core_and_collective_fault_tests": 12,
+    "core_seconds": 18.28,
+    "runtime_parent_tests": 1,
+    "runtime_seconds": 2.93,
+    "runtime_mpi_jobs": 5,
+    "ranks": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "split": "world4 split into two independent2-rank groups",
+    "strict_scoped_clippy": true,
+    "owned_rustfmt": true
+  },
+  "owner_checks": {
+    "core_and_fault_tests": 12,
+    "runtime_parent_tests": 1,
+    "whole_unitary_parent_tests": 4,
+    "strict_scoped_clippy": true,
+    "owned_rustfmt": true
+  },
+  "semantics": {
+    "receipt_only_after_complete_apply": true,
+    "apply_clears_before_preflight": true,
+    "standalone_admission_preserves_previous_receipt": true,
+    "sum_fields": 7,
+    "maximum_fields": 2,
+    "saturation_or_limit_marks_inexact_lower_bounds": true,
+    "rollup_allocations": 0,
+    "rollup_communication": 0,
+    "modeled_work_per_child_or_source_event": 128
+  },
+  "exclusions": [
+    "PREP and response/projector traffic",
+    "native internal traffic",
+    "constructor and separate coordinator traffic",
+    "MPI protocol/network wire overhead",
+    "allocator overhead and process RSS",
+    "actual huge-count or multi-host acceptance",
+    "persisted weighted inverse pipeline execution",
+    "quantum physical accuracy or uniform error certification"
+  ],
+  "logs": [
+    {
+      "scope": "independent",
+      "private_log": "quest-routing-telemetry-root-core.log",
+      "sha256": "87229c979b661de612bf66dd0bcd75eb4f3abfbcca2be8fed71256c02b5c61d6"
+    },
+    {
+      "scope": "independent",
+      "private_log": "quest-routing-telemetry-root-runtime.log",
+      "sha256": "2786893ce3ed02194dc0aeccd2a3a49cab17519f37bd86d380402e702805dbae"
+    },
+    {
+      "scope": "independent",
+      "private_log": "quest-routing-telemetry-root-clippy.log",
+      "sha256": "4be6c6067e1dcb30fcce56582f50066ff31bc223522fe5f313cb4c326456b476"
+    },
+    {
+      "scope": "independent",
+      "private_log": "quest-routing-telemetry-root-fmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "owner",
+      "private_log": "quest-routing-telemetry-core-red.log",
+      "sha256": "d04663b92c439b71a81e3ef864d3349ea395b1a6ed0e080c3a3f51f5e5f73bf0"
+    },
+    {
+      "scope": "owner",
+      "private_log": "quest-routing-telemetry-runtime-red.log",
+      "sha256": "55672ec107b27b8d87f8395e5c1bea72d1504c4ca250869f774e0da58a3d3321"
+    },
+    {
+      "scope": "owner",
+      "private_log": "quest-routing-telemetry-work-red.log",
+      "sha256": "6f67e1fcc972a0140916ac13a90747d2c039db186180147d7c6b2dedd1d9c965"
+    },
+    {
+      "scope": "owner",
+      "private_log": "quest-routing-telemetry-limit-red.log",
+      "sha256": "014d3475257496ef9795c38d226c97e110bf7712df69ec43c06971c7cad85b3c"
+    },
+    {
+      "scope": "owner",
+      "private_log": "quest-routing-telemetry-runtime-final.log",
+      "sha256": "0cf22626699dcfd3ab45281c5ac8bec65e3909f988c8cdde13a00a9cb96c80c6"
+    },
+    {
+      "scope": "owner",
+      "private_log": "quest-routing-telemetry-faults-core-final.log",
+      "sha256": "fa3ce24f25403e44e9abebefe8da2ae6b65c4a31a123579cc460d05a4a27862a"
+    },
+    {
+      "scope": "owner",
+      "private_log": "quest-routing-telemetry-whole-unitary.log",
+      "sha256": "94529af612c6226e94306337729740947287b443d7032af606fa2557eaef7ce7"
+    },
+    {
+      "scope": "owner",
+      "private_log": "quest-routing-telemetry-clippy-final.log",
+      "sha256": "29bfe55caecb5f897aa45a418283a78cd24300f9d6f66e97582a8e72dd1ca892"
+    },
+    {
+      "scope": "owner",
+      "private_log": "quest-routing-telemetry-fmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

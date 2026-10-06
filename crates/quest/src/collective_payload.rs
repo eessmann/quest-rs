@@ -12,7 +12,7 @@ pub fn encode(plan: &RegionPlan, limit: usize) -> Result<Vec<u8>> {
 		matrices: Vec::new(),
 		oracles: Vec::new(),
 	};
-	out.word(2)?; // Versioned canonical execution payload.
+	out.word(3)?; // Versioned canonical execution payload with numerical evidence.
 	out.word(plan.num_qubits())?;
 	out.word(plan.num_bits())?;
 	out.word(plan.instructions().len())?;
@@ -179,6 +179,9 @@ impl<'a> Encoder<'a> {
 				self.matrix_identity(matrix.view().as_ptr().addr())?;
 				self.targets(targets)?;
 				self.controls(controls)?;
+				for word in matrix.evidence_identity() {
+					self.raw(&word.to_le_bytes())?;
+				}
 				self.word(matrix.dimension())?;
 				let view = matrix.view();
 				for row in 0..matrix.dimension() {

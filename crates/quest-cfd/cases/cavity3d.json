@@ -26,7 +26,9 @@
     "velocity along geometric centerlines",
     "volume-integrated kinetic energy",
     "full momentum and divergence residual",
-    "steady residual recorded; reaching final time does not certify steady state"
+    "steady residual recorded; reaching final time does not certify steady state",
+    "full velocity on x=1/2 and y=1/2 interior sample planes; first-containing-cell DG trace",
+    "sampled spanwise-reflection vector defects and transverse-plane spanwise velocity RMS; not volume norms or certificates"
   ],
   "provenance": "Project-frozen square/cubic lid-driven cavity; U_ref=lid speed, L_ref=cavity edge."
 }

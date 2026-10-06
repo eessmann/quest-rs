@@ -1,7 +1,5 @@
 use crate::{Error, Interval, Result};
-use quest_numerics::arithmetic::{
-	ArithmeticError, Backend, ExactConstant, F64Backend, Interval64Backend,
-};
+use quest_numerics::arithmetic::{Backend, ExactConstant, F64Backend, Interval64Backend};
 
 type RecurrenceResult<A> = std::result::Result<
 	(
@@ -166,7 +164,9 @@ impl Basis for Laguerre {
 	}
 	fn recurrence_with<A: Backend>(&self, degree: u32, backend: &mut A) -> RecurrenceResult<A> {
 		if degree == 0 {
-			return Err(ArithmeticError::Domain("Laguerre recurrence order").into());
+			return Err(
+				mathcore::arithmetic::ArithmeticError::Domain("Laguerre recurrence order").into(),
+			);
 		}
 		let n = integer(backend, i64::from(degree))?;
 		let alpha = backend.point(self.alpha)?;

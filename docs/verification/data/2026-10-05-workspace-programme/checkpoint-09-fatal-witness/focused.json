@@ -1,0 +1,110 @@
+{
+  "schema": "quest-matching-fatal-witness-focused-v1",
+  "source_manifest_sha256": "5ed623268e3399c5cc526deed76d31ab780ac48d1e81921caf08c2b38cee27e3",
+  "historical_red": {
+    "log": "../checkpoint-08-logs/allfeatures.log",
+    "log_sha256": "f127b9be2658ec48bc5dd22213e97091de0fe52fe56074b1c7fa12def1783a2a",
+    "excerpt": "historical-red.log",
+    "excerpt_sha256": "e943581696cbe76bdae27cd7f170d422da188de0de2eae65878f9939a0104167",
+    "observed_failure": "Missing abort diagnostic substring only; exact original child status not printed.",
+    "all_feature_counts": {
+      "passed": 1644,
+      "failed": 1,
+      "skipped": 6
+    },
+    "original_log_label": "quest-programme-checkpoint-08-allfeatures.log",
+    "log_hash_scope": "log_sha256 binds original private full log; published_log_sha256 binds normalized public full log",
+    "published_log_sha256": "9cbbc151b375c538b479aaaa7c501c8b26fafd979437a03da2cf033c4dcca1ce",
+    "excerpt_hash_scope": "excerpt_sha256 binds original excerpt; published_excerpt_sha256 binds staged excerpt",
+    "published_excerpt_sha256": "e943581696cbe76bdae27cd7f170d422da188de0de2eae65878f9939a0104167"
+  },
+  "checks": [
+    {
+      "phase": "initial_focused",
+      "log": "quest-matching-fatal-witness-green.log",
+      "log_sha256": "cf0281492e5f9453f146f2746ff1d78fc93c70dcea12b34da43267d14232b3e0",
+      "log_bytes": 1579,
+      "exit_code": 0,
+      "elapsed_seconds": 4.153876851996756,
+      "original_log_label": "quest-matching-fatal-witness-green.log",
+      "published_copy": false,
+      "log_hash_scope": "Original historical log hash only; payload not copied"
+    },
+    {
+      "phase": "initial_lib_clippy",
+      "log": "quest-matching-fatal-witness-clippy.log",
+      "log_sha256": "76576321f7e4900d55e9bf09bdf83c919ffdb9105287b6801cdcfc9d2660514f",
+      "log_bytes": 1827,
+      "exit_code": 0,
+      "elapsed_seconds": 6.76948965700285,
+      "original_log_label": "quest-matching-fatal-witness-clippy.log",
+      "published_copy": false,
+      "log_hash_scope": "Original historical log hash only; payload not copied"
+    },
+    {
+      "phase": "initial_cfg_test_clippy",
+      "log": "quest-matching-fatal-witness-tests-clippy.log",
+      "log_sha256": "b2a559eb46b1aec17941bd7a9c6b00578a8815a279fd50d43d0e75a65be15e3b",
+      "log_bytes": 1211,
+      "exit_code": 0,
+      "elapsed_seconds": 6.28896873100166,
+      "original_log_label": "quest-matching-fatal-witness-tests-clippy.log",
+      "published_copy": false,
+      "log_hash_scope": "Original historical log hash only; payload not copied"
+    },
+    {
+      "phase": "final_focused",
+      "log": "final-green.log",
+      "log_sha256": "ae9d2a985d9328dd995de5a2613ec3c6ab4dc2fa94ac6b4528120d4e8c664c52",
+      "log_bytes": 1481,
+      "exit_code": 0,
+      "elapsed_seconds": 2.138486552001268,
+      "original_log_label": "quest-matching-fatal-witness-final-green.log",
+      "published_copy": true,
+      "log_hash_scope": "Existing log_sha256/log_bytes describe original log; added published fields describe normalized staged log",
+      "published_sha256": "2d129b9c76603a091510b6ca8cf8702c8b6406f1610ceac7a258db4a55866b40",
+      "published_bytes": 1410
+    },
+    {
+      "phase": "final_cfg_test_clippy",
+      "log": "final-clippy.log",
+      "log_sha256": "29709832fdb10e213052ab384f84b9be367ded3a530b91338f2d1d3563b3b386",
+      "log_bytes": 1017,
+      "exit_code": 0,
+      "elapsed_seconds": 0.7382906279963208,
+      "original_log_label": "quest-matching-fatal-witness-tests-clippy-final.log",
+      "published_copy": true,
+      "log_hash_scope": "Existing log_sha256/log_bytes describe original log; added published fields describe normalized staged log",
+      "published_sha256": "a87026c2e11f8c5e4ca86cdaaea5027310e990f26cc505027af3e9a233cfaf4b",
+      "published_bytes": 946
+    }
+  ],
+  "final_parent_tests_passed": 1,
+  "final_parent_test_seconds": 1.02,
+  "final_child_jobs": [
+    {
+      "ranks": 2,
+      "stderr_suppressed": false,
+      "exit_code": 1
+    },
+    {
+      "ranks": 2,
+      "stderr_suppressed": true,
+      "exit_code": 1
+    }
+  ],
+  "deadline_seconds_per_job": 20,
+  "forced_cleanup_grace_seconds_per_job": 5,
+  "reject_timeout_exit_codes": [
+    124,
+    137
+  ],
+  "scoped_fmt_exit_code": 0,
+  "scoped_diff_check_exit_code": 0,
+  "broad_suite_rerun": false,
+  "toolchain_warning": "Existing quest-polynomial generic_const_exprs next-solver warning; no new owned diagnostics.",
+  "scientific_campaign_execution": false,
+  "native_fixture_execution": true,
+  "original_private_receipt_sha256": "f14069c5d40a25e668a0ca8d7c5cd6909b684cb263179552a8b7817a1aeb74ea",
+  "source_manifest": "source.json"
+}

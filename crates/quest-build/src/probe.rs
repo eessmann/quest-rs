@@ -1,56 +1,79 @@
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeSet;
 use std::env;
 use std::fmt::Write as _;
 use std::fs;
 use std::path::{Path, PathBuf};
+#[cfg(test)]
 use std::process::Command;
 
+use crate::link::{NativeLink, record_link_tokens, split_flags};
+#[cfg(test)]
+use crate::{link::record_linked_file, validate_compiler_environment};
 use cmake_file_api::{objects, query, reply};
 use objects::codemodel_v2::Target;
 
 use crate::{
-	BridgeInputs, BuildError, HeaderContext, NativePackage, Result, absolute, explicit_prefix,
-	invalid, io, parse_header_configuration, run, runtime_link_args, validate_compiler_environment,
-	validate_target,
+	BridgeInputs, BuildError, HeaderContext, NativeBuildContext, NativePackage, Result, absolute,
+	invalid, io, parse_header_configuration, run,
 };
 
+#[cfg(test)]
 pub fn discover(
 	work: &Path,
 	host: &str,
 	target: &str,
 	inputs: Option<&BridgeInputs>,
 ) -> Result<NativePackage> {
-	validate_target(host, target)?;
-	validate_compiler_environment(target, None)?;
-	let explicit = explicit_prefix()?;
-	let search_prefixes = env::var_os("CMAKE_PREFIX_PATH").map_or_else(Vec::new, |value| {
-		env::split_paths(&value).collect::<Vec<_>>()
-	});
-	let setup = configure(
-		work,
-		host,
-		target,
-		explicit.as_deref(),
-		inputs,
-		&search_prefixes,
-	)?;
+	let mut context =
+		NativeBuildContext::capture(work, host, target, env::var_os("OUT_DIR").is_some())?;
+	context.cargo = true;
+	discover_context(&context, inputs)
+}
+
+pub fn discover_context(
+	context: &NativeBuildContext,
+	inputs: Option<&BridgeInputs>,
+) -> Result<NativePackage> {
+	crate::validate_target(&context.host, &context.target)?;
+	let target = context.target.as_str();
+	let explicit = context
+		.value("QUEST_ROOT")
+		.map(|value| crate::installation_prefix(Path::new(value)))
+		.transpose()?;
+	let search_prefixes = context
+		.value("CMAKE_PREFIX_PATH")
+		.map_or_else(Vec::new, |value| {
+			env::split_paths(value).collect::<Vec<_>>()
+		});
+	let setup = configure_context(context, explicit.as_deref(), inputs, &search_prefixes)?;
 	let reader = reply::Reader::from_build_dir(&setup.build_directory)
 		.map_err(|e| BuildError::CmakeFileApi(e.to_string()))?;
 	let probe = read_target(&reader, &setup.profile, "quest_link_query")?;
 	let compiler = read_compiler(&reader, target)?;
-	validate_compiler_environment(target, Some(&compiler.path))?;
 	let exported_includes = read_exported_includes(&setup.build_directory, &setup.profile)?;
 	let (prefix, configuration, mut headers) =
 		inspect_headers(&probe, explicit.as_deref(), &exported_includes)?;
 	headers.implicit_include_dirs = compiler.implicit_include_dirs;
 	headers.sysroot.clone_from(&setup.sysroot);
 	validate_header_context(&headers, target)?;
-	let mut link = inspect_link(&probe, &setup.build_directory, &setup.profile, target)?;
+	let mut link = inspect_link(
+		&probe,
+		&setup.build_directory,
+		&setup.profile,
+		target,
+		&compiler.implicit_link_dirs,
+	)?;
 	// CMake's link fragments omit the driver's implicit standard library.
 	// Use the evaluated toolchain rather than assuming GCC or Clang defaults.
 	let stdlib = compiler.standard_library;
 	link.libraries.push(stdlib);
-	watch_inputs(&reader, &probe, &link.linked_files, &exported_includes)?;
+	watch_inputs(
+		&reader,
+		&probe,
+		&link.linked_files,
+		&exported_includes,
+		context.cargo,
+	)?;
 	let bridge_archive = inputs
 		.map(|_| {
 			read_target(&reader, &setup.profile, "quest_bridge").and_then(|bridge| {
@@ -64,12 +87,27 @@ pub fn discover(
 		.transpose()?;
 	let package = NativePackage {
 		target: target.to_owned(),
+		profile: setup.profile.clone(),
 		prefix,
 		version: configuration.version,
 		mpi_enabled: configuration.mpi_enabled,
 		subcommunicators_enabled: configuration.subcommunicators_enabled,
 		headers,
 		compiler: compiler.path,
+		compiler_invocation: compiler.invocation,
+		compiler_arguments: read_words(
+			&setup.build_directory.join("quest-compiler-arguments.txt"),
+		)?,
+		implicit_link_dirs: compiler.implicit_link_dirs,
+		cmake: context.cmake(),
+		dynamic_loader_libraries: read_lines(
+			&setup
+				.build_directory
+				.join("quest-dynamic-loader-libraries.txt"),
+		)?,
+		openmp_enabled: configuration.openmp_enabled,
+		gpu_enabled: configuration.gpu_enabled,
+		cuquantum_enabled: configuration.cuquantum_enabled,
 		compiler_id: compiler.id,
 		compiler_version: compiler.version,
 		library: link.library,
@@ -97,6 +135,7 @@ struct Setup {
 	profile: String,
 }
 
+#[cfg(test)]
 fn configure(
 	work: &Path,
 	host: &str,
@@ -105,11 +144,27 @@ fn configure(
 	inputs: Option<&BridgeInputs>,
 	search_prefixes: &[PathBuf],
 ) -> Result<Setup> {
+	let context =
+		NativeBuildContext::capture(work, host, target, env::var_os("OUT_DIR").is_some())?;
+	configure_context(&context, explicit, inputs, search_prefixes)
+}
+
+fn configure_context(
+	context: &NativeBuildContext,
+	explicit: Option<&Path>,
+	inputs: Option<&BridgeInputs>,
+	search_prefixes: &[PathBuf],
+) -> Result<Setup> {
+	let work = &context.work_directory;
+	let target = context.target.as_str();
 	let sysroot = if target.ends_with("-apple-darwin") {
-		let path = if let Some(root) = env::var_os("SDKROOT") {
+		let path = if let Some(root) = context.value("SDKROOT") {
 			PathBuf::from(root)
 		} else {
-			let output = run(Command::new("xcrun").args(["--sdk", "macosx", "--show-sdk-path"]))?;
+			let output =
+				run(context
+					.command("xcrun")
+					.args(["--sdk", "macosx", "--show-sdk-path"]))?;
 			PathBuf::from(String::from_utf8_lossy(&output.stdout).trim())
 		};
 		Some(validate_sdk(&path)?)
@@ -117,40 +172,95 @@ fn configure(
 		None
 	};
 	let source = work.join("source");
-	let mut config = cmake::Config::new(&source);
-	config
-		.host(host)
-		.target(target)
-		.out_dir(work)
-		.build_target("quest_bridge")
-		.always_configure(true)
-		.configure_arg("--fresh")
-		.no_default_flags(true);
-	// Tooling has no Cargo PROFILE/OPT_LEVEL/DEBUG context.
-	if env::var_os("OUT_DIR").is_none() {
-		config.profile("Release");
-	}
-	let profile = config.get_profile().to_owned();
-	let cxx = env::var("CXX").unwrap_or_else(|_| "c++".to_owned());
-	config
-		.define("CMAKE_CXX_COMPILER", &cxx)
-		.define("CMAKE_CXX_FLAGS", "");
-	if let Some(sysroot) = &sysroot {
-		config.define("CMAKE_OSX_SYSROOT", cmake_path(sysroot)?);
-	}
+	let profile = context.profile.clone();
 	let prefix_value = search_prefixes
 		.iter()
 		.map(|path| cmake_path(path))
 		.collect::<Result<Vec<_>>>()?
 		.join(";");
-	config.define("CMAKE_PREFIX_PATH", &prefix_value);
 	let package_directory = explicit.map(find_package_directory).transpose()?;
-	if let Some(directory) = &package_directory {
-		config.define("QuEST_DIR", directory);
-	}
 	let build_directory = work.join("build");
-	fs::create_dir_all(&source).map_err(|error| io(&source, error))?;
-	fs::create_dir_all(&build_directory).map_err(|error| io(&build_directory, error))?;
+	prepare_project(&source, &build_directory, inputs, context.cargo)?;
+	let cmake = context.cmake();
+	let mut command = context.command(&cmake);
+	command
+		.arg("-S")
+		.arg(&source)
+		.arg("-B")
+		.arg(&build_directory)
+		.arg("--fresh")
+		.arg(format!("-DCMAKE_BUILD_TYPE={profile}"))
+		.arg(format!("-DCMAKE_PREFIX_PATH={prefix_value}"))
+		.arg(format!(
+			"-DQUEST_RUST_ARCH={}",
+			target.split('-').next().unwrap_or_default()
+		))
+		.arg(format!(
+			"-DQUEST_RUST_PLATFORM={}",
+			if target.ends_with("-apple-darwin") {
+				"darwin"
+			} else {
+				"linux_gnu"
+			}
+		));
+	if let Some(root) = &sysroot {
+		command.arg(format!("-DCMAKE_OSX_SYSROOT={}", cmake_path(root)?));
+	}
+	if let Some(directory) = &package_directory {
+		command.arg(format!("-DQuEST_DIR={}", cmake_path(directory)?));
+	}
+	// CC/CXX, flags, toolchain files and CMake defaults are interpreted by CMake.
+	run(&mut command).map_err(|error| BuildError::CmakeBuild(error.to_string()))?;
+	let mut build = context.command(&cmake);
+	build.arg("--build").arg(&build_directory).args([
+		"--target",
+		"quest_bridge",
+		"--config",
+		&profile,
+	]);
+	if context.value("CMAKE_BUILD_PARALLEL_LEVEL").is_none()
+		&& let Some(jobs) = context.value("NUM_JOBS")
+	{
+		build.arg("--parallel").arg(jobs);
+	}
+	run(&mut build).map_err(|error| BuildError::CmakeBuild(error.to_string()))?;
+	let evaluated_file = build_directory.join("quest-sysroot.txt");
+	let evaluated =
+		fs::read_to_string(&evaluated_file).map_err(|error| io(&evaluated_file, error))?;
+	let evaluated = evaluated.trim();
+	let evaluated_sysroot = if evaluated.is_empty() {
+		None
+	} else {
+		let path = Path::new(evaluated);
+		cmake_path(path)?;
+		if !path.is_absolute() {
+			return Err(invalid("CMake sysroot must be absolute"));
+		}
+		Some(if target.ends_with("-apple-darwin") {
+			validate_sdk(path)?
+		} else {
+			fs::canonicalize(path).map_err(|error| io(path, error))?
+		})
+	};
+	if sysroot.is_some() && sysroot != evaluated_sysroot {
+		return Err(invalid("CMake changed the selected Darwin SDK"));
+	}
+	let sysroot = evaluated_sysroot;
+	Ok(Setup {
+		sysroot,
+		build_directory,
+		profile,
+	})
+}
+
+fn prepare_project(
+	source: &Path,
+	build_directory: &Path,
+	inputs: Option<&BridgeInputs>,
+	cargo: bool,
+) -> Result<()> {
+	fs::create_dir_all(source).map_err(|error| io(source, error))?;
+	fs::create_dir_all(build_directory).map_err(|error| io(build_directory, error))?;
 	for (name, content) in [
 		("CMakeLists.txt", include_str!("../native/CMakeLists.txt")),
 		("abi.cpp", include_str!("../native/abi.cpp")),
@@ -161,41 +271,23 @@ fn configure(
 	}
 	write(
 		&source.join("bridge-inputs.cmake"),
-		&bridge_input_file(inputs)?,
+		&bridge_input_file_with_watches(inputs, cargo)?,
 	)?;
 	query::Writer::default()
 		.request_object::<objects::CodeModelV2>()
 		.request_object::<objects::ToolchainsV1>()
 		.request_object::<objects::CMakeFilesV1>()
-		.write_stateless(&build_directory)
+		.write_stateless(build_directory)
 		.map_err(|error| BuildError::CmakeFileApi(error.to_string()))?;
-	// cmake-rs reports process failures by panicking. Contain just that call;
-	// do not replace the process-wide panic hook or convert unrelated panics.
-	std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| config.build())).map_err(
-		|payload| {
-			let message = payload
-				.downcast_ref::<String>()
-				.map(String::as_str)
-				.or_else(|| payload.downcast_ref::<&str>().copied())
-				.unwrap_or("CMake build failed");
-			BuildError::CmakeBuild(message.to_owned())
-		},
-	)?;
-	if let Some(requested) = &sysroot {
-		let evaluated = build_directory.join("quest-sysroot.txt");
-		let value = fs::read_to_string(&evaluated).map_err(|error| io(&evaluated, error))?;
-		if validate_sdk(Path::new(value.trim()))? != *requested {
-			return Err(invalid("CMake changed the selected Darwin SDK"));
-		}
-	}
-	Ok(Setup {
-		sysroot,
-		build_directory,
-		profile,
-	})
+	Ok(())
 }
 
+#[cfg(test)]
 fn bridge_input_file(inputs: Option<&BridgeInputs>) -> Result<String> {
+	bridge_input_file_with_watches(inputs, true)
+}
+
+fn bridge_input_file_with_watches(inputs: Option<&BridgeInputs>, cargo: bool) -> Result<String> {
 	let mut text = String::new();
 	let mut watched = BTreeSet::new();
 	let empty = BridgeInputs::default();
@@ -220,11 +312,13 @@ fn bridge_input_file(inputs: Option<&BridgeInputs>) -> Result<String> {
 		}
 		text.push_str(")\n");
 	}
-	emit_input_watches(watched)?;
+	if cargo {
+		emit_input_watches(watched)?;
+	}
 	Ok(text)
 }
 
-fn cmake_path(path: &Path) -> Result<&str> {
+pub fn cmake_path(path: &Path) -> Result<&str> {
 	let text = path
 		.to_str()
 		.ok_or_else(|| invalid("CMake paths must be UTF-8"))?;
@@ -256,6 +350,8 @@ fn read_target(reader: &reply::Reader, profile: &str, name: &str) -> Result<Targ
 
 struct CompilerConfiguration {
 	path: PathBuf,
+	invocation: PathBuf,
+	implicit_link_dirs: Vec<PathBuf>,
 	id: String,
 	version: String,
 	standard_library: String,
@@ -277,9 +373,8 @@ fn read_compiler(reader: &reply::Reader, target: &str) -> Result<CompilerConfigu
 		.as_ref()
 		.ok_or_else(|| invalid("CMake did not identify its C++ compiler"))?;
 	let path = fs::canonicalize(compiler_path).map_err(|error| io(compiler_path, error))?;
-	let compiler_target = run(Command::new(&path).arg("-dumpmachine"))?;
-	let compiler_target = String::from_utf8_lossy(&compiler_target.stdout);
-	validate_compiler_target(target, compiler_target.trim())?;
+	// Native architecture/platform admission is compiled in abi.cpp using the
+	// evaluated toolchain, including wrapper arguments and flags.
 	let id = compiler.id.unwrap_or_default();
 	let standard_library = select_standard_library(target, &id, &compiler.implicit.link_libraries)?;
 	let implicit_include_dirs = compiler
@@ -295,6 +390,8 @@ fn read_compiler(reader: &reply::Reader, target: &str) -> Result<CompilerConfigu
 		})
 		.collect::<Result<Vec<_>>>()?;
 	Ok(CompilerConfiguration {
+		invocation: compiler_path.clone(),
+		implicit_link_dirs: compiler.implicit.link_directories,
 		path,
 		id,
 		version: compiler.version.unwrap_or_default(),
@@ -338,7 +435,7 @@ fn validate_compiler_target(target: &str, compiler: &str) -> Result<()> {
 	Ok(())
 }
 
-fn validate_sdk(path: &Path) -> Result<PathBuf> {
+pub fn validate_sdk(path: &Path) -> Result<PathBuf> {
 	cmake_path(path)?;
 	if !path.is_absolute()
 		|| !path.join("usr/include").is_dir()
@@ -373,7 +470,15 @@ fn validate_header_context(headers: &HeaderContext, target: &str) -> Result<()> 
 					("-isysroot", value)
 				} else if let Some(value) = flag.strip_prefix("-isysroot") {
 					("-isysroot", value)
-				} else if flag.starts_with("-Xarch_") || matches!(flag.as_str(), "-m32" | "-m64") {
+				} else if matches!(flag.as_str(), "-m32" | "-m64") {
+					let bits32 = matches!(target.split('-').next(), Some("i686" | "armv7"));
+					if (flag == "-m32") != bits32 {
+						return Err(invalid(
+							"compile pointer width differs from the native Cargo target",
+						));
+					}
+					continue;
+				} else if flag.starts_with("-Xarch_") {
 					return Err(invalid(format!(
 						"unsupported compile architecture override {flag}"
 					)));
@@ -483,26 +588,12 @@ fn inspect_headers(
 	Ok((prefix, parsed, headers))
 }
 
-#[derive(Default)]
-struct NativeLink {
-	target_os: Option<&'static str>,
-	architecture: Option<&'static str>,
-	sysroot: Option<PathBuf>,
-	framework_search_dirs: Vec<PathBuf>,
-	library: PathBuf,
-	search_dirs: Vec<PathBuf>,
-	libraries: Vec<String>,
-	options: Vec<String>,
-	runtime_dirs: Vec<PathBuf>,
-	linked_files: BTreeSet<PathBuf>,
-	library_files_by_name: BTreeMap<String, PathBuf>,
-}
-
 fn inspect_link(
 	probe: &Target,
 	build_directory: &Path,
 	profile: &str,
 	target: &str,
+	implicit_search_dirs: &[PathBuf],
 ) -> Result<NativeLink> {
 	let file = build_directory.join(format!("quest-library-{profile}.txt"));
 	let text = fs::read_to_string(&file).map_err(|error| io(&file, error))?;
@@ -520,6 +611,7 @@ fn inspect_link(
 		None
 	};
 	let mut link = NativeLink {
+		implicit_search_dirs: implicit_search_dirs.to_vec(),
 		sysroot,
 		target_os: Some(if target.ends_with("-apple-darwin") {
 			"macos"
@@ -551,220 +643,16 @@ fn inspect_link(
 	Ok(link)
 }
 
-fn record_link_tokens(tokens: &[String], link: &mut NativeLink) -> Result<()> {
-	let mut iter = tokens.iter();
-	while let Some(token) = iter.next() {
-		if matches!(token.as_str(), "-Wl,-rpath" | "-Wl,-rpath-link") {
-			let value = iter
-				.next()
-				.and_then(|value| value.strip_prefix("-Wl,"))
-				.ok_or_else(|| invalid(format!("missing paired path after {token}")))?;
-			let option = format!("{token},{value}");
-			validate_link_option(&option, link.target_os.unwrap_or("linux"))?;
-			link.options.push(option);
-		} else if token == "-framework" && link.target_os == Some("macos") {
-			let name = iter
-				.next()
-				.ok_or_else(|| invalid("missing framework name"))?;
-			if name.is_empty()
-				|| !name
-					.chars()
-					.all(|ch| ch.is_ascii_alphanumeric() || ch == '_')
-			{
-				return Err(invalid("unsupported framework name"));
-			}
-			link.libraries.push(format!("framework={name}"));
-		} else if token == "-isysroot" && link.target_os == Some("macos") {
-			let root = iter
-				.next()
-				.ok_or_else(|| invalid("missing Darwin sysroot"))?;
-			let sdk = validate_sdk(Path::new(root))?;
-			if link
-				.sysroot
-				.as_ref()
-				.is_some_and(|expected| expected != &sdk)
-			{
-				return Err(invalid(
-					"Darwin link sysroot differs from the evaluated SDK",
-				));
-			}
-			runtime_link_args("macos", std::slice::from_ref(&sdk))?;
-			link.options
-				.push(format!("-Wl,-syslibroot,{}", sdk.display()));
-		} else if token == "-arch" && link.target_os == Some("macos") {
-			let arch = iter
-				.next()
-				.ok_or_else(|| invalid("missing Darwin architecture"))?;
-			if !matches!(arch.as_str(), "arm64" | "x86_64")
-				|| link.architecture.is_some_and(|expected| expected != arch)
-			{
-				return Err(invalid(
-					"Darwin link architecture differs from the native Cargo target",
-				));
-			}
-			// Rust already selects the validated native architecture.
-		} else if token == "-L"
-			|| token == "-l"
-			|| (token == "-F" && link.target_os == Some("macos"))
-		{
-			let value = iter
-				.next()
-				.ok_or_else(|| invalid(format!("missing argument after {token}")))?;
-			record_link_token(&format!("{token}{value}"), link)?;
-		} else {
-			record_link_token(token, link)?;
-		}
-	}
-	Ok(())
-}
-
-fn record_link_token(token: &str, link: &mut NativeLink) -> Result<()> {
-	if token.is_empty()
-		|| token.starts_with("-O")
-		|| token == "-g"
-		|| token == "-DNDEBUG"
-		|| token == "-w"
-	{
-		return Ok(());
-	}
-	if token.contains(['\n', '\r', '\0']) || token.contains("$<") {
-		return Err(invalid(format!(
-			"unevaluated or invalid CMake link token: {token}"
-		)));
-	}
-	if let Some(directory) = token
-		.strip_prefix("-F")
-		.filter(|_| link.target_os == Some("macos"))
-	{
-		let directory = PathBuf::from(directory);
-		runtime_link_args("macos", std::slice::from_ref(&directory))?;
-		push_unique(&mut link.framework_search_dirs, directory);
-	} else if let Some(directory) = token.strip_prefix("-L") {
-		let directory = PathBuf::from(directory);
-		runtime_link_args(
-			link.target_os.unwrap_or("linux"),
-			std::slice::from_ref(&directory),
-		)?;
-		push_unique(&mut link.search_dirs, directory);
-	} else if let Some(name) = token.strip_prefix("-l") {
-		if name.is_empty() || name.contains(['=', ',', '/', ' ']) || name.starts_with('-') {
-			return Err(invalid("invalid native library name"));
-		}
-		if link.target_os == Some("macos") && name.starts_with(':') {
-			return Err(invalid(
-				"Darwin does not support GNU -l:filename library syntax",
-			));
-		}
-		link.libraries.push(name.strip_prefix(':').map_or_else(
-			|| name.to_owned(),
-			|filename| format!("dylib:+verbatim={filename}"),
-		));
-	} else if Path::new(token).is_absolute() {
-		record_linked_file(token, link)?;
-	} else {
-		validate_link_option(token, link.target_os.unwrap_or("linux"))?;
-		link.options.push(token.to_owned());
-	}
-	Ok(())
-}
-
-fn record_linked_file(token: &str, link: &mut NativeLink) -> Result<()> {
-	let path = fs::canonicalize(token).map_err(|error| io(Path::new(token), error))?;
-	let name = path
-		.file_name()
-		.and_then(|name| name.to_str())
-		.ok_or_else(|| invalid("native library filename must be UTF-8"))?;
-	if link
-		.library_files_by_name
-		.get(name)
-		.is_some_and(|earlier| earlier != &path)
-	{
-		return Err(invalid(format!(
-			"ambiguous native library basename {name}: Cargo's global link search paths cannot preserve distinct absolute libraries"
-		)));
-	}
-	let kind = native_library_kind(&path, name)?;
-	let parent = path
-		.parent()
-		.ok_or_else(|| invalid("native library lacks a parent"))?;
-	cmake_path(parent)?;
-	push_unique(&mut link.search_dirs, parent.to_owned());
-	if kind == "dylib" {
-		push_unique(&mut link.runtime_dirs, parent.to_owned());
-	}
-	if kind == "dylib" && link.target_os == Some("macos") {
-		let stem = name
-			.strip_prefix("lib")
-			.and_then(|name| name.strip_suffix(".dylib"))
-			.filter(|name| !name.is_empty())
-			.ok_or_else(|| invalid("Darwin shared libraries must have a libNAME.dylib filename"))?;
-		// ld64 uses -lNAME, and does not implement GNU -l:filename. Keep the
-		// version in NAME and validate search resolution against the exact file.
-		link.libraries.push(format!("dylib={stem}"));
-	} else {
-		link.libraries.push(format!("{kind}:+verbatim={name}"));
-	}
-	link.library_files_by_name
-		.insert(name.to_owned(), path.clone());
-	link.linked_files.insert(PathBuf::from(token));
-	link.linked_files.insert(path);
-	Ok(())
-}
-
-fn split_flags(fragment: &str) -> Result<Vec<String>> {
-	shlex::split(fragment)
-		.ok_or_else(|| invalid(format!("cannot parse CMake command fragment: {fragment}")))
-}
-
-fn validate_link_option(option: &str, target_os: &str) -> Result<()> {
-	if matches!(option, "-pthread" | "-fopenmp") || option.starts_with("-fopenmp=") {
-		return Ok(());
-	}
-	if target_os == "linux" && option == "-Wl,--enable-new-dtags" {
-		return Ok(());
-	}
-	if target_os == "macos"
-		&& matches!(
-			option,
-			"-Wl,-search_paths_first" | "-Wl,-headerpad_max_install_names"
-		) {
-		// Global Mach-O options: path-first search matches exact-file validation;
-		// header padding changes capacity, without changing library ordering.
-		return Ok(());
-	}
-	if target_os == "macos"
-		&& option
-			.strip_prefix("-mmacosx-version-min=")
-			.is_some_and(|value| {
-				!value.is_empty() && value.chars().all(|ch| ch.is_ascii_digit() || ch == '.')
-			}) {
-		return Ok(());
-	}
-	for prefix in ["-Wl,-rpath,", "-Wl,-rpath-link,"] {
-		if prefix == "-Wl,-rpath-link," && target_os != "linux" {
-			continue;
-		}
-		if let Some(paths) = option.strip_prefix(prefix) {
-			let directories = if target_os == "linux" {
-				paths.split(':').map(PathBuf::from).collect()
-			} else {
-				vec![PathBuf::from(paths)]
-			};
-			runtime_link_args(target_os, &directories)?;
-			return Ok(());
-		}
-	}
-	Err(invalid(format!(
-		"unsupported or order-sensitive CMake link option {option}; Cargo cannot preserve its placement among libraries"
-	)))
-}
-
 fn watch_inputs(
 	reader: &reply::Reader,
 	probe: &Target,
 	linked_files: &BTreeSet<PathBuf>,
 	exported_includes: &[PathBuf],
+	cargo: bool,
 ) -> Result<()> {
+	if !cargo {
+		return Ok(());
+	}
 	let mut inputs = linked_files.clone();
 	for include in probe
 		.compile_groups
@@ -826,27 +714,6 @@ fn find_package_directory(prefix: &Path) -> Result<PathBuf> {
 		})
 }
 
-fn native_library_kind(path: &Path, name: &str) -> Result<&'static str> {
-	let extension = path.extension().and_then(|extension| extension.to_str());
-	if extension.is_some_and(|extension| extension.eq_ignore_ascii_case("a")) {
-		return Ok("static");
-	}
-	let versioned_shared = name
-		.as_bytes()
-		.windows(4)
-		.any(|window| window.eq_ignore_ascii_case(b".so."));
-	if extension
-		.is_some_and(|extension| matches!(extension.to_ascii_lowercase().as_str(), "so" | "dylib"))
-		|| versioned_shared
-	{
-		return Ok("dylib");
-	}
-	Err(invalid(format!(
-		"unrecognized native library: {}",
-		path.display()
-	)))
-}
-
 fn collect_files(
 	directory: &Path,
 	files: &mut BTreeSet<PathBuf>,
@@ -874,10 +741,22 @@ fn collect_files(
 fn write(path: &Path, text: &str) -> Result<()> {
 	fs::write(path, text).map_err(|e| io(path, e))
 }
-fn push_unique<T: PartialEq>(items: &mut Vec<T>, item: T) {
+pub fn push_unique<T: PartialEq>(items: &mut Vec<T>, item: T) {
 	if !items.contains(&item) {
 		items.push(item);
 	}
+}
+
+fn read_words(path: &Path) -> Result<Vec<String>> {
+	split_flags(&fs::read_to_string(path).map_err(|error| io(path, error))?)
+}
+fn read_lines(path: &Path) -> Result<Vec<String>> {
+	Ok(fs::read_to_string(path)
+		.map_err(|error| io(path, error))?
+		.lines()
+		.filter(|line| !line.is_empty())
+		.map(str::to_owned)
+		.collect())
 }
 
 #[cfg(test)]
@@ -921,6 +800,88 @@ set_target_properties(QuEST::QuEST PROPERTIES
 "#,
         )
         .or_fail()?;
+		Ok(())
+	}
+
+	#[cfg(unix)]
+	#[gtest]
+	fn tooling_preserves_toolchain_wrapper_arguments_and_normal_environment()
+	-> googletest::Result<()> {
+		use std::os::unix::fs::PermissionsExt as _;
+		const CHILD: &str = "QUEST_NATIVE_CONTEXT_CHILD";
+		if let Some(root) = env::var_os(CHILD) {
+			let root = PathBuf::from(root);
+			let source = root.join("environment.cpp");
+			fs::write(
+				&source,
+				"#include <environment_marker.h>\nstatic_assert(QUEST_ENV_FLAG == 31);\nstatic_assert(QUEST_CPATH_MARKER == 47);\nstatic_assert(QUEST_WRAPPER_ARG == 59);\n",
+			)?;
+			let context = NativeBuildContext::for_tooling(root.join("work"), None)?;
+			let native = context.build_bridge(&BridgeInputs {
+				sources: vec![source],
+				include_directories: Vec::new(),
+			})?;
+			expect_eq!(&native.compiler_invocation, &root.join("CC"));
+			expect_eq!(&native.compiler, &root.join("dispatcher"));
+			expect_eq!(
+				&native.compiler_arguments,
+				&vec!["-DQUEST_WRAPPER_ARG=59".to_owned()]
+			);
+			expect_that!(
+				&native.headers.frontend_flags,
+				contains(eq("-DQUEST_ENV_FLAG=31"))
+			);
+			return Ok(());
+		}
+		let fixture = tempfile::tempdir()?;
+		let root = fixture.path().canonicalize()?;
+		fixture_package(&root.join("package"))?;
+		fs::create_dir(root.join("headers"))?;
+		fs::write(
+			root.join("headers/environment_marker.h"),
+			"#define QUEST_CPATH_MARKER 47\n",
+		)?;
+		let compiler = env::split_paths(&env::var_os("PATH").unwrap_or_default())
+			.map(|dir| dir.join("c++"))
+			.find(|path| path.is_file())
+			.ok_or_else(|| invalid("missing C++ compiler"))?;
+		let quote =
+			|path: &Path| format!("'{}'", path.display().to_string().replace('\'', "'\\''"));
+		fs::write(
+			root.join("dispatcher"),
+			format!(
+				"#!/bin/sh\ncase \"$0\" in */CC) ;; *) exit 92;; esac\nfor arg do [ \"$arg\" = -dumpmachine ] && exit 91; done\nexec {} \"$@\"\n",
+				quote(&compiler)
+			),
+		)?;
+		fs::set_permissions(root.join("dispatcher"), fs::Permissions::from_mode(0o755))?;
+		std::os::unix::fs::symlink(root.join("dispatcher"), root.join("CC"))?;
+		fs::write(
+			root.join("toolchain.cmake"),
+			format!(
+				"set(CMAKE_CXX_COMPILER \"{}\")\nset(CMAKE_CXX_COMPILER_ARG1 \"-DQUEST_WRAPPER_ARG=59\")\n",
+				root.join("CC").display()
+			),
+		)?;
+		let mut child = Command::new(env::current_exe()?);
+		child
+			.args([
+				"--exact",
+				"probe::tests::tooling_preserves_toolchain_wrapper_arguments_and_normal_environment",
+				"--nocapture",
+			])
+			.env(CHILD, &root)
+			.env("QUEST_ROOT", root.join("package"))
+			.env("CMAKE_TOOLCHAIN_FILE", root.join("toolchain.cmake"))
+			.env("CPATH", root.join("headers"))
+			.env(
+				"CXXFLAGS",
+				"-DQUEST_ENV_FLAG=31 -fno-exceptions -Werror -fPIC",
+			)
+			.env("OUT_DIR", root.join("irrelevant-cargo-output"))
+			.env_remove("CXX");
+		let output = run(&mut child)?;
+		expect_false!(String::from_utf8_lossy(&output.stdout).contains("cargo:"));
 		Ok(())
 	}
 
@@ -1032,7 +993,7 @@ set_target_properties(QuEST::QuEST PROPERTIES
 		} else {
 			"lib/libQuEST.so"
 		});
-		watch_inputs(&reader, &probe, &BTreeSet::from([native]), &[]).or_fail()?;
+		watch_inputs(&reader, &probe, &BTreeSet::from([native]), &[], true).or_fail()?;
 		Ok(())
 	}
 
@@ -1144,7 +1105,8 @@ set_target_properties(QuEST::QuEST PROPERTIES
 		let query = read_target(&reader, &setup.profile, "quest_link_query").or_fail()?;
 		let (_, configuration, headers) =
 			inspect_headers(&query, Some(&prefix.canonicalize().or_fail()?), &[]).or_fail()?;
-		let link = inspect_link(&query, &setup.build_directory, &setup.profile, host).or_fail()?;
+		let link =
+			inspect_link(&query, &setup.build_directory, &setup.profile, host, &[]).or_fail()?;
 		expect_eq!(configuration.version, "4.3.9");
 		let expected_profile =
 			env::var("QUEST_BUILD_FIXTURE_PROFILE").unwrap_or_else(|_| "Release".to_owned());
@@ -1376,6 +1338,45 @@ set_target_properties(QuEST::QuEST PROPERTIES
 		expect_that!(
 			link.libraries,
 			elements_are![eq("first"), eq("second"), eq("first")]
+		);
+		Ok(())
+	}
+
+	#[cfg(target_os = "linux")]
+	#[gtest]
+	fn whole_archive_scope_obeys_shared_first_search_in_each_directory() -> googletest::Result<()> {
+		let root = tempfile::tempdir()?;
+		let shared = root.path().join("libhugetlbfs.so");
+		let archive = root.path().join("libhugetlbfs.a");
+		let source = root.path().join("fixture.c");
+		fs::write(&source, "int fixture(void) { return 1; }\n")?;
+		run(Command::new("cc")
+			.args(["-shared", "-fPIC"])
+			.arg(&source)
+			.arg("-o")
+			.arg(&shared))?;
+		run(Command::new("ar").arg("rcs").arg(&archive))?;
+		let mut link = NativeLink::default();
+		record_link_tokens(
+			&[
+				format!("-L{}", root.path().display()),
+				"-Wl,--whole-archive,-lhugetlbfs,--no-whole-archive".into(),
+			],
+			&mut link,
+		)?;
+		expect_eq!(link.libraries, vec!["dylib:+verbatim=libhugetlbfs.so"]);
+		fs::remove_file(shared)?;
+		let mut link = NativeLink::default();
+		record_link_tokens(
+			&[
+				format!("-L{}", root.path().display()),
+				"-Wl,--whole-archive,-lhugetlbfs,--no-whole-archive".into(),
+			],
+			&mut link,
+		)?;
+		expect_eq!(
+			link.libraries,
+			vec!["static:-bundle,+whole-archive,+verbatim=libhugetlbfs.a"]
 		);
 		Ok(())
 	}
@@ -1653,6 +1654,26 @@ set_target_properties(QuEST::QuEST PROPERTIES
 		}
 		run(&mut command)?;
 		run(&mut Command::new(&executable))?;
+		Ok(())
+	}
+
+	#[gtest]
+	fn explicit_pointer_width_flags_must_agree_with_native_target() -> googletest::Result<()> {
+		for (target, flag, accepted) in [
+			("x86_64-unknown-linux-gnu", "-m64", true),
+			("x86_64-unknown-linux-gnu", "-m32", false),
+			("i686-unknown-linux-gnu", "-m32", true),
+			("i686-unknown-linux-gnu", "-m64", false),
+		] {
+			let headers = HeaderContext {
+				frontend_flags: vec![flag.into()],
+				..HeaderContext::default()
+			};
+			verify_that!(
+				validate_header_context(&headers, target).is_ok(),
+				eq(accepted)
+			)?;
+		}
 		Ok(())
 	}
 

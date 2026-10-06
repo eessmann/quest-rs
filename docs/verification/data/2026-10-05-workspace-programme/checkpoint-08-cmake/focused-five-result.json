@@ -1,0 +1,52 @@
+{
+  "command": [
+    "cargo",
+    "nextest",
+    "run",
+    "--workspace",
+    "--no-fail-fast",
+    "-E",
+    "package(quest-build) & (test(=probe::tests::cmake_build_evaluates_target_requirements_and_paths_with_spaces) | test(=probe::tests::reconfiguration_uses_current_prefix_after_explicit_selection_is_removed) | test(=probe::tests::cargo_discovery_evaluates_the_selected_package_once) | test(=probe::tests::cargo_watches_external_inputs_without_watching_its_own_outputs) | test(=probe::tests::cargo_profiles_and_explicit_cxx_remain_coherent_in_child_processes))"
+  ],
+  "explicit_environment": {
+    "QUEST_ROOT": "<quest-install>",
+    "MPICC": "/usr/lib64/mpich/bin/mpicc",
+    "PATH": "/usr/lib64/mpich/bin:<home-alias>/.codex<private-artifacts>/arg0/codex-arg0oRR6ZG:<home-alias>/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:<home-alias>/.cabal/bin:<home-alias>/.ghcup/bin:<home-alias>/.local/bin:<home-alias>/.cabal/bin:<home-alias>/.ghcup/bin:<home-alias>/.local/bin:<home-alias>/.cabal/bin:<home-alias>/.ghcup/bin:<home-alias>/.cargo/bin:<home-alias>/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/usr/lib64/mpich/bin:/usr/share/Modules/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:<home-alias>/.local/share/JetBrains/Toolbox/scripts:<home-alias>/Projects/opt/cuda/bin:<home-alias>/Projects/opt/cuda/bin:/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:<home-alias>/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/usr/lib/chatgpt/resources:<home-alias>/.local/share/JetBrains/Toolbox/scripts",
+    "CMAKE_PREFIX_PATH": "/usr/lib64/mpich",
+    "NEXTEST_TEST_THREADS": null,
+    "NEXTEST_PROFILE": null,
+    "RUSTFLAGS": null
+  },
+  "limits": {
+    "RLIMIT_NOFILE": [
+      1048576,
+      1048576
+    ],
+    "RLIMIT_AS": [
+      -1,
+      -1
+    ],
+    "RLIMIT_FSIZE": [
+      -1,
+      -1
+    ]
+  },
+  "quest_build_source_before": {
+    "crates/quest-build/Cargo.toml": "93860901318485a8bcf802e790d3c00a420fd0811b02734b72c4bc0012a0cba1",
+    "crates/quest-build/LICENSE": "670b5966adb424e1576187262e12063e041861861a7c4f913705b211a5cbce7c",
+    "crates/quest-build/README.md": "e01f493c87025f4b7bd78feafc563e89070516fd13c272f792fc4972dd961515",
+    "crates/quest-build/native/CMakeLists.txt": "9368d490cbb768bab34c7412a8b5df460bdf65190447001609c39244fc88d0d3",
+    "crates/quest-build/native/abi.cpp": "482b5b699567e19bf5918d8bf692bc727010ece16c2de40b41613ad9ce6e797f",
+    "crates/quest-build/native/mpi_abi.c": "987f02050c7612ce63b95c0215e360696df733ef9591fa45ac95d7872a895a8d",
+    "crates/quest-build/native/query.cpp": "2b9d8d3dac7ad333266c5ceda1c09f6e202f2d643a45c86d14412a46aebf5be6",
+    "crates/quest-build/src/hdf5.rs": "a130045fe6bd185924407a0620247d0a9f677028778555f372379e767d8fbbf0",
+    "crates/quest-build/src/lib.rs": "f8b36a7ddef33fae12f97d92a805fdb2ca40a7e37c08971dcec46da494ced6df",
+    "crates/quest-build/src/package.rs": "182296e402b3f18abbd2c07b5c60b0bc1e96336502721485c7559fabb3e41ddc",
+    "crates/quest-build/src/probe.rs": "8593e1ebc5c21607bc8b192021165c37eb4a935d5727eee761f30ab38bd8742b",
+    "crates/quest-build/src/rsmpi.rs": "728232bfc6116095dee6fc8b61b7123093e16f9736986030bb41be506fd1d09a"
+  },
+  "exit_code": 0,
+  "elapsed_seconds": 6.872270077001303,
+  "log_sha256": "e6a8f5de1604d7f63656236e60015f80b7668f1f63cd726e70312237cb098de3",
+  "quest_build_source_unchanged": true
+}

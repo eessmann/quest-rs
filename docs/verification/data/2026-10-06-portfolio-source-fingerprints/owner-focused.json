@@ -1,0 +1,49 @@
+{
+  "schema": "quest-portfolio-source-fingerprint-focused-v2",
+  "scope": "Pure QSVT only; no native/scientific campaign",
+  "source_manifest_sha256": "5065fe0f67b69d6986906cfa18e907faf3ffdaea5057ba88a5ae1bb1dafcf5a5",
+  "source_aggregate_sha256": "2e9a6d9343ca15fa68d8745fe8e297f22c35bab0d2e1940126f9ec738d86726d",
+  "tests": 41,
+  "new_tests": 7,
+  "test_targets": 10,
+  "clippy_exit": 0,
+  "format_exit": 0,
+  "N32_jobs": 0,
+  "historical_records_mutated": 0,
+  "commands": [
+    "cargo test -p quest-qsvt --test commutative_identities --test lcu_plan --test owned_replay --test portfolio_composition --test portfolio_structured --test structured_stencil --test structured --test portfolio_comparison --test portfolio_resource_curves --test portfolio_review_regressions",
+    "cargo clippy -p quest-qsvt --lib --test commutative_identities --test lcu_plan --test owned_replay --test portfolio_composition --test portfolio_structured --test structured_stencil --test structured --test portfolio_comparison --test portfolio_resource_curves --test portfolio_review_regressions --no-deps -- -D warnings"
+  ],
+  "evidence": [
+    {
+      "path": "<private-artifacts>/quest-portfolio-commutative-red.log",
+      "bytes": 2968,
+      "sha256": "e43d766918f8d227f0934cd29792ad763509d6f613c560095c3d572f66a68f50"
+    },
+    {
+      "path": "<private-artifacts>/quest-portfolio-offset-owners-red.log",
+      "bytes": 1683,
+      "sha256": "683941304a275f4ad05daf44269bf9edcb46403526c8841fba51e20ede744b58"
+    },
+    {
+      "path": "<private-artifacts>/quest-portfolio-offset-owners-green.log",
+      "bytes": 1132,
+      "sha256": "e642415f654e428315bd948fbe31851f6d8d78bc0c78efd24e37b5b34ef38e4d"
+    },
+    {
+      "path": "<private-artifacts>/quest-portfolio-identities-focused-freeze.log",
+      "bytes": 6393,
+      "sha256": "debab4de629be93e30ccfc1de8d5a34121f830bd4a7e1f6179c4671f3123558c"
+    },
+    {
+      "path": "<private-artifacts>/quest-portfolio-identities-clippy-freeze.log",
+      "bytes": 807,
+      "sha256": "e2d9c6c5faa6d2cf38c10d5fa74e4cad0297c07ae520a0fd99fd66c71fa6f0db"
+    },
+    {
+      "path": "<private-artifacts>/quest-portfolio-identities-format-freeze.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

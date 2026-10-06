@@ -1,0 +1,31 @@
+warning: quest-sys@0.2.0: Using QuEST 4.3.0 from <quest-install> with /usr/bin/c++
+warning: quest-sys@0.2.0: Verified rsmpi MPICC /usr/lib64/mpich/bin/mpicc matches QuEST MPI ABI and loaded library
+warning: `feature(generic_const_exprs)` is not supported with the next-generation trait solver
+ --> crates/quest-polynomial/src/lib.rs:1:30
+  |
+1 | #![feature(const_trait_impl, generic_const_exprs)]
+  |                              ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `-Znext-solver=globally` is currently enabled by default for testing
+  = note: reverted the setting to `-Znext-solver=coherence` for this crate
+  = note: the currently stable trait solver will be used for this crate
+  = note: see issues #160895 <https://github.com/rust-lang/rust/issues/160895> for more information
+
+warning: `quest-polynomial` (lib) generated 1 warning
+   Compiling quest-rs v0.1.0 (<workspace>/crates/quest)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.52s
+     Running unittests examples/persisted_weighted_transform.rs (target/debug/build/quest-rs/bf0b760e659f3ec2/out/persisted_weighted_transform-bf0b760e659f3ec2)
+
+running 9 tests
+test tests::nominal_spectrum_is_enclosed_and_finite_chebyshev_oracle_is_independent ... ok
+test tests::metadata_scan_rejects_unbounded_parsing_before_allocating_the_value ... ok
+test tests::bounded_capacity_rejection_preserves_attempt_and_completed_call_progress ... ok
+test tests::readout_floor_rejects_bad_partitions_scale_and_limits_before_queries ... ok
+test tests::complete_mapping_and_inverse_arithmetic_keep_every_system_coordinate ... ok
+test tests::json_owners_require_whole_live_overlap_before_cloning_or_filling ... ok
+test tests::source_generation_has_exact_cyclic_owners_and_signed_distinct_terms ... ok
+test tests::serialized_row_keeps_stage_result_owners_without_cloning ... ok
+test tests::typed_protocol_frame_binds_limits_signed_weights_layout_and_parts ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

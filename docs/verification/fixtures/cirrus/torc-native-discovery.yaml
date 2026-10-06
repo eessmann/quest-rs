@@ -1,0 +1,16 @@
+name: quest-native-discovery
+description: Focused discovery validation; does not prepare the workspace MPI test suite.
+use_pending_failed: false
+execution_config:
+  mode: direct
+  limit_resources: false
+jobs:
+  - name: native-discovery
+    command: bash -l "$QUEST_SOURCE/docs/verification/fixtures/cirrus/native-validation.sbatch"
+    resource_requirements: discovery
+resource_requirements:
+  - name: discovery
+    num_cpus: 8
+    num_nodes: 1
+    memory: 32g
+    runtime: PT1H45M

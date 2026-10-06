@@ -1,0 +1,1697 @@
+{
+  "schema": "quest-cfd-full-kvn-campaign-v1",
+  "source_tree_sha256": "acc225dc9d6dbe3d05b7abe6c2dc675f893a67ced99e3e60e7df5426140fcc8d",
+  "source_hash_scope": "tracked and untracked nonignored files excluding generated verification/data receipts",
+  "binary_sha256": "73ece75d33dc3fb79a32d39c35b53495e6f5aac701702230802c4f936d71c636",
+  "scope": "bounded classical full five-coordinate nonlinear DG validation",
+  "quantum_execution": false,
+  "convergence_certified": false,
+  "physical_coordinates": 5,
+  "baseline": {
+    "cells": 3,
+    "order": 1,
+    "extent": 1,
+    "width": 1.2,
+    "horizon": 0.001,
+    "steps": 4,
+    "minimum_support_samples": 2
+  },
+  "experiments": [
+    {
+      "axis": "baseline",
+      "arguments": [],
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 9.429363779003324,
+      "peak_rss_kib": 9692,
+      "address_space_cap_bytes": 536870912,
+      "stdout_bytes": 5208,
+      "report": {
+        "convergence_certified": false,
+        "elapsed_seconds": 9.393801469,
+        "error": null,
+        "error_contract": {
+          "combined_bound": null,
+          "comparison": "mass-weighted nodal probability weak coordinate and kinetic-energy errors versus the identical full DG trajectory ensemble",
+          "configuration": "weak observable discrepancy at fixed bump width; includes unresolved periodic-domain effects",
+          "domain": "outer-cell occupation only; no outward flux or leakage certificate",
+          "encoding_polynomial_sampling": "not executed in this classical experiment",
+          "physical_discretization": "held fixed; no continuum error bound",
+          "regularization": "sampled deterministic-limit bias; mixed with initial quadrature error until configuration refinement",
+          "time": "two independent classical RK4 references; step refinement measures reference integration sensitivity, not temporal DG error"
+        },
+        "parameters": {
+          "cells": 3,
+          "extent": 1.0,
+          "horizon": 0.001,
+          "max_bytes": 268435456,
+          "max_dimension": 100000,
+          "max_entries": 3000000,
+          "max_work": 2000000000,
+          "minimum_support_samples": 2,
+          "order": 1,
+          "steps": 4,
+          "width": 1.2
+        },
+        "physical_dimension": 5,
+        "physical_source": "PeriodicBdm1 complete periodic two-triangle nonlinear system",
+        "quantum_execution": false,
+        "result": {
+          "comparison": {
+            "configuration_dimension": 7776,
+            "coordinate_mean_error": 0.00018066380502217407,
+            "energy_error": 0.0005787958480312771,
+            "final_concentration": {
+              "boundary_occupation_fraction": 0.9718172686319962,
+              "convergence_certified": false,
+              "effective_nodal_coefficients": 1186.6906934261704,
+              "maximum_nodal_probability": 0.0014392748087062414,
+              "minimum_required_standard_deviations_per_spacing": null,
+              "probability": 1.0000000000000124,
+              "standard_deviations_per_spacing": [
+                0.5559177634664607,
+                0.5353192229606935,
+                0.5250967145503024,
+                0.5392033874621256,
+                0.5157882582395252
+              ]
+            },
+            "horizon": 0.001,
+            "initial": {
+              "boundary_probability": 0.9720726942605714,
+              "coordinate_means": [
+                0.09312124608872105,
+                -0.058336722929577735,
+                0.039536557785893434,
+                0.06495048957053104,
+                -0.022079724779936718
+              ],
+              "coordinate_variances": [
+                0.13735313766113552,
+                0.12765428437540075,
+                0.12254513761400875,
+                0.12952391370495936,
+                0.11870175336633289
+              ],
+              "mean_kinetic_energy": 0.3270610930902387,
+              "probability": 1.0000000000000164
+            },
+            "initial_concentration": {
+              "boundary_occupation_fraction": 0.9720726942605554,
+              "convergence_certified": false,
+              "effective_nodal_coefficients": 1189.7900682132195,
+              "maximum_nodal_probability": 0.0014262501345076845,
+              "minimum_required_standard_deviations_per_spacing": null,
+              "probability": 1.0000000000000164,
+              "standard_deviations_per_spacing": [
+                0.5559177634664635,
+                0.5359310961724946,
+                0.5250967145503004,
+                0.5398414636133079,
+                0.5167968121750065
+              ]
+            },
+            "lifted": {
+              "boundary_probability": 0.9718172686320083,
+              "coordinate_means": [
+                0.09312124608872338,
+                -0.058107244842478215,
+                0.03953655778589361,
+                0.06469840652662225,
+                -0.021881712263425637
+              ],
+              "coordinate_variances": [
+                0.13735313766113413,
+                0.12736296465388475,
+                0.12254513761400973,
+                0.12921790802250274,
+                0.1182389010390059
+              ],
+              "mean_kinetic_energy": 0.3264969499535309,
+              "probability": 1.0000000000000124
+            },
+            "method": "classical full-DG trajectory ensemble versus classical full-coordinate KvN semidiscretization; no quantum execution",
+            "probability_drift": 3.9968028886505635e-15,
+            "retained_coordinates": 5,
+            "trajectory_mean_coordinates": [
+              0.09312124608872105,
+              -0.05820923691462388,
+              0.039536557785893434,
+              0.0648012486561796,
+              -0.021989696169877622
+            ],
+            "trajectory_mean_kinetic_energy": 0.3259181541054996
+          },
+          "deterministic_reference": {
+            "coordinates": [
+              0.15,
+              -0.09978637380912778,
+              0.07,
+              0.10974311272089758,
+              -0.039835773826435196
+            ],
+            "kinetic_energy": 0.025493880031998758
+          },
+          "initial_sampled_regularization_coordinate_bias": 0.09082751382800512,
+          "sampling": {
+            "convergence_certified": false,
+            "distinct_samples_in_support": [
+              4,
+              4,
+              4,
+              4,
+              4
+            ],
+            "maximum_distinct_node_spacing": 0.6666666666666667,
+            "minimum_required_samples": 2,
+            "support_intersects_boundary": true,
+            "width_per_spacing": 1.7999999999999998
+          },
+          "trajectory_sampled_regularization_coordinate_bias": 0.09072004135642703,
+          "trajectory_sampled_regularization_energy_bias": 0.30042427407350086
+        },
+        "schema": "quest-cfd-full-kvn-refinement-v1",
+        "status": "classical_validation",
+        "viscosity": 0.01
+      },
+      "valid_report": true
+    },
+    {
+      "axis": "configuration-h",
+      "arguments": [
+        "--cells",
+        "2"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 1.2668580440004007,
+      "peak_rss_kib": 4868,
+      "address_space_cap_bytes": 536870912,
+      "stdout_bytes": 5157,
+      "report": {
+        "convergence_certified": false,
+        "elapsed_seconds": 1.234604008,
+        "error": null,
+        "error_contract": {
+          "combined_bound": null,
+          "comparison": "mass-weighted nodal probability weak coordinate and kinetic-energy errors versus the identical full DG trajectory ensemble",
+          "configuration": "weak observable discrepancy at fixed bump width; includes unresolved periodic-domain effects",
+          "domain": "outer-cell occupation only; no outward flux or leakage certificate",
+          "encoding_polynomial_sampling": "not executed in this classical experiment",
+          "physical_discretization": "held fixed; no continuum error bound",
+          "regularization": "sampled deterministic-limit bias; mixed with initial quadrature error until configuration refinement",
+          "time": "two independent classical RK4 references; step refinement measures reference integration sensitivity, not temporal DG error"
+        },
+        "parameters": {
+          "cells": 2,
+          "extent": 1.0,
+          "horizon": 0.001,
+          "max_bytes": 268435456,
+          "max_dimension": 100000,
+          "max_entries": 3000000,
+          "max_work": 2000000000,
+          "minimum_support_samples": 2,
+          "order": 1,
+          "steps": 4,
+          "width": 1.2
+        },
+        "physical_dimension": 5,
+        "physical_source": "PeriodicBdm1 complete periodic two-triangle nonlinear system",
+        "quantum_execution": false,
+        "result": {
+          "comparison": {
+            "configuration_dimension": 1024,
+            "coordinate_mean_error": 0.0003802468194711216,
+            "energy_error": 0.00030956488104630364,
+            "final_concentration": {
+              "boundary_occupation_fraction": 1.0,
+              "convergence_certified": false,
+              "effective_nodal_coefficients": 45.67414303828521,
+              "maximum_nodal_probability": 0.025948714892314772,
+              "minimum_required_standard_deviations_per_spacing": null,
+              "probability": 1.0000000000000022,
+              "standard_deviations_per_spacing": [
+                0.24554283362878582,
+                0.18878682770925403,
+                0.15456826280481153,
+                0.20039141855564108,
+                0.12096370854839211
+              ]
+            },
+            "horizon": 0.001,
+            "initial": {
+              "boundary_probability": 1.0000000000000024,
+              "coordinate_means": [
+                0.0644443583017098,
+                -0.03729205902341732,
+                0.02405066030850018,
+                0.04223233892476249,
+                -0.012915641439471149
+              ],
+              "coordinate_variances": [
+                0.06029128314645362,
+                0.03592766545994587,
+                0.023891347866497166,
+                0.04045570282407573,
+                0.015109323413099807
+              ],
+              "mean_kinetic_energy": 0.09187395709966066,
+              "probability": 1.0000000000000024
+            },
+            "initial_concentration": {
+              "boundary_occupation_fraction": 1.0,
+              "convergence_certified": false,
+              "effective_nodal_coefficients": 45.77355639660766,
+              "maximum_nodal_probability": 0.025894918289658564,
+              "minimum_required_standard_deviations_per_spacing": null,
+              "probability": 1.0000000000000024,
+              "standard_deviations_per_spacing": [
+                0.24554283362878587,
+                0.18954594551175677,
+                0.15456826280481115,
+                0.20113603064611701,
+                0.12291998785022641
+              ]
+            },
+            "lifted": {
+              "boundary_probability": 1.0000000000000022,
+              "coordinate_means": [
+                0.06444435830170972,
+                -0.03699286831555745,
+                0.02405066030850017,
+                0.041910942815827516,
+                -0.012646921641198185
+              ],
+              "coordinate_variances": [
+                0.06029128314645359,
+                0.03564046631652357,
+                0.023891347866497284,
+                0.04015672063074213,
+                0.014632218785780351
+              ],
+              "mean_kinetic_energy": 0.09131424519255665,
+              "probability": 1.0000000000000022
+            },
+            "method": "classical full-DG trajectory ensemble versus classical full-coordinate KvN semidiscretization; no quantum execution",
+            "probability_drift": 2.220446049250313e-16,
+            "retained_coordinates": 5,
+            "trajectory_mean_coordinates": [
+              0.0644443583017098,
+              -0.03720955688347768,
+              0.02405066030850018,
+              0.042136069395476525,
+              -0.012863605123231599
+            ],
+            "trajectory_mean_kinetic_energy": 0.09162381007360296
+          },
+          "deterministic_reference": {
+            "coordinates": [
+              0.15,
+              -0.09978637380912778,
+              0.07,
+              0.10974311272089758,
+              -0.039835773826435196
+            ],
+            "kinetic_energy": 0.025493880031998758
+          },
+          "initial_sampled_regularization_coordinate_bias": 0.13670923111574135,
+          "sampling": {
+            "convergence_certified": false,
+            "distinct_samples_in_support": [
+              3,
+              3,
+              3,
+              3,
+              3
+            ],
+            "maximum_distinct_node_spacing": 1.0,
+            "minimum_required_samples": 2,
+            "support_intersects_boundary": true,
+            "width_per_spacing": 1.2
+          },
+          "trajectory_sampled_regularization_coordinate_bias": 0.13654734656080586,
+          "trajectory_sampled_regularization_energy_bias": 0.0661299300416042
+        },
+        "schema": "quest-cfd-full-kvn-refinement-v1",
+        "status": "classical_validation",
+        "viscosity": 0.01
+      },
+      "valid_report": true
+    },
+    {
+      "axis": "configuration-h",
+      "arguments": [
+        "--cells",
+        "4"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 39.774914776000514,
+      "peak_rss_kib": 26520,
+      "address_space_cap_bytes": 536870912,
+      "stdout_bytes": 5161,
+      "report": {
+        "convergence_certified": false,
+        "elapsed_seconds": 39.770760767,
+        "error": null,
+        "error_contract": {
+          "combined_bound": null,
+          "comparison": "mass-weighted nodal probability weak coordinate and kinetic-energy errors versus the identical full DG trajectory ensemble",
+          "configuration": "weak observable discrepancy at fixed bump width; includes unresolved periodic-domain effects",
+          "domain": "outer-cell occupation only; no outward flux or leakage certificate",
+          "encoding_polynomial_sampling": "not executed in this classical experiment",
+          "physical_discretization": "held fixed; no continuum error bound",
+          "regularization": "sampled deterministic-limit bias; mixed with initial quadrature error until configuration refinement",
+          "time": "two independent classical RK4 references; step refinement measures reference integration sensitivity, not temporal DG error"
+        },
+        "parameters": {
+          "cells": 4,
+          "extent": 1.0,
+          "horizon": 0.001,
+          "max_bytes": 268435456,
+          "max_dimension": 100000,
+          "max_entries": 3000000,
+          "max_work": 2000000000,
+          "minimum_support_samples": 2,
+          "order": 1,
+          "steps": 4,
+          "width": 1.2
+        },
+        "physical_dimension": 5,
+        "physical_source": "PeriodicBdm1 complete periodic two-triangle nonlinear system",
+        "quantum_execution": false,
+        "result": {
+          "comparison": {
+            "configuration_dimension": 32768,
+            "coordinate_mean_error": 9.20532536577387e-05,
+            "energy_error": 0.0005164091817314587,
+            "final_concentration": {
+              "boundary_occupation_fraction": 0.8249716902197423,
+              "convergence_certified": false,
+              "effective_nodal_coefficients": 6586.300528995993,
+              "maximum_nodal_probability": 0.0004404918435140514,
+              "minimum_required_standard_deviations_per_spacing": null,
+              "probability": 0.999999999999978,
+              "standard_deviations_per_spacing": [
+                0.7832441051004052,
+                0.7748024790400534,
+                0.7707454131922127,
+                0.7764583954595947,
+                0.7643366889574679
+              ]
+            },
+            "horizon": 0.001,
+            "initial": {
+              "boundary_probability": 0.8262287517772142,
+              "coordinate_means": [
+                0.11468456689471515,
+                -0.07376964518170939,
+                0.05070485870272052,
+                0.08170782452866167,
+                -0.028606915553875237
+              ],
+              "coordinate_variances": [
+                0.1533678320436365,
+                0.15051417173689738,
+                0.1485121229892136,
+                0.151167883430382,
+                0.14682595876661844
+              ],
+              "mean_kinetic_energy": 0.38952399315179304,
+              "probability": 0.9999999999999595
+            },
+            "initial_concentration": {
+              "boundary_occupation_fraction": 0.8262287517772477,
+              "convergence_certified": false,
+              "effective_nodal_coefficients": 6618.169608636762,
+              "maximum_nodal_probability": 0.00043702038917528514,
+              "minimum_required_standard_deviations_per_spacing": null,
+              "probability": 0.9999999999999595,
+              "standard_deviations_per_spacing": [
+                0.7832441051004124,
+                0.7759231192248298,
+                0.7707454131922254,
+                0.777606284517768,
+                0.7663575112612088
+              ]
+            },
+            "lifted": {
+              "boundary_probability": 0.8249716902197242,
+              "coordinate_means": [
+                0.11468456689471641,
+                -0.07355855111720362,
+                0.050704858702718646,
+                0.0814694390042462,
+                -0.02843160215370552
+              ],
+              "coordinate_variances": [
+                0.15336783204363363,
+                0.1500797203816531,
+                0.14851212298920866,
+                0.15072190996992207,
+                0.14605264352161626
+              ],
+              "mean_kinetic_energy": 0.3886571237105407,
+              "probability": 0.999999999999978
+            },
+            "method": "classical full-DG trajectory ensemble versus classical full-coordinate KvN semidiscretization; no quantum execution",
+            "probability_drift": 1.8540724511240114e-14,
+            "retained_coordinates": 5,
+            "trajectory_mean_coordinates": [
+              0.11468456689471515,
+              -0.07360976079766628,
+              0.05070485870272052,
+              0.0815189489,
+              -0.028489912876204365
+            ],
+            "trajectory_mean_kinetic_energy": 0.3881407145288092
+          },
+          "deterministic_reference": {
+            "coordinates": [
+              0.15,
+              -0.09978637380912778,
+              0.07,
+              0.10974311272089758,
+              -0.039835773826435196
+            ],
+            "kinetic_energy": 0.025493880031998758
+          },
+          "initial_sampled_regularization_coordinate_bias": 0.05690134772645354,
+          "sampling": {
+            "convergence_certified": false,
+            "distinct_samples_in_support": [
+              5,
+              5,
+              5,
+              5,
+              5
+            ],
+            "maximum_distinct_node_spacing": 0.5,
+            "minimum_required_samples": 2,
+            "support_intersects_boundary": true,
+            "width_per_spacing": 2.4
+          },
+          "trajectory_sampled_regularization_coordinate_bias": 0.05683334712946688,
+          "trajectory_sampled_regularization_energy_bias": 0.36264683449681046
+        },
+        "schema": "quest-cfd-full-kvn-refinement-v1",
+        "status": "classical_validation",
+        "viscosity": 0.01
+      },
+      "valid_report": true
+    },
+    {
+      "axis": "configuration-p",
+      "arguments": [
+        "--order",
+        "2"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 71.62587093300317,
+      "peak_rss_kib": 44100,
+      "address_space_cap_bytes": 536870912,
+      "stdout_bytes": 5196,
+      "report": {
+        "convergence_certified": false,
+        "elapsed_seconds": 71.601014879,
+        "error": null,
+        "error_contract": {
+          "combined_bound": null,
+          "comparison": "mass-weighted nodal probability weak coordinate and kinetic-energy errors versus the identical full DG trajectory ensemble",
+          "configuration": "weak observable discrepancy at fixed bump width; includes unresolved periodic-domain effects",
+          "domain": "outer-cell occupation only; no outward flux or leakage certificate",
+          "encoding_polynomial_sampling": "not executed in this classical experiment",
+          "physical_discretization": "held fixed; no continuum error bound",
+          "regularization": "sampled deterministic-limit bias; mixed with initial quadrature error until configuration refinement",
+          "time": "two independent classical RK4 references; step refinement measures reference integration sensitivity, not temporal DG error"
+        },
+        "parameters": {
+          "cells": 3,
+          "extent": 1.0,
+          "horizon": 0.001,
+          "max_bytes": 268435456,
+          "max_dimension": 100000,
+          "max_entries": 3000000,
+          "max_work": 2000000000,
+          "minimum_support_samples": 2,
+          "order": 2,
+          "steps": 4,
+          "width": 1.2
+        },
+        "physical_dimension": 5,
+        "physical_source": "PeriodicBdm1 complete periodic two-triangle nonlinear system",
+        "quantum_execution": false,
+        "result": {
+          "comparison": {
+            "configuration_dimension": 59049,
+            "coordinate_mean_error": 1.735197269438575e-05,
+            "energy_error": 0.0001953785747746406,
+            "final_concentration": {
+              "boundary_occupation_fraction": 0.9584143177077775,
+              "convergence_certified": false,
+              "effective_nodal_coefficients": 2051.031041558942,
+              "maximum_nodal_probability": 0.007149545266603525,
+              "minimum_required_standard_deviations_per_spacing": null,
+              "probability": 0.9999999999999993,
+              "standard_deviations_per_spacing": [
+                1.2118881922416112,
+                1.2315334590011489,
+                1.2423845972020622,
+                1.2279153170225363,
+                1.2424916908784085
+              ]
+            },
+            "horizon": 0.001,
+            "initial": {
+              "boundary_probability": 0.9587508412285778,
+              "coordinate_means": [
+                0.14569991680885108,
+                -0.09702201557332804,
+                0.06778846615464522,
+                0.10678193004764636,
+                -0.03867637692272982
+              ],
+              "coordinate_variances": [
+                0.16318588783274018,
+                0.16920580780317668,
+                0.17150216526276724,
+                0.16821890348719148,
+                0.17287607176841815
+              ],
+              "mean_kinetic_energy": 0.44656204613925293,
+              "probability": 1.0000000000000129
+            },
+            "initial_concentration": {
+              "boundary_occupation_fraction": 0.9587508412285655,
+              "convergence_certified": false,
+              "effective_nodal_coefficients": 2064.1066871598614,
+              "maximum_nodal_probability": 0.007089920787806984,
+              "minimum_required_standard_deviations_per_spacing": null,
+              "probability": 1.0000000000000129,
+              "standard_deviations_per_spacing": [
+                1.2118881922416196,
+                1.2340390067694735,
+                1.2423845972020515,
+                1.2304349358599675,
+                1.2473510515952444
+              ]
+            },
+            "lifted": {
+              "boundary_probability": 0.9584143177077769,
+              "coordinate_means": [
+                0.14569991680885,
+                -0.0968249909169483,
+                0.06778846615464827,
+                0.10654510490401663,
+                -0.03852369492362263
+              ],
+              "coordinate_variances": [
+                0.16318588783273794,
+                0.16851940673770394,
+                0.1715021652627702,
+                0.1675306695309508,
+                0.1715317335446542
+              ],
+              "mean_kinetic_energy": 0.4451523090630864,
+              "probability": 0.9999999999999993
+            },
+            "method": "classical full-DG trajectory ensemble versus classical full-coordinate KvN semidiscretization; no quantum execution",
+            "probability_drift": 1.354472090042691e-14,
+            "retained_coordinates": 5,
+            "trajectory_mean_coordinates": [
+              0.14569991680885108,
+              -0.09681438616794626,
+              0.06778846615464522,
+              0.10653277307010268,
+              -0.03851764875729102
+            ],
+            "trajectory_mean_kinetic_energy": 0.44495693048831175
+          },
+          "deterministic_reference": {
+            "coordinates": [
+              0.15,
+              -0.09978637380912778,
+              0.07,
+              0.10974311272089758,
+              -0.039835773826435196
+            ],
+            "kinetic_energy": 0.025493880031998758
+          },
+          "initial_sampled_regularization_coordinate_bias": 0.006660175742003769,
+          "sampling": {
+            "convergence_certified": false,
+            "distinct_samples_in_support": [
+              7,
+              7,
+              7,
+              7,
+              7
+            ],
+            "maximum_distinct_node_spacing": 0.3333333333333335,
+            "minimum_required_samples": 2,
+            "support_intersects_boundary": true,
+            "width_per_spacing": 3.5999999999999983
+          },
+          "trajectory_sampled_regularization_coordinate_bias": 0.006652671817447414,
+          "trajectory_sampled_regularization_energy_bias": 0.419463050456313
+        },
+        "schema": "quest-cfd-full-kvn-refinement-v1",
+        "status": "classical_validation",
+        "viscosity": 0.01
+      },
+      "valid_report": true
+    },
+    {
+      "axis": "configuration-domain",
+      "arguments": [
+        "--extent",
+        "1.25"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 3.5199322439984826,
+      "peak_rss_kib": 9708,
+      "address_space_cap_bytes": 536870912,
+      "stdout_bytes": 5189,
+      "report": {
+        "convergence_certified": false,
+        "elapsed_seconds": 3.477503432,
+        "error": null,
+        "error_contract": {
+          "combined_bound": null,
+          "comparison": "mass-weighted nodal probability weak coordinate and kinetic-energy errors versus the identical full DG trajectory ensemble",
+          "configuration": "weak observable discrepancy at fixed bump width; includes unresolved periodic-domain effects",
+          "domain": "outer-cell occupation only; no outward flux or leakage certificate",
+          "encoding_polynomial_sampling": "not executed in this classical experiment",
+          "physical_discretization": "held fixed; no continuum error bound",
+          "regularization": "sampled deterministic-limit bias; mixed with initial quadrature error until configuration refinement",
+          "time": "two independent classical RK4 references; step refinement measures reference integration sensitivity, not temporal DG error"
+        },
+        "parameters": {
+          "cells": 3,
+          "extent": 1.25,
+          "horizon": 0.001,
+          "max_bytes": 268435456,
+          "max_dimension": 100000,
+          "max_entries": 3000000,
+          "max_work": 2000000000,
+          "minimum_support_samples": 2,
+          "order": 1,
+          "steps": 4,
+          "width": 1.2
+        },
+        "physical_dimension": 5,
+        "physical_source": "PeriodicBdm1 complete periodic two-triangle nonlinear system",
+        "quantum_execution": false,
+        "result": {
+          "comparison": {
+            "configuration_dimension": 7776,
+            "coordinate_mean_error": 0.00023910477251955987,
+            "energy_error": 0.0015882486179821242,
+            "final_concentration": {
+              "boundary_occupation_fraction": 0.9684645972678236,
+              "convergence_certified": false,
+              "effective_nodal_coefficients": 911.1337816100003,
+              "maximum_nodal_probability": 0.0019100547960319684,
+              "minimum_required_standard_deviations_per_spacing": null,
+              "probability": 1.0000000000000049,
+              "standard_deviations_per_spacing": [
+                0.4865155157684986,
+                0.49423060214854175,
+                0.49721475636266854,
+                0.4929732393406419,
+                0.49912009216342557
+              ]
+            },
+            "horizon": 0.001,
+            "initial": {
+              "boundary_probability": 0.9687502875489467,
+              "coordinate_means": [
+                0.0961807103304533,
+                -0.06314061143931732,
+                0.04391821672796052,
+                0.0696354174030398,
+                -0.02499217329165169
+              ],
+              "coordinate_variances": [
+                0.16437315769686797,
+                0.16962437437592173,
+                0.17168230135054827,
+                0.1687620240043147,
+                0.17298650238527125
+              ],
+              "mean_kinetic_energy": 0.4340341677544129,
+              "probability": 0.9999999999999988
+            },
+            "initial_concentration": {
+              "boundary_occupation_fraction": 0.9687502875489479,
+              "convergence_certified": false,
+              "effective_nodal_coefficients": 911.1400218182503,
+              "maximum_nodal_probability": 0.0018927836371263004,
+              "minimum_required_standard_deviations_per_spacing": null,
+              "probability": 0.9999999999999988,
+              "standard_deviations_per_spacing": [
+                0.4865155157685003,
+                0.4942257572216641,
+                0.49721475636267015,
+                0.49296786362420536,
+                0.4990997529901118
+              ]
+            },
+            "lifted": {
+              "boundary_probability": 0.9684645972678284,
+              "coordinate_means": [
+                0.09618071033045357,
+                -0.0631440768924721,
+                0.04391821672796033,
+                0.06963479951656845,
+                -0.0249982763748229
+              ],
+              "coordinate_variances": [
+                0.16437315769686683,
+                0.16962770006952094,
+                0.17168230135054716,
+                0.16876570465694848,
+                0.17300060166751838
+              ],
+              "mean_kinetic_energy": 0.43404504890683165,
+              "probability": 1.0000000000000049
+            },
+            "method": "classical full-DG trajectory ensemble versus classical full-coordinate KvN semidiscretization; no quantum execution",
+            "probability_drift": 6.106226635438361e-15,
+            "retained_coordinates": 5,
+            "trajectory_mean_coordinates": [
+              0.0961807103304533,
+              -0.06300317596790363,
+              0.04391821672796052,
+              0.06947502326965052,
+              -0.024889696576433886
+            ],
+            "trajectory_mean_kinetic_energy": 0.43245680028884953
+          },
+          "deterministic_reference": {
+            "coordinates": [
+              0.15,
+              -0.09978637380912778,
+              0.07,
+              0.10974311272089758,
+              -0.039835773826435196
+            ],
+            "kinetic_energy": 0.025493880031998758
+          },
+          "initial_sampled_regularization_coordinate_bias": 0.08240099680820759,
+          "sampling": {
+            "convergence_certified": false,
+            "distinct_samples_in_support": [
+              3,
+              3,
+              3,
+              3,
+              2
+            ],
+            "maximum_distinct_node_spacing": 0.8333333333333334,
+            "minimum_required_samples": 2,
+            "support_intersects_boundary": true,
+            "width_per_spacing": 1.44
+          },
+          "trajectory_sampled_regularization_coordinate_bias": 0.08230846405946045,
+          "trajectory_sampled_regularization_energy_bias": 0.40696292025685077
+        },
+        "schema": "quest-cfd-full-kvn-refinement-v1",
+        "status": "classical_validation",
+        "viscosity": 0.01
+      },
+      "valid_report": true
+    },
+    {
+      "axis": "configuration-domain",
+      "arguments": [
+        "--extent",
+        "1.5"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 1.8678043219988467,
+      "peak_rss_kib": 9304,
+      "address_space_cap_bytes": 536870912,
+      "stdout_bytes": 5167,
+      "report": {
+        "convergence_certified": false,
+        "elapsed_seconds": 1.81602978,
+        "error": null,
+        "error_contract": {
+          "combined_bound": null,
+          "comparison": "mass-weighted nodal probability weak coordinate and kinetic-energy errors versus the identical full DG trajectory ensemble",
+          "configuration": "weak observable discrepancy at fixed bump width; includes unresolved periodic-domain effects",
+          "domain": "outer-cell occupation only; no outward flux or leakage certificate",
+          "encoding_polynomial_sampling": "not executed in this classical experiment",
+          "physical_discretization": "held fixed; no continuum error bound",
+          "regularization": "sampled deterministic-limit bias; mixed with initial quadrature error until configuration refinement",
+          "time": "two independent classical RK4 references; step refinement measures reference integration sensitivity, not temporal DG error"
+        },
+        "parameters": {
+          "cells": 3,
+          "extent": 1.5,
+          "horizon": 0.001,
+          "max_bytes": 268435456,
+          "max_dimension": 100000,
+          "max_entries": 3000000,
+          "max_work": 2000000000,
+          "minimum_support_samples": 2,
+          "order": 1,
+          "steps": 4,
+          "width": 1.2
+        },
+        "physical_dimension": 5,
+        "physical_source": "PeriodicBdm1 complete periodic two-triangle nonlinear system",
+        "quantum_execution": false,
+        "result": {
+          "comparison": {
+            "configuration_dimension": 7776,
+            "coordinate_mean_error": 0.00038914162047228143,
+            "energy_error": 0.0022866651795812043,
+            "final_concentration": {
+              "boundary_occupation_fraction": 0.9684644003684197,
+              "convergence_certified": false,
+              "effective_nodal_coefficients": 829.3754095365445,
+              "maximum_nodal_probability": 0.0023618292936310407,
+              "minimum_required_standard_deviations_per_spacing": null,
+              "probability": 0.9999999999999988,
+              "standard_deviations_per_spacing": [
+                0.4751158906339704,
+                0.48934619427007825,
+                0.4948572254533261,
+                0.48702907067674717,
+                0.49835744801349985
+              ]
+            },
+            "horizon": 0.001,
+            "initial": {
+              "boundary_probability": 0.9687500000000004,
+              "coordinate_means": [
+                0.15577191809530225,
+                -0.10268533797849129,
+                0.07152850072967654,
+                0.11317625375212735,
+                -0.04074042947252646
+              ],
+              "coordinate_variances": [
+                0.22573510953290887,
+                0.23945572136424195,
+                0.2448836735833628,
+                0.23719113558663343,
+                0.24834021740639536
+              ],
+              "mean_kinetic_energy": 0.6249999999999999,
+              "probability": 1.0000000000000002
+            },
+            "initial_concentration": {
+              "boundary_occupation_fraction": 0.9687500000000002,
+              "convergence_certified": false,
+              "effective_nodal_coefficients": 829.3849761708912,
+              "maximum_nodal_probability": 0.0023404831820424,
+              "minimum_required_standard_deviations_per_spacing": null,
+              "probability": 1.0000000000000002,
+              "standard_deviations_per_spacing": [
+                0.47511589063396825,
+                0.4893421311968161,
+                0.4948572254533249,
+                0.4870227259447278,
+                0.4983374533450154
+              ]
+            },
+            "lifted": {
+              "boundary_probability": 0.9684644003684185,
+              "coordinate_means": [
+                0.15577191809530136,
+                -0.10269307657654463,
+                0.07152850072967644,
+                0.11317353350880792,
+                -0.04075033987823
+              ],
+              "coordinate_variances": [
+                0.22573510953291095,
+                0.23945969784660914,
+                0.24488367358336405,
+                0.23719731568425598,
+                0.24836014599052822
+              ],
+              "mean_kinetic_energy": 0.625015933192607,
+              "probability": 0.9999999999999988
+            },
+            "method": "classical full-DG trajectory ensemble versus classical full-coordinate KvN semidiscretization; no quantum execution",
+            "probability_drift": 1.4432899320127035e-15,
+            "retained_coordinates": 5,
+            "trajectory_mean_coordinates": [
+              0.15577191809530225,
+              -0.10246614726456012,
+              0.07152850072967654,
+              0.1129116138662028,
+              -0.040573330305145275
+            ],
+            "trajectory_mean_kinetic_energy": 0.6227292680130257
+          },
+          "deterministic_reference": {
+            "coordinates": [
+              0.15,
+              -0.09978637380912778,
+              0.07,
+              0.10974311272089758,
+              -0.039835773826435196
+            ],
+            "kinetic_energy": 0.025493880031998758
+          },
+          "initial_sampled_regularization_coordinate_bias": 0.007314315876410849,
+          "sampling": {
+            "convergence_certified": false,
+            "distinct_samples_in_support": [
+              2,
+              2,
+              2,
+              2,
+              2
+            ],
+            "maximum_distinct_node_spacing": 1.0,
+            "minimum_required_samples": 2,
+            "support_intersects_boundary": false,
+            "width_per_spacing": 1.2
+          },
+          "trajectory_sampled_regularization_coordinate_bias": 0.007308620103619202,
+          "trajectory_sampled_regularization_energy_bias": 0.597235387981027
+        },
+        "schema": "quest-cfd-full-kvn-refinement-v1",
+        "status": "classical_validation",
+        "viscosity": 0.01
+      },
+      "valid_report": true
+    },
+    {
+      "axis": "regularization",
+      "arguments": [
+        "--width",
+        "0.8"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 1.8177528329979395,
+      "peak_rss_kib": 9640,
+      "address_space_cap_bytes": 536870912,
+      "stdout_bytes": 5195,
+      "report": {
+        "convergence_certified": false,
+        "elapsed_seconds": 1.8083682730000001,
+        "error": null,
+        "error_contract": {
+          "combined_bound": null,
+          "comparison": "mass-weighted nodal probability weak coordinate and kinetic-energy errors versus the identical full DG trajectory ensemble",
+          "configuration": "weak observable discrepancy at fixed bump width; includes unresolved periodic-domain effects",
+          "domain": "outer-cell occupation only; no outward flux or leakage certificate",
+          "encoding_polynomial_sampling": "not executed in this classical experiment",
+          "physical_discretization": "held fixed; no continuum error bound",
+          "regularization": "sampled deterministic-limit bias; mixed with initial quadrature error until configuration refinement",
+          "time": "two independent classical RK4 references; step refinement measures reference integration sensitivity, not temporal DG error"
+        },
+        "parameters": {
+          "cells": 3,
+          "extent": 1.0,
+          "horizon": 0.001,
+          "max_bytes": 268435456,
+          "max_dimension": 100000,
+          "max_entries": 3000000,
+          "max_work": 2000000000,
+          "minimum_support_samples": 2,
+          "order": 1,
+          "steps": 4,
+          "width": 0.8
+        },
+        "physical_dimension": 5,
+        "physical_source": "PeriodicBdm1 complete periodic two-triangle nonlinear system",
+        "quantum_execution": false,
+        "result": {
+          "comparison": {
+            "configuration_dimension": 7776,
+            "coordinate_mean_error": 0.0003930037813307533,
+            "energy_error": 0.0010153526979610472,
+            "final_concentration": {
+              "boundary_occupation_fraction": 0.968464627831825,
+              "convergence_certified": false,
+              "effective_nodal_coefficients": 639.9015436846248,
+              "maximum_nodal_probability": 0.0035021963206824935,
+              "minimum_required_standard_deviations_per_spacing": null,
+              "probability": 0.9999999999999938,
+              "standard_deviations_per_spacing": [
+                0.4393836157712081,
+                0.4751177666768797,
+                0.48821358506965945,
+                0.46948106182954846,
+                0.49625550765802656
+              ]
+            },
+            "horizon": 0.001,
+            "initial": {
+              "boundary_probability": 0.9687500000000041,
+              "coordinate_means": [
+                0.15908353946809853,
+                -0.10384794539686801,
+                0.0719490416998393,
+                0.11468655695576524,
+                -0.040821321616867225
+              ],
+              "coordinate_variances": [
+                0.08580353858141213,
+                0.10032671534796003,
+                0.1059344465095858,
+                0.09795810476474187,
+                0.10944473081256303
+              ],
+              "mean_kinetic_energy": 0.27777777777777524,
+              "probability": 1.0000000000000044
+            },
+            "initial_concentration": {
+              "boundary_occupation_fraction": 0.9687499999999998,
+              "convergence_certified": false,
+              "effective_nodal_coefficients": 639.9169647731526,
+              "maximum_nodal_probability": 0.00347061919446182,
+              "minimum_required_standard_deviations_per_spacing": null,
+              "probability": 1.0000000000000044,
+              "standard_deviations_per_spacing": [
+                0.4393836157712043,
+                0.4751158906339694,
+                0.48821358506965784,
+                0.46947389248036914,
+                0.49623648024733813
+              ]
+            },
+            "lifted": {
+              "boundary_probability": 0.968464627831819,
+              "coordinate_means": [
+                0.15908353946810025,
+                -0.10385555820218023,
+                0.07194904169983937,
+                0.11468391046156347,
+                -0.040831306907981584
+              ],
+              "coordinate_variances": [
+                0.08580353858141362,
+                0.10032750764978932,
+                0.1059344465095865,
+                0.09796109662960015,
+                0.10945312394707808
+              ],
+              "mean_kinetic_energy": 0.2777847611803737,
+              "probability": 0.9999999999999938
+            },
+            "method": "classical full-DG trajectory ensemble versus classical full-coordinate KvN semidiscretization; no quantum execution",
+            "probability_drift": 1.0658141036401503e-14,
+            "retained_coordinates": 5,
+            "trajectory_mean_coordinates": [
+              0.15908353946809853,
+              -0.10362629988881653,
+              0.0719490416998393,
+              0.11441842339522655,
+              -0.04065408045538007
+            ],
+            "trajectory_mean_kinetic_energy": 0.27676940848241266
+          },
+          "deterministic_reference": {
+            "coordinates": [
+              0.15,
+              -0.09978637380912778,
+              0.07,
+              0.10974311272089758,
+              -0.039835773826435196
+            ],
+            "kinetic_energy": 0.025493880031998758
+          },
+          "initial_sampled_regularization_coordinate_bias": 0.01112450097269351,
+          "sampling": {
+            "convergence_certified": false,
+            "distinct_samples_in_support": [
+              2,
+              2,
+              2,
+              2,
+              2
+            ],
+            "maximum_distinct_node_spacing": 0.6666666666666667,
+            "minimum_required_samples": 2,
+            "support_intersects_boundary": false,
+            "width_per_spacing": 1.2
+          },
+          "trajectory_sampled_regularization_coordinate_bias": 0.011116772946955407,
+          "trajectory_sampled_regularization_energy_bias": 0.2512755284504139
+        },
+        "schema": "quest-cfd-full-kvn-refinement-v1",
+        "status": "classical_validation",
+        "viscosity": 0.01
+      },
+      "valid_report": true
+    },
+    {
+      "axis": "regularization",
+      "arguments": [
+        "--width",
+        "0.6"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 1.81741127100031,
+      "peak_rss_kib": 9684,
+      "address_space_cap_bytes": 536870912,
+      "stdout_bytes": 5191,
+      "report": {
+        "convergence_certified": false,
+        "elapsed_seconds": 1.812908438,
+        "error": null,
+        "error_contract": {
+          "combined_bound": null,
+          "comparison": "mass-weighted nodal probability weak coordinate and kinetic-energy errors versus the identical full DG trajectory ensemble",
+          "configuration": "weak observable discrepancy at fixed bump width; includes unresolved periodic-domain effects",
+          "domain": "outer-cell occupation only; no outward flux or leakage certificate",
+          "encoding_polynomial_sampling": "not executed in this classical experiment",
+          "physical_discretization": "held fixed; no continuum error bound",
+          "regularization": "sampled deterministic-limit bias; mixed with initial quadrature error until configuration refinement",
+          "time": "two independent classical RK4 references; step refinement measures reference integration sensitivity, not temporal DG error"
+        },
+        "parameters": {
+          "cells": 3,
+          "extent": 1.0,
+          "horizon": 0.001,
+          "max_bytes": 268435456,
+          "max_dimension": 100000,
+          "max_entries": 3000000,
+          "max_work": 2000000000,
+          "minimum_support_samples": 2,
+          "order": 1,
+          "steps": 4,
+          "width": 0.6
+        },
+        "physical_dimension": 5,
+        "physical_source": "PeriodicBdm1 complete periodic two-triangle nonlinear system",
+        "quantum_execution": false,
+        "result": {
+          "comparison": {
+            "configuration_dimension": 7776,
+            "coordinate_mean_error": 0.0009189732067497555,
+            "energy_error": 0.0010081678311131825,
+            "final_concentration": {
+              "boundary_occupation_fraction": 0.9684666627994929,
+              "convergence_certified": false,
+              "effective_nodal_coefficients": 158.9438405870025,
+              "maximum_nodal_probability": 0.011693558618606466,
+              "minimum_required_standard_deviations_per_spacing": null,
+              "probability": 1.0000000000000036,
+              "standard_deviations_per_spacing": [
+                0.16941637700590212,
+                0.3458295108072725,
+                0.42496284131085293,
+                0.3138466827472253,
+                0.47580175996837454
+              ]
+            },
+            "horizon": 0.001,
+            "initial": {
+              "boundary_probability": 0.968750000000002,
+              "coordinate_means": [
+                0.3136155404328298,
+                -0.24071938893128478,
+                0.1756341949811306,
+                0.2595064873202343,
+                -0.10246524355872594
+              ],
+              "coordinate_variances": [
+                0.012756403910136055,
+                0.05316528690366006,
+                0.08026374066444233,
+                0.04376749414982494,
+                0.10061198497356243
+              ],
+              "mean_kinetic_energy": 0.2777777777777773,
+              "probability": 1.000000000000002
+            },
+            "initial_concentration": {
+              "boundary_occupation_fraction": 0.9687500000000001,
+              "convergence_certified": false,
+              "effective_nodal_coefficients": 158.9577529951991,
+              "maximum_nodal_probability": 0.011588875826189218,
+              "minimum_required_standard_deviations_per_spacing": null,
+              "probability": 1.000000000000002,
+              "standard_deviations_per_spacing": [
+                0.1694163770059026,
+                0.34586398415162445,
+                0.4249628413108554,
+                0.31381023220587645,
+                0.4757908849384521
+              ]
+            },
+            "lifted": {
+              "boundary_probability": 0.9684666627994963,
+              "coordinate_means": [
+                0.3136155404328289,
+                -0.2407460373013347,
+                0.17563419498113042,
+                0.25949169967820535,
+                -0.10248741736030369
+              ],
+              "coordinate_variances": [
+                0.012756403910135987,
+                0.05315468913119885,
+                0.08026374066444143,
+                0.04377766234286112,
+                0.1006165843506679
+              ],
+              "mean_kinetic_energy": 0.27778471272115846,
+              "probability": 1.0000000000000036
+            },
+            "method": "classical full-DG trajectory ensemble versus classical full-coordinate KvN semidiscretization; no quantum execution",
+            "probability_drift": 1.5543122344752192e-15,
+            "retained_coordinates": 5,
+            "trajectory_mean_coordinates": [
+              0.3136155404328298,
+              -0.2402446268607503,
+              0.1756341949811306,
+              0.2588638950098021,
+              -0.10204136733718074
+            ],
+            "trajectory_mean_kinetic_energy": 0.2767765448900453
+          },
+          "deterministic_reference": {
+            "coordinates": [
+              0.15,
+              -0.09978637380912778,
+              0.07,
+              0.10974311272089758,
+              -0.039835773826435196
+            ],
+            "kinetic_energy": 0.025493880031998758
+          },
+          "initial_sampled_regularization_coordinate_bias": 0.2898010887579945,
+          "sampling": {
+            "convergence_certified": false,
+            "distinct_samples_in_support": [
+              2,
+              2,
+              2,
+              2,
+              2
+            ],
+            "maximum_distinct_node_spacing": 0.6666666666666667,
+            "minimum_required_samples": 2,
+            "support_intersects_boundary": false,
+            "width_per_spacing": 0.8999999999999999
+          },
+          "trajectory_sampled_regularization_coordinate_bias": 0.2894195788906325,
+          "trajectory_sampled_regularization_energy_bias": 0.2512826648580465
+        },
+        "schema": "quest-cfd-full-kvn-refinement-v1",
+        "status": "classical_validation",
+        "viscosity": 0.01
+      },
+      "valid_report": true
+    },
+    {
+      "axis": "regularization",
+      "arguments": [
+        "--width",
+        "0.4"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 0.004846616000577342,
+      "peak_rss_kib": 4332,
+      "address_space_cap_bytes": 536870912,
+      "stdout_bytes": 1503,
+      "report": {
+        "convergence_certified": false,
+        "elapsed_seconds": 0.000814065,
+        "error": "invalid CFD input: regularization fails distinct-support sampling policy",
+        "error_contract": {
+          "combined_bound": null,
+          "comparison": "mass-weighted nodal probability weak coordinate and kinetic-energy errors versus the identical full DG trajectory ensemble",
+          "configuration": "weak observable discrepancy at fixed bump width; includes unresolved periodic-domain effects",
+          "domain": "outer-cell occupation only; no outward flux or leakage certificate",
+          "encoding_polynomial_sampling": "not executed in this classical experiment",
+          "physical_discretization": "held fixed; no continuum error bound",
+          "regularization": "sampled deterministic-limit bias; mixed with initial quadrature error until configuration refinement",
+          "time": "two independent classical RK4 references; step refinement measures reference integration sensitivity, not temporal DG error"
+        },
+        "parameters": {
+          "cells": 3,
+          "extent": 1.0,
+          "horizon": 0.001,
+          "max_bytes": 268435456,
+          "max_dimension": 100000,
+          "max_entries": 3000000,
+          "max_work": 2000000000,
+          "minimum_support_samples": 2,
+          "order": 1,
+          "steps": 4,
+          "width": 0.4
+        },
+        "physical_dimension": 5,
+        "physical_source": "PeriodicBdm1 complete periodic two-triangle nonlinear system",
+        "quantum_execution": false,
+        "result": null,
+        "schema": "quest-cfd-full-kvn-refinement-v1",
+        "status": "rejected",
+        "viscosity": 0.01
+      },
+      "valid_report": true
+    },
+    {
+      "axis": "reference-integration",
+      "arguments": [
+        "--steps",
+        "8"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 18.14308996699765,
+      "peak_rss_kib": 9596,
+      "address_space_cap_bytes": 536870912,
+      "stdout_bytes": 5202,
+      "report": {
+        "convergence_certified": false,
+        "elapsed_seconds": 18.135573481,
+        "error": null,
+        "error_contract": {
+          "combined_bound": null,
+          "comparison": "mass-weighted nodal probability weak coordinate and kinetic-energy errors versus the identical full DG trajectory ensemble",
+          "configuration": "weak observable discrepancy at fixed bump width; includes unresolved periodic-domain effects",
+          "domain": "outer-cell occupation only; no outward flux or leakage certificate",
+          "encoding_polynomial_sampling": "not executed in this classical experiment",
+          "physical_discretization": "held fixed; no continuum error bound",
+          "regularization": "sampled deterministic-limit bias; mixed with initial quadrature error until configuration refinement",
+          "time": "two independent classical RK4 references; step refinement measures reference integration sensitivity, not temporal DG error"
+        },
+        "parameters": {
+          "cells": 3,
+          "extent": 1.0,
+          "horizon": 0.001,
+          "max_bytes": 268435456,
+          "max_dimension": 100000,
+          "max_entries": 3000000,
+          "max_work": 2000000000,
+          "minimum_support_samples": 2,
+          "order": 1,
+          "steps": 8,
+          "width": 1.2
+        },
+        "physical_dimension": 5,
+        "physical_source": "PeriodicBdm1 complete periodic two-triangle nonlinear system",
+        "quantum_execution": false,
+        "result": {
+          "comparison": {
+            "configuration_dimension": 7776,
+            "coordinate_mean_error": 0.00018066380502206394,
+            "energy_error": 0.0005787958480309996,
+            "final_concentration": {
+              "boundary_occupation_fraction": 0.9718172686319965,
+              "convergence_certified": false,
+              "effective_nodal_coefficients": 1186.690693426171,
+              "maximum_nodal_probability": 0.001439274808706242,
+              "minimum_required_standard_deviations_per_spacing": null,
+              "probability": 1.000000000000012,
+              "standard_deviations_per_spacing": [
+                0.5559177634664607,
+                0.5353192229606933,
+                0.5250967145503027,
+                0.5392033874621256,
+                0.5157882582395255
+              ]
+            },
+            "horizon": 0.001,
+            "initial": {
+              "boundary_probability": 0.9720726942605714,
+              "coordinate_means": [
+                0.09312124608872105,
+                -0.058336722929577735,
+                0.039536557785893434,
+                0.06495048957053104,
+                -0.022079724779936718
+              ],
+              "coordinate_variances": [
+                0.13735313766113552,
+                0.12765428437540075,
+                0.12254513761400875,
+                0.12952391370495936,
+                0.11870175336633289
+              ],
+              "mean_kinetic_energy": 0.3270610930902387,
+              "probability": 1.0000000000000164
+            },
+            "initial_concentration": {
+              "boundary_occupation_fraction": 0.9720726942605554,
+              "convergence_certified": false,
+              "effective_nodal_coefficients": 1189.7900682132195,
+              "maximum_nodal_probability": 0.0014262501345076845,
+              "minimum_required_standard_deviations_per_spacing": null,
+              "probability": 1.0000000000000164,
+              "standard_deviations_per_spacing": [
+                0.5559177634664635,
+                0.5359310961724946,
+                0.5250967145503004,
+                0.5398414636133079,
+                0.5167968121750065
+              ]
+            },
+            "lifted": {
+              "boundary_probability": 0.9718172686320081,
+              "coordinate_means": [
+                0.09312124608872344,
+                -0.05810724484247823,
+                0.03953655778589373,
+                0.06469840652662216,
+                -0.021881712263425678
+              ],
+              "coordinate_variances": [
+                0.13735313766113416,
+                0.1273629646538847,
+                0.12254513761400984,
+                0.12921790802250277,
+                0.11823890103900599
+              ],
+              "mean_kinetic_energy": 0.32649694995353057,
+              "probability": 1.000000000000012
+            },
+            "method": "classical full-DG trajectory ensemble versus classical full-coordinate KvN semidiscretization; no quantum execution",
+            "probability_drift": 4.440892098500626e-15,
+            "retained_coordinates": 5,
+            "trajectory_mean_coordinates": [
+              0.09312124608872105,
+              -0.05820923691462388,
+              0.039536557785893434,
+              0.06480124865617962,
+              -0.0219896961698774
+            ],
+            "trajectory_mean_kinetic_energy": 0.32591815410549957
+          },
+          "deterministic_reference": {
+            "coordinates": [
+              0.15,
+              -0.09978637380912778,
+              0.07,
+              0.1097431127208976,
+              -0.039835773826435196
+            ],
+            "kinetic_energy": 0.025493880031998758
+          },
+          "initial_sampled_regularization_coordinate_bias": 0.09082751382800512,
+          "sampling": {
+            "convergence_certified": false,
+            "distinct_samples_in_support": [
+              4,
+              4,
+              4,
+              4,
+              4
+            ],
+            "maximum_distinct_node_spacing": 0.6666666666666667,
+            "minimum_required_samples": 2,
+            "support_intersects_boundary": true,
+            "width_per_spacing": 1.7999999999999998
+          },
+          "trajectory_sampled_regularization_coordinate_bias": 0.09072004135642707,
+          "trajectory_sampled_regularization_energy_bias": 0.3004242740735008
+        },
+        "schema": "quest-cfd-full-kvn-refinement-v1",
+        "status": "classical_validation",
+        "viscosity": 0.01
+      },
+      "valid_report": true
+    },
+    {
+      "axis": "concentration-window",
+      "arguments": [
+        "--horizon",
+        "0.01",
+        "--steps",
+        "40"
+      ],
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_seconds": 88.45409344099971,
+      "peak_rss_kib": 9632,
+      "address_space_cap_bytes": 536870912,
+      "stdout_bytes": 5200,
+      "report": {
+        "convergence_certified": false,
+        "elapsed_seconds": 88.445894021,
+        "error": null,
+        "error_contract": {
+          "combined_bound": null,
+          "comparison": "mass-weighted nodal probability weak coordinate and kinetic-energy errors versus the identical full DG trajectory ensemble",
+          "configuration": "weak observable discrepancy at fixed bump width; includes unresolved periodic-domain effects",
+          "domain": "outer-cell occupation only; no outward flux or leakage certificate",
+          "encoding_polynomial_sampling": "not executed in this classical experiment",
+          "physical_discretization": "held fixed; no continuum error bound",
+          "regularization": "sampled deterministic-limit bias; mixed with initial quadrature error until configuration refinement",
+          "time": "two independent classical RK4 references; step refinement measures reference integration sensitivity, not temporal DG error"
+        },
+        "parameters": {
+          "cells": 3,
+          "extent": 1.0,
+          "horizon": 0.01,
+          "max_bytes": 268435456,
+          "max_dimension": 100000,
+          "max_entries": 3000000,
+          "max_work": 2000000000,
+          "minimum_support_samples": 2,
+          "order": 1,
+          "steps": 40,
+          "width": 1.2
+        },
+        "physical_dimension": 5,
+        "physical_source": "PeriodicBdm1 complete periodic two-triangle nonlinear system",
+        "quantum_execution": false,
+        "result": {
+          "comparison": {
+            "configuration_dimension": 7776,
+            "coordinate_mean_error": 0.0017811640317672538,
+            "energy_error": 0.006085342001203198,
+            "final_concentration": {
+              "boundary_occupation_fraction": 0.9694486854275914,
+              "convergence_certified": false,
+              "effective_nodal_coefficients": 1159.6971544308124,
+              "maximum_nodal_probability": 0.0015603133488327672,
+              "minimum_required_standard_deviations_per_spacing": null,
+              "probability": 1.0000000000000184,
+              "standard_deviations_per_spacing": [
+                0.5559177634664642,
+                0.5302188972340484,
+                0.525096714550301,
+                0.5338561189158973,
+                0.508479634549759
+              ]
+            },
+            "horizon": 0.01,
+            "initial": {
+              "boundary_probability": 0.9720726942605714,
+              "coordinate_means": [
+                0.09312124608872105,
+                -0.058336722929577735,
+                0.039536557785893434,
+                0.06495048957053104,
+                -0.022079724779936718
+              ],
+              "coordinate_variances": [
+                0.13735313766113552,
+                0.12765428437540075,
+                0.12254513761400875,
+                0.12952391370495936,
+                0.11870175336633289
+              ],
+              "mean_kinetic_energy": 0.3270610930902387,
+              "probability": 1.0000000000000164
+            },
+            "initial_concentration": {
+              "boundary_occupation_fraction": 0.9720726942605554,
+              "convergence_certified": false,
+              "effective_nodal_coefficients": 1189.7900682132195,
+              "maximum_nodal_probability": 0.0014262501345076845,
+              "minimum_required_standard_deviations_per_spacing": null,
+              "probability": 1.0000000000000164,
+              "standard_deviations_per_spacing": [
+                0.5559177634664635,
+                0.5359310961724946,
+                0.5250967145503004,
+                0.5398414636133079,
+                0.5167968121750065
+              ]
+            },
+            "lifted": {
+              "boundary_probability": 0.9694486854276093,
+              "coordinate_means": [
+                0.09312124608872255,
+                -0.05606437861806149,
+                0.039536557785893336,
+                0.062454845271694176,
+                -0.02013675363548125
+              ],
+              "coordinate_variances": [
+                0.13735313766113585,
+                0.12494759065959572,
+                0.1225451376140091,
+                0.1266677136461977,
+                0.11491179500082514
+              ],
+              "mean_kinetic_energy": 0.3220546957755749,
+              "probability": 1.0000000000000184
+            },
+            "method": "classical full-DG trajectory ensemble versus classical full-coordinate KvN semidiscretization; no quantum execution",
+            "probability_drift": 1.9984014443252818e-15,
+            "retained_coordinates": 5,
+            "trajectory_mean_coordinates": [
+              0.09312124608872105,
+              -0.057073988077312,
+              0.039536557785893434,
+              0.06346970059577328,
+              -0.021196613399337563
+            ],
+            "trajectory_mean_kinetic_energy": 0.3159693537743717
+          },
+          "deterministic_reference": {
+            "coordinates": [
+              0.15,
+              -0.09788185184956155,
+              0.07,
+              0.1074593552015651,
+              -0.038389197475606186
+            ],
+            "kinetic_energy": 0.02500105021232837
+          },
+          "initial_sampled_regularization_coordinate_bias": 0.09082751382800512,
+          "sampling": {
+            "convergence_certified": false,
+            "distinct_samples_in_support": [
+              4,
+              4,
+              4,
+              4,
+              4
+            ],
+            "maximum_distinct_node_spacing": 0.6666666666666667,
+            "minimum_required_samples": 2,
+            "support_intersects_boundary": true,
+            "width_per_spacing": 1.7999999999999998
+          },
+          "trajectory_sampled_regularization_coordinate_bias": 0.08977288211505158,
+          "trajectory_sampled_regularization_energy_bias": 0.29096830356204334
+        },
+        "schema": "quest-cfd-full-kvn-refinement-v1",
+        "status": "classical_validation",
+        "viscosity": 0.01
+      },
+      "valid_report": true
+    }
+  ],
+  "limitations": [
+    "Minimum support-node policy is necessary sampling evidence, not convergence",
+    "Outer-cell occupation is not outward flux or an error bound",
+    "Classical RK4 sensitivity is not temporal DG refinement",
+    "Initial regularization bias includes sampled quadrature error",
+    "Physical mesh is fixed; all independent coordinates are retained",
+    "Address-space cap is per process, not a distributed capacity test"
+  ]
+}

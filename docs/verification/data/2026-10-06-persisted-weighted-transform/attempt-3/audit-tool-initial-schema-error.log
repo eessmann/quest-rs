@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "<private-artifacts>/quest-persisted-attempt3-independent-audit.py", line 53, in <module>
+    for f in manifest['files']:assert source_map[f['path']]==f['sha256']
+                                      ~~~~~~~~~~^^^^^^^^^^^
+KeyError: 'docs/research/persisted-weighted-transform.md'

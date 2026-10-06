@@ -5,7 +5,8 @@
 //! Count backend calls and reserve modeled opaque-kernel work. This is not a
 //! bound on transcendental-library internals or arbitrary callback code. A bulk
 //! reservation remains charged if a later inner backend rejects the batch.
-use super::{ArithmeticError, Backend, EnclosureBackend, ExactConstant, PointBackend};
+use super::{Backend, EnclosureBackend, ExactConstant, PointBackend};
+use mathcore::arithmetic::ArithmeticError;
 use std::{cell::Cell, cmp::Ordering};
 #[derive(Debug)]
 pub struct Budget {

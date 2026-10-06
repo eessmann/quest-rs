@@ -1,0 +1,218 @@
+{
+  "schema": "quest-prepared-weighted-matching-focused-v1",
+  "captured_utc": "2026-10-06T02:23:54.936966+00:00",
+  "status": "scoped_owner_and_independent_checks_passed",
+  "scope": "local CPU/MPICH prepared matching weighted whole-unitary composition; no integrated workspace or research-programme acceptance",
+  "source": {
+    "schema": "quest-focused-native-weighted-matching-source-v1",
+    "captured_utc": "2026-10-06T02:19:49.367739+00:00",
+    "scope": "17 native runtime/helper/test files plus two coordinated pure dependency files; focused content identity, not a complete build attestation",
+    "file_count": 19,
+    "focused_content_sha256": "8367ffe34d1b31110f3c086cde0a497d39b3b9cbf753e2b97737b54b3014bc42",
+    "files": [
+      {
+        "path": "crates/quest-qsvt/src/portfolio/lcu_plan.rs",
+        "sha256": "db781ccfc3bc6524086395a20e371df60b36066d38e61a7ac255e51c24e2032a"
+      },
+      {
+        "path": "crates/quest-qsvt/src/state_preparation.rs",
+        "sha256": "17cde8a01e3e298252f736936699b1ae04affc875f022bb49c23902c19120b4c"
+      },
+      {
+        "path": "crates/quest/src/environment.rs",
+        "sha256": "ae8e23f4cdcb752c20fe743fdb8cffee5283c30986b31d32ebfa87945a3942c9"
+      },
+      {
+        "path": "crates/quest/src/qsvt/matching.rs",
+        "sha256": "87dbfc2f1ec6b61ffeadea693fbac0030943f3e8fda7d4df9d41628a66d6b822"
+      },
+      {
+        "path": "crates/quest/src/qsvt/matching/batched.rs",
+        "sha256": "d464add95b7e72fc731d807d5094b9e9a5d9cdbc38d54a9d816f87edfbd1d0c9"
+      },
+      {
+        "path": "crates/quest/src/qsvt/matching/collective.rs",
+        "sha256": "4550c1b9fc14133385f460ddbad94b81e9f5fca678681eae807b72c8c666208f"
+      },
+      {
+        "path": "crates/quest/src/qsvt/matching/cost.rs",
+        "sha256": "7dd3222d07505d70ab2f42157f463c29d3b49ebabe789cd58d2430c214cb971f"
+      },
+      {
+        "path": "crates/quest/src/qsvt/matching/local_batch.rs",
+        "sha256": "699d23da18a04327cd62f92fc661b60b16d2a92fe7bb8ead8e3ba2b7591c672e"
+      },
+      {
+        "path": "crates/quest/src/qsvt/matching_lcu.rs",
+        "sha256": "3a07131b74106cb7ee749c025b86c34da751f17bac432c4e07a02186e609ecb5"
+      },
+      {
+        "path": "crates/quest/src/qsvt/matching_lcu/collective.rs",
+        "sha256": "410aee41b5fe2299ddd9f5595c270514226beb758cd18c4cb53a0f0c0efaa0a4"
+      },
+      {
+        "path": "crates/quest/src/qsvt/matching_lcu/collective/failure_tests.rs",
+        "sha256": "1f48f5461288916bddefc5ccbef25cadc58ac3a3853ea417c14b65da07b99e46"
+      },
+      {
+        "path": "crates/quest/src/qsvt/mod.rs",
+        "sha256": "347c8d52be4ca3983e708bb2ad9b7dbacccc14800a744fa32beec84aeb16d738"
+      },
+      {
+        "path": "crates/quest/src/qsvt/replay_native.rs",
+        "sha256": "78c75f4e2a2b2f7189390424be8b6767bc968190ff11a674fe70fddd818629c5"
+      },
+      {
+        "path": "crates/quest/src/register.rs",
+        "sha256": "e27daac954f05c4a4b121086c44f12a4daa9f2caad3b1797426b3f4a5a706d65"
+      },
+      {
+        "path": "crates/quest/tests/matching_collective.rs",
+        "sha256": "3d924cda86ad97c55f7640f261991eb0fcdb57f222d86ed403d3a75824ecd3ea"
+      },
+      {
+        "path": "crates/quest/tests/matching_cost.rs",
+        "sha256": "dd94490d419d0f5af52a9c237abeefbcce442e09b52dc05425e31903c91a4b15"
+      },
+      {
+        "path": "crates/quest/tests/matching_lcu.rs",
+        "sha256": "02f2824daca6c9c38bc7f198d527998790593d8e5d61d073c84f773763f83b89"
+      },
+      {
+        "path": "crates/quest/tests/matching_lcu_collective.rs",
+        "sha256": "16acb9dd61f77400b6a1c60488bd8206075680dfc76eabb96be6e9ae3b00550d"
+      },
+      {
+        "path": "crates/quest/tests/matching_runtime.rs",
+        "sha256": "2dbf560526f7a5442a26865f8e7a0f885bd02dadb8d0d1e49abc97d42d833642"
+      }
+    ]
+  },
+  "source_binding": "focused per-file content captured before final owner CPU/fault and independent reruns; all nineteen bytes unchanged at receipt capture; not complete build attestation",
+  "owner_results": {
+    "cpu_tests_passed": 4,
+    "cpu_lcu_seconds": 20.65,
+    "cpu_child_seconds": 0.16,
+    "weighted_mpi_requests_passed": 7,
+    "weighted_mpi_seconds": 73.54,
+    "weighted_mpi_three_term_lanes": [
+      "1",
+      "2",
+      "4",
+      "8",
+      "4_split_2_plus_2"
+    ],
+    "weighted_mpi_zero_underflow_lanes": [
+      "1",
+      "2"
+    ],
+    "fault_parent_tests_passed": 2,
+    "admission_requests_passed": 9,
+    "fatal_requests_passed": 4,
+    "fault_parent_seconds": 7.1,
+    "child_mpi_parent_tests_passed": 1,
+    "child_mpi_requests_passed": 5,
+    "child_mpi_seconds": 15.38,
+    "strict_native_lib_tests_clippy_passed": true
+  },
+  "independent_results": {
+    "cost_tests_passed": 2,
+    "cpu_test_passed": true,
+    "cpu_seconds": 20.32,
+    "weighted_mpi_parent_test_passed": true,
+    "weighted_mpi_requests_passed": 7,
+    "weighted_mpi_seconds": 73.57,
+    "fault_parent_tests_passed": 2,
+    "fault_seconds": 7.07,
+    "strict_clippy_passed": true,
+    "strict_clippy_seconds": 5.5,
+    "selector_probe_early_rejection_passed": true,
+    "frozen_manifest_unchanged_before_after": true
+  },
+  "comparison": {
+    "full_reference_amplitudes": 512,
+    "absolute_complex_amplitude_tolerance": 2e-12,
+    "standalone_adjoint": true,
+    "positive_negative_controls": true,
+    "failure_color_padding_spectator_sectors": true,
+    "tiny_nonzero_mass_actually_underflowed": true,
+    "complete_reference_storage_test_only": true
+  },
+  "qualifications": [
+    "debug-profile local timings include cold full references and are not performance benchmarks",
+    "native state payload, four-copy environment accounting and Rust Vec/scalar/Arc/stack allowances are distinct; no measured native memory/RSS",
+    "matching-router payload bounds exclude constructor comparisons/scalar controls/native-internal/protocol wire; comparison traffic separately reported",
+    "already prepared children consume separate earlier source/preprocessing/loading/preparation budgets; wrapper is not total pipeline admission",
+    "zero-weight children remain owned and charged; K independent native scratch registers",
+    "no generic tensor/loaded-resource portfolio, density-register LCU, multi-host capacity or inverse/CFD accuracy acceptance",
+    "independent review approved scope; root integrated checkpoint follows separately"
+  ],
+  "logs": [
+    {
+      "label": "owner_cpu",
+      "log_basename": "quest-matching-lcu-cpu-final.log",
+      "sha256": "3b013cb1ac5f3e45826869b21743ec324fb6f9ec4f9ce4236dc29f459f71eb0f",
+      "bytes": 1891
+    },
+    {
+      "label": "owner_weighted_mpi",
+      "log_basename": "quest-matching-lcu-collective-final.log",
+      "sha256": "e259f4a26f8695313b5aa6b47477281b073b6c343c7051626defe7b905b77194",
+      "bytes": 16101
+    },
+    {
+      "label": "owner_fault_admission",
+      "log_basename": "quest-matching-lcu-failure-final.log",
+      "sha256": "4b106fcd68280f98942c43d174f39d5af3cc957d809db6a4eac7e96ec480af70",
+      "bytes": 7605
+    },
+    {
+      "label": "owner_child_mpi",
+      "log_basename": "quest-matching-lcu-child-mpi-final.log",
+      "sha256": "f49e784e6550bf9eadddef4b17fd4db5cfd9727512092961b3e89307e84f0145",
+      "bytes": 10671
+    },
+    {
+      "label": "owner_clippy",
+      "log_basename": "quest-matching-lcu-clippy-tests.log",
+      "sha256": "e928fdd555517498a75e44684587e9d08cb79b73830f082b5249e2f4c326052e",
+      "bytes": 1017
+    },
+    {
+      "label": "independent_cpu_mpi",
+      "log_basename": "quest-native-lcu-independent-tests.log",
+      "sha256": "fd40ac2f719525f701da945de89cc36f5a8b72e3eb4d1ba3f7f6979681f39079",
+      "bytes": 16961
+    },
+    {
+      "label": "independent_faults",
+      "log_basename": "quest-native-lcu-independent-faults.log",
+      "sha256": "ef9d0129795c35d76f086b621bfec6a66bc8aefe29995ea05eb60daa664012a2",
+      "bytes": 7696
+    },
+    {
+      "label": "independent_clippy",
+      "log_basename": "quest-native-lcu-independent-clippy.log",
+      "sha256": "23491e63a8cea91b0dcf1533f11944f1f1793cba0eff3be916ff21f437fa08ce",
+      "bytes": 1113
+    },
+    {
+      "label": "selector_red",
+      "log_basename": "quest-lcu-selector-probe-red.log",
+      "sha256": "e1cfb70e5f88474fecd5bae2123a2f47510b772ddb004b65dd5128f4e2d4e6ce",
+      "bytes": 210
+    },
+    {
+      "label": "selector_green",
+      "log_basename": "quest-lcu-selector-probe-green.log",
+      "sha256": "238971ee2eb4c06ec5744d78a50d581ffc064c7a0db1ec5bb06c9a66f2d9323e",
+      "bytes": 203
+    },
+    {
+      "label": "owner_selector_red",
+      "log_basename": "quest-matching-lcu-selector-red.log",
+      "sha256": "6ae5e579de2105d4b0fa30403f54b5ee54ec1d2cde40d5344bbac34ab22796ef",
+      "bytes": 1698
+    }
+  ]
+}

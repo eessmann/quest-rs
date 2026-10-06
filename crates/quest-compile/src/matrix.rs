@@ -1,4 +1,6 @@
-pub use quest_language::matrix::{MatrixPolicy, NumericalOperator, UnitaryAdmission};
+pub use quest_language::matrix::{
+	MatrixPolicy, NumericalOperator, UnitaryAdmission, UnitaryEvidence,
+};
 /// # Errors
 /// Rejects invalid dimensions, nonfinite values, failed numerical admission, and allocation limits.
 pub fn check_channel(

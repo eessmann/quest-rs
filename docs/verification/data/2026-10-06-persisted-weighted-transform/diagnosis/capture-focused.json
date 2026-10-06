@@ -1,0 +1,75 @@
+{
+  "schema": "quest-persisted-capture-fix-focused-v1",
+  "scope": "capture policy and minimal MPI init only; no consumer campaign retry",
+  "python_groups": 25,
+  "minimal_mpi_init": {
+    "returncode": 0,
+    "timed_out": false,
+    "driver_interrupted": false,
+    "output_limit": false,
+    "capture_incomplete": false,
+    "elapsed_seconds": 0.49722942000516923,
+    "caps": {
+      "address_space_bytes": 2147483648,
+      "stdout_bytes": 4194304,
+      "stderr_bytes": 4194304,
+      "read_chunk_bytes": 65536,
+      "process_file_size_limit": null,
+      "seconds": 30
+    },
+    "stdout": {
+      "path": "capture.stdout",
+      "bytes": 296,
+      "sha256": "c1fb5890477bb72970aef26083307485f0c94c60703bea3252db36275d160433",
+      "observed_bytes": 296,
+      "truncated": false
+    },
+    "stderr": {
+      "path": "capture.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "observed_bytes": 0,
+      "truncated": false
+    },
+    "scope": "minimal MPI_Init_thread/Finalize only; no QuEST or consumer generation/synthesis/application",
+    "runner_sha256": "0313e0ba2ab937873d08012b6214ab442cc2a342bf1f786e547aa61fdb635e26",
+    "minimal_binary_sha256": "e135610e233c6753c1ad5b41a9a5d43e0e61a2215e59e5538dd457b92ad37594"
+  },
+  "evidence": [
+    {
+      "path": "<private-artifacts>/quest-persisted-capture-transport-red.log",
+      "bytes": 738,
+      "sha256": "6068d31248cfc0f72153fbb447b475045cd8285c7395f4087a27243f0dede1ec"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-capture-first-green.log",
+      "bytes": 120,
+      "sha256": "4e28bebd0fc1d5e4a33885975016aeedf46892d8a729e7856d19f0e71c7044d8"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-capture-cleanup-green.log",
+      "bytes": 122,
+      "sha256": "2cd05b8dd004daae9db5c50a23c3e2385272b541eadf3d2d7a4db859d0ea14d1"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-capture-final-green.log",
+      "bytes": 124,
+      "sha256": "ebeaadd193f3a5551e2b5048e438c571a57beea228aa26c1d3c6a042218c008f"
+    },
+    {
+      "path": "<private-artifacts>/quest-mpi-fsize-diagnostic/receipt.json",
+      "bytes": 959,
+      "sha256": "00b2e852a2fec56798941d78f6c039334ac315053ce7828ff5b70808d850314c"
+    },
+    {
+      "path": "<private-artifacts>/quest-mpi-fsize-diagnostic/capture-receipt.json",
+      "bytes": 1056,
+      "sha256": "2573168df5b12a3186687b06857f9540031eda0cdcb9a55abd06b1b61ed6c299"
+    },
+    {
+      "path": "<private-artifacts>/quest-mpi-fsize-diagnostic/capture-probe.py",
+      "bytes": 896,
+      "sha256": "13d59fcaa9075d07b53b3872ae2289194badf6c9ee7421896fde2903dfc005bf"
+    }
+  ]
+}

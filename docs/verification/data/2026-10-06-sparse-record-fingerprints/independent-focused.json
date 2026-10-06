@@ -1,0 +1,233 @@
+{
+  "schema": "sparse-record-fingerprint-v2-independent-focused-v1",
+  "verdict": "approved within matching scope",
+  "scope_paths": 18,
+  "source_manifest": "source.json",
+  "source_manifest_sha256": "5ff27a818e1aa6e32e2a2f53690bccea5fdcf44036fd44c792c0186319abf41d",
+  "original_private_receipt_sha256": "f027de67faa4549202b3d29dbf5756b688df3c6ac67ca63d36881b116f933596",
+  "native_environment_scope": "Configured installed QuEST and matching system MPICH; not a hermetic executable-build attestation",
+  "no_new_commands_during_candidate_preparation": true,
+  "entries": [
+    {
+      "status": "passed",
+      "exit_code": 0,
+      "scope": "10 tests:3 digest+5 resource+2 shard",
+      "log": "logs/quest-sparse-fingerprint-independent-pure.log",
+      "log_bytes": 2179,
+      "log_sha256": "a25f0c5e6908e88d8195096546ef31a1fe3ffa3943c2e6e855d2340fc19ad6d8",
+      "original_log_bytes": 2179,
+      "original_log_sha256": "a25f0c5e6908e88d8195096546ef31a1fe3ffa3943c2e6e855d2340fc19ad6d8",
+      "test_summaries": [
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s",
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "status": "passed",
+      "exit_code": 0,
+      "scope": "11 HDF5/manifest tests",
+      "log": "logs/quest-sparse-fingerprint-independent-io.log",
+      "log_bytes": 1875,
+      "log_sha256": "0750b9d9761ab7e05d6017bbfbaba81e6ee9a6d27f42ee1d9d24f2961a29c840",
+      "original_log_bytes": 1945,
+      "original_log_sha256": "8ddc31be34dfc2e136a08a17194f95ec66cccd5ca3affcebeaa3128606e4d327",
+      "test_summaries": [
+        "test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s"
+      ]
+    },
+    {
+      "status": "passed",
+      "exit_code": 0,
+      "scope": "Four MPI parents:wholeU15.51s,restart8.14s,bridge3.01s,producer3.57s;1/2/4/8/split;4\u21922/8 and3reject",
+      "log": "logs/quest-sparse-fingerprint-independent-native.log",
+      "log_bytes": 13130,
+      "log_sha256": "c12ed06263381d07a2fcbbe1d6f1ec9b81038af8cae498187329d269e1960591",
+      "original_log_bytes": 13264,
+      "original_log_sha256": "438d6e991895f7053af26573fceb589befa5a394a3639b0f00ce0d00e9c0dce9",
+      "test_summaries": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.78s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.78s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.78s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.81s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.81s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.81s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.81s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.83s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.83s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.83s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.84s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.91s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.91s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.91s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.91s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.91s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.91s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.91s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.91s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 15.51s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.14s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.01s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.57s"
+      ]
+    },
+    {
+      "status": "lint-failed",
+      "exit_code": 101,
+      "scope": "Preserved3 assertion-in-Result diagnostics; later test-only correction passed",
+      "log": "logs/quest-sparse-fingerprint-independent-pure-clippy.log",
+      "log_bytes": 5092,
+      "log_sha256": "04720cefd7004b4b87d18cd161325258a691b5ccc9089b2283e327359aeb50b9",
+      "original_log_bytes": 5127,
+      "original_log_sha256": "5b9cbddc8f4f8ef8b15b9621cb5c10200db88f36d12daa4abd4f5e11aa5f0c18",
+      "test_summaries": []
+    },
+    {
+      "status": "passed",
+      "exit_code": 0,
+      "scope": "Strict scoped IO lib+sharded_matching",
+      "log": "logs/quest-sparse-fingerprint-independent-io-clippy.log",
+      "log_bytes": 841,
+      "log_sha256": "0f3dc93356a13fecbd2d90f9d41fa0b8478c1994f407d2e98fdb39560ad17516",
+      "original_log_bytes": 911,
+      "original_log_sha256": "e6297ccb6f595bc8985221c9b7f8ce102948caedee8c9613c74bd1d3990659b4",
+      "test_summaries": []
+    },
+    {
+      "status": "passed",
+      "exit_code": 0,
+      "scope": "Strict scoped native lib+four affected test targets",
+      "log": "logs/quest-sparse-fingerprint-independent-native-clippy.log",
+      "log_bytes": 1085,
+      "log_sha256": "9e4bc6265f3cf1d364c22597d6e750d476d1897bb3662049e22c260a2b3c689e",
+      "original_log_bytes": 1219,
+      "original_log_sha256": "95c6ab52e5c7f6c184b9720c408d54170022b3447f1715b2df39fcbe807055fd",
+      "test_summaries": []
+    },
+    {
+      "status": "passed",
+      "exit_code": 0,
+      "scope": "Final3 digest tests",
+      "log": "logs/quest-sparse-fingerprint-independent-digest-delta.log",
+      "log_bytes": 1220,
+      "log_sha256": "b5588381b1e8a38b35872b7338a353a767c10b2e4e3c70951a21d02e64f53c30",
+      "original_log_bytes": 1255,
+      "original_log_sha256": "dd476ac460d2dd1fd8803a4b78c266530ac888777951dcf19294ee4e101954c1",
+      "test_summaries": [
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "status": "passed",
+      "exit_code": 0,
+      "scope": "Final1 pure private producer source test; no MPI initialization",
+      "log": "logs/quest-sparse-fingerprint-independent-source-delta.log",
+      "log_bytes": 1433,
+      "log_sha256": "65949dbd2382d55ebc7a6346ffce40b061704831f1bbe319a3c25cdb9f353bd9",
+      "original_log_bytes": 1567,
+      "original_log_sha256": "0ebc0d6fd6f05d3d2d41b530ceab217f4f0e903d4a2529b70290e23db54eb089",
+      "test_summaries": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 38 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "status": "passed",
+      "exit_code": 0,
+      "scope": "Final strict scoped pure lib+three test targets",
+      "log": "logs/quest-sparse-fingerprint-independent-pure-clippy-final.log",
+      "log_bytes": 772,
+      "log_sha256": "b21c0ef0d0f7e6e9153049561b24ede91a00284f199700676600ca09440bd954",
+      "original_log_bytes": 807,
+      "original_log_sha256": "279e183a5d073df4c40debb777312a580494d350c55ec1e60b9027332a709ea8",
+      "test_summaries": []
+    }
+  ],
+  "artifacts": [
+    {
+      "original_label": "quest-sparse-fingerprint-independent-pure.log",
+      "original_bytes": 2179,
+      "original_sha256": "a25f0c5e6908e88d8195096546ef31a1fe3ffa3943c2e6e855d2340fc19ad6d8"
+    },
+    {
+      "original_label": "quest-sparse-fingerprint-independent-io.log",
+      "original_bytes": 1945,
+      "original_sha256": "8ddc31be34dfc2e136a08a17194f95ec66cccd5ca3affcebeaa3128606e4d327"
+    },
+    {
+      "original_label": "quest-sparse-fingerprint-independent-native.log",
+      "original_bytes": 13264,
+      "original_sha256": "438d6e991895f7053af26573fceb589befa5a394a3639b0f00ce0d00e9c0dce9"
+    },
+    {
+      "original_label": "quest-sparse-fingerprint-independent-digest-final.log",
+      "original_bytes": 1157,
+      "original_sha256": "3648fe87abc060d61f7389497b5ea03d7edcfdd9682e50d23727cbfd35689de3"
+    },
+    {
+      "original_label": "quest-sparse-fingerprint-independent-pure-clippy.log",
+      "original_bytes": 5127,
+      "original_sha256": "5b9cbddc8f4f8ef8b15b9621cb5c10200db88f36d12daa4abd4f5e11aa5f0c18"
+    },
+    {
+      "original_label": "quest-sparse-fingerprint-independent-io-clippy.log",
+      "original_bytes": 911,
+      "original_sha256": "e6297ccb6f595bc8985221c9b7f8ce102948caedee8c9613c74bd1d3990659b4"
+    },
+    {
+      "original_label": "quest-sparse-fingerprint-independent-native-clippy.log",
+      "original_bytes": 1219,
+      "original_sha256": "95c6ab52e5c7f6c184b9720c408d54170022b3447f1715b2df39fcbe807055fd"
+    },
+    {
+      "original_label": "quest-sparse-fingerprint-independent-digest-delta.log",
+      "original_bytes": 1255,
+      "original_sha256": "dd476ac460d2dd1fd8803a4b78c266530ac888777951dcf19294ee4e101954c1"
+    },
+    {
+      "original_label": "quest-sparse-fingerprint-independent-source-delta.log",
+      "original_bytes": 1567,
+      "original_sha256": "0ebc0d6fd6f05d3d2d41b530ceab217f4f0e903d4a2529b70290e23db54eb089"
+    },
+    {
+      "original_label": "quest-sparse-fingerprint-independent-pure-clippy-final.log",
+      "original_bytes": 807,
+      "original_sha256": "279e183a5d073df4c40debb777312a580494d350c55ec1e60b9027332a709ea8"
+    },
+    {
+      "original_label": "quest-sparse-fingerprint-review-before.json",
+      "original_bytes": 3694,
+      "original_sha256": "9b7b2ed700a579269ad6b3c2ba35881e2c2aec5a0a2387573d71a0d380d9a2c2"
+    },
+    {
+      "original_label": "quest-sparse-fingerprint-review-after.json",
+      "original_bytes": 3695,
+      "original_sha256": "84dc4f2fa707e5546026f53d04de21624b7b58638bcd609c7fdf55eee194b6e1"
+    },
+    {
+      "original_label": "quest-sparse-fingerprint-review-final-before.json",
+      "original_bytes": 3694,
+      "original_sha256": "d0f5a660eaefad48fb29fdc4a71fb53d0a956f4b8c1d36b649d0691daa094273"
+    },
+    {
+      "original_label": "quest-sparse-fingerprint-review-final-after.json",
+      "original_bytes": 3694,
+      "original_sha256": "d0f5a660eaefad48fb29fdc4a71fb53d0a956f4b8c1d36b649d0691daa094273"
+    },
+    {
+      "original_label": "quest-sparse-fingerprint-independent-reference.json",
+      "original_bytes": 1140,
+      "original_sha256": "c87b783e7c25ca8a7c4a051a4bf21b70db8e48c828218a3c14810141dbdf9614"
+    }
+  ],
+  "source_delta": {
+    "initial_manifest_sha256": "54023f8cd266cd58128e6ee60b5465fd247d17ef4b739f48a47acf811654ae4f",
+    "changed_paths": [
+      "crates/quest-qsvt/tests/matching_digest.rs",
+      "crates/quest/src/qsvt/matching/preprocess.rs"
+    ],
+    "scope": "test arithmetic/style and justified test assertion lint annotations only; production preprocessing hash restored by removing exactly the new cfg(test) allowance",
+    "final18_before_after_equal": true
+  },
+  "executed_n32_scientific_campaign": false,
+  "whole_workspace_acceptance_claimed": false
+}

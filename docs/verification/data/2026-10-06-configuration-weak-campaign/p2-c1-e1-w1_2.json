@@ -1,0 +1,104 @@
+{
+  "schema": "quest-configuration-weak-row-v1",
+  "status": "sampling-rejected",
+  "phase": "sampling policy",
+  "error": "see retained phase, resource receipt and bounded stderr",
+  "request": {
+    "row_id": "p2-c1-e1-w1_2",
+    "order": 2,
+    "cells": 1,
+    "extent": 1.0,
+    "width": 0.5,
+    "center": [
+      0.15,
+      -0.1,
+      0.07,
+      0.11,
+      -0.04
+    ],
+    "viscosity": 0.01,
+    "time": 0.0,
+    "physical_dimension": 5,
+    "minimum_support_samples": 2,
+    "nonlinear_witness": true
+  },
+  "limits": {
+    "max_bytes": 268435456,
+    "max_source_work": 1000000000,
+    "max_physical_work": 100000000000,
+    "max_physical_calls": 1000000
+  },
+  "plan": {
+    "axis_dimension": 3,
+    "dimension": 243,
+    "input_work": 2093056,
+    "state_payload_bytes": 3888
+  },
+  "input_resources": {
+    "input_work": 2093056,
+    "peak_bytes": 196608,
+    "grid_bytes": 472,
+    "state_capacity_bytes": 0,
+    "support_capacity_bytes": 0,
+    "metadata_capacity_bytes": 224,
+    "statistics_capacity_bytes": 0,
+    "declared_source_external_bytes": 0,
+    "declared_query_extra_bytes": 0,
+    "serializer_bytes": 65536,
+    "helper_bytes": 65536
+  },
+  "sampling": {
+    "distinct_samples": [
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "minimum_required": 2,
+    "maximum_distinct_spacing": 1.0,
+    "width_per_spacing": 0.5,
+    "support_margin": 0.35,
+    "support_intersects_boundary": false,
+    "policy_passed": false,
+    "convergence_certified": false
+  },
+  "represented_grid": {
+    "axis_dimension": 3,
+    "dimension": 243,
+    "nodes": [
+      -1.0,
+      0.0,
+      1.0
+    ],
+    "weights": [
+      0.3333333333333333,
+      1.3333333333333333,
+      0.3333333333333333
+    ],
+    "node_bits": [
+      13830554455654793216,
+      0,
+      4607182418800017408
+    ],
+    "weight_bits": [
+      4599676419421066581,
+      4608683618675807573,
+      4599676419421066581
+    ],
+    "lower_bits": 13830554455654793216,
+    "upper_bits": 4607182418800017408,
+    "spacing_bits": 4611686018427387904,
+    "grid_sha256": "74545c7e3b7c39dd468e9eb23a806db7249ef30c67fe341a7066ccf64d232ca4",
+    "derivative_sha256": "9f79681bb80d649b4af836d37031ada129de5213d71e3bf2011eb24e409e1582"
+  },
+  "initial": null,
+  "source": null,
+  "diagnostic_resources": null,
+  "validated_rows": 0,
+  "visited_rows": 0,
+  "diagnostic": null,
+  "quantum_execution": false,
+  "history_execution": false,
+  "convergence_certified": false
+}

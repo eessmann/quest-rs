@@ -38,7 +38,8 @@ fn structured_shift_width_is_compact_and_invalid_ranges_fail() -> googletest::Re
 	let plan = TensorShiftEncoding::new(
 		40,
 		vec![ShiftRegister::new(0, 40, 123)?],
-		NumericalPolicy { max_bytes: 1024 },
+		// The fixed digest stack is additional to the compact recipe owner.
+		NumericalPolicy { max_bytes: 2048 },
 	)?;
 	let mut count = 0_usize;
 	plan.visit_gates(false, |_| {

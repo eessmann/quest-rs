@@ -1,0 +1,41 @@
+{
+  "schema": "quest-weak-campaign-build-v1",
+  "scope": "Root Cargo/configuration plus all Rust/TOML/Cargo files in actual twelve local default compiler-artifact package closure; includes package tests; excludes unused quest and quest-sys native packages, external registry sources, environment, and non-Rust assets. This is not whole-process reproducible-build attestation.",
+  "local_package_manifests": [
+    "crates/quest-build/Cargo.toml",
+    "crates/quest-cfd/Cargo.toml",
+    "crates/quest-compile/Cargo.toml",
+    "crates/quest-language/Cargo.toml",
+    "crates/quest-math/Cargo.toml",
+    "crates/quest-numerics/Cargo.toml",
+    "crates/quest-polynomial/Cargo.toml",
+    "crates/quest-qasm/Cargo.toml",
+    "crates/quest-qsp/Cargo.toml",
+    "crates/quest-qsvt/Cargo.toml",
+    "crates/quest-symbolic/Cargo.toml",
+    "crates/vendor/mathcore/Cargo.toml"
+  ],
+  "source_files": 507,
+  "source_manifest_sha256": "38bd1e097ef65fd84a0160e566153965e1bad0ed0cb34147519049f2ce6a5759",
+  "source_before_after_equal": true,
+  "binary_sha256": "481156a3201148eaefdbfb59fadb434071c6d53bfc87f02bfcb20ab0e23e2335",
+  "example_features": [],
+  "example_source_sha256": "8c776b6aa61a5ab8e549e609f67ddec69879e20484eeac486d1c803125cf7819",
+  "command": [
+    "cargo",
+    "build",
+    "-p",
+    "quest-cfd",
+    "--example",
+    "configuration_weak",
+    "--message-format=json"
+  ],
+  "profile": {
+    "opt_level": "0",
+    "debuginfo": 1,
+    "debug_assertions": true,
+    "overflow_checks": true,
+    "test": false
+  },
+  "scope_of_execution": "Exactly seven fixed weak diagnostic campaign children after independent approval; no history or quantum execution"
+}

@@ -1,0 +1,273 @@
+{
+  "schema": "quest-configuration-weak-row-v1",
+  "status": "completed",
+  "phase": "complete",
+  "error": null,
+  "request": {
+    "row_id": "p1-c4-e1-w1_2",
+    "order": 1,
+    "cells": 4,
+    "extent": 1.0,
+    "width": 0.5,
+    "center": [
+      0.15,
+      -0.1,
+      0.07,
+      0.11,
+      -0.04
+    ],
+    "viscosity": 0.01,
+    "time": 0.0,
+    "physical_dimension": 5,
+    "minimum_support_samples": 2,
+    "nonlinear_witness": true
+  },
+  "limits": {
+    "max_bytes": 268435456,
+    "max_source_work": 1000000000,
+    "max_physical_work": 100000000000,
+    "max_physical_calls": 1000000
+  },
+  "plan": {
+    "axis_dimension": 8,
+    "dimension": 32768,
+    "input_work": 135397376,
+    "state_payload_bytes": 524288
+  },
+  "input_resources": {
+    "input_work": 135397376,
+    "peak_bytes": 8521048,
+    "grid_bytes": 944,
+    "state_capacity_bytes": 524288,
+    "support_capacity_bytes": 40,
+    "metadata_capacity_bytes": 384,
+    "statistics_capacity_bytes": 120,
+    "declared_source_external_bytes": 132440,
+    "declared_query_extra_bytes": 0,
+    "serializer_bytes": 65536,
+    "helper_bytes": 65536
+  },
+  "sampling": {
+    "distinct_samples": [
+      2,
+      2,
+      2,
+      2,
+      2
+    ],
+    "minimum_required": 2,
+    "maximum_distinct_spacing": 0.5,
+    "width_per_spacing": 1.0,
+    "support_margin": 0.35,
+    "support_intersects_boundary": false,
+    "policy_passed": true,
+    "convergence_certified": false
+  },
+  "represented_grid": {
+    "axis_dimension": 8,
+    "dimension": 32768,
+    "nodes": [
+      -1.0,
+      -0.5,
+      -0.5,
+      0.0,
+      0.0,
+      0.5,
+      0.5,
+      1.0
+    ],
+    "weights": [
+      0.25,
+      0.25,
+      0.25,
+      0.25,
+      0.25,
+      0.25,
+      0.25,
+      0.25
+    ],
+    "node_bits": [
+      13830554455654793216,
+      13826050856027422720,
+      13826050856027422720,
+      0,
+      0,
+      4602678819172646912,
+      4602678819172646912,
+      4607182418800017408
+    ],
+    "weight_bits": [
+      4598175219545276416,
+      4598175219545276416,
+      4598175219545276416,
+      4598175219545276416,
+      4598175219545276416,
+      4598175219545276416,
+      4598175219545276416,
+      4598175219545276416
+    ],
+    "lower_bits": 13830554455654793216,
+    "upper_bits": 4607182418800017408,
+    "spacing_bits": 4602678819172646912,
+    "grid_sha256": "a7de829d0075cf5fd6eaaa84e0bf14a57ad99ea08b08dca8fc33a22730f4b351",
+    "derivative_sha256": "0294fe65646677a25122e50b3d05303da69907e747e2f0cd0c2855edc9f3aa1c"
+  },
+  "initial": {
+    "probability": 1.0000000000000007,
+    "coordinate_means": [
+      0.07569332979755228,
+      -0.015056505482597309,
+      0.00176924951309899,
+      0.023588360344952215,
+      -8.284579725541271e-6
+    ],
+    "coordinate_variances": [
+      0.032117184722935024,
+      0.007301554383951166,
+      0.000881494512709894,
+      0.01123776942871283,
+      4.142221228509464e-6
+    ],
+    "mean_minus_continuum_center": [
+      -0.07430667020244772,
+      0.0849434945174027,
+      -0.06823075048690101,
+      -0.08641163965504778,
+      0.03999171542027446
+    ],
+    "standard_deviations_per_spacing": [
+      0.3584253602798498,
+      0.17089826662609736,
+      0.05937994653786391,
+      0.2120166920665713,
+      0.0040704895177408155
+    ],
+    "maximum_coefficient_probability": 0.024420058336874734,
+    "effective_coefficients": 50.61318737700851,
+    "outer_cell_occupation": 0.11266482599886893,
+    "zero_exterior_trace": true,
+    "supported_coefficients": 1024,
+    "ensemble_sha256": "e7e097a5eafc4f4e5dfe6db30ae7049f3900cf231b9a6ef542311bcdd2e5cdcc"
+  },
+  "source": {
+    "physical_recipe_sha256": "ea45a42dec15863d4174b91a8e57756e37d2a69ef76f5c21dd9d816320597de7",
+    "chart_mass_residual": 6.661338147750939e-16,
+    "constraint_residual": 4.440892098500626e-16,
+    "extraction_probe_error": 3.552713678800501e-15,
+    "extraction_scaled_error": 1.2212453270876722e-15,
+    "coefficient_roundoff_estimate": 1.3201465701918065e-13,
+    "residual_evaluations": 58,
+    "resources": {
+      "source_work": 100000000,
+      "caller_declared_input_preparation_work": null,
+      "physical_work": 5800000,
+      "physical_calls": 58,
+      "physical_calls_attempted": 58,
+      "constructor_peak_bytes": 8521048,
+      "retained_source_bytes": 206897,
+      "grid_bytes": 0,
+      "accessible_state_bytes": 0,
+      "external_bytes": 132440,
+      "result_bytes": 0,
+      "scratch_bytes": 0,
+      "peak_bytes": 8521048,
+      "supported_rows": 0,
+      "row_query_work": 0,
+      "maximum_row_entries": 0
+    }
+  },
+  "diagnostic_resources": {
+    "source_work": 838195456,
+    "caller_declared_input_preparation_work": 135397376,
+    "physical_work": 210700000,
+    "physical_calls": 2107,
+    "physical_calls_attempted": 2107,
+    "constructor_peak_bytes": 8521048,
+    "retained_source_bytes": 206897,
+    "grid_bytes": 944,
+    "accessible_state_bytes": 524288,
+    "external_bytes": 132440,
+    "result_bytes": 1048,
+    "scratch_bytes": 16384,
+    "peak_bytes": 8521048,
+    "supported_rows": 1024,
+    "row_query_work": 414896,
+    "maximum_row_entries": 20
+  },
+  "validated_rows": 32768,
+  "visited_rows": 1024,
+  "diagnostic": {
+    "source_identity": 11936425925803643088,
+    "time": 0.0,
+    "dimension": 32768,
+    "probability": 1.0000000000000007,
+    "probability_rate": -2.7503159797347132e-17,
+    "expectation": [
+      0.0756933297975523,
+      -0.0150565054825973,
+      0.0017692495130989894,
+      0.023588360344952222,
+      -8.284579725541292e-6,
+      0.029028932429481506
+    ],
+    "raw_skew_rate": [
+      7.602120701607341e-18,
+      0.09741181003522373,
+      2.3462812638944105e-19,
+      -0.12084943021650382,
+      0.0046270104038335265,
+      -0.0557220626638904
+    ],
+    "normalized_rate": [
+      9.683926446622717e-18,
+      0.09741181003522373,
+      2.832880784695811e-19,
+      -0.12084943021650382,
+      0.0046270104038335265,
+      -0.0557220626638904
+    ],
+    "physical_rate": [
+      0.0,
+      0.03432765085198875,
+      0.0,
+      -0.05378106415815204,
+      -0.0032413479186160278,
+      -0.044073981552825985
+    ],
+    "absolute_defect": [
+      9.683926446622717e-18,
+      0.06308415918323498,
+      2.832880784695811e-19,
+      0.06706836605835179,
+      0.007868358322449554,
+      0.011648081111064412
+    ],
+    "scaled_defect": [
+      9.683926446622717e-18,
+      0.06308415918323498,
+      2.832880784695811e-19,
+      0.06706836605835179,
+      0.007868358322449554,
+      0.011648081111064412
+    ],
+    "zero_exterior_trace": true,
+    "outer_cell_occupation": 0.11266482599886893,
+    "coordinate_standard_deviations": [
+      0.1792126801399249,
+      0.08544913331304868,
+      0.029689973268931955,
+      0.10600834603328566,
+      0.0020352447588704078
+    ],
+    "maximum_coefficient_probability": 0.024420058336874734,
+    "effective_coefficients": 50.61318737700851,
+    "nonlinear_mean_square": 4.802347078967703e-7,
+    "cartesian_energy_discrepancy": 3.552713678800501e-15,
+    "chart_mass_residual": 6.661338147750939e-16,
+    "extraction_probe_error": 3.552713678800501e-15,
+    "convergence_certified": false
+  },
+  "quantum_execution": false,
+  "history_execution": false,
+  "convergence_certified": false
+}

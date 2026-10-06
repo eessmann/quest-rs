@@ -43,6 +43,8 @@ pub struct RegisterDeployment {
 	rank: usize,
 	nodes: usize,
 	local_amplitudes: usize,
+	host_array_bytes: usize,
+	device_array_bytes: usize,
 }
 impl RegisterDeployment {
 	fn from_native(
@@ -67,6 +69,10 @@ impl RegisterDeployment {
 			.map_err(|_| Error::Value("invalid native node count"))?;
 		let local_amplitudes = usize::try_from(raw.num_amps_per_node)
 			.map_err(|_| Error::Value("invalid native local amplitude count"))?;
+		let host_array_bytes =
+			usize::try_from(raw.host_array_bytes).map_err(|_| Error::Overflow)?;
+		let device_array_bytes =
+			usize::try_from(raw.device_array_bytes).map_err(|_| Error::Overflow)?;
 		if actual_density != density
 			|| actual_width != width
 			|| nodes == 0
@@ -85,6 +91,8 @@ impl RegisterDeployment {
 			rank,
 			nodes,
 			local_amplitudes,
+			host_array_bytes,
+			device_array_bytes,
 		})
 	}
 	#[must_use]
@@ -118,6 +126,20 @@ impl RegisterDeployment {
 	#[must_use]
 	pub const fn local_amplitudes(self) -> usize {
 		self.local_amplitudes
+	}
+	/// Payload of the allocated native CPU amplitude and communication arrays.
+	/// This excludes allocator padding, native object metadata, temporary operation
+	/// workspace, MPI internals and OpenMP stacks. It is not process memory usage
+	/// or the conservative runtime reservation.
+	#[must_use]
+	pub const fn host_array_bytes(self) -> usize {
+		self.host_array_bytes
+	}
+	/// Payload of allocated native GPU amplitude and communication arrays.
+	/// Excludes device allocator overhead and temporary operation workspace.
+	#[must_use]
+	pub const fn device_array_bytes(self) -> usize {
+		self.device_array_bytes
 	}
 	/// Copy this actual native deployment into the compiler's validated target.
 	/// # Errors
@@ -200,6 +222,11 @@ impl<'env, K: RegisterKind> Register<'env, K> {
 		})
 	}
 	#[must_use]
+	#[cfg(feature = "qsvt")]
+	pub(crate) const fn accounted_bytes(&self) -> usize {
+		self.reservation.bytes()
+	}
+	#[must_use]
 	pub const fn num_qubits(&self) -> QubitCount {
 		self.count
 	}
@@ -216,6 +243,38 @@ impl<'env, K: RegisterKind> Register<'env, K> {
 		EnvironmentView {
 			resources: self.resources(),
 		}
+	}
+	/// Check a matrix against this actual native deployment and concurrent resources.
+	/// No native matrix is allocated. Forward/adjoint and staging storage are
+	/// included in the returned conservative rank/node peak evidence.
+	/// # Errors
+	/// Rejects incompatible deployments, signed-index limits or rank/node budgets.
+	pub fn admit_native_matrix(
+		&self,
+		kind: crate::native_admission::MatrixKind,
+		matrix_qubits: usize,
+		distributed_diagonal: bool,
+		ranks_per_node: usize,
+		node_budget: crate::MemoryBudget,
+	) -> Result<crate::native_admission::MatrixAdmission> {
+		let request = crate::native_admission::MatrixRequest {
+			kind,
+			matrix_qubits,
+			register_qubits: self.deployment.width(),
+			density: self.deployment.is_density_matrix(),
+			ranks: self.deployment.nodes(),
+			ranks_per_node,
+			gpu: self.deployment.is_gpu_accelerated(),
+			distributed_diagonal,
+			concurrent_bytes: self.resources().allocated_bytes(),
+		};
+		let evidence = request.admit(self.resources().memory_budget(), node_budget)?;
+		if evidence.local_register_elements != self.deployment.local_amplitudes() {
+			return Err(Error::Value(
+				"native matrix admission disagrees with register partition",
+			));
+		}
+		Ok(evidence)
 	}
 	pub(crate) const fn resources(&self) -> &'env RuntimeResources {
 		self.reservation.environment

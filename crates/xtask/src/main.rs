@@ -7,7 +7,9 @@ use color_eyre::eyre::{Result, eyre};
 
 mod generate;
 mod native_consumers;
+mod native_doctor;
 mod qsvt_catalog;
+mod tooling;
 
 fn main() -> Result<()> {
 	HookBuilder::default().install()?;
@@ -17,9 +19,13 @@ fn main() -> Result<()> {
 fn run() -> Result<(), generate::DynError> {
 	match parse_command(env::args_os().skip(1))? {
 		CommandKind::GenerateQuestBindings { check } => generate::run(check),
-		CommandKind::CheckNativeConsumers { work_dir, backends } => {
-			native_consumers::run(work_dir, &backends)
-		}
+		CommandKind::CheckNativeConsumers {
+			work_dir,
+			backends,
+			loader_isolated,
+		} => native_consumers::run(work_dir, &backends, loader_isolated),
+		CommandKind::NativeDoctor { json } => native_doctor::run(json),
+		CommandKind::NativeDoctorProbe { kind } => native_doctor::probe_worker(&kind),
 		CommandKind::QsvtCatalog { fetch } => qsvt_catalog::run(fetch),
 		CommandKind::Help => {
 			eprintln!("{USAGE}");
@@ -28,7 +34,7 @@ fn run() -> Result<(), generate::DynError> {
 	}
 }
 
-const USAGE: &str = "usage: cargo run -p xtask -- generate-quest-bindings [--check]\n       cargo run -p xtask -- check-native-consumers [--work-dir PATH] [--backends cpu,omp,gpu]\n       cargo run -p xtask -- fetch-qsvt-catalog\n       cargo run -p xtask -- check-qsvt-catalog";
+const USAGE: &str = "usage: cargo run -p xtask -- generate-quest-bindings [--check]\n       cargo run -p xtask -- check-native-consumers [--work-dir PATH] [--backends cpu,omp,gpu] [--loader-isolated]\n       cargo run -p xtask -- native-doctor [--json]\n       cargo run -p xtask -- fetch-qsvt-catalog\n       cargo run -p xtask -- check-qsvt-catalog";
 
 #[derive(Debug, Eq, PartialEq)]
 enum CommandKind {
@@ -38,6 +44,13 @@ enum CommandKind {
 	CheckNativeConsumers {
 		work_dir: Option<PathBuf>,
 		backends: Vec<native_consumers::Backend>,
+		loader_isolated: bool,
+	},
+	NativeDoctor {
+		json: bool,
+	},
+	NativeDoctorProbe {
+		kind: String,
 	},
 	QsvtCatalog {
 		fetch: bool,
@@ -72,11 +85,35 @@ fn parse_command(
 			)
 			.into()),
 		},
+		Some("__native-doctor-probe") => {
+			let kind = arguments
+				.next()
+				.ok_or("missing doctor probe name")?
+				.into_string()
+				.map_err(|_| "doctor probe name is not UTF-8")?;
+			if arguments.next().is_some() {
+				return Err("unexpected doctor probe argument".into());
+			}
+			Ok(CommandKind::NativeDoctorProbe { kind })
+		}
+		Some("native-doctor") => match arguments.next().as_deref() {
+			None => Ok(CommandKind::NativeDoctor { json: false }),
+			Some(argument) if argument == "--json" && arguments.next().is_none() => {
+				Ok(CommandKind::NativeDoctor { json: true })
+			}
+			_ => Err(format!("unexpected native-doctor argument\n{USAGE}").into()),
+		},
 		Some("check-native-consumers") => {
 			let mut work_dir = None;
 			let mut backends = None;
+			let mut loader_isolated = false;
 			while let Some(argument) = arguments.next() {
-				if argument == "--work-dir" {
+				if argument == "--loader-isolated" {
+					if loader_isolated {
+						return Err("duplicate --loader-isolated option".into());
+					}
+					loader_isolated = true;
+				} else if argument == "--work-dir" {
 					if work_dir.is_some() {
 						return Err("duplicate --work-dir option".into());
 					}
@@ -101,6 +138,7 @@ fn parse_command(
 			Ok(CommandKind::CheckNativeConsumers {
 				work_dir,
 				backends: backends.unwrap_or_else(|| vec![native_consumers::Backend::Cpu]),
+				loader_isolated,
 			})
 		}
 		Some(command) => Err(format!("unknown xtask command: {command}\n{USAGE}").into()),
@@ -114,6 +152,18 @@ mod tests {
 	use googletest::prelude::*;
 	use std::ffi::OsString;
 	use std::path::PathBuf;
+
+	#[gtest]
+	fn native_doctor_accepts_json_and_consumers_accept_loader_isolation() {
+		expect_true!(parse_command(["native-doctor", "--json"].map(OsString::from)).is_ok());
+		expect_true!(
+			parse_command(["check-native-consumers", "--loader-isolated"].map(OsString::from))
+				.is_ok()
+		);
+		expect_true!(
+			parse_command(["native-doctor", "--json", "--json"].map(OsString::from)).is_err()
+		);
+	}
 
 	#[gtest]
 	fn catalog_commands_are_explicit_and_reject_the_old_cpp_source() {
@@ -145,6 +195,7 @@ mod tests {
 			eq(&CommandKind::CheckNativeConsumers {
 				work_dir: Some(PathBuf::from("/tmp/fixture with spaces")),
 				backends: vec![native_consumers::Backend::Cpu],
+				loader_isolated: false,
 			})
 		)
 	}
@@ -190,6 +241,7 @@ mod tests {
 						native_consumers::Backend::Omp,
 						native_consumers::Backend::Gpu
 					],
+					loader_isolated: false,
 				})
 			);
 		}
@@ -198,6 +250,7 @@ mod tests {
 			eq(&CommandKind::CheckNativeConsumers {
 				work_dir: None,
 				backends: vec![native_consumers::Backend::Cpu],
+				loader_isolated: false,
 			})
 		)
 	}

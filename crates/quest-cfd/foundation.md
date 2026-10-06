@@ -7,6 +7,12 @@ studies and benchmark acceptance from the existing foundation described here.
 
 `PeriodicBdm1` and `SimplexBdm` evolve complete incompressible BDM1/P0 DG states. They do not select energetic modes, use a POD basis, freeze the convective operator, or replace Navier–Stokes with Burgers dynamics. The mass chart eliminates algebraic constraints only.
 
+The [physical-order implementation](docs/physical-space.md) additionally supplies
+complete BDM2/P1 box references, with MathCore-derived basis values/derivatives.
+`BoxConstraintRecipe` generates complete BDM1/BDM2 constraints for distributed
+Householder charts without a global mesh or basis. Its generic multiplier
+coordinates still require separate physical-pressure normalization.
+
 ## Discrete equations
 
 Each triangle has six affine velocity coefficients; each tetrahedron has twelve. The pressure is constant on each cell. A normal trace is affine on a facet, so equality at its two/three vertices enforces the complete normal-continuity constraint. Prescribed boundary normal traces and integrated cell divergence enter the same constraint matrix. Open boundaries retain their free normal degrees.
@@ -31,7 +37,15 @@ The approved `shedding3d` manifest retains the stationary-cylinder setup from [K
 
 The focused tests check complete rank, mass orthogonality, nonzero nonlinear convection, inviscid energy conservation, viscous decay, constant-flow invariance, pressure/momentum closure, nonzero inlet lifting, manufactured uniform channel flow, RK4 time refinement, and independent 2D Taylor–Green projection refinement. Both triangular and tetrahedral physical spaces are exercised. Cylinder tests compare actual rank with topology accounting and expose polygon geometry error.
 
-Still open: physical BDM order above one, large/distributed physical mesh assembly, curved-boundary convergence, time-dependent normal liftings, the approved 3D cylinder boundary dynamics, established shedding statistics and certified benchmark comparison across the full physical time windows. Dense short references are distinct from the KvN configuration/time discretization and from quantum circuit execution. A successful algebraic QSVT residual alone does not establish physical mesh accuracy or phase-space truncation accuracy.
+Scalar affine time-dependent trace lifting is implemented on the bounded BDM1
+reference, including its derivative in original-coordinate acceleration and
+momentum recovery. General independent boundary functions remain open. Other
+open work includes generated distributed nonlinear physical forces, curved and
+mixed higher-order geometry, the approved 3D cylinder pressure/outlet closure,
+established shedding statistics and certified benchmark comparison across full
+physical time windows. Dense short references are distinct from configuration/time
+discretization and quantum execution. An algebraic inverse residual alone does
+not establish physical mesh or phase-space truncation accuracy.
 
 ## Source boundaries
 

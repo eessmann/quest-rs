@@ -1,0 +1,108 @@
+{
+  "schema": "persisted-readout-tag-fix-focused-v1",
+  "source_manifest": "source.json",
+  "source_manifest_sha256": "82be7c38a1cef657236bf428da0c791a93b4812d858e0139a86743837057517f",
+  "source_paths": 2,
+  "final_before_after_match": true,
+  "scientific_campaign_rerun": false,
+  "native_quest_changed": false,
+  "logs": [
+    {
+      "status": "fixture-compile-failure",
+      "path": "fixture-compile-failure.log",
+      "exit_code": 101,
+      "bytes": 1638,
+      "sha256": "dbcbd5e31f36b69c13875456f82bdb172efc95b912ba4b64c4b5327899eb8a53",
+      "summaries": [],
+      "original_log_label": "quest-persisted-readout-tag-red.log",
+      "payload_path_scope": "normalized published log; original bytes/hash retained in existing fields",
+      "published_bytes": 1539,
+      "published_sha256": "38ef581c5f3150b5131f706dea063dd1b5735dc9080ea62eb77e0bf7fdf696d9"
+    },
+    {
+      "status": "old-code-behavior-failure",
+      "path": "behavior-red.log",
+      "exit_code": 101,
+      "bytes": 2067,
+      "sha256": "957a5904de9d205db71fd07375dd7dbc5e604f1db6cb8fa3479b5007c42e3bf7",
+      "summaries": [
+        "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 10.54s"
+      ],
+      "original_log_label": "quest-persisted-readout-tag-behavior-red.log",
+      "payload_path_scope": "normalized published log; original bytes/hash retained in existing fields",
+      "published_bytes": 2003,
+      "published_sha256": "839226d479512a40190ed23e763d3c6caa77b2c1b030d8fcd134476826ca83e9"
+    },
+    {
+      "status": "initial-fixed-green",
+      "path": "quest-persisted-readout-tag-green.log",
+      "exit_code": 0,
+      "bytes": 1710,
+      "sha256": "1a88bb58d019aa1ab20f5e87084e137de848b0d767fdbbca048376fe8eba4e64",
+      "summaries": [
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.00s"
+      ],
+      "original_log_label": "quest-persisted-readout-tag-green.log",
+      "published_copy": false,
+      "payload_path_scope": "Original historical log hash only; redundant initial success payload is not copied"
+    },
+    {
+      "status": "initial-lint-failure",
+      "path": "initial-clippy-failure.log",
+      "exit_code": 101,
+      "bytes": 2710,
+      "sha256": "017373a3302d2c475ec5097f51bbdcbd190e4bb710202a4cd330652acd10f309",
+      "summaries": [],
+      "original_log_label": "quest-persisted-readout-tag-clippy.log",
+      "payload_path_scope": "normalized published log; original bytes/hash retained in existing fields",
+      "published_bytes": 2541,
+      "published_sha256": "c346587b9793dc07e09320e49ce7078d79f37f527fd01fc3be14bf21bf160fe0"
+    },
+    {
+      "status": "final-strict-clippy",
+      "path": "final-clippy.log",
+      "exit_code": 0,
+      "bytes": 1017,
+      "sha256": "18470176a6d9904cfe14202288ad7b0c8c7851b945dcaa6ff50b9d61c046c412",
+      "summaries": [],
+      "original_log_label": "quest-persisted-readout-tag-clippy-final.log",
+      "payload_path_scope": "normalized published log; original bytes/hash retained in existing fields",
+      "published_bytes": 953,
+      "published_sha256": "20ed5da04c95ea1ea54262ee3ccd81c2b762c06590c1bec959c30ea1448fa868"
+    },
+    {
+      "status": "final-functional-green",
+      "path": "final-green.log",
+      "exit_code": 0,
+      "bytes": 1710,
+      "sha256": "c388520d4573c6d407663597c67903fd9e569e2e8c1608fc8a9760c40b5b6c9a",
+      "summaries": [
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.95s"
+      ],
+      "original_log_label": "quest-persisted-readout-tag-final-green.log",
+      "payload_path_scope": "normalized published log; original bytes/hash retained in existing fields",
+      "published_bytes": 1646,
+      "published_sha256": "1d97accc79cbdeab69d614666e6ed03133a6ef320a062d19c9e192ea456ae19a"
+    }
+  ],
+  "format_check": {
+    "command": [
+      "rustfmt",
+      "--edition",
+      "2024",
+      "--config",
+      "skip_children=true",
+      "--check",
+      "crates/quest/examples/persisted_weighted_transform/execution.rs",
+      "crates/quest/tests/persisted_weighted_transform.rs"
+    ],
+    "exit_code": 0,
+    "log": "no output; tool exit0 recorded"
+  },
+  "root_independent_review": {
+    "status": "approved by parent message",
+    "checks": "3 integration tests plus9 example tests green12.67s",
+    "scope": "Root-owned independent logs/source pin reported separately; owner does not synthesize an independent receipt"
+  },
+  "original_private_receipt_sha256": "88420ac417949b4e46d3279f2947eaa06f6523f1631c81424fed4684d039a314"
+}

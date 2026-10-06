@@ -1,0 +1,17 @@
+{
+  "schema": "quest-affine-exact-reproduction-v1",
+  "status": "completed",
+  "command": "python3 -B docs/verification/fixtures/quest-cfd/affine_exact.py",
+  "time_cap_seconds": 120,
+  "os_memory_cap_bytes": null,
+  "wall_elapsed_seconds": 0.17,
+  "maximum_rss_kib": 19000,
+  "exit_code": 0,
+  "script_sha256": "80db36fa9e2759f32b3934fe0ba57e73f7373947add980ad974362fab60598bd",
+  "exact_output_sha256": "5673a0765177ebb0a465e6edce68ff7146207d9ae20941ac0bb0c485af224b71",
+  "process_log_sha256": "8fcde907201b7346d066bc629f7eda8458042b1692db0b6913df979f881c6fed",
+  "fixed_fixture_meshes": 4,
+  "rank_certificates": 8,
+  "p2_normalized_mass_tables": 2,
+  "scope": "Ideal rational finite fixture derivations; not compiled binary/runtime exact ranks, distributed acceptance or science convergence. RSS is a measurement, not a memory-cap admission."
+}

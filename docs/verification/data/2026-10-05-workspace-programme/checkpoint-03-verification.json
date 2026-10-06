@@ -1,0 +1,121 @@
+{
+  "schema": "quest.workspace-verification.checkpoint.v1",
+  "base_commit": "dd9a869ebe9952cf85a6411a180ed7b688f568fb",
+  "environment": {
+    "rust": "1.101.0-nightly (db8f076d2 2026-10-03)",
+    "quest": "4.3.0 installed, native source unchanged",
+    "mpi": "MPICH 4.2.2; QuEST, MPICC and mpiexec ABI matched",
+    "hdf5": "serial",
+    "execution": "local CPU native statevector; MPI socket-dependent tests allowed loopback networking"
+  },
+  "checkpoint": "03-generated-time-pressure-reference-spectra",
+  "recorded_utc": "2026-10-05T23:36:02.029073+00:00",
+  "source_sha256": "b02f0c21d692a5301ea203b4e5645f9886901fdbd678fae2dd6586e1ab588f3d",
+  "source_file_count": 758,
+  "source_manifest": "checkpoint-03-source.json",
+  "source_unchanged_before_after": true,
+  "gates": [
+    {
+      "name": "allfeatures",
+      "command": "cargo nextest run --workspace --all-features",
+      "exit_code": 0,
+      "log_sha256": "dd79798137bd68183ef875126623942532555bed2c2df5637f5143500d506118",
+      "seconds": 165.606,
+      "tests_run": 1508,
+      "passed": 1508,
+      "skipped": 6
+    },
+    {
+      "name": "default",
+      "command": "cargo nextest run --workspace",
+      "exit_code": 0,
+      "log_sha256": "10a3ece69f5034688c1e214b192548d8d4e6d674a0ed969fcb225161cb0cad5b",
+      "seconds": 65.929,
+      "tests_run": 1348,
+      "passed": 1348,
+      "skipped": 1
+    },
+    {
+      "name": "doctests",
+      "command": "cargo test --workspace --all-features --doc",
+      "exit_code": 0,
+      "log_sha256": "44d4458fc960073f090d00e526dd2bd1f1c972c1be2fb40a2e99b538b43020bf",
+      "wrapper_elapsed_seconds": 6.66972132200317,
+      "suites": 24,
+      "passed": 65,
+      "failed": 0,
+      "ignored": 1
+    },
+    {
+      "name": "default-check",
+      "command": "cargo check --workspace --all-targets",
+      "exit_code": 0,
+      "log_sha256": "598a22bcf813ccb18802917e759b9959f53c50aeba0334f7fbc14ad68b82da07",
+      "wrapper_elapsed_seconds": 1.8579202559994883
+    },
+    {
+      "name": "clippy",
+      "command": "cargo clippy --workspace --all-features --all-targets -- -D warnings",
+      "exit_code": 0,
+      "log_sha256": "5f7254058287826dc87032a413214a0daeef1932ff5f440c995bf02281d16a51",
+      "wrapper_elapsed_seconds": 7.579254768003011
+    },
+    {
+      "name": "bindings",
+      "command": "cargo run -p xtask -- generate-quest-bindings --check",
+      "exit_code": 0,
+      "log_sha256": "36fd5d5c21e4040feecceac8dd00d1ba1a53d69ab0b157adfe2daf22e1f753a1",
+      "wrapper_elapsed_seconds": 2.3337088440021034
+    },
+    {
+      "name": "format",
+      "command": "cargo fmt --all -- --check",
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "whitespace",
+      "command": "git diff --check",
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "historical_evidence": [
+    {
+      "name": "offline_catalog",
+      "receipt": "checkpoint-01-verification.json",
+      "status": "previous passing run; unchanged catalog; not rerun at checkpoint03"
+    }
+  ],
+  "preliminary_attempts": [
+    {
+      "name": "focused_time_history_root_review",
+      "exit_code": 101,
+      "scope": "build failed before tests because concurrently added JSON fixture memory constant overflowed inferred i32; owner changed it to explicit u64 before frozen checks",
+      "log_sha256": "c83845feb3f284dd0b0b909379ca10b0249bf7942a0c839839fc794cda075044"
+    }
+  ],
+  "additional_scoped_evidence": [
+    {
+      "name": "box_window_validation",
+      "passed": 12,
+      "receipt": "../2026-10-06-box-windows/revalidation.json",
+      "scope": "new capped classical runner and parser regressions, including actual malformed child"
+    },
+    {
+      "name": "time_history_independent_root_review",
+      "exit_code": 0,
+      "scope": "complete DG1/DG2 history matrices on MPI1/2/4/8 and split communicators; nonzero preparation only",
+      "log_sha256": "84bcb6c2527dca213aa849d576e5b655250f6c7d5e60fc6ed25e1ddad911d6d6"
+    }
+  ],
+  "limitations": [
+    "Source manifest excludes Markdown and docs/verification; separate static audit inventories their publication snapshots.",
+    "Prebuilt binary and source/log hashes record identity, not independent build attestation.",
+    "Six all-feature and one default skipped tests remain distinct from passing tests. Explicit native nonlinear experiments have separate receipts.",
+    "Nightly generic-constant-expression compiler notices remain distinct from strict Clippy results.",
+    "Offline catalog was unchanged and its prior passing evidence was not rerun.",
+    "No multi-host capacity, huge-count transfer, accelerator/hardware, quantum advantage or physical convergence acceptance is implied.",
+    "New stages after this frozen checkpoint require affected tests and further integrated checks."
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "schema": "quest.workspace-verification.checkpoint.v1",
+  "base_commit": "dd9a869ebe9952cf85a6411a180ed7b688f568fb",
+  "environment": {
+    "rust": "1.101.0-nightly (db8f076d2 2026-10-03)",
+    "quest": "4.3.0 installed, native source unchanged",
+    "mpi": "MPICH 4.2.2; QuEST, MPICC and mpiexec ABI matched",
+    "hdf5": "serial",
+    "execution": "local CPU native statevector; MPI socket-dependent tests allowed loopback networking"
+  },
+  "checkpoint": "07-complete-p2-evolution-and-native-lcu-transform",
+  "recorded_utc": "2026-10-06T03:25:23.279390+00:00",
+  "source_sha256": "0e08426d4e0f302c334d74e4ebbb7e0ccded47ae83ace41ecb4aa18d3bbc78d0",
+  "source_file_count": 804,
+  "source_manifest": "checkpoint-07-source.json",
+  "source_unchanged_before_after": true,
+  "gates": [
+    {
+      "name": "allfeatures",
+      "command": "cargo nextest run --workspace --all-features --no-fail-fast",
+      "exit_code": 0,
+      "elapsed_seconds": 302.44968466299906,
+      "log_sha256": "5d424508398aab36b61d7a4e2c747137194e4ae3f86e50faa1b7f58420cb8445",
+      "seconds": 282.414,
+      "tests_run": 1601,
+      "passed": 1601,
+      "skipped": 6
+    },
+    {
+      "name": "default",
+      "command": "cargo nextest run --workspace --no-fail-fast",
+      "exit_code": 0,
+      "elapsed_seconds": 102.97503557700111,
+      "log_sha256": "e1bd967ae71a5c8f39f013eb2db375db4ed91a8f4d5709ff38fb68a69a01fd9e",
+      "seconds": 89.403,
+      "tests_run": 1436,
+      "passed": 1436,
+      "skipped": 1
+    },
+    {
+      "name": "doctests",
+      "command": "cargo test --workspace --all-features --doc",
+      "exit_code": 0,
+      "elapsed_seconds": 8.522171119999257,
+      "log_sha256": "d39902acc230b7f087331e8af3e09c7ac97fa5a3986010067f69e56aea6a76df",
+      "suites": 24,
+      "passed": 65,
+      "failed": 0,
+      "ignored": 1
+    },
+    {
+      "name": "default-check",
+      "command": "cargo check --workspace --all-targets",
+      "exit_code": 0,
+      "elapsed_seconds": 2.875028417001886,
+      "log_sha256": "9abad848f1b64341533b62ae08e3db661fae354307a99911e922790fdf9ae129"
+    },
+    {
+      "name": "clippy",
+      "command": "cargo clippy --workspace --all-features --all-targets --no-deps -- -D warnings",
+      "exit_code": 0,
+      "elapsed_seconds": 6.304469861002872,
+      "log_sha256": "c5bace98b6bbc743434a1b0cf5929f5c2e1aed88ff87429eb5668c090c57ab05"
+    },
+    {
+      "name": "bindings",
+      "command": "cargo run --locked -p xtask -- generate-quest-bindings --check",
+      "exit_code": 0,
+      "elapsed_seconds": 3.8277815129986266,
+      "log_sha256": "fd5b24018a25fd7160aafe8c18a618458183f931981e7d10e0b1e63e584c4e59"
+    },
+    {
+      "name": "format",
+      "command": "cargo fmt --all --check",
+      "exit_code": 0,
+      "elapsed_seconds": 1.3071778230005293,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "whitespace",
+      "command": "git diff --check",
+      "exit_code": 0,
+      "elapsed_seconds": 0.012626314994122367,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "preliminary_attempts": [],
+  "historical_evidence": [
+    {
+      "name": "offline_catalog",
+      "receipt": "checkpoint-01-verification.json",
+      "status": "Earlier passing run; unchanged catalog, not rerun at checkpoint07."
+    }
+  ],
+  "scoped_evidence": [
+    "../2026-10-06-cylinder-p2-evolution/publication.json",
+    "../2026-10-06-prepared-lcu-transform/focused.json"
+  ],
+  "limitations": [
+    "The source manifest excludes Markdown and docs/verification; a separate static audit records published artifacts.",
+    "Hashes identify source and private logs; the workspace snapshot is not independent source-to-binary build attestation.",
+    "The cylinder campaign has its own explicit default-package build closure, attempted-build records and immutable output identities.",
+    "Skipped tests and the ignored doctest remain distinct from passing tests.",
+    "The P2 cylinder integrations completed but their fixed state/force temporal sensitivity criterion failed; this checkpoint does not change that result.",
+    "The native LCU transform is locally verified over prepared matching children; source errors, preparation and physical inverse guarantees retain their stated unknown premises.",
+    "No source/native installation fix is inferred for historical intermittent CMake module-open failures; prior attempts remain unchanged.",
+    "Nightly generic-constant-expression notices are separate from strict dependency-excluded Clippy results.",
+    "Actual multi-host capacity, huge-count transport, accelerator/hardware, converged physical/lift errors and total systematic quantum accuracy remain unverified.",
+    "Later implementation stages require their own source identities and affected verification."
+  ]
+}

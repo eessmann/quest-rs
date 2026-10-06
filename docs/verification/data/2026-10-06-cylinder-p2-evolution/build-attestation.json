@@ -1,0 +1,44 @@
+{
+  "schema": "quest-cylinder-p2-evolution-build-v1",
+  "scope": "Root Cargo/configuration plus all Rust/TOML/Cargo files in actual twelve local default compiler-artifact package closure; includes package tests; excludes unused quest and quest-sys native packages, external registry sources, environment, and non-Rust assets. This is not whole-process reproducible-build attestation.",
+  "local_package_manifests": [
+    "crates/quest-build/Cargo.toml",
+    "crates/quest-cfd/Cargo.toml",
+    "crates/quest-compile/Cargo.toml",
+    "crates/quest-language/Cargo.toml",
+    "crates/quest-math/Cargo.toml",
+    "crates/quest-numerics/Cargo.toml",
+    "crates/quest-polynomial/Cargo.toml",
+    "crates/quest-qasm/Cargo.toml",
+    "crates/quest-qsp/Cargo.toml",
+    "crates/quest-qsvt/Cargo.toml",
+    "crates/quest-symbolic/Cargo.toml",
+    "crates/vendor/mathcore/Cargo.toml"
+  ],
+  "source_files": 504,
+  "source_manifest_sha256": "e45b8e9a64ee01698413e70c9a457a35775974280388dcf5a3df6e0da41a2da3",
+  "source_before_after_equal": true,
+  "binary_sha256": "c9baa91ec2e9ed36272a9d71b61886d5a6b4735cddf891d1b31e256f97a38fb4",
+  "example_features": [],
+  "owned_review_manifest_sha256": "c40cc89a2b33e94a0e60f30b5c4e0075a9631368a10a4f4c310b32f32d84cdad",
+  "command": [
+    "cargo",
+    "build",
+    "-p",
+    "quest-cfd",
+    "--example",
+    "cylinder_p2_evolution",
+    "--message-format=json"
+  ],
+  "profile": {
+    "opt_level": "0",
+    "debuginfo": 1,
+    "debug_assertions": true,
+    "overflow_checks": true,
+    "test": false
+  },
+  "earlier_rejected_attempts": [
+    "whole-workspace source changed in unused native quest adapter",
+    "default package closure source changed in pure qsp/qsvt dependency files"
+  ]
+}

@@ -1,0 +1,178 @@
+warning: quest-sys@0.2.0: Using QuEST 4.3.0 from <quest-install> with /usr/bin/c++
+warning: quest-sys@0.2.0: Verified rsmpi MPICC <matching-mpicc> matches QuEST MPI ABI and loaded library
+warning: `feature(generic_const_exprs)` is not supported with the next-generation trait solver
+ --> crates/quest-polynomial/src/lib.rs:1:30
+  |
+1 | #![feature(const_trait_impl, generic_const_exprs)]
+  |                              ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `-Znext-solver=globally` is currently enabled by default for testing
+  = note: reverted the setting to `-Znext-solver=coherence` for this crate
+  = note: the currently stable trait solver will be used for this crate
+  = note: see issues #160895 <https://github.com/rust-lang/rust/issues/160895> for more information
+
+warning: `quest-polynomial` (lib) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.14s
+     Running tests/matching_collective.rs (target/debug/build/quest-rs/0cb8a7bbb28170de/out/matching_collective-0cb8a7bbb28170de)
+
+running 1 test
+test collective_matching_shards_route_all_sectors_without_global_storage ... 
+running 1 test
+test collective_matching_shards_route_all_sectors_without_global_storage ... matching setup_seconds=0.00009581
+matching parts=1 max_scalar_pair_seconds=0.000612994 max_batch_pair_seconds=0.000466323 total_sent_bytes=0 total_received_bytes=0 max_sent_bytes=0 max_received_bytes=0 rank0_stats=RoutingStatistics { batches: 4, local_pair_candidates: 256, maximum_batch_pairs: 32, maximum_routed_amplitudes: 64, coordination_calls: 0, indexed_reads: 4, indexed_writes: 4, point_to_point_sent_bytes: 0, point_to_point_received_bytes: 0 }
+matching setup_seconds=0.00003312
+matching parts=1 max_scalar_pair_seconds=0.000579124 max_batch_pair_seconds=0.000456713 total_sent_bytes=0 total_received_bytes=0 max_sent_bytes=0 max_received_bytes=0 rank0_stats=RoutingStatistics { batches: 2, local_pair_candidates: 256, maximum_batch_pairs: 64, maximum_routed_amplitudes: 128, coordination_calls: 0, indexed_reads: 2, indexed_writes: 2, point_to_point_sent_bytes: 0, point_to_point_received_bytes: 0 }
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.80s
+
+
+running 1 test
+test collective_matching_shards_route_all_sectors_without_global_storage ... 
+running 1 test
+test collective_matching_shards_route_all_sectors_without_global_storage ... matching setup_seconds=0.00005802
+matching parts=2 max_scalar_pair_seconds=0.001211937 max_batch_pair_seconds=0.000735514 total_sent_bytes=18176 total_received_bytes=18176 max_sent_bytes=9088 max_received_bytes=9088 rank0_stats=RoutingStatistics { batches: 4, local_pair_candidates: 128, maximum_batch_pairs: 16, maximum_routed_amplitudes: 64, coordination_calls: 32, indexed_reads: 2, indexed_writes: 2, point_to_point_sent_bytes: 9088, point_to_point_received_bytes: 9088 }
+matching setup_seconds=0.000091891
+matching parts=2 max_scalar_pair_seconds=0.00164797 max_batch_pair_seconds=0.000519933 total_sent_bytes=18048 total_received_bytes=18048 max_sent_bytes=10304 max_received_bytes=10304 rank0_stats=RoutingStatistics { batches: 2, local_pair_candidates: 256, maximum_batch_pairs: 32, maximum_routed_amplitudes: 64, coordination_calls: 16, indexed_reads: 2, indexed_writes: 2, point_to_point_sent_bytes: 10304, point_to_point_received_bytes: 7744 }
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.81s
+
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.81s
+
+
+running 1 test
+test collective_matching_shards_route_all_sectors_without_global_storage ... 
+running 1 test
+test collective_matching_shards_route_all_sectors_without_global_storage ... 
+running 1 test
+test collective_matching_shards_route_all_sectors_without_global_storage ... 
+running 1 test
+test collective_matching_shards_route_all_sectors_without_global_storage ... matching setup_seconds=0.000092761
+matching parts=4 max_scalar_pair_seconds=0.00169323 max_batch_pair_seconds=0.000717594 total_sent_bytes=28416 total_received_bytes=28416 max_sent_bytes=7104 max_received_bytes=7104 rank0_stats=RoutingStatistics { batches: 4, local_pair_candidates: 64, maximum_batch_pairs: 8, maximum_routed_amplitudes: 64, coordination_calls: 96, indexed_reads: 1, indexed_writes: 1, point_to_point_sent_bytes: 7104, point_to_point_received_bytes: 7104 }
+matching setup_seconds=0.0000915
+matching parts=4 max_scalar_pair_seconds=0.00163492 max_batch_pair_seconds=0.000560603 total_sent_bytes=27648 total_received_bytes=27648 max_sent_bytes=7872 max_received_bytes=7232 rank0_stats=RoutingStatistics { batches: 2, local_pair_candidates: 128, maximum_batch_pairs: 16, maximum_routed_amplitudes: 64, coordination_calls: 48, indexed_reads: 1, indexed_writes: 1, point_to_point_sent_bytes: 7872, point_to_point_received_bytes: 6592 }
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.82s
+
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.82s
+
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.82s
+
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.82s
+
+
+running 1 test
+test collective_matching_shards_route_all_sectors_without_global_storage ... 
+running 1 test
+test collective_matching_shards_route_all_sectors_without_global_storage ... 
+running 1 test
+test collective_matching_shards_route_all_sectors_without_global_storage ... 
+running 1 test
+test collective_matching_shards_route_all_sectors_without_global_storage ... matching setup_seconds=0.00005825
+matching setup_seconds=0.00006725
+matching parts=2 max_scalar_pair_seconds=0.001229197 max_batch_pair_seconds=0.000728294 total_sent_bytes=18176 total_received_bytes=18176 max_sent_bytes=9088 max_received_bytes=9088 rank0_stats=RoutingStatistics { batches: 4, local_pair_candidates: 128, maximum_batch_pairs: 16, maximum_routed_amplitudes: 64, coordination_calls: 32, indexed_reads: 2, indexed_writes: 2, point_to_point_sent_bytes: 9088, point_to_point_received_bytes: 9088 }
+matching parts=2 max_scalar_pair_seconds=0.001224107 max_batch_pair_seconds=0.000730574 total_sent_bytes=18176 total_received_bytes=18176 max_sent_bytes=9088 max_received_bytes=9088 rank0_stats=RoutingStatistics { batches: 4, local_pair_candidates: 128, maximum_batch_pairs: 16, maximum_routed_amplitudes: 64, coordination_calls: 32, indexed_reads: 2, indexed_writes: 2, point_to_point_sent_bytes: 9088, point_to_point_received_bytes: 9088 }
+matching setup_seconds=0.00005796
+matching setup_seconds=0.00005665
+matching parts=2 max_scalar_pair_seconds=0.001218617 max_batch_pair_seconds=0.000480622 total_sent_bytes=18048 total_received_bytes=18048 max_sent_bytes=10304 max_received_bytes=10304 rank0_stats=RoutingStatistics { batches: 2, local_pair_candidates: 256, maximum_batch_pairs: 32, maximum_routed_amplitudes: 64, coordination_calls: 16, indexed_reads: 2, indexed_writes: 2, point_to_point_sent_bytes: 10304, point_to_point_received_bytes: 7744 }
+matching parts=2 max_scalar_pair_seconds=0.001194477 max_batch_pair_seconds=0.000501253 total_sent_bytes=18048 total_received_bytes=18048 max_sent_bytes=10304 max_received_bytes=10304 rank0_stats=RoutingStatistics { batches: 2, local_pair_candidates: 256, maximum_batch_pairs: 32, maximum_routed_amplitudes: 64, coordination_calls: 16, indexed_reads: 2, indexed_writes: 2, point_to_point_sent_bytes: 10304, point_to_point_received_bytes: 7744 }
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.83s
+
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.83s
+
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.83s
+
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.83s
+
+
+running 1 test
+test collective_matching_shards_route_all_sectors_without_global_storage ... 
+running 1 test
+test collective_matching_shards_route_all_sectors_without_global_storage ... 
+running 1 test
+test collective_matching_shards_route_all_sectors_without_global_storage ... 
+running 1 test
+test collective_matching_shards_route_all_sectors_without_global_storage ... 
+running 1 test
+test collective_matching_shards_route_all_sectors_without_global_storage ... 
+running 1 test
+test collective_matching_shards_route_all_sectors_without_global_storage ... 
+running 1 test
+test collective_matching_shards_route_all_sectors_without_global_storage ... 
+running 1 test
+test collective_matching_shards_route_all_sectors_without_global_storage ... matching setup_seconds=0.000291272
+matching parts=8 max_scalar_pair_seconds=0.003493879 max_batch_pair_seconds=0.001182647 total_sent_bytes=38528 total_received_bytes=38528 max_sent_bytes=7616 max_received_bytes=7616 rank0_stats=RoutingStatistics { batches: 4, local_pair_candidates: 32, maximum_batch_pairs: 8, maximum_routed_amplitudes: 16, coordination_calls: 224, indexed_reads: 0, indexed_writes: 0, point_to_point_sent_bytes: 6016, point_to_point_received_bytes: 4736 }
+matching setup_seconds=0.000282031
+matching parts=8 max_scalar_pair_seconds=0.003389939 max_batch_pair_seconds=0.000832985 total_sent_bytes=34304 total_received_bytes=34304 max_sent_bytes=8128 max_received_bytes=6848 rank0_stats=RoutingStatistics { batches: 2, local_pair_candidates: 64, maximum_batch_pairs: 16, maximum_routed_amplitudes: 64, coordination_calls: 112, indexed_reads: 1, indexed_writes: 1, point_to_point_sent_bytes: 8128, point_to_point_received_bytes: 6848 }
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.90s
+
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.90s
+
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.90s
+
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.90s
+
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.90s
+
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.90s
+
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.90s
+
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.90s
+
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 15.54s
+
+     Running tests/matching_persisted.rs (target/debug/build/quest-rs/5435ebc239028c5a/out/matching_persisted-5435ebc239028c5a)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/matching_preprocess.rs (target/debug/build/quest-rs/a7df70e2f311f595/out/matching_preprocess-a7df70e2f311f595)
+
+running 1 test
+test producer_starts_with_sharded_entries_and_closes_paths ... MPI producer acceptance ranks=1 split=0 batch=1 ["PRODUCER_IDENTITY 14033415735815936723:4508973185947801423:16854322175675395532:3454504671002449863"]
+MPI producer acceptance ranks=2 split=0 batch=3 ["PRODUCER_IDENTITY 14033415735815936723:4508973185947801423:16854322175675395532:3454504671002449863"]
+MPI producer acceptance ranks=4 split=0 batch=1 ["PRODUCER_IDENTITY 14033415735815936723:4508973185947801423:16854322175675395532:3454504671002449863"]
+MPI producer acceptance ranks=8 split=0 batch=3 ["PRODUCER_IDENTITY 14033415735815936723:4508973185947801423:16854322175675395532:3454504671002449863"]
+MPI producer acceptance ranks=4 split=1 batch=2 ["PRODUCER_IDENTITY 14033415735815936723:4508973185947801423:16854322175675395532:3454504671002449863"]
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.59s
+

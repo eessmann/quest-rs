@@ -1,0 +1,18 @@
+[
+  {
+    "path": "crates/quest-cfd/src/configuration_weak.rs",
+    "sha256": "814340f13cf46b8f4c0f9080466465cce631a3a660097af686c1cf3a8eeb30c2"
+  },
+  {
+    "path": "crates/quest-cfd/tests/configuration_weak.rs",
+    "sha256": "44eab4e2510246d3f792e908d8e8ed4b61ea82dc858326157e73d440e08501e4"
+  },
+  {
+    "path": "crates/quest-cfd/src/lib.rs",
+    "sha256": "4121d009e65cb6e10219082a104146278592838db6db70464e08ab9fe6695c12"
+  },
+  {
+    "path": "crates/quest-cfd/docs/configuration-weak.md",
+    "sha256": "02b99df988f3c3b5aa1d2613292b217572970a215dc58171b1f37d653a29c6e6"
+  }
+]

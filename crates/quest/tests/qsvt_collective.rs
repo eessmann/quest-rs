@@ -12,12 +12,11 @@ fn ranks(
 	if std::env::var("QUEST_COLLECTIVE_TEST").as_deref() == Ok(name) {
 		return body();
 	}
-	let output = std::process::Command::new("timeout")
-		.args(["60s", "mpiexec", "-n", count])
-		.arg(std::env::current_exe()?)
-		.args(["--exact", name, "--nocapture", "--test-threads=1"])
-		.env("QUEST_COLLECTIVE_TEST", name)
-		.output()?;
+	let output =
+		quest_test_support::mpi::MpiTest::new(count.parse()?, std::time::Duration::from_secs(60))?
+			.args(["--exact", name, "--nocapture", "--test-threads=1"])
+			.env("QUEST_COLLECTIVE_TEST", name)
+			.output()?;
 	verify_that!(output.status.success(), eq(true)).with_failure_message(|| {
 		format!(
 			"{}\n{}\n{}",
@@ -57,6 +56,7 @@ fn collective_compact_range_projection_and_descriptor_disagreement() -> googlete
 			};
 			let runtime = MpiRuntime::initialize()?;
 			let comm = runtime.world()?;
+			quest_test_support::mpi::assert_rank_count(comm.size()?)?;
 			let environment = CollectiveEnvironment::builder(&comm)?.build()?;
 			let build = |start| -> quest_qsvt::Result<_> {
 				let policy = NumericalPolicy::default();
@@ -107,6 +107,7 @@ fn collective_qsvt_mass_conditioning_and_complex_hadamard() -> googletest::Resul
 		|| {
 			let runtime = MpiRuntime::initialize()?;
 			let mut comm = runtime.world()?;
+			quest_test_support::mpi::assert_rank_count(comm.size()?)?;
 			{
 				let env = CollectiveEnvironment::builder(&comm)?.build()?;
 				let transform = transform(Complex64::new(0.3, 0.4))?;
@@ -155,6 +156,7 @@ fn collective_qsvt_rejects_transform_vector_and_budget_disagreement() -> googlet
 		|| {
 			let runtime = MpiRuntime::initialize()?;
 			let mut comm = runtime.world()?;
+			quest_test_support::mpi::assert_rank_count(comm.size()?)?;
 			{
 				let env = CollectiveEnvironment::builder(&comm)?
 					.memory_budget(MemoryBudget::new(if comm.rank()? == 0 {
@@ -222,6 +224,7 @@ fn collective_qsvt_subgroups_run_independent_transforms() -> googletest::Result<
 		|| {
 			let runtime = MpiRuntime::initialize()?;
 			let mut world = runtime.world()?;
+			quest_test_support::mpi::assert_rank_count(world.size()?)?;
 			let color = world.rank()? / 2;
 			let mut subgroup = world.split(Some(color), world.rank()?)?.unwrap();
 			{
@@ -256,6 +259,7 @@ fn collective_qsvt_checks_projector_representation_and_dense_complex_projection(
 			use quest_qsvt::{EncodingBuilder, Left, LogicalSpace, Right};
 			let runtime = MpiRuntime::initialize()?;
 			let mut comm = runtime.world()?;
+			quest_test_support::mpi::assert_rank_count(comm.size()?)?;
 			{
 				let env = CollectiveEnvironment::builder(&comm)?.build()?;
 				let policy = NumericalPolicy::default();

@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "id": "cirrus-loader-isolation-diagnosis",
+  "campaign_source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+  "native_source_revision": "503552065045eaf89baba85e6cd6aad728525554",
+  "scope": "Read-only inspection of retained installations and consumer executables; no new cluster execution job",
+  "method": {
+    "commands": [
+      "readelf -d",
+      "ldd",
+      "sha256sum"
+    ],
+    "loader_environment_removed": [
+      "LD_*",
+      "DYLD_*",
+      "LIBPATH",
+      "SHLIB_PATH"
+    ],
+    "runtime_execution": "No MPI initialization or numerical consumer execution in the read-only follow-up"
+  },
+  "profiles": [
+    {
+      "compiler": "gnu",
+      "consumer_job": "536833",
+      "native_library_sha256": "afdf97834ae301ce6029fd85c3e66b86c6b7934c1bc97c5c98d05d2ef3df3ee3",
+      "native_cmake_cache_sha256": "7e526b934d85c8188a9f681f04fb39d8147ef69a5744747c80178148c2e25298",
+      "native_install_script_sha256": "7a3f26bc1049edd91ac89b387ca11632474730085e68403094594dc8500b47b4",
+      "direct_consumer_sha256": "cd99259d093ce53e94e5801faa379193cb8a477ea0084b2205c48e7068cd6ddb",
+      "mpi_soname": "libmpi_gnu_112.so.12",
+      "mpi_sha256": "5c97ac228d08148417517449a32697a607ad8533698fcffa2f7b786fbfa04cdf",
+      "native_rpath": [
+        "$ORIGIN/"
+      ],
+      "consumer_runpath": [
+        "<native-prefix>/lib64",
+        "<native-prefix>/lib64"
+      ],
+      "native_install_rpath_use_link_path": true,
+      "mpi_rpath": null,
+      "mpi_runpath": null,
+      "unresolved_dependency": "libfabric.so.1",
+      "module_consumer_status": "passed-existing-receipt",
+      "loader_isolated_consumer_status": "failed-existing-receipt-and-reproduced-ldd"
+    },
+    {
+      "compiler": "cray",
+      "consumer_job": "536810",
+      "native_library_sha256": "f1eba6a43b2f9b0b0ed043adeb66840bdae977aa1920efa6e767e4e3ec14af89",
+      "native_cmake_cache_sha256": "37dfdb0e4049f303188c549457c903e57fd8d3ee8fc31debe58a929dfe7eba5d",
+      "native_install_script_sha256": "cd7442b28061b15856762ebeb78d1e9f14eb6e07df883430cb3b358296e69207",
+      "direct_consumer_sha256": "ececd46d653bf644b2654b70cdcf793a7e8537ec40bc2f58d0897e6846884325",
+      "mpi_soname": "libmpi_cray.so.12",
+      "mpi_sha256": "1c972b113e1c17f4ec675b07bd993aae72402019e22473a22282a632241b0cad",
+      "native_rpath": [
+        "$ORIGIN/",
+        "/opt/cray/pe/cce/19.0.0/cce-clang/x86_64/lib",
+        "/opt/cray/pe/cce/19.0.0/cce-clang/x86_64/lib"
+      ],
+      "consumer_runpath": [
+        "/opt/cray/pe/cce/19.0.0/cce/x86_64/lib",
+        "<native-prefix>/lib64",
+        "<native-prefix>/lib64"
+      ],
+      "native_install_rpath_use_link_path": true,
+      "mpi_rpath": null,
+      "mpi_runpath": null,
+      "unresolved_dependency": "libfabric.so.1",
+      "module_consumer_status": "passed-existing-receipt",
+      "loader_isolated_consumer_status": "failed-existing-receipt-and-reproduced-ldd"
+    }
+  ],
+  "fabric": {
+    "path": "/opt/cray/libfabric/2.3.1/lib64/libfabric.so.1.29.1",
+    "sha256": "e83864e8764e293cc024f91780465fb237ad1eebeb62f02eedbf4b0d4b68850a",
+    "own_loader_isolated_closure": "resolved"
+  },
+  "diagnosis": "Vendor MPI depends on libfabric without recording a dependency search path. The executable direct-library RUNPATH does not cover that transitive dependency. Both native caches already enable install RPATH link-path propagation.",
+  "disposition": {
+    "loader_isolated_status": "unsupported-for-retained-installations-within-authorized-documented-module-workflow",
+    "user_constraint": "Use documented Cirrus tools; report unavailable execution modes and move on without workarounds.",
+    "source_or_installation_changes": false,
+    "remote_file_changes": false,
+    "new_cluster_jobs": 0,
+    "local_diagnostic_only": "A three-library ELF fixture reproduced failure with executable-only or intermediate-only RUNPATH; its dependency-retention experiment is diagnostic evidence, not an approved deployment recipe or a Cirrus acceptance result."
+  },
+  "references": [
+    "https://docs.cirrus.ac.uk/user-guide/development/",
+    "https://sourceware.org/pipermail/glibc-cvs/2024q2/085264.html"
+  ],
+  "evidence": [
+    {
+      "path": "target/loader-isolation/cirrus-native-elf-evidence.txt",
+      "sha256": "0da265990a1bc3d752d59116affaacdb553e1ca318815fb4e02382146974913f",
+      "size_bytes": 34280,
+      "visibility": "private-original-local-ignored"
+    },
+    {
+      "path": "target/loader-isolation/local-closure-probe.py",
+      "sha256": "55bd454eda013852a4e26b18c50585fe37d0f0f2d7a49996fdeb65437594577e",
+      "size_bytes": 2197,
+      "visibility": "private-original-local-ignored"
+    },
+    {
+      "path": "target/loader-isolation/closure-33v2ifzt/results.json",
+      "sha256": "1bba2874c5338135a3cff3029eb70a9158a12d5bb3828628fd378a80a0664ebc",
+      "size_bytes": 970,
+      "visibility": "private-original-local-ignored"
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+{
+  "schema": "quest-checkpoint08-cmake-private-publication-candidates-v1",
+  "status": "private-only; parent owns publication",
+  "future_public_parent": "docs/verification/data/2026-10-05-workspace-programme",
+  "namespace": "checkpoint-08-cmake/",
+  "physical_native_or_probe_executions_during_staging": 0,
+  "original_bytes_unchanged": true,
+  "root_owns_full_original08_gate_logs": true,
+  "original_failure_cause": "unresolved",
+  "focused_PATH_matches_original08": false,
+  "normalization": "Public SHA hashes candidate bytes; original SHA hashes original private bytes. Numerical JSON values unchanged. <home> and <home-alias> preserve distinct path spellings without personal paths. Syscall excerpt process numbers normalized; full trace omitted and bound by diagnosis receipt only.",
+  "excluded": [
+    "binaries",
+    "package archives",
+    "full syscall trace",
+    "full08 gate logs"
+  ],
+  "files": [
+    {
+      "path": "checkpoint-08-cmake/diagnosis.md",
+      "bytes": 6048,
+      "sha256": "73cb3004e66e44d710f4e4bdc00fae34901db7349697330c468061afe7cb3f41",
+      "original_private_identifier": "<workspace>/.superpowers/sdd/2026-10-05-sparse-mathcore-cfd/checkpoint-08-cmake-diagnosis.md",
+      "original_bytes": 6042,
+      "original_sha256": "aada2d21190849989e2f1d5275a9bd540dff1fe13eb6bbd246a5b1bbbde53e73",
+      "representation": "path/host/process identifier strings normalized; numerical JSON values unchanged"
+    },
+    {
+      "path": "checkpoint-08-cmake/diagnosis.json",
+      "bytes": 3488,
+      "sha256": "072617ab1ee867d5eb17914cc9523fd77ce522d3fed52840ce2a496e5de424d3",
+      "original_private_identifier": "<workspace>/.superpowers/sdd/2026-10-05-sparse-mathcore-cfd/checkpoint-08-cmake-diagnosis.json",
+      "original_bytes": 3317,
+      "original_sha256": "3d559e9c738dee92191a7e013623f0df3a83ff24f48a6272267002ac7c72666a",
+      "representation": "path/host/process identifier strings normalized; numerical JSON values unchanged"
+    },
+    {
+      "path": "checkpoint-08-cmake/host-byte-check.json",
+      "bytes": 3945,
+      "sha256": "8992da49e90654c02a6aabec43536a333e1dad9c8e28592068e0660595713c0f",
+      "original_private_identifier": "<private-artifacts>/quest-checkpoint-08-cmake-diagnosis/host.json",
+      "original_bytes": 3911,
+      "original_sha256": "c3ececb96a0534ef8dec4f2cad8e8b50ad3fc079aa895faf2c70fc46e08a0dc8",
+      "representation": "path/host/process identifier strings normalized; numerical JSON values unchanged"
+    },
+    {
+      "path": "checkpoint-08-cmake/initial-ptrace-denied.log",
+      "bytes": 147,
+      "sha256": "bf77ee2a0c153f78b0914b4dfd529285f257ba31ffc6e5ebd04a032deed512e0",
+      "original_private_identifier": "<private-artifacts>/quest-checkpoint-08-cmake-diagnosis/minimal.log",
+      "original_bytes": 147,
+      "original_sha256": "bf77ee2a0c153f78b0914b4dfd529285f257ba31ffc6e5ebd04a032deed512e0",
+      "representation": "byte-original"
+    },
+    {
+      "path": "checkpoint-08-cmake/minimal-configure.log",
+      "bytes": 421,
+      "sha256": "996fc7c784e9115e3c6a7644ceac18c3e0991f16ca41155437c685b376426b59",
+      "original_private_identifier": "<private-artifacts>/quest-checkpoint-08-cmake-diagnosis/minimal-escalated.log",
+      "original_bytes": 406,
+      "original_sha256": "bda72f871fc2729178ad88927864024f07ba27e9d0b3a3ccffcfcd3e0dee898e",
+      "representation": "path/host/process identifier strings normalized; numerical JSON values unchanged"
+    },
+    {
+      "path": "checkpoint-08-cmake/module-open-excerpt.log",
+      "bytes": 720,
+      "sha256": "dad720d24801222b82c21d1b71c349fe3ffc88c0098d3ccdb93239e51ac30568",
+      "original_private_identifier": "<private-artifacts>/quest-checkpoint-08-cmake-diagnosis/module-syscalls.log",
+      "original_bytes": 690,
+      "original_sha256": "1599a130acf36c9e80bcd5559e994afa892821391ed2c7806a1f88ba818b0105",
+      "representation": "path/host/process identifier strings normalized; numerical JSON values unchanged"
+    },
+    {
+      "path": "checkpoint-08-cmake/concurrent-probes.json",
+      "bytes": 1484,
+      "sha256": "9160170d449750159edc5dbe171464c8987b414c9992c1a525ba11f7bfc96e09",
+      "original_private_identifier": "<private-artifacts>/quest-checkpoint-08-cmake-diagnosis/concurrent-results.json",
+      "original_bytes": 1364,
+      "original_sha256": "eb8adf64f969fd61492438a2e84e89fbb6027051f565f4d53e91804347bfcb57",
+      "representation": "path/host/process identifier strings normalized; numerical JSON values unchanged"
+    },
+    {
+      "path": "checkpoint-08-cmake/focused-five-result.json",
+      "bytes": 3395,
+      "sha256": "917dc27836b9dc684b5476af1139e9cf71f0dccfe72bd00bb6552303f80665b4",
+      "original_private_identifier": "<private-artifacts>/quest-checkpoint-08-cmake-diagnosis/focused-result.json",
+      "original_bytes": 3382,
+      "original_sha256": "611fb0211666a48469e5cb66deee78dbde8a5d57d85b989101b8d95a869b3c3e",
+      "representation": "path/host/process identifier strings normalized; numerical JSON values unchanged"
+    },
+    {
+      "path": "checkpoint-08-cmake/focused-five.log",
+      "bytes": 3302,
+      "sha256": "ed0c90bd0467eebb772a64438fc77f3736e139066690bcf9999509727d5ca295",
+      "original_private_identifier": "<private-artifacts>/quest-checkpoint-08-cmake-diagnosis/focused-default-five.log",
+      "original_bytes": 3426,
+      "original_sha256": "e6a8f5de1604d7f63656236e60015f80b7668f1f63cd726e70312237cb098de3",
+      "representation": "path/host/process identifier strings normalized; numerical JSON values unchanged"
+    },
+    {
+      "path": "checkpoint-08-cmake/path-resolution-comparison.json",
+      "bytes": 816,
+      "sha256": "c8f5fcb98a3de8f8427d7f48dc6c930a42293bb26f9e287ac29615d1561b3a4f",
+      "original_private_identifier": "<private-artifacts>/quest-checkpoint-08-cmake-diagnosis/path-resolution-comparison.json",
+      "original_bytes": 832,
+      "original_sha256": "962a67e7a306c16246b92ca7856a976a5e4551516e91d9261c810a48e74cbddd",
+      "representation": "path/host/process identifier strings normalized; numerical JSON values unchanged"
+    },
+    {
+      "path": "checkpoint-08-cmake/concurrent-streams.json",
+      "bytes": 3247,
+      "sha256": "ed63c5bc31b5ea64647e6860ab948aa708a9e156f5b6aa13c59f540c7dd17774",
+      "representation": "derived stream index; normalized text, original byte counts and hashes"
+    },
+    {
+      "path": "checkpoint-08-cmake/historical-context.json",
+      "bytes": 1796,
+      "sha256": "356cdc2a6246c2f44e2c00618689c5041e294495d7701f1a1ff2725e7048f2c9",
+      "representation": "derived exact fields of existing published06 receipt and stated overview context"
+    }
+  ],
+  "manifest_self_hash_excluded": true
+}

@@ -1,0 +1,149 @@
+{
+  "schema": "quest-portfolio-source-fingerprint-publication-v1",
+  "status": "published after root scoped verification and candidate integrity/privacy review",
+  "normalization": "Original input bytes frozen. Candidate SHA values hash candidate bytes; original private SHA identifies separate original bytes. No original hash is asserted to hash normalized content. Numeric JSON values unchanged.",
+  "actual_test_scope": "41pure tests/10targets,7new; independently root repeated41+strictClippy with26scoped hashes stable; not a transitive build/scientific campaign",
+  "reruns_during_staging": 0,
+  "original_inputs_unchanged": true,
+  "files": [
+    {
+      "path": "source.json",
+      "bytes": 1789,
+      "sha256": "5065fe0f67b69d6986906cfa18e907faf3ffdaea5057ba88a5ae1bb1dafcf5a5",
+      "original_private_identifier": "<workspace>/.superpowers/sdd/2026-10-05-sparse-mathcore-cfd/portfolio-source-fingerprints-source.json",
+      "original_bytes": 1789,
+      "original_sha256": "5065fe0f67b69d6986906cfa18e907faf3ffdaea5057ba88a5ae1bb1dafcf5a5",
+      "representation": "byte-original"
+    },
+    {
+      "path": "owner-focused.json",
+      "bytes": 2299,
+      "sha256": "59b35c2963a8ea71718fed361fdf65d425266af74632c8dfb818e9d6a0d51479",
+      "original_private_identifier": "<workspace>/.superpowers/sdd/2026-10-05-sparse-mathcore-cfd/portfolio-source-fingerprints-focused.json",
+      "original_bytes": 2209,
+      "original_sha256": "2ce542bb73b5f4b15e4f2ca5d832410c01e08518b69a418bb901a36beeef768b",
+      "representation": "generic path strings only; original SHA does not hash normalized bytes"
+    },
+    {
+      "path": "owner-report.md",
+      "bytes": 6186,
+      "sha256": "9dadd3526579da717e2f230518dca2ddf45ba6347a1b98ea25c100ca6f2b74aa",
+      "original_private_identifier": "<workspace>/.superpowers/sdd/2026-10-05-sparse-mathcore-cfd/portfolio-source-fingerprints-report.md",
+      "original_bytes": 6066,
+      "original_sha256": "9ed782b5fb248830480a5f68dd5f0b383de8fc69ea013a1505c420cd5443b110",
+      "representation": "generic path strings only; original SHA does not hash normalized bytes"
+    },
+    {
+      "path": "root-verification.json",
+      "bytes": 2346,
+      "sha256": "ce19e743948dd1f5e8320169e23033f3c87dfd3ce76aca90ecd36b7fff265b18",
+      "original_private_identifier": "<workspace>/.superpowers/sdd/2026-10-05-sparse-mathcore-cfd/portfolio-source-fingerprints-root-verification.json",
+      "original_bytes": 2346,
+      "original_sha256": "ce19e743948dd1f5e8320169e23033f3c87dfd3ce76aca90ecd36b7fff265b18",
+      "representation": "byte-original"
+    },
+    {
+      "path": "logs/quest-portfolio-commutative-red.log",
+      "bytes": 2933,
+      "sha256": "d0ee4b61182032fa3a608d633a1705a82154da823cbb6afefafe2c3efe3bfdc0",
+      "original_private_identifier": "<private-artifacts>/quest-portfolio-commutative-red.log",
+      "original_bytes": 2968,
+      "original_sha256": "e43d766918f8d227f0934cd29792ad763509d6f613c560095c3d572f66a68f50",
+      "representation": "generic path strings only; original SHA does not hash normalized bytes"
+    },
+    {
+      "path": "logs/quest-portfolio-offset-owners-red.log",
+      "bytes": 1648,
+      "sha256": "d10cc51f63c0f8931ccf48dc29f7e7cee8d5374d5ce33ca2b802331f7d4273f7",
+      "original_private_identifier": "<private-artifacts>/quest-portfolio-offset-owners-red.log",
+      "original_bytes": 1683,
+      "original_sha256": "683941304a275f4ad05daf44269bf9edcb46403526c8841fba51e20ede744b58",
+      "representation": "generic path strings only; original SHA does not hash normalized bytes"
+    },
+    {
+      "path": "logs/quest-portfolio-offset-owners-green.log",
+      "bytes": 1097,
+      "sha256": "e0452680d6ffd553b9b87bbd8112390ae04bff9375bec95777e32954c14327c3",
+      "original_private_identifier": "<private-artifacts>/quest-portfolio-offset-owners-green.log",
+      "original_bytes": 1132,
+      "original_sha256": "e642415f654e428315bd948fbe31851f6d8d78bc0c78efd24e37b5b34ef38e4d",
+      "representation": "generic path strings only; original SHA does not hash normalized bytes"
+    },
+    {
+      "path": "logs/quest-portfolio-identities-focused-freeze.log",
+      "bytes": 6358,
+      "sha256": "3cf84a342401428704940cf266ef895cb11ade2c6c467e184fa488b1ff2b9ef2",
+      "original_private_identifier": "<private-artifacts>/quest-portfolio-identities-focused-freeze.log",
+      "original_bytes": 6393,
+      "original_sha256": "debab4de629be93e30ccfc1de8d5a34121f830bd4a7e1f6179c4671f3123558c",
+      "representation": "generic path strings only; original SHA does not hash normalized bytes"
+    },
+    {
+      "path": "logs/quest-portfolio-identities-clippy-freeze.log",
+      "bytes": 772,
+      "sha256": "8863770894a5005ea13005ebc740b3cca80e54c34274b31eab338f648af07840",
+      "original_private_identifier": "<private-artifacts>/quest-portfolio-identities-clippy-freeze.log",
+      "original_bytes": 807,
+      "original_sha256": "e2d9c6c5faa6d2cf38c10d5fa74e4cad0297c07ae520a0fd99fd66c71fa6f0db",
+      "representation": "generic path strings only; original SHA does not hash normalized bytes"
+    },
+    {
+      "path": "logs/quest-portfolio-identities-format-freeze.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_private_identifier": "<private-artifacts>/quest-portfolio-identities-format-freeze.log",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "representation": "byte-original"
+    },
+    {
+      "path": "logs/quest-portfolio-fingerprint-root-tests.log",
+      "bytes": 6295,
+      "sha256": "c446ecb6781aecad7dde1854c4077eed8077ba2d550326f47ad19e2cf4722767",
+      "original_private_identifier": "<private-artifacts>/quest-portfolio-fingerprint-root-tests.log",
+      "original_bytes": 6295,
+      "original_sha256": "c446ecb6781aecad7dde1854c4077eed8077ba2d550326f47ad19e2cf4722767",
+      "representation": "byte-original"
+    },
+    {
+      "path": "logs/quest-portfolio-fingerprint-root-clippy.log",
+      "bytes": 709,
+      "sha256": "a84744b5b4ce853725e7bfa664c858880c31b78a110ed287e4d82b197097bf38",
+      "original_private_identifier": "<private-artifacts>/quest-portfolio-fingerprint-root-clippy.log",
+      "original_bytes": 709,
+      "original_sha256": "a84744b5b4ce853725e7bfa664c858880c31b78a110ed287e4d82b197097bf38",
+      "representation": "byte-original"
+    },
+    {
+      "path": "public-api-probe.rs",
+      "bytes": 3105,
+      "sha256": "e58226036c8adca6e852c760514dfdbd79c9856890f46a5a7dc978d8ee7648e9",
+      "original_private_identifier": "<private-artifacts>/quest-portfolio-identity-review/src/main.rs",
+      "original_bytes": 3105,
+      "original_sha256": "e58226036c8adca6e852c760514dfdbd79c9856890f46a5a7dc978d8ee7648e9",
+      "representation": "byte-original"
+    },
+    {
+      "path": "public-api-probe.log",
+      "bytes": 2276,
+      "sha256": "202793a4f6858b156a6856cdf9ce51f51f81bee062c5f9f5d08ff6877e8885b0",
+      "original_private_identifier": "<private-artifacts>/quest-portfolio-identity-review-behavior.log",
+      "original_bytes": 2296,
+      "original_sha256": "1f47855a0b0ea9b85d20b281abd074a72344034132daf66de31f9d329d4fca40",
+      "representation": "generic path strings only; original SHA does not hash normalized bytes"
+    },
+    {
+      "path": "shared-helper-reference.json",
+      "bytes": 715,
+      "sha256": "b4146e37e28dc02bb745d3c667d172f890b703d6f57ea15bd127d172d8381f4e",
+      "representation": "derived named manifest/test scope index, not a new test execution"
+    }
+  ],
+  "publication_self_hash_excluded": true,
+  "prospective_chapter": {
+    "path": "2026-10-06-portfolio-source-fingerprints.md",
+    "bytes": 3181,
+    "sha256": "1a0ac80c3ead2c9f96ecf949da10f1313db2345fd575c1f1580592baa2028224"
+  },
+  "candidate_manifest_sha256": "14d719eb41f936c9b9376d34c22da68783dd4ed05a4fc3056fa1fb7096a3fa6a"
+}

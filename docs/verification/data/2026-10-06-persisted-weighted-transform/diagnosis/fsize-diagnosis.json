@@ -1,0 +1,191 @@
+{
+  "schema": "quest-mpi-capture-fsize-diagnosis-v1",
+  "status": "minimal-MPI-init-reproduces-shared-memory-EFBIG",
+  "minimal_scope": "MPI_Init_thread/Finalize only; no QuEST or consumer or source generation",
+  "minimal_receipt": {
+    "scope": "minimal MPI_Init_thread/Finalize only; no QuEST or production consumer",
+    "returncode": 153,
+    "seconds": 1.218012061995978,
+    "address_space_bytes": 2147483648,
+    "file_size_bytes": 4194304,
+    "command": [
+      "strace",
+      "-ff",
+      "-o",
+      "<private-artifacts>/quest-mpi-fsize-diagnostic/trace",
+      "-e",
+      "trace=openat,close,ftruncate,truncate,fallocate,unlink,mmap,write",
+      "/usr/lib64/mpich/bin/mpiexec",
+      "-n",
+      "8",
+      "<private-artifacts>/quest-mpi-fsize-diagnostic/init"
+    ],
+    "init.c": {
+      "bytes": 432,
+      "sha256": "7f53384f29909e7984d4d0bd1442513ba6a2a5fcfe397dab09a32dfa014bbb00"
+    },
+    "init": {
+      "bytes": 12848,
+      "sha256": "e135610e233c6753c1ad5b41a9a5d43e0e61a2215e59e5538dd457b92ad37594"
+    },
+    "stdout": {
+      "bytes": 553,
+      "sha256": "45950c9eb973a3d8b09b094bb688467fd7f0a91cd5de7cac7d9dba970734eacd"
+    },
+    "stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "failing_shared_memory_bytes": 4337664,
+  "rlimit_fsize_bytes": 4194304,
+  "excess_bytes": 143360,
+  "failing_ranks": 8,
+  "failure_syscalls": [
+    {
+      "trace": "trace-process-03",
+      "prior_open": "openat(AT_FDCWD, \"/dev/shm/psm3_shm.<transport-id>\", O_RDWR|O_CREAT|O_NOFOLLOW|O_CLOEXEC, 0600) = 20",
+      "failure": "ftruncate(20, 4337664)                  = -1 EFBIG (File too large)",
+      "next": "--- SIGXFSZ {si_signo=SIGXFSZ, si_code=SI_USER, si_pid=<process-id>, si_uid=<user-id>} ---"
+    },
+    {
+      "trace": "trace-process-04",
+      "prior_open": "openat(AT_FDCWD, \"/dev/shm/psm3_shm.<transport-id>\", O_RDWR|O_CREAT|O_NOFOLLOW|O_CLOEXEC, 0600) = 22",
+      "failure": "ftruncate(22, 4337664)                  = -1 EFBIG (File too large)",
+      "next": "--- SIGXFSZ {si_signo=SIGXFSZ, si_code=SI_USER, si_pid=<process-id>, si_uid=<user-id>} ---"
+    },
+    {
+      "trace": "trace-process-05",
+      "prior_open": "openat(AT_FDCWD, \"/dev/shm/psm3_shm.<transport-id>\", O_RDWR|O_CREAT|O_NOFOLLOW|O_CLOEXEC, 0600) = 22",
+      "failure": "ftruncate(22, 4337664)                  = -1 EFBIG (File too large)",
+      "next": "--- SIGXFSZ {si_signo=SIGXFSZ, si_code=SI_USER, si_pid=<process-id>, si_uid=<user-id>} ---"
+    },
+    {
+      "trace": "trace-process-06",
+      "prior_open": "openat(AT_FDCWD, \"/dev/shm/psm3_shm.<transport-id>\", O_RDWR|O_CREAT|O_NOFOLLOW|O_CLOEXEC, 0600) = 21",
+      "failure": "ftruncate(21, 4337664)                  = -1 EFBIG (File too large)",
+      "next": "--- SIGXFSZ {si_signo=SIGXFSZ, si_code=SI_USER, si_pid=<process-id>, si_uid=<user-id>} ---"
+    },
+    {
+      "trace": "trace-process-07",
+      "prior_open": "openat(AT_FDCWD, \"/dev/shm/psm3_shm.<transport-id>\", O_RDWR|O_CREAT|O_NOFOLLOW|O_CLOEXEC, 0600) = 19",
+      "failure": "ftruncate(19, 4337664)                  = -1 EFBIG (File too large)",
+      "next": "--- SIGXFSZ {si_signo=SIGXFSZ, si_code=SI_USER, si_pid=<process-id>, si_uid=<user-id>} ---"
+    },
+    {
+      "trace": "trace-process-08",
+      "prior_open": "openat(AT_FDCWD, \"/dev/shm/psm3_shm.<transport-id>\", O_RDWR|O_CREAT|O_NOFOLLOW|O_CLOEXEC, 0600) = 19",
+      "failure": "ftruncate(19, 4337664)                  = -1 EFBIG (File too large)",
+      "next": "--- SIGXFSZ {si_signo=SIGXFSZ, si_code=SI_USER, si_pid=<process-id>, si_uid=<user-id>} ---"
+    },
+    {
+      "trace": "trace-process-09",
+      "prior_open": "openat(AT_FDCWD, \"/dev/shm/psm3_shm.<transport-id>\", O_RDWR|O_CREAT|O_NOFOLLOW|O_CLOEXEC, 0600) = 19",
+      "failure": "ftruncate(19, 4337664)                  = -1 EFBIG (File too large)",
+      "next": "--- SIGXFSZ {si_signo=SIGXFSZ, si_code=SI_USER, si_pid=<process-id>, si_uid=<user-id>} ---"
+    },
+    {
+      "trace": "trace-process-10",
+      "prior_open": "openat(AT_FDCWD, \"/dev/shm/psm3_shm.<transport-id>\", O_RDWR|O_CREAT|O_NOFOLLOW|O_CLOEXEC, 0600) = 19",
+      "failure": "ftruncate(19, 4337664)                  = -1 EFBIG (File too large)",
+      "next": "--- SIGXFSZ {si_signo=SIGXFSZ, si_code=SI_USER, si_pid=<process-id>, si_uid=<user-id>} ---"
+    }
+  ],
+  "trace_files": [
+    {
+      "path": "<private-artifacts>/quest-mpi-fsize-diagnostic/trace-process-01",
+      "bytes": 26388,
+      "sha256": "42615b5e4fc998855deb417bf5aacddfe50d649ee85648d1711de9d806993b1e"
+    },
+    {
+      "path": "<private-artifacts>/quest-mpi-fsize-diagnostic/trace-process-02",
+      "bytes": 170056,
+      "sha256": "1e59c41ae1d5fca82979e327e7a5b7aee1f8877f9c38ec9a46a49ad07733fb52"
+    },
+    {
+      "path": "<private-artifacts>/quest-mpi-fsize-diagnostic/trace-process-03",
+      "bytes": 40322,
+      "sha256": "c7df08d5c29cca18b4d3f2ebf35614edde7291a11452480c8d61ff0fd98cfdbe"
+    },
+    {
+      "path": "<private-artifacts>/quest-mpi-fsize-diagnostic/trace-process-04",
+      "bytes": 40325,
+      "sha256": "0c985d42bac68d4b142e144290ce15fdd2b5b3ab18f30777e4786e3f836acd17"
+    },
+    {
+      "path": "<private-artifacts>/quest-mpi-fsize-diagnostic/trace-process-05",
+      "bytes": 40325,
+      "sha256": "bfc280fa1699ef2ae83f18b0397d3f6eb8e58a23e5fd4338f225353a3919d3e0"
+    },
+    {
+      "path": "<private-artifacts>/quest-mpi-fsize-diagnostic/trace-process-06",
+      "bytes": 40325,
+      "sha256": "6850e9b2f063e550bb403585212d969d35d4c737032899ac1073e0f86196b48e"
+    },
+    {
+      "path": "<private-artifacts>/quest-mpi-fsize-diagnostic/trace-process-07",
+      "bytes": 40325,
+      "sha256": "c7bb1a0239a24b9e414f938f1ab129018c1d622f5b990e646d5bc8f869efb669"
+    },
+    {
+      "path": "<private-artifacts>/quest-mpi-fsize-diagnostic/trace-process-08",
+      "bytes": 40325,
+      "sha256": "673b05b391648ca3b43644aad0823e08618f142e65e4bcbb37dbc380dc6afdb5"
+    },
+    {
+      "path": "<private-artifacts>/quest-mpi-fsize-diagnostic/trace-process-09",
+      "bytes": 40339,
+      "sha256": "01991f5895610be9a9a92489a3cc3df4f414ffd0eb24b167ee561b5fd739213b"
+    },
+    {
+      "path": "<private-artifacts>/quest-mpi-fsize-diagnostic/trace-process-10",
+      "bytes": 40339,
+      "sha256": "2f1161dce11bda9d07a62a173f072283e087dccfa08f6cc1c829332f4f75f9e1"
+    },
+    {
+      "path": "<private-artifacts>/quest-mpi-fsize-diagnostic/trace-process-11",
+      "bytes": 40,
+      "sha256": "7d75aa2d34976a4763ac0e96e8e1662ce6057275682e12b31d1162cbf2a12280"
+    },
+    {
+      "path": "<private-artifacts>/quest-mpi-fsize-diagnostic/trace-process-12",
+      "bytes": 40,
+      "sha256": "7d75aa2d34976a4763ac0e96e8e1662ce6057275682e12b31d1162cbf2a12280"
+    },
+    {
+      "path": "<private-artifacts>/quest-mpi-fsize-diagnostic/trace-process-13",
+      "bytes": 26,
+      "sha256": "fa7e833212ad4b18b1586b15d305c12ce4d36186f4cc9be3db476f6e3a08a219"
+    },
+    {
+      "path": "<private-artifacts>/quest-mpi-fsize-diagnostic/trace-process-14",
+      "bytes": 26,
+      "sha256": "fa7e833212ad4b18b1586b15d305c12ce4d36186f4cc9be3db476f6e3a08a219"
+    },
+    {
+      "path": "<private-artifacts>/quest-mpi-fsize-diagnostic/trace-process-15",
+      "bytes": 26,
+      "sha256": "fa7e833212ad4b18b1586b15d305c12ce4d36186f4cc9be3db476f6e3a08a219"
+    },
+    {
+      "path": "<private-artifacts>/quest-mpi-fsize-diagnostic/trace-process-16",
+      "bytes": 26,
+      "sha256": "fa7e833212ad4b18b1586b15d305c12ce4d36186f4cc9be3db476f6e3a08a219"
+    },
+    {
+      "path": "<private-artifacts>/quest-mpi-fsize-diagnostic/trace-process-17",
+      "bytes": 26,
+      "sha256": "fa7e833212ad4b18b1586b15d305c12ce4d36186f4cc9be3db476f6e3a08a219"
+    },
+    {
+      "path": "<private-artifacts>/quest-mpi-fsize-diagnostic/trace-process-18",
+      "bytes": 26,
+      "sha256": "fa7e833212ad4b18b1586b15d305c12ce4d36186f4cc9be3db476f6e3a08a219"
+    }
+  ],
+  "campaign_receipt_sha256": "5426cd73301c5489b87543d09e629d1da2920b0a45ad0608ce589046013f592b",
+  "campaign_dataset_entries": [],
+  "consumer_sources_changed": false,
+  "campaign_rerun": false,
+  "caps_changed": false
+}

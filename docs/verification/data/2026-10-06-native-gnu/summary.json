@@ -1,0 +1,2445 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-06",
+  "scope": "Frozen-source local GNU CPU/OpenMP/MPI validation; GPU execution not claimed",
+  "campaign": {
+    "started_at_utc": "2026-10-06T18:50:23Z",
+    "finished_at_utc": "2026-10-06T19:05:06Z",
+    "exit_code": 0,
+    "stage_count": 12,
+    "execution": "Local Linux, outside the execution sandbox for authorized MPI communication",
+    "driver": {
+      "path": "target/native-gnu-20261006/verify-gnu.sh",
+      "bytes": 4507,
+      "sha256": "16e30d5d0f9036183ae7f7f35428922a715582cad898942e3fcc8c1c814d0ec6"
+    },
+    "completion_receipt": {
+      "path": "target/native-gnu-20261006/evidence/completed.status",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "fresh_cargo_target": true,
+    "disk_backed_tmpdir": true,
+    "failed_stage_retries": 0
+  },
+  "source": {
+    "manifest": {
+      "path": "target/discovery-full-cirrus-20261006/source.sha256",
+      "bytes": 346821,
+      "sha256": "565f59ccd796712da5277c57a4203d0869f0ad67a26fdec47e99709b83dc2602"
+    },
+    "archive": {
+      "path": "target/discovery-full-cirrus-20261006/source.tar.gz",
+      "bytes": 11837626,
+      "sha256": "b9256d7c0cbb72b7b2477b782c8e5666cde150564b261dd78f51cee5e2b80f5b"
+    },
+    "file_count": 2584,
+    "snapshot_directory": "target/discovery-full-cirrus-20261006/frozen",
+    "post_campaign_verification": {
+      "exit_code": 0,
+      "matched_files": 2584,
+      "log": {
+        "path": "target/native-gnu-20261006/evidence/source-after-check.log",
+        "bytes": 186613,
+        "sha256": "f6be7b2d7cfe296ae82b7d15ff8b6036581fe28491c5852fa3e774f2d5f3bc62"
+      }
+    },
+    "documentation_added_after_freeze": true
+  },
+  "toolchain": {
+    "target": "x86_64-unknown-linux-gnu",
+    "rustc": {
+      "release": "1.101.0-nightly",
+      "commit_hash": "db8f076d2619ce2585b0380dda06e8da25a40da4",
+      "commit_date": "2026-10-03",
+      "llvm_version": "23.1.1"
+    },
+    "cargo": "1.101.0-nightly (f3865b2a4 2026-09-29)",
+    "gcc": "16.2.1 20260819 (Red Hat 16.2.1-2)",
+    "gxx": "16.2.1 20260819 (Red Hat 16.2.1-2)",
+    "clang_and_libclang": "22.1.8 (Fedora 22.1.8-4.fc44)",
+    "cmake": "4.3.0",
+    "mpi": "MPICH 4.2.2 (system compiler wrapper and launcher)",
+    "serial_hdf5": "1.14.6",
+    "version_output_identities": {
+      "rustc": {
+        "path": "target/native-gnu-20261006/evidence/rustc.txt",
+        "bytes": 214,
+        "sha256": "6b8a26f695d400a8e53c871b05b05056ee46db7ca3b16160df6f91aca58b50b3"
+      },
+      "cargo": {
+        "path": "target/native-gnu-20261006/evidence/cargo.txt",
+        "bytes": 45,
+        "sha256": "71de2de1f7d9ecf66030112aa59bf05781d6210a550634db5eba3920af9d08de"
+      },
+      "gcc": {
+        "path": "target/native-gnu-20261006/evidence/gcc.txt",
+        "bytes": 247,
+        "sha256": "dcddcefbfc2827a1d7b83a86a683bfa8e1ae76b6080fc490c9110d51e0e3da40"
+      },
+      "gxx": {
+        "path": "target/native-gnu-20261006/evidence/gxx.txt",
+        "bytes": 247,
+        "sha256": "87e3dc71035ef3b73843ef947164533882c3624ba0c5f5d84405afdbb780fee9"
+      },
+      "clang": {
+        "path": "target/native-gnu-20261006/evidence/clang.txt",
+        "bytes": 184,
+        "sha256": "b9427ba8eb4c01f9459e58047587d1e2a794814a46fa5c49bbd6e3c2b98114bb"
+      },
+      "cmake": {
+        "path": "target/native-gnu-20261006/evidence/cmake.txt",
+        "bytes": 90,
+        "sha256": "6b8c2501a983639b330c555c9a105057ea877b701cf25920bc3fe32dd2a54b13"
+      },
+      "mpicc": {
+        "path": "target/native-gnu-20261006/evidence/mpicc.txt",
+        "bytes": 120,
+        "sha256": "26ce39bc108adbb9404c5bad46f42b24c959cb194154070d9848e0c5eceac4f5"
+      },
+      "mpiexec": {
+        "path": "target/native-gnu-20261006/evidence/mpiexec.txt",
+        "bytes": 5118,
+        "sha256": "bdd5a018dd07170773ebf3337e04bf43428889f3848031fadeae83cd43c4a1a0"
+      }
+    }
+  },
+  "native": {
+    "version": "4.3.0",
+    "build_compiler": "GNU 16.2.1",
+    "precision": "binary64",
+    "compiled_capabilities": [
+      "mpi",
+      "subcommunicators",
+      "openmp",
+      "numa",
+      "cuda",
+      "cuquantum"
+    ],
+    "openmp_runtime": "GNU libgomp",
+    "reused_existing_installation": true,
+    "source_modified": false,
+    "installation_modified": false,
+    "input_identities": [
+      {
+        "path": "<quest-prefix>/lib64/libQuEST.so.4.3.0",
+        "sha256": "2128fd71d6effd5ae463f9f92ff467032f09089a07cdb9ba7a5d565719b95396"
+      },
+      {
+        "path": "<quest-prefix>/lib64/cmake/QuEST/QuESTConfig.cmake",
+        "sha256": "9e6dce8dd10d8b056ef06b66cf58671a172d87170528ca3e22882d925ce6ce65"
+      },
+      {
+        "path": "/usr/bin/gcc",
+        "sha256": "153e46b4657620f2baef1b4a70b4b4f275772faa5b0fb9e415697e87ebcb7fea"
+      },
+      {
+        "path": "/usr/bin/g++",
+        "sha256": "579d25c2d1e45abeed0c63a517b5c52f6d09ea811a787bf7a7c677a7fd0726f6"
+      }
+    ],
+    "post_campaign_input_verification": {
+      "exit_code": 0,
+      "log": {
+        "path": "target/native-gnu-20261006/evidence/native-after-check.log",
+        "bytes": 172,
+        "sha256": "2020865a85db0778a2a8b4584aa8c48cf8404da5258b29b1655e4a2a7859a584"
+      }
+    },
+    "cache_receipt": {
+      "path": "target/native-gnu-20261006/evidence/native-cache.txt",
+      "bytes": 457,
+      "sha256": "89846c0688df10e7c2b0c8c3921c417473a6b6255922dce6275ac9ce619f141c"
+    },
+    "dynamic_metadata_receipt": {
+      "path": "target/native-gnu-20261006/evidence/native-dynamic.txt",
+      "bytes": 2464,
+      "sha256": "e8eda1de7ad006b0849f17dc6c44ad56763596b28c54e5ec11b6dcb1651b68ec"
+    },
+    "upstream_native_tests_rerun": false,
+    "gpu_execution_validated": false
+  },
+  "environment": {
+    "QUEST_ROOT": "<quest-prefix>",
+    "CARGO_TARGET_DIR": "<repository>/target/native-gnu-20261006/cargo",
+    "TMPDIR": "<repository>/target/native-gnu-20261006/tmp",
+    "CC": "/usr/bin/gcc",
+    "CXX": "/usr/bin/g++",
+    "CLANG": "/usr/bin/clang",
+    "MPICC": "/usr/lib64/mpich/bin/mpicc",
+    "PATH": "/usr/lib64/mpich/bin:/usr/bin:/bin:<cargo-bin>",
+    "CARGO_BUILD_JOBS": "8",
+    "OMP_NUM_THREADS": "2",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0",
+    "CARGO_INCREMENTAL": "0",
+    "CMAKE_PREFIX_PATH": "/usr/lib64/mpich",
+    "CUDAToolkit_ROOT": null,
+    "CUQUANTUM_ROOT": null,
+    "LD_LIBRARY_PATH": "/usr/lib64/mpich/lib:<cuda-prefix>/lib64:<cuda-prefix>/lib64",
+    "LIBCLANG_PATH": null,
+    "HDF5_DIR": null,
+    "RUSTFLAGS": null,
+    "CARGO_ENCODED_RUSTFLAGS": null
+  },
+  "nextest_workers": 4,
+  "stages": [
+    {
+      "name": "all-feature-tests",
+      "command": [
+        "cargo",
+        "nextest",
+        "run",
+        "--locked",
+        "--offline",
+        "--workspace",
+        "--all-features",
+        "--test-threads=4",
+        "--no-fail-fast",
+        "--status-level=fail",
+        "--final-status-level=fail"
+      ],
+      "started_at_utc": "2026-10-06T18:50:23Z",
+      "finished_at_utc": "2026-10-06T18:58:56Z",
+      "exit_code": 0,
+      "log": {
+        "path": "target/native-gnu-20261006/evidence/all-feature-tests.log",
+        "bytes": 16117,
+        "sha256": "d96b57ae8d8c3b077d71e814bcfd5e5710cd1055c4c2b91c3a31ab9f046abe00"
+      },
+      "command_receipt": {
+        "path": "target/native-gnu-20261006/evidence/all-feature-tests.command",
+        "bytes": 143,
+        "sha256": "159d767c81319f5ab4b907ad49709683ca90a35542ace2fbb46147b7333b3263"
+      },
+      "status_receipt": {
+        "path": "target/native-gnu-20261006/evidence/all-feature-tests.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "nextest_run_id": "fb1dbda9-6653-4237-9f46-f7d1507a58b4",
+      "summary": "Summary [ 461.851s] 1708 tests run: 1708 passed (1 slow), 6 skipped",
+      "passed": 1708,
+      "failed": 0,
+      "skipped": 6,
+      "binaries": 289,
+      "elapsed_seconds": 461.851
+    },
+    {
+      "name": "default-tests",
+      "command": [
+        "cargo",
+        "nextest",
+        "run",
+        "--locked",
+        "--offline",
+        "--workspace",
+        "--test-threads=4",
+        "--no-fail-fast",
+        "--status-level=fail",
+        "--final-status-level=fail"
+      ],
+      "started_at_utc": "2026-10-06T18:58:56Z",
+      "finished_at_utc": "2026-10-06T19:02:09Z",
+      "exit_code": 0,
+      "log": {
+        "path": "target/native-gnu-20261006/evidence/default-tests.log",
+        "bytes": 7146,
+        "sha256": "0b86a8d809de65d672718d32d89b136f66b754042c3d9b6536a706556f662bc7"
+      },
+      "command_receipt": {
+        "path": "target/native-gnu-20261006/evidence/default-tests.command",
+        "bytes": 128,
+        "sha256": "92969510dc2251909d92d7f79263c7e33578fbacd73393cb36b403f8dd9349a4"
+      },
+      "status_receipt": {
+        "path": "target/native-gnu-20261006/evidence/default-tests.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "nextest_run_id": "2bba5b72-b867-4094-a694-591d767fad51",
+      "summary": "Summary [ 158.114s] 1515 tests run: 1515 passed, 1 skipped",
+      "passed": 1515,
+      "failed": 0,
+      "skipped": 1,
+      "binaries": 289,
+      "elapsed_seconds": 158.114
+    },
+    {
+      "name": "all-feature-doctests",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "--workspace",
+        "--all-features",
+        "--doc"
+      ],
+      "started_at_utc": "2026-10-06T19:02:09Z",
+      "finished_at_utc": "2026-10-06T19:02:13Z",
+      "exit_code": 0,
+      "log": {
+        "path": "target/native-gnu-20261006/evidence/all-feature-doctests.log",
+        "bytes": 11144,
+        "sha256": "d2a1c5bbde72edbf30b0fd80452b8852a693603de77f5818cf62289b991bfb11"
+      },
+      "command_receipt": {
+        "path": "target/native-gnu-20261006/evidence/all-feature-doctests.command",
+        "bytes": 64,
+        "sha256": "e12bb3a16c991c1f0247b98acc44b5f0493bdbda232388d4c130d8faf148caa3"
+      },
+      "status_receipt": {
+        "path": "target/native-gnu-20261006/evidence/all-feature-doctests.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "passed": 65,
+      "failed": 0,
+      "ignored": 1
+    },
+    {
+      "name": "default-doctests",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "--workspace",
+        "--doc"
+      ],
+      "started_at_utc": "2026-10-06T19:02:13Z",
+      "finished_at_utc": "2026-10-06T19:02:17Z",
+      "exit_code": 0,
+      "log": {
+        "path": "target/native-gnu-20261006/evidence/default-doctests.log",
+        "bytes": 10135,
+        "sha256": "e856e5fc308ac8e0d18166de3366ae83a929d727d27a5a42a323c8e468dd1bf9"
+      },
+      "command_receipt": {
+        "path": "target/native-gnu-20261006/evidence/default-doctests.command",
+        "bytes": 49,
+        "sha256": "dcec0c35f896337252f3ae34b11f9ad7dcc6627fb26889f6eb610d675681708e"
+      },
+      "status_receipt": {
+        "path": "target/native-gnu-20261006/evidence/default-doctests.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "passed": 55,
+      "failed": 0,
+      "ignored": 1
+    },
+    {
+      "name": "all-feature-check",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "--offline",
+        "--workspace",
+        "--all-features"
+      ],
+      "started_at_utc": "2026-10-06T19:02:17Z",
+      "finished_at_utc": "2026-10-06T19:02:40Z",
+      "exit_code": 0,
+      "log": {
+        "path": "target/native-gnu-20261006/evidence/all-feature-check.log",
+        "bytes": 11407,
+        "sha256": "1334e8d914969647d5c4c5ed939e909274ba6a1927cf18c57341823c4e6b99ac"
+      },
+      "command_receipt": {
+        "path": "target/native-gnu-20261006/evidence/all-feature-check.command",
+        "bytes": 59,
+        "sha256": "f7605d1960587555fcc32af9b54f2f20248dd446b0c874f596942105b758bfa1"
+      },
+      "status_receipt": {
+        "path": "target/native-gnu-20261006/evidence/all-feature-check.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      }
+    },
+    {
+      "name": "default-check",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "--offline",
+        "--workspace"
+      ],
+      "started_at_utc": "2026-10-06T19:02:40Z",
+      "finished_at_utc": "2026-10-06T19:03:00Z",
+      "exit_code": 0,
+      "log": {
+        "path": "target/native-gnu-20261006/evidence/default-check.log",
+        "bytes": 4346,
+        "sha256": "1457ced4b025b8e36a0a2f1700baccddda32d595c973d77e2fa720375b74e1a8"
+      },
+      "command_receipt": {
+        "path": "target/native-gnu-20261006/evidence/default-check.command",
+        "bytes": 44,
+        "sha256": "96073caec118ef1dbeb81c34eded3b4d9308bf26efbbf3c3bb5b929b044c71e4"
+      },
+      "status_receipt": {
+        "path": "target/native-gnu-20261006/evidence/default-check.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      }
+    },
+    {
+      "name": "all-feature-clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--offline",
+        "--workspace",
+        "--all-features",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "started_at_utc": "2026-10-06T19:03:00Z",
+      "finished_at_utc": "2026-10-06T19:03:25Z",
+      "exit_code": 0,
+      "log": {
+        "path": "target/native-gnu-20261006/evidence/all-feature-clippy.log",
+        "bytes": 7920,
+        "sha256": "5484570a1b53a26ec40a187ef4bc582401ec380b7e5ebb82f87de88391ce4efb"
+      },
+      "command_receipt": {
+        "path": "target/native-gnu-20261006/evidence/all-feature-clippy.command",
+        "bytes": 89,
+        "sha256": "c65d1ec15e581d83c80e8c3d859a19477d6c2bcce74a2f1e4f1eedaebd58ad20"
+      },
+      "status_receipt": {
+        "path": "target/native-gnu-20261006/evidence/all-feature-clippy.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      }
+    },
+    {
+      "name": "bindings",
+      "command": [
+        "cargo",
+        "run",
+        "--locked",
+        "--offline",
+        "-p",
+        "xtask",
+        "--",
+        "generate-quest-bindings",
+        "--check"
+      ],
+      "started_at_utc": "2026-10-06T19:03:25Z",
+      "finished_at_utc": "2026-10-06T19:03:47Z",
+      "exit_code": 0,
+      "log": {
+        "path": "target/native-gnu-20261006/evidence/bindings.log",
+        "bytes": 4288,
+        "sha256": "3b3661f6971186f4706f5b4e333ed6ad52d00ba594da2a9a181be2986a91c8b8"
+      },
+      "command_receipt": {
+        "path": "target/native-gnu-20261006/evidence/bindings.command",
+        "bytes": 74,
+        "sha256": "3baf0fa937f78d0e7301b0541492b676fea79df1ded8ce76b6f81f0038132a62"
+      },
+      "status_receipt": {
+        "path": "target/native-gnu-20261006/evidence/bindings.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      }
+    },
+    {
+      "name": "doctor",
+      "command": [
+        "cargo",
+        "run",
+        "--locked",
+        "--offline",
+        "-p",
+        "xtask",
+        "--",
+        "native-doctor",
+        "--json"
+      ],
+      "started_at_utc": "2026-10-06T19:03:47Z",
+      "finished_at_utc": "2026-10-06T19:03:51Z",
+      "exit_code": 0,
+      "log": {
+        "path": "target/native-gnu-20261006/evidence/doctor.log",
+        "bytes": 5936,
+        "sha256": "0a2d8792e7b538c53d60c76992fb34bfde12a965b1660a7c471becbe98570bbd"
+      },
+      "command_receipt": {
+        "path": "target/native-gnu-20261006/evidence/doctor.command",
+        "bytes": 63,
+        "sha256": "f09ed844a54f9a885d3215a3cddd1bda48e2a05829e74c4c96a9118031287f3a"
+      },
+      "status_receipt": {
+        "path": "target/native-gnu-20261006/evidence/doctor.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      }
+    },
+    {
+      "name": "consumers",
+      "command": [
+        "cargo",
+        "run",
+        "--locked",
+        "--offline",
+        "-p",
+        "xtask",
+        "--",
+        "check-native-consumers",
+        "--backends",
+        "cpu,omp",
+        "--work-dir",
+        "<repository>/target/native-gnu-20261006/consumers"
+      ],
+      "started_at_utc": "2026-10-06T19:03:51Z",
+      "finished_at_utc": "2026-10-06T19:04:18Z",
+      "exit_code": 0,
+      "log": {
+        "path": "target/native-gnu-20261006/evidence/consumers.log",
+        "bytes": 1731,
+        "sha256": "d65d38fe6eb09aa8e2e5c6d3926650555cf089ff9af185821835ce9230c229a8"
+      },
+      "command_receipt": {
+        "path": "target/native-gnu-20261006/evidence/consumers.command",
+        "bytes": 180,
+        "sha256": "e38a3b2e223b70c43cd7ba08a7a0be93e217a8c9b60c1091e779a2581db32df1"
+      },
+      "status_receipt": {
+        "path": "target/native-gnu-20261006/evidence/consumers.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "backends": [
+        "cpu",
+        "omp"
+      ],
+      "numerical_cases": 10,
+      "native_mode_checks": 2,
+      "loader_isolated": false,
+      "checked_executable_dependency_closures": 0
+    },
+    {
+      "name": "consumers-loader-isolated",
+      "command": [
+        "cargo",
+        "run",
+        "--locked",
+        "--offline",
+        "-p",
+        "xtask",
+        "--",
+        "check-native-consumers",
+        "--backends",
+        "cpu,omp",
+        "--loader-isolated",
+        "--work-dir",
+        "<repository>/target/native-gnu-20261006/consumers-loader-isolated"
+      ],
+      "started_at_utc": "2026-10-06T19:04:18Z",
+      "finished_at_utc": "2026-10-06T19:04:45Z",
+      "exit_code": 0,
+      "log": {
+        "path": "target/native-gnu-20261006/evidence/consumers-loader-isolated.log",
+        "bytes": 2029,
+        "sha256": "e774ae0f925b16ee4bccac21053fb5ba6c5790220090acad879ecbe108dd8f27"
+      },
+      "command_receipt": {
+        "path": "target/native-gnu-20261006/evidence/consumers-loader-isolated.command",
+        "bytes": 214,
+        "sha256": "2befbcb12d995719523dc58291ceeee556eb25bdfa14679f981f2b4c77ef715e"
+      },
+      "status_receipt": {
+        "path": "target/native-gnu-20261006/evidence/consumers-loader-isolated.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "backends": [
+        "cpu",
+        "omp"
+      ],
+      "numerical_cases": 10,
+      "native_mode_checks": 2,
+      "loader_isolated": true,
+      "checked_executable_dependency_closures": 4
+    },
+    {
+      "name": "mpi-consumer",
+      "command": [
+        "cargo",
+        "run",
+        "--locked",
+        "--offline",
+        "--manifest-path",
+        "docs/verification/fixtures/native-mpi-consumer/Cargo.toml"
+      ],
+      "started_at_utc": "2026-10-06T19:04:45Z",
+      "finished_at_utc": "2026-10-06T19:05:06Z",
+      "exit_code": 0,
+      "log": {
+        "path": "target/native-gnu-20261006/evidence/mpi-consumer.log",
+        "bytes": 4675,
+        "sha256": "684fa7bfdcfa4ee8357847d518cbcba31ee59c0331570046023de6a6b82f1748"
+      },
+      "command_receipt": {
+        "path": "target/native-gnu-20261006/evidence/mpi-consumer.command",
+        "bytes": 104,
+        "sha256": "21d720bf61a24764915459bf33ca271964953bf1cdee0c25f9e5051d8cdb2ff2"
+      },
+      "status_receipt": {
+        "path": "target/native-gnu-20261006/evidence/mpi-consumer.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "verified_ranks": [
+        1,
+        2,
+        4,
+        8
+      ],
+      "deadline_seconds_per_launch": 60,
+      "timed_out": false,
+      "output_truncated": false,
+      "loader_environment": "retained",
+      "amplitude_tolerance": 1e-13
+    }
+  ],
+  "native_doctor": {
+    "schema_version": 1,
+    "stages": [
+      {
+        "details": {
+          "host": "x86_64-unknown-linux-gnu",
+          "profile": "Release",
+          "target": "x86_64-unknown-linux-gnu"
+        },
+        "stage": "native_context",
+        "status": "passed"
+      },
+      {
+        "details": {
+          "capabilities": {
+            "cuquantum": true,
+            "gpu": true,
+            "mpi": true,
+            "openmp": true,
+            "subcommunicators": true
+          },
+          "compiler": {
+            "arguments": [],
+            "id": "GNU",
+            "identity": "/usr/bin/g++",
+            "invocation": "/usr/bin/g++",
+            "version": "16.2.1"
+          },
+          "evidence": "CMake imported target and compiled ABI admission; consumer runtime not checked",
+          "headers": {
+            "definitions": [],
+            "frontend_flags": [],
+            "implicit_include_dirs": [
+              "/usr/include/c++/16",
+              "/usr/include/c++/16/x86_64-redhat-linux",
+              "/usr/include/c++/16/backward",
+              "/usr/lib/gcc/x86_64-redhat-linux/16/include",
+              "/usr/local/include",
+              "/usr/include"
+            ],
+            "include_dirs": [
+              "$QUEST_PREFIX/include",
+              "/usr/include/mpich-x86_64"
+            ],
+            "sysroot": null,
+            "system_include_dirs": [
+              "$QUEST_PREFIX/include",
+              "/usr/include/mpich-x86_64"
+            ]
+          },
+          "library": "$QUEST_PREFIX/lib64/libQuEST.so.4.3.0",
+          "prefix": "$QUEST_PREFIX",
+          "runtime_library_dirs": [
+            "$QUEST_PREFIX/lib64",
+            "/usr/lib64/mpich/lib"
+          ],
+          "version": "4.3.0"
+        },
+        "stage": "native_discovery",
+        "status": "passed"
+      },
+      {
+        "details": {
+          "arguments": [
+            "-x",
+            "c++",
+            "-std=c++20",
+            "-I$QUEST_PREFIX/include",
+            "-I$QUEST_PREFIX/include/quest/include",
+            "-isystem",
+            "$QUEST_PREFIX/include",
+            "-isystem",
+            "/usr/include/mpich-x86_64",
+            "-isystem",
+            "/usr/include/c++/16",
+            "-isystem",
+            "/usr/include/c++/16/x86_64-redhat-linux",
+            "-isystem",
+            "/usr/include/c++/16/backward",
+            "-isystem",
+            "/usr/lib/gcc/x86_64-redhat-linux/16/include",
+            "-isystem",
+            "/usr/local/include",
+            "-isystem",
+            "/usr/include",
+            "-resource-dir",
+            "/usr/bin/../lib/clang/22",
+            "-target",
+            "x86_64-unknown-linux-gnu"
+          ],
+          "driver": "/usr/bin/clang",
+          "evidence": "Installed QuEST C++ headers parsed successfully; ordinary MPI bindgen has a separate C header context.",
+          "libclang_version": "clang version 22.1.8 (Fedora 22.1.8-4.fc44)",
+          "parsed_declarations": 748
+        },
+        "stage": "binding_parser",
+        "status": "passed"
+      },
+      {
+        "details": {
+          "evidence": "rsmpi discovery recipe; Cargo MPI builds additionally verify the loaded library and ABI against QuEST",
+          "include_dirs": [
+            "/usr/include/mpich-x86_64"
+          ],
+          "libraries": [
+            "mpi"
+          ],
+          "library_dirs": [
+            "/usr/lib64/mpich/lib"
+          ],
+          "source": {
+            "kind": "compiler_wrapper",
+            "wrapper": "/usr/lib64/mpich/bin/mpicc"
+          },
+          "version": "unknown",
+          "wrapper": "/usr/lib64/mpich/bin/mpicc"
+        },
+        "stage": "mpi_selection",
+        "status": "passed"
+      },
+      {
+        "details": {
+          "evidence": "HDF5 discovery and serial header admission; hdf5-metno-sys additionally verifies header/library runtime version agreement during normal builds",
+          "header": "/usr/include/H5pubconf-64.h",
+          "include_dirs": [
+            "/usr/include"
+          ],
+          "library_dirs": [],
+          "source": "pkg-config or system layout",
+          "version": "1.14.6"
+        },
+        "stage": "serial_hdf5_selection",
+        "status": "passed"
+      },
+      {
+        "details": {
+          "compiler": {
+            "CC": "/usr/bin/gcc",
+            "CFLAGS": null,
+            "CMAKE_GENERATOR": null,
+            "CMAKE_TOOLCHAIN_FILE": null,
+            "CPATH": null,
+            "CPLUS_INCLUDE_PATH": null,
+            "CXX": "/usr/bin/g++",
+            "CXXFLAGS": null,
+            "LIBRARY_PATH": null
+          },
+          "hdf5": {
+            "HDF5_DIR": null,
+            "HDF5_VERSION": null,
+            "PKG_CONFIG_LIBDIR": null,
+            "PKG_CONFIG_PATH": "/usr/lib64/mpich/lib/pkgconfig"
+          },
+          "loader_environment": [
+            "LD_LIBRARY_PATH"
+          ],
+          "mpi": {
+            "CRAY_MPICH_DIR": null,
+            "MPICC": "/usr/lib64/mpich/bin/mpicc",
+            "MPI_PKG_CONFIG": null
+          },
+          "mpi_parser_requirement": "Ordinary rsmpi builds use bindgen and require libclang; binding regeneration also requires a matching clang driver.",
+          "parser": {
+            "BINDGEN_EXTRA_CLANG_ARGS": null,
+            "CLANG": "/usr/bin/clang",
+            "LIBCLANG_PATH": null
+          }
+        },
+        "stage": "selectors",
+        "status": "passed"
+      }
+    ]
+  },
+  "independent_mpi_consumer": {
+    "fixture_source_sha256": [
+      {
+        "path": "docs/verification/fixtures/native-mpi-consumer/Cargo.toml",
+        "bytes": 370,
+        "sha256": "e63910d829b6112b82708698b17abc05fbc3704046b189450b969c48661f7aa8"
+      },
+      {
+        "path": "docs/verification/fixtures/native-mpi-consumer/Cargo.lock",
+        "bytes": 52836,
+        "sha256": "ad165e081dc1d7aa262903dd3e49437589953d668fe58464db223c5e853aa690"
+      },
+      {
+        "path": "docs/verification/fixtures/native-mpi-consumer/build.rs",
+        "bytes": 113,
+        "sha256": "c73934cd80157c1dadda827e81e776ffd0019c62cb6b31b8d7d5e24524748e2e"
+      },
+      {
+        "path": "docs/verification/fixtures/native-mpi-consumer/src/main.rs",
+        "bytes": 3538,
+        "sha256": "a17df3df7f0f5d08f04b090312b9f205f512489ce8fea7a6b498af2efd1d510b"
+      }
+    ],
+    "executable": {
+      "path": "target/native-gnu-20261006/cargo/debug/quest-independent-mpi-consumer",
+      "bytes": 13609864,
+      "sha256": "5df9f0f4dd2dc80c5f32bd8945d2404acffb06ec94f349033177ab3790dddbba"
+    },
+    "rank_counts": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "execution": "local; normal loader environment retained",
+    "omp_threads_requested": 2,
+    "actual_openmp_team_size_measured": false,
+    "tolerance": 1e-13,
+    "checks": [
+      "all local complex amplitudes, including phase and spectator coordinates",
+      "probability marginals, norm and forbidden joint projection",
+      "rank count, partition length and deployment flags",
+      "MPI usability after QuEST cleanup",
+      "runtime-owner finalization"
+    ],
+    "speedup_claimed": false,
+    "multi_host_capacity_claimed": false
+  },
+  "consumer_log_identities": [
+    {
+      "path": "target/native-gnu-20261006/consumers/build.log",
+      "bytes": 7062,
+      "sha256": "48fdd08ad3e58b59eb5afd4d915a3bfd23de9899422ab9b7648da8d07fabfc54"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers/direct-cpu-dm-run.log",
+      "bytes": 206,
+      "sha256": "d9008f553627bd704f26bc8ad2f68ec4690f363d51b5cf4a09b6274a5e5ac2a8"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers/direct-cpu-modes-run.log",
+      "bytes": 580,
+      "sha256": "3067952158e715888482ebcf56ac9858bafd957c3d8c43189dc283cca3316000"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers/direct-cpu-sv-run.log",
+      "bytes": 205,
+      "sha256": "66b26c22e18f0a7c53e4332ba7d1bbb3d019db0264186ef499dd423eb3d24798"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers/direct-omp-dm-run.log",
+      "bytes": 206,
+      "sha256": "08f40ddae8e3816c5461904458c57181d5560ac8e84289c410168a41b358185f"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers/direct-omp-modes-run.log",
+      "bytes": 580,
+      "sha256": "ecc8d48666ae10641443455313a6d6b4eb1a3c04bc0cae79e0972f241021437f"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers/direct-omp-sv-run.log",
+      "bytes": 205,
+      "sha256": "17d6f9321cd6b09106ae9cac116ca30a44860839c18211d398811a43f84651fc"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers/facade-cpu-run.log",
+      "bytes": 65,
+      "sha256": "6c557f9f5d08927c562d0bd2988470f692302d940a34b06b5adc3f17d7cb5dcb"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers/facade-omp-run.log",
+      "bytes": 65,
+      "sha256": "9308aaab88e799be3c56b82a947d565d99416bd706a705c6fc07a8b3da7808cc"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers/lock.log",
+      "bytes": 78,
+      "sha256": "6b096ee5e12d4918314fed6f84055f0cb1e4444915bf2d8061a3eec3b0f5ab12"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers/renamed-cpu-run.log",
+      "bytes": 65,
+      "sha256": "6c557f9f5d08927c562d0bd2988470f692302d940a34b06b5adc3f17d7cb5dcb"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers/renamed-omp-run.log",
+      "bytes": 65,
+      "sha256": "9308aaab88e799be3c56b82a947d565d99416bd706a705c6fc07a8b3da7808cc"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers/wrapped-cpu-run.log",
+      "bytes": 65,
+      "sha256": "6c557f9f5d08927c562d0bd2988470f692302d940a34b06b5adc3f17d7cb5dcb"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers/wrapped-omp-run.log",
+      "bytes": 65,
+      "sha256": "9308aaab88e799be3c56b82a947d565d99416bd706a705c6fc07a8b3da7808cc"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers-loader-isolated/build.log",
+      "bytes": 7142,
+      "sha256": "ded12fa65d42fff275d3aed562acdfeb91efa9aec043afb677ae08dfa682ea25"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers-loader-isolated/direct-cpu-dm-run.log",
+      "bytes": 206,
+      "sha256": "d9008f553627bd704f26bc8ad2f68ec4690f363d51b5cf4a09b6274a5e5ac2a8"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers-loader-isolated/direct-cpu-modes-run.log",
+      "bytes": 580,
+      "sha256": "3067952158e715888482ebcf56ac9858bafd957c3d8c43189dc283cca3316000"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers-loader-isolated/direct-cpu-sv-run.log",
+      "bytes": 205,
+      "sha256": "66b26c22e18f0a7c53e4332ba7d1bbb3d019db0264186ef499dd423eb3d24798"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers-loader-isolated/direct-ldd.log",
+      "bytes": 1932,
+      "sha256": "259d77e1527e38ec0593aa85ac7d8d9913d38385c39d1c5115deebd12b117d9e"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers-loader-isolated/direct-omp-dm-run.log",
+      "bytes": 206,
+      "sha256": "08f40ddae8e3816c5461904458c57181d5560ac8e84289c410168a41b358185f"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers-loader-isolated/direct-omp-modes-run.log",
+      "bytes": 580,
+      "sha256": "ecc8d48666ae10641443455313a6d6b4eb1a3c04bc0cae79e0972f241021437f"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers-loader-isolated/direct-omp-sv-run.log",
+      "bytes": 205,
+      "sha256": "17d6f9321cd6b09106ae9cac116ca30a44860839c18211d398811a43f84651fc"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers-loader-isolated/direct-readelf.log",
+      "bytes": 2105,
+      "sha256": "4ae488d0ec50f0090585074776324c2e4ad45e315b08069f17f5b51c678b1ce1"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers-loader-isolated/facade-cpu-run.log",
+      "bytes": 65,
+      "sha256": "6c557f9f5d08927c562d0bd2988470f692302d940a34b06b5adc3f17d7cb5dcb"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers-loader-isolated/facade-ldd.log",
+      "bytes": 1932,
+      "sha256": "18e76f83f9dc4774d9c0136d47ed01bea430d0522f9f5675916a059bfe7e92b8"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers-loader-isolated/facade-omp-run.log",
+      "bytes": 65,
+      "sha256": "9308aaab88e799be3c56b82a947d565d99416bd706a705c6fc07a8b3da7808cc"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers-loader-isolated/facade-readelf.log",
+      "bytes": 2115,
+      "sha256": "82c37ec09e09cb34558d566ab2c329d9ccc8d2f3e023890dfc48cdb398813447"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers-loader-isolated/lock.log",
+      "bytes": 78,
+      "sha256": "6b096ee5e12d4918314fed6f84055f0cb1e4444915bf2d8061a3eec3b0f5ab12"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers-loader-isolated/renamed-cpu-run.log",
+      "bytes": 65,
+      "sha256": "6c557f9f5d08927c562d0bd2988470f692302d940a34b06b5adc3f17d7cb5dcb"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers-loader-isolated/renamed-ldd.log",
+      "bytes": 1932,
+      "sha256": "386c3de92beebc259da911e7988bb6be8fb619dc584efbd803c890b632e0be26"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers-loader-isolated/renamed-omp-run.log",
+      "bytes": 65,
+      "sha256": "9308aaab88e799be3c56b82a947d565d99416bd706a705c6fc07a8b3da7808cc"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers-loader-isolated/renamed-readelf.log",
+      "bytes": 2115,
+      "sha256": "82c37ec09e09cb34558d566ab2c329d9ccc8d2f3e023890dfc48cdb398813447"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers-loader-isolated/wrapped-cpu-run.log",
+      "bytes": 65,
+      "sha256": "6c557f9f5d08927c562d0bd2988470f692302d940a34b06b5adc3f17d7cb5dcb"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers-loader-isolated/wrapped-ldd.log",
+      "bytes": 1932,
+      "sha256": "b6b57c6e75957109c072a39b3b4c24b98afa1757b04787841760b63932b3c80a"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers-loader-isolated/wrapped-omp-run.log",
+      "bytes": 65,
+      "sha256": "9308aaab88e799be3c56b82a947d565d99416bd706a705c6fc07a8b3da7808cc"
+    },
+    {
+      "path": "target/native-gnu-20261006/consumers-loader-isolated/wrapped-readelf.log",
+      "bytes": 2115,
+      "sha256": "d8634a9a89b3ef1dee33641eadffe2a00dfe016d5f1c403b193a720408e624de"
+    }
+  ],
+  "evidence_index": {
+    "path": "target/native-gnu-20261006/evidence/artifacts.sha256",
+    "bytes": 8825,
+    "sha256": "89decb06dde01206272774d777a150a8296282899b80b738692d971cbf1f8a38"
+  },
+  "storage": {
+    "cargo_target_end_rounded": "12 GiB",
+    "tmpdir_end_bytes": 0,
+    "available_before_rounded": "233 GiB",
+    "available_after_rounded": "217 GiB",
+    "peak_memory_measured": false,
+    "receipts": [
+      {
+        "path": "target/native-gnu-20261006/evidence/storage-before.txt",
+        "bytes": 145,
+        "sha256": "8d1a6147550a92125ef017fed7d2f32526d35d07d1ecf576531fc8eb8e02ebc1"
+      },
+      {
+        "path": "target/native-gnu-20261006/evidence/storage-after.txt",
+        "bytes": 145,
+        "sha256": "d1dc62d5ce3c9d92242302e02bf74e68d9b77a61e7d889691d98a3f41c553f80"
+      },
+      {
+        "path": "target/native-gnu-20261006/evidence/storage-used.txt",
+        "bytes": 164,
+        "sha256": "710a7e85a55478232ba101744f7ae17e68d06697e7199acec7b39eb01a574bc0"
+      }
+    ]
+  },
+  "limits": {
+    "local_clang_cmake_failures": "Two module-open errors in the separate Clang all-feature campaign remain unexplained; this GNU pass does not supersede those failures.",
+    "related_discovery_record": "docs/verification/2026-10-06-native-discovery-followup.md",
+    "gpu_execution": "Not claimed; native CUDA/cuQuantum compilation and loader closure are distinct from GPU execution.",
+    "cirrus": "This record is local evidence; it does not establish cluster acceptance.",
+    "macos": "Not executed in this campaign.",
+    "capacity": "Local rank-count and consumer checks do not close multi-host capacity acceptance.",
+    "ignored_tests": "Six all-feature and one default nextest tests were skipped by normal test admission; no ignored campaign was explicitly enabled.",
+    "ignored_doctests": "One build-script example was ignored in each feature configuration.",
+    "existing_warning": "quest-polynomial nightly generic_const_exprs/trait-solver compatibility warning",
+    "lint_exceptions_added": false,
+    "package_installations": false,
+    "source_changes_during_campaign": false
+  },
+  "reviewed_source_followup": {
+    "scope": "Later reviewed-source local GNU CPU/OpenMP/MPI evidence; preserve the failed original driver separately from the corrected-consumer success.",
+    "campaign": {
+      "started_at_utc": "2026-10-06T19:29:00Z",
+      "finished_at_utc": "2026-10-06T19:43:59Z",
+      "exit_code": 1,
+      "stage_count": 12,
+      "stages_passed": 11,
+      "stages_failed": 1,
+      "failure": "Standalone MPI consumer Cargo.lock lacked the newly direct rustix dependency; Cargo --locked rejected the build before runtime.",
+      "driver": {
+        "path": "target/native-reviewed-gnu-20261006/verify-gnu.sh",
+        "bytes": 4525,
+        "sha256": "12b6eae9b60ea23101db46ca28d8069fda28f09c30c1bcff0d4133be2b33c42c"
+      },
+      "completion_receipt": {
+        "path": "target/native-reviewed-gnu-20261006/evidence/completed.status",
+        "bytes": 2,
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+      },
+      "fresh_cargo_target": true,
+      "source": {
+        "manifest": {
+          "path": "target/portable-reviewed-cirrus-20261006/source.sha256",
+          "bytes": 348034,
+          "sha256": "4e5b423ebf3db42db19c3f75481ad786a527117eecd4d41c8b9a9b9dcebd6cf1"
+        },
+        "archive": {
+          "path": "target/portable-reviewed-cirrus-20261006/source.tar.gz",
+          "bytes": 11866798,
+          "sha256": "50b5a4a7727754f77282c2597d46e1cf6709bee8506ae63b5c7d05310a08b526"
+        },
+        "file_count": 2594,
+        "snapshot_directory": "target/portable-reviewed-cirrus-20261006/frozen",
+        "verified_files": 2594,
+        "mismatches": 0
+      }
+    },
+    "toolchain": {
+      "same_versions_as_earlier_campaign": true,
+      "version_outputs": {
+        "rustc": {
+          "matches_earlier_campaign_output": true,
+          "receipt": {
+            "path": "target/native-reviewed-gnu-20261006/evidence/rustc.txt",
+            "bytes": 214,
+            "sha256": "6b8a26f695d400a8e53c871b05b05056ee46db7ca3b16160df6f91aca58b50b3"
+          }
+        },
+        "cargo": {
+          "matches_earlier_campaign_output": true,
+          "receipt": {
+            "path": "target/native-reviewed-gnu-20261006/evidence/cargo.txt",
+            "bytes": 45,
+            "sha256": "71de2de1f7d9ecf66030112aa59bf05781d6210a550634db5eba3920af9d08de"
+          }
+        },
+        "gcc": {
+          "matches_earlier_campaign_output": true,
+          "receipt": {
+            "path": "target/native-reviewed-gnu-20261006/evidence/gcc.txt",
+            "bytes": 247,
+            "sha256": "dcddcefbfc2827a1d7b83a86a683bfa8e1ae76b6080fc490c9110d51e0e3da40"
+          }
+        },
+        "gxx": {
+          "matches_earlier_campaign_output": true,
+          "receipt": {
+            "path": "target/native-reviewed-gnu-20261006/evidence/gxx.txt",
+            "bytes": 247,
+            "sha256": "87e3dc71035ef3b73843ef947164533882c3624ba0c5f5d84405afdbb780fee9"
+          }
+        },
+        "clang": {
+          "matches_earlier_campaign_output": true,
+          "receipt": {
+            "path": "target/native-reviewed-gnu-20261006/evidence/clang.txt",
+            "bytes": 184,
+            "sha256": "b9427ba8eb4c01f9459e58047587d1e2a794814a46fa5c49bbd6e3c2b98114bb"
+          }
+        },
+        "cmake": {
+          "matches_earlier_campaign_output": true,
+          "receipt": {
+            "path": "target/native-reviewed-gnu-20261006/evidence/cmake.txt",
+            "bytes": 90,
+            "sha256": "6b8c2501a983639b330c555c9a105057ea877b701cf25920bc3fe32dd2a54b13"
+          }
+        },
+        "mpicc": {
+          "matches_earlier_campaign_output": true,
+          "receipt": {
+            "path": "target/native-reviewed-gnu-20261006/evidence/mpicc.txt",
+            "bytes": 120,
+            "sha256": "26ce39bc108adbb9404c5bad46f42b24c959cb194154070d9848e0c5eceac4f5"
+          }
+        },
+        "mpiexec": {
+          "matches_earlier_campaign_output": true,
+          "receipt": {
+            "path": "target/native-reviewed-gnu-20261006/evidence/mpiexec.txt",
+            "bytes": 5118,
+            "sha256": "bdd5a018dd07170773ebf3337e04bf43428889f3848031fadeae83cd43c4a1a0"
+          }
+        }
+      },
+      "native_input_identities": [
+        {
+          "path": "<quest-prefix>/lib64/libQuEST.so.4.3.0",
+          "sha256": "2128fd71d6effd5ae463f9f92ff467032f09089a07cdb9ba7a5d565719b95396"
+        },
+        {
+          "path": "<quest-prefix>/lib64/cmake/QuEST/QuESTConfig.cmake",
+          "sha256": "9e6dce8dd10d8b056ef06b66cf58671a172d87170528ca3e22882d925ce6ce65"
+        },
+        {
+          "path": "/usr/bin/gcc",
+          "sha256": "153e46b4657620f2baef1b4a70b4b4f275772faa5b0fb9e415697e87ebcb7fea"
+        },
+        {
+          "path": "/usr/bin/g++",
+          "sha256": "579d25c2d1e45abeed0c63a517b5c52f6d09ea811a787bf7a7c677a7fd0726f6"
+        }
+      ],
+      "native_installation_modified": false,
+      "native_source_modified": false
+    },
+    "environment": {
+      "QUEST_ROOT": "<quest-prefix>",
+      "CARGO_TARGET_DIR": "<repository>/target/native-reviewed-gnu-20261006/cargo",
+      "TMPDIR": "<repository>/target/native-reviewed-gnu-20261006/tmp",
+      "CC": "/usr/bin/gcc",
+      "CXX": "/usr/bin/g++",
+      "CLANG": "/usr/bin/clang",
+      "MPICC": "/usr/lib64/mpich/bin/mpicc",
+      "PATH": "/usr/lib64/mpich/bin:/usr/bin:/bin:<cargo-bin>",
+      "CARGO_BUILD_JOBS": "8",
+      "OMP_NUM_THREADS": "2",
+      "CARGO_PROFILE_DEV_DEBUG": "0",
+      "CARGO_PROFILE_TEST_DEBUG": "0",
+      "CARGO_INCREMENTAL": "0",
+      "CMAKE_PREFIX_PATH": "/usr/lib64/mpich",
+      "CUDAToolkit_ROOT": "<unset>",
+      "CUQUANTUM_ROOT": "<unset>",
+      "LD_LIBRARY_PATH": "/usr/lib64/mpich/lib:<cuda-prefix>/lib64:<cuda-prefix>/lib64",
+      "LIBCLANG_PATH": "<unset>",
+      "HDF5_DIR": "<unset>",
+      "RUSTFLAGS": "<unset>",
+      "CARGO_ENCODED_RUSTFLAGS": "<unset>"
+    },
+    "stages": [
+      {
+        "name": "all-feature-tests",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "--locked",
+          "--offline",
+          "--workspace",
+          "--all-features",
+          "--test-threads=4",
+          "--no-fail-fast",
+          "--status-level=fail",
+          "--final-status-level=fail"
+        ],
+        "started_at_utc": "2026-10-06T19:29:00Z",
+        "finished_at_utc": "2026-10-06T19:37:51Z",
+        "exit_code": 0,
+        "log": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-tests.log",
+          "bytes": 16186,
+          "sha256": "ef7e5cdc1354a056e86fb3de34366e3d784098d59eaef52fc1ac7447146e51e2"
+        },
+        "command_receipt": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-tests.command",
+          "bytes": 143,
+          "sha256": "159d767c81319f5ab4b907ad49709683ca90a35542ace2fbb46147b7333b3263"
+        },
+        "status_receipt": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-tests.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        },
+        "summary": "Summary [ 482.810s] 1710 tests run: 1710 passed (3 slow), 6 skipped",
+        "elapsed_seconds": 482.81,
+        "passed": 1710,
+        "failed": 0,
+        "skipped": 6,
+        "binaries": 289,
+        "nextest_run_id": "ef1a763c-6d44-45e1-8b6f-c7c1b8137eb0"
+      },
+      {
+        "name": "default-tests",
+        "command": [
+          "cargo",
+          "nextest",
+          "run",
+          "--locked",
+          "--offline",
+          "--workspace",
+          "--test-threads=4",
+          "--no-fail-fast",
+          "--status-level=fail",
+          "--final-status-level=fail"
+        ],
+        "started_at_utc": "2026-10-06T19:37:51Z",
+        "finished_at_utc": "2026-10-06T19:41:10Z",
+        "exit_code": 0,
+        "log": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/default-tests.log",
+          "bytes": 7209,
+          "sha256": "bb673e7fbbc2fee2afb5a9ce5b289781fea14bb822dd9848a2dd6bd2f80e0396"
+        },
+        "command_receipt": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/default-tests.command",
+          "bytes": 128,
+          "sha256": "92969510dc2251909d92d7f79263c7e33578fbacd73393cb36b403f8dd9349a4"
+        },
+        "status_receipt": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/default-tests.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        },
+        "summary": "Summary [ 163.869s] 1516 tests run: 1516 passed, 1 skipped",
+        "elapsed_seconds": 163.869,
+        "passed": 1516,
+        "failed": 0,
+        "skipped": 1,
+        "binaries": 289,
+        "nextest_run_id": "ed69cfc8-04fa-41ed-b088-07f2eca6c943"
+      },
+      {
+        "name": "all-feature-doctests",
+        "command": [
+          "cargo",
+          "test",
+          "--locked",
+          "--offline",
+          "--workspace",
+          "--all-features",
+          "--doc"
+        ],
+        "started_at_utc": "2026-10-06T19:41:10Z",
+        "finished_at_utc": "2026-10-06T19:41:14Z",
+        "exit_code": 0,
+        "log": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-doctests.log",
+          "bytes": 11144,
+          "sha256": "4c7d7393f6328bde2173db65f71a59c2b91537591c6869a8f2e02919c11f4814"
+        },
+        "command_receipt": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-doctests.command",
+          "bytes": 64,
+          "sha256": "e12bb3a16c991c1f0247b98acc44b5f0493bdbda232388d4c130d8faf148caa3"
+        },
+        "status_receipt": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-doctests.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        },
+        "passed": 65,
+        "failed": 0,
+        "ignored": 1
+      },
+      {
+        "name": "default-doctests",
+        "command": [
+          "cargo",
+          "test",
+          "--locked",
+          "--offline",
+          "--workspace",
+          "--doc"
+        ],
+        "started_at_utc": "2026-10-06T19:41:14Z",
+        "finished_at_utc": "2026-10-06T19:41:18Z",
+        "exit_code": 0,
+        "log": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/default-doctests.log",
+          "bytes": 10135,
+          "sha256": "988cbbb052fd932cc4de7de2b6426448109a42694483e5c523437f8b7ef86aa2"
+        },
+        "command_receipt": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/default-doctests.command",
+          "bytes": 49,
+          "sha256": "dcec0c35f896337252f3ae34b11f9ad7dcc6627fb26889f6eb610d675681708e"
+        },
+        "status_receipt": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/default-doctests.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        },
+        "passed": 55,
+        "failed": 0,
+        "ignored": 1
+      },
+      {
+        "name": "all-feature-check",
+        "command": [
+          "cargo",
+          "check",
+          "--locked",
+          "--offline",
+          "--workspace",
+          "--all-features"
+        ],
+        "started_at_utc": "2026-10-06T19:41:18Z",
+        "finished_at_utc": "2026-10-06T19:41:42Z",
+        "exit_code": 0,
+        "log": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-check.log",
+          "bytes": 11476,
+          "sha256": "742b835c2b51815dcdd131ee568be87e6c1c2c8399aebd6c1083a02b924ce41e"
+        },
+        "command_receipt": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-check.command",
+          "bytes": 59,
+          "sha256": "f7605d1960587555fcc32af9b54f2f20248dd446b0c874f596942105b758bfa1"
+        },
+        "status_receipt": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-check.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      },
+      {
+        "name": "default-check",
+        "command": [
+          "cargo",
+          "check",
+          "--locked",
+          "--offline",
+          "--workspace"
+        ],
+        "started_at_utc": "2026-10-06T19:41:42Z",
+        "finished_at_utc": "2026-10-06T19:42:03Z",
+        "exit_code": 0,
+        "log": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/default-check.log",
+          "bytes": 4394,
+          "sha256": "1579ed7f2b3671003813d36d8a78c7abfc9fc3d3c1551fde2e2226bded5959c2"
+        },
+        "command_receipt": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/default-check.command",
+          "bytes": 44,
+          "sha256": "96073caec118ef1dbeb81c34eded3b4d9308bf26efbbf3c3bb5b929b044c71e4"
+        },
+        "status_receipt": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/default-check.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      },
+      {
+        "name": "all-feature-clippy",
+        "command": [
+          "cargo",
+          "clippy",
+          "--locked",
+          "--offline",
+          "--workspace",
+          "--all-features",
+          "--all-targets",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "started_at_utc": "2026-10-06T19:42:03Z",
+        "finished_at_utc": "2026-10-06T19:42:30Z",
+        "exit_code": 0,
+        "log": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-clippy.log",
+          "bytes": 7989,
+          "sha256": "ab3fccd034b42a38b30c9faca3116f27e135dbd499346b7bb0dfcec8e7a8e635"
+        },
+        "command_receipt": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-clippy.command",
+          "bytes": 89,
+          "sha256": "c65d1ec15e581d83c80e8c3d859a19477d6c2bcce74a2f1e4f1eedaebd58ad20"
+        },
+        "status_receipt": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-clippy.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      },
+      {
+        "name": "bindings",
+        "command": [
+          "cargo",
+          "run",
+          "--locked",
+          "--offline",
+          "-p",
+          "xtask",
+          "--",
+          "generate-quest-bindings",
+          "--check"
+        ],
+        "started_at_utc": "2026-10-06T19:42:30Z",
+        "finished_at_utc": "2026-10-06T19:42:54Z",
+        "exit_code": 0,
+        "log": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/bindings.log",
+          "bytes": 4336,
+          "sha256": "f376291d89492b16adc06767fb0e234e490fc4891802b6ecd36f0c50894e7a02"
+        },
+        "command_receipt": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/bindings.command",
+          "bytes": 74,
+          "sha256": "3baf0fa937f78d0e7301b0541492b676fea79df1ded8ce76b6f81f0038132a62"
+        },
+        "status_receipt": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/bindings.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      },
+      {
+        "name": "doctor",
+        "command": [
+          "cargo",
+          "run",
+          "--locked",
+          "--offline",
+          "-p",
+          "xtask",
+          "--",
+          "native-doctor",
+          "--json"
+        ],
+        "started_at_utc": "2026-10-06T19:42:54Z",
+        "finished_at_utc": "2026-10-06T19:42:58Z",
+        "exit_code": 0,
+        "log": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/doctor.log",
+          "bytes": 5945,
+          "sha256": "9c8261cc2e86fa459af08931eca62da86917e987eedccdb92dc90be11b4bdcc7"
+        },
+        "command_receipt": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/doctor.command",
+          "bytes": 63,
+          "sha256": "f09ed844a54f9a885d3215a3cddd1bda48e2a05829e74c4c96a9118031287f3a"
+        },
+        "status_receipt": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/doctor.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      },
+      {
+        "name": "consumers",
+        "command": [
+          "cargo",
+          "run",
+          "--locked",
+          "--offline",
+          "-p",
+          "xtask",
+          "--",
+          "check-native-consumers",
+          "--backends",
+          "cpu,omp",
+          "--work-dir",
+          "<repository>/target/native-reviewed-gnu-20261006/consumers"
+        ],
+        "started_at_utc": "2026-10-06T19:42:58Z",
+        "finished_at_utc": "2026-10-06T19:43:28Z",
+        "exit_code": 0,
+        "log": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/consumers.log",
+          "bytes": 1758,
+          "sha256": "3204a4fe1faf892c53af9eaac060eef18e4eb1fc9b915cfc95e656e247b850cd"
+        },
+        "command_receipt": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/consumers.command",
+          "bytes": 189,
+          "sha256": "d98facf3b1056ba7534fa0c9a46e779a80d066ea6fa94c17c636855b4974e045"
+        },
+        "status_receipt": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/consumers.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      },
+      {
+        "name": "consumers-loader-isolated",
+        "command": [
+          "cargo",
+          "run",
+          "--locked",
+          "--offline",
+          "-p",
+          "xtask",
+          "--",
+          "check-native-consumers",
+          "--backends",
+          "cpu,omp",
+          "--loader-isolated",
+          "--work-dir",
+          "<repository>/target/native-reviewed-gnu-20261006/consumers-loader-isolated"
+        ],
+        "started_at_utc": "2026-10-06T19:43:28Z",
+        "finished_at_utc": "2026-10-06T19:43:58Z",
+        "exit_code": 0,
+        "log": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/consumers-loader-isolated.log",
+          "bytes": 2056,
+          "sha256": "74d49fbc9d932efe982e0a487a61b7d404b9182622a0552f5124a96450ae8b3b"
+        },
+        "command_receipt": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/consumers-loader-isolated.command",
+          "bytes": 223,
+          "sha256": "6216e536f6c8eb172c035a79cf72aebee8eed9478cbcce0e5117c848bb22676b"
+        },
+        "status_receipt": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/consumers-loader-isolated.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      },
+      {
+        "name": "mpi-consumer",
+        "command": [
+          "cargo",
+          "run",
+          "--locked",
+          "--offline",
+          "--manifest-path",
+          "docs/verification/fixtures/native-mpi-consumer/Cargo.toml"
+        ],
+        "started_at_utc": "2026-10-06T19:43:58Z",
+        "finished_at_utc": "2026-10-06T19:43:58Z",
+        "exit_code": 101,
+        "log": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/mpi-consumer.log",
+          "bytes": 347,
+          "sha256": "d5b428dae5623a8a44d9d5e973d6e9a163de31a3050b5dcf0649daed5f7f47d3"
+        },
+        "command_receipt": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/mpi-consumer.command",
+          "bytes": 104,
+          "sha256": "21d720bf61a24764915459bf33ca271964953bf1cdee0c25f9e5051d8cdb2ff2"
+        },
+        "status_receipt": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/mpi-consumer.status",
+          "bytes": 4,
+          "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c"
+        }
+      }
+    ],
+    "consumer_checks": {
+      "module_environment": {
+        "numerical_cases": 10,
+        "native_mode_checks": 2,
+        "exit_code": 0
+      },
+      "loader_isolated": {
+        "numerical_cases": 10,
+        "native_mode_checks": 2,
+        "executable_dependency_closures": 4,
+        "exit_code": 0
+      },
+      "gpu_execution_claimed": false,
+      "omp_threads_requested": 2,
+      "actual_openmp_team_size_measured": false
+    },
+    "corrected_consumer_followup": {
+      "source": {
+        "manifest": {
+          "path": "target/portable-locked-cirrus-20261006/source.sha256",
+          "bytes": 348034,
+          "sha256": "452a49852c4e23f018b82795c19a3fd183c781234f2914df2c0ab516d696918f"
+        },
+        "archive": {
+          "path": "target/portable-locked-cirrus-20261006/source.tar.gz",
+          "bytes": 11866989,
+          "sha256": "46636f8a311fa221d0754f4042a961e2191d756597ea2fe1ce97f50d1f2898a7"
+        },
+        "file_count": 2594,
+        "snapshot_directory": "target/portable-locked-cirrus-20261006/frozen",
+        "verified_files": 2594,
+        "mismatches": 0
+      },
+      "parent_source_manifest_sha256": "4e5b423ebf3db42db19c3f75481ad786a527117eecd4d41c8b9a9b9dcebd6cf1",
+      "changed_files": [
+        "docs/verification/fixtures/native-mpi-consumer/Cargo.lock"
+      ],
+      "parent_delta_receipt": {
+        "path": "target/portable-locked-cirrus-20261006/parent-delta.txt",
+        "bytes": 274,
+        "sha256": "a7ea9cb65c9de5d55b00900126fb8638cfb676b8b3550dec2c64ed6408e71de3"
+      },
+      "workspace_source_crates_unchanged": true,
+      "lockfile_before_sha256": "ad165e081dc1d7aa262903dd3e49437589953d668fe58464db223c5e853aa690",
+      "lockfile_after_sha256": "7d2171d648f99ac5d678bbb5fc3c7808906cadb520fc9b57b609a2be210bb6c7",
+      "stage": {
+        "name": "corrected-mpi-consumer",
+        "command": [
+          "cargo",
+          "run",
+          "--locked",
+          "--offline",
+          "--manifest-path",
+          "docs/verification/fixtures/native-mpi-consumer/Cargo.toml"
+        ],
+        "started_at_utc": "2026-10-06T19:44:47Z",
+        "finished_at_utc": "2026-10-06T19:45:08Z",
+        "exit_code": 0,
+        "log": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/corrected-mpi-consumer.log",
+          "bytes": 4546,
+          "sha256": "1e299907117624447f1b799943d833c262a29a710d948bbe37408fa43b92b118"
+        },
+        "command_receipt": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/corrected-mpi-consumer.command",
+          "bytes": 103,
+          "sha256": "1b2bf580d1beb7ae1c988dc8583bea6b8a77c00bb0c5077b954872cf3c3154dd"
+        },
+        "status_receipt": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/corrected-mpi-consumer.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        },
+        "source_manifest_sha256": "452a49852c4e23f018b82795c19a3fd183c781234f2914df2c0ab516d696918f",
+        "source_receipt": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/corrected-mpi-consumer.source-digest",
+          "bytes": 65,
+          "sha256": "76839b0623df3773cfba3821085305422522a5e475b5807ee4928d2dabe358d9"
+        },
+        "rank_counts": [
+          1,
+          2,
+          4,
+          8
+        ],
+        "launches": [
+          {
+            "ranks": 1,
+            "elapsed_ms": 546.938187,
+            "exit_code": 0,
+            "timed_out": false,
+            "stdout_truncated": false,
+            "stderr_truncated": false
+          },
+          {
+            "ranks": 2,
+            "elapsed_ms": 541.613321,
+            "exit_code": 0,
+            "timed_out": false,
+            "stdout_truncated": false,
+            "stderr_truncated": false
+          },
+          {
+            "ranks": 4,
+            "elapsed_ms": 561.811819,
+            "exit_code": 0,
+            "timed_out": false,
+            "stdout_truncated": false,
+            "stderr_truncated": false
+          },
+          {
+            "ranks": 8,
+            "elapsed_ms": 607.771681,
+            "exit_code": 0,
+            "timed_out": false,
+            "stdout_truncated": false,
+            "stderr_truncated": false
+          }
+        ],
+        "execution": "local, ordinary loader environment; separate invocation after lockfile correction",
+        "invocation_provenance": "Command, source digest, timestamps, log and status were retained; this follow-up invocation is not part of the original Bash campaign driver.",
+        "executable": {
+          "path": "target/native-reviewed-gnu-20261006/cargo/debug/quest-independent-mpi-consumer",
+          "bytes": 13658088,
+          "sha256": "e575d49da8424be7bd879cd25a004e27b3153e7384454f9373823ba1c6b91883"
+        }
+      },
+      "supersedes_original_driver_failure": false,
+      "whole_workspace_rerun_on_corrected_snapshot": false
+    },
+    "post_execution_checks": [
+      {
+        "name": "source-after",
+        "exit_code": 0,
+        "log": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/source-after.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "status": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/source-after.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      },
+      {
+        "name": "corrected-source-after",
+        "exit_code": 0,
+        "log": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/corrected-source-after.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "status": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/corrected-source-after.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      },
+      {
+        "name": "native-after",
+        "exit_code": 0,
+        "log": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/native-after.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "status": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/native-after.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      }
+    ],
+    "raw_receipts": [
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-check.command",
+        "bytes": 59,
+        "sha256": "f7605d1960587555fcc32af9b54f2f20248dd446b0c874f596942105b758bfa1"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-check.finished",
+        "bytes": 21,
+        "sha256": "0ea2a27d9fcaef134ed15f3622ee259f0e92bd2feb0a31e5ffa98d7dbf12741b"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-check.log",
+        "bytes": 11476,
+        "sha256": "742b835c2b51815dcdd131ee568be87e6c1c2c8399aebd6c1083a02b924ce41e"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-check.started",
+        "bytes": 21,
+        "sha256": "cc037099a8cce85d01b6f2efa5502bd9d7c817fb1e7bf54cbeb3f9f4ca0a39e0"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-check.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-clippy.command",
+        "bytes": 89,
+        "sha256": "c65d1ec15e581d83c80e8c3d859a19477d6c2bcce74a2f1e4f1eedaebd58ad20"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-clippy.finished",
+        "bytes": 21,
+        "sha256": "0198920d348aed9de46277b82d9279b36cd61ffa3a0cf8ca14a57f67310f23bd"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-clippy.log",
+        "bytes": 7989,
+        "sha256": "ab3fccd034b42a38b30c9faca3116f27e135dbd499346b7bb0dfcec8e7a8e635"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-clippy.started",
+        "bytes": 21,
+        "sha256": "56fd7ef626a10b8682ff87c9e5ad20974490a40e2ddd1ac1710ca4547634ef3b"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-clippy.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-doctests.command",
+        "bytes": 64,
+        "sha256": "e12bb3a16c991c1f0247b98acc44b5f0493bdbda232388d4c130d8faf148caa3"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-doctests.finished",
+        "bytes": 21,
+        "sha256": "a9e7b507edafe5af7ebde8055333b68657e1a077db714ffacf408b8aee3b6e63"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-doctests.log",
+        "bytes": 11144,
+        "sha256": "4c7d7393f6328bde2173db65f71a59c2b91537591c6869a8f2e02919c11f4814"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-doctests.started",
+        "bytes": 21,
+        "sha256": "9ad6914a3acc3cd7cf50f3d169827461150f7b078ac83186430bd62ec3138890"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-doctests.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-tests.command",
+        "bytes": 143,
+        "sha256": "159d767c81319f5ab4b907ad49709683ca90a35542ace2fbb46147b7333b3263"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-tests.finished",
+        "bytes": 21,
+        "sha256": "e8fc16fd0de751c2f08b14cf3e1c09876b1fdc0ace27c1c50df6056dd65e8f27"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-tests.log",
+        "bytes": 16186,
+        "sha256": "ef7e5cdc1354a056e86fb3de34366e3d784098d59eaef52fc1ac7447146e51e2"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-tests.started",
+        "bytes": 21,
+        "sha256": "47916344b1f4d397457cd1196e21908f992dcb49ad2a0a915acf2d133ae9d50d"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-tests.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/bindings.command",
+        "bytes": 74,
+        "sha256": "3baf0fa937f78d0e7301b0541492b676fea79df1ded8ce76b6f81f0038132a62"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/bindings.finished",
+        "bytes": 21,
+        "sha256": "6092471d863c0039c0a23473ea1131aed124e29c7b8c224cb5158f5c07ce2e88"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/bindings.log",
+        "bytes": 4336,
+        "sha256": "f376291d89492b16adc06767fb0e234e490fc4891802b6ecd36f0c50894e7a02"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/bindings.started",
+        "bytes": 21,
+        "sha256": "0198920d348aed9de46277b82d9279b36cd61ffa3a0cf8ca14a57f67310f23bd"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/bindings.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/campaign.finished",
+        "bytes": 21,
+        "sha256": "a0fc8601425aec80e9e116ed41fdc7e9334b968572745acf04747e063c3ce92a"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/campaign.started",
+        "bytes": 21,
+        "sha256": "47916344b1f4d397457cd1196e21908f992dcb49ad2a0a915acf2d133ae9d50d"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/cargo.txt",
+        "bytes": 45,
+        "sha256": "71de2de1f7d9ecf66030112aa59bf05781d6210a550634db5eba3920af9d08de"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/clang.txt",
+        "bytes": 184,
+        "sha256": "b9427ba8eb4c01f9459e58047587d1e2a794814a46fa5c49bbd6e3c2b98114bb"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/cmake.txt",
+        "bytes": 90,
+        "sha256": "6b8c2501a983639b330c555c9a105057ea877b701cf25920bc3fe32dd2a54b13"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/completed.status",
+        "bytes": 2,
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/consumers-loader-isolated.command",
+        "bytes": 223,
+        "sha256": "6216e536f6c8eb172c035a79cf72aebee8eed9478cbcce0e5117c848bb22676b"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/consumers-loader-isolated.finished",
+        "bytes": 21,
+        "sha256": "aa3d1f8eae19e6c17257f6ff24d96015024262c3f99e8f4d7dee863f39729129"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/consumers-loader-isolated.log",
+        "bytes": 2056,
+        "sha256": "74d49fbc9d932efe982e0a487a61b7d404b9182622a0552f5124a96450ae8b3b"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/consumers-loader-isolated.started",
+        "bytes": 21,
+        "sha256": "28496600c16b43a09cb30667d8edbd22d43a9546d30dc595ccf4bb74d34c3660"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/consumers-loader-isolated.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/consumers.command",
+        "bytes": 189,
+        "sha256": "d98facf3b1056ba7534fa0c9a46e779a80d066ea6fa94c17c636855b4974e045"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/consumers.finished",
+        "bytes": 21,
+        "sha256": "28496600c16b43a09cb30667d8edbd22d43a9546d30dc595ccf4bb74d34c3660"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/consumers.log",
+        "bytes": 1758,
+        "sha256": "3204a4fe1faf892c53af9eaac060eef18e4eb1fc9b915cfc95e656e247b850cd"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/consumers.started",
+        "bytes": 21,
+        "sha256": "7505efe76a8579e244b72dca4eab338f85ccd3f6c9975465c360cfd98038a1e4"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/consumers.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/corrected-mpi-consumer.command",
+        "bytes": 103,
+        "sha256": "1b2bf580d1beb7ae1c988dc8583bea6b8a77c00bb0c5077b954872cf3c3154dd"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/corrected-mpi-consumer.finished",
+        "bytes": 21,
+        "sha256": "baceb557ac070b9880af12ac90d6f1bd0761147455af0619f84229eea9fcfe4f"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/corrected-mpi-consumer.log",
+        "bytes": 4546,
+        "sha256": "1e299907117624447f1b799943d833c262a29a710d948bbe37408fa43b92b118"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/corrected-mpi-consumer.source-digest",
+        "bytes": 65,
+        "sha256": "76839b0623df3773cfba3821085305422522a5e475b5807ee4928d2dabe358d9"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/corrected-mpi-consumer.started",
+        "bytes": 21,
+        "sha256": "c30a43e6350e6da8e8e977c25f1367ad6aae6fd5c6ad2e5a5b873e25b3ba7283"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/corrected-mpi-consumer.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/corrected-source-after.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/corrected-source-after.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/default-check.command",
+        "bytes": 44,
+        "sha256": "96073caec118ef1dbeb81c34eded3b4d9308bf26efbbf3c3bb5b929b044c71e4"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/default-check.finished",
+        "bytes": 21,
+        "sha256": "56fd7ef626a10b8682ff87c9e5ad20974490a40e2ddd1ac1710ca4547634ef3b"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/default-check.log",
+        "bytes": 4394,
+        "sha256": "1579ed7f2b3671003813d36d8a78c7abfc9fc3d3c1551fde2e2226bded5959c2"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/default-check.started",
+        "bytes": 21,
+        "sha256": "0ea2a27d9fcaef134ed15f3622ee259f0e92bd2feb0a31e5ffa98d7dbf12741b"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/default-check.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/default-doctests.command",
+        "bytes": 49,
+        "sha256": "dcec0c35f896337252f3ae34b11f9ad7dcc6627fb26889f6eb610d675681708e"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/default-doctests.finished",
+        "bytes": 21,
+        "sha256": "cc037099a8cce85d01b6f2efa5502bd9d7c817fb1e7bf54cbeb3f9f4ca0a39e0"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/default-doctests.log",
+        "bytes": 10135,
+        "sha256": "988cbbb052fd932cc4de7de2b6426448109a42694483e5c523437f8b7ef86aa2"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/default-doctests.started",
+        "bytes": 21,
+        "sha256": "a9e7b507edafe5af7ebde8055333b68657e1a077db714ffacf408b8aee3b6e63"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/default-doctests.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/default-tests.command",
+        "bytes": 128,
+        "sha256": "92969510dc2251909d92d7f79263c7e33578fbacd73393cb36b403f8dd9349a4"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/default-tests.finished",
+        "bytes": 21,
+        "sha256": "9ad6914a3acc3cd7cf50f3d169827461150f7b078ac83186430bd62ec3138890"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/default-tests.log",
+        "bytes": 7209,
+        "sha256": "bb673e7fbbc2fee2afb5a9ce5b289781fea14bb822dd9848a2dd6bd2f80e0396"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/default-tests.started",
+        "bytes": 21,
+        "sha256": "e8fc16fd0de751c2f08b14cf3e1c09876b1fdc0ace27c1c50df6056dd65e8f27"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/default-tests.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/doctor.command",
+        "bytes": 63,
+        "sha256": "f09ed844a54f9a885d3215a3cddd1bda48e2a05829e74c4c96a9118031287f3a"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/doctor.finished",
+        "bytes": 21,
+        "sha256": "7505efe76a8579e244b72dca4eab338f85ccd3f6c9975465c360cfd98038a1e4"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/doctor.log",
+        "bytes": 5945,
+        "sha256": "9c8261cc2e86fa459af08931eca62da86917e987eedccdb92dc90be11b4bdcc7"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/doctor.started",
+        "bytes": 21,
+        "sha256": "6092471d863c0039c0a23473ea1131aed124e29c7b8c224cb5158f5c07ce2e88"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/doctor.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/environment.txt",
+        "bytes": 791,
+        "sha256": "56c1efe8dc3cd8baa96f59ab16a16d1b1dfbfdef2990b4756d64e29499d9df71"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/gcc.txt",
+        "bytes": 247,
+        "sha256": "dcddcefbfc2827a1d7b83a86a683bfa8e1ae76b6080fc490c9110d51e0e3da40"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/gxx.txt",
+        "bytes": 247,
+        "sha256": "87e3dc71035ef3b73843ef947164533882c3624ba0c5f5d84405afdbb780fee9"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/mpi-consumer.command",
+        "bytes": 104,
+        "sha256": "21d720bf61a24764915459bf33ca271964953bf1cdee0c25f9e5051d8cdb2ff2"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/mpi-consumer.finished",
+        "bytes": 21,
+        "sha256": "aa3d1f8eae19e6c17257f6ff24d96015024262c3f99e8f4d7dee863f39729129"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/mpi-consumer.log",
+        "bytes": 347,
+        "sha256": "d5b428dae5623a8a44d9d5e973d6e9a163de31a3050b5dcf0649daed5f7f47d3"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/mpi-consumer.started",
+        "bytes": 21,
+        "sha256": "aa3d1f8eae19e6c17257f6ff24d96015024262c3f99e8f4d7dee863f39729129"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/mpi-consumer.status",
+        "bytes": 4,
+        "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/mpicc.txt",
+        "bytes": 120,
+        "sha256": "26ce39bc108adbb9404c5bad46f42b24c959cb194154070d9848e0c5eceac4f5"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/mpiexec.txt",
+        "bytes": 5118,
+        "sha256": "bdd5a018dd07170773ebf3337e04bf43428889f3848031fadeae83cd43c4a1a0"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/native-after.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/native-after.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/native-cache.txt",
+        "bytes": 457,
+        "sha256": "89846c0688df10e7c2b0c8c3921c417473a6b6255922dce6275ac9ce619f141c"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/native-dynamic.txt",
+        "bytes": 2464,
+        "sha256": "e8eda1de7ad006b0849f17dc6c44ad56763596b28c54e5ec11b6dcb1651b68ec"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/native-identities.sha256",
+        "bytes": 420,
+        "sha256": "40cd82f38aba2af2462e6c13eb21eb8ad35d1a5b167c41e99b5aab1d76b2b012"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/rustc.txt",
+        "bytes": 214,
+        "sha256": "6b8a26f695d400a8e53c871b05b05056ee46db7ca3b16160df6f91aca58b50b3"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/source-after.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/source-after.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/source-directory",
+        "bytes": 95,
+        "sha256": "59bf5050976b24ee157af67bde8f82a6fb42f7524047107cc37e50ea69dab5bc"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/source-identities.sha256",
+        "bytes": 336,
+        "sha256": "e4a5ee3c9e52730ab045bc262680bd58bfd235bdd4c1bd6db39ddd708cdf65e4"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/storage-after.txt",
+        "bytes": 145,
+        "sha256": "e62755dd0cbadadf7dd3076cc8c5cb64ea83d243ffbdecb9c723cb2d73eaa2f6"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/storage-before.txt",
+        "bytes": 145,
+        "sha256": "c69c4ea3c5040a01190eb359cdcaf11fbcca900aea53d919fab38d97baef94af"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/evidence/storage-used.txt",
+        "bytes": 182,
+        "sha256": "afdabad0960c6c8f3489ebbae8647eda1b56377fe00f77cc8a16c0be973d9820"
+      }
+    ],
+    "consumer_log_identities": [
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers/build.log",
+        "bytes": 7143,
+        "sha256": "809397d33653ab87d74364a42dfcf8c053e42effc9ffeb4732b0188c798a3cd0"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers/direct-cpu-dm-run.log",
+        "bytes": 206,
+        "sha256": "d9008f553627bd704f26bc8ad2f68ec4690f363d51b5cf4a09b6274a5e5ac2a8"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers/direct-cpu-modes-run.log",
+        "bytes": 580,
+        "sha256": "3067952158e715888482ebcf56ac9858bafd957c3d8c43189dc283cca3316000"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers/direct-cpu-sv-run.log",
+        "bytes": 205,
+        "sha256": "66b26c22e18f0a7c53e4332ba7d1bbb3d019db0264186ef499dd423eb3d24798"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers/direct-omp-dm-run.log",
+        "bytes": 206,
+        "sha256": "08f40ddae8e3816c5461904458c57181d5560ac8e84289c410168a41b358185f"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers/direct-omp-modes-run.log",
+        "bytes": 580,
+        "sha256": "ecc8d48666ae10641443455313a6d6b4eb1a3c04bc0cae79e0972f241021437f"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers/direct-omp-sv-run.log",
+        "bytes": 205,
+        "sha256": "17d6f9321cd6b09106ae9cac116ca30a44860839c18211d398811a43f84651fc"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers/facade-cpu-run.log",
+        "bytes": 65,
+        "sha256": "6c557f9f5d08927c562d0bd2988470f692302d940a34b06b5adc3f17d7cb5dcb"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers/facade-omp-run.log",
+        "bytes": 65,
+        "sha256": "9308aaab88e799be3c56b82a947d565d99416bd706a705c6fc07a8b3da7808cc"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers/lock.log",
+        "bytes": 78,
+        "sha256": "6b096ee5e12d4918314fed6f84055f0cb1e4444915bf2d8061a3eec3b0f5ab12"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers/renamed-cpu-run.log",
+        "bytes": 65,
+        "sha256": "6c557f9f5d08927c562d0bd2988470f692302d940a34b06b5adc3f17d7cb5dcb"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers/renamed-omp-run.log",
+        "bytes": 65,
+        "sha256": "9308aaab88e799be3c56b82a947d565d99416bd706a705c6fc07a8b3da7808cc"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers/wrapped-cpu-run.log",
+        "bytes": 65,
+        "sha256": "6c557f9f5d08927c562d0bd2988470f692302d940a34b06b5adc3f17d7cb5dcb"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers/wrapped-omp-run.log",
+        "bytes": 65,
+        "sha256": "9308aaab88e799be3c56b82a947d565d99416bd706a705c6fc07a8b3da7808cc"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers-loader-isolated/build.log",
+        "bytes": 7223,
+        "sha256": "06ec03cfd7e2ae4677abcae2332e3e969f2429e648734467f888fb717f33ed9e"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers-loader-isolated/direct-cpu-dm-run.log",
+        "bytes": 206,
+        "sha256": "d9008f553627bd704f26bc8ad2f68ec4690f363d51b5cf4a09b6274a5e5ac2a8"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers-loader-isolated/direct-cpu-modes-run.log",
+        "bytes": 580,
+        "sha256": "3067952158e715888482ebcf56ac9858bafd957c3d8c43189dc283cca3316000"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers-loader-isolated/direct-cpu-sv-run.log",
+        "bytes": 205,
+        "sha256": "66b26c22e18f0a7c53e4332ba7d1bbb3d019db0264186ef499dd423eb3d24798"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers-loader-isolated/direct-ldd.log",
+        "bytes": 1932,
+        "sha256": "5c47b7264d4aa3d6f2b14c5834e220854ace390ffbbb89c5fa40a503160fa010"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers-loader-isolated/direct-omp-dm-run.log",
+        "bytes": 206,
+        "sha256": "08f40ddae8e3816c5461904458c57181d5560ac8e84289c410168a41b358185f"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers-loader-isolated/direct-omp-modes-run.log",
+        "bytes": 580,
+        "sha256": "ecc8d48666ae10641443455313a6d6b4eb1a3c04bc0cae79e0972f241021437f"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers-loader-isolated/direct-omp-sv-run.log",
+        "bytes": 205,
+        "sha256": "17d6f9321cd6b09106ae9cac116ca30a44860839c18211d398811a43f84651fc"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers-loader-isolated/direct-readelf.log",
+        "bytes": 2105,
+        "sha256": "ef9d8d6863263affef082ab798a259d985af289fbeab83bee86f66f175978ab6"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers-loader-isolated/facade-cpu-run.log",
+        "bytes": 65,
+        "sha256": "6c557f9f5d08927c562d0bd2988470f692302d940a34b06b5adc3f17d7cb5dcb"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers-loader-isolated/facade-ldd.log",
+        "bytes": 1932,
+        "sha256": "033d806d247086f75c8ec9298f37ba7d29dce1a0ebdd047b4cc9519b3c8573d5"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers-loader-isolated/facade-omp-run.log",
+        "bytes": 65,
+        "sha256": "9308aaab88e799be3c56b82a947d565d99416bd706a705c6fc07a8b3da7808cc"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers-loader-isolated/facade-readelf.log",
+        "bytes": 2115,
+        "sha256": "e22d6755219b1bc1cd21d9aa73035865ead85c858707dcffb476020fb1dcb80a"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers-loader-isolated/lock.log",
+        "bytes": 78,
+        "sha256": "6b096ee5e12d4918314fed6f84055f0cb1e4444915bf2d8061a3eec3b0f5ab12"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers-loader-isolated/renamed-cpu-run.log",
+        "bytes": 65,
+        "sha256": "6c557f9f5d08927c562d0bd2988470f692302d940a34b06b5adc3f17d7cb5dcb"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers-loader-isolated/renamed-ldd.log",
+        "bytes": 1932,
+        "sha256": "a67f153b360489f49db164455948e4e9bbf3739a5cbd9bd8b44ae85de95e5ac0"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers-loader-isolated/renamed-omp-run.log",
+        "bytes": 65,
+        "sha256": "9308aaab88e799be3c56b82a947d565d99416bd706a705c6fc07a8b3da7808cc"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers-loader-isolated/renamed-readelf.log",
+        "bytes": 2115,
+        "sha256": "e22d6755219b1bc1cd21d9aa73035865ead85c858707dcffb476020fb1dcb80a"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers-loader-isolated/wrapped-cpu-run.log",
+        "bytes": 65,
+        "sha256": "6c557f9f5d08927c562d0bd2988470f692302d940a34b06b5adc3f17d7cb5dcb"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers-loader-isolated/wrapped-ldd.log",
+        "bytes": 1932,
+        "sha256": "4117154ce54d26f96801af7908ea7ecd70c3ea4021fb23596e0f7289c52ffbbd"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers-loader-isolated/wrapped-omp-run.log",
+        "bytes": 65,
+        "sha256": "9308aaab88e799be3c56b82a947d565d99416bd706a705c6fc07a8b3da7808cc"
+      },
+      {
+        "path": "target/native-reviewed-gnu-20261006/consumers-loader-isolated/wrapped-readelf.log",
+        "bytes": 2115,
+        "sha256": "90cb08d1618da3fee0ae9461aa1e464bb0abc7b4643ade01fbecdd8b28e92d23"
+      }
+    ],
+    "acceptance": "Eleven original stages passed on 4e5b423; that driver remains failed because its standalone fixture lockfile was stale. The unchanged source crates plus the separately executed corrected consumer on 452a4985 provide recorded local GNU evidence across the planned stages, not a claim that either frozen source completed all twelve stages in one successful driver.",
+    "limits": {
+      "original_driver_failure_retained": true,
+      "gpu_execution_claimed": false,
+      "cirrus_acceptance_established": false,
+      "macos_execution_established": false,
+      "multi_host_capacity_established": false,
+      "mpi_loader_isolated_execution_claimed": false,
+      "earlier_clang_module_open_failure_cause": "unresolved; this GNU evidence does not explain or repair it",
+      "existing_warning": "quest-polynomial nightly generic_const_exprs/trait-solver compatibility",
+      "native_changes": false,
+      "source_edits_or_reruns_for_this_documentation": false
+    }
+  }
+}

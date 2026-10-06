@@ -5,10 +5,7 @@ use quest_qsvt_io::{
 	IoPolicy,
 	hdf5::{StoredBlockEncoding, write_block_encoding, write_state_vector},
 };
-use std::{
-	path::{Path, PathBuf},
-	process::Command,
-};
+use std::path::{Path, PathBuf};
 
 static FIXTURES: std::sync::Mutex<()> = std::sync::Mutex::new(());
 struct Fixture {
@@ -53,14 +50,18 @@ fn path(value: &Path) -> googletest::Result<&str> {
 		.to_str()
 		.ok_or_else(|| std::io::Error::other("path"))?)
 }
-fn run(count: &str, args: &[&str]) -> googletest::Result<std::process::Output> {
-	Ok(Command::new("timeout")
-		.args(["60s", "mpiexec", "-n", count])
-		.arg(env!("CARGO_BIN_EXE_quest-qsvt-cli"))
-		.args(args)
-		.output()?)
+fn run(count: &str, args: &[&str]) -> googletest::Result<quest_test_support::mpi::RunOutput> {
+	Ok(
+		quest_test_support::mpi::MpiTest::new(count.parse()?, std::time::Duration::from_secs(60))?
+			.executable(env!("CARGO_BIN_EXE_quest-qsvt-cli"))
+			.args(args)
+			.output()?,
+	)
 }
-fn report(output: &std::process::Output) -> googletest::Result<serde_json::Value> {
+fn report(
+	output: &quest_test_support::mpi::RunOutput,
+	ranks: u64,
+) -> googletest::Result<serde_json::Value> {
 	expect_true!(
 		output.status.success(),
 		"stderr: {}",
@@ -70,10 +71,17 @@ fn report(output: &std::process::Output) -> googletest::Result<serde_json::Value
 	let start = text
 		.find('{')
 		.ok_or_else(|| std::io::Error::other("JSON report"))?;
-	Ok(serde_json::from_str(
+	let result: serde_json::Value = serde_json::from_str(
 		text.get(start..)
 			.ok_or_else(|| std::io::Error::other("JSON report"))?,
-	)?)
+	)?;
+	expect_eq!(
+		result
+			.pointer("/distributed/ranks")
+			.and_then(serde_json::Value::as_u64),
+		Some(ranks)
+	);
+	Ok(result)
 }
 #[gtest]
 fn mpi_two_and_four_rank_root_synthesis_preserve_embedded_and_overlap_mass()
@@ -106,7 +114,7 @@ fn mpi_two_and_four_rank_root_synthesis_preserve_embedded_and_overlap_mass()
 				path(&fixture.input)?,
 			],
 		)?;
-		let result = report(&output)?;
+		let result = report(&output, count.parse()?)?;
 		let timing = |name| {
 			result
 				.pointer(name)
@@ -167,7 +175,7 @@ fn mpi_two_and_four_rank_root_synthesis_preserve_embedded_and_overlap_mass()
 				path(&fixture.reference)?,
 			],
 		)?;
-		let result = report(&output)?;
+		let result = report(&output, count.parse()?)?;
 		expect_that!(
 			result
 				.pointer("/mass/native_dispatches/total")
@@ -212,7 +220,7 @@ fn root_input_failure_is_collective_and_never_enters_native_execution() -> googl
 		],
 	)?;
 	expect_false!(output.status.success());
-	expect_ne!(output.status.code(), Some(124));
+	expect_false!(output.status.timed_out);
 	expect_true!(String::from_utf8_lossy(&output.stderr).contains("another rank rejected"));
 	Ok(())
 }
@@ -224,40 +232,28 @@ fn nonroot_missing_files_are_not_read_or_synthesized() -> googletest::Result<()>
 		.lock()
 		.map_err(|_| std::io::Error::other("fixture lock"))?;
 	let fixture = fixture()?;
-	let output = Command::new("timeout")
-		.args(["60s", "mpiexec", "-n", "1"])
-		.arg(env!("CARGO_BIN_EXE_quest-qsvt-cli"))
-		.args(["--workers", if cfg!(feature = "rayon") { "2" } else { "1" }])
+	// Rank-dependent argv through one executable works with both mpiexec and srun.
+	// All paths are positional arguments; none are interpolated into shell text.
+	let script = r#"rank=${SLURM_PROCID:-${OMPI_COMM_WORLD_RANK:-${PMI_RANK:-${PMIX_RANK:-}}}}
+case "$rank" in
+0) exec "$1" --workers "$2" embedded --distributed --encoding "$3" --qsp "$4" --route standard --synthesize-input --certify-input --input-state "$5";;
+1) exec "$1" embedded --distributed --encoding /missing/nonroot-block.h5 --qsp /missing/nonroot-qsp.json --route standard --input-state /missing/nonroot-state.h5;;
+*) exit 71;;
+esac"#;
+	let output = quest_test_support::mpi::MpiTest::new(2, std::time::Duration::from_secs(60))?
+		.executable("/bin/sh")
 		.args([
-			"embedded",
-			"--distributed",
-			"--encoding",
+			"-c",
+			script,
+			"quest-cli-rank-arguments",
+			env!("CARGO_BIN_EXE_quest-qsvt-cli"),
+			if cfg!(feature = "rayon") { "2" } else { "1" },
 			path(&fixture.encoding)?,
-			"--qsp",
 			path(&fixture.qsp)?,
-			"--route",
-			"standard",
-			"--synthesize-input",
-			"--certify-input",
-			"--input-state",
 			path(&fixture.input)?,
 		])
-		.args([":", "-n", "1"])
-		.arg(env!("CARGO_BIN_EXE_quest-qsvt-cli"))
-		.args([
-			"embedded",
-			"--distributed",
-			"--encoding",
-			"/missing/nonroot-block.h5",
-			"--qsp",
-			"/missing/nonroot-qsp.json",
-			"--route",
-			"standard",
-			"--input-state",
-			"/missing/nonroot-state.h5",
-		])
 		.output()?;
-	let result = report(&output)?;
+	let result = report(&output, 2)?;
 	expect_eq!(
 		result
 			.pointer("/input_synthesis/certified")

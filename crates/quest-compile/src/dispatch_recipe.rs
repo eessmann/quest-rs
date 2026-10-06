@@ -184,13 +184,30 @@ impl<'a> MatrixRecipe<'a> {
 	pub const fn is_diagonal(self) -> bool {
 		self.source.is_diagonal()
 	}
+	/// Native dense control dispatch is authorized only by this operator's evidence.
+	#[must_use]
+	pub const fn uses_native_controls(self) -> bool {
+		self.source.unitary_evidence().is_some() && !self.source.is_diagonal()
+	}
+	#[must_use]
+	pub fn native_dimension(self) -> usize {
+		if self.uses_native_controls() {
+			self.source.dimension()
+		} else {
+			self.dimension
+		}
+	}
 	#[must_use]
 	pub const fn native_variant_count(self) -> usize {
 		2
 	}
 	#[must_use]
 	pub const fn native_apply_calls(self, density: bool) -> usize {
-		if density { 2 } else { 1 }
+		if density && !self.uses_native_controls() {
+			2
+		} else {
+			1
+		}
 	}
 	#[must_use]
 	pub const fn signed_profile(self) -> &'a [bool] {
@@ -200,15 +217,15 @@ impl<'a> MatrixRecipe<'a> {
 	pub fn storage_identity(self) -> usize {
 		self.source.view().as_ptr().addr()
 	}
-	/// Bytes of logical forward+adjoint entries, excluding native padding and GPU mirrors.
+	/// Bytes of native forward and adjoint entries, excluding padding and GPU mirrors.
 	/// # Errors
 	/// Rejects byte-count overflow.
 	pub fn payload_bytes(self) -> Result<usize> {
 		let entries = if self.is_diagonal() {
-			self.dimension
+			self.native_dimension()
 		} else {
-			self.dimension
-				.checked_mul(self.dimension)
+			self.native_dimension()
+				.checked_mul(self.native_dimension())
 				.ok_or(Error::Budget("matrix payload overflow"))?
 		};
 		entries
@@ -216,7 +233,7 @@ impl<'a> MatrixRecipe<'a> {
 			.and_then(|n| n.checked_mul(2))
 			.ok_or(Error::Budget("matrix payload overflow"))
 	}
-	/// The entry transferred to the forward native variant.
+	/// Forward entry of the complete logical signed-control operator.
 	#[must_use]
 	#[expect(
 		clippy::arithmetic_side_effects,
@@ -238,7 +255,7 @@ impl<'a> MatrixRecipe<'a> {
 			Complex64::new(0.0, 0.0)
 		}
 	}
-	/// The entry transferred to the adjoint native variant.
+	/// Adjoint entry of the complete logical signed-control operator.
 	#[must_use]
 	pub fn adjoint_value(self, row: usize, col: usize) -> Complex64 {
 		self.value(col, row).conj()
@@ -392,7 +409,7 @@ impl PreparedRecipeInventory {
 	}
 }
 struct InventoryWalker {
-	seen: BTreeSet<(usize, Vec<bool>)>,
+	seen: BTreeSet<(usize, Vec<bool>, [u64; 3])>,
 	result: PreparedRecipeInventory,
 	density: bool,
 	width: usize,
@@ -503,7 +520,11 @@ impl InventoryWalker {
 					.ok_or(Error::Budget("dispatch count overflow"))?;
 				self.add_dispatches(calls)?;
 				self.add_passes(1)?;
-				let key = (recipe.storage_identity(), profile.clone());
+				let key = (
+					recipe.storage_identity(),
+					profile.clone(),
+					matrix.evidence_identity(),
+				);
 				let comparisons = usize::try_from(
 					self.seen
 						.len()
@@ -529,7 +550,7 @@ impl InventoryWalker {
 						return Err(Error::Budget("dispatch recipe profiles"));
 					}
 					let payload = recipe.payload_bytes()?;
-					let retained = size_of::<(usize, Vec<bool>)>()
+					let retained = size_of::<(usize, Vec<bool>, [u64; 3])>()
 						.checked_add(profile.len())
 						.and_then(|n| n.checked_add(64))
 						.and_then(|n| n.checked_add(payload))

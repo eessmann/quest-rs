@@ -1,0 +1,362 @@
+warning: `feature(generic_const_exprs)` is not supported with the next-generation trait solver
+ --> crates/quest-polynomial/src/lib.rs:1:30
+  |
+1 | #![feature(const_trait_impl, generic_const_exprs)]
+  |                              ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `-Znext-solver=globally` is currently enabled by default for testing
+  = note: reverted the setting to `-Znext-solver=coherence` for this crate
+  = note: the currently stable trait solver will be used for this crate
+  = note: see issues #160895 <https://github.com/rust-lang/rust/issues/160895> for more information
+
+warning: `quest-polynomial` (lib) generated 1 warning
+   Compiling quest-qsvt v0.1.0 (<workspace>/crates/quest-qsvt)
+   Compiling quest-qsvt-io v0.1.0 (<workspace>/crates/quest-qsvt-io)
+   Compiling xtask v0.1.0 (<workspace>/crates/xtask)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.28s
+     Running `target/debug/xtask generate-quest-bindings --check`
+cargo:rerun-if-env-changed=QUEST_ROOT
+cargo:rerun-if-env-changed=QUEST_DIR
+cargo:rerun-if-env-changed=QuEST_DIR
+cargo:rerun-if-env-changed=QuEST_ROOT
+cargo:rerun-if-env-changed=QUEST_NATIVE_CONFIG
+cargo:rerun-if-env-changed=QUEST_RUNTIME_LIBRARY_PATH
+cargo:rerun-if-env-changed=CMAKE_PREFIX_PATH
+cargo:rerun-if-env-changed=CMAKE
+cargo:rerun-if-env-changed=CMAKE_GENERATOR
+cargo:rerun-if-env-changed=CMAKE_TOOLCHAIN_FILE
+cargo:rerun-if-env-changed=CUDAToolkit_ROOT
+cargo:rerun-if-env-changed=CUDATOOLKIT_ROOT
+cargo:rerun-if-env-changed=CUDA_PATH
+cargo:rerun-if-env-changed=CUQUANTUM_ROOT
+cargo:rerun-if-env-changed=PATH
+cargo:rerun-if-env-changed=CXX
+cargo:rerun-if-env-changed=CXXFLAGS
+cargo:rerun-if-env-changed=CC
+cargo:rerun-if-env-changed=CFLAGS
+cargo:rerun-if-env-changed=LD_LIBRARY_PATH
+cargo:rerun-if-env-changed=LD_PRELOAD
+cargo:rerun-if-env-changed=LD_AUDIT
+cargo:rerun-if-env-changed=SDKROOT
+cargo:rerun-if-env-changed=DYLD_LIBRARY_PATH
+cargo:rerun-if-env-changed=DYLD_FALLBACK_LIBRARY_PATH
+cargo:rerun-if-env-changed=DYLD_INSERT_LIBRARIES
+cargo:rerun-if-env-changed=CXX_x86_64-unknown-linux-gnu
+cargo:rerun-if-env-changed=CXX_x86_64_unknown_linux_gnu
+cargo:rerun-if-env-changed=HOST_CXX
+cargo:rerun-if-env-changed=TARGET_CXX
+cargo:rerun-if-env-changed=CXXFLAGS_x86_64-unknown-linux-gnu
+cargo:rerun-if-env-changed=CXXFLAGS_x86_64_unknown_linux_gnu
+cargo:rerun-if-env-changed=HOST_CXXFLAGS
+cargo:rerun-if-env-changed=TARGET_CXXFLAGS
+cargo:rerun-if-env-changed=CXXFLAGS
+cargo:rerun-if-env-changed=CXXSTDLIB_x86_64-unknown-linux-gnu
+cargo:rerun-if-env-changed=CXXSTDLIB_x86_64_unknown_linux_gnu
+cargo:rerun-if-env-changed=HOST_CXXSTDLIB
+cargo:rerun-if-env-changed=TARGET_CXXSTDLIB
+cargo:rerun-if-env-changed=CXXSTDLIB
+cargo:rerun-if-env-changed=CMAKE_TOOLCHAIN_FILE_x86_64-unknown-linux-gnu
+cargo:rerun-if-env-changed=CMAKE_TOOLCHAIN_FILE_x86_64_unknown_linux_gnu
+cargo:rerun-if-env-changed=HOST_CMAKE_TOOLCHAIN_FILE
+cargo:rerun-if-env-changed=TARGET_CMAKE_TOOLCHAIN_FILE
+cargo:rerun-if-env-changed=CMAKE_TOOLCHAIN_FILE
+cargo:rerun-if-env-changed=CMAKE_PREFIX_PATH_x86_64-unknown-linux-gnu
+cargo:rerun-if-env-changed=CMAKE_PREFIX_PATH_x86_64_unknown_linux_gnu
+cargo:rerun-if-env-changed=HOST_CMAKE_PREFIX_PATH
+cargo:rerun-if-env-changed=TARGET_CMAKE_PREFIX_PATH
+cargo:rerun-if-env-changed=CPATH
+cargo:rerun-if-env-changed=CPLUS_INCLUDE_PATH
+cargo:rerun-if-env-changed=C_INCLUDE_PATH
+cargo:rerun-if-env-changed=OBJC_INCLUDE_PATH
+cargo:rerun-if-env-changed=GCC_EXEC_PREFIX
+cargo:rerun-if-env-changed=COMPILER_PATH
+cargo:rerun-if-env-changed=LIBRARY_PATH
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+cargo:rerun-if-env-changed=SDKROOT
+CMAKE_TOOLCHAIN_FILE_x86_64-unknown-linux-gnu = None
+CMAKE_TOOLCHAIN_FILE_x86_64_unknown_linux_gnu = None
+HOST_CMAKE_TOOLCHAIN_FILE = None
+CMAKE_TOOLCHAIN_FILE = None
+CMAKE_GENERATOR_x86_64-unknown-linux-gnu = None
+CMAKE_GENERATOR_x86_64_unknown_linux_gnu = None
+HOST_CMAKE_GENERATOR = None
+CMAKE_GENERATOR = None
+CMAKE_PREFIX_PATH_x86_64-unknown-linux-gnu = None
+CMAKE_PREFIX_PATH_x86_64_unknown_linux_gnu = None
+HOST_CMAKE_PREFIX_PATH = None
+CMAKE_PREFIX_PATH = Some("/usr/lib64/mpich")
+CMAKE_x86_64-unknown-linux-gnu = None
+CMAKE_x86_64_unknown_linux_gnu = None
+HOST_CMAKE = None
+CMAKE = None
+running: cd "<workspace>/target/xtask-binding-native-discovery/build" && CMAKE_PREFIX_PATH="/usr/lib64/mpich" LC_ALL="C" "cmake" "<workspace>/target/xtask-binding-native-discovery/source" "-B" "<workspace>/target/xtask-binding-native-discovery/build" "-DCMAKE_CXX_COMPILER=c++" "-DCMAKE_CXX_FLAGS=" "-DCMAKE_PREFIX_PATH=/usr/lib64/mpich" "-DQuEST_DIR=<quest-install>/lib64/cmake/QuEST" "-DCMAKE_INSTALL_PREFIX=<workspace>/target/xtask-binding-native-discovery" "-DCMAKE_C_FLAGS= -w" "-DCMAKE_C_COMPILER=/usr/bin/cc" "-DCMAKE_ASM_FLAGS= -w" "-DCMAKE_ASM_COMPILER=/usr/bin/cc" "-DCMAKE_BUILD_TYPE=Release" "--fresh"
+-- The CXX compiler identification is GNU 16.2.1
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+CMake Warning (dev) at CMakeLists.txt:4 (find_package):
+  Policy CMP0144 is not set: find_package uses upper-case <PACKAGENAME>_ROOT
+  variables.  Run "cmake --help-policy CMP0144" for policy details.  Use the
+  cmake_policy command to set the policy and suppress this warning.
+
+  Environment variable QUEST_ROOT is set to:
+
+    <quest-install>
+
+  For compatibility, find_package is ignoring the variable, but code in a
+  .cmake module might still use it.
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Found MPI_CXX: /usr/lib64/mpich/lib/libmpicxx.so (found version "4.1")
+-- Found MPI: TRUE (found version "4.1") found components: CXX
+-- Configuring done (0.5s)
+-- Generating done (0.0s)
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_ASM_COMPILER
+    CMAKE_ASM_FLAGS
+    CMAKE_C_COMPILER
+    CMAKE_C_FLAGS
+
+
+-- Build files have been written to: <workspace>/target/xtask-binding-native-discovery/build
+running: cd "<workspace>/target/xtask-binding-native-discovery/build" && LC_ALL="C" "cmake" "--build" "<workspace>/target/xtask-binding-native-discovery/build" "--target" "quest_bridge" "--config" "Release"
+[ 50%] Building CXX object CMakeFiles/quest_bridge.dir/abi.cpp.o
+[100%] Linking CXX static library libquest_bridge.a
+[100%] Built target quest_bridge
+cargo:root=<workspace>/target/xtask-binding-native-discovery
+cargo:rerun-if-env-changed=CXX_x86_64-unknown-linux-gnu
+cargo:rerun-if-env-changed=CXX_x86_64_unknown_linux_gnu
+cargo:rerun-if-env-changed=HOST_CXX
+cargo:rerun-if-env-changed=TARGET_CXX
+cargo:rerun-if-env-changed=CXXFLAGS_x86_64-unknown-linux-gnu
+cargo:rerun-if-env-changed=CXXFLAGS_x86_64_unknown_linux_gnu
+cargo:rerun-if-env-changed=HOST_CXXFLAGS
+cargo:rerun-if-env-changed=TARGET_CXXFLAGS
+cargo:rerun-if-env-changed=CXXFLAGS
+cargo:rerun-if-env-changed=CXXSTDLIB_x86_64-unknown-linux-gnu
+cargo:rerun-if-env-changed=CXXSTDLIB_x86_64_unknown_linux_gnu
+cargo:rerun-if-env-changed=HOST_CXXSTDLIB
+cargo:rerun-if-env-changed=TARGET_CXXSTDLIB
+cargo:rerun-if-env-changed=CXXSTDLIB
+cargo:rerun-if-env-changed=CMAKE_TOOLCHAIN_FILE_x86_64-unknown-linux-gnu
+cargo:rerun-if-env-changed=CMAKE_TOOLCHAIN_FILE_x86_64_unknown_linux_gnu
+cargo:rerun-if-env-changed=HOST_CMAKE_TOOLCHAIN_FILE
+cargo:rerun-if-env-changed=TARGET_CMAKE_TOOLCHAIN_FILE
+cargo:rerun-if-env-changed=CMAKE_TOOLCHAIN_FILE
+cargo:rerun-if-env-changed=CMAKE_PREFIX_PATH_x86_64-unknown-linux-gnu
+cargo:rerun-if-env-changed=CMAKE_PREFIX_PATH_x86_64_unknown_linux_gnu
+cargo:rerun-if-env-changed=HOST_CMAKE_PREFIX_PATH
+cargo:rerun-if-env-changed=TARGET_CMAKE_PREFIX_PATH
+cargo:rerun-if-env-changed=CPATH
+cargo:rerun-if-env-changed=CPLUS_INCLUDE_PATH
+cargo:rerun-if-env-changed=C_INCLUDE_PATH
+cargo:rerun-if-env-changed=OBJC_INCLUDE_PATH
+cargo:rerun-if-env-changed=GCC_EXEC_PREFIX
+cargo:rerun-if-env-changed=COMPILER_PATH
+cargo:rerun-if-env-changed=LIBRARY_PATH
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+cargo:rerun-if-env-changed=SDKROOT
+cargo:rerun-if-changed=/usr/include/mpich-x86_64
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5ACpublic.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5Apublic.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5Cpublic.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5DOpublic.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5DSpublic.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5Dpublic.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5ESdevelop.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5ESpublic.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5Epubgen.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5Epublic.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5FDcore.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5FDdevelop.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5FDdirect.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5FDfamily.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5FDhdfs.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5FDioc.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5FDlog.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5FDmirror.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5FDmpi.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5FDmpio.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5FDmulti.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5FDonion.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5FDpublic.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5FDros3.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5FDsec2.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5FDsplitter.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5FDstdio.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5FDsubfiling.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5FDwindows.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5Fpublic.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5Gpublic.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5IMpublic.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5Idevelop.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5Ipublic.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5LDpublic.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5LTpublic.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5Ldevelop.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5Lpublic.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5MMpublic.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5Mpublic.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5Opublic.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5PLextern.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5PLpublic.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5PTpublic.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5Ppublic.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5Rpublic.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5Spublic.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5TBpublic.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5TSdevelop.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5Tdevelop.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5Tpublic.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5VLconnector.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5VLconnector_passthru.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5VLnative.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5VLpassthru.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5VLpublic.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5Zdevelop.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5Zpublic.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5api_adpt.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5config_f.inc
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5f90i.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5f90i_gen.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5overflow.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5pubconf.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5public.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/H5version.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/hdf5.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/hdf5_hl.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/mpi.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/mpi_proto.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/mpicxx.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/mpif.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/mpio.h
+cargo:rerun-if-changed=/usr/include/mpich-x86_64/mpiof.h
+cargo:rerun-if-changed=/usr/lib64/mpich/lib/libmpi.so
+cargo:rerun-if-changed=/usr/lib64/mpich/lib/libmpi.so.12.4.2
+cargo:rerun-if-changed=/usr/lib64/mpich/lib/libmpicxx.so
+cargo:rerun-if-changed=/usr/lib64/mpich/lib/libmpicxx.so.12.4.2
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeCXXCompiler.cmake.in
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeCXXInformation.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeCommonLanguageInclude.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeCompilerIdDetection.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeDetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeDetermineCompilerABI.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeDetermineCompilerSupport.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeDetermineSystem.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeFindBinUtils.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeFindDependencyMacro.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeGenericSystem.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeInitializeConfigs.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeLanguageInformation.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeParseImplicitIncludeInfo.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeParseImplicitLinkInfo.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeParseLibraryArchitecture.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeSystem.cmake.in
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeSystemSpecificInformation.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeSystemSpecificInitialize.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeTestCXXCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeTestCompilerCommon.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/CMakeUnixFindMake.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/ADSP-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/ARMCC-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/ARMClang-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/AppleClang-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/Borland-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/CMakeCommonCompilerMacros.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/Clang-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/Clang-DetermineCompilerInternal.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/Compaq-CXX-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/Cray-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/CrayClang-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/Diab-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/Embarcadero-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/Fujitsu-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/GHS-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/GNU-CXX-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/GNU-CXX.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/GNU-FindBinUtils.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/GNU.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/HP-CXX-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/IAR-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/IBMClang-CXX-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/Intel-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/LCC-CXX-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/MSVC-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/NVHPC-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/NVIDIA-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/OrangeC-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/PGI-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/PathScale-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/Renesas-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/SCO-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/SunPro-CXX-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/TI-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/TIClang-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/Tasking-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/VisualAge-CXX-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/Watcom-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/XL-CXX-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/XLClang-CXX-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Compiler/zOS-CXX-DetermineCompiler.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/FindMPI.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/FindPackageHandleStandardArgs.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/FindPackageMessage.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/FindPkgConfig.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Internal/CMakeCXXLinkerInformation.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Internal/CMakeCommonLinkerInformation.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Internal/CMakeDetermineLinkerId.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Internal/CMakeInspectCXXLinker.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Internal/FeatureTesting.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Linker/GNU-CXX.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Linker/GNU.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Platform/Linker/GNU.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Platform/Linker/Linux-GNU-CXX.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Platform/Linker/Linux-GNU.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Platform/Linux-Determine-CXX.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Platform/Linux-GNU-CXX.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Platform/Linux-GNU.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Platform/Linux-Initialize.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Platform/Linux.cmake
+cargo:rerun-if-changed=/usr/share/cmake/Modules/Platform/UnixPaths.cmake
+cargo:rerun-if-changed=<workspace>/target/xtask-binding-native-discovery/build/CMakeFiles/4.3.0/CMakeCXXCompiler.cmake
+cargo:rerun-if-changed=<workspace>/target/xtask-binding-native-discovery/build/CMakeFiles/4.3.0/CMakeSystem.cmake
+cargo:rerun-if-changed=<quest-install>/include
+cargo:rerun-if-changed=<quest-install>/include/quest
+cargo:rerun-if-changed=<quest-install>/include/quest/include
+cargo:rerun-if-changed=<quest-install>/include/quest/include/calculations.h
+cargo:rerun-if-changed=<quest-install>/include/quest/include/channels.h
+cargo:rerun-if-changed=<quest-install>/include/quest/include/config.h
+cargo:rerun-if-changed=<quest-install>/include/quest/include/debug.h
+cargo:rerun-if-changed=<quest-install>/include/quest/include/decoherence.h
+cargo:rerun-if-changed=<quest-install>/include/quest/include/deprecated.h
+cargo:rerun-if-changed=<quest-install>/include/quest/include/environment.h
+cargo:rerun-if-changed=<quest-install>/include/quest/include/experimental.h
+cargo:rerun-if-changed=<quest-install>/include/quest/include/initialisations.h
+cargo:rerun-if-changed=<quest-install>/include/quest/include/matrices.h
+cargo:rerun-if-changed=<quest-install>/include/quest/include/modes.h
+cargo:rerun-if-changed=<quest-install>/include/quest/include/multiplication.h
+cargo:rerun-if-changed=<quest-install>/include/quest/include/operations.h
+cargo:rerun-if-changed=<quest-install>/include/quest/include/paulis.h
+cargo:rerun-if-changed=<quest-install>/include/quest/include/precision.h
+cargo:rerun-if-changed=<quest-install>/include/quest/include/qureg.h
+cargo:rerun-if-changed=<quest-install>/include/quest/include/trotterisation.h
+cargo:rerun-if-changed=<quest-install>/include/quest/include/types.h
+cargo:rerun-if-changed=<quest-install>/include/quest/include/wrappers.h
+cargo:rerun-if-changed=<quest-install>/include/quest.h
+cargo:rerun-if-changed=<quest-install>/lib64/cmake/QuEST/QuESTConfig.cmake
+cargo:rerun-if-changed=<quest-install>/lib64/cmake/QuEST/QuESTConfigDependencies.cmake
+cargo:rerun-if-changed=<quest-install>/lib64/cmake/QuEST/QuESTConfigVersion.cmake
+cargo:rerun-if-changed=<quest-install>/lib64/cmake/QuEST/QuESTTargets-release.cmake
+cargo:rerun-if-changed=<quest-install>/lib64/cmake/QuEST/QuESTTargets.cmake
+cargo:rerun-if-changed=<quest-install>/lib64/libQuEST.so.4.3.0

@@ -1,0 +1,1270 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-06",
+  "status": "local validation complete: baseline workspace and MPI passed, baseline loader-isolation failure retained; documented fixed-SDK scoped consumer and MPI validation passed",
+  "scope": "Local Linux x86_64 native QuEST and CXX bridge compiled with Clang, LLVM OpenMP, system MPICH, workspace verification and independent MPI consumer",
+  "source_identity": {
+    "inventory_before": {
+      "path": "target/native-clang-20261006/evidence/source-before.sha256",
+      "sha256": "23e41f85da44d2a32ce39b9e0c6744b0c99ada304733661342c14fdb729c1c94",
+      "size_bytes": 344968
+    },
+    "inventory_before_entries": 2569,
+    "final_inventory_verification": "passed: before, baseline-after and SDK-after manifests match exactly, 2569 entries; frozen before public fixture and receipt publication",
+    "abi_source_sha256": {
+      "crates/quest-build/native/mpi_abi.c": "901a162a18b4214c37c84f80e92aa2f69ca09569603ea75bf7bae8d74dac22df",
+      "crates/quest-build/src/rsmpi.rs": "81b034d1f036dccea79ce1b4bf8ad5c71c48b0fc370c1c6df370c7f8453bc373",
+      "crates/quest-sys/src/mpi.rs": "ee407e113f7777d3243c411a5a66b23854ad89062cce2441f60f4c7607f555e2",
+      "crates/quest-sys/src/cxx_bindings/quest_mpi.cpp": "dfa5d7d1821ed1f8616a64998131f905c1576a9b25d4be7d8911133cb20801c6"
+    },
+    "inventory_after": {
+      "path": "target/native-clang-20261006/evidence/source-after.sha256",
+      "sha256": "23e41f85da44d2a32ce39b9e0c6744b0c99ada304733661342c14fdb729c1c94",
+      "size_bytes": 344968
+    },
+    "final_inventory_status_file": {
+      "path": "target/native-clang-20261006/evidence/source-stability.status",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "size_bytes": 2
+    },
+    "preserved_workspace_archive": {
+      "path": "target/native-clang-20261006/workspace-source.tar.gz",
+      "sha256": "2ceb804586c254e5f2b90ef8bad76ad3944b12449a55c8885554f31c87daf354",
+      "size_bytes": 11790655
+    },
+    "inventory_after_sdk": {
+      "path": "target/native-clang-20261006/evidence/source-sdk-after.sha256",
+      "sha256": "23e41f85da44d2a32ce39b9e0c6744b0c99ada304733661342c14fdb729c1c94",
+      "size_bytes": 344968
+    },
+    "sdk_inventory_status_file": {
+      "path": "target/native-clang-20261006/evidence/source-sdk-stability.status",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "size_bytes": 2
+    },
+    "later_publication_boundary": "Public consumer fixture and verification receipts were added after the unchanged 2569-file inventory and source archive were frozen. Public fixture source hashes and separate manifest build/run are recorded below."
+  },
+  "native": {
+    "source_revision": "503552065045eaf89baba85e6cd6aad728525554",
+    "source_diff_empty": true,
+    "source_modified": false,
+    "version": "4.3.0",
+    "compiler": "Clang 22.1.8 (Fedora 22.1.8-4.fc44)",
+    "build_type": "Release",
+    "configuration": {
+      "QUEST_ENABLE_MPI": true,
+      "QUEST_ENABLE_SUBCOMM": true,
+      "QUEST_ENABLE_OMP": true,
+      "QUEST_ENABLE_NUMA": true,
+      "QUEST_ENABLE_CUDA": false,
+      "QUEST_ENABLE_CUQUANTUM": false,
+      "QUEST_ENABLE_HIP": false,
+      "QUEST_ENABLE_ADIOS2": false,
+      "QUEST_ENABLE_BMI2": false,
+      "QUEST_FLOAT_PRECISION": 2,
+      "QUEST_BUILD_TESTS": false,
+      "QUEST_BUILD_EXAMPLES": false
+    },
+    "openmp_compile_flag": "-fopenmp=libomp",
+    "library": {
+      "path": "target/native-clang-20261006/native-install/lib64/libQuEST.so.4.3.0",
+      "sha256": "212196a68898bf27af3997ac0050c2ba9b5f5f139e7320653cd1641742e1e3fc",
+      "size_bytes": 3546312
+    },
+    "configuration_evidence": {
+      "path": "target/native-clang-20261006/evidence/native-cmake-cache.txt",
+      "sha256": "a5b004b0f26d864e582e3b5f12b30a4bc85b7649666cf142e39af0903aac8a53",
+      "size_bytes": 28790
+    },
+    "upstream_native_test_suite": "not run; disabled in this build"
+  },
+  "toolchain": {
+    "rust": "rustc 1.101.0-nightly (db8f076d2 2026-10-03)",
+    "target": "x86_64-unknown-linux-gnu",
+    "mpi": "system MPICH; independent MPICC wrapper invokes GCC, matched against native headers and loaded library",
+    "hdf5": "system serial HDF5 1.14.6",
+    "environment": {
+      "QUEST_ROOT": "$LANE/native-install",
+      "CARGO_TARGET_DIR": "$LANE/cargo",
+      "TMPDIR": "$LANE/tmp",
+      "CC": "clang",
+      "CXX": "clang++",
+      "CLANG": "clang",
+      "MPICC": "$MPI_PREFIX/bin/mpicc",
+      "CARGO_BUILD_JOBS": 8
+    }
+  },
+  "runtime_identity": {
+    "native_and_mpi_consumer_dependency_trees": "LLVM libomp.so present; GNU libgomp absent",
+    "libstdcxx": "GNU libstdc++.so.6 is retained; this is not an all-LLVM dependency stack",
+    "full_clang_native_lane": true,
+    "prior_bridge_only_receipt": "docs/verification/data/2026-10-06-matching-buffer-reuse/clang-bridge.json",
+    "prior_bridge_scope": "Clang bridge with existing GCC-built QuEST and GNU libgomp; no native rebuild"
+  },
+  "verification_driver": {
+    "path": "target/native-clang-20261006/verify.sh",
+    "sha256": "fa4d1037447e948eddafc8b3dc835f29999ae26703ddae2929ad6f4259f9681b",
+    "size_bytes": 2054
+  },
+  "initial_stages": [
+    {
+      "stage": "native-configure",
+      "status": "passed",
+      "exit_status": 0,
+      "command": null,
+      "status_file": {
+        "path": "target/native-clang-20261006/evidence/native-configure.status",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "size_bytes": 2
+      },
+      "log": {
+        "path": "target/native-clang-20261006/evidence/native-configure.log",
+        "sha256": "4ecc0f21cb8b3b1fff68f7c5d593d89e38e39f9e02905b92c3840bcedd5a5c8a",
+        "size_bytes": 2070
+      }
+    },
+    {
+      "stage": "native-build",
+      "status": "passed",
+      "exit_status": 0,
+      "command": null,
+      "status_file": {
+        "path": "target/native-clang-20261006/evidence/native-build.status",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "size_bytes": 2
+      },
+      "log": {
+        "path": "target/native-clang-20261006/evidence/native-build.log",
+        "sha256": "bd51c7900559c605e7f3545d8bcac84daba8d262fd77c63cbc9276f09933bac3",
+        "size_bytes": 2745
+      }
+    },
+    {
+      "stage": "native-install",
+      "status": "passed",
+      "exit_status": 0,
+      "command": null,
+      "status_file": {
+        "path": "target/native-clang-20261006/evidence/native-install.status",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "size_bytes": 2
+      },
+      "log": {
+        "path": "target/native-clang-20261006/evidence/native-install.log",
+        "sha256": "42beb6ba16b656b51d91aac3e3d2c0cae1e2a807c1f54f7632084240e45a3b90",
+        "size_bytes": 5165
+      }
+    },
+    {
+      "stage": "mpi-consumer-lock",
+      "status": "passed",
+      "exit_status": 0,
+      "command": null,
+      "status_file": {
+        "path": "target/native-clang-20261006/evidence/mpi-consumer-lock.status",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "size_bytes": 2
+      },
+      "log": {
+        "path": "target/native-clang-20261006/evidence/mpi-consumer-lock.log",
+        "sha256": "5364b33a4752015bfdad4046086d9f083cd4afa9ab89625ed66686af78fb7f27",
+        "size_bytes": 78
+      }
+    },
+    {
+      "stage": "mpi-consumer-build",
+      "status": "passed",
+      "exit_status": 0,
+      "command": null,
+      "status_file": {
+        "path": "target/native-clang-20261006/evidence/mpi-consumer-build.status",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "size_bytes": 2
+      },
+      "log": {
+        "path": "target/native-clang-20261006/evidence/mpi-consumer-build.log",
+        "sha256": "1e1c5cb782ed6a1ce5455fc09101e954ecc290bc5beba76aa9f8d69561a9b2d4",
+        "size_bytes": 6235
+      }
+    },
+    {
+      "stage": "mpi-consumer-run",
+      "status": "passed",
+      "exit_status": 0,
+      "command": null,
+      "status_file": {
+        "path": "target/native-clang-20261006/evidence/mpi-consumer-run.status",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "size_bytes": 2
+      },
+      "log": {
+        "path": "target/native-clang-20261006/evidence/mpi-consumer-run.log",
+        "sha256": "486e0992c5e811f59dfe3c7b16989fb1f3eed0e82f1b76b43b3dccf882233832",
+        "size_bytes": 996
+      }
+    },
+    {
+      "stage": "mpi-consumer-clippy",
+      "status": "passed",
+      "exit_status": 0,
+      "command": null,
+      "status_file": {
+        "path": "target/native-clang-20261006/evidence/mpi-consumer-clippy.status",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "size_bytes": 2
+      },
+      "log": {
+        "path": "target/native-clang-20261006/evidence/mpi-consumer-clippy.log",
+        "sha256": "0dbbf82b12f3c9c60236243799f978ba30de50e9577fa979232bfbcc05237044",
+        "size_bytes": 5533
+      }
+    }
+  ],
+  "workspace_stages": [
+    {
+      "stage": "doctor",
+      "status": "passed",
+      "exit_status": 0,
+      "command": [
+        "cargo",
+        "run",
+        "--locked",
+        "--offline",
+        "-p",
+        "xtask",
+        "--",
+        "native-doctor",
+        "--json"
+      ],
+      "status_file": {
+        "path": "target/native-clang-20261006/evidence/doctor.status",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "size_bytes": 2
+      },
+      "log": {
+        "path": "target/native-clang-20261006/evidence/doctor.log",
+        "sha256": "5569618322c82eac7a17cec505b9fb099a9922cdc92ca43afee1a9e8cd80daa1",
+        "size_bytes": 13195
+      }
+    },
+    {
+      "stage": "all-features",
+      "status": "passed",
+      "exit_status": 0,
+      "command": [
+        "cargo",
+        "nextest",
+        "run",
+        "--locked",
+        "--offline",
+        "--workspace",
+        "--all-features",
+        "--no-fail-fast",
+        "--status-level",
+        "fail",
+        "--final-status-level",
+        "fail",
+        "--test-threads=8"
+      ],
+      "status_file": {
+        "path": "target/native-clang-20261006/evidence/all-features.status",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "size_bytes": 2
+      },
+      "log": {
+        "path": "target/native-clang-20261006/evidence/all-features.log",
+        "sha256": "af29e11bd8b363ed6a757352236c5b7e6098171a3457a8fdd74db6e1801e9863",
+        "size_bytes": 11795
+      },
+      "tests": {
+        "run": 1706,
+        "passed": 1706,
+        "skipped": 6,
+        "elapsed_seconds": 371.141
+      }
+    },
+    {
+      "stage": "default-tests",
+      "status": "passed",
+      "exit_status": 0,
+      "command": [
+        "cargo",
+        "nextest",
+        "run",
+        "--locked",
+        "--offline",
+        "--workspace",
+        "--no-fail-fast",
+        "--status-level",
+        "fail",
+        "--final-status-level",
+        "fail",
+        "--test-threads=8"
+      ],
+      "status_file": {
+        "path": "target/native-clang-20261006/evidence/default-tests.status",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "size_bytes": 2
+      },
+      "log": {
+        "path": "target/native-clang-20261006/evidence/default-tests.log",
+        "sha256": "b27c80c7a2097c34ed8418a61da9bbeaa8195ba5558bce8960166411fff90626",
+        "size_bytes": 6227
+      },
+      "tests": {
+        "run": 1513,
+        "passed": 1513,
+        "skipped": 1,
+        "elapsed_seconds": 128.266
+      }
+    },
+    {
+      "stage": "doctests",
+      "status": "passed",
+      "exit_status": 0,
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "--workspace",
+        "--all-features",
+        "--doc",
+        "--",
+        "--test-threads=1"
+      ],
+      "status_file": {
+        "path": "target/native-clang-20261006/evidence/doctests.status",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "size_bytes": 2
+      },
+      "log": {
+        "path": "target/native-clang-20261006/evidence/doctests.log",
+        "sha256": "6f904e16949cc0afc81398e448fd108205d28afdb279d5de212800213633569b",
+        "size_bytes": 11959
+      },
+      "tests": {
+        "passed": 65,
+        "failed": 0,
+        "ignored": 1
+      }
+    },
+    {
+      "stage": "default-doctests",
+      "status": "passed",
+      "exit_status": 0,
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "--workspace",
+        "--doc",
+        "--",
+        "--test-threads=1"
+      ],
+      "status_file": {
+        "path": "target/native-clang-20261006/evidence/default-doctests.status",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "size_bytes": 2
+      },
+      "log": {
+        "path": "target/native-clang-20261006/evidence/default-doctests.log",
+        "sha256": "1fcbf38670cea44a29e021c2e1cc6be1dc17dcd594c8225ba95ad0fd171e062d",
+        "size_bytes": 10488
+      },
+      "tests": {
+        "passed": 55,
+        "failed": 0,
+        "ignored": 1
+      }
+    },
+    {
+      "stage": "default-check",
+      "status": "passed",
+      "exit_status": 0,
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "--offline",
+        "--workspace"
+      ],
+      "status_file": {
+        "path": "target/native-clang-20261006/evidence/default-check.status",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "size_bytes": 2
+      },
+      "log": {
+        "path": "target/native-clang-20261006/evidence/default-check.log",
+        "sha256": "6c8f2bf873220575c78c956394e4f618f8707111d9b9c634a7db481c7b199e4d",
+        "size_bytes": 9300
+      }
+    },
+    {
+      "stage": "all-feature-check",
+      "status": "passed",
+      "exit_status": 0,
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "--offline",
+        "--workspace",
+        "--all-features"
+      ],
+      "status_file": {
+        "path": "target/native-clang-20261006/evidence/all-feature-check.status",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "size_bytes": 2
+      },
+      "log": {
+        "path": "target/native-clang-20261006/evidence/all-feature-check.log",
+        "sha256": "54fa05c6f0bc48f717d36f5bd62933d0890f4d7928f78709937a2c0e81a18b61",
+        "size_bytes": 5836
+      }
+    },
+    {
+      "stage": "clippy",
+      "status": "passed",
+      "exit_status": 0,
+      "command": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--offline",
+        "--workspace",
+        "--all-features",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "status_file": {
+        "path": "target/native-clang-20261006/evidence/clippy.status",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "size_bytes": 2
+      },
+      "log": {
+        "path": "target/native-clang-20261006/evidence/clippy.log",
+        "sha256": "201498d0ccf0ff3d4d62db4fc8858a14087113bdf96a0c5e56f2f795f9ae737e",
+        "size_bytes": 7086
+      }
+    },
+    {
+      "stage": "bindings",
+      "status": "passed",
+      "exit_status": 0,
+      "command": [
+        "cargo",
+        "run",
+        "--locked",
+        "--offline",
+        "-p",
+        "xtask",
+        "--",
+        "generate-quest-bindings",
+        "--check"
+      ],
+      "status_file": {
+        "path": "target/native-clang-20261006/evidence/bindings.status",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "size_bytes": 2
+      },
+      "log": {
+        "path": "target/native-clang-20261006/evidence/bindings.log",
+        "sha256": "3676311a4136da97184ba54cd550968ecd70638b14ed931dc60804dffff760a4",
+        "size_bytes": 803
+      }
+    },
+    {
+      "stage": "consumers",
+      "status": "passed",
+      "exit_status": 0,
+      "command": [
+        "cargo",
+        "run",
+        "--locked",
+        "--offline",
+        "-p",
+        "xtask",
+        "--",
+        "check-native-consumers",
+        "--backends",
+        "cpu,omp",
+        "--work-dir",
+        "$LANE/consumers"
+      ],
+      "status_file": {
+        "path": "target/native-clang-20261006/evidence/consumers.status",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "size_bytes": 2
+      },
+      "log": {
+        "path": "target/native-clang-20261006/evidence/consumers.log",
+        "sha256": "a11f9ee56b7a6571b41cb3824eebeddff69ef0601b15ab633cbd610239beff52",
+        "size_bytes": 1763
+      }
+    },
+    {
+      "stage": "consumers-isolated",
+      "status": "failed",
+      "exit_status": 1,
+      "command": [
+        "cargo",
+        "run",
+        "--locked",
+        "--offline",
+        "-p",
+        "xtask",
+        "--",
+        "check-native-consumers",
+        "--backends",
+        "cpu,omp",
+        "--loader-isolated",
+        "--work-dir",
+        "$LANE/consumers-isolated"
+      ],
+      "status_file": {
+        "path": "target/native-clang-20261006/evidence/consumers-isolated.status",
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+        "size_bytes": 2
+      },
+      "log": {
+        "path": "target/native-clang-20261006/evidence/consumers-isolated.log",
+        "sha256": "66ca87a88061c025ae3d422e75dec6b3752aa4e67b9836b4e2af4ee3f2008c2b",
+        "size_bytes": 1318
+      }
+    },
+    {
+      "stage": "fmt",
+      "status": "passed",
+      "exit_status": 0,
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "status_file": {
+        "path": "target/native-clang-20261006/evidence/fmt.status",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "size_bytes": 2
+      },
+      "log": {
+        "path": "target/native-clang-20261006/evidence/fmt.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    },
+    {
+      "stage": "whitespace",
+      "status": "passed",
+      "exit_status": 0,
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "status_file": {
+        "path": "target/native-clang-20261006/evidence/whitespace.status",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "size_bytes": 2
+      },
+      "log": {
+        "path": "target/native-clang-20261006/evidence/whitespace.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      }
+    }
+  ],
+  "independent_mpi_consumer": {
+    "status": "passed",
+    "cargo_scope": "Independent Cargo workspace with its own lockfile and explicit quest-rs mpi feature, using repository path dependencies and an installed native QuEST package",
+    "unsafe_policy": "Consumer main and build script forbid unsafe code; dependencies and existing FFI are not claimed unsafe-free",
+    "artifacts": [
+      {
+        "path": "target/native-clang-20261006/mpi-consumer/Cargo.toml",
+        "sha256": "72ac9089b29db070155ba0735c566daf8d4cfd22c43e96a676a7b29a61363f2f",
+        "size_bytes": 361
+      },
+      {
+        "path": "target/native-clang-20261006/mpi-consumer/Cargo.lock",
+        "sha256": "ad165e081dc1d7aa262903dd3e49437589953d668fe58464db223c5e853aa690",
+        "size_bytes": 52836
+      },
+      {
+        "path": "target/native-clang-20261006/mpi-consumer/build.rs",
+        "sha256": "c73934cd80157c1dadda827e81e776ffd0019c62cb6b31b8d7d5e24524748e2e",
+        "size_bytes": 113
+      },
+      {
+        "path": "target/native-clang-20261006/mpi-consumer/src/main.rs",
+        "sha256": "a17df3df7f0f5d08f04b090312b9f205f512489ce8fea7a6b498af2efd1d510b",
+        "size_bytes": 3538
+      },
+      {
+        "path": "target/native-clang-20261006/mpi-consumer-baseline",
+        "sha256": "322d0ed80ae26b490f0562366993dd48d841cf7d586790e2d82597d087279d86",
+        "size_bytes": 146663664
+      }
+    ],
+    "ranks": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "launches": 4,
+    "deadline_seconds_per_launch": 60,
+    "timeouts": 0,
+    "truncated_stdout_or_stderr": false,
+    "qubits": 5,
+    "state_dimension": 32,
+    "circuit": "h q[0]; cx q[0], q[4];",
+    "state_checks": "Every local complex amplitude matches +1/sqrt(2) at global indices 0 and 17, and zero elsewhere, within absolute tolerance 1e-13. All ranks collectively agree.",
+    "additional_checks": [
+      "both endpoint marginals equal 0.5",
+      "total probability equals one",
+      "forbidden joint projection has zero norm",
+      "register rank, communicator size and local partition length agree",
+      "native multithreading flag is true",
+      "native distribution flag is true for more than one rank"
+    ],
+    "ownership_checks": [
+      "register and prepared plan drop before borrowed collective environment",
+      "MPI communicator remains usable after native environment drops",
+      "communicator drops before runtime owner",
+      "MPI finalization is checked before the unique rank-zero success marker"
+    ],
+    "requested_openmp_threads_per_rank": 2,
+    "measured_openmp_team_size": null,
+    "topology_scope": "Multiple local MPI processes; no multi-host execution claimed",
+    "native_prefix_scope": "$LANE/native-install; preserved baseline executable before separate SDK rebuild"
+  },
+  "static_evidence": {
+    "clang-version.txt": {
+      "path": "target/native-clang-20261006/evidence/clang-version.txt",
+      "sha256": "b9427ba8eb4c01f9459e58047587d1e2a794814a46fa5c49bbd6e3c2b98114bb",
+      "size_bytes": 184
+    },
+    "clangxx-version.txt": {
+      "path": "target/native-clang-20261006/evidence/clangxx-version.txt",
+      "sha256": "2a9695b914d9e63778169aa7bb55576d23afa276383b89c095aa16c1c4e90457",
+      "size_bytes": 186
+    },
+    "mpi-consumer-dynamic.txt": {
+      "path": "target/native-clang-20261006/evidence/mpi-consumer-dynamic.txt",
+      "sha256": "eab80a6883c3ce9b70b6d87970bb537727b6e456477a5c0cb5991147ad9c1bcc",
+      "size_bytes": 2227
+    },
+    "mpi-consumer-ldd.txt": {
+      "path": "target/native-clang-20261006/evidence/mpi-consumer-ldd.txt",
+      "sha256": "947f82be9b073fe79674b5b5d1e976f530d2c4da18e09f0d9220861f872017a1",
+      "size_bytes": 1468
+    },
+    "mpich-wrapper.txt": {
+      "path": "target/native-clang-20261006/evidence/mpich-wrapper.txt",
+      "sha256": "26ce39bc108adbb9404c5bad46f42b24c959cb194154070d9848e0c5eceac4f5",
+      "size_bytes": 120
+    },
+    "native-cmake-cache.txt": {
+      "path": "target/native-clang-20261006/evidence/native-cmake-cache.txt",
+      "sha256": "a5b004b0f26d864e582e3b5f12b30a4bc85b7649666cf142e39af0903aac8a53",
+      "size_bytes": 28790
+    },
+    "native-comment.txt": {
+      "path": "target/native-clang-20261006/evidence/native-comment.txt",
+      "sha256": "667b2227d827847c2eda3d530957efaf3d4ffaa37dff512f7ff98417fa338132",
+      "size_bytes": 151
+    },
+    "native-dynamic.txt": {
+      "path": "target/native-clang-20261006/evidence/native-dynamic.txt",
+      "sha256": "b5ce19067706d61a8f9adc9e248fdcff233dcf4a3b351ae0609263fa1bbc425a",
+      "size_bytes": 1975
+    },
+    "native-ldd.txt": {
+      "path": "target/native-clang-20261006/evidence/native-ldd.txt",
+      "sha256": "e4f930ff29dab0ffb009cf5c7da4447c7d449866383c70830c855129e0d116e3",
+      "size_bytes": 1318
+    },
+    "native-source-diff.txt": {
+      "path": "target/native-clang-20261006/evidence/native-source-diff.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    "native-source-revision.txt": {
+      "path": "target/native-clang-20261006/evidence/native-source-revision.txt",
+      "sha256": "312af75d684abdfad5ebd2139f96233ed5efd91fdf112af31c4ef60a8c96542f",
+      "size_bytes": 41
+    },
+    "rust-version.txt": {
+      "path": "target/native-clang-20261006/evidence/rust-version.txt",
+      "sha256": "6b8a26f695d400a8e53c871b05b05056ee46db7ca3b16160df6f91aca58b50b3",
+      "size_bytes": 214
+    },
+    "sdk-mpi-consumer-dynamic.txt": {
+      "path": "target/native-clang-20261006/evidence/sdk-mpi-consumer-dynamic.txt",
+      "sha256": "5e787c4ad5c78ced81f0e35eec2e140d4f87af2cc98eb77f18dcb52c0b224943",
+      "size_bytes": 2221
+    },
+    "sdk-mpi-consumer-ldd.txt": {
+      "path": "target/native-clang-20261006/evidence/sdk-mpi-consumer-ldd.txt",
+      "sha256": "3ff8992977d3ee20a935f13bd39a50e8a1b9cadf2a08fe7f95b8dab72e485f1d",
+      "size_bytes": 1465
+    },
+    "sdk-native-cmake-cache.txt": {
+      "path": "target/native-clang-20261006/evidence/sdk-native-cmake-cache.txt",
+      "sha256": "72c2d1d2809dd04be9610a1449c32232e4e85241cfb26c7d49d13d43342d9a5d",
+      "size_bytes": 28875
+    },
+    "sdk-native-dynamic.txt": {
+      "path": "target/native-clang-20261006/evidence/sdk-native-dynamic.txt",
+      "sha256": "cf15400d991b74ac951d5247f6e5fec4d59200f1809479dec5f9a1d0c36c5480",
+      "size_bytes": 1996
+    },
+    "source-after.sha256": {
+      "path": "target/native-clang-20261006/evidence/source-after.sha256",
+      "sha256": "23e41f85da44d2a32ce39b9e0c6744b0c99ada304733661342c14fdb729c1c94",
+      "size_bytes": 344968
+    },
+    "source-archive.sha256": {
+      "path": "target/native-clang-20261006/evidence/source-archive.sha256",
+      "sha256": "3a0803bdd23a91e29fc0aee8735bc5b8d438bdcf87bc59b69af1bc41ef55a6f1",
+      "size_bytes": 119
+    },
+    "source-before.sha256": {
+      "path": "target/native-clang-20261006/evidence/source-before.sha256",
+      "sha256": "23e41f85da44d2a32ce39b9e0c6744b0c99ada304733661342c14fdb729c1c94",
+      "size_bytes": 344968
+    },
+    "source-sdk-after.sha256": {
+      "path": "target/native-clang-20261006/evidence/source-sdk-after.sha256",
+      "sha256": "23e41f85da44d2a32ce39b9e0c6744b0c99ada304733661342c14fdb729c1c94",
+      "size_bytes": 344968
+    }
+  },
+  "boundaries": {
+    "cirrus_current_delta": "not run",
+    "macos": "not run",
+    "other_mpi_implementations": "not run",
+    "gpu": "not enabled or validated",
+    "strict_capacity_closed": false,
+    "restricted_matching_state_implemented": false,
+    "native_storage_protocol_attested": false,
+    "performance_or_speedup_claim": false,
+    "source_inventory_final": "passed for baseline and SDK verification before public fixture and receipt publication",
+    "raw_logs": "Local ignored artifacts retain original paths; the published receipt uses generic paths."
+  },
+  "baseline_installation": {
+    "prefix": "$LANE/native-install",
+    "native_library": {
+      "path": "target/native-clang-20261006/native-install/lib64/libQuEST.so.4.3.0",
+      "sha256": "212196a68898bf27af3997ac0050c2ba9b5f5f139e7320653cd1641742e1e3fc",
+      "size_bytes": 3546312
+    },
+    "workspace_and_standalone_mpi_results_apply_to_this_prefix": true,
+    "module_preserving_consumers": {
+      "status": "passed",
+      "numerical_cases": 10,
+      "additional_direct_native_mode_cases": 2,
+      "log": {
+        "path": "target/native-clang-20261006/evidence/consumers.log",
+        "sha256": "a11f9ee56b7a6571b41cb3824eebeddff69ef0601b15ab633cbd610239beff52",
+        "size_bytes": 1763
+      }
+    },
+    "loader_isolated_consumers": {
+      "status": "failed",
+      "exit_status": 1,
+      "unresolved_library": "libmpicxx.so.12",
+      "failure_phase": "dependency closure inspection before numerical consumer execution",
+      "native_runtime_search_policy": "default relative $ORIGIN path; external MPI directory not retained in this native installation",
+      "log": {
+        "path": "target/native-clang-20261006/evidence/consumers-isolated.log",
+        "sha256": "66ca87a88061c025ae3d422e75dec6b3752aa4e67b9836b4e2af4ee3f2008c2b",
+        "size_bytes": 1318
+      },
+      "dependency_evidence": {
+        "path": "target/native-clang-20261006/consumers-isolated/direct-ldd.log",
+        "sha256": "362c25b081c772c82a7571a1c9655acc5f61e9db3c09d7f69d47fb2fca10bd12",
+        "size_bytes": 1420
+      }
+    },
+    "retained_unchanged": true
+  },
+  "documented_fixed_sdk_followup": {
+    "status": "passed: documented fixed-SDK configure/build/install, isolated downstream consumers, independent MPI consumer, and separately published consumer manifest",
+    "build_prefix": "$LANE/sdk-build",
+    "install_prefix": "$LANE/sdk-install",
+    "configuration_change": {
+      "CMAKE_INSTALL_RPATH_USE_LINK_PATH": true
+    },
+    "basis": {
+      "native_document": "docs/cmake.md in unchanged native revision 503552065045eaf89baba85e6cd6aad728525554",
+      "lines": [
+        93,
+        140,
+        151
+      ],
+      "scope": "Documented native installation tied to fixed external SDK locations; external runtimes remain at the recorded directories."
+    },
+    "stages": [
+      {
+        "stage": "sdk-configure",
+        "status": "passed",
+        "exit_status": 0,
+        "command": null,
+        "status_file": {
+          "path": "target/native-clang-20261006/evidence/sdk-configure.status",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "size_bytes": 2
+        },
+        "log": {
+          "path": "target/native-clang-20261006/evidence/sdk-configure.log",
+          "sha256": "c031cba599f90f7518e5936ec28c78dd6c30229c101193177150ce9ab06d25ef",
+          "size_bytes": 2067
+        }
+      },
+      {
+        "stage": "sdk-build",
+        "status": "passed",
+        "exit_status": 0,
+        "command": null,
+        "status_file": {
+          "path": "target/native-clang-20261006/evidence/sdk-build.status",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "size_bytes": 2
+        },
+        "log": {
+          "path": "target/native-clang-20261006/evidence/sdk-build.log",
+          "sha256": "5fde7250612be716f91d931790dcf1f314c1eb5ba3707b69ce3d20948b606a86",
+          "size_bytes": 2745
+        }
+      },
+      {
+        "stage": "sdk-install",
+        "status": "passed",
+        "exit_status": 0,
+        "command": null,
+        "status_file": {
+          "path": "target/native-clang-20261006/evidence/sdk-install.status",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "size_bytes": 2
+        },
+        "log": {
+          "path": "target/native-clang-20261006/evidence/sdk-install.log",
+          "sha256": "a65612a1e993332d7375934c59878d28a87834fe1c545cd0eb13b44c5d14fefe",
+          "size_bytes": 5078
+        }
+      },
+      {
+        "stage": "sdk-consumers-isolated",
+        "status": "passed",
+        "exit_status": 0,
+        "command": "cargo run --locked --offline -p xtask -- check-native-consumers --backends cpu,omp --loader-isolated --work-dir \"$LANE/sdk-consumers-isolated\"",
+        "status_file": {
+          "path": "target/native-clang-20261006/evidence/sdk-consumers-isolated.status",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "size_bytes": 2
+        },
+        "log": {
+          "path": "target/native-clang-20261006/evidence/sdk-consumers-isolated.log",
+          "sha256": "1222291a306743ab68502efd38357bf5166d85363ab5e417048f515eacd82370",
+          "size_bytes": 2052
+        }
+      },
+      {
+        "stage": "sdk-mpi-consumer-build",
+        "status": "passed",
+        "exit_status": 0,
+        "command": "cargo build --locked --offline --manifest-path \"$LANE/mpi-consumer/Cargo.toml\"",
+        "status_file": {
+          "path": "target/native-clang-20261006/evidence/sdk-mpi-consumer-build.status",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "size_bytes": 2
+        },
+        "log": {
+          "path": "target/native-clang-20261006/evidence/sdk-mpi-consumer-build.log",
+          "sha256": "55875924d62eb0e0babea5d6c49d6daf8cb987be2e1064f035384c86ef17b8d5",
+          "size_bytes": 689
+        }
+      },
+      {
+        "stage": "sdk-mpi-consumer-run",
+        "status": "passed",
+        "exit_status": 0,
+        "command": "\"$LANE/cargo/debug/quest-independent-mpi-consumer\"",
+        "status_file": {
+          "path": "target/native-clang-20261006/evidence/sdk-mpi-consumer-run.status",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "size_bytes": 2
+        },
+        "log": {
+          "path": "target/native-clang-20261006/evidence/sdk-mpi-consumer-run.log",
+          "sha256": "999b97d623e8c005a7f2dc36c3591389cbedeb0a0a4346624170acf29872f42d",
+          "size_bytes": 996
+        }
+      },
+      {
+        "stage": "source-sdk-stability",
+        "status": "passed",
+        "exit_status": 0,
+        "command": null,
+        "status_file": {
+          "path": "target/native-clang-20261006/evidence/source-sdk-stability.status",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "size_bytes": 2
+        }
+      }
+    ],
+    "native_source_or_vendor_library_changes": false,
+    "full_workspace_suite_against_this_prefix": "not run; baseline suite must not be attributed to this second configuration",
+    "cirrus_policy": "No change to the separately recorded unsupported Cirrus isolation mode.",
+    "native_library": {
+      "path": "target/native-clang-20261006/sdk-install/lib64/libQuEST.so.4.3.0",
+      "sha256": "daeaa610f45f0fec9527cb6c251253eadbb9f33342d521663a3ad2c5b9b3dcf1",
+      "size_bytes": 3546312
+    },
+    "verification_driver": {
+      "path": "target/native-clang-20261006/verify-sdk.sh",
+      "sha256": "a4ceb50246424e9f65efff3d8cb96630d23f03a579c6158b460d2077fd4319a8",
+      "size_bytes": 1333
+    },
+    "runtime_environment": "SDK MPI execution removes every LD_* and DYLD_* variable, LIBPATH and SHLIB_PATH after building; installed-consumer isolation uses its existing corresponding policy.",
+    "native_runpath": "The unchanged native package records $ORIGIN/ plus the fixed external MPICH library directory selected at install time.",
+    "loader_isolated_consumers": {
+      "status": "passed",
+      "numerical_cases": 10,
+      "complete_consumer_closures": 4,
+      "consumer_shapes": [
+        "direct",
+        "facade",
+        "wrapped",
+        "renamed"
+      ],
+      "log": {
+        "path": "target/native-clang-20261006/evidence/sdk-consumers-isolated.log",
+        "sha256": "1222291a306743ab68502efd38357bf5166d85363ab5e417048f515eacd82370",
+        "size_bytes": 2052
+      },
+      "closure_evidence": [
+        {
+          "path": "target/native-clang-20261006/sdk-consumers-isolated/direct-readelf.log",
+          "sha256": "f8a130a601814a8269c91c638a39def8c8591a5b9b52c69f6a437cf781af778c",
+          "size_bytes": 2211
+        },
+        {
+          "path": "target/native-clang-20261006/sdk-consumers-isolated/direct-ldd.log",
+          "sha256": "3cb8593a5acc2acfc61e63400869b0286f64c3fe646f80a0c4d65398a2a265d5",
+          "size_bytes": 1465
+        },
+        {
+          "path": "target/native-clang-20261006/sdk-consumers-isolated/facade-readelf.log",
+          "sha256": "7a072252f320b391736a61a2c8740d15375eee68120ed9722a7953e1b4067230",
+          "size_bytes": 2221
+        },
+        {
+          "path": "target/native-clang-20261006/sdk-consumers-isolated/facade-ldd.log",
+          "sha256": "6f0f746d4277b7e1d9c4ec323e002b4a7cc0537ba7412c3c024e33ed527eb775",
+          "size_bytes": 1465
+        },
+        {
+          "path": "target/native-clang-20261006/sdk-consumers-isolated/wrapped-readelf.log",
+          "sha256": "c5a8b35c0456f26e52c531013c87c936cda178d7c096d932a3554c498ab7608a",
+          "size_bytes": 2221
+        },
+        {
+          "path": "target/native-clang-20261006/sdk-consumers-isolated/wrapped-ldd.log",
+          "sha256": "5bd82fded744e4a34a1349e77a8a35e68ea0cb5fdcc891d9cc0d7cee971a1b6e",
+          "size_bytes": 1465
+        },
+        {
+          "path": "target/native-clang-20261006/sdk-consumers-isolated/renamed-readelf.log",
+          "sha256": "ffcbd2c958a5703172d134a69457eac1b5a4eff64f29fb8af2771e171d9a2af0",
+          "size_bytes": 2221
+        },
+        {
+          "path": "target/native-clang-20261006/sdk-consumers-isolated/renamed-ldd.log",
+          "sha256": "a0db7e5a749ea91fe4b43d5db1c7cce2d166027a6f870442d3d3bd87fb080657",
+          "size_bytes": 1465
+        }
+      ]
+    },
+    "independent_mpi_consumer": {
+      "status": "passed",
+      "preserved_executable": {
+        "path": "target/native-clang-20261006/mpi-consumer-sdk",
+        "sha256": "110bd46612f5c6433226a764d0f0a3b26c7e4322746319f2982bb5d7ca8473b5",
+        "size_bytes": 146663648
+      },
+      "ranks": [
+        1,
+        2,
+        4,
+        8
+      ],
+      "launches": 4,
+      "timeouts": 0,
+      "truncated_stdout_or_stderr": false,
+      "semantic_and_ownership_checks": "Same target-local source and checks as independent_mpi_consumer; rebuilt against sdk-install.",
+      "requested_openmp_threads_per_rank": 2,
+      "measured_openmp_team_size": null,
+      "log": {
+        "path": "target/native-clang-20261006/evidence/sdk-mpi-consumer-run.log",
+        "sha256": "999b97d623e8c005a7f2dc36c3591389cbedeb0a0a4346624170acf29872f42d",
+        "size_bytes": 996
+      },
+      "dynamic_evidence": {
+        "path": "target/native-clang-20261006/evidence/sdk-mpi-consumer-dynamic.txt",
+        "sha256": "5e787c4ad5c78ced81f0e35eec2e140d4f87af2cc98eb77f18dcb52c0b224943",
+        "size_bytes": 2221
+      },
+      "dependency_evidence": {
+        "path": "target/native-clang-20261006/evidence/sdk-mpi-consumer-ldd.txt",
+        "sha256": "3ff8992977d3ee20a935f13bd39a50e8a1b9cadf2a08fe7f95b8dab72e485f1d",
+        "size_bytes": 1465
+      }
+    },
+    "published_consumer_fixture": {
+      "status": "passed: built and executed separately from the public fixture manifest",
+      "manifest": "docs/verification/fixtures/native-mpi-consumer/Cargo.toml",
+      "source_relationship": "build.rs, src/main.rs and Cargo.lock are byte-identical to the target-local fixture; Cargo.toml adjusts relative repository dependency paths. README documents invocation and limits.",
+      "native_prefix": "$LANE/sdk-install",
+      "artifacts": [
+        {
+          "path": "docs/verification/fixtures/native-mpi-consumer/Cargo.toml",
+          "sha256": "e63910d829b6112b82708698b17abc05fbc3704046b189450b969c48661f7aa8",
+          "size_bytes": 370
+        },
+        {
+          "path": "docs/verification/fixtures/native-mpi-consumer/Cargo.lock",
+          "sha256": "ad165e081dc1d7aa262903dd3e49437589953d668fe58464db223c5e853aa690",
+          "size_bytes": 52836
+        },
+        {
+          "path": "docs/verification/fixtures/native-mpi-consumer/build.rs",
+          "sha256": "c73934cd80157c1dadda827e81e776ffd0019c62cb6b31b8d7d5e24524748e2e",
+          "size_bytes": 113
+        },
+        {
+          "path": "docs/verification/fixtures/native-mpi-consumer/src/main.rs",
+          "sha256": "a17df3df7f0f5d08f04b090312b9f205f512489ce8fea7a6b498af2efd1d510b",
+          "size_bytes": 3538
+        },
+        {
+          "path": "docs/verification/fixtures/native-mpi-consumer/README.md",
+          "sha256": "f6ae4a150690b0c7ba870e0d4160dc5ad9154e80e12ea49000050fa9e8f11a4f",
+          "size_bytes": 1850
+        }
+      ],
+      "stages": [
+        {
+          "stage": "published-consumer-build",
+          "status": "passed",
+          "exit_status": 0,
+          "command": "cargo build --locked --offline --manifest-path docs/verification/fixtures/native-mpi-consumer/Cargo.toml",
+          "status_file": {
+            "path": "target/native-clang-20261006/evidence/published-consumer-build.status",
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+            "size_bytes": 2
+          },
+          "log": {
+            "path": "target/native-clang-20261006/evidence/published-consumer-build.log",
+            "sha256": "f9602a3b64a4a31225cd500511fb3af4d3c0d7f81fff19af36f2b65c1ed4f622",
+            "size_bytes": 507
+          }
+        },
+        {
+          "stage": "published-consumer-run",
+          "status": "passed",
+          "exit_status": 0,
+          "command": "\"$LANE/cargo/debug/quest-independent-mpi-consumer\"",
+          "status_file": {
+            "path": "target/native-clang-20261006/evidence/published-consumer-run.status",
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+            "size_bytes": 2
+          },
+          "log": {
+            "path": "target/native-clang-20261006/evidence/published-consumer-run.log",
+            "sha256": "45f4567ec044932e8de49b8a4ae5add323f9fde968301f1db6a9abe753d7fe54",
+            "size_bytes": 994
+          }
+        }
+      ],
+      "ranks": [
+        1,
+        2,
+        4,
+        8
+      ],
+      "launches": 4,
+      "timeouts": 0,
+      "truncated_stdout_or_stderr": false,
+      "source_inventory_scope": "Published after the frozen source inventory; these files have separately recorded hashes and build/run evidence.",
+      "preserved_executable": {
+        "path": "target/native-clang-20261006/mpi-consumer-published",
+        "sha256": "286cf25c1c256848933e29c235de63f117087be01f2af36335a1fdf25f671a57",
+        "size_bytes": 146663656
+      }
+    }
+  },
+  "reviewed_source_followup": {
+    "schema_version": 1,
+    "date": "2026-10-06",
+    "scope": "Local Clang CPU/OpenMP/MPI validation with a separately recorded standalone-consumer lockfile correction",
+    "frozen_campaign": {
+      "source_manifest_sha256": "4e5b423ebf3db42db19c3f75481ad786a527117eecd4d41c8b9a9b9dcebd6cf1",
+      "source_archive_sha256": "50b5a4a7727754f77282c2597d46e1cf6709bee8506ae63b5c7d05310a08b526",
+      "source_files": 2594,
+      "started_at_utc": "2026-10-06T19:30:38Z",
+      "finished_at_utc": "2026-10-06T19:44:28Z",
+      "driver_exit_code": 1,
+      "acceptance_stages": 12,
+      "passed_stages": 11,
+      "failed_stages": 1,
+      "failed_stage_retries": 0,
+      "source_after_check_status": 0,
+      "native_after_check_status": 0,
+      "stages": [
+        {
+          "name": "all-feature-tests",
+          "status": 0,
+          "passed": 1710,
+          "failed": 0,
+          "skipped": 6,
+          "seconds": 431.861,
+          "nextest_run_id": "a7f650c4-739a-46ac-99de-51c9dba24f2a"
+        },
+        {
+          "name": "default-tests",
+          "status": 0,
+          "passed": 1516,
+          "failed": 0,
+          "skipped": 1,
+          "seconds": 142.319,
+          "nextest_run_id": "1b777ebe-48cc-48ca-a32a-ed3a81b4a0a3"
+        },
+        {
+          "name": "all-feature-doctests",
+          "status": 0,
+          "passed": 65,
+          "failed": 0,
+          "ignored": 1
+        },
+        {
+          "name": "default-doctests",
+          "status": 0,
+          "passed": 55,
+          "failed": 0,
+          "ignored": 1
+        },
+        {
+          "name": "all-feature-check",
+          "status": 0
+        },
+        {
+          "name": "default-check",
+          "status": 0
+        },
+        {
+          "name": "all-feature-clippy",
+          "status": 0,
+          "warnings_policy": "-D warnings"
+        },
+        {
+          "name": "bindings",
+          "status": 0
+        },
+        {
+          "name": "doctor",
+          "status": 0
+        },
+        {
+          "name": "consumers",
+          "status": 0,
+          "numerical_cases_passed": 10,
+          "loader_mode": "module environment"
+        },
+        {
+          "name": "consumers-loader-isolated",
+          "status": 0,
+          "numerical_cases_passed": 10,
+          "executable_dependency_closures_passed": 4,
+          "loader_mode": "isolated"
+        },
+        {
+          "name": "mpi-consumer",
+          "status": 101,
+          "execution_started": false,
+          "failure": "Cargo refused to update the stale standalone Cargo.lock because --locked was passed."
+        }
+      ]
+    },
+    "consumer_delta": {
+      "source_manifest_sha256": "452a49852c4e23f018b82795c19a3fd183c781234f2914df2c0ab516d696918f",
+      "source_archive_sha256": "46636f8a311fa221d0754f4042a961e2191d756597ea2fe1ce97f50d1f2898a7",
+      "changed_path": "docs/verification/fixtures/native-mpi-consumer/Cargo.lock",
+      "old_lock_sha256": "ad165e081dc1d7aa262903dd3e49437589953d668fe58464db223c5e853aa690",
+      "corrected_lock_sha256": "7d2171d648f99ac5d678bbb5fc3c7808906cadb520fc9b57b609a2be210bb6c7",
+      "tree_comparison": "Independent recursive byte comparison found exactly one differing file, the standalone lock; all Rust and native source files are identical.",
+      "tree_comparison_sha256": "fb6fe9cd68c0720312e7d6632aae65f49563f7ff90ae683cda8983b330cc0149",
+      "started_at_utc": "2026-10-06T19:45:34Z",
+      "finished_at_utc": "2026-10-06T19:45:55Z",
+      "status": 0,
+      "command": "cargo run --locked --offline --manifest-path docs/verification/fixtures/native-mpi-consumer/Cargo.toml",
+      "build_seconds": 18.37,
+      "local_ranks_passed": [
+        1,
+        2,
+        4,
+        8
+      ],
+      "all_launcher_exits": 0,
+      "any_timeout": false,
+      "any_output_truncation": false,
+      "source_after_check_status": 0,
+      "native_after_check_status": 0,
+      "log_sha256": "36a47717deecd933c04b547990f60aad747a54d1e0d337e1ab146517105faceb",
+      "unchanged_workspace_suites_rerun": false,
+      "original_failure_preserved": true
+    },
+    "environment": {
+      "execution": "Local Linux, outside the execution sandbox for authorized MPI communication",
+      "compiler": "/usr/bin/clang and /usr/bin/clang++",
+      "native_sdk": "target/native-clang-20261006/sdk-install",
+      "native_library_sha256": "daeaa610f45f0fec9527cb6c251253eadbb9f33342d521663a3ad2c5b9b3dcf1",
+      "native_library_modified": false,
+      "mpi_wrapper": "/usr/lib64/mpich/bin/mpicc",
+      "mpi_launcher": "/usr/lib64/mpich/bin/mpiexec",
+      "rustc": "1.101.0-nightly (db8f076d2619ce2585b0380dda06e8da25a40da4)",
+      "cmake": "4.3.0",
+      "cargo_build_jobs": 8,
+      "nextest_workers": 4,
+      "openmp_threads": 2,
+      "profile_debug": 0,
+      "incremental": false,
+      "cargo_target": "target/native-reviewed-clang-20261006/cargo",
+      "fresh_target_at_campaign_start": true,
+      "disk_backed_tmpdir": "target/native-reviewed-clang-20261006/tmp",
+      "commands_locked_and_offline": true
+    },
+    "limitations": [
+      "The original twelve-stage campaign retains exit status 1 from its stale standalone lockfile; the corrected consumer is separate delta evidence.",
+      "The earlier Clang campaign's two installed-CMake module-open failures remain unexplained; this later pass does not establish their cause or a repair.",
+      "Local MPI ranks do not establish multi-node Cirrus capacity or macOS support.",
+      "The existing quest-polynomial nightly trait-solver compatibility warning remains in the logs.",
+      "No package installation, native-library modification, frozen-source edit or unchanged workspace-suite rerun occurred."
+    ],
+    "raw_evidence_root": "target/native-reviewed-clang-20261006",
+    "completion_summary_sha256": "72b71edcbbfa8d94dacf644e414a8d7e0d2e01dcdfbb228e9c240d2381080feb",
+    "artifact_index": {
+      "path": "target/native-reviewed-clang-20261006/artifacts.sha256",
+      "files": 102,
+      "sha256": "0e29846045f9a65fc9469273d6866e64a710db191ee92b9d842eed2c304e67c2"
+    },
+    "earlier_cmake_failure_record": "docs/verification/2026-10-06-native-discovery-followup.md",
+    "earlier_failures_superseded": false
+  }
+}

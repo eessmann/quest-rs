@@ -1,0 +1,38 @@
+{
+  "cmake": {
+    "focused": "/usr/bin/cmake",
+    "checkpoint08": "/usr/bin/cmake"
+  },
+  "c++": {
+    "focused": "/usr/bin/c++",
+    "checkpoint08": "/usr/bin/c++"
+  },
+  "cc": {
+    "focused": "/usr/bin/cc",
+    "checkpoint08": "/usr/bin/cc"
+  },
+  "ar": {
+    "focused": "/usr/bin/ar",
+    "checkpoint08": "/usr/bin/ar"
+  },
+  "make": {
+    "focused": "/usr/bin/make",
+    "checkpoint08": "/usr/bin/make"
+  },
+  "gmake": {
+    "focused": "/usr/bin/gmake",
+    "checkpoint08": "/usr/bin/gmake"
+  },
+  "ninja": {
+    "focused": "/usr/bin/ninja",
+    "checkpoint08": "/usr/bin/ninja"
+  },
+  "rustc": {
+    "focused": "<home-alias>/.cargo/bin/rustc",
+    "checkpoint08": "<home>/.cargo/bin/rustc"
+  },
+  "cargo": {
+    "focused": "<home-alias>/.cargo/bin/cargo",
+    "checkpoint08": "<home>/.cargo/bin/cargo"
+  }
+}

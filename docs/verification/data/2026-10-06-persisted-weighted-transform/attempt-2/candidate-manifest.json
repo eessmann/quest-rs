@@ -1,0 +1,335 @@
+{
+  "schema": "quest-persisted-consumer-private-publication-candidates-v1",
+  "status": "private attempt2 candidates only; publication pending root approval",
+  "physical_or_native_reruns": 0,
+  "original_input_bytes_unchanged": true,
+  "normalization": "Public candidate SHA hashes candidate bytes; original private SHA identifies original bytes and is never asserted to hash normalized bytes. Strings only; numeric JSON values retained. Generic numeric/source JSON is byte-original.",
+  "source_scope": "Attempt2 source970 is audited workspace superset, not exact sixteen-package compiler input closure; compiler JSON records actual sixteen local manifest set. rustc/cargo executable hash identifies rustup launcher; version/profile captured separately. No hermetic/native-library transitive closure claim.",
+  "outcome_scope": "Publication8 completed; compile native child completed/exit0, but original runner rejects legitimate zero P1 transport ceiling. Five replay jobs not-run; no native inverse. Saved row/phase diagnostics are not inverse accuracy or certificates. Attempt1 retained separately.",
+  "files": [
+    {
+      "path": "attempt-2/build-attestation.json",
+      "bytes": 2552,
+      "sha256": "a4034c88a2c403b3db32a1154bd32f01bb581abd2695f7b7f4463f35329523a9",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-final-build-2-attestation.json",
+      "original_bytes": 2537,
+      "original_sha256": "402ffda301f248570d877eee8e30b38199ac805ca6c63d8888e7a5ad697891d9",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "attempt-2/build-context-before.json",
+      "bytes": 173752,
+      "sha256": "23905d8f336f35be4c64887883672089f3511df27c90e955dcb2d887a80544e2",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-final-build-2-before.json",
+      "original_bytes": 174317,
+      "original_sha256": "498d511c9ebe4f2844fa4c8bf0ab4d9164126f63c5f261cbfd25e3a7a553fee7",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "attempt-2/build-context-after.json",
+      "bytes": 173752,
+      "sha256": "23905d8f336f35be4c64887883672089f3511df27c90e955dcb2d887a80544e2",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-final-build-2-after.json",
+      "original_bytes": 174317,
+      "original_sha256": "498d511c9ebe4f2844fa4c8bf0ab4d9164126f63c5f261cbfd25e3a7a553fee7",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "attempt-2/build-source-before.json",
+      "bytes": 153139,
+      "sha256": "f23156126a0635452ca33a406ff2dd523cd269d70a1cbb1896670ad40a7c7bfb",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-final-build-2-source-before.json",
+      "original_bytes": 153139,
+      "original_sha256": "f23156126a0635452ca33a406ff2dd523cd269d70a1cbb1896670ad40a7c7bfb",
+      "representation": "byte-original"
+    },
+    {
+      "path": "attempt-2/build-source-after.json",
+      "bytes": 153139,
+      "sha256": "f23156126a0635452ca33a406ff2dd523cd269d70a1cbb1896670ad40a7c7bfb",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-final-build-2-source-after.json",
+      "original_bytes": 153139,
+      "original_sha256": "f23156126a0635452ca33a406ff2dd523cd269d70a1cbb1896670ad40a7c7bfb",
+      "representation": "byte-original"
+    },
+    {
+      "path": "attempt-2/compiler-artifacts.jsonl",
+      "bytes": 288560,
+      "sha256": "857bde3e95ad4acabfb75a837bc9489b0bf84e1efe04d9538dda87d9008321a0",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-final-build-2-compiler-artifacts.jsonl",
+      "original_bytes": 301574,
+      "original_sha256": "d6f3a61e5c6bde209d1f2c18a714baa20f8414a0fbe5a56a05a17c7a8f288877",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "attempt-2/build.log",
+      "bytes": 270,
+      "sha256": "50900803a19a67db66d4da90005069cb462acb0e6bd2561ffb6d6aad634db088",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-final-build-2-build.log",
+      "original_bytes": 289,
+      "original_sha256": "76cd3b45406ee411fc25796c794c992022a0e26831c10df8eb2271e7a6b7ea71",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "attempt-2/execution-attestation.json",
+      "bytes": 2798,
+      "sha256": "1863e7201bf7c1d057d48733ba3529cda465713308291c1d051b35ffad5760e4",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-final-execution-2.json",
+      "original_bytes": 2823,
+      "original_sha256": "0498958feb75ca6960bacdfd4654dbf386e5e6121ac91c075d5bd58210a6e7a3",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "attempt-2/execution-context-before.json",
+      "bytes": 173752,
+      "sha256": "23905d8f336f35be4c64887883672089f3511df27c90e955dcb2d887a80544e2",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-final-execution-2-before.json",
+      "original_bytes": 174317,
+      "original_sha256": "498d511c9ebe4f2844fa4c8bf0ab4d9164126f63c5f261cbfd25e3a7a553fee7",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "attempt-2/execution-context-after.json",
+      "bytes": 173752,
+      "sha256": "23905d8f336f35be4c64887883672089f3511df27c90e955dcb2d887a80544e2",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-final-execution-2-after.json",
+      "original_bytes": 174317,
+      "original_sha256": "498d511c9ebe4f2844fa4c8bf0ab4d9164126f63c5f261cbfd25e3a7a553fee7",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "attempt-2/runner.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-final-execution-2-runner.log",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "representation": "byte-original"
+    },
+    {
+      "path": "attempt-2/receipt.json",
+      "bytes": 172673,
+      "sha256": "e1d70846a4f0252cac1e3133a0137aef4f64d42b0e3fc19b882cdb9638dc0130",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-campaign-2/receipt.json",
+      "original_bytes": 172673,
+      "original_sha256": "e1d70846a4f0252cac1e3133a0137aef4f64d42b0e3fc19b882cdb9638dc0130",
+      "representation": "byte-original"
+    },
+    {
+      "path": "attempt-2/job-0.stdout",
+      "bytes": 2376,
+      "sha256": "0aa10ff1bad1d572359f51f06140153175d04471c67d3cbae23ba3fa3699ef2e",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-campaign-2/job-0.stdout",
+      "original_bytes": 2376,
+      "original_sha256": "0aa10ff1bad1d572359f51f06140153175d04471c67d3cbae23ba3fa3699ef2e",
+      "representation": "byte-original"
+    },
+    {
+      "path": "attempt-2/job-0.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-campaign-2/job-0.stderr",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "representation": "byte-original"
+    },
+    {
+      "path": "attempt-2/job-1.stdout",
+      "bytes": 297,
+      "sha256": "a6d6c7495cbaf000f89fda1782b05f1125b9e9207887e4206517e3636a5d788b",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-campaign-2/job-1.stdout",
+      "original_bytes": 297,
+      "original_sha256": "a6d6c7495cbaf000f89fda1782b05f1125b9e9207887e4206517e3636a5d788b",
+      "representation": "byte-original"
+    },
+    {
+      "path": "attempt-2/job-1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-campaign-2/job-1.stderr",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "representation": "byte-original"
+    },
+    {
+      "path": "attempt-2/independent-audit.json",
+      "bytes": 4941,
+      "sha256": "dfa0703b0b9bde57552c68b964d8e9c5b9f0e0e785a619bc92d789c61df95ee8",
+      "original_private_identifier": "<workspace>/.superpowers/sdd/2026-10-05-sparse-mathcore-cfd/persisted-weighted-transform-attempt-2-independent-audit.json",
+      "original_bytes": 4836,
+      "original_sha256": "2eaafdad1cde748d8994cc2a5751556bcf1b4ba5b7555004aeab29f6ad55ec2e",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "attempt-2/independent-review.md",
+      "bytes": 3211,
+      "sha256": "583ff1a6029e2ec1777c88beb86abd8f228f214930602701dd56fe202b499d8d",
+      "original_private_identifier": "<workspace>/.superpowers/sdd/2026-10-05-sparse-mathcore-cfd/persisted-weighted-transform-attempt-2-independent-audit.md",
+      "original_bytes": 3196,
+      "original_sha256": "06ce3f45668f512978704501f3f168bf4f87ab6870a080f270dc5b4c21d9c62a",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "reviews/capture-closure.md",
+      "bytes": 1082,
+      "sha256": "7a3922b533ecd9c347d1b353de0eb352c3921b3db98eb676536e41880ac19e16",
+      "original_private_identifier": "<workspace>/.superpowers/sdd/2026-10-05-sparse-mathcore-cfd/persisted-weighted-transform-capture-fix-closure.md",
+      "original_bytes": 1082,
+      "original_sha256": "7a3922b533ecd9c347d1b353de0eb352c3921b3db98eb676536e41880ac19e16",
+      "representation": "byte-original"
+    },
+    {
+      "path": "reviews/capture-independent-review.md",
+      "bytes": 7366,
+      "sha256": "82f2de9388bcf93ce4a983792721589056034c9bd1e4db92cc81ef4bffdc8723",
+      "original_private_identifier": "<workspace>/.superpowers/sdd/2026-10-05-sparse-mathcore-cfd/persisted-weighted-transform-pipe-capture-independent-review.md",
+      "original_bytes": 7306,
+      "original_sha256": "d7b60e6efde41bbae78b447bd9197b6d5dce2f14768e2e2d5688e0985f79ff60",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "attempt-2/consumer-source.json",
+      "bytes": 2778,
+      "sha256": "fac76f206b3d7aca6e0b9c89e1b021c864084ed6c9724f617a35320d896ccdb1",
+      "original_private_identifier": "<workspace>/.superpowers/sdd/2026-10-05-sparse-mathcore-cfd/persisted-weighted-transform-consumer-source-capture-fix-1.json",
+      "original_bytes": 2778,
+      "original_sha256": "fac76f206b3d7aca6e0b9c89e1b021c864084ed6c9724f617a35320d896ccdb1",
+      "representation": "byte-original"
+    },
+    {
+      "path": "attempt-2/dataset/freeze.json",
+      "bytes": 5767,
+      "sha256": "08ebfc0b020ae970f35d9ae8d93ded684e7ed660fee66f2ab45f1204ddcc6d21",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-campaign-2/dataset/freeze.json",
+      "original_bytes": 5767,
+      "original_sha256": "08ebfc0b020ae970f35d9ae8d93ded684e7ed660fee66f2ab45f1204ddcc6d21",
+      "representation": "byte-original"
+    },
+    {
+      "path": "attempt-2/dataset/phases.json",
+      "bytes": 974,
+      "sha256": "51753f689cdca32c68a812c20df82e0b8b83643a8d587a6a12e8ac706d3de412",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-campaign-2/dataset/phases.json",
+      "original_bytes": 974,
+      "original_sha256": "51753f689cdca32c68a812c20df82e0b8b83643a8d587a6a12e8ac706d3de412",
+      "representation": "byte-original"
+    },
+    {
+      "path": "attempt-2/dataset/receipt-compile-world1-rank0.json",
+      "bytes": 11131,
+      "sha256": "e0a089496ede2f418afeae36329a88876dcd4e866ea780cb902533a875d5eee2",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-campaign-2/dataset/receipt-compile-world1-rank0.json",
+      "original_bytes": 11131,
+      "original_sha256": "e0a089496ede2f418afeae36329a88876dcd4e866ea780cb902533a875d5eee2",
+      "representation": "byte-original"
+    },
+    {
+      "path": "attempt-2/dataset/receipt-publish-world8-rank0.json",
+      "bytes": 20882,
+      "sha256": "339b326ad78921fb7d685ff4db5dcda24397b98a5b5121e7179c6bddf90e8b44",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-campaign-2/dataset/receipt-publish-world8-rank0.json",
+      "original_bytes": 20882,
+      "original_sha256": "339b326ad78921fb7d685ff4db5dcda24397b98a5b5121e7179c6bddf90e8b44",
+      "representation": "byte-original"
+    },
+    {
+      "path": "attempt-2/dataset/receipt-publish-world8-rank1.json",
+      "bytes": 20882,
+      "sha256": "a452c55b4177908380534f43c85b9cb2dc91c7bc5974907f16d5ffaba2da2df7",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-campaign-2/dataset/receipt-publish-world8-rank1.json",
+      "original_bytes": 20882,
+      "original_sha256": "a452c55b4177908380534f43c85b9cb2dc91c7bc5974907f16d5ffaba2da2df7",
+      "representation": "byte-original"
+    },
+    {
+      "path": "attempt-2/dataset/receipt-publish-world8-rank2.json",
+      "bytes": 20882,
+      "sha256": "91de5e54f7f82bcf26789e289115289eac55ce659a566b9173491485bf770ac8",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-campaign-2/dataset/receipt-publish-world8-rank2.json",
+      "original_bytes": 20882,
+      "original_sha256": "91de5e54f7f82bcf26789e289115289eac55ce659a566b9173491485bf770ac8",
+      "representation": "byte-original"
+    },
+    {
+      "path": "attempt-2/dataset/receipt-publish-world8-rank3.json",
+      "bytes": 20882,
+      "sha256": "4efd79cd1fc86744c94894855f3373cc9237e00104eebbb9706834e20e3ea49f",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-campaign-2/dataset/receipt-publish-world8-rank3.json",
+      "original_bytes": 20882,
+      "original_sha256": "4efd79cd1fc86744c94894855f3373cc9237e00104eebbb9706834e20e3ea49f",
+      "representation": "byte-original"
+    },
+    {
+      "path": "attempt-2/dataset/receipt-publish-world8-rank4.json",
+      "bytes": 20882,
+      "sha256": "5f7c83348534c08e295b80d2c8ec22eddab178698fcb01d0e0bff7c69b3f6181",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-campaign-2/dataset/receipt-publish-world8-rank4.json",
+      "original_bytes": 20882,
+      "original_sha256": "5f7c83348534c08e295b80d2c8ec22eddab178698fcb01d0e0bff7c69b3f6181",
+      "representation": "byte-original"
+    },
+    {
+      "path": "attempt-2/dataset/receipt-publish-world8-rank5.json",
+      "bytes": 20882,
+      "sha256": "22d67794bea8740801abe591b02e94d75cda3f26ec218184bff6e09a45b390cb",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-campaign-2/dataset/receipt-publish-world8-rank5.json",
+      "original_bytes": 20882,
+      "original_sha256": "22d67794bea8740801abe591b02e94d75cda3f26ec218184bff6e09a45b390cb",
+      "representation": "byte-original"
+    },
+    {
+      "path": "attempt-2/dataset/receipt-publish-world8-rank6.json",
+      "bytes": 20882,
+      "sha256": "7c579d72c6a9980419b5f52fb1d049fbd1846e604510be981b3998dbb838370f",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-campaign-2/dataset/receipt-publish-world8-rank6.json",
+      "original_bytes": 20882,
+      "original_sha256": "7c579d72c6a9980419b5f52fb1d049fbd1846e604510be981b3998dbb838370f",
+      "representation": "byte-original"
+    },
+    {
+      "path": "attempt-2/dataset/receipt-publish-world8-rank7.json",
+      "bytes": 20882,
+      "sha256": "7f4bdfcd69d7012afc5bbdb871c214c289749c539470f7a09524933eb7d33a9a",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-campaign-2/dataset/receipt-publish-world8-rank7.json",
+      "original_bytes": 20882,
+      "original_sha256": "7f4bdfcd69d7012afc5bbdb871c214c289749c539470f7a09524933eb7d33a9a",
+      "representation": "byte-original"
+    },
+    {
+      "path": "attempt-2/dataset/term-0/manifest.json",
+      "bytes": 8318,
+      "sha256": "f6914e8441af19a636e8642eb25547f4d74318b5612be62450527345b787ea15",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-campaign-2/dataset/term-0/manifest.json",
+      "original_bytes": 8318,
+      "original_sha256": "f6914e8441af19a636e8642eb25547f4d74318b5612be62450527345b787ea15",
+      "representation": "byte-original"
+    },
+    {
+      "path": "attempt-2/dataset/term-1/manifest.json",
+      "bytes": 8327,
+      "sha256": "ed7826fc7af9ea506c62b3df29b5af49c0591da2d71a0c5ff17d30b59ff8bb7c",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-campaign-2/dataset/term-1/manifest.json",
+      "original_bytes": 8327,
+      "original_sha256": "ed7826fc7af9ea506c62b3df29b5af49c0591da2d71a0c5ff17d30b59ff8bb7c",
+      "representation": "byte-original"
+    },
+    {
+      "path": "attempt-2/dataset/term-2/manifest.json",
+      "bytes": 8326,
+      "sha256": "f626f2e186817acce53a1241d7653a60ef3f0f9040365347a7b3f209f1b36a23",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-campaign-2/dataset/term-2/manifest.json",
+      "original_bytes": 8326,
+      "original_sha256": "f626f2e186817acce53a1241d7653a60ef3f0f9040365347a7b3f209f1b36a23",
+      "representation": "byte-original"
+    },
+    {
+      "path": "attempt-2/published-input-bindings.json",
+      "bytes": 5926,
+      "sha256": "cb79ea8d79fda29e89dd4977280c0648761dd8fbcca6b5c576c16850193c1fe7",
+      "representation": "derived exact saved-input hash/size index; binary payload excluded"
+    }
+  ],
+  "binaries_full_traces_and_HDF5_payloads_included": false,
+  "excluded_execution_binary_sha256": "2bdc5ca75c018f9f5fe40b33d08050bb313f5b41b14901252ecaa4774426cf87",
+  "manifest_self_hash_excluded": true
+}

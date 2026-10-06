@@ -1,0 +1,77 @@
+{
+  "schema": "quest-scoped-source-v1",
+  "captured_utc": "2026-10-06T03:15:32.394904+00:00",
+  "scope": "13 owned implementation/integration/test files for prepared LCU transform; not a whole workspace/build identity",
+  "hash_method": "SHA256 of sorted relative-path UTF8 + NUL + lowercase file SHA256 hex + LF",
+  "aggregate_sha256": "f13906bc93b8ca839883bc35089042a3278325ced30ba92538e53d4c4d21e130",
+  "file_count": 13,
+  "files": [
+    {
+      "path": "crates/quest-qsp/src/sequence.rs",
+      "sha256": "05ab18fa8c15442d8ed8561ebba57ada8ffb56c1ea2fb23fbe4345fb6ade696e",
+      "bytes": 14515
+    },
+    {
+      "path": "crates/quest-qsvt/src/replay_transform.rs",
+      "sha256": "bb797fb7abff1ff0a08ca2c84603e50412fed3d99a264da20bd6fa0b2e1f57d2",
+      "bytes": 36617
+    },
+    {
+      "path": "crates/quest-qsvt/tests/transform_schedule_factories.rs",
+      "sha256": "459c21802df628cdd53221db5a42f1810773141838dd94a0e2cd889f454de465",
+      "bytes": 2708
+    },
+    {
+      "path": "crates/quest/src/qsvt/matching_lcu.rs",
+      "sha256": "8e5f96f9b4abe7901d2a38967fe3dbeda07f664b1000b95842ab5fe6ed614605",
+      "bytes": 15350
+    },
+    {
+      "path": "crates/quest/src/qsvt/matching_lcu/collective.rs",
+      "sha256": "1430d40db186245882dc26158e9666ccf7f5bcc3048f12599f59f1cbfe693857",
+      "bytes": 20482
+    },
+    {
+      "path": "crates/quest/src/qsvt/matching_lcu_transform.rs",
+      "sha256": "72ead4b847a349e75e30b8c39c4de17505dda8e1b281f62388409f007e1747cb",
+      "bytes": 16377
+    },
+    {
+      "path": "crates/quest/src/qsvt/matching_lcu_transform/collective.rs",
+      "sha256": "779e9845c8dab6ea84138253c8223d90c63a9efa34bc67d918e47cdb534d1171",
+      "bytes": 14737
+    },
+    {
+      "path": "crates/quest/src/qsvt/matching_lcu_transform/collective/failure_tests.rs",
+      "sha256": "ea79a73137cf2a75d99b225963d390962dde38cd4f2f83d4b799616f7384bdb1",
+      "bytes": 7734
+    },
+    {
+      "path": "crates/quest/src/qsvt/matching_transform.rs",
+      "sha256": "3f85a90a22c51ac63fac7fccfdaf76a75c9ae657447a05446ea77cb9b15466c2",
+      "bytes": 8799
+    },
+    {
+      "path": "crates/quest/src/qsvt/mod.rs",
+      "sha256": "d4a0b20b8cacb571e3dbc72baa44a14d8fee160ad44c437ea6f8edffd312a1e6",
+      "bytes": 16012
+    },
+    {
+      "path": "crates/quest/src/qsvt/transform_execution.rs",
+      "sha256": "fdf617d5e030082ad27b2fe47b9c273b43f46136456d007b32b34cce943cd099",
+      "bytes": 9029
+    },
+    {
+      "path": "crates/quest/tests/matching_lcu_transform.rs",
+      "sha256": "48f0f253874a68bc4d0d09768f1a4ff632afba3fdf859f522a05ae680581980b",
+      "bytes": 10614
+    },
+    {
+      "path": "crates/quest/tests/matching_lcu_transform_collective.rs",
+      "sha256": "5f018b04b9a3729158417faeba659724d84e898091151387531e63bb4b07baa4",
+      "bytes": 7586
+    }
+  ],
+  "previous_source_manifest": "prepared-lcu-transform-source-initial.json",
+  "previous_source_sha256": "9c49d8e22d053d9d1f6fff2bb021b417bcfd2a157a3a2c457f56eed8961f106f"
+}

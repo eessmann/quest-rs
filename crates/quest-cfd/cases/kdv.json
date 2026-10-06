@@ -1,0 +1,22 @@
+{
+  "schema": "quest-cfd.scalar-dg-case.v1",
+  "id": "kdv",
+  "dimension": 1,
+  "geometry": "periodic [0,2*pi]",
+  "equations": ["u_t+6*u*u_x+u_xxx=0", "phi_t-phi_xxx=0"],
+  "initial_condition": ["u=0.05*cos(x)", "phi=0"],
+  "time_window": [0, 0.1],
+  "cells": 4,
+  "physical_degree": 2,
+  "full_state_dimension": 24,
+  "spatial_method": "Fu-Shu doubled-field ultraweak DG; complete mass-orthonormal Legendre basis; eight-point Gauss volume quadrature",
+  "dispersive_flux": "For derivatives 0,1,2: u_hat=average(u)+0.5*jump(phi), phi_hat=average(phi)+0.5*jump(u); jump=right-left",
+  "convective_flux": "u_left^2+u_left*u_right+u_right^2",
+  "initial_time_elements": 2,
+  "initial_time_degree": 1,
+  "observables": ["combined integral(u^2+phi^2)", "separate field energies", "both field integrals", "auxiliary L2 norm", "full state temporal and physical refinement"],
+  "separate_validation_case": "LinearAiry mode: convection disabled explicitly; exact u=0.05*cos(x+t), phi=0",
+  "source": "https://arxiv.org/html/1805.04471v1",
+  "source_pdf": "https://arxiv.org/pdf/1805.04471",
+  "status": "full classical spatial/reference implementation; quantum execution requires separately admitted common history and circuit workflow"
+}

@@ -1,0 +1,62 @@
+[
+  {
+    "index": 0,
+    "command": [
+      "cmake",
+      "-S",
+      "<private-artifacts>/quest-checkpoint-08-cmake-diagnosis/source",
+      "-B",
+      "<private-artifacts>/quest-checkpoint-08-cmake-diagnosis/concurrent-0",
+      "-DCMAKE_CXX_COMPILER=c++"
+    ],
+    "status": 0,
+    "elapsed": 0.1808316860042396,
+    "stdout_bytes": 403,
+    "stderr_bytes": 0
+  },
+  {
+    "index": 1,
+    "command": [
+      "cmake",
+      "-S",
+      "<private-artifacts>/quest-checkpoint-08-cmake-diagnosis/source",
+      "-B",
+      "<private-artifacts>/quest-checkpoint-08-cmake-diagnosis/concurrent-1",
+      "-DCMAKE_CXX_COMPILER=c++"
+    ],
+    "status": 0,
+    "elapsed": 0.17811023000103887,
+    "stdout_bytes": 403,
+    "stderr_bytes": 0
+  },
+  {
+    "index": 2,
+    "command": [
+      "cmake",
+      "-S",
+      "<private-artifacts>/quest-checkpoint-08-cmake-diagnosis/source",
+      "-B",
+      "<private-artifacts>/quest-checkpoint-08-cmake-diagnosis/concurrent-2",
+      "-DCMAKE_CXX_COMPILER=c++"
+    ],
+    "status": 0,
+    "elapsed": 0.1791819670033874,
+    "stdout_bytes": 403,
+    "stderr_bytes": 0
+  },
+  {
+    "index": 3,
+    "command": [
+      "cmake",
+      "-S",
+      "<private-artifacts>/quest-checkpoint-08-cmake-diagnosis/source",
+      "-B",
+      "<private-artifacts>/quest-checkpoint-08-cmake-diagnosis/concurrent-3",
+      "-DCMAKE_CXX_COMPILER=c++"
+    ],
+    "status": 0,
+    "elapsed": 0.1788831250014482,
+    "stdout_bytes": 403,
+    "stderr_bytes": 0
+  }
+]

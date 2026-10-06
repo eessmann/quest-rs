@@ -1,0 +1,418 @@
+{
+  "schema": "quest-node-enforcement-observation-v1",
+  "date": "2026-10-06",
+  "outcome": "read-only observation completed; strict application memory enforcement remains unverified",
+  "probe_complete": true,
+  "enforcement_tested": false,
+  "strict_application_per_node_cap_established": false,
+  "cgroup_mutations_attempted": false,
+  "limit_mutations_attempted": false,
+  "scheduler": [
+    {
+      "job": "537644",
+      "state": "COMPLETED",
+      "exit_code": "0:0",
+      "elapsed_seconds": 22,
+      "nodes": 2,
+      "allocated_cpu_slots": 576,
+      "time_limit_minutes": 20
+    },
+    {
+      "job": "537644.batch",
+      "state": "COMPLETED",
+      "exit_code": "0:0",
+      "elapsed_seconds": 22,
+      "nodes": 1,
+      "allocated_cpu_slots": 288,
+      "time_limit_minutes": null
+    },
+    {
+      "job": "537644.extern",
+      "state": "COMPLETED",
+      "exit_code": "0:0",
+      "elapsed_seconds": 22,
+      "nodes": 2,
+      "allocated_cpu_slots": 576,
+      "time_limit_minutes": null
+    },
+    {
+      "job": "537644.0",
+      "state": "COMPLETED",
+      "exit_code": "0:0",
+      "elapsed_seconds": 4,
+      "nodes": 2,
+      "allocated_cpu_slots": 576,
+      "time_limit_minutes": null
+    }
+  ],
+  "allocation": {
+    "exclusive": true,
+    "nodes": 2,
+    "mpi_ranks": 2,
+    "ranks_per_node": 1,
+    "requested_cpu_slots_per_rank": 288,
+    "requested_openmp_threads": 288,
+    "partition": "standard",
+    "qos": "short",
+    "dependency": "afterany:537617"
+  },
+  "provenance": {
+    "base_source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+    "base_native_build_job": 536807,
+    "native_build_profile_sha256": "ff5b86538552c11c3b5564e6400279b4ec9a9e6a351ea005ed4751667abe7a35",
+    "native_revision": "503552065045eaf89baba85e6cd6aad728525554",
+    "native_quest_linked": false,
+    "compiler": "GNU 14.2.1 through CC",
+    "central_hdf5_module": "cray-hdf5/1.14.3.5 (profile only; not used by probe)",
+    "reviewed_payload_manifest_sha256": "444c7673e446c950f58ad614a4a2afecbb7335497ffbc40689efda1e6a89cb7b",
+    "receipt_manifest_sha256": "4dabfcafea7d2d00f481a41400c8eb05a65250aa8b8d98e3a2d2b8e3bdf8d867",
+    "manifest_identity_note": "Receipt serializes the same JSON object with sorted keys; bytes differ from reviewed manifest.",
+    "deployed_archive_sha256": "37dc59bd587ad8c9f26c88d0839d0f43ba5b36351b487cd16d32bbab9b91c8ab",
+    "payload_source_sha256": {
+      "run.sh": "f0798dde0da2413a58bea7c395ef3782ddda5cf1bd84620c7bc0bec09a2dca8a",
+      "srun": "8091ba0acde6d187babe5b7aa75932b23ec4164960ba90f7f84fbf832a56f04d",
+      "coordinator.py": "ecaf03f5244dac3b61b8a84d9c0e42d51567f1d00a90224444c7a529e658ecde",
+      "probe.cpp": "5c2b790588697f4fa0b311d020274db42af275907317fdbcb9b6e208f6abc64b"
+    },
+    "auxiliary_source_sha256": {
+      "README.md": "67ab4e5ab3517f0926d567f0224b3d7acbfaaf71e08170230bb262f5ae776efe",
+      "test_probe.py": "5c241f604e47f708b6200d6fb89dd2af77cd626ef2300e1a7af2fcbd4051d540"
+    },
+    "executed_entry_sha256": "f0798dde0da2413a58bea7c395ef3782ddda5cf1bd84620c7bc0bec09a2dca8a",
+    "executable_sha256": "772cc855a80c798fcd2736acb210399aeb078dc28c62b92a409775701c7fc507"
+  },
+  "supervision": {
+    "schema_version": 1,
+    "exit_status": 0,
+    "timed_out": false,
+    "log_truncated": false,
+    "owned_step": "537644.0",
+    "cleanup": null,
+    "error": null,
+    "elapsed_seconds": 3.774731043027714
+  },
+  "observed_job_memory_controller_limit": {
+    "bytes_per_node": 780945850368,
+    "mib_per_node": 744768,
+    "gib_per_node": 727.3125,
+    "memory_high_bytes_per_node": 780945850368,
+    "memory_swap_max_bytes": 0,
+    "covers_observed_coordinator_launcher_and_rank_ancestry": true,
+    "requested_application_cap_bytes": 8589934592,
+    "requested_application_cap_installed": false,
+    "stress_or_oom_enforcement_tested": false
+  },
+  "delegation": {
+    "observed_slurm_ancestor_directories_writable": false,
+    "observed_control_files_writable": false,
+    "observed_user_delegated_slurm_subtree": false,
+    "privileged_or_service_mediated_api_tested": false,
+    "own_user_service_scopes_present_on_observed_compute_nodes": false,
+    "user_slice_outside_slurm_is_acceptable_enforcement_route": false
+  },
+  "hugetlb": {
+    "root_controller_available": true,
+    "root_subtree_controller_enabled": false,
+    "controller_available_inside_observed_slurm_job": false,
+    "fixed_2MB_1GB_limit_and_current_files_present": false,
+    "rank_observed_hugetlb_bytes": [
+      16777216,
+      16777216
+    ],
+    "memory_controller_hugetlb_coverage": "unknown",
+    "memory_hugetlb_accounting_mount_option_retained": false
+  },
+  "process_count_bound_proved": false,
+  "processes": [
+    {
+      "role": "coordinator",
+      "node": "node-A",
+      "raw_artifact": "coordinator.json",
+      "membership": "/system.slice/slurmstepd.scope/job_<JOB>/step_batch/user/task_0",
+      "rlimit_as_soft": "unlimited",
+      "rlimit_as_hard": "unlimited",
+      "rlimit_rss_soft_bytes": 780945850368,
+      "rlimit_nproc_soft": 3090998,
+      "observed_threads": 1,
+      "observed_vm_size_bytes": 24387584,
+      "observed_vm_rss_bytes": 9437184,
+      "observed_hugetlb_pages_bytes": 0,
+      "vm_hugetlb_field_present": false,
+      "observed_read_bytes": 7919,
+      "hierarchy_interpretable": true,
+      "truncated": false,
+      "ancestor_directories_inspected": 7,
+      "all_ancestor_directories_and_existing_inspected_controls_root_owned": true,
+      "any_inspected_directory_or_control_write_access": false,
+      "own_user_slice_path": "absent (ENOENT)",
+      "own_user_service_path": "absent (ENOENT)"
+    },
+    {
+      "role": "launcher-before-exec",
+      "node": "node-A",
+      "raw_artifact": "launcher-before-exec.json",
+      "membership": "/system.slice/slurmstepd.scope/job_<JOB>/step_batch/user/task_0",
+      "rlimit_as_soft": "unlimited",
+      "rlimit_as_hard": "unlimited",
+      "rlimit_rss_soft_bytes": 780945850368,
+      "rlimit_nproc_soft": 3090998,
+      "observed_threads": 1,
+      "observed_vm_size_bytes": 7598080,
+      "observed_vm_rss_bytes": 0,
+      "observed_hugetlb_pages_bytes": 0,
+      "vm_hugetlb_field_present": false,
+      "observed_read_bytes": 7920,
+      "hierarchy_interpretable": true,
+      "truncated": false,
+      "ancestor_directories_inspected": 7,
+      "all_ancestor_directories_and_existing_inspected_controls_root_owned": true,
+      "any_inspected_directory_or_control_write_access": false,
+      "own_user_slice_path": "absent (ENOENT)",
+      "own_user_service_path": "absent (ENOENT)"
+    },
+    {
+      "role": "launcher",
+      "node": "node-A",
+      "raw_artifact": "launcher.json",
+      "membership": "/system.slice/slurmstepd.scope/job_<JOB>/step_batch/user/task_0",
+      "rlimit_as_soft": "unlimited",
+      "rlimit_as_hard": "unlimited",
+      "rlimit_rss_soft_bytes": 780945850368,
+      "rlimit_nproc_soft": 3090998,
+      "observed_threads": 1,
+      "observed_vm_size_bytes": 30052352,
+      "observed_vm_rss_bytes": 0,
+      "observed_hugetlb_pages_bytes": 0,
+      "vm_hugetlb_field_present": false,
+      "observed_read_bytes": 7921,
+      "hierarchy_interpretable": true,
+      "truncated": false,
+      "ancestor_directories_inspected": 7,
+      "all_ancestor_directories_and_existing_inspected_controls_root_owned": true,
+      "any_inspected_directory_or_control_write_access": false,
+      "own_user_slice_path": "absent (ENOENT)",
+      "own_user_service_path": "absent (ENOENT)"
+    },
+    {
+      "role": "rank-0",
+      "node": "node-A",
+      "raw_artifact": "rank-0.json",
+      "membership": "/system.slice/slurmstepd.scope/job_<JOB>/step_0/user/task_0",
+      "rlimit_as_soft": "unlimited",
+      "rlimit_as_hard": "unlimited",
+      "rlimit_rss_soft_bytes": 780945850368,
+      "rlimit_nproc_soft": 3090998,
+      "observed_threads": 1,
+      "observed_vm_size_bytes": 214958080,
+      "observed_vm_rss_bytes": 135868416,
+      "observed_hugetlb_pages_bytes": 16777216,
+      "vm_hugetlb_field_present": false,
+      "observed_read_bytes": 7918,
+      "hierarchy_interpretable": true,
+      "truncated": false,
+      "ancestor_directories_inspected": 7,
+      "all_ancestor_directories_and_existing_inspected_controls_root_owned": true,
+      "any_inspected_directory_or_control_write_access": false,
+      "own_user_slice_path": "absent (ENOENT)",
+      "own_user_service_path": "absent (ENOENT)",
+      "mpi": {
+        "rank": 0,
+        "ranks": 2,
+        "shared_memory_size": 1,
+        "thread_support": 1,
+        "library": "MPI VERSION    : CRAY MPICH version 8.1.32.110 (ANL base 3.4a2)\nMPI BUILD INFO : Thu Feb 06 22:52 2025 (git hash f9c5634)\n"
+      },
+      "openmp_environment": {
+        "OMP_NUM_THREADS": "288",
+        "OMP_PLACES": "cores",
+        "OMP_PROC_BIND": "close",
+        "OMP_DYNAMIC": "FALSE",
+        "OMP_STACKSIZE": "8M"
+      },
+      "measured_openmp_team_size": null
+    },
+    {
+      "role": "rank-1",
+      "node": "node-B",
+      "raw_artifact": "rank-1.json",
+      "membership": "/system.slice/slurmstepd.scope/job_<JOB>/step_0/user/task_1",
+      "rlimit_as_soft": "unlimited",
+      "rlimit_as_hard": "unlimited",
+      "rlimit_rss_soft_bytes": 780945850368,
+      "rlimit_nproc_soft": 3090998,
+      "observed_threads": 1,
+      "observed_vm_size_bytes": 214958080,
+      "observed_vm_rss_bytes": 135868416,
+      "observed_hugetlb_pages_bytes": 16777216,
+      "vm_hugetlb_field_present": false,
+      "observed_read_bytes": 7926,
+      "hierarchy_interpretable": true,
+      "truncated": false,
+      "ancestor_directories_inspected": 7,
+      "all_ancestor_directories_and_existing_inspected_controls_root_owned": true,
+      "any_inspected_directory_or_control_write_access": false,
+      "own_user_slice_path": "absent (ENOENT)",
+      "own_user_service_path": "absent (ENOENT)",
+      "mpi": {
+        "rank": 1,
+        "ranks": 2,
+        "shared_memory_size": 1,
+        "thread_support": 1,
+        "library": "MPI VERSION    : CRAY MPICH version 8.1.32.110 (ANL base 3.4a2)\nMPI BUILD INFO : Thu Feb 06 22:52 2025 (git hash f9c5634)\n"
+      },
+      "openmp_environment": {
+        "OMP_NUM_THREADS": "288",
+        "OMP_PLACES": "cores",
+        "OMP_PROC_BIND": "close",
+        "OMP_DYNAMIC": "FALSE",
+        "OMP_STACKSIZE": "8M"
+      },
+      "measured_openmp_team_size": null
+    }
+  ],
+  "common_hierarchy_control_values": {
+    "identical_across_all_five_snapshots": true,
+    "null_means": "file absent (ENOENT)",
+    "levels": [
+      {
+        "level": "task",
+        "controls": {
+          "cgroup.controllers": "cpuset cpu memory",
+          "cgroup.subtree_control": "",
+          "memory.max": "max",
+          "memory.high": "max",
+          "memory.swap.max": "max",
+          "memory.swap.current": "0",
+          "pids.max": null
+        }
+      },
+      {
+        "level": "step_user",
+        "controls": {
+          "cgroup.controllers": "cpuset cpu memory",
+          "cgroup.subtree_control": "cpuset cpu memory",
+          "memory.max": "780945850368",
+          "memory.high": "780945850368",
+          "memory.swap.max": "0",
+          "memory.swap.current": "0",
+          "pids.max": null
+        }
+      },
+      {
+        "level": "step",
+        "controls": {
+          "cgroup.controllers": "cpuset cpu memory",
+          "cgroup.subtree_control": "cpuset cpu memory",
+          "memory.max": "max",
+          "memory.high": "max",
+          "memory.swap.max": "max",
+          "memory.swap.current": "0",
+          "pids.max": null
+        }
+      },
+      {
+        "level": "job",
+        "controls": {
+          "cgroup.controllers": "cpuset cpu memory",
+          "cgroup.subtree_control": "cpuset cpu memory",
+          "memory.max": "780945850368",
+          "memory.high": "780945850368",
+          "memory.swap.max": "0",
+          "memory.swap.current": "0",
+          "pids.max": null
+        }
+      },
+      {
+        "level": "slurmstepd_scope",
+        "controls": {
+          "cgroup.controllers": "cpuset cpu io memory pids",
+          "cgroup.subtree_control": "cpuset cpu memory",
+          "memory.max": "max",
+          "memory.high": "max",
+          "memory.swap.max": "max",
+          "memory.swap.current": "0",
+          "pids.max": "max"
+        }
+      },
+      {
+        "level": "system_slice",
+        "controls": {
+          "cgroup.controllers": "cpuset cpu io memory pids",
+          "cgroup.subtree_control": "cpuset cpu io memory pids",
+          "memory.max": "max",
+          "memory.high": "max",
+          "memory.swap.max": "max",
+          "memory.swap.current": "0",
+          "pids.max": "max"
+        }
+      },
+      {
+        "level": "hierarchy_root",
+        "controls": {
+          "cgroup.controllers": "cpuset cpu io memory hugetlb pids rdma misc",
+          "cgroup.subtree_control": "cpuset cpu io memory pids",
+          "memory.max": null,
+          "memory.high": null,
+          "memory.swap.max": null,
+          "memory.swap.current": null,
+          "pids.max": null
+        }
+      }
+    ]
+  },
+  "read_bounds": {
+    "maximum_file_bytes": 16384,
+    "maximum_mountinfo_bytes": 65536,
+    "maximum_total_read_bytes_per_observation": 1048576,
+    "maximum_ancestor_depth": 32,
+    "inspected_process_snapshots": 5,
+    "distinct_known_processes": 4,
+    "process_id_lists_read": false,
+    "other_user_processes_traversed": false
+  },
+  "limitations": [
+    "Observation only: no limit changes, cgroup writes, allocation pressure, OOM test, or delegation write test.",
+    "Known coordinator/launcher/rank snapshots do not enumerate or bound every helper, descendant, bootstrap, cleanup process, or lifetime overlap.",
+    "memory.current, memory.peak, memory.events, and process-ID lists were inspected for metadata only; aggregate memory usage was not measured.",
+    "The selected user service paths were absent on these compute nodes; this is not an exhaustive search for privileged services or delegation mechanisms.",
+    "HugeTLB memory-controller coverage is unknown because mount options and kernel version were not retained.",
+    "288 OpenMP threads were configured, but this MPI-only probe did not create or measure an OpenMP team.",
+    "A configured site memory.max is not evidence of an 8 GiB application cap or a mathematically exact no-overshoot bound."
+  ],
+  "failed_stages": [],
+  "private_evidence": {
+    "path_template": "<probe-root>/results/job-537644.<attempt>/",
+    "completion_sha256": "277d0c18983e62a77ffa30eb9fc62f18fd437c08b3ace7ef409c2042ea02abb4",
+    "artifacts_sha256": {
+      "base-build-profile.json": "ff5b86538552c11c3b5564e6400279b4ec9a9e6a351ea005ed4751667abe7a35",
+      "commands.json": "5ec852ad099c3933a5274d1c8c47036974401a4b959c4aa975fe2c1f65c94b37",
+      "compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "compiler-version.log": "e4673156e9a9934b962434aa9b67482487548468d9b24bd433636bb31beb7b1d",
+      "coordinator-inspection.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "coordinator.json": "b25c3f92c82e92e2d5031db9d4b4b457907f4ed78921a00231f3814ea5cad35d",
+      "executable-sha256.json": "0d162f518daf1ba893ca4f0fb12107d943b56df589b3054f3b416ae65ab47939",
+      "executed-entry.sh": "f0798dde0da2413a58bea7c395ef3782ddda5cf1bd84620c7bc0bec09a2dca8a",
+      "identity.json": "6aed9e4506f0c1b7df234dd436500e64a6702eaa000b21d7a4bf9c019ca81664",
+      "launcher-before-exec.json": "2b2932c51eebb87ea47f4eae545b35575f5835b8aa66f8eec7ae95219df9ab58",
+      "launcher-observer.json": "e138e50db7c5352541e00b073576c715125b4e0209cb928fc160b869c0448e51",
+      "launcher-pid": "345c5492220680bdee7ec678916bb20e71f6d4e353f61877c522e7e67f1a11a4",
+      "launcher.json": "d15fcd77d482a839eab99a5939f4c8553c1e6cce3f98b03ea34d1ad78ecb45e6",
+      "mpi.log": "ba4ef94a4449e836a25b7004808231c6637b029818448259202f5b059c7a6eff",
+      "mpi.log.supervision.json": "263cc6c5dae7e84b5ac0d3a047572deaf77bfd3271b152e3921f55a3e806bda6",
+      "observations.json": "bd1bd5c34a305dc517794f9403cdcc5d2beedac1ea430012c426a2b48ba80364",
+      "probe": "772cc855a80c798fcd2736acb210399aeb078dc28c62b92a409775701c7fc507",
+      "rank-0.json": "4cfae3ed0920695839cd843fcc8b621902b2355f31633f1631a2c0d74ebcb043",
+      "rank-1.json": "1b2c151076b72603e2c0f08690cb96ebf646623e31433ee7b0e640b747ead570",
+      "source-after.log": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+      "source-sha256.json": "4dabfcafea7d2d00f481a41400c8eb05a65250aa8b8d98e3a2d2b8e3bdf8d867"
+    },
+    "scheduler_receipt_sha256": "81054f9841ca2a22de45ec2c23b1ab927062206a27a90c46a94542d8ad61218f",
+    "batch_log_sha256": "27ed132b16acdaa5168e070e313d4eee09b1488cbafbb64f469b1072f9b0cc16"
+  },
+  "references": [
+    "https://docs.kernel.org/admin-guide/cgroup-v2.html#mounting",
+    "https://docs.kernel.org/admin-guide/cgroup-v2.html#memory",
+    "https://slurm.schedmd.com/cgroup_v2.html#hierarchy-overview",
+    "https://docs.cirrus.ac.uk/user-guide/batch/#resource-limits"
+  ]
+}

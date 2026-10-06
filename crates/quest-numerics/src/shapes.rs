@@ -1,6 +1,6 @@
 //! Statically shaped, heap-owned matrices. Dimension mismatch is rejected at
 //! construction; heap storage avoids embedding large Jacobians in solver frames.
-use crate::arithmetic::{ArithmeticError, ArithmeticResult};
+use mathcore::arithmetic::{ArithmeticError, ArithmeticResult};
 /// A zero dimension is rejected at monomorphization.
 /// ```compile_fail
 /// use quest_numerics::shapes::Matrix;

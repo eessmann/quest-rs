@@ -1,0 +1,59 @@
+{
+  "schema": "quest-fatal-witness-publication-v1",
+  "publication_status": "published after reviewed test-only correction and focused checks",
+  "files": [
+    {
+      "path": "docs/verification/data/2026-10-05-workspace-programme/checkpoint-09-fatal-witness/README.md",
+      "bytes": 1693,
+      "sha256": "3336eb41ca0b52d74a7167cb13100105064fe6188ff0ba61dcb2e34a7144ffb7"
+    },
+    {
+      "path": "docs/verification/data/2026-10-05-workspace-programme/checkpoint-09-fatal-witness/diagnosis.md",
+      "bytes": 4530,
+      "sha256": "88c045d6e2a09d8161b89be843d1c014aca87fa867aa708c13a4093f0659dbcd"
+    },
+    {
+      "path": "docs/verification/data/2026-10-05-workspace-programme/checkpoint-09-fatal-witness/final-clippy.log",
+      "bytes": 946,
+      "sha256": "a87026c2e11f8c5e4ca86cdaaea5027310e990f26cc505027af3e9a233cfaf4b"
+    },
+    {
+      "path": "docs/verification/data/2026-10-05-workspace-programme/checkpoint-09-fatal-witness/final-green.log",
+      "bytes": 1410,
+      "sha256": "2d129b9c76603a091510b6ca8cf8702c8b6406f1610ceac7a258db4a55866b40"
+    },
+    {
+      "path": "docs/verification/data/2026-10-05-workspace-programme/checkpoint-09-fatal-witness/focused.json",
+      "bytes": 4679,
+      "sha256": "40b56a51cddbbafa08980f81d666a2bc9987a82e3fcaefab28bcffe81c49878d"
+    },
+    {
+      "path": "docs/verification/data/2026-10-05-workspace-programme/checkpoint-09-fatal-witness/historical-red.log",
+      "bytes": 983,
+      "sha256": "e943581696cbe76bdae27cd7f170d422da188de0de2eae65878f9939a0104167"
+    },
+    {
+      "path": "docs/verification/data/2026-10-05-workspace-programme/checkpoint-09-fatal-witness/provenance.json",
+      "bytes": 3858,
+      "sha256": "c6321d46750f138e06b11c27f3b03230f63ff17142f862d40f0908504da78153"
+    },
+    {
+      "path": "docs/verification/data/2026-10-05-workspace-programme/checkpoint-09-fatal-witness/report.md",
+      "bytes": 2871,
+      "sha256": "8d776daf574cbb075b09da151d79103a943c8feb9cb311e0a046e42833b43d7f"
+    },
+    {
+      "path": "docs/verification/data/2026-10-05-workspace-programme/checkpoint-09-fatal-witness/source.json",
+      "bytes": 813,
+      "sha256": "5ed623268e3399c5cc526deed76d31ab780ac48d1e81921caf08c2b38cee27e3"
+    }
+  ],
+  "checks": {
+    "privacy_findings": 0,
+    "relative_markdown_link_errors": 0,
+    "finite_json": true,
+    "original_numeric_status_fields_unchanged": true,
+    "frozen_test_source_matches": true
+  },
+  "candidate_index_sha256": "200e3e2710866ab60d18045ebaa9589812f44e7f3ed0aa6ab83ad719e4d53587"
+}

@@ -1,0 +1,48 @@
+warning: `feature(generic_const_exprs)` is not supported with the next-generation trait solver
+ --> crates/quest-polynomial/src/lib.rs:1:30
+  |
+1 | #![feature(const_trait_impl, generic_const_exprs)]
+  |                              ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `-Znext-solver=globally` is currently enabled by default for testing
+  = note: reverted the setting to `-Znext-solver=coherence` for this crate
+  = note: the currently stable trait solver will be used for this crate
+  = note: see issues #160895 <https://github.com/rust-lang/rust/issues/160895> for more information
+
+warning: `quest-polynomial` (lib) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+     Running tests/mixed_physical_boundary.rs (target/debug/build/quest-cfd/65c70f3dc3efa8e0/out/mixed_physical_boundary-65c70f3dc3efa8e0)
+
+running 7 tests
+test time_owner_admission_includes_declared_live_mesh_external_storage ... ok
+test natural_capacity_shapes_and_pressure_limits_are_enforced ... ok
+test mixed_time_loads_extract_to_complete_shared_polynomial_drift ... ok
+test canonical_batch_lifting_solves_full_constraints_and_is_mass_orthogonal ... ok
+test affine_pressure_gradient_is_recovered_without_closed_gauge ... ok
+test prescribed_traction_fixes_nonzero_constant_pressure_without_mean_subtraction ... ok
+test polynomial_extension_uses_original_acceleration_and_all_natural_load_modes ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/mixed_physical_mesh.rs (target/debug/build/quest-cfd/4c305145d205251f/out/mixed_physical_mesh-4c305145d205251f)
+
+running 5 tests
+test mixed_classification_and_attempt_admission_are_explicit ... ok
+test natural_face_has_no_spurious_sip_penalty ... ok
+test natural_cubic_energy_flux_has_both_outflow_and_backflow_signs ... ok
+test all_open_constraint_rows_are_independent_and_every_coordinate_is_retained ... ok
+test unequal_cells_keep_all_coordinates_and_match_independent_p1_assembly ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/physical_boundary.rs (target/debug/build/quest-cfd/df4ae145fc30c80b/out/physical_boundary-df4ae145fc30c80b)
+
+running 5 tests
+test boundary_rejects_incompatible_data_and_resources_without_projection ... ok
+test full_polynomial_time_extraction_matches_direct_drift_and_temporal_quadrature ... ok
+test periodic_time_body_source_and_last_complete_coordinate_are_preserved ... ok
+test complete_time_lifting_retains_original_momentum_and_nonzero_normal_boundary_work ... ok
+test polynomial_lid_body_force_and_lifting_derivative_match_independent_complete_assemblies ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.94s
+

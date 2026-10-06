@@ -1,0 +1,15 @@
+{
+  "schema": "persisted-readout-tag-fix-source-v1",
+  "files": [
+    {
+      "path": "crates/quest/examples/persisted_weighted_transform/execution.rs",
+      "bytes": 15520,
+      "sha256": "53c1091181933c1bbe5d92e9232397d44ee0f2eeeca9c08c23141995d164535b"
+    },
+    {
+      "path": "crates/quest/tests/persisted_weighted_transform.rs",
+      "bytes": 16082,
+      "sha256": "a4dd4689a0f933e3f4ffb9a5fd19a93f3e314520921fee10b60991daad7a8d72"
+    }
+  ]
+}

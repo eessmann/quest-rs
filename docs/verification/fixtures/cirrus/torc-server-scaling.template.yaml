@@ -1,0 +1,50 @@
+# Review template only: replace account and admitted predecessor job ID before creation.
+# Existing immutable source/build paths arrive through the explicitly exported environment.
+name: quest-cray-server-scaling
+description: One server-backed coordinator runs the immutable CPU/MPI scaling campaign.
+use_pending_failed: false
+execution_config:
+  mode: direct
+  limit_resources: false
+slurm_defaults:
+  ntasks: 8
+  ntasks-per-node: 1
+  cpus-per-task: 288
+  hint: nomultithread
+  export: ALL
+jobs:
+  - name: native-scaling
+    command: bash -l "$QUEST_SOURCE/docs/verification/fixtures/cirrus/native-validation.sbatch"
+    env:
+      QUEST_STAGE: scaling
+      QUEST_COMPILER: cray
+      QUEST_VALIDATION_ROOT: /path/to/scaling-campaign
+      QUEST_NATIVE_CAMPAIGN: /path/to/native-campaign
+      QUEST_SOURCE: /path/to/immutable-ff4d-source
+      QUEST_SOURCE_MANIFEST: /path/to/immutable-ff4d-source.sha256
+      QUEST_SOURCE_DIGEST: REPLACE_WITH_FULL_FF4D_SOURCE_MANIFEST_SHA256
+      QUEST_NATIVE_SHA256: REPLACE_WITH_VERIFIED_CRAY_NATIVE_LIBRARY_SHA256
+      QUEST_BUILD_RECEIPT: /path/to/successful-cray-scaling-build-receipt
+    resource_requirements: scaling
+    scheduler: scaling
+resource_requirements:
+  - name: scaling
+    num_cpus: 288
+    num_nodes: 8
+    memory: 32g
+    runtime: PT55M
+slurm_schedulers:
+  - name: scaling
+    account: REPLACE_WITH_ACCOUNT
+    nodes: 8
+    partition: standard
+    qos: lowpriority
+    walltime: "01:00:00"
+    extra: "--exclusive --no-requeue --dependency=afterok:REPLACE_WITH_ADMITTED_PREDECESSOR_JOB_ID"
+actions:
+  - trigger_type: on_workflow_start
+    action_type: schedule_nodes
+    scheduler: scaling
+    scheduler_type: slurm
+    num_allocations: 1
+    start_one_worker_per_node: false

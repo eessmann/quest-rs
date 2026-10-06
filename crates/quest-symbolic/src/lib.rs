@@ -22,7 +22,7 @@ use dashu_int::IBig;
 use source::{Kind, Linear, MAX_INPUT_BINDINGS, Source, rational_bytes};
 
 pub use affine::ExactError;
-pub use dashu_ratio::RBig;
+pub use mathcore::RBig;
 
 /// Quest's parameter namespace, independent of the algebra engine's type.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]

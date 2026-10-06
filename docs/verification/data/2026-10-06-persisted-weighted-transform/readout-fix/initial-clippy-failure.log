@@ -1,0 +1,45 @@
+warning: `feature(generic_const_exprs)` is not supported with the next-generation trait solver
+ --> crates/quest-polynomial/src/lib.rs:1:30
+  |
+1 | #![feature(const_trait_impl, generic_const_exprs)]
+  |                              ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `-Znext-solver=globally` is currently enabled by default for testing
+  = note: reverted the setting to `-Znext-solver=coherence` for this crate
+  = note: the currently stable trait solver will be used for this crate
+  = note: see issues #160895 <https://github.com/rust-lang/rust/issues/160895> for more information
+
+warning: `quest-polynomial` (lib) generated 1 warning
+   Compiling quest-sys v0.2.0 (<workspace>/crates/quest-sys)
+    Checking quest-qsvt v0.1.0 (<workspace>/crates/quest-qsvt)
+    Checking quest-qsvt-io v0.1.0 (<workspace>/crates/quest-qsvt-io)
+warning: quest-sys@0.2.0: Using QuEST 4.3.0 from <quest-install> with /usr/bin/c++
+warning: quest-sys@0.2.0: Verified rsmpi MPICC <matching-mpicc> matches QuEST MPI ABI and loaded library
+   Compiling quest-rs v0.1.0 (<workspace>/crates/quest)
+error: pub(crate) function inside private module
+  --> crates/quest/examples/persisted_weighted_transform/execution.rs:23:1
+   |
+23 | pub(crate) fn decode_pair_packet(incoming: &[u8; 1024], received: usize) -> Result<Vec<Complex64>> {
+   | ----------^^^^^^^^^^^^^^^^^^^^^^
+   | |
+   | help: consider using: `pub`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/main/index.html#redundant_pub_crate
+   = note: `-D clippy::redundant-pub-crate` implied by `-D clippy::nursery`
+   = help: to override `-D clippy::nursery` add `#[allow(clippy::redundant_pub_crate)]`
+
+error: pub(crate) function inside private module
+  --> crates/quest/tests/../examples/persisted_weighted_transform/execution.rs:23:1
+   |
+23 | pub(crate) fn decode_pair_packet(incoming: &[u8; 1024], received: usize) -> Result<Vec<Complex64>> {
+   | ----------^^^^^^^^^^^^^^^^^^^^^^
+   | |
+   | help: consider using: `pub`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/main/index.html#redundant_pub_crate
+   = note: `-D clippy::redundant-pub-crate` implied by `-D clippy::nursery`
+   = help: to override `-D clippy::nursery` add `#[allow(clippy::redundant_pub_crate)]`
+
+error: could not compile `quest-rs` (example "persisted_weighted_transform") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `quest-rs` (test "persisted_weighted_transform") due to 1 previous error

@@ -3,7 +3,8 @@
 //!
 //! IO admits shape, finite values and convention tags. Catalog provenance and
 //! file metadata are not mathematical certificates. HDF5 is required and serial;
-//! distributed applications call these APIs on the coordinating root only.
+//! Legacy whole-file readers run on the coordinating root. Sharded readers run
+//! independently on each file owner and never require the complete input.
 
 mod catalog;
 #[cfg(feature = "certification")]
@@ -12,7 +13,9 @@ mod compiled;
 pub use compiled::{CompiledInput, read_compiled_qsp_json};
 pub mod hdf5;
 mod json;
+pub mod sharded_matching;
 mod sparse;
+pub mod sparse_stream;
 pub use catalog::{CatalogFamily, CatalogSource, InverseCatalog};
 pub use json::{
 	GeneralizedAngleInput, PolynomialConversion, PolynomialInput, QspInput,

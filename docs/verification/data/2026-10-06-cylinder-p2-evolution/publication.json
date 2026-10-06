@@ -1,0 +1,119 @@
+{
+  "schema": "quest-cylinder-p2-evolution-publication-v1",
+  "date": "2026-10-06",
+  "artifacts": [
+    {
+      "file": "build-attestation.json",
+      "sha256": "d744fdd0873a3ef2b00463725d7e71968153a7ead40e4bbe89a34931298086f5",
+      "bytes": 1722
+    },
+    {
+      "file": "build-source.json",
+      "sha256": "e45b8e9a64ee01698413e70c9a457a35775974280388dcf5a3df6e0da41a2da3",
+      "bytes": 74220
+    },
+    {
+      "file": "publication-provenance.json",
+      "sha256": "dd1f9089570699230e236eadd26243995bf0ea20176e2220a44b4a524ee9aa41",
+      "bytes": 4354
+    },
+    {
+      "file": "receipt.json",
+      "sha256": "2ebf2a2e00331ab30d1c20282fdba02e7f2011a76112d0ed4c51e8e4220c89f1",
+      "bytes": 3625
+    },
+    {
+      "file": "reviewed-source.json",
+      "sha256": "c40cc89a2b33e94a0e60f30b5c4e0075a9631368a10a4f4c310b32f32d84cdad",
+      "bytes": 2268
+    },
+    {
+      "file": "steps-2.json",
+      "sha256": "6e592189a1eb912d65604040cbb977742d87ee1ba60f930e002074bc11982a31",
+      "bytes": 9314
+    },
+    {
+      "file": "steps-2.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "file": "steps-4.json",
+      "sha256": "4de6683ea68dac757dde999f96785e33fe1508e15fcc08668c1abeb250f2095a",
+      "bytes": 9524
+    },
+    {
+      "file": "steps-4.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "file": "steps-8.json",
+      "sha256": "13ee12fec0ff6c7e9c86635b06aad137888e5f5a9d72ebddd8b7f516c2f176ed",
+      "bytes": 9882
+    },
+    {
+      "file": "steps-8.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  ],
+  "source_checks": {
+    "reviewed_files": 15,
+    "default_build_files": 504,
+    "build_before_after_and_campaign_after_equal": true,
+    "current_files_match_at_publication": true
+  },
+  "independent_review": {
+    "scoped_rust_tests_passed": 19,
+    "python_runner_tests_passed": 5,
+    "strict_clippy_passed": true,
+    "saved_campaign_revalidated": true,
+    "reviewer_reexecuted_physical_children": false,
+    "private_logs": [
+      {
+        "file": "quest-cylinder-evolution-independent-helper.log",
+        "sha256": "92474155e8e4a7a34c18bb2fad55d75e8edd1980a686db1537b6cd324e8b4999"
+      },
+      {
+        "file": "quest-cylinder-evolution-independent-integration-corrected.log",
+        "sha256": "f893abf69e7b628b5992862492b1a8ef2930fb447627c55e34a0fbebb64de441"
+      },
+      {
+        "file": "quest-cylinder-evolution-independent-clippy.log",
+        "sha256": "daaeab7f249a214bcd6765e6aff4062c1d8bae77e42a7387792076b72317a1e7"
+      },
+      {
+        "file": "quest-cylinder-evolution-independent-schema-fix-2-green.log",
+        "sha256": "4e717fd4bfa9196e3e04aa03cd5a9a1b7f56df09a4b82c65300bbf33da886505"
+      },
+      {
+        "file": "quest-cylinder-evolution-independent-positive-schema-fix-2.log",
+        "sha256": "a0f4e64c382167a67d43880c724731f2844a1f3a095903d55ce7f947da46d576"
+      },
+      {
+        "file": "quest-cylinder-evolution-independent-campaign-review.log",
+        "sha256": "fb3101d5e74e60788aad43ca14be9b5df3403d4e638772752a3794d6a8f27cbc"
+      }
+    ]
+  },
+  "root_saved_output_check": {
+    "all_raw_hashes_match": true,
+    "retained_coordinates_per_row": 54,
+    "all_work_and_callback_counts_match": true,
+    "six_temporal_comparisons_independently_recomputed": true
+  },
+  "physical_child_runs": 3,
+  "integration_status": "three-completed",
+  "accuracy_status": "accuracy-failure",
+  "rss_measured": false,
+  "quantum_execution": false,
+  "official_dfg_cycle_executed": false,
+  "limitations": [
+    "Source closure attestation excludes external registry contents, environment and non-Rust build assets.",
+    "Private Cargo JSONL paths are not published; their unchanged hashes remain in publication-provenance.json.",
+    "Managed payload peak and enforced address-space cap are distinct from unmeasured process RSS.",
+    "Completed integration, small original residuals and nonzero quadratic action do not certify forward accuracy.",
+    "No physical child retry, tolerance change or work-cap change followed the fixed temporal accuracy failure."
+  ]
+}

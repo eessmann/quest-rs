@@ -1,0 +1,167 @@
+[
+  {
+    "basename": "p1-c3-e1-w1_2.json",
+    "bytes": 7258,
+    "sha256": "be621e969bf6d2f925865682e9006aba0d2f0cf8d818b5b9a8f1ca87aaf02973"
+  },
+  {
+    "basename": "p1-c3-e1-w1_2.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "basename": "p1-c3-e1-w1_2.time",
+    "bytes": 10,
+    "sha256": "dc9065feac42d7edf3aeb8be5b53466dbe59c82285dbfbc3080ec756f77875f8"
+  },
+  {
+    "basename": "p1-c3-e1-w3_5.json",
+    "bytes": 7239,
+    "sha256": "ecbea7902eba0456328151a0e5acd407daf157f2460dafecbd38a9c2eaebad39"
+  },
+  {
+    "basename": "p1-c3-e1-w3_5.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "basename": "p1-c3-e1-w3_5.time",
+    "bytes": 10,
+    "sha256": "200f39bf70a404823721ac2cf7bdae9f5035badf0b28a3a3a8762e1d629ac92f"
+  },
+  {
+    "basename": "p1-c4-e1-w1_2.json",
+    "bytes": 7232,
+    "sha256": "14664ebc2b353933ef9dabd3e9768f64e4ba5edfa9b4a5d6731e1fc8351d7d76"
+  },
+  {
+    "basename": "p1-c4-e1-w1_2.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "basename": "p1-c4-e1-w1_2.time",
+    "bytes": 10,
+    "sha256": "00afa88cd5659e7e09910455f58a2d2611144f587ae6db85cd6e9ce568348108"
+  },
+  {
+    "basename": "p1-c5-e1-w1_2.json",
+    "bytes": 5672,
+    "sha256": "f45c87c7de69f3100bdbd66405451e0060a53760221a1f37cb9f7d53dab24c24"
+  },
+  {
+    "basename": "p1-c5-e1-w1_2.stderr",
+    "bytes": 69,
+    "sha256": "cf247f85fff572f2633d7bbd6a1ce9e3e34b3c0c20f06849bddda2a0762b3060"
+  },
+  {
+    "basename": "p1-c5-e1-w1_2.time",
+    "bytes": 10,
+    "sha256": "8a88e46155ef7f14c01c8b080224da2911699ae5de99e0d8851a83ac2910be39"
+  },
+  {
+    "basename": "p1-c5-e5_3-w1_2.json",
+    "bytes": 5866,
+    "sha256": "654dc7c59d6664e983283157dbf24d05bb690c525b9f0b5e0e0e98eeb3aca641"
+  },
+  {
+    "basename": "p1-c5-e5_3-w1_2.stderr",
+    "bytes": 69,
+    "sha256": "cf247f85fff572f2633d7bbd6a1ce9e3e34b3c0c20f06849bddda2a0762b3060"
+  },
+  {
+    "basename": "p1-c5-e5_3-w1_2.time",
+    "bytes": 10,
+    "sha256": "d44851cfab91d4a75008a2dd7b35f8b95fa73c9c352ef16bd123119ce87ed262"
+  },
+  {
+    "basename": "p2-c1-e1-w1_2.json",
+    "bytes": 2454,
+    "sha256": "9de1431eda62ad20dbecae4f880e5fe7883322822eb418e12a693eb0907144e9"
+  },
+  {
+    "basename": "p2-c1-e1-w1_2.stderr",
+    "bytes": 73,
+    "sha256": "00455e7626839a05c97172bd5da000299645280dd16dd0af663db505b02953ef"
+  },
+  {
+    "basename": "p2-c1-e1-w1_2.time",
+    "bytes": 10,
+    "sha256": "5990fde8326a05abb308187c195a457300dec77bfcc6ec303caf42fe8835080f"
+  },
+  {
+    "basename": "p2-c3-e1-w1_2.json",
+    "bytes": 5691,
+    "sha256": "b38731314832ddd019147a9b3302d69e81df4119bd952dba1881909854c5553f"
+  },
+  {
+    "basename": "p2-c3-e1-w1_2.stderr",
+    "bytes": 69,
+    "sha256": "cf247f85fff572f2633d7bbd6a1ce9e3e34b3c0c20f06849bddda2a0762b3060"
+  },
+  {
+    "basename": "p2-c3-e1-w1_2.time",
+    "bytes": 10,
+    "sha256": "c9243257c96891ce5ac4b819ac2be5de9798af3554c216555d024c4a2c8c0129"
+  },
+  {
+    "basename": "receipt.json",
+    "bytes": 14407,
+    "sha256": "bf677ee747da930647cb05a3c4d4174399cb475d126d3f2b454eff76f27677de"
+  },
+  {
+    "basename": "quest-weak-campaign-analysis-1.json",
+    "bytes": 30280,
+    "sha256": "2aa640c9f223160ff8d6159d0aa98b202f92025be1ccf72f0d27dc4a386b8b35"
+  },
+  {
+    "basename": "quest-weak-campaign-build-attestation-1.json",
+    "bytes": 1659,
+    "sha256": "32b1ddfc22012dae0845b3394ca7eab49bdfe34478114c1edf28bcf367d463d3"
+  },
+  {
+    "basename": "quest-weak-campaign-build-1-before.json",
+    "bytes": 74671,
+    "sha256": "38bd1e097ef65fd84a0160e566153965e1bad0ed0cb34147519049f2ce6a5759"
+  },
+  {
+    "basename": "quest-weak-campaign-build-1-after.json",
+    "bytes": 74671,
+    "sha256": "38bd1e097ef65fd84a0160e566153965e1bad0ed0cb34147519049f2ce6a5759"
+  },
+  {
+    "basename": "quest-weak-campaign-build-1-build.jsonl",
+    "bytes": 173570,
+    "sha256": "e518a36f15a37f9c3660b07f9e5d2a7cca3216ddccabb9c97b1ab63bde91de87"
+  },
+  {
+    "basename": "quest-weak-campaign-build-1-build.log",
+    "bytes": 168,
+    "sha256": "5fc7ff036c178371e967505bf585be739a476b2c0166bd8a93a7ac7e0b701c43"
+  },
+  {
+    "basename": "quest-weak-campaign-execution-attestation-1.json",
+    "bytes": 1370,
+    "sha256": "244e89823eef3eb66f76a3c7d237e851e720c98758e7d8ccae9ccc54b7147c03"
+  },
+  {
+    "basename": "quest-weak-campaign-execution-1-before.json",
+    "bytes": 79362,
+    "sha256": "c5e009e5de2a4fac42f7e36adc917bc24802f765f1e68a98d4f6483f8f352cc1"
+  },
+  {
+    "basename": "quest-weak-campaign-execution-1-after.json",
+    "bytes": 79362,
+    "sha256": "c5e009e5de2a4fac42f7e36adc917bc24802f765f1e68a98d4f6483f8f352cc1"
+  },
+  {
+    "basename": "quest-weak-campaign-build-1.py",
+    "bytes": 3579,
+    "sha256": "b3b7054c0a636749c97e07c4555dd77391d2aab2e3d738fa229de38c7ff51903"
+  },
+  {
+    "basename": "quest-weak-campaign-execute-1.py",
+    "bytes": 3392,
+    "sha256": "6fd6b902c7318fb3f618eb91b7a0ebfe7aafc3c6db779da6ea20669a00bcdd33"
+  }
+]

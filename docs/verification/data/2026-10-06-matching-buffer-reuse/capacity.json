@@ -1,0 +1,237 @@
+{
+  "schema_version": 1,
+  "status": "local buffer reuse verified; strict capacity open",
+  "scope": "One physical host; controlled whole-U and adjoint retained. No multi-host or oversized-input acceptance.",
+  "identities": {
+    "v5_executable_sha256": "1f0c4550b6a84fef042ad4c2a0a0b5a08d5b8b94503d5912ce69f087da56c0a1",
+    "checkpoint_executable_sha256": "cd3e3d9252e47b5c7b01181b24abab253b203c3f55c2e68ef675d51ca15e5d9f",
+    "checkpoint_source_sha256": "021469455d77178f4254a85e8545fec9e923891e7aa287c24da6560b42a91440",
+    "example_sources_sha256": {
+      "crates/quest/examples/sparse_capacity.rs": "a78d11efa9930fd1b9d785c38c13f5da069baf257b621238017d10d3c634c4d4",
+      "crates/quest/examples/sparse_capacity/support.rs": "58e87d0889adbdb4a8771e5350dae78cea2bf0ebc13f9b0a654ab88019e77dca"
+    },
+    "source_hash_scope": "Example and support sources captured with the diagnostic build; these hashes do not identify the complete library working tree. No immutable full-source snapshot was made for these local runs.",
+    "remote_snapshot_8e02_results_included": false
+  },
+  "red_regression": {
+    "test": "buffer_reuse::distributed_matching_reuses_native_buffer_without_width_scaled_scratch",
+    "pre_change": "P1 passed; P2/P4/P8 failed the width-independent preparation reservation assertion; numerical comparisons passed.",
+    "qubit_widths": [
+      9,
+      13
+    ],
+    "additional_reserved_bytes_per_rank": {
+      "2": 245760,
+      "4": 122880,
+      "8": 61440
+    },
+    "post_change": "P1 retains owned scratch; P2/P4/P8 prepare equal retained payload at both widths and report no owned scratch register."
+  },
+  "validation": {
+    "matching_collective_tests": 2,
+    "matching_collective_mpi_launches": 9,
+    "consumer_tests": 3,
+    "consumer_mpi_launches": 19,
+    "consumer_targets": [
+      "matching_lcu_collective",
+      "matching_lcu_transform_collective",
+      "matching_persisted_preparation"
+    ],
+    "python_fixture_tests": 70,
+    "strict_scoped_clippy": "passed",
+    "rustfmt_and_diff_check": "passed",
+    "historical_cirrus_cases_revalidated": 13,
+    "historical_v4_local_cases_revalidated": 2,
+    "independent_review": "No material findings; geometric inputs and fitted values independently decoded and checked."
+  },
+  "before_after": [
+    {
+      "ranks": 1,
+      "dimension": 64,
+      "repetitions": 3,
+      "requested_openmp_threads": 2,
+      "native_openmp_team_size": null,
+      "native_multithreading_enabled": true,
+      "v4_executable_sha256": "2d1b1890763cadeea2772e901fe914a9b140fd0c9c7271b41c29954f7938fdfb",
+      "v5_executable_sha256": "1f0c4550b6a84fef042ad4c2a0a0b5a08d5b8b94503d5912ce69f087da56c0a1",
+      "v4_native_reserved_bytes_per_rank": 106360,
+      "v5_native_reserved_bytes_per_rank": 106360,
+      "v4_actual_native_host_array_bytes_per_rank": 16384,
+      "v5_actual_native_host_array_bytes_per_rank": 16384,
+      "v5_scratch_mode": "owned-register",
+      "norms": [
+        0.9999999999999999
+      ],
+      "maximum_sample_error": 2.7755575615628914e-17,
+      "complete": true,
+      "capacity_closed": false
+    },
+    {
+      "ranks": 2,
+      "dimension": 64,
+      "repetitions": 3,
+      "requested_openmp_threads": 2,
+      "native_openmp_team_size": null,
+      "native_multithreading_enabled": true,
+      "v4_executable_sha256": "2d1b1890763cadeea2772e901fe914a9b140fd0c9c7271b41c29954f7938fdfb",
+      "v5_executable_sha256": "1f0c4550b6a84fef042ad4c2a0a0b5a08d5b8b94503d5912ce69f087da56c0a1",
+      "v4_native_reserved_bytes_per_rank": 70008,
+      "v5_native_reserved_bytes_per_rank": 53624,
+      "v4_actual_native_host_array_bytes_per_rank": 16384,
+      "v5_actual_native_host_array_bytes_per_rank": 8192,
+      "v5_scratch_mode": "borrowed-input-communication-buffer",
+      "norms": [
+        0.9999999999999998,
+        0.9999999999999998
+      ],
+      "maximum_sample_error": 2.7755575615628914e-17,
+      "complete": true,
+      "capacity_closed": false
+    }
+  ],
+  "affinity_diagnosis": {
+    "failed_attempts": [
+      {
+        "id": "buffer-reuse-geometric-p4",
+        "dimension": 8192,
+        "ranks": 4,
+        "timeout_seconds": 180,
+        "elapsed_seconds": 180.0014654789993,
+        "complete": false,
+        "capacity_closed": false,
+        "rank_receipts": 0,
+        "reason": "MPI masters inherited overlapping core affinity",
+        "later_dimensions_executed": false
+      },
+      {
+        "id": "buffer-reuse-checkpoint-p4",
+        "dimension": 8192,
+        "ranks": 4,
+        "timeout_seconds": 30,
+        "elapsed_seconds": 30.002035794008407,
+        "complete": false,
+        "capacity_closed": false,
+        "rank_receipts": 0,
+        "reason": "MPI masters inherited overlapping core affinity",
+        "later_dimensions_executed": false
+      }
+    ],
+    "unbound_all_rank_master_cpu_list": "0,16",
+    "corrected_launcher": [
+      "mpiexec",
+      "-bind-to",
+      "core:2"
+    ],
+    "launcher_adapter_sha256": "6dce9f1b95a1bb1cacf34f1fdc13b6931e4aee6f5f77bdfc8456a34e797c2a68",
+    "corrected_rank_master_cpu_lists": [
+      "0,16",
+      "2,18",
+      "4,20",
+      "6,22"
+    ],
+    "corrected_rank_worker_cpu_lists": [
+      "1,17",
+      "3,19",
+      "5,21",
+      "7,23"
+    ],
+    "same_checkpoint_binary_and_workload": true,
+    "bound_checkpoint_launcher_seconds": 1.161594224991859,
+    "interpretation": "The identical checkpointed N8192 case timed out at 30 seconds with overlapping affinity and completed with disjoint binding. The original 180-second failure remains separate evidence; no numerical implementation or timeout increase was needed."
+  },
+  "geometric": {
+    "scope": "single physical host, four MPI ranks, two requested OpenMP threads per rank, disjoint two-core Hydra binding; no multi-host or oversized-input acceptance",
+    "dimensions": [
+      8192,
+      16384,
+      32768
+    ],
+    "ranks": 4,
+    "physical_hosts": 1,
+    "requested_openmp_threads_per_rank": 2,
+    "native_openmp_team_size": null,
+    "repetitions": 3,
+    "process_as_cap_bytes": 2147483648,
+    "managed_rank_budget_bytes": 134217728,
+    "decoded_nonzeros": 114688,
+    "cases": [
+      {
+        "dimension": 8192,
+        "local_dimension": 2048,
+        "original_bytes": 524288,
+        "launcher_seconds": 1.160474778007483,
+        "stage_max_seconds": {
+          "preprocessing": 0.086596902,
+          "persistence": 0.018114838,
+          "load": 0.074738896,
+          "prepare": 0.02464687,
+          "execution": 0.371093631
+        },
+        "median_rank_max_roundtrip_seconds": 0.123041999,
+        "producer_peak_bytes": 919136,
+        "loaded_retained_bytes": 430080,
+        "native_reserved_bytes": 1311664,
+        "native_host_array_payload_bytes": 524288,
+        "capacity_closed": false,
+        "max_sample_error": 2.603214346243983e-18
+      },
+      {
+        "dimension": 16384,
+        "local_dimension": 4096,
+        "original_bytes": 1048576,
+        "launcher_seconds": 1.787650731013855,
+        "stage_max_seconds": {
+          "preprocessing": 0.173709249,
+          "persistence": 0.040683244,
+          "load": 0.149491981,
+          "prepare": 0.049429771,
+          "execution": 0.760409509
+        },
+        "median_rank_max_roundtrip_seconds": 0.253386956,
+        "producer_peak_bytes": 1820256,
+        "loaded_retained_bytes": 856064,
+        "native_reserved_bytes": 2589624,
+        "native_host_array_payload_bytes": 1048576,
+        "capacity_closed": false,
+        "max_sample_error": 1.734723475976807e-18
+      },
+      {
+        "dimension": 32768,
+        "local_dimension": 8192,
+        "original_bytes": 2097152,
+        "launcher_seconds": 3.004199852992315,
+        "stage_max_seconds": {
+          "preprocessing": 0.353907348,
+          "persistence": 0.0631139,
+          "load": 0.300650813,
+          "prepare": 0.100785455,
+          "execution": 1.576344068
+        },
+        "median_rank_max_roundtrip_seconds": 0.526108467,
+        "producer_peak_bytes": 3622496,
+        "loaded_retained_bytes": 1708032,
+        "native_reserved_bytes": 5145536,
+        "native_host_array_payload_bytes": 2097152,
+        "capacity_closed": false,
+        "max_sample_error": 1.3016071731219915e-18
+      }
+    ],
+    "fitted_payload_formulas": {
+      "local_dimension": "x=N/4",
+      "producer_peak": "440*x+18016",
+      "loaded_retained": "208*x+4096",
+      "native_conservative_reservation": "624*x+33608+8*log2(N)",
+      "native_host_array_payload": "256*x",
+      "scope": "exact fits to these three measured 64-bit builds and workload points; producer/reservation counters are not measured RSS"
+    }
+  },
+  "acceptance": {
+    "strict_capacity": "open",
+    "multi_host_new_v5_execution": "not performed in this evidence",
+    "largest_completed_original_input_bytes": 2097152,
+    "any_completed_original_input_exceeds_rank_process_cap": false,
+    "portable_replay_admission": "unrun on v5 resource-only capacity path",
+    "generic_input_reservation": "unchanged: four local complex arrays",
+    "exclusions": "Native array payload excludes allocator overhead, MPI internals, OpenMP stacks and other temporary storage. Producer and reservation counters are not RSS measurements."
+  }
+}

@@ -1,0 +1,298 @@
+{
+  "source_policy": "explicit-rectangle-corner-priority-v1",
+  "fingerprint": 17853273085390264558,
+  "vertices": [
+    [
+      0.25,
+      0.2,
+      0.0
+    ],
+    [
+      0.24972663333523598,
+      0.2052212965001998,
+      0.0
+    ],
+    [
+      0.2,
+      0.25,
+      0.0
+    ],
+    [
+      0.16551724137931034,
+      0.23620689655172414,
+      0.0
+    ],
+    [
+      0.15000000000000002,
+      0.2,
+      0.0
+    ],
+    [
+      0.16464466094067262,
+      0.16464466094067262,
+      0.0
+    ],
+    [
+      0.2,
+      0.15000000000000002,
+      0.0
+    ],
+    [
+      0.24975185951049947,
+      0.19502481404895006,
+      0.0
+    ],
+    [
+      2.2,
+      0.2,
+      0.0
+    ],
+    [
+      2.2,
+      0.41,
+      0.0
+    ],
+    [
+      0.2,
+      0.41,
+      0.0
+    ],
+    [
+      0.0,
+      0.41,
+      0.0
+    ],
+    [
+      0.0,
+      0.2,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.2,
+      0.0,
+      0.0
+    ],
+    [
+      2.2,
+      0.0,
+      0.0
+    ]
+  ],
+  "cells": [
+    [
+      0,
+      8,
+      9
+    ],
+    [
+      0,
+      9,
+      1
+    ],
+    [
+      1,
+      9,
+      10
+    ],
+    [
+      1,
+      10,
+      2
+    ],
+    [
+      2,
+      10,
+      11
+    ],
+    [
+      2,
+      11,
+      3
+    ],
+    [
+      3,
+      11,
+      12
+    ],
+    [
+      3,
+      12,
+      4
+    ],
+    [
+      4,
+      12,
+      13
+    ],
+    [
+      4,
+      13,
+      5
+    ],
+    [
+      5,
+      13,
+      14
+    ],
+    [
+      5,
+      14,
+      6
+    ],
+    [
+      6,
+      14,
+      15
+    ],
+    [
+      6,
+      15,
+      7
+    ],
+    [
+      7,
+      15,
+      8
+    ],
+    [
+      7,
+      8,
+      0
+    ]
+  ],
+  "exterior": [
+    {
+      "vertices": [
+        0,
+        1
+      ],
+      "label": "cylinder",
+      "condition": "Dirichlet"
+    },
+    {
+      "vertices": [
+        8,
+        9
+      ],
+      "label": "outlet",
+      "condition": "NaturalMechanicalTraction"
+    },
+    {
+      "vertices": [
+        1,
+        2
+      ],
+      "label": "cylinder",
+      "condition": "Dirichlet"
+    },
+    {
+      "vertices": [
+        9,
+        10
+      ],
+      "label": "far-wall",
+      "condition": "Dirichlet"
+    },
+    {
+      "vertices": [
+        2,
+        3
+      ],
+      "label": "cylinder",
+      "condition": "Dirichlet"
+    },
+    {
+      "vertices": [
+        10,
+        11
+      ],
+      "label": "far-wall",
+      "condition": "Dirichlet"
+    },
+    {
+      "vertices": [
+        3,
+        4
+      ],
+      "label": "cylinder",
+      "condition": "Dirichlet"
+    },
+    {
+      "vertices": [
+        11,
+        12
+      ],
+      "label": "inlet",
+      "condition": "Dirichlet"
+    },
+    {
+      "vertices": [
+        4,
+        5
+      ],
+      "label": "cylinder",
+      "condition": "Dirichlet"
+    },
+    {
+      "vertices": [
+        12,
+        13
+      ],
+      "label": "inlet",
+      "condition": "Dirichlet"
+    },
+    {
+      "vertices": [
+        5,
+        6
+      ],
+      "label": "cylinder",
+      "condition": "Dirichlet"
+    },
+    {
+      "vertices": [
+        13,
+        14
+      ],
+      "label": "far-wall",
+      "condition": "Dirichlet"
+    },
+    {
+      "vertices": [
+        6,
+        7
+      ],
+      "label": "cylinder",
+      "condition": "Dirichlet"
+    },
+    {
+      "vertices": [
+        14,
+        15
+      ],
+      "label": "far-wall",
+      "condition": "Dirichlet"
+    },
+    {
+      "vertices": [
+        7,
+        0
+      ],
+      "label": "cylinder",
+      "condition": "Dirichlet"
+    },
+    {
+      "vertices": [
+        15,
+        8
+      ],
+      "label": "outlet",
+      "condition": "NaturalMechanicalTraction"
+    }
+  ]
+}

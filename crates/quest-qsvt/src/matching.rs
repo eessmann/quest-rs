@@ -233,7 +233,7 @@ fn color_entries(matrix: &SparseMatrix) -> Result<ColoredEntries> {
 		u64::try_from(matrix.rows()).map_err(|_| Error::Budget("source identity"))?,
 		u64::try_from(matrix.cols()).map_err(|_| Error::Budget("source identity"))?,
 	] {
-		identity = (identity ^ component).wrapping_mul(0x0000_0100_0000_01b3);
+		identity = crate::owned_replay::fingerprint_word(identity, component);
 	}
 	for (position, &(row, col, value)) in entries.iter().enumerate() {
 		let magnitude = value.norm();
@@ -247,7 +247,7 @@ fn color_entries(matrix: &SparseMatrix) -> Result<ColoredEntries> {
 			value.re.to_bits(),
 			value.im.to_bits(),
 		] {
-			identity = (identity ^ component).wrapping_mul(0x0000_0100_0000_01b3);
+			identity = crate::owned_replay::fingerprint_word(identity, component);
 		}
 		let color = (0..num_matchings)
 			.find(|&candidate| {

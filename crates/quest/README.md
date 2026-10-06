@@ -297,3 +297,9 @@ values assembled with different sharing graphs can require different native
 allocation schedules. First-occurrence indices describe those relationships;
 raw memory addresses never cross ranks. Such a schedule mismatch is rejected
 before materialization, even when the numerical operations are otherwise equal.
+
+The Linux [sparse matching experiment](examples/sparse_capacity/README.md) creates
+input shards directly and records construction, persistence, loading and repeated
+CPU/MPI execution. Its explicit `--scaling` mode accepts observed unlimited
+process limits while retaining finite managed budgets; those receipts never claim
+whole-node capacity acceptance.

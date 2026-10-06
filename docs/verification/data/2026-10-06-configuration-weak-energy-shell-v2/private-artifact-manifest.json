@@ -1,0 +1,122 @@
+[
+  {
+    "path": "<private-artifacts>/quest-weak-shell-v2-build-1-attestation.json",
+    "bytes": 2217,
+    "sha256": "efece0afe5cea98b1254e32af71759e485cbbe087ebe20ff9013581eeb6afc9b"
+  },
+  {
+    "path": "<private-artifacts>/quest-weak-shell-v2-build-1-source-before.json",
+    "bytes": 75010,
+    "sha256": "93d4944c110624d2a83dd987499efb6770eb963257af29af0caf4c888ac3e05b"
+  },
+  {
+    "path": "<private-artifacts>/quest-weak-shell-v2-build-1-source-after.json",
+    "bytes": 75010,
+    "sha256": "93d4944c110624d2a83dd987499efb6770eb963257af29af0caf4c888ac3e05b"
+  },
+  {
+    "path": "<private-artifacts>/quest-weak-shell-v2-build-1-before.json",
+    "bytes": 83916,
+    "sha256": "13f74e60158b1b8fa4f06b41702958216a8caeb006af0d3425103f87d0478197"
+  },
+  {
+    "path": "<private-artifacts>/quest-weak-shell-v2-build-1-after.json",
+    "bytes": 83916,
+    "sha256": "13f74e60158b1b8fa4f06b41702958216a8caeb006af0d3425103f87d0478197"
+  },
+  {
+    "path": "<private-artifacts>/quest-weak-shell-v2-build-1-compiler-artifacts.jsonl",
+    "bytes": 173634,
+    "sha256": "7b68736ff77837f02d1cdcbc19b8160838dd0ced1ed9f9b722093d110b910e54"
+  },
+  {
+    "path": "<private-artifacts>/quest-weak-shell-v2-build-1-build.log",
+    "bytes": 168,
+    "sha256": "24c452f17036b35c01807d04feae91b5b5c86dc03d4e75e3d2662a48839a55d3"
+  },
+  {
+    "path": "<private-artifacts>/quest-weak-shell-v2-execution-attestation-1.json",
+    "bytes": 1719,
+    "sha256": "0326c148da0548fef12d99ac7e22ca78516df0dd376279b3f12b999e4bdffb81"
+  },
+  {
+    "path": "<private-artifacts>/quest-weak-shell-v2-execution-attestation-1-before.json",
+    "bytes": 84290,
+    "sha256": "bf1a74ed21653419a7e4dd8df85be994d8009d00149b2997c68d05adbe6815e8"
+  },
+  {
+    "path": "<private-artifacts>/quest-weak-shell-v2-execution-attestation-1-after.json",
+    "bytes": 84290,
+    "sha256": "bf1a74ed21653419a7e4dd8df85be994d8009d00149b2997c68d05adbe6815e8"
+  },
+  {
+    "path": "<private-artifacts>/quest-weak-shell-v2-execution-attestation-1-runner.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "<private-artifacts>/quest-weak-shell-v2-analysis.py",
+    "bytes": 5067,
+    "sha256": "073e370349a4ddbfbf8e45ac97b6b701e0939b6355c81a8fa5f260a91ee7965a"
+  },
+  {
+    "path": "<private-artifacts>/quest-weak-shell-v2-analysis.json",
+    "bytes": 11059,
+    "sha256": "a049b918966b50cc5d56cc9d1fedec0dbdf61c44c6f2b07c20098157bfe69e3d"
+  },
+  {
+    "path": "<private-artifacts>/quest-weak-shell-v2-analysis.log",
+    "bytes": 1131,
+    "sha256": "92d6ec9c2671d7a5021f91bea40ab2c319ef6ed16dc358da058f2c0eadd0c027"
+  },
+  {
+    "path": "<private-artifacts>/quest_weak_shell_v2_attestation.py",
+    "bytes": 3574,
+    "sha256": "44f4b178b44c9c3bd00a9b3098100f6d1bf0ebbb328fa76393b3c53b71af8e2d"
+  },
+  {
+    "path": "<private-artifacts>/quest-weak-shell-v2-build-1.py",
+    "bytes": 4242,
+    "sha256": "682dd8f05107d69c46cc436bf1b9da609b50edd68b6108545abe39f2584489a9"
+  },
+  {
+    "path": "<private-artifacts>/quest-weak-shell-v2-execute-1.py",
+    "bytes": 4603,
+    "sha256": "316db0188e439ba7074d8b205b4feb6491382bc094bb92b97941be9860819cf5"
+  },
+  {
+    "path": "<private-artifacts>/quest-weak-shell-v2-prepared-scripts.json",
+    "bytes": 621,
+    "sha256": "bb87bba84e6e7f2580ce38a796430cb86bb117e92114b841e28f259cdbbf218c"
+  },
+  {
+    "path": "<private-artifacts>/quest-weak-shell-v2-build-release.log",
+    "bytes": 2217,
+    "sha256": "efece0afe5cea98b1254e32af71759e485cbbe087ebe20ff9013581eeb6afc9b"
+  },
+  {
+    "path": "<private-artifacts>/quest-weak-shell-v2-execution-release.log",
+    "bytes": 1719,
+    "sha256": "0326c148da0548fef12d99ac7e22ca78516df0dd376279b3f12b999e4bdffb81"
+  },
+  {
+    "path": "<private-artifacts>/quest-weak-shell-v2-execution-1/p2-c2-e1-w1_2.json",
+    "bytes": 7126,
+    "sha256": "b8e4ca7603f15bb3e93f418d0209a7f25e743d7ec4ab5c09b119e089090f8387"
+  },
+  {
+    "path": "<private-artifacts>/quest-weak-shell-v2-execution-1/p2-c2-e1-w1_2.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "<private-artifacts>/quest-weak-shell-v2-execution-1/p2-c2-e1-w1_2.time",
+    "bytes": 10,
+    "sha256": "085646402220e5ef4e504595d49db2474d52cf6d4d7fa65be56372ec5a817cb5"
+  },
+  {
+    "path": "<private-artifacts>/quest-weak-shell-v2-execution-1/receipt.json",
+    "bytes": 5351,
+    "sha256": "b969804f27e37ca8e6d8e973e45940996fe21a1e2f541478d5b9a6a059134f19"
+  }
+]

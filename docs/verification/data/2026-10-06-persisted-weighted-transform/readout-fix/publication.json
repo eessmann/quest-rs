@@ -1,0 +1,82 @@
+{
+  "schema": "quest-persisted-readout-fix-publication-v1",
+  "publication_status": "published after root independent review and tests",
+  "files": [
+    {
+      "path": "docs/verification/data/2026-10-06-persisted-weighted-transform/readout-fix/README.md",
+      "bytes": 2148,
+      "sha256": "bf843e7a76f5dacde44de527854786b414d24dd40b36b5dd12dcc216f2c1664e"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-persisted-weighted-transform/readout-fix/behavior-red.log",
+      "bytes": 2003,
+      "sha256": "839226d479512a40190ed23e763d3c6caa77b2c1b030d8fcd134476826ca83e9"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-persisted-weighted-transform/readout-fix/consumer-source.json",
+      "bytes": 3234,
+      "sha256": "dc69f1e3a848b6ebf368f6b0ac2a09e4573e5601cae0b06452ea38b352b8963c"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-persisted-weighted-transform/readout-fix/diagnosis.json",
+      "bytes": 2307,
+      "sha256": "00bdec375040da9f013e3043e7bfa8dc3707398261260394d70a233f3846eca4"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-persisted-weighted-transform/readout-fix/diagnosis.md",
+      "bytes": 3835,
+      "sha256": "70b20e2f435d61f58e12eb25d411a88c522962a6ceae0f33a552904be5b80da1"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-persisted-weighted-transform/readout-fix/final-clippy.log",
+      "bytes": 953,
+      "sha256": "20ed5da04c95ea1ea54262ee3ccd81c2b762c06590c1bec959c30ea1448fa868"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-persisted-weighted-transform/readout-fix/final-green.log",
+      "bytes": 1646,
+      "sha256": "1d97accc79cbdeab69d614666e6ed03133a6ef320a062d19c9e192ea456ae19a"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-persisted-weighted-transform/readout-fix/fixture-compile-failure.log",
+      "bytes": 1539,
+      "sha256": "38ef581c5f3150b5131f706dea063dd1b5735dc9080ea62eb77e0bf7fdf696d9"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-persisted-weighted-transform/readout-fix/focused.json",
+      "bytes": 4603,
+      "sha256": "4fcc6c1936b19fcf2cfd3a2be1a7b77ad5ba1c612f5db26c076a2ac0320017d7"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-persisted-weighted-transform/readout-fix/initial-clippy-failure.log",
+      "bytes": 2541,
+      "sha256": "c346587b9793dc07e09320e49ce7078d79f37f527fd01fc3be14bf21bf160fe0"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-persisted-weighted-transform/readout-fix/provenance.json",
+      "bytes": 6144,
+      "sha256": "d8446f169d52f1721942ed6e59b62e3694ef6a3beec5cecbbbc5de47977139cb"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-persisted-weighted-transform/readout-fix/report.md",
+      "bytes": 4917,
+      "sha256": "b133094cf1a4e89cdecdba08cd45a608eb1cb0b6143ffb3ec9ed2e4e29e6e2f5"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-persisted-weighted-transform/readout-fix/root-green.log",
+      "bytes": 2759,
+      "sha256": "130560eefc631c8ab70e794b9b2faed15396cad434905f98c996ec63acbda384"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-persisted-weighted-transform/readout-fix/root-verification.json",
+      "bytes": 979,
+      "sha256": "102d404eb2c632a07dde35d36de2a91f9ffe43e067bfc76e8a0f4d8029eb9ca8"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-persisted-weighted-transform/readout-fix/source.json",
+      "bytes": 456,
+      "sha256": "82be7c38a1cef657236bf428da0c791a93b4812d858e0139a86743837057517f"
+    }
+  ],
+  "candidate_index_sha256": "27c4fec5b0da97e5aa8ad7b9ec68b3396f5690600c262089782e0668bde6ac3d"
+}

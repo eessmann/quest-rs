@@ -1,0 +1,55 @@
+{
+  "schema": "matching-fingerprint-independent-reference-v1",
+  "scope": "Pure fixed fields only; no producer/native/state/synthesis run",
+  "columns": [
+    {
+      "dimension": 4,
+      "positive_i": 14734719441162554801,
+      "negative_i": 11688921203604310761
+    },
+    {
+      "dimension": 8,
+      "positive_i": 11909647265508861937,
+      "negative_i": 1588499124886062226
+    },
+    {
+      "dimension": 32,
+      "positive_i": 11732924624168595733,
+      "negative_i": 2713288697373596283
+    }
+  ],
+  "sources": [
+    {
+      "dimension": 2,
+      "source_ids": [
+        3870828688365484054,
+        10646968883854699474,
+        157650090515574255
+      ]
+    },
+    {
+      "dimension": 4,
+      "source_ids": [
+        5075787799180317055,
+        14941292962293048369,
+        13855202916340710544
+      ]
+    },
+    {
+      "dimension": 8,
+      "source_ids": [
+        8873194812514124922,
+        1588723412353295292,
+        11461483915558951397
+      ]
+    },
+    {
+      "dimension": 32,
+      "source_ids": [
+        1017135645874412409,
+        4137702323942760639,
+        9519297731046934094
+      ]
+    }
+  ]
+}

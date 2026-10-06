@@ -1,0 +1,155 @@
+{
+  "schema": "quest.workspace-verification.checkpoint.v1",
+  "base_commit": "dd9a869ebe9952cf85a6411a180ed7b688f568fb",
+  "environment": {
+    "rust": "1.101.0-nightly (db8f076d2 2026-10-03)",
+    "quest": "4.3.0 installed, native source unchanged",
+    "mpi": "MPICH 4.2.2; QuEST, MPICC and mpiexec ABI matched",
+    "hdf5": "serial",
+    "execution": "local CPU native statevector; MPI socket-dependent tests allowed loopback networking"
+  },
+  "checkpoint": "06-mixed-traction-cylinder-and-native-weighted-matching",
+  "recorded_utc": "2026-10-06T02:35:43.991536+00:00",
+  "source_sha256": "c537bbb1e00e4e04ab5957baf6f31ce39ae49f525fe9d4192634bae651da5c4b",
+  "source_file_count": 789,
+  "source_manifest": "checkpoint-06-source.json",
+  "workspace_test_source_sha256": "f12c59455b05b563ec996dcc16c60a75a3553488e4481dd396864ad492c4d163",
+  "workspace_test_source_manifest": "checkpoint-06-tested-source.json",
+  "source_unchanged_before_after": false,
+  "workspace_test_source_unchanged_before_after": true,
+  "post_format_source_unchanged_before_after": true,
+  "source_delta": {
+    "file": "crates/quest/tests/matching_runtime.rs",
+    "before_sha256": "2dbf560526f7a5442a26865f8e7a0f885bd02dadb8d0d1e49abc97d42d833642",
+    "after_sha256": "5d6637871353c485858ee08121848632fdae2f93864ff299f21ea9402c4de5ff",
+    "whitespace_stripped_equal": true,
+    "scope": "Formatting one unchanged assertion in a test, as required by workspace rustfmt; no production source change."
+  },
+  "gates": [
+    {
+      "name": "allfeatures",
+      "command": "cargo nextest run --workspace --all-features --no-fail-fast",
+      "exit_code": 0,
+      "elapsed_seconds": 282.2361863689948,
+      "log_sha256": "7692716429383e557cd45d9458e116107c1c97fb6f032d80c45f48d2ad266230",
+      "seconds": 261.666,
+      "tests_run": 1581,
+      "passed": 1581,
+      "skipped": 6
+    },
+    {
+      "name": "default",
+      "command": "cargo nextest run --workspace --no-fail-fast",
+      "exit_code": 0,
+      "elapsed_seconds": 102.67816966900136,
+      "log_sha256": "25ddee9a5d8914399dd7d45504ec87f6163bee54b346b20258843dbe904af1f4",
+      "seconds": 89.019,
+      "tests_run": 1418,
+      "passed": 1418,
+      "skipped": 1
+    },
+    {
+      "name": "doctests",
+      "command": "cargo test --workspace --all-features --doc",
+      "exit_code": 0,
+      "elapsed_seconds": 8.786184662007145,
+      "log_sha256": "48271e2bbb3876792c0f6fdec1df47bc487e4b38fa27506f4046edc8359f239f",
+      "suites": 24,
+      "passed": 65,
+      "failed": 0,
+      "ignored": 1
+    },
+    {
+      "name": "default-check",
+      "command": "cargo check --workspace --all-targets",
+      "exit_code": 0,
+      "elapsed_seconds": 3.07741984599852,
+      "log_sha256": "e062f6441dd53fe62a48c85684817fc4e1e474a88ec39641bd853db2ab474c22"
+    },
+    {
+      "name": "clippy",
+      "command": "cargo clippy --workspace --all-features --all-targets --no-deps -- -D warnings",
+      "exit_code": 0,
+      "elapsed_seconds": 10.442743742998573,
+      "log_sha256": "f22566d1923c14a1167363fd5f00a82c9a5bbb7692df9b8a1346c811e9d9c10c"
+    },
+    {
+      "name": "bindings",
+      "command": "cargo run --locked -p xtask -- generate-quest-bindings --check",
+      "exit_code": 0,
+      "elapsed_seconds": 4.9234647449993645,
+      "log_sha256": "e50dbeef3076acd7c7e5fbee69f3617e267f09ac9f107ee399d9629e01477978"
+    },
+    {
+      "name": "format",
+      "command": "cargo fmt --all --check",
+      "exit_code": 1,
+      "elapsed_seconds": 1.2879331309959525,
+      "log_sha256": "f31535fe1f26ab3cb72264006fec069a5d12b2ad0f448033129547591503870c"
+    },
+    {
+      "name": "whitespace",
+      "command": "git diff --check",
+      "exit_code": 0,
+      "elapsed_seconds": 0.012910958001157269,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "post_format_gates": [
+    {
+      "name": "post-format-runtime",
+      "command": "cargo test -p quest-rs --all-features --test matching_runtime",
+      "exit_code": 0,
+      "elapsed_seconds": 11.440867680998053,
+      "log_sha256": "9a55a52df249f50acffa5316a34195caeff7e07e5bed4d4a2835b0ebff8885ad",
+      "passed": 1
+    },
+    {
+      "name": "post-format-clippy",
+      "command": "cargo clippy --workspace --all-features --all-targets --no-deps -- -D warnings",
+      "exit_code": 0,
+      "elapsed_seconds": 0.5154532279993873,
+      "log_sha256": "bed488b4d563ed8acbec44d24b7e86f810e9670679aecfc402d5cfba242856c0"
+    },
+    {
+      "name": "post-format-format",
+      "command": "cargo fmt --all --check",
+      "exit_code": 0,
+      "elapsed_seconds": 1.2672243659981177,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "post-format-whitespace",
+      "command": "git diff --check",
+      "exit_code": 0,
+      "elapsed_seconds": 0.012937587998749223,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "preliminary_attempts": [],
+  "historical_evidence": [
+    {
+      "name": "offline_catalog",
+      "receipt": "checkpoint-01-verification.json",
+      "status": "earlier passing run; unchanged catalog; not rerun at checkpoint06"
+    }
+  ],
+  "scoped_evidence": [
+    "../2026-10-06-distributed-weighted-matching/focused.json",
+    "../2026-10-06-mixed-traction/runtime-foundation.json",
+    "../2026-10-06-cylinder-p2/exact-execution.json",
+    "../2026-10-06-cylinder-p2/runtime-execution.json"
+  ],
+  "limitations": [
+    "Source manifest excludes Markdown and docs/verification; static inventory separately records publication snapshots.",
+    "Source and log hashes identify content; they are not independent build attestation.",
+    "Full tests ran on the recorded tested source. Rustfmt then expanded one unchanged assertion in a test; the final source differs only by that preserved whitespace delta. Focused native regression, strict Clippy, formatting and whitespace checks passed on the final source; the full suite was not redundantly rerun.",
+    "No source or native installation fix is inferred for the earlier intermittent CMake module-open failures; this checkpoint preserves prior attempts unchanged.",
+    "Skipped tests and the ignored doctest remain distinct from passing tests. Separate native nonlinear experiments retain their dated source and receipts.",
+    "Upstream nightly generic-constant-expression notices are separate from strict dependency-excluded Clippy results.",
+    "Mixed affine and cylinder construction remain bounded classical references; the cylinder consumer is a supplied-state snapshot with no time integration.",
+    "Native weighted matching composes already prepared children; prior child preparation costs and general distributed tensor/persisted-resource composition remain separate.",
+    "No multi-host capacity, actual huge-count transport, accelerator/hardware, convergence, quantum advantage or total systematic-error acceptance is implied.",
+    "New source stages require their own affected verification and later integrated checks."
+  ]
+}

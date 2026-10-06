@@ -8,6 +8,7 @@ description = "Native-independent quantum singular value transformations"
 
 [dependencies]
 thiserror.workspace = true
+sha2.workspace = true
 num-complex.workspace = true
 quest-qsp.workspace = true
 quest-polynomial.workspace = true
@@ -16,6 +17,7 @@ quest-compile.workspace = true
 faer = { workspace = true, default-features = false, features = ["std", "linalg"] }
 
 [dev-dependencies]
+mathcore.workspace = true
 googletest.workspace = true
 
 [lints]

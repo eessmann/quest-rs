@@ -1,0 +1,65 @@
+{
+  "schema": "quest-persisted-weighted-attempt-4-independent-audit-v1",
+  "verdict": "approved scoped saved seven-job completion and direct residual/readout evidence",
+  "native_or_scientific_reruns": 0,
+  "source_files": 975,
+  "workspace_source_aggregate_sha256": "9056b776fb8865b02112a01a20db061c0a8c7cb95e3191179972347b43569f8a",
+  "snapshot_file_sha256": "9dcf3171035b7a13bc0804ff33959175fbbe939032b771d23f4552dbe6d9c1b8",
+  "consumer_source_manifest_sha256": "dc69f1e3a848b6ebf368f6b0ac2a09e4573e5601cae0b06452ea38b352b8963c",
+  "mutable_cargo_artifact_current_sha256": "389f0827d031f278d7ebda9cf38d0092f3589fb7104cdcada465620f0f889264",
+  "mutable_cargo_artifact_note": "Cargo target is reused by later broad gates; immutable pinned binary copies are authoritative for this saved run",
+  "current_later_documentation_deltas": [
+    "crates/quest-cfd/NEXT_STEPS.md",
+    "crates/quest-cfd/README.md"
+  ],
+  "consumer_files": 16,
+  "native_install_files": 29,
+  "tool_executable_records": 5,
+  "binary_sha256": "7acd0d38dc30a81aa299ad5704a28d7c2e0acec00f0d4a4a5f20f584759dcab9",
+  "build_attestation_sha256": "fd59fe4164397f1abccdae411e292f2cd63897ce1c62ee8fc10dc1660748b3ec",
+  "raw_receipt_sha256": "a9fb283e26c948dc2c2e5ff6871559fae968692173b54981515cc90fd19ea89f",
+  "execution_attestation_sha256": "e82ca07970d9f5e5a5d1ce365efec3a96854ba07b468875710f6036a1b99a80d",
+  "raw_rank_rows": 28,
+  "independent_replay_calls": 57,
+  "jobs": 7,
+  "publication_input_files": 27,
+  "freeze_phase_files": 2,
+  "immutable_files": 29,
+  "phase_sha256": "51753f689cdca32c68a812c20df82e0b8b83643a8d587a6a12e8ac706d3de412",
+  "degree": 33,
+  "alpha": 1.2500000000000002,
+  "nominal_sigma": 0.6373774391990981,
+  "independent_polynomial_response": 0.15313643661118861,
+  "independent_relative_polynomial_residual": 2.9622031556986173e-05,
+  "ideal_inverse_norm_squared": 2.4615384615384617,
+  "nominal_finite_success": 0.023450768217972588,
+  "ideal_reciprocal_success": 0.023452157598499068,
+  "native_failure_mass_range": [
+    0.9765492317820176,
+    0.9765492317820191
+  ],
+  "caps": {
+    "address_space_bytes": 2147483648,
+    "stdout_bytes": 4194304,
+    "stderr_bytes": 4194304,
+    "read_chunk_bytes": 65536,
+    "process_file_size_limit": null,
+    "seconds": 180
+  },
+  "elapsed_seconds": {
+    "campaign_driver": 6.299383257995942,
+    "outer_execution": 6.537869480001973,
+    "build": 1.00806791800278
+  },
+  "qualifications": [
+    "975-file workspace superset distinct from actual16-local-package compiler closure; neither hashes external registry/dependent library closure",
+    "rustc/cargo hashes identify rustup launcher; actual reported versions/profile preserved separately",
+    "three calls each use fresh computational basis RHS; not an accumulated U-U\u2020 round-trip or general dense input preparation",
+    "full32-coordinate scalar residuals validated; no saved global quantum-state vector available to independently recompute native amplitude coordinates",
+    "source H=.625I-.125iX encodes A\u2020; forward solves A=.625I+.125iX, standalone adjoint solves A\u2020",
+    "nominal analytic sigma/polynomial diagnostics not uniform source/native/phase error certificate; certificate and native-overhead remain null",
+    "telemetry exact only for named router counters, excludes PREP/projectors/coordinator/native/MPI protocol",
+    "managed cap not RSS quota;2GiB process AS and recorded RSS separate; local MPI not multihost evidence",
+    "historical attempts1/2/3 preserved; no change to caps/tolerances or old bytes"
+  ]
+}

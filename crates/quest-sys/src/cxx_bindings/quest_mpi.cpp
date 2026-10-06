@@ -1,6 +1,7 @@
 #include "quest_mpi.hpp"
 
 #include <dlfcn.h>
+#include <array>
 #include <cstdio>
 #include <cstdlib>
 #include <filesystem>
@@ -28,9 +29,7 @@ bool mpi_available() noexcept {
   return QUEST_SYS_MPI_ENABLED;
 }
 
-void mpi_validate_rsmpi_abi(std::size_t comm_size,
-                            std::size_t fint_size,
-                            std::size_t status_size,
+void mpi_validate_rsmpi_abi(rust::Slice<const std::size_t> layout,
                             std::uint32_t version,
                             std::uint32_t subversion,
                             std::int32_t multiple,
@@ -43,12 +42,20 @@ void mpi_validate_rsmpi_abi(std::size_t comm_size,
           std::string(library.data(), library.size()))
     throw std::runtime_error(
         "loaded MPI library differs from the verified QuEST/MPICC library");
-  if (comm_size != sizeof(MPI_Comm) || fint_size != sizeof(MPI_Fint) ||
-      status_size != sizeof(MPI_Status) || version != MPI_VERSION ||
-      subversion != MPI_SUBVERSION || multiple != MPI_THREAD_MULTIPLE)
+  const std::array<std::size_t, 11> expected = {
+      sizeof(MPI_Comm), alignof(MPI_Comm), sizeof(MPI_Fint), alignof(MPI_Fint),
+      sizeof(MPI_Status), alignof(MPI_Status), offsetof(MPI_Status, MPI_SOURCE),
+      offsetof(MPI_Status, MPI_TAG), offsetof(MPI_Status, MPI_ERROR),
+      sizeof(MPI_Request), alignof(MPI_Request)};
+  bool same = layout.size() == expected.size();
+  if (same)
+    for (std::size_t i = 0; i < expected.size(); ++i)
+      same = same && layout[i] == expected[i];
+  if (!same || version != MPI_VERSION || subversion != MPI_SUBVERSION ||
+      multiple != MPI_THREAD_MULTIPLE)
     throw std::runtime_error(
         "rsmpi generated MPI ABI differs from QuEST; rebuild mpi-sys with the "
-        "verified MPICC selection");
+        "verified MPI header, compiler and parser selection");
 #else
   throw std::runtime_error("installed QuEST lacks MPI subcommunicator support");
 #endif

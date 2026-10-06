@@ -7,27 +7,32 @@ and mathematical obligations are described in
 [Method and theory](method-and-theory.md); execution boundaries are in
 [Quantum and distributed execution](quantum-and-distributed.md).
 
-The alternatives below are research comparisons, not additional implemented
-solvers. The current bounded references, matching oracle, arithmetic tensor
-operators, and phase synthesis provide experiments with which to assess them.
+Carleman is now an implemented comparison route using the same global history
+machinery, with [separate derivations and error contracts](carleman-history.md).
+The [encoding portfolio](../../quest-qsvt/docs/portfolio.md) also implements
+bounded structured and sparse-access comparisons. Direct Hamiltonian evolution,
+Schrödingerisation, hybrid nonlinear iterations and compression remain research
+alternatives. The current classical references and admitted inverse circuits
+provide experiments with which to assess them.
 Neither a reduced physical model nor an estimate of an unexecuted system
 satisfies the accepted full-KvN solve requirement. Preserving all physical
 coordinates also does not eliminate configuration discretization error.
 
 ## Decisions to test
 
-This table states proposed decision criteria. The following sections explain the
-assumptions behind them; it does not report measured advantages.
+This table states comparison criteria. Implemented routes still require equal
+accuracy and complete preparation/readout accounting; the table does not report
+measured advantages.
 
 | Route | Potential reason to investigate | Costs or errors requiring evidence | First discriminating experiment |
 | --- | --- | --- | --- |
 | Direct evolution of the KvN Hamiltonian | A few observation times; avoid history inversion | Hamiltonian normalization, evolution horizon, time dependence, measurement repetitions | Same generator and initial state, fixed observable accuracy, increasing horizon |
 | Schrödingerisation | A naturally linear, nonunitary system | Auxiliary coordinate, recovery probability, truncation and preparation | Linear viscous test with independent auxiliary-domain refinement |
 | Picard/Newton/Oseen plus quantum linear solves | Reuse mature nonlinear CFD iterations | Outer convergence, repeated loading, classical reconstruction | Count every iteration and transfer against a preconditioned classical solve |
-| Carleman lift | Polynomial drift with favorable dissipativity | Hierarchy truncation, corrected theorem hypotheses, solution decay | Full five-coordinate smoke system; increase polynomial degree |
+| Carleman lift (implemented) | Polynomial drift with favorable dissipativity | Hierarchy truncation, corrected theorem hypotheses, solution decay | Full five-coordinate smoke system; increase polynomial degree |
 | Matrix-free constraint projection | Avoid storing a dense nullspace chart | Global pressure solves and their tolerances | Compare reconstructed drift and pressure against exact bounded elimination |
 | Fourier, Hermite, or tensor formats | Exploit smoothness, decay, or separability | Boundary artifacts, weights, tensor ranks and truncation | Match physical observables while refining each approximation independently |
-| Paper-specific structured encoding | Repeated coefficients and reversible index rules | Normalization, arithmetic, workspace and loading | Same matrix and whole-unitary tests against matching encoding |
+| Paper-specific structured encoding (bounded portfolio implemented) | Repeated coefficients and reversible index rules | Normalization, arithmetic, workspace and loading | Same extracted matrix/cost comparison; each construction's full controls and adjoints |
 
 ## Schrödingerisation and direct Hamiltonian evolution
 
@@ -138,13 +143,24 @@ quadratic-system notation. These conditions must be checked together with the
 remaining hypotheses and scaling; they are not a universal Carleman
 convergence criterion. Forced cavity or inflow problems cannot inherit a
 guarantee from viscosity alone.
-[Corrected supporting theorem](https://doi.org/10.1073/pnas.2615307123)
+[Corrected supporting theorem, v4](https://arxiv.org/html/2011.03185v4)
 
-The full five-coordinate periodic smoke system would permit a meaningful
-comparison: retain all five coordinates in every monomial degree, increase the
-hierarchy cutoff, and compare observables with trajectories of the identical
-DG ODE. Report convergence with degree and horizon separately. A low-degree
-result without such evidence is a truncated-lift result, not a full-KvN solve.
+The five-coordinate periodic smoke system retains its uniform mean coordinates,
+so full-space strict viscous decay is unavailable. A conservation-aware theorem
+would need to account explicitly for those coordinates and the complementary
+subspace; removing them changes the problem. Burgers and the doubled-field KdV
+implementation now have [order-refinement receipts](../../../docs/verification/2026-10-05-dual-history.md)
+against their identical complete DG dynamics at T=0.1. These fixed-mesh classical
+comparisons establish neither continuum error nor a quantum complexity benefit.
+
+An optional conservative continuous truncation certificate uses actual
+coefficient bounds, full-space logarithmic contraction, and the corrected
+forcing condition after scaling. It deliberately returns inconclusive evidence
+for the current undamped mean modes and conservative KdV examples. Its proof
+and scope are in the [Carleman chapter](carleman-history.md). The broader
+[Jennings et al. framework](https://arxiv.org/abs/2509.07155v2) remains a route to
+investigate with a concrete metric/conservation construction and all hypotheses
+checked; a citation alone does not supply those certificates.
 
 ## Physical discretization and exact constraint projection
 
@@ -179,7 +195,11 @@ global. Fu's divergence-free DG method illustrates the connection between
 constrained velocity evolution and a mixed Poisson solve.
 [Fu](https://arxiv.org/abs/1808.04669)
 
-Replacing the current bounded dense chart by this projector requires more than
+The implemented [distributed Householder chart](physical-space.md#generated-constraints-and-distributed-complete-charts)
+already avoids a global dense null basis, while retaining local dense fill and
+globally coupled queries. Its [supplied-force pressure wrapper](physical-space.md#distributed-physical-pressure-from-a-broken-force)
+is focused-tested and awaiting independent review; it does not generate nonlinear
+physical force. A Schur-projector alternative to either chart requires more than
 a matrix-free classical API. A KvN configuration chart, drift evaluation and
 its derivatives must remain consistent; coherent execution must account for
 the pressure work. First compare drift, reconstructed momentum and continuity
@@ -237,14 +257,18 @@ rotations; coefficient repetition alone does not prove the required identities.
 The paper also compares data-loading cost multiplied by normalization.
 [Structured block encodings](https://arxiv.org/html/2302.10949v2)
 
-The repository's arithmetic tensor constructions and matching oracle are not a
-completed implementation of every scheme in that paper. Start with a temporal
-DG stencil or separable configuration term whose index maps can be proved
-reversible. Compare $\alpha/\sigma_{\min}$, arithmetic gates, workspace,
-preprocessing and loading against matching. Extract the successful block and
-test the entire unitary, including complex phases, adjoints, inactive controls,
-rectangular padding and unsuccessful flags. A better projected block alone
-does not validate coherent composition.
+The [implemented portfolio](../../quest-qsvt/docs/portfolio.md) supports explicitly
+admitted arithmetic maps and PREP identities, not every scheme in that paper.
+The [measured same-matrix fixture](../../quest-qsvt/docs/portfolio-comparison.md)
+compares a four-site complex circulant across uniform/per-matching bounds,
+SCC base/eligible PREP, explicit sparse QROM, weighted LCU, tensor product and
+Kronecker sum. It independently extracts A and records normalization, actual
+primitive/preparation counts, workspace, precision, managed storage and local
+constructor timings. Whole unitaries can differ across constructions; their own
+complex phases, adjoints, inactive controls, padding and failure branches require
+separate behavioral checks. Native/equal-accuracy comparisons over larger sizes,
+temporal DG stencils and complete CFD operators remain open. A better projected
+block alone does not validate coherent composition or cheaper total loading.
 
 qRAM would supply coherent access to stored data, a different assumption from
 ordinary classical memory access.

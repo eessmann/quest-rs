@@ -1,0 +1,197 @@
+{
+  "schema": "quest.workspace-verification.checkpoint.v1",
+  "base_commit": "dd9a869ebe9952cf85a6411a180ed7b688f568fb",
+  "checkpoint": "08-sparse-identities-and-persisted-weighted-inverse",
+  "status": "failed; six Rust test failures preserved",
+  "recorded_utc": "2026-10-06T07:04:55.587892+00:00",
+  "source_sha256": "83373206f9f5239a83d2737b20e14a9e0e2d9b90d8daae4c3ff65f0b1f45b228",
+  "source_file_count": 975,
+  "source_manifest": "checkpoint-08-source.json",
+  "source_manifest_sha256": "466da6eb47407b6bddc1b5532f7f8c44963163c807e9ef25803502a35f1bac9d",
+  "source_scope": "all existing tracked and untracked crate files including Markdown consumed by doctests; verification fixture sources/data; root Cargo manifests/lock and any repository .cargo configuration, Rust toolchain and nextest configuration. Excludes unrelated documentation/evidence, external registry/native install contents and arbitrary environment",
+  "source_unchanged_before_after": true,
+  "environment": {
+    "rust": "1.101.0-nightly db8f076d2",
+    "quest": "installed QuEST4.3.0, native source unchanged",
+    "mpi": "MPICH4.2.2; matching native ABI checked",
+    "hdf5": "serial",
+    "execution": "local CPU/MPI; not multi-host capacity"
+  },
+  "gates": [
+    {
+      "name": "allfeatures",
+      "command": [
+        "cargo",
+        "nextest",
+        "run",
+        "--workspace",
+        "--all-features",
+        "--no-fail-fast"
+      ],
+      "exit_code": 100,
+      "elapsed_seconds": 326.8202056519949,
+      "log_sha256": "f127b9be2658ec48bc5dd22213e97091de0fe52fe56074b1c7fa12def1783a2a",
+      "published_log": {
+        "path": "checkpoint-08-logs/allfeatures.log",
+        "bytes": 214951,
+        "sha256": "9cbbc151b375c538b479aaaa7c501c8b26fafd979437a03da2cf033c4dcca1ce",
+        "normalization": "generic workspace, home, temporary paths and thread process IDs; log_sha256 above binds original bytes"
+      },
+      "tests_run": 1645,
+      "passed": 1644,
+      "failed": 1,
+      "skipped": 6,
+      "seconds": 304.375
+    },
+    {
+      "name": "default",
+      "command": [
+        "cargo",
+        "nextest",
+        "run",
+        "--workspace",
+        "--no-fail-fast"
+      ],
+      "exit_code": 100,
+      "elapsed_seconds": 104.6340485030014,
+      "log_sha256": "2791f9c1d12abaa87847934256b2cdf16057c067cdcc8d25f11fdfe2175d23e3",
+      "published_log": {
+        "path": "checkpoint-08-logs/default.log",
+        "bytes": 207578,
+        "sha256": "e7df7306d1e16fd9f8734913794f120ee848d7a5f38500c2ec4f7b9c3e0f83ea",
+        "normalization": "generic workspace, home, temporary paths and thread process IDs; log_sha256 above binds original bytes"
+      },
+      "tests_run": 1463,
+      "passed": 1458,
+      "failed": 5,
+      "skipped": 1,
+      "seconds": 88.664
+    },
+    {
+      "name": "doctests",
+      "command": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-features",
+        "--doc"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 9.481652857000881,
+      "log_sha256": "d76968a5024789313d0f2174ff51a83484fe539811db3b4b974eef365a674f16",
+      "published_log": {
+        "path": "checkpoint-08-logs/doctests.log",
+        "bytes": 11236,
+        "sha256": "1c5f898c92f5df22fd8b11639519e01bed9184aef1dfd5530d126f9aefe77609",
+        "normalization": "generic workspace, home, temporary paths and thread process IDs; log_sha256 above binds original bytes"
+      },
+      "passed": 65,
+      "failed": 0,
+      "ignored": 1,
+      "suites": 24
+    },
+    {
+      "name": "default-check",
+      "command": [
+        "cargo",
+        "check",
+        "--workspace",
+        "--all-targets"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 3.456803492998006,
+      "log_sha256": "9f34923e582b8349b433a773dc99db67d3547d7df37313d3e8692280261d5518",
+      "published_log": {
+        "path": "checkpoint-08-logs/default-check.log",
+        "bytes": 2546,
+        "sha256": "5094bc386da075a18f689de9d35170dbc023cf946839215b83c49cf9986f7afd",
+        "normalization": "generic workspace, home, temporary paths and thread process IDs; log_sha256 above binds original bytes"
+      }
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-features",
+        "--all-targets",
+        "--no-deps",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.928769325997564,
+      "log_sha256": "584a2011e2def22f60e91614334064743b505ad15799630bb9c9b096555725d1",
+      "published_log": {
+        "path": "checkpoint-08-logs/clippy.log",
+        "bytes": 2661,
+        "sha256": "53b0e435d78ceca636ae0aeed46bf605d73582d0975a4f2a8c2dd97645b743ca",
+        "normalization": "generic workspace, home, temporary paths and thread process IDs; log_sha256 above binds original bytes"
+      }
+    },
+    {
+      "name": "bindings",
+      "command": [
+        "cargo",
+        "run",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "generate-quest-bindings",
+        "--check"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.448683340000571,
+      "log_sha256": "074c32c3281801c372060c43144cb72825525a861a3013ad252b44960758ce4e",
+      "published_log": {
+        "path": "checkpoint-08-logs/bindings.log",
+        "bytes": 22636,
+        "sha256": "d16adedb3eb5da9a70ad873930448c3ba50138397eb263a822b1246f45a0e057",
+        "normalization": "generic workspace, home, temporary paths and thread process IDs; log_sha256 above binds original bytes"
+      }
+    },
+    {
+      "name": "format",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--check"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.3510073779980303,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_log": {
+        "path": "checkpoint-08-logs/format.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "normalization": "generic workspace, home, temporary paths and thread process IDs; log_sha256 above binds original bytes"
+      }
+    },
+    {
+      "name": "whitespace",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.013143449999915902,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_log": {
+        "path": "checkpoint-08-logs/whitespace.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "normalization": "generic workspace, home, temporary paths and thread process IDs; log_sha256 above binds original bytes"
+      }
+    }
+  ],
+  "failures": {
+    "allfeatures": "Matching fatal test: nonzero/non-timeout termination checks passed; abort diagnostic stderr missing. Later test-only durable witnesses are a separate source change.",
+    "default": "Five quest-build tests failed opening CMake compiler modules; earlier and focused checks pass. Intermittent cause unresolved; no installation/source fix established."
+  },
+  "other_acceptance": "Successful sparse inverse and focused scientific receipts remain separate. This checkpoint does not pass the complete repository gate matrix."
+}

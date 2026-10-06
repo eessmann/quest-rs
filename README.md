@@ -25,12 +25,18 @@ commands and repository conventions.
 | `quest-optimizer-client` / `quest-optimizer-worker` | Optional bounded external engine boundary |
 | `quest-sys` | Audited CXX bridge and native RAII resources |
 | `quest-build` / `xtask` | Native configuration, runtime paths and binding generation |
+| [`quest-mathcore`](crates/vendor/mathcore/README.md) | Shared exact/scoped algebra, bounded expressions and polynomial lowering; maintained pinned fork |
 | [`quest-numerics`](crates/quest-numerics/README.md) | Static arithmetic backends, directed intervals, AD, root contractors and reusable workspaces |
 | [`quest-polynomial`](crates/quest-polynomial/README.md) | Typed polynomial bases, function expressions and approximation |
 | [`quest-qsp`](crates/quest-qsp/README.md) | Real-parity Wx and unit-circle QSP, RHW/Half-Cholesky and inverse NLFT, with frozen-export certification |
 | [`quest-qsvt`](crates/quest-qsvt/README.md) | Native-independent encodings, projectors, transforms and analysis |
 | [`quest-qsvt-io`](crates/quest-qsvt-io/README.md) | JSON, PennyLane catalogs, and serial HDF5 interchange |
 | [`quest-qsvt-cli`](crates/quest-qsvt-cli/README.md) | Synthesis, inverse catalogs, solve, embedded and overlap applications |
+| [`quest-cfd`](crates/quest-cfd/README.md) | Full-coordinate DG, KvN/Carleman global histories, nonlinear demonstrations and resource experiments |
+
+The [shared algebra architecture](docs/research/shared-algebra.md) explains
+MathCore ownership, exactness versus ordered numerical evaluation, migrated
+consumers and independent certificate boundaries.
 
 ## Build
 
@@ -126,6 +132,8 @@ that package does not require HDF5. The installed package must export
 static CXX bridge against that target; the evaluated target supplies native
 link requirements. `QUEST_ROOT` selects the exact installation prefix, and `CMAKE_PREFIX_PATH`
 retains conventional CMake package search. See [`quest-build`](crates/quest-build/README.md) for package selection.
+The [native tooling guide](docs/native-tooling.md) covers compiler wrappers,
+module environments, parser configuration and `xtask native-doctor --json`.
 
 For a local QuEST installation whose external native libraries live outside
 system loader paths, configure **QuEST itself** with

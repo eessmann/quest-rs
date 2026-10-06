@@ -64,6 +64,12 @@ impl Environment {
 				.bytes()
 				.saturating_sub(self.resources.allocated_bytes()),
 		)?;
+		inventory.admit_native_unitaries(fingerprint.validation_epsilon)?;
+		for payload in plan.quantum_payloads().values() {
+			if let quest_compile::QuantumPayload::Matrix { matrix, .. } = payload {
+				crate::execution::admit_native_unitary(matrix, fingerprint.validation_epsilon)?;
+			}
+		}
 		let mut seen_matrices = std::collections::BTreeSet::new();
 		let oracle_bytes = inventory
 			.estimated_bytes(

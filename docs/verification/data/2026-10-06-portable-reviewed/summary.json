@@ -1,0 +1,2216 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-06",
+  "scope": "Combined reviewed portable-native source: focused correction evidence and pending full acceptance. This ledger was added after the source freeze.",
+  "full_acceptance": "pending",
+  "source": {
+    "manifest": {
+      "path": "target/portable-reviewed-cirrus-20261006/source.sha256",
+      "bytes": 348034,
+      "sha256": "4e5b423ebf3db42db19c3f75481ad786a527117eecd4d41c8b9a9b9dcebd6cf1"
+    },
+    "archive": {
+      "path": "target/portable-reviewed-cirrus-20261006/source.tar.gz",
+      "bytes": 11866798,
+      "sha256": "50b5a4a7727754f77282c2597d46e1cf6709bee8506ae63b5c7d05310a08b526"
+    },
+    "files": 2594,
+    "frozen_manifest_check": {
+      "files": 2594,
+      "mismatches": 0
+    },
+    "archive_members_match_manifest": true,
+    "selected_files": [
+      {
+        "path": "Cargo.toml",
+        "sha256": "f2767e5d14aa3e2c554b84d0c65fc9d930f70244b021990790c8257d33cc8ce0",
+        "working_tree_matches_frozen_at_recording": true
+      },
+      {
+        "path": "Cargo.lock",
+        "sha256": "6b2d800675669d4fe1dc83b19b0d711d48655af0f2956cf7ac3fe281a6f213e5",
+        "working_tree_matches_frozen_at_recording": true
+      },
+      {
+        "path": "crates/quest-build/src/hdf5.rs",
+        "sha256": "71fb027e017144ec73f78131bd0ab20a00eec86e42ff032bef239c33077ac357",
+        "working_tree_matches_frozen_at_recording": true
+      },
+      {
+        "path": "crates/quest-sys/tests/mpi.rs",
+        "sha256": "4665cd2d4a0eaa7b68a2308a2eebb7534fe6208765d8c742b938a609bc73d48b",
+        "working_tree_matches_frozen_at_recording": true
+      },
+      {
+        "path": "crates/quest-test-support/Cargo.toml",
+        "sha256": "812fe60ede0d0bb669ab750abd0742419aa8313632622f63e8611eca9bf99524",
+        "working_tree_matches_frozen_at_recording": true
+      },
+      {
+        "path": "crates/quest-test-support/src/lib.rs",
+        "sha256": "a1cf6933dfcae1f499a137b925ba7fd048457464009bf6e83be42e95d2ff897c",
+        "working_tree_matches_frozen_at_recording": true
+      },
+      {
+        "path": "crates/quest-test-support/src/mpi.rs",
+        "sha256": "ed09ffda151e86895c544c97035c722267fc59d492525caf37c89503c4ddf7bd",
+        "working_tree_matches_frozen_at_recording": true
+      },
+      {
+        "path": "crates/quest-test-support/tests/supervisor.rs",
+        "sha256": "e257ce45b3baeffab2a56d4d5a5a23a21014cab10f93836ee1fd5e3ba4fd2d71",
+        "working_tree_matches_frozen_at_recording": true
+      }
+    ]
+  },
+  "native_installations": {
+    "modified_by_review_corrections": false,
+    "quest_version": "4.3.0",
+    "quest_revision": "503552065045eaf89baba85e6cd6aad728525554",
+    "library_sha256": {
+      "local_gnu": "2128fd71d6effd5ae463f9f92ff467032f09089a07cdb9ba7a5d565719b95396",
+      "local_clang": "daeaa610f45f0fec9527cb6c251253eadbb9f33342d521663a3ad2c5b9b3dcf1",
+      "cirrus_gnu": "afdf97834ae301ce6029fd85c3e66b86c6b7934c1bc97c5c98d05d2ef3df3ee3",
+      "cirrus_cray": "f1eba6a43b2f9b0b0ed043adeb66840bdae977aa1920efa6e767e4e3ec14af89"
+    },
+    "configuration_records": [
+      "docs/verification/2026-10-06-native-gnu.md",
+      "docs/verification/2026-10-06-native-clang.md",
+      "docs/verification/2026-10-06-torc-cirrus.md"
+    ]
+  },
+  "corrections": {
+    "hdf5_empty_link_paths": {
+      "source": "crates/quest-build/src/hdf5.rs",
+      "report": "docs/verification/2026-10-06-native-discovery-followup.md#additional-hdf5-finalization-correction",
+      "details": "Matches locked hdf5-metno-sys 0.12.4 finalization only for an empty link-path list, using the actual selected header include root and checking lib/bin candidates for the platform library. Nonempty path order is unchanged.",
+      "regression": "hdf5::tests::linux_pkg_config_empty_link_paths_use_selected_header_root",
+      "scope": "Discovery and emitted RUNPATH; file-presence fixtures do not establish HDF5 ABI or loader execution.",
+      "checks": [
+        {
+          "name": "red regression",
+          "command": "cargo test --locked --offline -p quest-build --all-features hdf5::tests::linux_pkg_config_empty_link_paths_use_selected_header_root -- --exact --nocapture",
+          "exit_code": 101,
+          "passed": 0,
+          "failed": 1,
+          "filtered": 62,
+          "reason": "Expected selected lib/bin paths; actual selection was empty.",
+          "log": {
+            "path": "target/portability-review-20261006/hdf5-empty-links-red.log",
+            "bytes": 3239,
+            "sha256": "77c83c6c7ecf8057b5836033898320e467826bc749903e5828692b93d7a19eae"
+          },
+          "status": {
+            "path": "target/portability-review-20261006/hdf5-empty-links-red.status",
+            "bytes": 4,
+            "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c"
+          }
+        },
+        {
+          "name": "intermediate post-fix suite",
+          "command": "cargo test --locked --offline -p quest-build --all-features hdf5::tests:: -- --nocapture",
+          "exit_code": 101,
+          "passed": 7,
+          "failed": 1,
+          "filtered": 55,
+          "reason": "Selection was correct; new test expected separate Linux RUNPATH flags instead of the existing colon-joined argument. Only the test expectation was corrected.",
+          "log": {
+            "path": "target/portability-review-20261006/hdf5-empty-links-green.log",
+            "bytes": 5759,
+            "sha256": "8fbf8de3c3749dc17760e2394c800032315b1a14f8673f72e378170998d59877"
+          },
+          "status": {
+            "path": "target/portability-review-20261006/hdf5-empty-links-green.status",
+            "bytes": 4,
+            "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c"
+          }
+        },
+        {
+          "name": "final focused suite",
+          "command": "cargo test --locked --offline -p quest-build --all-features hdf5::tests:: -- --nocapture",
+          "exit_code": 0,
+          "passed": 8,
+          "failed": 0,
+          "ignored": 0,
+          "filtered": 55,
+          "log": {
+            "path": "target/portability-review-20261006/hdf5-empty-links-green-final.log",
+            "bytes": 1074,
+            "sha256": "01cf78867085c7be75b069a4c34cd971a621d6cc697270f3dbf1f24c31befa01"
+          },
+          "status": {
+            "path": "target/portability-review-20261006/hdf5-empty-links-green-final.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "strict package Clippy",
+          "command": "cargo clippy --locked --offline -p quest-build --all-targets --all-features --no-deps -- -D warnings",
+          "exit_code": 0,
+          "log": {
+            "path": "target/portability-review-20261006/hdf5-empty-links-clippy.log",
+            "bytes": 172,
+            "sha256": "9431b1ea86908ff49eb8a1beecb9f016787ba64514d637ee050237b777dbd2cb"
+          },
+          "status": {
+            "path": "target/portability-review-20261006/hdf5-empty-links-clippy.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "complete package tests",
+          "command": "cargo test --locked --offline -p quest-build --all-features",
+          "environment": {
+            "CARGO_TARGET_DIR": "target/safe-supervisor-20261006/cargo",
+            "CC": "/usr/bin/gcc",
+            "CXX": "/usr/bin/g++"
+          },
+          "exit_code": 0,
+          "passed": 63,
+          "failed": 0,
+          "ignored": 0,
+          "filtered": 0,
+          "doctests": 0,
+          "log": {
+            "path": "target/safe-supervisor-20261006/quest-build.log",
+            "bytes": 7112,
+            "sha256": "ab3a7941b00eba5baee15a3846c162966bdb121abcce285dc1d80248c7d4376d"
+          },
+          "status": {
+            "path": "target/safe-supervisor-20261006/quest-build.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        }
+      ]
+    },
+    "fatal_drop_witness": {
+      "source": "crates/quest-sys/tests/mpi.rs",
+      "defect": "A returning environment drop followed by a child test failure could satisfy a nonzero-exit-only fatal assertion.",
+      "correction": "Require every rank pre-drop witness, no post-drop witness, nonzero launcher exit and no timeout. A valid returning-drop negative control must be rejected by the same assertion.",
+      "native_behavior_changed": false,
+      "mpi_ranks": 2,
+      "checks": [
+        {
+          "name": "negative control against old assertion",
+          "passed": 0,
+          "failed": 1,
+          "filtered": 6,
+          "reason": "Returning-drop child failure incorrectly satisfied the fatal assertion.",
+          "exit_code": 101,
+          "log": {
+            "path": "target/fatal-witness-20261006-evidence/red.log",
+            "bytes": 3602,
+            "sha256": "10bc159dfdbd947dc4cff59c372c8cfbec718ee2e2519f459cf61ed35d61b9f6"
+          },
+          "status": {
+            "path": "target/fatal-witness-20261006-evidence/red.status",
+            "bytes": 4,
+            "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c"
+          }
+        },
+        {
+          "name": "interrupted check during supervisor migration",
+          "tests_executed": false,
+          "reason": "Compilation rejected three prior unsafe blocks after the forbid lint was added.",
+          "exit_code": 101,
+          "log": {
+            "path": "target/fatal-witness-20261006-evidence/green-concurrent-supervisor-transition.log",
+            "bytes": 1292,
+            "sha256": "f518e618537587ce3d03f23ee12b1dc5c964d9b406eb4092e012496f13d2a4a8"
+          },
+          "status": {
+            "path": "target/fatal-witness-20261006-evidence/green-concurrent-supervisor-transition.status",
+            "bytes": 4,
+            "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c"
+          }
+        },
+        {
+          "name": "final real abort and returning-drop negative control",
+          "passed": 2,
+          "failed": 0,
+          "ignored": 0,
+          "filtered": 5,
+          "children": [
+            {
+              "case": "live-resource abort",
+              "exit_code": 1,
+              "timed_out": false
+            },
+            {
+              "case": "returning-drop negative control",
+              "exit_code": 101,
+              "timed_out": false
+            }
+          ],
+          "exit_code": 0,
+          "log": {
+            "path": "target/fatal-witness-20261006-evidence/green.log",
+            "bytes": 1417,
+            "sha256": "a9f2e92062d2270817aab50dc705857f1f410dc43920cfb90c6ec17f412368b5"
+          },
+          "status": {
+            "path": "target/fatal-witness-20261006-evidence/green.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "strict package Clippy",
+          "warnings_denied": true,
+          "exit_code": 0,
+          "log": {
+            "path": "target/fatal-witness-20261006-evidence/clippy.log",
+            "bytes": 1410,
+            "sha256": "5a6a6c58c589ba67033e22743d10227c4c879d4930d6cdf7fb9b499cffbdfad4"
+          },
+          "status": {
+            "path": "target/fatal-witness-20261006-evidence/clippy.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        }
+      ],
+      "source_receipts": [
+        {
+          "path": "target/fatal-witness-20261006-evidence/mpi.before.rs",
+          "bytes": 10089,
+          "sha256": "7e8664d348e37331e96ed48199beb22588f9f7bcd3aebf797e2f3d3b70cf3108"
+        },
+        {
+          "path": "target/fatal-witness-20261006-evidence/mpi.red.rs",
+          "bytes": 11951,
+          "sha256": "5f4540aafae4a2a38ad278824fa838cc90a3ee07a77b0f578be669dc1ac3aff6"
+        },
+        {
+          "path": "target/fatal-witness-20261006-evidence/mpi.green.rs",
+          "bytes": 12098,
+          "sha256": "4665cd2d4a0eaa7b68a2308a2eebb7534fe6208765d8c742b938a609bc73d48b"
+        },
+        {
+          "path": "target/fatal-witness-20261006-evidence/artifacts.sha256",
+          "bytes": 697,
+          "sha256": "5d0dc92a8cb386a319482a7467cb4d7cd78041c9e6b98781889e67e8d89aaf52"
+        },
+        {
+          "path": "target/fatal-witness-20261006-evidence/final-source.sha256",
+          "bytes": 482,
+          "sha256": "b19907e0ffaf4e68624055eea15b48a45c69cb39c21a5f8e443010b8f879f16c"
+        },
+        {
+          "path": "target/fatal-witness-20261006-evidence/verified-inputs.sha256",
+          "bytes": 607,
+          "sha256": "b61dde391521664865c0fe97634e1f4084bfac038d7174a8a56c8e4b7792eab4"
+        }
+      ]
+    },
+    "safe_supervisor": {
+      "source": [
+        "crates/quest-test-support/Cargo.toml",
+        "crates/quest-test-support/src/lib.rs",
+        "crates/quest-test-support/src/mpi.rs"
+      ],
+      "dependency": {
+        "name": "rustix",
+        "version": "1.1.5",
+        "already_locked": true,
+        "features": [
+          "fs",
+          "process"
+        ],
+        "platform": "cfg(unix)"
+      },
+      "correction": "Replace direct unsafe libc fcntl/kill calls with rustix safe APIs, retaining nonblocking owned pipes, child-owned process groups, deadlines, capture bounds and cancellation semantics.",
+      "library_forbids_unsafe_code": true,
+      "dependency_internals_claimed_unsafe_free": false,
+      "checks": [
+        {
+          "name": "unsafe-code lint before API migration",
+          "unsafe_blocks_rejected": 3,
+          "exit_code": 101,
+          "log": {
+            "path": "target/safe-supervisor-20261006/red.log",
+            "bytes": 1062,
+            "sha256": "09ece32cc34ab20e3849c1020ddc17a2a92183513b8c708548f3cbdde0ce957c"
+          },
+          "status": {
+            "path": "target/safe-supervisor-20261006/red.status",
+            "bytes": 4,
+            "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c"
+          }
+        },
+        {
+          "name": "first safe supervisor run",
+          "passed": 17,
+          "failed": 0,
+          "ignored": 0,
+          "filtered": 0,
+          "exit_code": 0,
+          "log": {
+            "path": "target/safe-supervisor-20261006/green.log",
+            "bytes": 2216,
+            "sha256": "fa0f60f8ca9db642cbd1f69d70d318b5c8544a08daf03e388af8d8b0cfad1efe"
+          },
+          "status": {
+            "path": "target/safe-supervisor-20261006/green.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "final safe supervisor run",
+          "passed": 17,
+          "failed": 0,
+          "ignored": 0,
+          "filtered": 0,
+          "unit_tests": 0,
+          "doctests": 0,
+          "exit_code": 0,
+          "log": {
+            "path": "target/safe-supervisor-20261006/green-final.log",
+            "bytes": 1979,
+            "sha256": "08bd34946d41bee6689e8a511a57314c2c3e31278e7a9b955820fbe583d920e0"
+          },
+          "status": {
+            "path": "target/safe-supervisor-20261006/green-final.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "final strict package Clippy",
+          "warnings_denied": true,
+          "exit_code": 0,
+          "log": {
+            "path": "target/safe-supervisor-20261006/clippy.log",
+            "bytes": 186,
+            "sha256": "357b8d295727b22553e741db662d60fdf4dc9d84eac6932eecda815f4b89614e"
+          },
+          "status": {
+            "path": "target/safe-supervisor-20261006/clippy.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "complete quest-build regression suite",
+          "passed": 63,
+          "failed": 0,
+          "ignored": 0,
+          "filtered": 0,
+          "doctests": 0,
+          "exit_code": 0,
+          "log": {
+            "path": "target/safe-supervisor-20261006/quest-build.log",
+            "bytes": 7112,
+            "sha256": "ab3a7941b00eba5baee15a3846c162966bdb121abcce285dc1d80248c7d4376d"
+          },
+          "status": {
+            "path": "target/safe-supervisor-20261006/quest-build.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        }
+      ],
+      "intermediate_failures": [
+        {
+          "reason": "Initial forbid attribute placed after an item; corrected before the intended red check.",
+          "log": {
+            "path": "target/safe-supervisor-20261006/initial-attribute-position.log",
+            "bytes": 745,
+            "sha256": "e1ea3277d7636b145bcffa95ca2c314fbbe93035f14e734a8659092aab4549e1"
+          }
+        },
+        {
+          "reason": "Nested error condition triggered collapsible_if under -D warnings; corrected before final tests and Clippy.",
+          "log": {
+            "path": "target/safe-supervisor-20261006/clippy-initial.log",
+            "bytes": 1293,
+            "sha256": "ed990debfaf0181df8d338752396ac8a05279c4ea2861c2ea483c3375f52780f"
+          }
+        }
+      ],
+      "test_scope": "Local process supervision and simulated Slurm protocol fixtures; no live Slurm cancellation execution established by these tests."
+    }
+  },
+  "campaigns": [
+    {
+      "lane": "local GNU",
+      "path": "target/native-reviewed-gnu-20261006",
+      "acceptance": "Local planned checks have evidence across the original workspace and separately corrected consumer snapshots; original driver remains failed.",
+      "fresh_cargo_target": true,
+      "completed_test_stages": [
+        {
+          "stage": "all-feature-tests",
+          "exit_code": 0,
+          "passed": 1710,
+          "failed": 0,
+          "skipped": 6,
+          "log": {
+            "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-tests.log",
+            "bytes": 16186,
+            "sha256": "ef7e5cdc1354a056e86fb3de34366e3d784098d59eaef52fc1ac7447146e51e2"
+          },
+          "status": {
+            "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-tests.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "stage": "default-tests",
+          "exit_code": 0,
+          "passed": 1516,
+          "failed": 0,
+          "skipped": 1,
+          "log": {
+            "path": "target/native-reviewed-gnu-20261006/evidence/default-tests.log",
+            "bytes": 7209,
+            "sha256": "bb673e7fbbc2fee2afb5a9ce5b289781fea14bb822dd9848a2dd6bd2f80e0396"
+          },
+          "status": {
+            "path": "target/native-reviewed-gnu-20261006/evidence/default-tests.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        }
+      ],
+      "source_manifest_sha256": "4e5b423ebf3db42db19c3f75481ad786a527117eecd4d41c8b9a9b9dcebd6cf1",
+      "original_driver": {
+        "exit_code": 1,
+        "stages_passed": 11,
+        "stages_failed": 1,
+        "failure": "Stale standalone consumer lockfile; --locked rejected the build before compilation or execution.",
+        "status": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/completed.status",
+          "bytes": 2,
+          "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+        },
+        "started_at_utc": "2026-10-06T19:29:00Z",
+        "finished_at_utc": "2026-10-06T19:43:59Z"
+      },
+      "stages": [
+        {
+          "name": "all-feature-tests",
+          "exit_code": 0,
+          "status": {
+            "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-tests.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "default-tests",
+          "exit_code": 0,
+          "status": {
+            "path": "target/native-reviewed-gnu-20261006/evidence/default-tests.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "all-feature-doctests",
+          "exit_code": 0,
+          "status": {
+            "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-doctests.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "default-doctests",
+          "exit_code": 0,
+          "status": {
+            "path": "target/native-reviewed-gnu-20261006/evidence/default-doctests.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "all-feature-check",
+          "exit_code": 0,
+          "status": {
+            "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-check.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "default-check",
+          "exit_code": 0,
+          "status": {
+            "path": "target/native-reviewed-gnu-20261006/evidence/default-check.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "all-feature-clippy",
+          "exit_code": 0,
+          "status": {
+            "path": "target/native-reviewed-gnu-20261006/evidence/all-feature-clippy.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "bindings",
+          "exit_code": 0,
+          "status": {
+            "path": "target/native-reviewed-gnu-20261006/evidence/bindings.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "doctor",
+          "exit_code": 0,
+          "status": {
+            "path": "target/native-reviewed-gnu-20261006/evidence/doctor.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "consumers",
+          "exit_code": 0,
+          "status": {
+            "path": "target/native-reviewed-gnu-20261006/evidence/consumers.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "consumers-loader-isolated",
+          "exit_code": 0,
+          "status": {
+            "path": "target/native-reviewed-gnu-20261006/evidence/consumers-loader-isolated.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "mpi-consumer",
+          "exit_code": 101,
+          "status": {
+            "path": "target/native-reviewed-gnu-20261006/evidence/mpi-consumer.status",
+            "bytes": 4,
+            "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c"
+          }
+        }
+      ],
+      "doctests": {
+        "all_features": {
+          "passed": 65,
+          "failed": 0,
+          "ignored": 1
+        },
+        "default": {
+          "passed": 55,
+          "failed": 0,
+          "ignored": 1
+        }
+      },
+      "corrected_consumer": {
+        "source_manifest_sha256": "452a49852c4e23f018b82795c19a3fd183c781234f2914df2c0ab516d696918f",
+        "exit_code": 0,
+        "ranks_passed": [
+          1,
+          2,
+          4,
+          8
+        ],
+        "all_launcher_exit_codes": 0,
+        "any_timeout": false,
+        "any_output_truncation": false,
+        "loader_environment": "ordinary",
+        "workspace_rerun": false,
+        "original_driver_failure_preserved": true,
+        "source_crates_unchanged": true,
+        "log": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/corrected-mpi-consumer.log",
+          "bytes": 4546,
+          "sha256": "1e299907117624447f1b799943d833c262a29a710d948bbe37408fa43b92b118"
+        },
+        "status": {
+          "path": "target/native-reviewed-gnu-20261006/evidence/corrected-mpi-consumer.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        },
+        "started_at_utc": "2026-10-06T19:44:47Z",
+        "finished_at_utc": "2026-10-06T19:45:08Z"
+      },
+      "post_execution_checks": [
+        {
+          "name": "source-after",
+          "exit_code": 0,
+          "status": {
+            "path": "target/native-reviewed-gnu-20261006/evidence/source-after.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "native-after",
+          "exit_code": 0,
+          "status": {
+            "path": "target/native-reviewed-gnu-20261006/evidence/native-after.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "corrected-source-after",
+          "exit_code": 0,
+          "status": {
+            "path": "target/native-reviewed-gnu-20261006/evidence/corrected-source-after.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        }
+      ],
+      "detailed_evidence": {
+        "report": {
+          "path": "docs/verification/2026-10-06-native-gnu.md",
+          "bytes": 9796,
+          "sha256": "3116373f3d38043af68e0edbb11feb19dc3999771fd641b436e905376edc6195"
+        },
+        "summary": {
+          "path": "docs/verification/data/2026-10-06-native-gnu/summary.json",
+          "bytes": 91484,
+          "sha256": "2145f0f15cda8a44100da45ac54f86816478cb805fcdbcff7d0363daa5f0108c"
+        },
+        "summary_key": "reviewed_source_followup"
+      }
+    },
+    {
+      "lane": "local Clang",
+      "path": "target/native-reviewed-clang-20261006",
+      "acceptance": "Local planned checks have evidence across the original workspace and separately corrected consumer snapshots; original driver remains failed.",
+      "fresh_cargo_target": true,
+      "completed_test_stages": [
+        {
+          "stage": "all-feature-tests",
+          "exit_code": 0,
+          "passed": 1710,
+          "failed": 0,
+          "skipped": 6,
+          "log": {
+            "path": "target/native-reviewed-clang-20261006/evidence/all-feature-tests.log",
+            "bytes": 16244,
+            "sha256": "abe35a6a7383c6e8a1fe9e2147e2c5fe1087a2816da6be19bb6876d17f2e5053"
+          },
+          "status": {
+            "path": "target/native-reviewed-clang-20261006/evidence/all-feature-tests.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "stage": "default-tests",
+          "exit_code": 0,
+          "passed": 1516,
+          "failed": 0,
+          "skipped": 1,
+          "log": {
+            "path": "target/native-reviewed-clang-20261006/evidence/default-tests.log",
+            "bytes": 7267,
+            "sha256": "79a1f6a53317cae809d78e6ecff1ac2ab321ceae7975483eca9686c23ca4fda3"
+          },
+          "status": {
+            "path": "target/native-reviewed-clang-20261006/evidence/default-tests.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        }
+      ],
+      "source_manifest_sha256": "4e5b423ebf3db42db19c3f75481ad786a527117eecd4d41c8b9a9b9dcebd6cf1",
+      "original_driver": {
+        "exit_code": 1,
+        "stages_passed": 11,
+        "stages_failed": 1,
+        "failure": "Stale standalone consumer lockfile; --locked rejected the build before compilation or execution.",
+        "status": {
+          "path": "target/native-reviewed-clang-20261006/evidence/completed.status",
+          "bytes": 2,
+          "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+        },
+        "started_at_utc": "2026-10-06T19:30:38Z",
+        "finished_at_utc": "2026-10-06T19:44:28Z"
+      },
+      "stages": [
+        {
+          "name": "all-feature-tests",
+          "exit_code": 0,
+          "status": {
+            "path": "target/native-reviewed-clang-20261006/evidence/all-feature-tests.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "default-tests",
+          "exit_code": 0,
+          "status": {
+            "path": "target/native-reviewed-clang-20261006/evidence/default-tests.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "all-feature-doctests",
+          "exit_code": 0,
+          "status": {
+            "path": "target/native-reviewed-clang-20261006/evidence/all-feature-doctests.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "default-doctests",
+          "exit_code": 0,
+          "status": {
+            "path": "target/native-reviewed-clang-20261006/evidence/default-doctests.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "all-feature-check",
+          "exit_code": 0,
+          "status": {
+            "path": "target/native-reviewed-clang-20261006/evidence/all-feature-check.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "default-check",
+          "exit_code": 0,
+          "status": {
+            "path": "target/native-reviewed-clang-20261006/evidence/default-check.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "all-feature-clippy",
+          "exit_code": 0,
+          "status": {
+            "path": "target/native-reviewed-clang-20261006/evidence/all-feature-clippy.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "bindings",
+          "exit_code": 0,
+          "status": {
+            "path": "target/native-reviewed-clang-20261006/evidence/bindings.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "doctor",
+          "exit_code": 0,
+          "status": {
+            "path": "target/native-reviewed-clang-20261006/evidence/doctor.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "consumers",
+          "exit_code": 0,
+          "status": {
+            "path": "target/native-reviewed-clang-20261006/evidence/consumers.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "consumers-loader-isolated",
+          "exit_code": 0,
+          "status": {
+            "path": "target/native-reviewed-clang-20261006/evidence/consumers-loader-isolated.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "mpi-consumer",
+          "exit_code": 101,
+          "status": {
+            "path": "target/native-reviewed-clang-20261006/evidence/mpi-consumer.status",
+            "bytes": 4,
+            "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c"
+          }
+        }
+      ],
+      "doctests": {
+        "all_features": {
+          "passed": 65,
+          "failed": 0,
+          "ignored": 1
+        },
+        "default": {
+          "passed": 55,
+          "failed": 0,
+          "ignored": 1
+        }
+      },
+      "corrected_consumer": {
+        "source_manifest_sha256": "452a49852c4e23f018b82795c19a3fd183c781234f2914df2c0ab516d696918f",
+        "exit_code": 0,
+        "ranks_passed": [
+          1,
+          2,
+          4,
+          8
+        ],
+        "all_launcher_exit_codes": 0,
+        "any_timeout": false,
+        "any_output_truncation": false,
+        "loader_environment": "ordinary",
+        "workspace_rerun": false,
+        "original_driver_failure_preserved": true,
+        "source_crates_unchanged": true,
+        "log": {
+          "path": "target/native-reviewed-clang-20261006/evidence/consumer-delta.log",
+          "bytes": 4689,
+          "sha256": "36a47717deecd933c04b547990f60aad747a54d1e0d337e1ab146517105faceb"
+        },
+        "status": {
+          "path": "target/native-reviewed-clang-20261006/evidence/consumer-delta.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        },
+        "started_at_utc": "2026-10-06T19:45:34Z",
+        "finished_at_utc": "2026-10-06T19:45:55Z"
+      },
+      "post_execution_checks": [
+        {
+          "name": "source-after-check",
+          "exit_code": 0,
+          "status": {
+            "path": "target/native-reviewed-clang-20261006/evidence/source-after-check.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "native-after-check",
+          "exit_code": 0,
+          "status": {
+            "path": "target/native-reviewed-clang-20261006/evidence/native-after-check.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "consumer-delta-source-after-check",
+          "exit_code": 0,
+          "status": {
+            "path": "target/native-reviewed-clang-20261006/evidence/consumer-delta-source-after-check.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        },
+        {
+          "name": "consumer-delta-native-after-check",
+          "exit_code": 0,
+          "status": {
+            "path": "target/native-reviewed-clang-20261006/evidence/consumer-delta-native-after-check.status",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          }
+        }
+      ],
+      "detailed_evidence": {
+        "report": {
+          "path": "docs/verification/2026-10-06-native-clang.md",
+          "bytes": 12099,
+          "sha256": "7e7739dc28993fafbfdbfa54757907c9f5d3b76dd275f1c9146d299276276bcd"
+        },
+        "summary": {
+          "path": "docs/verification/data/2026-10-06-native-clang/summary.json",
+          "bytes": 47911,
+          "sha256": "0a763483c0c5fc4f5bfd5d770658dbf638ad3bb3c616c04092246a503176eb0d"
+        },
+        "summary_key": "reviewed_source_followup"
+      }
+    },
+    {
+      "lane": "Cirrus Cray build",
+      "slurm_job_id": 538212,
+      "submission_reported": true,
+      "acceptance": "failed",
+      "nodes": 1,
+      "requested_cpus_per_task": 8,
+      "coordinator": "Torc standalone",
+      "slurm_state": "FAILED",
+      "slurm_exit_code": "1:0",
+      "elapsed_seconds": 200,
+      "outcome_provenance": "retained terminal Slurm accounting, native statuses and Torc export",
+      "stages": {
+        "doctor": 0,
+        "bindings": 0,
+        "default-build": 0,
+        "all-feature-build": 0,
+        "mpi-consumer-build": 101,
+        "source-after": 0
+      },
+      "reason": "Separate standalone MPI consumer Cargo.lock did not include supervisor rustix dependency.",
+      "start": "2026-10-06T20:28:09",
+      "end": "2026-10-06T20:31:29",
+      "allocated_cpus": 288
+    },
+    {
+      "lane": "Cirrus Cray runtime",
+      "slurm_job_id": 538213,
+      "submission_reported": true,
+      "acceptance": "unrun",
+      "nodes": 8,
+      "mpi_ranks_per_node": 1,
+      "omp_threads_per_rank": 288,
+      "coordinator": "ordinary native-validation.sbatch and srun",
+      "slurm_state": "CANCELLED",
+      "cancelled_while_pending": true,
+      "outcome_provenance": "retained terminal Slurm accounting, native statuses and Torc export",
+      "reason": "Cancelled after prerequisite build failure.",
+      "slurm_exit_code": "0:0",
+      "elapsed_seconds": 0,
+      "started": false
+    },
+    {
+      "lane": "Cirrus GNU corrected runtime",
+      "acceptance": "passed full runtime campaign",
+      "terminal_receipt_recorded": true,
+      "slurm_job_id": 538236,
+      "source_manifest_sha256": "452a49852c4e23f018b82795c19a3fd183c781234f2914df2c0ab516d696918f",
+      "evidence_pointer": "/standalone_consumer_lock_followup/runtime_evidence/gnu"
+    },
+    {
+      "lane": "macOS Apple Silicon",
+      "acceptance": "unrun",
+      "reason": "No runner available."
+    },
+    {
+      "lane": "small enforced per-node capacity",
+      "acceptance": "unsupported",
+      "reason": "Supported enforcement has not been established under the accepted no-custom-limits execution policy."
+    },
+    {
+      "lane": "Cirrus Cray corrected runtime",
+      "acceptance": "passed full runtime campaign",
+      "terminal_receipt_recorded": true,
+      "slurm_job_id": 538231,
+      "source_manifest_sha256": "452a49852c4e23f018b82795c19a3fd183c781234f2914df2c0ab516d696918f",
+      "evidence_pointer": "/standalone_consumer_lock_followup/runtime_evidence/cray"
+    }
+  ],
+  "execution_policy": {
+    "exclusive_nodes": true,
+    "aggregate_node_limit": 8,
+    "central_modules_and_serial_hdf5_preserved": true,
+    "cargo_host_policy_report": "docs/verification/2026-10-06-cargo-host-policy.md",
+    "python_campaign_controller": false,
+    "special_trybuild_routing": false,
+    "custom_memory_caps": false,
+    "vendor_library_patches": false
+  },
+  "preserved_prior_outcomes": {
+    "clang_cmake_failures": {
+      "report": "docs/verification/2026-10-06-native-discovery-followup.md",
+      "passed": 1706,
+      "failed": 2,
+      "skipped": 6,
+      "exit_code": 100,
+      "tests": [
+        "probe::tests::cmake_build_evaluates_target_requirements_and_paths_with_spaces",
+        "probe::tests::cargo_discovery_evaluates_the_selected_package_once"
+      ],
+      "cause": "unresolved CMake installed-module open failures",
+      "superseded_by_focused_checks": false
+    },
+    "earlier_host_policy": {
+      "report": "docs/verification/2026-10-06-cargo-host-policy.md",
+      "probe_job": 538200,
+      "build_job": 538206,
+      "owner_cancelled_runtime_jobs": [
+        538207,
+        538208
+      ],
+      "full_runtime_acceptance": false
+    }
+  },
+  "acceptance_boundaries": [
+    "Focused tests do not establish complete default/all-feature compiler or cluster runtime acceptance.",
+    "Ordinary downstream consumers and isolated loader checks are separate gates.",
+    "Earlier source snapshots retain their own outcomes and do not cover this correction set.",
+    "No macOS or enforced per-node capacity acceptance is claimed."
+  ],
+  "accepted_plan": "docs/superpowers/plans/2026-10-06-portable-cirrus.md",
+  "standalone_consumer_lock_followup": {
+    "scope": "Correction after failed 4e5b423 build; local workspace evidence remains on original frozen source, with corrected consumers executed separately on 452a498.",
+    "manifest": {
+      "path": "target/portable-locked-cirrus-20261006/source.sha256",
+      "bytes": 348034,
+      "sha256": "452a49852c4e23f018b82795c19a3fd183c781234f2914df2c0ab516d696918f"
+    },
+    "archive": {
+      "path": "target/portable-locked-cirrus-20261006/source.tar.gz",
+      "bytes": 11866989,
+      "sha256": "46636f8a311fa221d0754f4042a961e2191d756597ea2fe1ce97f50d1f2898a7"
+    },
+    "files": 2594,
+    "changed_files": [
+      "docs/verification/fixtures/native-mpi-consumer/Cargo.lock"
+    ],
+    "parent_delta_receipt": {
+      "path": "target/portable-locked-cirrus-20261006/parent-delta.txt",
+      "bytes": 274,
+      "sha256": "a7ea9cb65c9de5d55b00900126fb8638cfb676b8b3550dec2c64ed6408e71de3"
+    },
+    "lockfile_before_sha256": "ad165e081dc1d7aa262903dd3e49437589953d668fe58464db223c5e853aa690",
+    "lockfile_after_sha256": "7d2171d648f99ac5d678bbb5fc3c7808906cadb520fc9b57b609a2be210bb6c7",
+    "packages_added": [
+      {
+        "name": "rustix",
+        "version": "1.1.5"
+      },
+      {
+        "name": "errno",
+        "version": "0.3.14"
+      },
+      {
+        "name": "linux-raw-sys",
+        "version": "0.12.1"
+      }
+    ],
+    "added_versions_already_in_workspace_lock": true,
+    "quest_test_support_dependency_change": {
+      "removed": "libc",
+      "added": "rustix"
+    },
+    "source_crates_unchanged": true,
+    "resolution_check": {
+      "command": "cargo tree --locked --offline --manifest-path docs/verification/fixtures/native-mpi-consumer/Cargo.toml",
+      "exit_code": 0,
+      "provenance": "reported by campaign owner"
+    },
+    "consumer_runtime_acceptance": "Passed locally with GNU and Clang at 1/2/4/8 ranks, and in complete GNU and Cray eight-node campaigns on corrected snapshot 452a498.",
+    "campaigns": [
+      {
+        "lane": "Cirrus Cray build",
+        "slurm_job_id": 538230,
+        "acceptance": "passed build stage",
+        "slurm_state": "COMPLETED",
+        "slurm_exit_code": "0:0",
+        "elapsed_seconds": 231,
+        "nodes": 1,
+        "requested_cpus_per_task": 8,
+        "allocated_cpus": 288
+      },
+      {
+        "lane": "Cirrus Cray runtime",
+        "slurm_job_id": 538231,
+        "acceptance": "passed full runtime campaign",
+        "slurm_state_at_observation": "RUNNING",
+        "nodes": 8,
+        "allocated_cpus": 2304,
+        "slurm_state": "COMPLETED",
+        "slurm_exit_code": "0:0",
+        "elapsed_seconds": 2312,
+        "started_at_utc": "2026-10-06T19:40:41Z",
+        "finished_at_utc": "2026-10-06T20:19:13Z"
+      },
+      {
+        "lane": "Cirrus GNU build",
+        "slurm_job_id": 538235,
+        "acceptance": "passed full build stage",
+        "slurm_state_at_observation": "PENDING",
+        "dependency": "afterany:538231",
+        "nodes": 1,
+        "requested_cpus_per_task": 8,
+        "slurm_state": "COMPLETED",
+        "slurm_exit_code": "0:0",
+        "elapsed_seconds": 227,
+        "started_at_utc": "2026-10-06T20:19:15Z",
+        "finished_at_utc": "2026-10-06T20:23:02Z",
+        "allocated_cpus": 288
+      },
+      {
+        "lane": "Cirrus GNU runtime",
+        "slurm_job_id": 538236,
+        "acceptance": "passed full runtime campaign",
+        "slurm_state_at_observation": "RUNNING",
+        "dependency": "afterok:538235",
+        "nodes": 8,
+        "requested_cpus": 2304,
+        "observed_at_utc": "2026-10-06T20:24:44Z",
+        "started_at_utc": "2026-10-06T20:23:04Z",
+        "allocated_cpus": 2304,
+        "slurm_state": "COMPLETED",
+        "slurm_exit_code": "0:0",
+        "elapsed_seconds": 2347,
+        "finished_at_utc": "2026-10-06T21:02:11Z"
+      }
+    ],
+    "build_evidence": {
+      "archive": {
+        "path": "target/portable-locked-cirrus-20261006/build-receipts.tar.gz",
+        "bytes": 225071,
+        "sha256": "050ced85a0b533837c4c504547dc1c256c6c45dd35c476feecaef8b9cb04fec8"
+      },
+      "accounting": {
+        "path": "target/portable-locked-cirrus-20261006/build-receipts/locked-build-accounting.txt",
+        "bytes": 235,
+        "sha256": "c8f53fce2c2cd28e96246ac56c9cbf35ea552db8f59970f7569a5ca444dcb703"
+      },
+      "observed_at_utc": "2026-10-06T19:42:32Z",
+      "queued_jobs": {
+        "path": "target/portable-locked-cirrus-20261006/build-receipts/locked-queued-jobs.txt",
+        "bytes": 3069,
+        "sha256": "1a51cefaf1fb88b9f4dbe1e61bc8f3622a0538394a8caf3b1d1ff9ae2f82f396"
+      },
+      "source_manifest": {
+        "path": "target/portable-locked-cirrus-20261006/build-receipts/source.sha256",
+        "bytes": 348034,
+        "sha256": "452a49852c4e23f018b82795c19a3fd183c781234f2914df2c0ab516d696918f"
+      },
+      "native_status_files": {
+        "all-feature-build": 0,
+        "bindings": 0,
+        "completed": 0,
+        "default-build": 0,
+        "doctor": 0,
+        "job-exit": 0,
+        "mpi-consumer-build": 0,
+        "source-after": 0
+      },
+      "native_logs": [
+        {
+          "path": "target/portable-locked-cirrus-20261006/build-receipts/receipts/cray/538230/doctor.log",
+          "bytes": 15812,
+          "sha256": "de8d45532548f823b60c01d3770e78e42cf243b32cb0009c8945c024d2b28bdc"
+        },
+        {
+          "path": "target/portable-locked-cirrus-20261006/build-receipts/receipts/cray/538230/bindings.log",
+          "bytes": 906,
+          "sha256": "a134bcb7e31d473f30391314249a69177ab250fd380248f2e8d65ef234a6b88f"
+        },
+        {
+          "path": "target/portable-locked-cirrus-20261006/build-receipts/receipts/cray/538230/default-build.log",
+          "bytes": 89935,
+          "sha256": "1165a443a17a94b4c5f3d33133e517cd336e6adb8be31d95c0a0f4569ab6edae"
+        },
+        {
+          "path": "target/portable-locked-cirrus-20261006/build-receipts/receipts/cray/538230/all-feature-build.log",
+          "bytes": 88737,
+          "sha256": "1f4a99993ec7a49e5b0b114890ce105f91b299d5291711100acd96c59fdcc04b"
+        },
+        {
+          "path": "target/portable-locked-cirrus-20261006/build-receipts/receipts/cray/538230/mpi-consumer-build.log",
+          "bytes": 4887,
+          "sha256": "dbdc3008a8cd8e3ac2848411fddf24ef935e889db0945d31185e1ab718f7cf44"
+        },
+        {
+          "path": "target/portable-locked-cirrus-20261006/build-receipts/receipts/cray/538230/source-before.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "target/portable-locked-cirrus-20261006/build-receipts/receipts/cray/538230/source-after.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "target/portable-locked-cirrus-20261006/build-receipts/receipts/cray/538230/native-identity.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "target/portable-locked-cirrus-20261006/build-receipts/receipts/cray/538230/compiler-inputs.txt",
+          "bytes": 1824,
+          "sha256": "187baa0252193e40bd041003b7e321175bc7a9cdd6c77110ed22d634ada18f00"
+        }
+      ],
+      "torc": {
+        "run_exit_code": 0,
+        "wrapper_exit_code": 0,
+        "acceptance": true,
+        "export": {
+          "path": "target/portable-locked-cirrus-20261006/build-receipts/torc/cray/538230/workflow-export.json",
+          "bytes": 5165,
+          "sha256": "e0e254b15c950db751a359a4067a7bdeeffd5ecd6fb1b943e9d05e642966b693"
+        },
+        "local_artifacts": {
+          "path": "target/portable-locked-cirrus-20261006/build-receipts/torc/cray/538230/local-artifacts.tar.gz",
+          "bytes": 80547,
+          "sha256": "c3b9eedba05c4fb9708a54c531e0fafff77a35b3cd904e6fa776fc288dd4a870"
+        },
+        "archive_gzip_integrity": "passed",
+        "restored_database_readonly_quick_check": "ok",
+        "workflow": {
+          "id": 1,
+          "run_id": 1
+        },
+        "jobs": [
+          {
+            "id": 1,
+            "name": "native-build",
+            "status": "completed",
+            "attempt_id": 1,
+            "workflow_id": 1
+          }
+        ],
+        "results": [
+          {
+            "job_id": 1,
+            "workflow_id": 1,
+            "run_id": 1,
+            "attempt_id": 1,
+            "status": "completed",
+            "return_code": 0
+          }
+        ]
+      },
+      "scope": "Build/compilation and native discovery only; workspace and consumer execution require separate runtime receipts."
+    },
+    "submission_and_cleanup": {
+      "receipt": {
+        "path": "target/portable-locked-cirrus-20261006/submission-and-cleanup.txt",
+        "bytes": 6710,
+        "sha256": "76c6a99bf2b1817fe8096d1988c86f9c018478379d1bef46d0f9e4043195cc37"
+      },
+      "scope": "Recorded submissions and owner-approved removal of two obsolete compiled caches; sources, native installations, logs and receipts retained.",
+      "removed_compiled_caches": 2,
+      "removal_authorized": true
+    },
+    "runtime_evidence": {
+      "cray": {
+        "slurm_job_id": 538231,
+        "compiler": "cray",
+        "stage": "verify",
+        "acceptance": "passed full runtime campaign",
+        "source_manifest_sha256": "452a49852c4e23f018b82795c19a3fd183c781234f2914df2c0ab516d696918f",
+        "source_files": 2594,
+        "matching_successful_build_job": 538230,
+        "slurm_state": "COMPLETED",
+        "slurm_exit_code": "0:0",
+        "started_at_utc": "2026-10-06T19:40:41Z",
+        "finished_at_utc": "2026-10-06T20:19:13Z",
+        "elapsed_seconds": 2312,
+        "nodes": 8,
+        "allocated_cpus": 2304,
+        "mpi_ranks_per_node": 1,
+        "openmp_threads_per_rank": 288,
+        "all_status_files_zero": true,
+        "status_files": 25,
+        "workspace_test_filter": null,
+        "all_feature_tests": {
+          "passed": 1710,
+          "failed": 0,
+          "skipped": 6,
+          "elapsed_seconds": 1491.031
+        },
+        "default_tests": {
+          "passed": 1516,
+          "failed": 0,
+          "skipped": 1,
+          "elapsed_seconds": 514.687
+        },
+        "all_feature_doctests": {
+          "passed": 65,
+          "failed": 0,
+          "ignored": 1
+        },
+        "default_doctests": {
+          "passed": 55,
+          "failed": 0,
+          "ignored": 1
+        },
+        "abi_stage": {
+          "passed": 8,
+          "failed": 0,
+          "reported_skipped": 58,
+          "filter": "test(generated_abi_tests::) | test(rsmpi::tests::)"
+        },
+        "compiled_abi_mutation_regression_passed_in_workspace": true,
+        "trybuild_groups": [
+          {
+            "test": "quest-compile::compile_fail invalid_dsl_and_semantic_capabilities_are_rejected",
+            "all_features": "passed",
+            "default_features": "passed"
+          },
+          {
+            "test": "quest-rs::compile_fail runtime_ownership_and_kind_contracts",
+            "all_features": "passed",
+            "default_features": "passed"
+          }
+        ],
+        "independent_mpi_consumer": {
+          "ranks": [
+            1,
+            2,
+            4,
+            8
+          ],
+          "all_exit_codes_zero": true,
+          "each_rank_count_has_matching_unique_host_placement": true
+        },
+        "installed_consumers": {
+          "numerical_cases_passed": 10,
+          "backends": [
+            "cpu",
+            "omp"
+          ],
+          "loader_mode": "module environment",
+          "loader_isolated": false
+        },
+        "strict_clippy": {
+          "passed": true,
+          "command": "cargo clippy --locked --offline --workspace --all-features --all-targets -- -D warnings"
+        },
+        "formatting_passed": true,
+        "default_and_all_feature_checks_passed": true,
+        "source_before_and_after_verified": true,
+        "native_identity_preflight_passed": true,
+        "native_library_sha256": "f1eba6a43b2f9b0b0ed043adeb66840bdae977aa1920efa6e767e4e3ec14af89",
+        "failure_semantics": {
+          "failed_slurm_steps": 22,
+          "all_failed_steps_matched_to_passing_negative_test_parents": true,
+          "mapping_receipt": "target/portable-locked-cirrus-20261006/main-campaign-observations/cray-538231-expected-failure-mapping.txt",
+          "mapping_sha256": "f028cd983e826050839b315dbff7eb85b3454a621567678a3d1797a974a430a2",
+          "returning_drop_negative_control": {
+            "test_passed": true,
+            "step": "538231.239",
+            "supervisor_exit_code": 101,
+            "slurm_exit_code": "101:0",
+            "timed_out": false,
+            "output_truncated": false
+          },
+          "live_resource_fatal_drop": {
+            "test_passed": true,
+            "step": "538231.240",
+            "supervisor_exit_code": 255,
+            "slurm_exit_code": "127:0",
+            "timed_out": false,
+            "output_truncated": false
+          },
+          "real_job_mpi_supervisor_timeouts_reported": 0,
+          "synthetic_supervisor_timeouts_are_separate": true,
+          "real_slurm_timeout_cancellation_acceptance": "Separate probe; not established by synthetic supervisor tests or this campaign."
+        },
+        "archive": {
+          "path": "target/portable-locked-cirrus-20261006/full-cray-538231-receipts.tar.gz",
+          "bytes": 187641702,
+          "sha256": "62af77e81e3d28bef3964d40227afd4501c519b3aac54ec74a3ef8a341df2838",
+          "gzip_integrity": "passed",
+          "includes": [
+            "complete runtime receipt directory including consumer artifacts",
+            "batch log",
+            "source manifest"
+          ]
+        },
+        "accounting": {
+          "path": "target/portable-locked-cirrus-20261006/full-cray-538231-accounting.txt",
+          "bytes": 23555,
+          "sha256": "6d2c1f4d457c126f5c6da4831fa96eabc00be431777bf213cb2fd57a25f99890",
+          "timezone": "UTC"
+        },
+        "acceptance_limits": [
+          "This result covers the recorded 452a498 source and unchanged Cray native installation.",
+          "Ordinary module-environment consumers are distinct from loader-isolated consumers.",
+          "Reported nextest skips and ignored doctests remain excluded execution.",
+          "This is correctness acceptance, not a scaling or enforced per-node capacity result."
+        ],
+        "stages": [
+          {
+            "name": "abi",
+            "exit_code": 0
+          },
+          {
+            "name": "all-feature-check",
+            "exit_code": 0
+          },
+          {
+            "name": "all-features",
+            "exit_code": 0
+          },
+          {
+            "name": "clippy",
+            "exit_code": 0
+          },
+          {
+            "name": "completed",
+            "exit_code": 0
+          },
+          {
+            "name": "consumers",
+            "exit_code": 0
+          },
+          {
+            "name": "default-check",
+            "exit_code": 0
+          },
+          {
+            "name": "default-doctests",
+            "exit_code": 0
+          },
+          {
+            "name": "default-tests",
+            "exit_code": 0
+          },
+          {
+            "name": "doctests",
+            "exit_code": 0
+          },
+          {
+            "name": "fmt",
+            "exit_code": 0
+          },
+          {
+            "name": "job-exit",
+            "exit_code": 0
+          },
+          {
+            "name": "mpi-consumer-1",
+            "exit_code": 0
+          },
+          {
+            "name": "mpi-consumer-2",
+            "exit_code": 0
+          },
+          {
+            "name": "mpi-consumer-4",
+            "exit_code": 0
+          },
+          {
+            "name": "mpi-consumer-8",
+            "exit_code": 0
+          },
+          {
+            "name": "placement-1-check",
+            "exit_code": 0
+          },
+          {
+            "name": "placement-1",
+            "exit_code": 0
+          },
+          {
+            "name": "placement-2-check",
+            "exit_code": 0
+          },
+          {
+            "name": "placement-2",
+            "exit_code": 0
+          },
+          {
+            "name": "placement-4-check",
+            "exit_code": 0
+          },
+          {
+            "name": "placement-4",
+            "exit_code": 0
+          },
+          {
+            "name": "placement-8-check",
+            "exit_code": 0
+          },
+          {
+            "name": "placement-8",
+            "exit_code": 0
+          },
+          {
+            "name": "source-after",
+            "exit_code": 0
+          }
+        ],
+        "logs": [
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-cray-538231-receipts/receipts/cray/538231/all-features.log",
+            "bytes": 930634,
+            "sha256": "a103dd33373dff37ae6fa2cc8bdd4df93b7a518be39fae932cae90165dcb5bd3"
+          },
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-cray-538231-receipts/receipts/cray/538231/default-tests.log",
+            "bytes": 619862,
+            "sha256": "ff6b8feb8fe35778e8d45448bfa07412bac2215326b49426bdd1f9f08998c17c"
+          },
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-cray-538231-receipts/receipts/cray/538231/abi.log",
+            "bytes": 5066,
+            "sha256": "6eba01515a076abaf4d77292e78bc2a50a62fccae5c4836ba7219744b7cfc356"
+          },
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-cray-538231-receipts/receipts/cray/538231/doctests.log",
+            "bytes": 11282,
+            "sha256": "f8bfbf9a2e4c945002cfee5e8b0b935b9af141d5692e1cdd84aa014aad2d5b12"
+          },
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-cray-538231-receipts/receipts/cray/538231/default-doctests.log",
+            "bytes": 10234,
+            "sha256": "f2f2d5d8fc2c018d7504170ec5b66e2edf1f708579c1167570bad162adc18c8a"
+          },
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-cray-538231-receipts/receipts/cray/538231/clippy.log",
+            "bytes": 9874,
+            "sha256": "d3250e5fca4b40f852d8477690a66d542bb227d93a4808c12e7aed1415b42aed"
+          },
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-cray-538231-receipts/receipts/cray/538231/consumers.log",
+            "bytes": 1938,
+            "sha256": "8dccaca829a92e9eaef17773f1ee4c158669c839a2f72ecc1bce1afead0768cc"
+          },
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-cray-538231-receipts/receipts/cray/538231/source-before.log",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-cray-538231-receipts/receipts/cray/538231/source-after.log",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-cray-538231-receipts/receipts/cray/538231/native-identity.log",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-cray-538231-receipts/receipts/cray/538231/compiler-inputs.txt",
+            "bytes": 1824,
+            "sha256": "187baa0252193e40bd041003b7e321175bc7a9cdd6c77110ed22d634ada18f00"
+          },
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-cray-538231-receipts/receipts/cray/538231/modules.txt",
+            "bytes": 260,
+            "sha256": "f5d648c8bf61cb94f937cffc0969166adc8b1bda5a27658b370d5a134ac88fee"
+          },
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-cray-538231-receipts/receipts/cray/538231/rustc.txt",
+            "bytes": 214,
+            "sha256": "ba405b896c6b4a26674e9d3e7fc4956ed4b1c632ac70c6b7880c76157d124b25"
+          },
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-cray-538231-receipts/receipts/cray/538231/cxx.txt",
+            "bytes": 208,
+            "sha256": "ad0e02a3148b3be0eaea1590bc0e46721cee9769d6501a5482425d4a36c1309d"
+          },
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-cray-538231-receipts/receipts/cray/538231/mpi-launcher-args.json",
+            "bytes": 154,
+            "sha256": "0926cd3678c1720f305772eb55d65b9831b67b155486c77b8ecb97f221348736"
+          }
+        ]
+      },
+      "gnu": {
+        "slurm_job_id": 538236,
+        "compiler": "gnu",
+        "stage": "verify",
+        "acceptance": "passed full runtime campaign",
+        "source_manifest_sha256": "452a49852c4e23f018b82795c19a3fd183c781234f2914df2c0ab516d696918f",
+        "source_files": 2594,
+        "matching_successful_build_job": 538235,
+        "slurm_state": "COMPLETED",
+        "slurm_exit_code": "0:0",
+        "started_at_utc": "2026-10-06T20:23:04Z",
+        "finished_at_utc": "2026-10-06T21:02:11Z",
+        "elapsed_seconds": 2347,
+        "nodes": 8,
+        "allocated_cpus": 2304,
+        "mpi_ranks_per_node": 1,
+        "openmp_threads_per_rank": 288,
+        "all_status_files_zero": true,
+        "status_files": 25,
+        "workspace_test_filter": null,
+        "all_feature_tests": {
+          "passed": 1710,
+          "failed": 0,
+          "skipped": 6,
+          "elapsed_seconds": 1524.317
+        },
+        "default_tests": {
+          "passed": 1516,
+          "failed": 0,
+          "skipped": 1,
+          "elapsed_seconds": 511.237
+        },
+        "all_feature_doctests": {
+          "passed": 65,
+          "failed": 0,
+          "ignored": 1
+        },
+        "default_doctests": {
+          "passed": 55,
+          "failed": 0,
+          "ignored": 1
+        },
+        "abi_stage": {
+          "passed": 8,
+          "failed": 0,
+          "reported_skipped": 58,
+          "filter": "test(generated_abi_tests::) | test(rsmpi::tests::)"
+        },
+        "compiled_abi_mutation_regression_passed_in_workspace": true,
+        "trybuild_groups": [
+          {
+            "test": "quest-compile::compile_fail invalid_dsl_and_semantic_capabilities_are_rejected",
+            "all_features": "passed",
+            "default_features": "passed"
+          },
+          {
+            "test": "quest-rs::compile_fail runtime_ownership_and_kind_contracts",
+            "all_features": "passed",
+            "default_features": "passed"
+          }
+        ],
+        "independent_mpi_consumer": {
+          "ranks": [
+            1,
+            2,
+            4,
+            8
+          ],
+          "all_exit_codes_zero": true,
+          "each_rank_count_has_matching_unique_host_placement": true
+        },
+        "installed_consumers": {
+          "numerical_cases_passed": 10,
+          "backends": [
+            "cpu",
+            "omp"
+          ],
+          "loader_mode": "module environment",
+          "loader_isolated": false
+        },
+        "strict_clippy": {
+          "passed": true,
+          "command": "cargo clippy --locked --offline --workspace --all-features --all-targets -- -D warnings"
+        },
+        "formatting_passed": true,
+        "default_and_all_feature_checks_passed": true,
+        "source_before_and_after_verified": true,
+        "native_identity_preflight_passed": true,
+        "native_library_sha256": "afdf97834ae301ce6029fd85c3e66b86c6b7934c1bc97c5c98d05d2ef3df3ee3",
+        "failure_semantics": {
+          "failed_slurm_steps": 22,
+          "all_failed_steps_matched_to_passing_negative_test_parents": true,
+          "mapping_receipt": "target/portable-locked-cirrus-20261006/main-campaign-observations/gnu-538236-expected-failure-mapping.txt",
+          "mapping_sha256": "d138df636ac3db25aa59a8e3049fa0a9bcf68a23e167e34f585c68204ef6bcc9",
+          "returning_drop_negative_control": {
+            "test_passed": true,
+            "step": "538236.239",
+            "supervisor_exit_code": 101,
+            "slurm_exit_code": "101:0",
+            "timed_out": false,
+            "output_truncated": false
+          },
+          "live_resource_fatal_drop": {
+            "test_passed": true,
+            "step": "538236.240",
+            "supervisor_exit_code": 255,
+            "slurm_exit_code": "127:0",
+            "timed_out": false,
+            "output_truncated": false
+          },
+          "real_job_mpi_supervisor_timeouts_reported": 0,
+          "synthetic_supervisor_timeouts_are_separate": true,
+          "real_slurm_timeout_cancellation_acceptance": "Separate probe; not established by synthetic supervisor tests or this campaign."
+        },
+        "archive": {
+          "path": "target/portable-locked-cirrus-20261006/full-gnu-538236-receipts.tar.gz",
+          "bytes": 146485952,
+          "sha256": "f42834258a927c8533c50d1866c4b3742eb1b4cc8f47c0f9cd654ce4a2b1e438",
+          "gzip_integrity": "passed",
+          "includes": [
+            "complete runtime receipt directory including consumer artifacts",
+            "batch log",
+            "source manifest"
+          ]
+        },
+        "accounting": {
+          "path": "target/portable-locked-cirrus-20261006/full-gnu-538236-accounting.txt",
+          "bytes": 23535,
+          "sha256": "e77bb23f524fa069c9efe3bccb412494b96f4bdc350c8e86d6eef91383e29388",
+          "timezone": "UTC"
+        },
+        "acceptance_limits": [
+          "This result covers the recorded 452a498 source and unchanged GNU native installation.",
+          "Ordinary module-environment consumers are distinct from loader-isolated consumers.",
+          "Reported nextest skips and ignored doctests remain excluded execution.",
+          "This is correctness acceptance, not a scaling or enforced per-node capacity result."
+        ],
+        "stages": [
+          {
+            "name": "abi",
+            "exit_code": 0
+          },
+          {
+            "name": "all-feature-check",
+            "exit_code": 0
+          },
+          {
+            "name": "all-features",
+            "exit_code": 0
+          },
+          {
+            "name": "clippy",
+            "exit_code": 0
+          },
+          {
+            "name": "completed",
+            "exit_code": 0
+          },
+          {
+            "name": "consumers",
+            "exit_code": 0
+          },
+          {
+            "name": "default-check",
+            "exit_code": 0
+          },
+          {
+            "name": "default-doctests",
+            "exit_code": 0
+          },
+          {
+            "name": "default-tests",
+            "exit_code": 0
+          },
+          {
+            "name": "doctests",
+            "exit_code": 0
+          },
+          {
+            "name": "fmt",
+            "exit_code": 0
+          },
+          {
+            "name": "job-exit",
+            "exit_code": 0
+          },
+          {
+            "name": "mpi-consumer-1",
+            "exit_code": 0
+          },
+          {
+            "name": "mpi-consumer-2",
+            "exit_code": 0
+          },
+          {
+            "name": "mpi-consumer-4",
+            "exit_code": 0
+          },
+          {
+            "name": "mpi-consumer-8",
+            "exit_code": 0
+          },
+          {
+            "name": "placement-1-check",
+            "exit_code": 0
+          },
+          {
+            "name": "placement-1",
+            "exit_code": 0
+          },
+          {
+            "name": "placement-2-check",
+            "exit_code": 0
+          },
+          {
+            "name": "placement-2",
+            "exit_code": 0
+          },
+          {
+            "name": "placement-4-check",
+            "exit_code": 0
+          },
+          {
+            "name": "placement-4",
+            "exit_code": 0
+          },
+          {
+            "name": "placement-8-check",
+            "exit_code": 0
+          },
+          {
+            "name": "placement-8",
+            "exit_code": 0
+          },
+          {
+            "name": "source-after",
+            "exit_code": 0
+          }
+        ],
+        "logs": [
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-gnu-538236-receipts/receipts/gnu/538236/all-features.log",
+            "bytes": 930697,
+            "sha256": "d903e67aee700521995346764df3681b8cb91020f0eebf3638cb063090e87b2b"
+          },
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-gnu-538236-receipts/receipts/gnu/538236/default-tests.log",
+            "bytes": 619857,
+            "sha256": "3c0b64d0f3d6ea9bef96947d23f067360b33b311b169f27a8fd4b2e610d03310"
+          },
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-gnu-538236-receipts/receipts/gnu/538236/abi.log",
+            "bytes": 4995,
+            "sha256": "26b5caa9331cba93aaacf3e3c7a2de772d7b14edc642a4084b63d58e89c66206"
+          },
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-gnu-538236-receipts/receipts/gnu/538236/doctests.log",
+            "bytes": 11275,
+            "sha256": "ade86b8191008061b38b0fef8fd2e0aca7d53acdec7aa04abf5de168c6f3de3b"
+          },
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-gnu-538236-receipts/receipts/gnu/538236/default-doctests.log",
+            "bytes": 10233,
+            "sha256": "9108189d5d63858c66b2398e3483b75a02bc52cb92735d3b51dcfacd804fe16e"
+          },
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-gnu-538236-receipts/receipts/gnu/538236/clippy.log",
+            "bytes": 9638,
+            "sha256": "36a2593b06ba1bfb16af56c2699d59441046ef1b198d636082722c5e8540acc4"
+          },
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-gnu-538236-receipts/receipts/gnu/538236/consumers.log",
+            "bytes": 1934,
+            "sha256": "bab11e41a584160a28e85b91ce3ff45c744c3d07ebfd237344199d260616803d"
+          },
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-gnu-538236-receipts/receipts/gnu/538236/source-before.log",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-gnu-538236-receipts/receipts/gnu/538236/source-after.log",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-gnu-538236-receipts/receipts/gnu/538236/native-identity.log",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-gnu-538236-receipts/receipts/gnu/538236/compiler-inputs.txt",
+            "bytes": 1232,
+            "sha256": "363f2cfef474a7f08c0190ed5748ec97897c394455a39b3b4a9ed75481cb0858"
+          },
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-gnu-538236-receipts/receipts/gnu/538236/modules.txt",
+            "bytes": 308,
+            "sha256": "8623b74f7226ee04c83cc4c021763741102179df3832d59bd93f3d505f641690"
+          },
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-gnu-538236-receipts/receipts/gnu/538236/rustc.txt",
+            "bytes": 214,
+            "sha256": "ba405b896c6b4a26674e9d3e7fc4956ed4b1c632ac70c6b7880c76157d124b25"
+          },
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-gnu-538236-receipts/receipts/gnu/538236/cxx.txt",
+            "bytes": 247,
+            "sha256": "e4673156e9a9934b962434aa9b67482487548468d9b24bd433636bb31beb7b1d"
+          },
+          {
+            "path": "target/portable-locked-cirrus-20261006/full-gnu-538236-receipts/receipts/gnu/538236/mpi-launcher-args.json",
+            "bytes": 154,
+            "sha256": "0926cd3678c1720f305772eb55d65b9831b67b155486c77b8ecb97f221348736"
+          }
+        ]
+      }
+    },
+    "gnu_build_evidence": {
+      "slurm_job_id": 538235,
+      "compiler": "gnu",
+      "stage": "build",
+      "acceptance": "passed full build stage",
+      "source_manifest_sha256": "452a49852c4e23f018b82795c19a3fd183c781234f2914df2c0ab516d696918f",
+      "source_files": 2594,
+      "slurm_state": "COMPLETED",
+      "slurm_exit_code": "0:0",
+      "started_at_utc": "2026-10-06T20:19:15Z",
+      "finished_at_utc": "2026-10-06T20:23:02Z",
+      "elapsed_seconds": 227,
+      "nodes": 1,
+      "requested_cpus_per_task": 8,
+      "allocated_cpus": 288,
+      "all_status_files_zero": true,
+      "native_status_files": 8,
+      "source_before_and_after_verified": true,
+      "native_identity_preflight_passed": true,
+      "native_library_sha256": "afdf97834ae301ce6029fd85c3e66b86c6b7934c1bc97c5c98d05d2ef3df3ee3",
+      "torc": {
+        "version": "0.41.0",
+        "cli_sha256": "ca7a5e6daa601a97a6f3cc7d6ac688ec18a015257b65dc277222bdf189e331ad",
+        "server_sha256": "2766f61186705f818e7770161bfa5ac59eecaf20a3bf47bc1534d55d9169221d",
+        "run_exit_code": 0,
+        "wrapper_exit_code": 0,
+        "acceptance": true,
+        "structured_identity_predicate_rechecked": true,
+        "archive_gzip_integrity": "passed",
+        "restored_database_readonly_quick_check": "ok",
+        "resource_measurement_limit": "Sampled peak memory is an observation, not an enforced memory cap.",
+        "workflow": {
+          "id": 1,
+          "run_id": 1
+        },
+        "jobs": [
+          {
+            "id": 1,
+            "name": "native-build",
+            "status": "completed",
+            "attempt_id": 1,
+            "workflow_id": 1
+          }
+        ],
+        "results": [
+          {
+            "job_id": 1,
+            "workflow_id": 1,
+            "run_id": 1,
+            "attempt_id": 1,
+            "status": "completed",
+            "return_code": 0,
+            "exec_time_minutes": 3.653183333333333,
+            "peak_memory_bytes": 3288182784
+          }
+        ]
+      },
+      "archive": {
+        "path": "target/portable-locked-cirrus-20261006/build-gnu-538235-receipts.tar.gz",
+        "bytes": 223635,
+        "sha256": "5c6f9c9b6db4fcc8dbc696e023cf230589b22f55636ddf87640054effe0a8537",
+        "gzip_integrity": "passed",
+        "includes": [
+          "complete native build receipt directory",
+          "Torc receipt directory including exported results and closed database/WAL archive",
+          "batch log",
+          "source manifest"
+        ]
+      },
+      "accounting": {
+        "path": "target/portable-locked-cirrus-20261006/build-gnu-538235-accounting.txt",
+        "bytes": 2152,
+        "sha256": "90ba02adaa975eda011dbd2999d02097b081ef9fb557e828109d395f5a931088",
+        "timezone": "UTC"
+      },
+      "acceptance_limit": "Compilation and native discovery only; runtime job 538236 provides separate execution evidence.",
+      "stages": [
+        {
+          "name": "all-feature-build",
+          "exit_code": 0
+        },
+        {
+          "name": "bindings",
+          "exit_code": 0
+        },
+        {
+          "name": "completed",
+          "exit_code": 0
+        },
+        {
+          "name": "default-build",
+          "exit_code": 0
+        },
+        {
+          "name": "doctor",
+          "exit_code": 0
+        },
+        {
+          "name": "job-exit",
+          "exit_code": 0
+        },
+        {
+          "name": "mpi-consumer-build",
+          "exit_code": 0
+        },
+        {
+          "name": "source-after",
+          "exit_code": 0
+        }
+      ],
+      "logs": [
+        {
+          "path": "target/portable-locked-cirrus-20261006/build-gnu-538235-receipts/receipts/gnu/538235/doctor.log",
+          "bytes": 15787,
+          "sha256": "c31c70f1f3ef4357016dda0eb8efa223e6ec8b28a877ed71bcd569c254584d77"
+        },
+        {
+          "path": "target/portable-locked-cirrus-20261006/build-gnu-538235-receipts/receipts/gnu/538235/bindings.log",
+          "bytes": 905,
+          "sha256": "f56c90b72efaec1a622e2fe24975007adb0fc0f3d8ccba6fc69972eb58dab8ce"
+        },
+        {
+          "path": "target/portable-locked-cirrus-20261006/build-gnu-538235-receipts/receipts/gnu/538235/default-build.log",
+          "bytes": 88083,
+          "sha256": "de945f48a4832d23c7a348eada2ec2d0c875d629125461538014ec7e279fed39"
+        },
+        {
+          "path": "target/portable-locked-cirrus-20261006/build-gnu-538235-receipts/receipts/gnu/538235/all-feature-build.log",
+          "bytes": 88126,
+          "sha256": "d282850e24a6ea637a25b0026adb7495eb28d1f64d319782bd583727b4f40d84"
+        },
+        {
+          "path": "target/portable-locked-cirrus-20261006/build-gnu-538235-receipts/receipts/gnu/538235/mpi-consumer-build.log",
+          "bytes": 4814,
+          "sha256": "3db8e7ba0fe968693207f20e8d2be42eaccc9255842b718d6986e0d0abc860e7"
+        },
+        {
+          "path": "target/portable-locked-cirrus-20261006/build-gnu-538235-receipts/receipts/gnu/538235/source-before.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "target/portable-locked-cirrus-20261006/build-gnu-538235-receipts/receipts/gnu/538235/source-after.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "target/portable-locked-cirrus-20261006/build-gnu-538235-receipts/receipts/gnu/538235/native-identity.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "target/portable-locked-cirrus-20261006/build-gnu-538235-receipts/receipts/gnu/538235/compiler-inputs.txt",
+          "bytes": 1232,
+          "sha256": "363f2cfef474a7f08c0190ed5748ec97897c394455a39b3b4a9ed75481cb0858"
+        },
+        {
+          "path": "target/portable-locked-cirrus-20261006/build-gnu-538235-receipts/torc/gnu/538235/workflow-export.json",
+          "bytes": 5164,
+          "sha256": "2ebb10d19afd14f36631952c699087cb81eee247fce8ee536d9c921025b4c394"
+        },
+        {
+          "path": "target/portable-locked-cirrus-20261006/build-gnu-538235-receipts/torc/gnu/538235/local-artifacts.tar.gz",
+          "bytes": 80656,
+          "sha256": "e6df23b67918a3996fc23b0939ca8397dfdaadd3c2d37a8681b373c3233ecc82"
+        },
+        {
+          "path": "target/portable-locked-cirrus-20261006/build-gnu-538235-database-readonly/quick-check.txt",
+          "bytes": 3,
+          "sha256": "dc51b8c96c2d745df3bd5590d990230a482fd247123599548e0632fdbf97fc22"
+        }
+      ]
+    },
+    "final_input_identity_check": {
+      "observed_at_utc": "2026-10-06T21:03:46Z",
+      "source_manifest_sha256": "452a49852c4e23f018b82795c19a3fd183c781234f2914df2c0ab516d696918f",
+      "source_archive_sha256": "46636f8a311fa221d0754f4042a961e2191d756597ea2fe1ce97f50d1f2898a7",
+      "source_manifest_and_archive_unchanged": true,
+      "native_libraries_unchanged": true,
+      "native_library_sha256": {
+        "gnu": "afdf97834ae301ce6029fd85c3e66b86c6b7934c1bc97c5c98d05d2ef3df3ee3",
+        "cray": "f1eba6a43b2f9b0b0ed043adeb66840bdae977aa1920efa6e767e4e3ec14af89"
+      },
+      "retained_executable_sha256": {
+        "gnu_xtask": "713a6f924526a1da6ca9941c7a79bd88f35713a3e6c86e7bdb79cacee92878e0",
+        "gnu_independent_mpi_consumer": "5ab62c7af1ea4a1a79a19cb87c164a8681c018170b3d9fa3984a65fbfd939fba",
+        "cray_xtask": "50ea857d18120cda231a59210aa7f72d4e0bd29107cfdd90a627279b03cf365a",
+        "cray_independent_mpi_consumer": "646d7596cc17806f22a5022261f7ecc27c95135893b20575672ca8d948746647"
+      },
+      "executable_hash_scope": "Read-only hashes of retained campaign outputs after runtime completion; not an additional execution",
+      "receipt": {
+        "path": "target/portable-locked-cirrus-20261006/main-campaign-final-input-identities.txt",
+        "bytes": 1648,
+        "sha256": "a27af2b7536f9360fca511eb6fb70a7883d42c29e8ac7e079e61139352397d24"
+      }
+    },
+    "main_campaign_artifact_index": {
+      "path": "target/portable-locked-cirrus-20261006/main-campaign-artifacts.sha256",
+      "files": 134,
+      "bytes": 20733,
+      "sha256": "4d93306b37ffd161c7fd39d524e4b70c56a551b4175a0ec580df27780838048d",
+      "verification": "All 134 indexed raw artifacts matched their SHA-256 digests."
+    }
+  },
+  "cirrus_failed_build_evidence": {
+    "archive": {
+      "path": "target/portable-reviewed-cirrus-20261006/build-receipts.tar.gz",
+      "bytes": 224196,
+      "sha256": "cb4dada5479166e1503876cdc1535cd2e3d008f23757abe598f15a71c1bb4a9f"
+    },
+    "accounting": {
+      "path": "target/portable-reviewed-cirrus-20261006/build-receipts/reviewed-terminal-accounting.txt",
+      "bytes": 141,
+      "sha256": "514265bdca3c74fdc0f8f8249e7d147112e44480dffea470e18c1eadc30dceca"
+    },
+    "source_manifest": {
+      "path": "target/portable-reviewed-cirrus-20261006/build-receipts/source.sha256",
+      "bytes": 348034,
+      "sha256": "4e5b423ebf3db42db19c3f75481ad786a527117eecd4d41c8b9a9b9dcebd6cf1"
+    },
+    "native_status_files": {
+      "all-feature-build": 0,
+      "bindings": 0,
+      "completed": 1,
+      "default-build": 0,
+      "doctor": 0,
+      "job-exit": 1,
+      "mpi-consumer-build": 101,
+      "source-after": 0
+    },
+    "native_logs": [
+      {
+        "path": "target/portable-reviewed-cirrus-20261006/build-receipts/receipts/cray/538212/mpi-consumer-build.log",
+        "bytes": 415,
+        "sha256": "0c0e0721e98609cbb93884708b8f1d2c67c663e661f5ec077a6f162ea413e751"
+      },
+      {
+        "path": "target/portable-reviewed-cirrus-20261006/build-receipts/receipts/cray/538212/source-after.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "target/portable-reviewed-cirrus-20261006/build-receipts/receipts/cray/538212/native-identity.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "torc": {
+      "run_exit_code": 0,
+      "wrapper_exit_code": 1,
+      "acceptance": false,
+      "export": {
+        "path": "target/portable-reviewed-cirrus-20261006/build-receipts/torc/cray/538212/workflow-export.json",
+        "bytes": 5158,
+        "sha256": "e553861a652e7eab0b179d8f06dd0945d01a5b1332c20528874acbf2a0704973"
+      },
+      "local_artifacts": {
+        "path": "target/portable-reviewed-cirrus-20261006/build-receipts/torc/cray/538212/local-artifacts.tar.gz",
+        "bytes": 80695,
+        "sha256": "7b095528be4bf3687913b161e0e50ed8af050beaf6feb7ac0b2898e5cb6fc274"
+      },
+      "workflow": {
+        "id": 1,
+        "run_id": 1
+      },
+      "jobs": [
+        {
+          "id": 1,
+          "name": "native-build",
+          "status": "failed",
+          "attempt_id": 1,
+          "workflow_id": 1
+        }
+      ],
+      "results": [
+        {
+          "job_id": 1,
+          "workflow_id": 1,
+          "run_id": 1,
+          "attempt_id": 1,
+          "status": "failed",
+          "return_code": 1
+        }
+      ]
+    }
+  }
+}

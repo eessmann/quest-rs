@@ -24,12 +24,18 @@ cxx-build = { workspace = true, features = ["parallel"] }
 quest-build.workspace = true
 
 [dev-dependencies]
+quest-test-support.workspace = true
 googletest.workspace = true
 libc = { workspace = true }
+serde_json.workspace = true
 
 [[example]]
 name = "min_example"
 path = "examples/min_example.rs"
+
+[[example]]
+name = "mpi_large_count"
+required-features = ["mpi"]
 
 [lints]
 workspace = true

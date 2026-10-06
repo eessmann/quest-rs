@@ -13,12 +13,11 @@ fn ranks(
 	if std::env::var("QUEST_COLLECTIVE_TEST").as_deref() == Ok(name) {
 		return body();
 	}
-	let output = std::process::Command::new("timeout")
-		.args(["60s", "mpiexec", "-n", count])
-		.arg(std::env::current_exe()?)
-		.args(["--exact", name, "--nocapture", "--test-threads=1"])
-		.env("QUEST_COLLECTIVE_TEST", name)
-		.output()?;
+	let output =
+		quest_test_support::mpi::MpiTest::new(count.parse()?, std::time::Duration::from_secs(60))?
+			.args(["--exact", name, "--nocapture", "--test-threads=1"])
+			.env("QUEST_COLLECTIVE_TEST", name)
+			.output()?;
 	verify_that!(output.status.success(), eq(true)).with_failure_message(|| {
 		format!(
 			"{}\n{}\n{}",
@@ -38,6 +37,7 @@ fn collective_rejects_different_classical_results_and_step_counts() -> googletes
 		|| {
 			let runtime = MpiRuntime::initialize()?;
 			let mut comm = runtime.world()?;
+			quest_test_support::mpi::assert_rank_count(comm.size()?)?;
 			let different = comm.rank()? == 1;
 			{
 				let env = CollectiveEnvironment::builder(&comm)?.build()?;
@@ -117,6 +117,7 @@ fn collective_prepared_bell_oracle_and_projection_preserve_mpi() -> googletest::
 		|| {
 			let runtime = MpiRuntime::initialize()?;
 			let mut comm = runtime.world()?;
+			quest_test_support::mpi::assert_rank_count(comm.size()?)?;
 			{
 				let env = CollectiveEnvironment::builder(&comm)?.build()?;
 				let mut register = env.state_vector(QubitCount::new(2)?)?;
@@ -180,6 +181,7 @@ fn collective_mismatched_payload_and_preflight_recover_together() -> googletest:
 		|| {
 			let runtime = MpiRuntime::initialize()?;
 			let mut comm = runtime.world()?;
+			quest_test_support::mpi::assert_rank_count(comm.size()?)?;
 			let rank = comm.rank()?;
 			{
 				let env = CollectiveEnvironment::builder(&comm)?.build()?;
@@ -238,6 +240,7 @@ fn collective_budget_failure_on_one_rank_precedes_native_allocation() -> googlet
 		|| {
 			let runtime = MpiRuntime::initialize()?;
 			let mut comm = runtime.world()?;
+			quest_test_support::mpi::assert_rank_count(comm.size()?)?;
 			{
 				let budget = if comm.rank()? == 0 { 128 } else { 1_000_000 };
 				let env = CollectiveEnvironment::builder(&comm)?
@@ -270,6 +273,7 @@ fn collective_subgroups_execute_independent_schedules() -> googletest::Result<()
 		|| {
 			let runtime = MpiRuntime::initialize()?;
 			let mut world = runtime.world()?;
+			quest_test_support::mpi::assert_rank_count(world.size()?)?;
 			let group = world.rank()? / 2;
 			let mut comm = world.split_power_of_two(2)?;
 			{
@@ -382,6 +386,7 @@ fn collective_compares_full_semantics_and_prepared_identity() -> googletest::Res
 		|| {
 			let runtime = MpiRuntime::initialize()?;
 			let mut comm = runtime.world()?;
+			quest_test_support::mpi::assert_rank_count(comm.size()?)?;
 			let different = comm.rank()? == 1;
 			{
 				let env = CollectiveEnvironment::builder(&comm)?.build()?;
@@ -437,6 +442,7 @@ fn collective_rejects_different_cache_sharing_before_materialization() -> google
 		|| {
 			let runtime = MpiRuntime::initialize()?;
 			let mut comm = runtime.world()?;
+			quest_test_support::mpi::assert_rank_count(comm.size()?)?;
 			let shared = comm.rank()? == 0;
 			{
 				let env = CollectiveEnvironment::builder(&comm)?.build()?;

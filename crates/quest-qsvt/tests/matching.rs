@@ -16,6 +16,38 @@ fn sparse(
 	)
 }
 #[gtest]
+fn history_adjoint_sign_permutation_changes_source_identity() -> googletest::Result<()> {
+	// The two changed signs used to cancel when entire binary64 words were
+	// XORed into FNV. This is the actual two-node, zero-generator DG1 history.
+	let history = sparse(
+		2,
+		2,
+		vec![
+			(0, 0, Complex64::new(0.5, 0.0)),
+			(0, 1, Complex64::new(0.5, 0.0)),
+			(1, 0, Complex64::new(-0.5, 0.0)),
+			(1, 1, Complex64::new(0.5, 0.0)),
+		],
+	)?;
+	let adjoint = history.adjoint(SparseLimits::default())?;
+	let policy = NumericalPolicy::default();
+	let direct = MatchingEncoding::from_sparse(&history, policy)?;
+	let inverse_source = MatchingEncoding::from_sparse(&adjoint, policy)?;
+	expect_true!(direct.source_identity() != inverse_source.source_identity());
+	let csc = SparseMatrix::from_triplets(
+		2,
+		2,
+		SparseFormat::Csc,
+		history.entries().collect(),
+		SparseLimits::default(),
+	)?;
+	expect_that!(
+		MatchingEncoding::from_sparse(&csc, policy)?.source_identity(),
+		eq(direct.source_identity())
+	);
+	Ok(())
+}
+#[gtest]
 fn complex_rectangular_matching_extracts_independent_matrix() -> googletest::Result<()> {
 	let source = sparse(
 		3,

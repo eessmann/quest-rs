@@ -1,0 +1,35 @@
+   Compiling quest-sys v0.2.0 (<workspace>/crates/quest-sys)
+warning: `feature(generic_const_exprs)` is not supported with the next-generation trait solver
+ --> crates/quest-polynomial/src/lib.rs:1:30
+  |
+1 | #![feature(const_trait_impl, generic_const_exprs)]
+  |                              ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `-Znext-solver=globally` is currently enabled by default for testing
+  = note: reverted the setting to `-Znext-solver=coherence` for this crate
+  = note: the currently stable trait solver will be used for this crate
+  = note: see issues #160895 <https://github.com/rust-lang/rust/issues/160895> for more information
+
+warning: `quest-polynomial` (lib) generated 1 warning
+   Compiling quest-qsvt v0.1.0 (<workspace>/crates/quest-qsvt)
+   Compiling quest-qsvt-io v0.1.0 (<workspace>/crates/quest-qsvt-io)
+warning: quest-sys@0.2.0: Using QuEST 4.3.0 from <quest-install> with /usr/bin/c++
+warning: quest-sys@0.2.0: Verified rsmpi MPICC <matching-mpicc> matches QuEST MPI ABI and loaded library
+   Compiling quest-rs v0.1.0 (<workspace>/crates/quest)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.34s
+     Running tests/matching_persisted.rs (target/debug/build/quest-rs/c16933dd25791a4c/out/matching_persisted-c16933dd25791a4c)
+
+running 1 test
+test persisted_gate_replay_and_collective_restart ... Persisted gate replay ranks=1 split=0: RESOURCE_ID 16854322175675395532:3454504671002449863
+Persisted gate replay ranks=2 split=0: RESOURCE_ID 16854322175675395532:3454504671002449863
+Persisted gate replay ranks=4 split=0: RESOURCE_ID 16854322175675395532:3454504671002449863
+Persisted gate replay ranks=8 split=0: RESOURCE_ID 16854322175675395532:3454504671002449863
+Persisted gate replay ranks=4 split=1: RESOURCE_ID 16854322175675395532:3454504671002449863
+Persisted producer/restart ranks=4 mode=publish: passed
+Persisted producer/restart ranks=2 mode=restart: passed
+Persisted producer/restart ranks=8 mode=restart: passed
+Persisted producer/restart ranks=3 mode=reject: passed
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.18s
+

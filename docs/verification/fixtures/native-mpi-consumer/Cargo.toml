@@ -1,0 +1,14 @@
+[workspace]
+
+[package]
+name = "quest-independent-mpi-consumer"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+quest = { package = "quest-rs", path = "../../../../crates/quest", features = ["mpi"] }
+quest-test-support = { path = "../../../../crates/quest-test-support" }
+
+[build-dependencies]
+quest-build = { path = "../../../../crates/quest-build" }

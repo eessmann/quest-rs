@@ -1,0 +1,118 @@
+{
+  "schema": "quest-configuration-weak-focused-v1",
+  "recorded_date": "2026-10-06",
+  "status": "independently-reviewed-bounded-classical-diagnostic",
+  "source_manifest": "source.json",
+  "source_manifest_sha256": "62ec097130b6b3edf2b6333efa4bdccf0b8747cd293f9d12c61ecc0cecb5e046",
+  "source_unchanged_through_independent_checks": true,
+  "whole_physical_dimension": 5,
+  "method_document": "crates/quest-cfd/docs/configuration-weak.md",
+  "independent_checks": {
+    "analytic_tests_passed": 4,
+    "integration_tests_passed": 8,
+    "strict_scoped_clippy": true,
+    "targeted_rejection_rechecked": true
+  },
+  "owner_only_checks": {
+    "affected_existing_tests_passed": 14
+  },
+  "known_rejection": {
+    "kind": "source-work-admission",
+    "configuration_order": 2,
+    "configuration_cells_per_axis": 3,
+    "dimension": 59049,
+    "validated_rows": 59049,
+    "supported_rows": 3125,
+    "visited_rows": 0,
+    "planned_source_work": 2029007712,
+    "max_source_work": 1000000000,
+    "row_query_work": 513696,
+    "maximum_row_entries": 25,
+    "planned_physical_calls": 3183,
+    "actual_physical_calls_attempted": 58,
+    "planned_physical_work": 318300000,
+    "retained_source_bytes": 206897,
+    "accessible_state_bytes": 944784,
+    "grid_bytes": 1192,
+    "result_bytes": 1048,
+    "scratch_bytes": 16384,
+    "historical_constructor_peak_bytes": 8388608,
+    "caller_declared_input_preparation_work": null
+  },
+  "resolved_finding": "Failed source extraction counted all reserved callbacks as attempted; a shared counted callback now retains the actual attempted count on early error.",
+  "development_qualifications": [
+    "The first API compile failed malformed float literals; the corrected absent-export test supplies the API RED.",
+    "An independent tiny complex matrix fixture initially omitted the periodic endpoint jump and used incorrect mass scaling; only the oracle was corrected.",
+    "The first full-model test selected a conserved coordinate; the final fixture uses a nonzero fifth-coordinate action. Its earlier log filename containing green does not imply that run passed."
+  ],
+  "logs": [
+    {
+      "scope": "independent-analytic",
+      "private_log": "quest-configuration-weak-independent-analytic.log",
+      "sha256": "b05b7153b5f653ae36a34cff7f244e5b0e8811dbed6d62159c68fb7ba89bed6b"
+    },
+    {
+      "scope": "independent-integration",
+      "private_log": "quest-configuration-weak-independent-integration.log",
+      "sha256": "8c05a55fa765f791b618bd81e01f209d04eb20a18c6b0ba46cb766582e4eaefb"
+    },
+    {
+      "scope": "independent-clippy",
+      "private_log": "quest-configuration-weak-independent-clippy.log",
+      "sha256": "ba3f2ba252adf5fc92e5b9d04e5b42c17cf1216f840b21540c900be105a0d59d"
+    },
+    {
+      "scope": "independent-rejection",
+      "private_log": "quest-configuration-weak-independent-rejection.log",
+      "sha256": "ad259dc7b2bde082ed18f69a2a10f3053eeabee409e7eec309b18d29037fa6f7"
+    },
+    {
+      "scope": "independent-source",
+      "private_log": "quest-configuration-weak-independent-source.log",
+      "sha256": "d2046b328e0aedc4f0e19a7eb671dec45290243d408c58f898dea06e22fb68a8"
+    },
+    {
+      "scope": "owner-affected",
+      "private_log": "quest-configuration-weak-affected-final.log",
+      "sha256": "e821e2b6eea2e8a5109f66c9f61e7a31f291145431380c024e12507b9071b5eb"
+    },
+    {
+      "scope": "owner-counter-red",
+      "private_log": "quest-configuration-weak-counter-red.log",
+      "sha256": "9f1e1f1b98d22b12ae5a866580a22fab333d19e5c12e1bb8a3524c037e78dda5"
+    },
+    {
+      "scope": "owner-counter-green",
+      "private_log": "quest-configuration-weak-counter-green.log",
+      "sha256": "3f2cd597feea86bc1a88a5c4f181d55c8fd8cea4ff3f000df55bdad26a639889"
+    },
+    {
+      "scope": "owner-preparation-red",
+      "private_log": "quest-configuration-weak-preparation-red.log",
+      "sha256": "8b3428cb7dde595e896e72fc1f9ab9596ece708561a4e42f4e6dbe60951dd09e"
+    },
+    {
+      "scope": "owner-preparation-green",
+      "private_log": "quest-configuration-weak-preparation-green.log",
+      "sha256": "05fcd4c69d258b00609fc0ef27f487fbd96f3092685028ba88be59ab59d38d31"
+    },
+    {
+      "scope": "owner-fixture-matrix-first",
+      "private_log": "quest-configuration-weak-analytic-first.log",
+      "sha256": "88c5998312ef16bc7133f9d3a2b0731705c39814835c13fe0d1b2b1c97801a38"
+    },
+    {
+      "scope": "owner-fixture-original-force-first",
+      "private_log": "quest-configuration-weak-full-operator-green.log",
+      "sha256": "73578a5b81f82b0064ab6dd8cc4a4610b5f51c68b08dd95ec633e67bdb7bf3d4"
+    }
+  ],
+  "limitations": [
+    "Focused file hashes and private test-log hashes are not complete source-to-binary attestation.",
+    "This additive stage is outside workspace checkpoint07; no new broad workspace gate is claimed.",
+    "No example/campaign, global history, quantum/native/MPI execution or trajectory accuracy was tested in this stage.",
+    "Managed arithmetic and payload bounds are separate from allocator/OS/native memory and process quotas.",
+    "The borrowed state exposes only accessible slice payload; hidden backing capacity and prior input preparation must be declared by its owner.",
+    "Zero exterior trace, support counts, concentration and nonlinear polarization are diagnostics, not flux, sampling resolution or convergence certificates."
+  ]
+}

@@ -1,7 +1,7 @@
 use std::collections::BTreeSet;
 use std::env;
 use std::path::{Path, PathBuf};
-use std::process::Command;
+use std::process::{Command, Stdio};
 use std::sync::{Mutex, OnceLock};
 
 use clang::diagnostic::Severity;
@@ -100,6 +100,24 @@ pub fn collect_quest_api(package: &quest_build::NativePackage) -> Result<Vec<Api
 	Ok(items)
 }
 
+/// Check actual installed headers as well as the driver/library configuration.
+pub fn parser_diagnostics(
+	package: &quest_build::NativePackage,
+) -> Result<serde_json::Value, DynError> {
+	let items = collect_quest_api(package)?;
+	let _guard = clang_lock()
+		.lock()
+		.map_err(|_| "libclang mutex was poisoned")?;
+	let _clang = Clang::new().map_err(|error| format_libclang_error(&error))?;
+	Ok(serde_json::json!({
+		"libclang_version": clang::get_version(),
+		"driver": clang_command(),
+		"arguments": clang_arguments(package, &package.prefix.join("include"))?,
+		"parsed_declarations": items.len(),
+		"evidence": "Installed QuEST C++ headers parsed successfully; ordinary MPI bindgen has a separate C header context."
+	}))
+}
+
 fn clang_lock() -> &'static Mutex<()> {
 	static LOCK: OnceLock<Mutex<()>> = OnceLock::new();
 	LOCK.get_or_init(|| Mutex::new(()))
@@ -125,12 +143,21 @@ fn clang_arguments(
 		.output()
 		.map_err(|error| format!("could not inspect parser driver {driver}: {error}"))?;
 	let driver_version = String::from_utf8_lossy(&driver_output.stdout);
+	// Vendor banners can reflect the active module rather than the parser:
+	// Cray's driver reports 0.0.0.0 under PrgEnv-gnu but defines Clang 19.
+	let macros = Command::new(&driver)
+		.args(["-dM", "-E", "-x", "c", "-"])
+		.stdin(Stdio::null())
+		.output()
+		.map_err(|error| format!("could not inspect parser macros for {driver}: {error}"))?;
+	let driver_major = clang_macro_major(&String::from_utf8_lossy(&macros.stdout));
 	let library_version = clang::get_version();
 	if !driver_output.status.success()
-		|| clang_major_version(&driver_version).is_none()
-		|| clang_major_version(&driver_version) != clang_major_version(&library_version)
+		|| !macros.status.success()
+		|| driver_major.is_none()
+		|| driver_major != clang_major_version(&library_version)
 	{
-		return Err(format!("libclang and parser driver must come from the same LLVM major version; libclang={library_version}; driver={driver_version}. Select matching LIBCLANG_PATH and CLANG.").into());
+		return Err(format!("libclang and parser driver must come from the same LLVM major version; libclang={library_version}; driver={driver_version}; semantic major={driver_major:?}; macro probe stderr={}. Select matching LIBCLANG_PATH and CLANG.", String::from_utf8_lossy(&macros.stderr)).into());
 	}
 	let mut args = vec![
 		"-x".to_owned(),
@@ -139,7 +166,10 @@ fn clang_arguments(
 		format!("-I{}", include_root.display()),
 		format!("-I{}", include_root.join("quest/include").display()),
 	];
-	args.extend(header_context_arguments(&package.headers));
+	args.extend(header_context_arguments(
+		&package.headers,
+		&package.compiler_arguments,
+	));
 
 	if let Some(resource_dir) = clang_resource_dir() {
 		args.push("-resource-dir".to_owned());
@@ -175,6 +205,16 @@ fn clang_major_version(version: &str) -> Option<u32> {
 		.next()?
 		.parse()
 		.ok()
+}
+
+fn clang_macro_major(macros: &str) -> Option<u32> {
+	let mut values = macros.lines().filter_map(|line| {
+		let mut words = line.split_whitespace();
+		(words.next() == Some("#define") && words.next() == Some("__clang_major__"))
+			.then(|| words.next().and_then(|value| value.parse::<u32>().ok()))
+	});
+	let value = values.next()??;
+	(value > 0 && values.next().is_none()).then_some(value)
 }
 
 fn manifest_canonical_type(ty: &str) -> String {
@@ -236,8 +276,18 @@ fn llvm_config_path(arg: &str) -> Option<PathBuf> {
 	(!value.is_empty()).then_some(PathBuf::from(value))
 }
 
-fn header_context_arguments(headers: &quest_build::HeaderContext) -> Vec<String> {
+fn header_context_arguments(
+	headers: &quest_build::HeaderContext,
+	compiler_arguments: &[String],
+) -> Vec<String> {
 	let mut arguments = Vec::new();
+	// CMAKE_CXX_COMPILER_ARG1 precedes the target's definitions and flags in
+	// the native invocation. Preserve that order for macro overrides and includes.
+	append_parser_flags(
+		&mut arguments,
+		compiler_arguments,
+		headers.sysroot.is_some(),
+	);
 	for include in &headers.include_dirs {
 		if !headers.system_include_dirs.contains(include) {
 			arguments.push(format!("-I{}", include.display()));
@@ -260,21 +310,87 @@ fn header_context_arguments(headers: &quest_build::HeaderContext) -> Vec<String>
 			arguments.push(format!("-D{definition}"));
 		}
 	}
-	let mut flags = headers.frontend_flags.iter();
+	append_parser_flags(
+		&mut arguments,
+		&headers.frontend_flags,
+		headers.sysroot.is_some(),
+	);
+	arguments
+}
+
+fn append_parser_flags(arguments: &mut Vec<String>, flags: &[String], has_sysroot: bool) {
+	let mut flags = flags.iter();
 	while let Some(flag) = flags.next() {
 		match flag.as_str() {
 			"-arch" | "-target" | "--target" => {
 				flags.next();
 			}
-			"-isysroot" | "--sysroot" if headers.sysroot.is_some() => {
+			"-isysroot" | "--sysroot" if has_sysroot => {
 				flags.next();
 			}
-			_ if flag.starts_with("-isysroot=") && headers.sysroot.is_some() => {}
+			_ if (flag.starts_with("-isysroot=") || flag.starts_with("--sysroot="))
+				&& has_sysroot => {}
 			_ if flag.starts_with("--target=") => {}
-			_ => arguments.push(flag.clone()),
+			"-D" | "-U" | "-I" | "-isystem" | "-iquote" | "-idirafter" | "-include"
+			| "-imacros" | "-F" | "-iframework" | "-isysroot" | "--sysroot" => {
+				arguments.push(flag.clone());
+				if let Some(value) = flags.next() {
+					arguments.push(value.clone());
+				}
+			}
+			// Translate only flags affecting the headers' language/ABI context.
+			// Native optimization, instrumentation and warning flags are irrelevant.
+			_ if parser_flag(flag) => arguments.push(flag.clone()),
+			_ => {}
 		}
 	}
-	arguments
+}
+
+fn parser_flag(flag: &str) -> bool {
+	matches!(
+		flag,
+		"-pthread"
+			| "-fopenmp"
+			| "-fopenmp-simd"
+			| "-fexceptions"
+			| "-fno-exceptions"
+			| "-frtti"
+			| "-fno-rtti"
+			| "-fpack-struct"
+			| "-fshort-enums"
+			| "-fshort-wchar"
+			| "-funsigned-char"
+			| "-fsigned-char"
+			| "-fPIC"
+			| "-fpic"
+			| "-fPIE"
+			| "-fpie"
+			| "-fms-extensions"
+			| "-fms-compatibility"
+			| "-nostdinc"
+			| "-nostdinc++"
+	) || [
+		"-D",
+		"-U",
+		"-I",
+		"-include",
+		"-imacros",
+		"-isystem",
+		"-iquote",
+		"-idirafter",
+		"-iframework",
+		"-F",
+		"-std=",
+		"-stdlib=",
+		"-fpack-struct=",
+		"-mmacosx-version-min=",
+		"-miphoneos-version-min=",
+		"-fopenmp=",
+		"--sysroot=",
+		"-isysroot=",
+	]
+	.iter()
+	.any(|prefix| flag.starts_with(prefix))
 }
 
 fn clang_resource_dir() -> Option<PathBuf> {
@@ -421,6 +537,54 @@ mod tests {
 	use googletest::prelude::*;
 
 	#[gtest]
+	fn parser_macros_require_an_unambiguous_positive_clang_version() -> googletest::Result<()> {
+		for macros in [
+			"",
+			"#define __clang_major__ 0",
+			"#define __clang_major__ unknown",
+			"#define __clang_major__ 19\n#define __clang_major__ 20",
+		] {
+			expect_that!(clang_macro_major(macros), none());
+		}
+		verify_that!(
+			clang_macro_major("#define __GNUC__ 4\n#define __clang_major__ 19\n"),
+			some(eq(19))
+		)
+	}
+
+	#[cfg(unix)]
+	#[gtest]
+	fn vendor_banner_does_not_override_parser_semantic_version() -> googletest::Result<()> {
+		use std::os::unix::fs::PermissionsExt;
+		let work = tempfile::tempdir().or_fail()?;
+		let wrapper = work.path().join("vendor-clang");
+		std::fs::write(
+			&wrapper,
+			"#!/bin/sh\nif [ \"$1\" = --version ]; then echo 'Cray clang version 0.0.0.0'; exit 0; fi\nexec \"$QUEST_TEST_REAL_CLANG\" \"$@\"\n",
+		)
+		.or_fail()?;
+		std::fs::set_permissions(&wrapper, std::fs::Permissions::from_mode(0o755)).or_fail()?;
+		let output = Command::new(std::env::current_exe().or_fail()?)
+			.args([
+				"--exact",
+				"generate::clang::tests::libclang_extracts_representative_overloads",
+				"--nocapture",
+			])
+			.env("QUEST_TEST_REAL_CLANG", clang_command())
+			.env("CLANG", wrapper)
+			.output()
+			.or_fail()?;
+		if !output.status.success() {
+			return fail!(
+				"semantic parser compatibility rejected vendor banner:\n{}\n{}",
+				String::from_utf8_lossy(&output.stdout),
+				String::from_utf8_lossy(&output.stderr)
+			);
+		}
+		Ok(())
+	}
+
+	#[gtest]
 	fn libclang_error_mentions_expected_lookup_paths() -> googletest::Result<()> {
 		let message = format_libclang_error("not found");
 
@@ -445,7 +609,7 @@ mod tests {
 		};
 
 		verify_that!(
-			header_context_arguments(&headers),
+			header_context_arguments(&headers, &[]),
 			elements_are![
 				eq("-I/opt/QuEST install/include"),
 				eq("-isystem"),
@@ -454,6 +618,150 @@ mod tests {
 				eq("/opt/LLVM include"),
 				eq("-DQUEST_MPI=1"),
 				eq("-pthread")
+			]
+		)
+	}
+
+	#[gtest]
+	fn compiler_arguments_precede_target_definitions_and_frontend_flags() -> googletest::Result<()>
+	{
+		let headers = quest_build::HeaderContext {
+			definitions: vec!["ABI_MODE=2".into()],
+			frontend_flags: ["-U", "ABI_MODE", "-DABI_MODE=3", "-DRESTORED=1"]
+				.map(str::to_owned)
+				.to_vec(),
+			..Default::default()
+		};
+		let compiler_arguments = ["-D", "ABI_MODE=1", "-U", "RESTORED"].map(str::to_owned);
+		verify_that!(
+			header_context_arguments(&headers, &compiler_arguments),
+			elements_are![
+				eq("-D"),
+				eq("ABI_MODE=1"),
+				eq("-U"),
+				eq("RESTORED"),
+				eq("-DABI_MODE=2"),
+				eq("-U"),
+				eq("ABI_MODE"),
+				eq("-DABI_MODE=3"),
+				eq("-DRESTORED=1")
+			]
+		)
+	}
+
+	#[gtest]
+	fn compiler_arguments_preserve_paired_paths_and_filter_codegen() -> googletest::Result<()> {
+		let compiler_arguments = [
+			"-O3",
+			"-march=native",
+			"-flto=auto",
+			"-Werror",
+			"-include",
+			"/opt/module headers/config.h",
+			"-imacros",
+			"/opt/module headers/defines.h",
+			"-isystem",
+			"/opt/module headers",
+			"-fno-exceptions",
+		]
+		.map(str::to_owned);
+		verify_that!(
+			header_context_arguments(&quest_build::HeaderContext::default(), &compiler_arguments),
+			elements_are![
+				eq("-include"),
+				eq("/opt/module headers/config.h"),
+				eq("-imacros"),
+				eq("/opt/module headers/defines.h"),
+				eq("-isystem"),
+				eq("/opt/module headers"),
+				eq("-fno-exceptions")
+			]
+		)
+	}
+
+	#[gtest]
+	fn native_codegen_flags_do_not_reach_the_parser() -> googletest::Result<()> {
+		let headers = quest_build::HeaderContext {
+			frontend_flags: vec![
+				"-O3",
+				"-march=native",
+				"-mtune=generic",
+				"-flto=auto",
+				"-fno-fat-lto-objects",
+				"-Werror",
+				"-fopenmp",
+				"-pthread",
+				"-fno-exceptions",
+				"-DABI_MODE=1",
+			]
+			.into_iter()
+			.map(str::to_owned)
+			.collect(),
+			..Default::default()
+		};
+		verify_that!(
+			header_context_arguments(&headers, &[]),
+			elements_are![
+				eq("-fopenmp"),
+				eq("-pthread"),
+				eq("-fno-exceptions"),
+				eq("-DABI_MODE=1")
+			]
+		)
+	}
+
+	#[gtest]
+	fn parser_preserves_paired_preprocessor_arguments() -> googletest::Result<()> {
+		let headers = quest_build::HeaderContext {
+			frontend_flags: [
+				"-include",
+				"/opt/module headers/config.h",
+				"-iquote",
+				"/opt/module headers",
+				"-U",
+				"OLD_ABI",
+				"-D",
+				"NEW_ABI=1",
+			]
+			.map(str::to_owned)
+			.to_vec(),
+			..Default::default()
+		};
+		verify_that!(
+			header_context_arguments(&headers, &[]),
+			elements_are![
+				eq("-include"),
+				eq("/opt/module headers/config.h"),
+				eq("-iquote"),
+				eq("/opt/module headers"),
+				eq("-U"),
+				eq("OLD_ABI"),
+				eq("-D"),
+				eq("NEW_ABI=1")
+			]
+		)
+	}
+
+	#[gtest]
+	fn parser_preserves_joined_forced_header_and_system_paths() -> googletest::Result<()> {
+		let headers = quest_build::HeaderContext {
+			frontend_flags: [
+				"-include/opt/module/config.h",
+				"-isystem/opt/module/include",
+				"-imacros/opt/module/defines.h",
+				"-fpack-struct",
+			]
+			.map(str::to_owned)
+			.to_vec(),
+			..Default::default()
+		};
+		verify_that!(
+			header_context_arguments(&headers, &[]),
+			elements_are![
+				eq("-include/opt/module/config.h"),
+				eq("-isystem/opt/module/include"),
+				eq("-imacros/opt/module/defines.h"),
+				eq("-fpack-struct")
 			]
 		)
 	}
@@ -487,7 +795,7 @@ mod tests {
 			..Default::default()
 		};
 		verify_that!(
-			header_context_arguments(&headers),
+			header_context_arguments(&headers, &[]),
 			elements_are![eq("-mmacosx-version-min=14.0")]
 		)
 	}

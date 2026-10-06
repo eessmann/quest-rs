@@ -7,6 +7,7 @@ repository.workspace = true
 description = "Typed polynomial bases and mathematical function expressions"
 
 [dependencies]
+mathcore.workspace = true
 thiserror.workspace = true
 num-complex.workspace = true
 quest-numerics.workspace = true

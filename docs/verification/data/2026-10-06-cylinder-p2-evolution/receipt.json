@@ -1,0 +1,101 @@
+{
+  "schema": "quest-cylinder-p2-evolution-campaign-v1",
+  "binary_sha256": "c9baa91ec2e9ed36272a9d71b61886d5a6b4735cddf891d1b31e256f97a38fb4",
+  "bounds": {
+    "address_space_bytes": 536870912,
+    "child_seconds": 180,
+    "captured_file_bytes": 4194304
+  },
+  "rows": [
+    {
+      "steps": 2,
+      "process_status": "exited",
+      "exit_code": 0,
+      "elapsed_seconds": 0.5154598239969346,
+      "stdout": "steps-2.json",
+      "stdout_sha256": "6e592189a1eb912d65604040cbb977742d87ee1ba60f930e002074bc11982a31",
+      "stderr": "steps-2.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validated_completed": true,
+      "protocol_status": "completed"
+    },
+    {
+      "steps": 4,
+      "process_status": "exited",
+      "exit_code": 0,
+      "elapsed_seconds": 0.5154173339979025,
+      "stdout": "steps-4.json",
+      "stdout_sha256": "4de6683ea68dac757dde999f96785e33fe1508e15fcc08668c1abeb250f2095a",
+      "stderr": "steps-4.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validated_completed": true,
+      "protocol_status": "completed"
+    },
+    {
+      "steps": 8,
+      "process_status": "exited",
+      "exit_code": 0,
+      "elapsed_seconds": 0.5153798239989555,
+      "stdout": "steps-8.json",
+      "stdout_sha256": "13ee12fec0ff6c7e9c86635b06aad137888e5f5a9d72ebddd8b7f516c2f176ed",
+      "stderr": "steps-8.stderr",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validated_completed": true,
+      "protocol_status": "completed"
+    }
+  ],
+  "comparison": {
+    "status": "accuracy-failure",
+    "original_residual_pass": true,
+    "metrics": {
+      "full_coordinate_state": {
+        "difference_2_4": 0.016379033085446616,
+        "difference_4_8": 3.156892975363816e-05,
+        "ratio": 518.8339678686451,
+        "fine_scaled_difference": 3.156892975363816e-05,
+        "sensitivity_pass": false
+      },
+      "drag_coefficient": {
+        "difference_2_4": 8.11139315752572,
+        "difference_4_8": 0.020320170466490595,
+        "ratio": 399.1793853748414,
+        "fine_scaled_difference": 0.00220289560636436,
+        "sensitivity_pass": false
+      },
+      "lift_coefficient": {
+        "difference_2_4": 6.038557213126289,
+        "difference_4_8": 0.014580429266722206,
+        "ratio": 414.15496777645996,
+        "fine_scaled_difference": 0.0004939739346045918,
+        "sensitivity_pass": false
+      },
+      "pressure_difference": {
+        "difference_2_4": 23.09346483094366,
+        "difference_4_8": 0.0470706553098168,
+        "ratio": 490.61277517688205,
+        "fine_scaled_difference": 0.0011781415511636067,
+        "sensitivity_pass": false
+      },
+      "mean_kinetic_energy": {
+        "difference_2_4": 4.3424040998552016e-05,
+        "difference_4_8": 4.00881135842468e-07,
+        "ratio": 108.32148763322233,
+        "fine_scaled_difference": 4.00881135842468e-07,
+        "sensitivity_pass": true
+      },
+      "enstrophy": {
+        "difference_2_4": 0.009423071678829498,
+        "difference_4_8": 2.9042376461951847e-05,
+        "ratio": 324.4593875151566,
+        "fine_scaled_difference": 8.340038632015347e-06,
+        "sensitivity_pass": true
+      }
+    },
+    "quadratic_action_resolved_in_each_row": true,
+    "resolved_full_minus_linear_response": false,
+    "forward_accuracy_certified": false,
+    "spatial_convergence_certified": false,
+    "developed_cycle_acceptance": false
+  },
+  "binary_sha256_after": "c9baa91ec2e9ed36272a9d71b61886d5a6b4735cddf891d1b31e256f97a38fb4"
+}

@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "<private-artifacts>/quest-persisted-attempt3-independent-audit.py", line 131, in <module>
+    assert abs(u[0][0].real-poly)<1e-11
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

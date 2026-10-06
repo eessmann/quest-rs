@@ -1,0 +1,2047 @@
+{
+  "source": [
+    {
+      "path": "Cargo.lock",
+      "sha256": "d5a1f8b556e964792afe342670a2ccf27f9dff86c7048aec6b7742baf1e547d8"
+    },
+    {
+      "path": "Cargo.toml",
+      "sha256": "69aa4b537e7c5cda9a92a13f81e4d745cd0e05355df42f2e6a1f1cec973a8ca0"
+    },
+    {
+      "path": "crates/quest-build/Cargo.toml",
+      "sha256": "93860901318485a8bcf802e790d3c00a420fd0811b02734b72c4bc0012a0cba1"
+    },
+    {
+      "path": "crates/quest-build/src/hdf5.rs",
+      "sha256": "a130045fe6bd185924407a0620247d0a9f677028778555f372379e767d8fbbf0"
+    },
+    {
+      "path": "crates/quest-build/src/lib.rs",
+      "sha256": "f8b36a7ddef33fae12f97d92a805fdb2ca40a7e37c08971dcec46da494ced6df"
+    },
+    {
+      "path": "crates/quest-build/src/package.rs",
+      "sha256": "182296e402b3f18abbd2c07b5c60b0bc1e96336502721485c7559fabb3e41ddc"
+    },
+    {
+      "path": "crates/quest-build/src/probe.rs",
+      "sha256": "8593e1ebc5c21607bc8b192021165c37eb4a935d5727eee761f30ab38bd8742b"
+    },
+    {
+      "path": "crates/quest-build/src/rsmpi.rs",
+      "sha256": "728232bfc6116095dee6fc8b61b7123093e16f9736986030bb41be506fd1d09a"
+    },
+    {
+      "path": "crates/quest-cfd/Cargo.toml",
+      "sha256": "b513e7badd6ff4f9ad6cbb5938332f7fea5754e1c862687500ce5589efb1dcbd"
+    },
+    {
+      "path": "crates/quest-cfd/build.rs",
+      "sha256": "aa30ddd5a58483d0cae1af71bad879689933cc094fe1cb9af4a950030c4993a1"
+    },
+    {
+      "path": "crates/quest-cfd/examples/configuration_weak.rs",
+      "sha256": "8c776b6aa61a5ab8e549e609f67ddec69879e20484eeac486d1c803125cf7819"
+    },
+    {
+      "path": "crates/quest-cfd/examples/cylinder_p2_evolution.rs",
+      "sha256": "9d77df4c63d8bdd75bed40964e412c59663e9514618ad2e7f5bf383f04ac66a6"
+    },
+    {
+      "path": "crates/quest-cfd/examples/cylinder_p2_snapshot.rs",
+      "sha256": "a8beaa508c4d4b1c8613c2251575ca0ed8e941aa66583abe82e605b68939e946"
+    },
+    {
+      "path": "crates/quest-cfd/examples/cylinder_window.rs",
+      "sha256": "3c97d0c32db74ed5fb3cde2bed8158ed083f0f436a9ed3d96e39516b84a5fee9"
+    },
+    {
+      "path": "crates/quest-cfd/examples/distributed_history.rs",
+      "sha256": "7337e910806e4266a555ec7809680ca4db5f98f62c71eeced58a7d5afb883818"
+    },
+    {
+      "path": "crates/quest-cfd/examples/kvn_refinement.rs",
+      "sha256": "b16741055b224dfeaf37c71d0cd95323acb8ad45073658e1aebc32a89d41ee6b"
+    },
+    {
+      "path": "crates/quest-cfd/examples/paired_history.rs",
+      "sha256": "8c000765179809ed74899b7f0a06e88e24be8324c39c329071a50940c533d525"
+    },
+    {
+      "path": "crates/quest-cfd/examples/resource_curves.rs",
+      "sha256": "78045ed1ecbdee95938eba57ccb8dd2f2a0c14967a46790d6f06ca117d46093e"
+    },
+    {
+      "path": "crates/quest-cfd/src/bdm.rs",
+      "sha256": "013ad931ed6e59814bc1f5980874648760465541e7938ccdcb3dade91f04ca57"
+    },
+    {
+      "path": "crates/quest-cfd/src/box_kvn_history.rs",
+      "sha256": "6cd78e276b3a408de221cab9bf19c6ee4494441f74247504066ad0d3785116db"
+    },
+    {
+      "path": "crates/quest-cfd/src/box_kvn_history_tests.rs",
+      "sha256": "bebd416f1e2487bb7cd75fd5e128734be881edff8087de84894b765713ae1046"
+    },
+    {
+      "path": "crates/quest-cfd/src/box_time_history_tests.rs",
+      "sha256": "c042ceedd502c503e96a1fe883583f05e7685319ba3c0461076a8e2e427db622"
+    },
+    {
+      "path": "crates/quest-cfd/src/burgers.rs",
+      "sha256": "505d4b804bb5602b0783df8bce35748bf0ad939b0a46f46162727e086ff28f41"
+    },
+    {
+      "path": "crates/quest-cfd/src/carleman.rs",
+      "sha256": "59ea79465483ec75dab03662ee6c7b0bd4dc8e64a2525816d7def62634d6f9cc"
+    },
+    {
+      "path": "crates/quest-cfd/src/carleman_certificate.rs",
+      "sha256": "cf7b73d91d736eebcfd21ef6089015736c7f7e1cf94add0c78b4bfc17b47305f"
+    },
+    {
+      "path": "crates/quest-cfd/src/carleman_recipe.rs",
+      "sha256": "66c0a39fa32396e7a929fffef2612752b088fea06991d763c4244c628a35307a"
+    },
+    {
+      "path": "crates/quest-cfd/src/cases.rs",
+      "sha256": "c443acf0e79342dd160020410f54d1ae6e5e96a6de02e89bb1abd4929e6d7eae"
+    },
+    {
+      "path": "crates/quest-cfd/src/cases_high_order.rs",
+      "sha256": "ebc6d0fb35a918778c161791431a62e33007ca743b5c7f16aa74e0850037c597"
+    },
+    {
+      "path": "crates/quest-cfd/src/cavity_observations.rs",
+      "sha256": "e0209d8d4e46f834a72dc909ca3146c55d82db800f4565b2c61feeac5f8cc160"
+    },
+    {
+      "path": "crates/quest-cfd/src/classical_history.rs",
+      "sha256": "69f4da32d1381a3608246ca5f271f62706d78c6de07b082df264bd623da2a120"
+    },
+    {
+      "path": "crates/quest-cfd/src/configuration.rs",
+      "sha256": "11d1a4d3d7e59209e02d67fb09f8083e2309f5eb6e084e26e02274c98ab3e8aa"
+    },
+    {
+      "path": "crates/quest-cfd/src/configuration_diagnostics.rs",
+      "sha256": "b2166ab6989ad5ab470199c9ab5a26ebf2cabc1578c4c06a3fffb41b5b8d5228"
+    },
+    {
+      "path": "crates/quest-cfd/src/configuration_flux.rs",
+      "sha256": "a78e0b725fd5722903d0c10ff8b1806d6a01f57f899ddb353810cd02ec53b3dd"
+    },
+    {
+      "path": "crates/quest-cfd/src/configuration_weak.rs",
+      "sha256": "814340f13cf46b8f4c0f9080466465cce631a3a660097af686c1cf3a8eeb30c2"
+    },
+    {
+      "path": "crates/quest-cfd/src/constructed_resources.rs",
+      "sha256": "d12141760e032ec95b7445bd822f88fb8996f1a5abb9eb37fadba895190cf2c8"
+    },
+    {
+      "path": "crates/quest-cfd/src/cylinder.rs",
+      "sha256": "8ccdab8f716505e57a157d7786ecb04063448d4769e532b5e4692dad20595b51"
+    },
+    {
+      "path": "crates/quest-cfd/src/cylinder_evolution.rs",
+      "sha256": "479e9e2e0ba2c79319d9600bfeb9a02c308962c0a071028e64fff5632c862e1a"
+    },
+    {
+      "path": "crates/quest-cfd/src/cylinder_geometry.rs",
+      "sha256": "6b3d97823e51ea4d2b0ca6f28cba8c0817fb2c2b7cc0ab0351f3cc54e873320c"
+    },
+    {
+      "path": "crates/quest-cfd/src/cylinder_high_order.rs",
+      "sha256": "771c2fcea77f6ce1f286f326506bc4ea88f04eb31c0ca83ba7d89a428a3a3a78"
+    },
+    {
+      "path": "crates/quest-cfd/src/distributed_history.rs",
+      "sha256": "0751f54b9c7c274ed50b7a3342ba8651403552b91007a5a4f5bc0f3e7ceba64a"
+    },
+    {
+      "path": "crates/quest-cfd/src/distributed_history_factory_tests.rs",
+      "sha256": "91cc64013690f8ff65edfc4087ea176db99ae27c449a370a3f4457d9fe9f20b7"
+    },
+    {
+      "path": "crates/quest-cfd/src/distributed_probability.rs",
+      "sha256": "dbb7929e71653cce306836286eab50320c9acca70e8232358c34b73347836a3d"
+    },
+    {
+      "path": "crates/quest-cfd/src/distributed_temporal_observation.rs",
+      "sha256": "6cb357e402e5138bec672bde045cf69183ae2bea7e700f72abd09996559f4dde"
+    },
+    {
+      "path": "crates/quest-cfd/src/history.rs",
+      "sha256": "3a8887bbebbc9c9610cd7938932d45d195a30a553c82f7da447b4a99e8f4f457"
+    },
+    {
+      "path": "crates/quest-cfd/src/history_spectrum.rs",
+      "sha256": "816bd72e350d0b2a8e076058e87d68cb0d23520ca67416a68d835bd84c12f0c6"
+    },
+    {
+      "path": "crates/quest-cfd/src/kdv.rs",
+      "sha256": "cbbd9cf35e48c847bbddd9415dc2240e18f15063ac1d932012fcff5853bc5374"
+    },
+    {
+      "path": "crates/quest-cfd/src/kvn_recipe.rs",
+      "sha256": "18f65cb993301109855296c8de7cb68aca993be6ca378b7effdc61de32ca17e9"
+    },
+    {
+      "path": "crates/quest-cfd/src/lib.rs",
+      "sha256": "4121d009e65cb6e10219082a104146278592838db6db70464e08ab9fe6695c12"
+    },
+    {
+      "path": "crates/quest-cfd/src/lift.rs",
+      "sha256": "8af6a6d1700c5eba4f8907373e9a74281f89d3b4fe89829918cfe52e184e7cef"
+    },
+    {
+      "path": "crates/quest-cfd/src/main.rs",
+      "sha256": "ca72ab56997ab45e6d9024643f6bbfa793afb2b1c0ada8960dea138d75e72ff6"
+    },
+    {
+      "path": "crates/quest-cfd/src/observations.rs",
+      "sha256": "b88a34d4efe24a68b24b42726ca22eefdabb9b2ae0af519606f4e2f3e32c2520"
+    },
+    {
+      "path": "crates/quest-cfd/src/paired_history.rs",
+      "sha256": "db9a8604d8b0dfc0160d592c8f5dae792317e78b58ffe9bcade38ceeea2f3d7b"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_observation.rs",
+      "sha256": "e720e86d027e81570a064a3b660d9bae76c1620dd2fe9dbcc8c0d52023d5b332"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/affine_lifting.rs",
+      "sha256": "ba4417e1f88d28f9bd7c2888f0870d47ab3b6789cc0ac035ecac78a91037dd84"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/basis.rs",
+      "sha256": "afbf7c860b3788c3d640cf84f2e6fd6b159195e63619bed12ccd342120e53400"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/boundary.rs",
+      "sha256": "4484c5c8c181bbc3795b2fe5f830786920ae5b32922f23995410a0c08f9be07a"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/chart.rs",
+      "sha256": "711b0555226efb8f8378e09be22835acb4e40df2e3ea7d430f94c612ba05491d"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/constraint_pressure.rs",
+      "sha256": "7b4020ce137e2121e2c998c54db4a4114e08a296115e2f67a041442bda7b3649"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/constraint_qr.rs",
+      "sha256": "81221bfb507fe5c7db5fd678f23ad59d3359006da10f923f4fc60e7a38abd2e7"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/constraint_recipe.rs",
+      "sha256": "3b15ca60bcc9b8fa5d380b046f750dfb6e5711f98e3de6a659412fbab423ab1b"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/force_collective.rs",
+      "sha256": "b9e652fad5eda6462266946808ea721db26b6d082445f8de1d69f2f1f61bab65"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/force_recipe.rs",
+      "sha256": "8a258c72bd3c6469a7b496e8ffc5be750c6612a4fb0645fb74924d080f4810a0"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/mesh.rs",
+      "sha256": "469d7619e59e5b83bba5f516b6608527eada2f9bf62be4df18e8bced815e3e0f"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/mesh_geometry.rs",
+      "sha256": "4b63cc9de148dba2a7a1eafe64018dfe6f65312c75072e55bbfa9a511401252e"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/mesh_topology.rs",
+      "sha256": "e9dc83d29815ad2fdaa9531dd39869d9326eac4f4d4b7cb8d4b49d6ed8319091"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/mixed_mesh.rs",
+      "sha256": "5d9a0d836eda2717cd78a1c2919ffab45673f211acfe3505ffae01c02db08b5b"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/observables.rs",
+      "sha256": "dfb792b4ac3eddc58f1fffeab91e6c749695c90dcd761aad96856442487cf477"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/operators.rs",
+      "sha256": "759dae49ed8ea0c29bbd941220b84ef4b9f10964c2b45ed2b767b4a9d1d23f44"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/pressure.rs",
+      "sha256": "36086cf5873424227b30b69edc4d8d8134a05bb7478747630b0e43eb4a993ea7"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/pressure_observables.rs",
+      "sha256": "467bc1a5bd8d7daa748aa861772a8ad409d5ce3dafdc5a96b21cc07a8a40295a"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/time_collective.rs",
+      "sha256": "8f96abadd9e7e61065e85328f4e6d722b8c9b88db0e9e6dedaba4f36dc2a68dd"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/time_data.rs",
+      "sha256": "c5a781a96cfc58c2efa852d9bb0f7f6616967ff2a58d026de3d3aaa135007db3"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space.rs",
+      "sha256": "821968393a65bc869cd811de40a6ef6747a4df2eca23c8450b85c292cbefebbc"
+    },
+    {
+      "path": "crates/quest-cfd/src/polynomial.rs",
+      "sha256": "711eef613c6222f46a48b0b592f02f16c32ac6ce506ef5e526926c4c16f42ec0"
+    },
+    {
+      "path": "crates/quest-cfd/src/probability_observation.rs",
+      "sha256": "ef700d56fef867ebedf1b270e47c2b4e093ceae068838b958754ac4504ecebca"
+    },
+    {
+      "path": "crates/quest-cfd/src/reference_rk4.rs",
+      "sha256": "4d5331723e3b39d361a9a51166a87e7e85ef576b5ea900cba829f2c22b109b62"
+    },
+    {
+      "path": "crates/quest-cfd/src/resources.rs",
+      "sha256": "a10aa8b0ea76661b37758f0c8343339d6bc329ccf73c57037f8077ed9aa566fb"
+    },
+    {
+      "path": "crates/quest-cfd/src/simplex.rs",
+      "sha256": "a188631ca1301bf130d26331a2baa78239b7fc64f4dc926cd8468c8faca48e0a"
+    },
+    {
+      "path": "crates/quest-cfd/src/solve.rs",
+      "sha256": "27fb1c548e2d854db4124365683f151f7c9ca48158fe551b7ad51625545e338b"
+    },
+    {
+      "path": "crates/quest-cfd/src/stream_history.rs",
+      "sha256": "0386bcb6d84761bdc2e72731f9007acf0b4d09ba3bb7f1f6251e330d58e78e5c"
+    },
+    {
+      "path": "crates/quest-cfd/src/temporal_encoding.rs",
+      "sha256": "6dcad53aa37b8711a284aef34d101fe5295bd90e3a707b9d70799821fd8e986e"
+    },
+    {
+      "path": "crates/quest-cfd/src/temporal_observation.rs",
+      "sha256": "12ada5757fd82801af53bde4881232690e6c8b1287263a3595f9c720edbcf6f0"
+    },
+    {
+      "path": "crates/quest-cfd/src/validation.rs",
+      "sha256": "9a3943a9f6742374725c7bcb279f876586805b8f92cb19c5fd6cb6e1294762e1"
+    },
+    {
+      "path": "crates/quest-cfd/tests/boundary_dynamics.rs",
+      "sha256": "cf218e5a83b339c5365ca7c9081d5e333639e8d0136eab2c611492fb4b349682"
+    },
+    {
+      "path": "crates/quest-cfd/tests/box_kvn_history.rs",
+      "sha256": "8de82cf4f9d2bca42cb1e8b1744f92d99f44d43d200388cad43830ab50ad36ce"
+    },
+    {
+      "path": "crates/quest-cfd/tests/box_time_collective.rs",
+      "sha256": "6b1101034ff2e239a5f5c07efbbe1a94fb5ef9b2a4340a503e3b27ec52920823"
+    },
+    {
+      "path": "crates/quest-cfd/tests/box_time_data.rs",
+      "sha256": "76e90b865124fa21e56e849a8ecb0012d389cc2f58d30ecdec8c9ec5ad51bfe7"
+    },
+    {
+      "path": "crates/quest-cfd/tests/burgers.rs",
+      "sha256": "d71ceb7b85b381ee1b05179cd62006116a33af915499bebd9f6969a5327b8471"
+    },
+    {
+      "path": "crates/quest-cfd/tests/carleman.rs",
+      "sha256": "9b544b3b6dd82a2162096d28140a7d69ce4a148b7a2e27e6b628109d509ec75b"
+    },
+    {
+      "path": "crates/quest-cfd/tests/carleman_certificate.rs",
+      "sha256": "a9b8f59eae5138ae5b84b6aa54381dcf4ef47ab58bfc00a7059c08b734800c70"
+    },
+    {
+      "path": "crates/quest-cfd/tests/carleman_recipe.rs",
+      "sha256": "ffa1ec2550bed843e5474c95c558c2930cf58f53616521dedb79cb999ac3b11a"
+    },
+    {
+      "path": "crates/quest-cfd/tests/cases.rs",
+      "sha256": "8de27dfd5a787373bcf37024a761f02958afc25390447561a556395a90c2215f"
+    },
+    {
+      "path": "crates/quest-cfd/tests/cavity_observations.rs",
+      "sha256": "6caf7b0de2d1bd7d13f19e69f3bb37c11cb6f6fd6b8d24e0369da9fa43debfe3"
+    },
+    {
+      "path": "crates/quest-cfd/tests/classical_history.rs",
+      "sha256": "3bf8754e4c6976ab46f201219c20f6fb3ee4377bbc86b628d17a2a7bf945003b"
+    },
+    {
+      "path": "crates/quest-cfd/tests/configuration_diagnostics.rs",
+      "sha256": "99affc369515609fd8203533771d85653827480fa7140b4c6f293f5da5934266"
+    },
+    {
+      "path": "crates/quest-cfd/tests/configuration_flux.rs",
+      "sha256": "c3238e787dfad1dbd8dffe0500d3d09eff8f5b84794f26ef9b625f8f66deb3b7"
+    },
+    {
+      "path": "crates/quest-cfd/tests/configuration_weak.rs",
+      "sha256": "44eab4e2510246d3f792e908d8e8ed4b61ea82dc858326157e73d440e08501e4"
+    },
+    {
+      "path": "crates/quest-cfd/tests/constraint_pressure.rs",
+      "sha256": "8a57e7ea9444b6de39f2ebd73539f9fb0c2b216ea471ba10fae2ce6c1ebf8993"
+    },
+    {
+      "path": "crates/quest-cfd/tests/constraint_pressure_collective.rs",
+      "sha256": "f738d5737b44f7c0621b8bf6f7f0db7fad100f3dd12bf81ba8b36881aec4ab16"
+    },
+    {
+      "path": "crates/quest-cfd/tests/constraint_recipe.rs",
+      "sha256": "55699f659d2f437c9130def65721dc642902d1e58ce1c0251b2e9fd1435f95c2"
+    },
+    {
+      "path": "crates/quest-cfd/tests/constructed_resources.rs",
+      "sha256": "9bfbcf0cd4281eb2293e2acc61d6c4b3c1a879b270eef32554f00e2ba75d4d43"
+    },
+    {
+      "path": "crates/quest-cfd/tests/cylinder.rs",
+      "sha256": "7d80c1a3f7168ab47bdf5037d12db4f4d945275d897bdd9fe45a44716224b789"
+    },
+    {
+      "path": "crates/quest-cfd/tests/cylinder_evolution.rs",
+      "sha256": "98b1f45afb27c1907b88db2d8ea4afa17ed5da961891f68c3003386be3eedbcd"
+    },
+    {
+      "path": "crates/quest-cfd/tests/cylinder_high_order.rs",
+      "sha256": "a1b2e202fc7330398f03c66fa58f02f4ecb2170ab4edad49885f0f9cf5b03823"
+    },
+    {
+      "path": "crates/quest-cfd/tests/cylinder_observations.rs",
+      "sha256": "ecb022baef486aa9526d7cec8b1046d1e6bb69535b42c0a237870173a1310ade"
+    },
+    {
+      "path": "crates/quest-cfd/tests/cylinder_window_example.rs",
+      "sha256": "9f13b47d1d196c99894c0d899177897642ecf39ba616db4aca8e8fd559a5bf99"
+    },
+    {
+      "path": "crates/quest-cfd/tests/distributed_history.rs",
+      "sha256": "711daa1dc9d1e4cf50f3704a6b0c1213e7eb54560154cb8820dfe2bb483993ec"
+    },
+    {
+      "path": "crates/quest-cfd/tests/distributed_temporal_observation.rs",
+      "sha256": "475a6e711387604b0edf73a4b3d2d2541bb935fe192de466ed9f43656b296bae"
+    },
+    {
+      "path": "crates/quest-cfd/tests/force_collective.rs",
+      "sha256": "c7a5bf07ad60df685cdd3a0bfac56f7d09c7d643d010e8298b73947e2a0059cd"
+    },
+    {
+      "path": "crates/quest-cfd/tests/force_recipe.rs",
+      "sha256": "70d6cebb330fa1cf6c84fc8677fda1409dd60cfeafc5005cb2f0faf3d96eb624"
+    },
+    {
+      "path": "crates/quest-cfd/tests/foundation.rs",
+      "sha256": "e00ecfe36f43c5387c4a9862f1194eba1a04ef6028e01b14a9db07a939e04852"
+    },
+    {
+      "path": "crates/quest-cfd/tests/general_history.rs",
+      "sha256": "0c248190662bd0b17874c8d5e6b2908cf0121632374e87e81b3eeff335fd117e"
+    },
+    {
+      "path": "crates/quest-cfd/tests/history_spectrum.rs",
+      "sha256": "98c94048e5828e739a0cb2d6a4d829957421eaf8ba9472745041aaebe5f7216f"
+    },
+    {
+      "path": "crates/quest-cfd/tests/kdv.rs",
+      "sha256": "e9360bae3f3b875d0900c2e4181560a1183f3225d0195156388f4db8fcf95325"
+    },
+    {
+      "path": "crates/quest-cfd/tests/kvn_history.rs",
+      "sha256": "a82b3bc75f2ca0afde0078b8d0e3ac82c0620a90790866b3179facb2c9dc1ed7"
+    },
+    {
+      "path": "crates/quest-cfd/tests/kvn_recipe.rs",
+      "sha256": "d0d5165d1e76f8b91be69385940da73e48bbee73faef25852e35eb1af14ed6ce"
+    },
+    {
+      "path": "crates/quest-cfd/tests/kvn_recipe_collective.rs",
+      "sha256": "0489de76c671bb2eb108cf7ebea5a7e13faea8a58a75476f019a86506aea7740"
+    },
+    {
+      "path": "crates/quest-cfd/tests/lifting.rs",
+      "sha256": "eb9f6b5fa43ad1ecf04e6f50d7090299bae1aab0b18b95094a859c01ea93c995"
+    },
+    {
+      "path": "crates/quest-cfd/tests/mixed_physical_boundary.rs",
+      "sha256": "00cc8cd7a32d28735f6d9a64536f5bca30bc1d9485c7e010450bdbedfa13cf54"
+    },
+    {
+      "path": "crates/quest-cfd/tests/mixed_physical_mesh.rs",
+      "sha256": "373ebde162f8a5ca8f798679402370f6fbd5bc7e57b4fe24a08dc0f60412f1fd"
+    },
+    {
+      "path": "crates/quest-cfd/tests/mixed_physical_observations.rs",
+      "sha256": "e6d2bfa789ff8afeab5d2c5afb05f3db84f38a7448b1c44130b3ab2f075f408b"
+    },
+    {
+      "path": "crates/quest-cfd/tests/observations.rs",
+      "sha256": "10d476db8f99931f254add945da489a89d73afba16ec4a26e30b9080ade468ed"
+    },
+    {
+      "path": "crates/quest-cfd/tests/paired_history.rs",
+      "sha256": "a8d372425dac4d0ad73f73711ad3d5e9069ff0519aa218bdd99bd3881fcc24e3"
+    },
+    {
+      "path": "crates/quest-cfd/tests/physical_boundary.rs",
+      "sha256": "dfd29d7b41855362f0cbdf4aae63a7b0de8f048c59fd64edd44c5f479e86001d"
+    },
+    {
+      "path": "crates/quest-cfd/tests/physical_constraint_collective.rs",
+      "sha256": "b1c689ca3bfaae068a5869cc62fa03d0a8c7efeb4eb46eccbdb8daa91f496d45"
+    },
+    {
+      "path": "crates/quest-cfd/tests/physical_integration_budget.rs",
+      "sha256": "65beda45a49b250897df0c78af706671005c508235ee9192586ef84092c4219c"
+    },
+    {
+      "path": "crates/quest-cfd/tests/physical_mesh.rs",
+      "sha256": "59a7f0f0de97ad6a162152bbe9929376e96fc461f7413e0f902ad532f158971f"
+    },
+    {
+      "path": "crates/quest-cfd/tests/physical_observation.rs",
+      "sha256": "f40494f6364caabdd49642eaf6c48ec0431d6801881f17618d0eab1cf9607ec6"
+    },
+    {
+      "path": "crates/quest-cfd/tests/physical_order.rs",
+      "sha256": "12092f1979c36a3e425242e1b50903c1c9f0b8bf4c7d81c3a6ce9f42912b02d1"
+    },
+    {
+      "path": "crates/quest-cfd/tests/physical_pressure_observation.rs",
+      "sha256": "2eed8efc499a2a0f5e92402946607ca4583f5093537e9b3825d4bcf8350a957e"
+    },
+    {
+      "path": "crates/quest-cfd/tests/polynomial_dynamics.rs",
+      "sha256": "e3907cbfc34fd0a1592cd0a71dd1b2e0a94a30412ab4cc980054a0748fce25c4"
+    },
+    {
+      "path": "crates/quest-cfd/tests/polynomial_rk4.rs",
+      "sha256": "59987b3fff96f74d3d91981c1cea321787459ef96505530e0d9cb2e8a8118433"
+    },
+    {
+      "path": "crates/quest-cfd/tests/probability_observation.rs",
+      "sha256": "4da9c55f10ab0241f5f8b09c3b519dce8e08e26b1f757fe81a2afb06b675805a"
+    },
+    {
+      "path": "crates/quest-cfd/tests/probability_observation_collective.rs",
+      "sha256": "3f86e2840e86ec4919fb5f3498757a5c290a7b9b7550958c6dcea17b5bc1b85f"
+    },
+    {
+      "path": "crates/quest-cfd/tests/resource_build.rs",
+      "sha256": "17dee4b3dcee4f762199fa26e791145da43d0f5874690f1a12efc3d2c1d71342"
+    },
+    {
+      "path": "crates/quest-cfd/tests/resources.rs",
+      "sha256": "42dcb468422be027f0bea6634e9bb0c2a31ad404589fcc344c3f5b297f67c81b"
+    },
+    {
+      "path": "crates/quest-cfd/tests/simplex.rs",
+      "sha256": "2481c1a553f0328aa4cdaaf282dfc8963090c35b90a809bbf9b3b27c0b931335"
+    },
+    {
+      "path": "crates/quest-cfd/tests/solve.rs",
+      "sha256": "7485a656f442dc888bfad89c7c225aa37833a180c42218a94d32dbf01831d64b"
+    },
+    {
+      "path": "crates/quest-cfd/tests/stream_history.rs",
+      "sha256": "b4f6f6e9f8ef6efbef42bef4a4b723cae33d97ddeb0eb404f9b63b0fa9d864ba"
+    },
+    {
+      "path": "crates/quest-cfd/tests/temporal_encoding.rs",
+      "sha256": "384c3816f446f50af793aba9ac63176c6a1970c26fcb3ecbd9d92fdbed1aeeea"
+    },
+    {
+      "path": "crates/quest-cfd/tests/temporal_observation.rs",
+      "sha256": "3399676a9bbf3b98478d6c1d459795f9b73c39ee25e95f3e789b911c51a7def3"
+    },
+    {
+      "path": "crates/quest-cfd/tests/transport.rs",
+      "sha256": "1b8bc2bb6ba36c92e615289cb345626a0059736dcd92906a010d2451890c966c"
+    },
+    {
+      "path": "crates/quest-cfd/tests/workflows.rs",
+      "sha256": "42e7089e8db80012ba832eb8acea374f42fe5a7514460dca73d5afee7fcb90b6"
+    },
+    {
+      "path": "crates/quest-compile/Cargo.toml",
+      "sha256": "333a42193d37b9827b3154a2f89422811ea3c5b366882c896da8d7ed1abce788"
+    },
+    {
+      "path": "crates/quest-compile/benches/compiler.rs",
+      "sha256": "dc95df05d72167e44b2ba9d79c50d8dd5ba2f30175a11526ac8f91c6b9f82e6f"
+    },
+    {
+      "path": "crates/quest-compile/src/beam.rs",
+      "sha256": "73329d7cd15b81b16a6aa2e7080c02fcd5a83e7a0780e9c86cfdf7d7807c982b"
+    },
+    {
+      "path": "crates/quest-compile/src/beam_approx.rs",
+      "sha256": "692326265b09bbec030dc6c273e2fed407cf7ef95cce3e7eabba2b658f30e510"
+    },
+    {
+      "path": "crates/quest-compile/src/beam_mitm.rs",
+      "sha256": "aadba81e31d4b12f6a282a8a88f7d2d11d2abd4808ccd906425b7c52974579b0"
+    },
+    {
+      "path": "crates/quest-compile/src/builder.rs",
+      "sha256": "cd6e3801d8870c5e000603c3da018942e8756d37fb5e95ec3ad463e1e7a5924a"
+    },
+    {
+      "path": "crates/quest-compile/src/capture.rs",
+      "sha256": "c70e8fa16533f5a68c471fb96956ae78f57a401887ca4d81e15e7ae942747bbe"
+    },
+    {
+      "path": "crates/quest-compile/src/classical/cleanup.rs",
+      "sha256": "3f4296629d6a57f61ebafade214fd4e6d6b7452d88c9f7966ce1a5b49323911f"
+    },
+    {
+      "path": "crates/quest-compile/src/classical/constants.rs",
+      "sha256": "16a720db2130af7697b3734e1f4ef1741698d793356f7f148864c90a1a467a54"
+    },
+    {
+      "path": "crates/quest-compile/src/classical/mod.rs",
+      "sha256": "fdf69ce57da936151df308cd6976444521fd40bdee0da00ea2c1d4198414fd5b"
+    },
+    {
+      "path": "crates/quest-compile/src/coherent.rs",
+      "sha256": "b4aa077d4da0bf3722824929badd3086adc653eb776a0a2232e9d2c89d162a99"
+    },
+    {
+      "path": "crates/quest-compile/src/dispatch_recipe.rs",
+      "sha256": "c006b14ae416539d7934369d16d674d6d0391e3816f2e7c0b5743bcf883c8a8f"
+    },
+    {
+      "path": "crates/quest-compile/src/error.rs",
+      "sha256": "8755716dff3b10db01bd53aa547c983cde33b84df9a568f8eb347bc8da81be0a"
+    },
+    {
+      "path": "crates/quest-compile/src/generator.rs",
+      "sha256": "5935de65f3ec95d870650859d54008790f12455e774a796515305ff76fda35ae"
+    },
+    {
+      "path": "crates/quest-compile/src/import.rs",
+      "sha256": "25e2fdd0eb0c462977aef2e9734db118b626988fde423c22887d74df61e95839"
+    },
+    {
+      "path": "crates/quest-compile/src/lib.rs",
+      "sha256": "f885d07901e9f4091fca67f948eaf6c7818c85cfdcc60e4bba51a0d8e1bed08a"
+    },
+    {
+      "path": "crates/quest-compile/src/linear.rs",
+      "sha256": "2fdf76ca46fd3b51ddbe2a94d4d4abf938133f20d5e1b3dd545ad665662b9471"
+    },
+    {
+      "path": "crates/quest-compile/src/matrix.rs",
+      "sha256": "1a1c19580b4cc1a1dd4e3e6515be6c174390190be752414c6d382b26d693a60f"
+    },
+    {
+      "path": "crates/quest-compile/src/optimize.rs",
+      "sha256": "58b868c10c15fb399b89d66e31aaa3d558a5d914ea4d8f665a45245768a0a383"
+    },
+    {
+      "path": "crates/quest-compile/src/optimizer_contracts.rs",
+      "sha256": "3a95011dd5a3104de5b91489916ccfdf10ea4770aba455dd4fcfaba36accecd2"
+    },
+    {
+      "path": "crates/quest-compile/src/oracle.rs",
+      "sha256": "04b47d99155eaae8a1eadcf5a083ed1c10bb21bff7e86a61968ef1797a4697ac"
+    },
+    {
+      "path": "crates/quest-compile/src/parity/bound.rs",
+      "sha256": "72694ef6ceafbd84e8c792b1dd8ae1be6dfce060140640ac2052ca258dbfbbc2"
+    },
+    {
+      "path": "crates/quest-compile/src/parity.rs",
+      "sha256": "d6e5a361cdd6efe2daa84fa44980bbbb0412d21278aeefc578cb16f9277ce350"
+    },
+    {
+      "path": "crates/quest-compile/src/structured/artifact.rs",
+      "sha256": "29170e2858746321c7b8541ee5dc2f0e3c6223429249d3a34cc9646fd4c10574"
+    },
+    {
+      "path": "crates/quest-compile/src/structured/specialize.rs",
+      "sha256": "79d4395214ac255a3ee4a36feac67fc9db6352c190c9744008f715f1c9838a3a"
+    },
+    {
+      "path": "crates/quest-compile/src/structured.rs",
+      "sha256": "aee85916e0770a7c536afd50ce01a4e4f0b8342511172ca352dd30077d3d87b5"
+    },
+    {
+      "path": "crates/quest-compile/src/structured_optimize.rs",
+      "sha256": "e7a468f9c0fae413a51028bf222d423e704278bad3a4244e79b75cf4c0813552"
+    },
+    {
+      "path": "crates/quest-compile/src/structured_pipeline.rs",
+      "sha256": "8fb26771d4b9774696054ddd3882daa82538d6103f91ded2735a8f8780206d1e"
+    },
+    {
+      "path": "crates/quest-compile/src/structured_terminal.rs",
+      "sha256": "a21bf37515cc6a26952468b03f3cbb8b03dc32ee5b5fca7c8f9d6b5c857df0bb"
+    },
+    {
+      "path": "crates/quest-compile/src/structured_workers.rs",
+      "sha256": "baa31d75d06e306b618c5c4cd87ecb1650e62c62f1497b379fea7dd41355bba7"
+    },
+    {
+      "path": "crates/quest-compile/src/terminal.rs",
+      "sha256": "b55cd9da72b0d9db45599990ab43b67d04a8b537470426261b0f052ff0a6b32b"
+    },
+    {
+      "path": "crates/quest-compile/src/workers.rs",
+      "sha256": "2ddb21bdb781c744973c6636942377f3320168b0579a759ab3fda921bf15acb3"
+    },
+    {
+      "path": "crates/quest-compile/tests/adapters_contract.rs",
+      "sha256": "90c8b54adb933ba34f361610b102af11052a8757b5640ac48f7c9e3ad589ed34"
+    },
+    {
+      "path": "crates/quest-compile/tests/artifact_contract.rs",
+      "sha256": "13516ebee10a8fc5ae23cb6b724cd69a08df9538f25bcbc6cf4f107543ce4d1e"
+    },
+    {
+      "path": "crates/quest-compile/tests/beam_approx_contract.rs",
+      "sha256": "3aa7d374d01468ba653423a0758d9ece0953c5d42e2206b362627c8b3dabcd19"
+    },
+    {
+      "path": "crates/quest-compile/tests/beam_contract.rs",
+      "sha256": "ed53fe5624aaaa021b5f7555e47b436e53457b1b4acbf78496344908b1f69f67"
+    },
+    {
+      "path": "crates/quest-compile/tests/beam_mitm_contract.rs",
+      "sha256": "44f0a96899a54deaa818b20ca37e5fee944018c091ee3aaf252366b25ee19dfa"
+    },
+    {
+      "path": "crates/quest-compile/tests/beam_timeout_contract.rs",
+      "sha256": "393986602e79f30612862d3190c5a55c3b7b9342ff97405628d040113e3b6f46"
+    },
+    {
+      "path": "crates/quest-compile/tests/classical_contract.rs",
+      "sha256": "fad6581ecc21e7dcaa628a093bc7deadf08ea55832143532f765912f3d612191"
+    },
+    {
+      "path": "crates/quest-compile/tests/compile_fail.rs",
+      "sha256": "6817e5c7103fcb23875a1d5d22086301b2d84bc08204c690163d1a6a69ee60ca"
+    },
+    {
+      "path": "crates/quest-compile/tests/core_contract.rs",
+      "sha256": "2d2697350e38529cf45faf590bf22425c2d73b9e7cdbbb31563cd4884f60a77f"
+    },
+    {
+      "path": "crates/quest-compile/tests/definitions_contract.rs",
+      "sha256": "f688321a514e251b5570bc02039a769e03cae7be54b22f0ce08ad82eaf72831e"
+    },
+    {
+      "path": "crates/quest-compile/tests/diagnostics.rs",
+      "sha256": "d967dba40640764f6ca0da9d4b32d02b073e033bf5c2b467bab560e9ce0a7e1f"
+    },
+    {
+      "path": "crates/quest-compile/tests/differential.rs",
+      "sha256": "4ca83254501982ea22793f490fab517c87f4434c4669568816f04d6ee9c9ae5b"
+    },
+    {
+      "path": "crates/quest-compile/tests/dispatch_recipe.rs",
+      "sha256": "4bdfa7fd3a328d0a7ac93a07e9832859e881478bac89a92fad2741635c7c27d7"
+    },
+    {
+      "path": "crates/quest-compile/tests/finite_semantic_contract.rs",
+      "sha256": "7a0ff9fece15b50d70650d8baab79c8bc4afe7889b40d10a7e2be1f367f3cd76"
+    },
+    {
+      "path": "crates/quest-compile/tests/generator_error_contract.rs",
+      "sha256": "127330448f991150d43265abe6853c9f8c44189b7abd20d7a402f0312fc3ccbc"
+    },
+    {
+      "path": "crates/quest-compile/tests/generator_provenance.rs",
+      "sha256": "4cccf8d9f21ede4e39e4987c8f240baa772e3d2c68b8e2beb8759a12c508d712"
+    },
+    {
+      "path": "crates/quest-compile/tests/linear_contract.rs",
+      "sha256": "6111de20c1273089955a67b1f1c04f5fcb09cc71826a5e4f79d46d7a62c871c4"
+    },
+    {
+      "path": "crates/quest-compile/tests/macro_contract.rs",
+      "sha256": "8dca98c0dd2d5126402c0dc2cc2699b1776d7bee7700ffa6a2798be9dbf6e5bf"
+    },
+    {
+      "path": "crates/quest-compile/tests/matrix_contract.rs",
+      "sha256": "ef43fdd7ca180d1f68f96c6ead99cdf839b2212fc693644fe74f65de2ba05a7d"
+    },
+    {
+      "path": "crates/quest-compile/tests/native_direct.rs",
+      "sha256": "07202ed6dfdb9e0cecdd633109c7ca5cdc356682172d311098af949409e36cf8"
+    },
+    {
+      "path": "crates/quest-compile/tests/optimization_contract.rs",
+      "sha256": "945542df5fce3919c69528bd2650e092aab7e18e14ec50fb2460828c0d0dad00"
+    },
+    {
+      "path": "crates/quest-compile/tests/optimizer_contract.rs",
+      "sha256": "65271c2f61d367bb99b1a71d4238f235a5339fdc34509d8a10e47a47ff4b5643"
+    },
+    {
+      "path": "crates/quest-compile/tests/oracle_contract.rs",
+      "sha256": "d8ce85e04aeb62a49548c570cb93748179f2665e1c7cf8fe2eb243d28abdd919"
+    },
+    {
+      "path": "crates/quest-compile/tests/parity_contract.rs",
+      "sha256": "1f0a19c3b244062bf1e0b3794266a989049c54222461fc57600aa4074083f6d5"
+    },
+    {
+      "path": "crates/quest-compile/tests/provenance_contract.rs",
+      "sha256": "f0f400446c49803b432eb53d13dc939ad9ecf32b54ce8733ba0b3009bbde8bfb"
+    },
+    {
+      "path": "crates/quest-compile/tests/snapshot_identity.rs",
+      "sha256": "ecf38e427d92e0f1fc8e49d3a9b11c176a6659b7c37a3eadbbb7b25d276a652b"
+    },
+    {
+      "path": "crates/quest-compile/tests/structured_contract.rs",
+      "sha256": "675938777aa130be710ea545135e3202b53f9c6e737900888f8c0dee91a90734"
+    },
+    {
+      "path": "crates/quest-compile/tests/structured_macro.rs",
+      "sha256": "440481ce7001cf5b8642dd9dde6448cbda6da235a4a9f76053f9720a0d5a92e9"
+    },
+    {
+      "path": "crates/quest-compile/tests/structured_optimization.rs",
+      "sha256": "aa02befe1005cd17113f8b02d6c360837652d6adb2f70e6d38d55cd3bc4e612b"
+    },
+    {
+      "path": "crates/quest-compile/tests/structured_terminal.rs",
+      "sha256": "f21d112b7845a2b98dd5e0a24db33dbd4684ac9c39fb10f7e6d2fb19d0e0e7c9"
+    },
+    {
+      "path": "crates/quest-compile/tests/symbolic_contract.rs",
+      "sha256": "b946749bc57b840bf40c14a599cd3e7b47f16401cd50268b9fefe99e17485175"
+    },
+    {
+      "path": "crates/quest-compile/tests/terminal_contract.rs",
+      "sha256": "e61e8b0e12906592ac8ee477ce164d77e7804798b0fadaad4e0f593b83c89d2f"
+    },
+    {
+      "path": "crates/quest-compile/tests/tutorials.rs",
+      "sha256": "cc1a05e06e1fa5381fdbaccff08229357e8f7a2e8b6da2e572a151161a9e3d8d"
+    },
+    {
+      "path": "crates/quest-compile/tests/ui/arity.rs",
+      "sha256": "4684618f8206776af628e711f12febc060598a5c406ac5d2ba755678799657c1"
+    },
+    {
+      "path": "crates/quest-compile/tests/ui/duplicate.rs",
+      "sha256": "c4ab05caea1a3d26c9a4968b636556763e84ccd5d0b42fe049d62d3d0afa3c43"
+    },
+    {
+      "path": "crates/quest-compile/tests/ui/index.rs",
+      "sha256": "0316f4a6f2ca547db8facf17f801e2efd19e011ce41335f11e50b9842b38dc62"
+    },
+    {
+      "path": "crates/quest-compile/tests/ui/nonfinite_literal.rs",
+      "sha256": "523c8e622cfb2ddd666134468f82c8cd711a9bd89f61be6585d8ac571a7373ae"
+    },
+    {
+      "path": "crates/quest-compile/tests/ui/numerical_inverse.rs",
+      "sha256": "50eab259a34b9dadccf8e97f1e89707d4d338ef4e170949e6d080d115eef7be2"
+    },
+    {
+      "path": "crates/quest-compile/tests/ui/opaque_expression.rs",
+      "sha256": "fd87def65be0e0c5d39e65a07e5249760e3d3cd2a53558752a101ef6d66e1dd0"
+    },
+    {
+      "path": "crates/quest-compile/tests/ui/oracle_capture_type.rs",
+      "sha256": "013000a3035610f8be0aee646f7c5c73552f654ef04bfd737a239acba42483d3"
+    },
+    {
+      "path": "crates/quest-compile/tests/ui/oracle_inverse.rs",
+      "sha256": "33709a8d032e440617a81fe76dcade866f47758da726d9d4349e847212b96860"
+    },
+    {
+      "path": "crates/quest-compile/tests/ui/oracle_unadmitted.rs",
+      "sha256": "bbb2d3ff38e6504eb48975aaf5c49c4cee34a716163b66e45dd8b11daba16d5c"
+    },
+    {
+      "path": "crates/quest-compile/tests/ui/program_adjoint.rs",
+      "sha256": "3cd7b469de5c07c7573aaa458ed22d868cf25d0b3cdf2beeb698f73494f7341b"
+    },
+    {
+      "path": "crates/quest-compile/tests/ui/structured_alias.rs",
+      "sha256": "bf15be19ef509381fe9cb7ec4c3599873576cc15c809be5ef5dbc5919a776d8a"
+    },
+    {
+      "path": "crates/quest-compile/tests/ui/structured_capture_type.rs",
+      "sha256": "9cdd93a5c0bf0b55b6be1af14fc91b7ecfc072f59d363abad1318c52016b43c6"
+    },
+    {
+      "path": "crates/quest-compile/tests/ui/structured_gate_effect.rs",
+      "sha256": "d84aefe9241601d4693fe4edd0d03378b7130c5ec85a1333b1f890ae33b422b3"
+    },
+    {
+      "path": "crates/quest-compile/tests/ui/structured_recursion.rs",
+      "sha256": "6f8c2b7e84efe806a89ea4dc1ccb2ef1653033be888e17338395326b7a387bc3"
+    },
+    {
+      "path": "crates/quest-compile/tests/ui/structured_uninitialized.rs",
+      "sha256": "740c390f36c15599deaed0b5ba5e54865e05edbc3ddaa2a31148261cdd436595"
+    },
+    {
+      "path": "crates/quest-compile/tests/ui/unknown.rs",
+      "sha256": "09edd9ff87c5a4fcbea61a7c4797ee1faeb2fe1fe6ebcdd45a477144e84a0f99"
+    },
+    {
+      "path": "crates/quest-compile/tests/ui/unsupported.rs",
+      "sha256": "e64e12bd71277d76c0dc59069dd4837719ca585dfa3bb0fc5d03f1239c9d2dba"
+    },
+    {
+      "path": "crates/quest-compile/tests/ui-pass/measurement_index_expression.rs",
+      "sha256": "45a648a79d1b789af8e7e20725a221427578b3eee34ffca9be74d97fe5699d67"
+    },
+    {
+      "path": "crates/quest-compile/tests/ui-pass/unindexed_array.rs",
+      "sha256": "87fac51695c95be90ed091e05e67f14ed636989bd9ea276678b65f6055294c82"
+    },
+    {
+      "path": "crates/quest-compile/tests/ui-pass/zero_denominator.rs",
+      "sha256": "ffdf40a9606159a67eff5ed410faf0e290b6d42c83c3fdf8c4239a1bdeb02cf7"
+    },
+    {
+      "path": "crates/quest-compile/tests/unified_program.rs",
+      "sha256": "56bed150e06f921fce55b02656c0e68371bd8373eb501e170ec9e35785a143ff"
+    },
+    {
+      "path": "crates/quest-compile/tests/unitary_admission.rs",
+      "sha256": "e2172f9351a8d5b34637e871a15603a1be6c7415ca8dfcf22be24e65ab6d1250"
+    },
+    {
+      "path": "crates/quest-compile/tests/worker_contract.rs",
+      "sha256": "74f679122150078338bfe9f33ec78f469b4efe6889b05613f53070a23b80971d"
+    },
+    {
+      "path": "crates/quest-language/Cargo.toml",
+      "sha256": "9e6dc8245a47a233bce3a243aed309127755065826b0272f1f44565701a9b342"
+    },
+    {
+      "path": "crates/quest-language/src/angle.rs",
+      "sha256": "87320b828d0d463a7d6418a25fb4d13a5cc755ddb650ead89929d96640d221b5"
+    },
+    {
+      "path": "crates/quest-language/src/classical/mod.rs",
+      "sha256": "26783496ac22a742e6250c2dc8351871662fff139a4f7ff644d424ce0f640200"
+    },
+    {
+      "path": "crates/quest-language/src/classical/operations.rs",
+      "sha256": "4724badc310b11381dbe78c9b882cdf787e3d0cab90395daf58939ccaae38556"
+    },
+    {
+      "path": "crates/quest-language/src/classical/typing.rs",
+      "sha256": "46cacffdd55bc69577b70c6e64d141e277d6e6790d4e31755a3bc69bee6a1993"
+    },
+    {
+      "path": "crates/quest-language/src/diagnostic.rs",
+      "sha256": "f6bdf8c3295ba5458f5d0bedd40a2df2382bce814a08ce610a49296eac6e7078"
+    },
+    {
+      "path": "crates/quest-language/src/gates.rs",
+      "sha256": "72d3aed67203ef9b4807a5cb4d761691e45ba0f1fcca1bc5dcc5122ab7a8bd4d"
+    },
+    {
+      "path": "crates/quest-language/src/lib.rs",
+      "sha256": "93271eb0b69d46e280a0c1070ae06efaed2a5d2fa7aa1996046be2ef0db6637a"
+    },
+    {
+      "path": "crates/quest-language/src/matrix.rs",
+      "sha256": "5de068dbac47da45a94530f12df1a2f1eecd1577495121bf0bfcf2998c2abbde"
+    },
+    {
+      "path": "crates/quest-language/src/payload.rs",
+      "sha256": "2eddd4e4e18228bb8bff1b1c5b47594f91e3528e541da497f8b951ff63881425"
+    },
+    {
+      "path": "crates/quest-language/src/quantum/error.rs",
+      "sha256": "404cd02e9540ae4be244bc71d0b7516c0174de53da57075bfc8120d818970584"
+    },
+    {
+      "path": "crates/quest-language/src/quantum/evidence.rs",
+      "sha256": "62cef452b92a1261d8b0cc3777ee5525379a9eaab3622df7b4f59c1f3c0db84e"
+    },
+    {
+      "path": "crates/quest-language/src/quantum/gate_matrix.rs",
+      "sha256": "d1a41c73e5349a47c21550105a9b5af7b0533aab0f0c50729a3ae40c94ad38a8"
+    },
+    {
+      "path": "crates/quest-language/src/quantum/mod.rs",
+      "sha256": "f01f907c22adae4e3ae01c6c40d8fcb2bf7758bbc0c502fbfdd01e635931c94d"
+    },
+    {
+      "path": "crates/quest-language/src/quantum/model.rs",
+      "sha256": "2097de606633767fa8f8b41599c3dd28255e4598c779dc43b24a78fb95df1e7d"
+    },
+    {
+      "path": "crates/quest-language/src/quantum/oracle.rs",
+      "sha256": "ba8d7dbc7313151250086cf56d7429ae82e0f32bacfbee25927edd2e10b3ac2e"
+    },
+    {
+      "path": "crates/quest-language/src/quantum/program.rs",
+      "sha256": "5b02cb0ee40292ffafd2fdf41db3cb7d2a1cda7d50f5ee19731fc73f87bad546"
+    },
+    {
+      "path": "crates/quest-language/src/quantum/provenance.rs",
+      "sha256": "4574d34741530138c4ad4dc5290b9648af680028f59cbacf352650b59fe6e6ac"
+    },
+    {
+      "path": "crates/quest-language/src/quantum/storage.rs",
+      "sha256": "927414f7a798ecaf56a739c649586172327b75650e51bbc96ed110b4d36a40f4"
+    },
+    {
+      "path": "crates/quest-language/src/rational.rs",
+      "sha256": "6abafbe154b1605577eb2e05cb61af49b2d1ce82583ab8b1e5c67412453e42a0"
+    },
+    {
+      "path": "crates/quest-language/src/render.rs",
+      "sha256": "ceb01616b7620633276c6dea4d0a1875566d427d351172dfae7604ca831d3995"
+    },
+    {
+      "path": "crates/quest-language/src/semantic/allocation.rs",
+      "sha256": "e36896853537b60f114ef73b5357c7c52c187c6135e82df9eb271a1b011bb502"
+    },
+    {
+      "path": "crates/quest-language/src/semantic/builder/arrays.rs",
+      "sha256": "d9898bc836e1abc05597dd42a9625126d5fe6ac5d0b31c93f57ea0ed5959b49c"
+    },
+    {
+      "path": "crates/quest-language/src/semantic/builder/effects.rs",
+      "sha256": "72e3553af24feda19ec726dcb8d3e93a4441a875c8467051e75f74fcf44ba85a"
+    },
+    {
+      "path": "crates/quest-language/src/semantic/builder/expressions.rs",
+      "sha256": "8aab8805b8b6c7008e6574c905a27e4f99c0cd0872882b07b309d76ccc334ca9"
+    },
+    {
+      "path": "crates/quest-language/src/semantic/builder/fragment.rs",
+      "sha256": "7d37acfa75c1510218c76da1e2a3aea8daf78cd681199633a4515425acba3551"
+    },
+    {
+      "path": "crates/quest-language/src/semantic/builder/mod.rs",
+      "sha256": "822480023f9e1025f5a2a58887d0cd547cd2f4f8c3a5ded14e3db18d7b55149f"
+    },
+    {
+      "path": "crates/quest-language/src/semantic/builder/ranked.rs",
+      "sha256": "188bb3d055a349c7f90c74d3008bf4a65b63e7f64487bf818a2ee9c33331a801"
+    },
+    {
+      "path": "crates/quest-language/src/semantic/builder/shared.rs",
+      "sha256": "67eaf842c5c3fffcadb3789c58cb8f286247ffdb25b924e62fc1629a158948d2"
+    },
+    {
+      "path": "crates/quest-language/src/semantic/builder/signature.rs",
+      "sha256": "d714b4d2ea48074c344d857ea52aa3eefca69fbb0482ab98833a096df6b47bb0"
+    },
+    {
+      "path": "crates/quest-language/src/semantic/builder/types.rs",
+      "sha256": "b8d20e2d5717a4854945539411f52804b7d2bb7a009161d850de217cb61344cb"
+    },
+    {
+      "path": "crates/quest-language/src/semantic/cfg.rs",
+      "sha256": "e31190b3f6659e2fbfa33014696ec79008568e960999adae7e71c6e758c1d553"
+    },
+    {
+      "path": "crates/quest-language/src/semantic/compile.rs",
+      "sha256": "88f80f538d17e9e77eda6a3a2aaed05d40128b11981d9271c8cfac6936dc836a"
+    },
+    {
+      "path": "crates/quest-language/src/semantic/expressions.rs",
+      "sha256": "f91e0a2dc665bb86a32af6118319f343660ea8363c35a48ca48a9c5c4c196fcd"
+    },
+    {
+      "path": "crates/quest-language/src/semantic/finite.rs",
+      "sha256": "de41a1c840c1fb7d92746407052cd9815890408b48c54bc62cec37e8554252ae"
+    },
+    {
+      "path": "crates/quest-language/src/semantic/mod.rs",
+      "sha256": "22fc127ade3cf61f98308f84adf55ab8ef4d3d34c2ee45bc73ca9aee522a5074"
+    },
+    {
+      "path": "crates/quest-language/src/semantic/preflight.rs",
+      "sha256": "d67ab061abd4b623b2bd8ed75b317fac84000a6fe9b366e613461357bce71444"
+    },
+    {
+      "path": "crates/quest-language/src/semantic/promote.rs",
+      "sha256": "c97be3697deef5625108b63031604ff6cfbbf277946ccca8912931b4f1c01daa"
+    },
+    {
+      "path": "crates/quest-language/src/semantic/retained/syntax.rs",
+      "sha256": "489fee52830a384c0657944c3c97c7d9cca9bd248ee984e16c22abc6dba3c9c8"
+    },
+    {
+      "path": "crates/quest-language/src/semantic/retained.rs",
+      "sha256": "c16e05f515242be9e8bf30092431df43a9c3a33383f574b58c09ac6bced769d2"
+    },
+    {
+      "path": "crates/quest-language/src/semantic/statements/loops.rs",
+      "sha256": "7742a689752086806dfa12e712ed123932317714c7558acf4e3a168c5d86e2ee"
+    },
+    {
+      "path": "crates/quest-language/src/semantic/statements.rs",
+      "sha256": "f82faab7313d34abb16b6f176368d15b2c07285df6f024fd8cd7fe75c98b63f5"
+    },
+    {
+      "path": "crates/quest-language/src/semantic/template.rs",
+      "sha256": "939478a69bc57fc6703f8af3a1632d62879d098a455922aacd6497be6170e575"
+    },
+    {
+      "path": "crates/quest-language/src/semantic/types.rs",
+      "sha256": "2fed4adfddcadebbd5f64d51086165934893d284e78dfb7e108d37de9cb17289"
+    },
+    {
+      "path": "crates/quest-language/src/source.rs",
+      "sha256": "1af28ea6898d4050e880e986032d45dd64490c2ddf5d427bad3fa271a8bd20bf"
+    },
+    {
+      "path": "crates/quest-language/src/ssa/edit.rs",
+      "sha256": "f4cec15c445a28f73d4b874bbae53d450bc72dcc666065bb229529b81b9d759e"
+    },
+    {
+      "path": "crates/quest-language/src/ssa/mod.rs",
+      "sha256": "32688609a9daac45ffb6a120706ae7a271d81d8af3d84fb734a298149498f0e2"
+    },
+    {
+      "path": "crates/quest-language/src/ssa/quantum.rs",
+      "sha256": "342572ffa2ca807ed7a0d2997304065adea06098c82bfdb7ea4502398b1a63cb"
+    },
+    {
+      "path": "crates/quest-language/src/ssa/quantum_flow.rs",
+      "sha256": "023b48e09f2806ded9171204f841dac1958713e4710e2d29e1cc2b7294e1358e"
+    },
+    {
+      "path": "crates/quest-language/src/ssa/verify/assignment.rs",
+      "sha256": "5327e05019f2f6c912b6ee6c4337f82ece532e87a20a6bdac0e03490497a853e"
+    },
+    {
+      "path": "crates/quest-language/src/ssa/verify/dominance.rs",
+      "sha256": "dc6b0d09fa6f34b8b30cd32c133589792adc01ebf3e9d832a4a646c9da082848"
+    },
+    {
+      "path": "crates/quest-language/src/ssa/verify/instruction.rs",
+      "sha256": "37c0452768d86aa08d9c0eeea8fa8617562c2179671dfd7a34541311df3826db"
+    },
+    {
+      "path": "crates/quest-language/src/ssa/verify/interfaces.rs",
+      "sha256": "b046b9d5fa6d9a3c2686c41af0b9bd813cf0df94017b0d042aa89719439d9ef4"
+    },
+    {
+      "path": "crates/quest-language/src/ssa/verify.rs",
+      "sha256": "9c627cd794d65cb0e3567797e43481188bed50697c32895dae670c1443ba3472"
+    },
+    {
+      "path": "crates/quest-language/src/syntax/lexer.rs",
+      "sha256": "54eb27d8d3b3b59eb2aff71c8701d7a4c9bddaa26925895e0266385defa35234"
+    },
+    {
+      "path": "crates/quest-language/src/syntax/mod.rs",
+      "sha256": "a0fb416c9ea6901382699cd069841a16b52c25214c38d2006816dc51f323e9b5"
+    },
+    {
+      "path": "crates/quest-language/src/syntax/parser.rs",
+      "sha256": "e5057351252593b5eb0ecc793e1c1215b7f3f27e0a321843735eaf1b16db6ca4"
+    },
+    {
+      "path": "crates/quest-language/src/vm/mod.rs",
+      "sha256": "718ad5f15c0073e0b683317dd6133e64fbaa90ecd9fd5107af0799d2c212b192"
+    },
+    {
+      "path": "crates/quest-language/src/vm/prepared.rs",
+      "sha256": "c97a1e9050a0248c2947eabafce77adc9d63b8b558c7e71f07cfc305b7e98447"
+    },
+    {
+      "path": "crates/quest-language/tests/builder_contract.rs",
+      "sha256": "7d2e2a948c0b3659a57960b8574aa3f0321deaa584c78ab377f3e686eb54595d"
+    },
+    {
+      "path": "crates/quest-language/tests/classical_contract.rs",
+      "sha256": "214929e4d00646b4eda8a682c227716b9eb93ec4c95627e26fdd9ca73badbac7"
+    },
+    {
+      "path": "crates/quest-language/tests/contracts.rs",
+      "sha256": "ea74c0d76935aebfc884bdbec34b96f85d3eed63839d3f8e37543a22e09b27bc"
+    },
+    {
+      "path": "crates/quest-language/tests/edit_contract.rs",
+      "sha256": "c3e30cb639437dc7aa8e88b056e0cba39dd2a5618b5c5dd146880ae61ce263db"
+    },
+    {
+      "path": "crates/quest-language/tests/quantum_flow.rs",
+      "sha256": "5f30c6b3c0cb8ab73815fe91f92bd4a11e8277b8ae8622f0203ee3ffc0fb99eb"
+    },
+    {
+      "path": "crates/quest-language/tests/ssa_contract.rs",
+      "sha256": "388599fef574f09a1f7e6f737c180ca81f055a96ec032e8c0f22f7822bef23fd"
+    },
+    {
+      "path": "crates/quest-language/tests/syntax_contract.rs",
+      "sha256": "6610ce8a7a03cdb24ddc54421700cd4ffe393a7575e2b3578ac33b0902df9398"
+    },
+    {
+      "path": "crates/quest-language/tests/template_contract.rs",
+      "sha256": "dfc8616d16324b5980ecb82ffd6f4aa5d9b572c2912a9c249fe39ef975df4c1f"
+    },
+    {
+      "path": "crates/quest-language/tests/vm_contract.rs",
+      "sha256": "e4e3e141da2f4f22d72502053f4aa637932a94e27d6423906691daf15c22ed0e"
+    },
+    {
+      "path": "crates/quest-math/Cargo.toml",
+      "sha256": "b7a02a41e1abe606a12c863143c71c68f6a6034e461f5a781778f6088c594384"
+    },
+    {
+      "path": "crates/quest-math/src/approx.rs",
+      "sha256": "c25d4a450eccd916897491932eefc1db677c35b5f5d5a8fac5a8f5d5210f83fe"
+    },
+    {
+      "path": "crates/quest-math/src/controlled.rs",
+      "sha256": "b28b755def61075cd0e1c743b4b9dca45148872654f8c4cfad4912ba17db3a55"
+    },
+    {
+      "path": "crates/quest-math/src/encoding.rs",
+      "sha256": "c180f9019145462249a7178fead8bdccacde133a5c1fe968d2c0e825930efd76"
+    },
+    {
+      "path": "crates/quest-math/src/interval.rs",
+      "sha256": "f635b98765c75563f209ab5ad9090dc3251c5495e04501427f4246a2b2ec46f2"
+    },
+    {
+      "path": "crates/quest-math/src/lib.rs",
+      "sha256": "98d6385c347799c4125b34d51bba7ec285d105086e06125486962ce79e452df4"
+    },
+    {
+      "path": "crates/quest-math/src/matrix.rs",
+      "sha256": "0f19b61e311f97cc00afcda955c848048f57dbac6ee8dd229ff6ea5d6d080b15"
+    },
+    {
+      "path": "crates/quest-math/src/ring.rs",
+      "sha256": "57a0726bfea553ea8125f41055462b2c9aa646e22509ff6595af6b421627b992"
+    },
+    {
+      "path": "crates/quest-math/src/synthesis.rs",
+      "sha256": "6891e14e7724a0a62fd5167284e3335cd75ace26cbb091710912b8c3a35446aa"
+    },
+    {
+      "path": "crates/quest-math/src/types.rs",
+      "sha256": "f5d04e52f18e3c75ac51271645886e0be6eea54c0f61a9f8a664c80b33200e48"
+    },
+    {
+      "path": "crates/quest-math/tests/approximation.rs",
+      "sha256": "a4db74815907b7ab083af07ddda5f906cb09b00439c9b0976dd969fd69891b98"
+    },
+    {
+      "path": "crates/quest-math/tests/controlled.rs",
+      "sha256": "418724eb0fd952b54ffb8b30f528a53c2e8d306ccbb7a186418ce1e4a5f13d5b"
+    },
+    {
+      "path": "crates/quest-math/tests/encoding.rs",
+      "sha256": "ee9fd9892b9d2c018fee20e996582f672c0277703fe9ed588713019f0d4ca433"
+    },
+    {
+      "path": "crates/quest-math/tests/exact.rs",
+      "sha256": "cc18131fac6295eab50dde902e575281577046c84d911a78497aa1f7d72907ce"
+    },
+    {
+      "path": "crates/quest-math/tests/mitm_enclosure.rs",
+      "sha256": "716e764ddd2280f47fbd5e870ae9e5ce4c615426ec5cadc59bec5a910f859140"
+    },
+    {
+      "path": "crates/quest-math/tests/mitm_matrix.rs",
+      "sha256": "6cd9119d7289916621ade951544e1b3d30b5d2e964714f9fda73970e85f99c98"
+    },
+    {
+      "path": "crates/quest-math/tests/oracle.rs",
+      "sha256": "87880a57b44a1a961e280544888843ae764fa3980c5200646e9cc41c8e267ca6"
+    },
+    {
+      "path": "crates/quest-math/tests/ring.rs",
+      "sha256": "818f82d9d80f4150f59867d831833d8540c086ea91c6196cebb2cf6503a98052"
+    },
+    {
+      "path": "crates/quest-math/tests/synthesis_proof.rs",
+      "sha256": "25828d63291deab807767cfd33f5b4ef40960180682460a3c7ae2ddc7b8a0e3b"
+    },
+    {
+      "path": "crates/quest-math/tests/synthesis_ring.rs",
+      "sha256": "398140adedbbc865acecfa3c2188dc78a6008648018dee6fdcc0d3f0558604f8"
+    },
+    {
+      "path": "crates/quest-numerics/Cargo.toml",
+      "sha256": "42b9d4590096733e138d42fb22a332cc96c84432c49dd02683e71a535c84d32b"
+    },
+    {
+      "path": "crates/quest-numerics/src/ad.rs",
+      "sha256": "1eb83fd2183911bd691bf708da98d2d431107ad71a5f6d74948c3517ff7fc977"
+    },
+    {
+      "path": "crates/quest-numerics/src/arithmetic/budget.rs",
+      "sha256": "b89c1e4c79603481ecec955dec47643ff8aed46c0a2cb847a3b4ed208ef0e1c9"
+    },
+    {
+      "path": "crates/quest-numerics/src/arithmetic/interchange.rs",
+      "sha256": "fb91e84cc614f0b80a990cb5213fd15aacc15d5514e3554ea7bb96a0c079e5c3"
+    },
+    {
+      "path": "crates/quest-numerics/src/arithmetic.rs",
+      "sha256": "d46f181a082283b425be2fc14a1e3fb3e9e94771f55c1a59e5bbbbc9dc2258a0"
+    },
+    {
+      "path": "crates/quest-numerics/src/constraint_chart.rs",
+      "sha256": "fc7db7edad6a5f1cd983d3a69a431f3146fae33e04c3a8cca1c9bb65833606ae"
+    },
+    {
+      "path": "crates/quest-numerics/src/fft/shared.rs",
+      "sha256": "f5029c5e904af6bf65bc881bb70d959bc29fbff10a05d9fc00065e734b7038e4"
+    },
+    {
+      "path": "crates/quest-numerics/src/fft.rs",
+      "sha256": "6d6aa39f9ed5983cda95354008a91ab54eb850666f5e6dea9127c11322556acc"
+    },
+    {
+      "path": "crates/quest-numerics/src/interval.rs",
+      "sha256": "ff2f763f2eef0e0c47f0e8707b42448d305164e771c9a38d65faa3cb5667f042"
+    },
+    {
+      "path": "crates/quest-numerics/src/lib.rs",
+      "sha256": "adfd8b36f55fcc971e81ed73ceaac4939a7970bb8a9fdf033f44fa8d14d90d83"
+    },
+    {
+      "path": "crates/quest-numerics/src/observer.rs",
+      "sha256": "676fc428c240211dddae1721454415c324afc242b337608b7cbae8fee888cd03"
+    },
+    {
+      "path": "crates/quest-numerics/src/policy.rs",
+      "sha256": "3eaff8574ea41d3646a4377593a3b91b64b4253313accbf62bac697e8070c7ae"
+    },
+    {
+      "path": "crates/quest-numerics/src/roots.rs",
+      "sha256": "84da900d5ce963f24f0513f55d1c591390f1e8d2a8a80bb0bfba4ee9a6b2dfed"
+    },
+    {
+      "path": "crates/quest-numerics/src/shapes.rs",
+      "sha256": "cb8fcce804c97dc36ee15fee49f3bdfbe33cdfb93250d509889d40a92db110cf"
+    },
+    {
+      "path": "crates/quest-numerics/src/sparse.rs",
+      "sha256": "cdd1a6679fb2f314343b20bd5caa3cd1fa65ba703f9a6c81b857b0d42fab0bdc"
+    },
+    {
+      "path": "crates/quest-numerics/src/sparse_stream.rs",
+      "sha256": "f60a51daf44b6340ebf8d9989762e7b3484e6a4219bf5e603ef26c7fc40ac088"
+    },
+    {
+      "path": "crates/quest-numerics/tests/arithmetic.rs",
+      "sha256": "2bdafd9030b710c53c61874e0d37f2a3979eea877a5500929e6951a590898444"
+    },
+    {
+      "path": "crates/quest-numerics/tests/constraint_whitening.rs",
+      "sha256": "c8421254f438523f578a6f6a84a8ece38de469c594a76d6f14114facaa2818ad"
+    },
+    {
+      "path": "crates/quest-numerics/tests/exact_oracle.rs",
+      "sha256": "fda9e74f36b497e381d5ff9305d3fd9e780567988099761dadf4e1fb29566f42"
+    },
+    {
+      "path": "crates/quest-numerics/tests/kernels.rs",
+      "sha256": "29cc79cab4a112d1765260e25b56b0db8a313a697121ee6dd7dc7cc24f0abb6f"
+    },
+    {
+      "path": "crates/quest-numerics/tests/observer.rs",
+      "sha256": "85ba00591412abb4df57b3a61b7dd0ddcb4456d821655cb88f14ba404cd95e43"
+    },
+    {
+      "path": "crates/quest-numerics/tests/root_allocations.rs",
+      "sha256": "78cda91cc11c8f028905a442388c76f993b0a00bf82faeb99743137b196270e0"
+    },
+    {
+      "path": "crates/quest-numerics/tests/roots_generic.rs",
+      "sha256": "90ebf36491f22630bb46da292796038625c924150929bcab7b8d0050d4f278ca"
+    },
+    {
+      "path": "crates/quest-numerics/tests/shared_convolution.rs",
+      "sha256": "cc66acde378376d4c37cfcb8b60ac2799cca33c5ac88d703d15b5726747fab53"
+    },
+    {
+      "path": "crates/quest-numerics/tests/sparse.rs",
+      "sha256": "b3e00ed294f2fd9281c0ccd8e3bde6f1e7d59730bf7ef14eb661a2bd3fed2208"
+    },
+    {
+      "path": "crates/quest-numerics/tests/sparse_stream.rs",
+      "sha256": "836181db727172d2764eeb1648cdf00a54e1fca06b6a5cf90f177561f22df499"
+    },
+    {
+      "path": "crates/quest-numerics/tests/warm_parallel.rs",
+      "sha256": "fe284e7ffa519b9bd2e89cc9419d1dfa72eae1f7e35b2f3e8be4d7875b752c8e"
+    },
+    {
+      "path": "crates/quest-polynomial/Cargo.toml",
+      "sha256": "6d0709d0e00f52bc0b5e4ee18532ca5095d9022d3e6f1a9aa3407b605c80ee2e"
+    },
+    {
+      "path": "crates/quest-polynomial/examples/function.rs",
+      "sha256": "19db8b4428d1d60c56ff2918c1d18b27ba844d6da09cba5283cb5476d8a3f6d9"
+    },
+    {
+      "path": "crates/quest-polynomial/examples/support/function_measurement.rs",
+      "sha256": "3929b5870ba9455925c19d81bea68bfdda22e21de5f9b1f189940a8c2a81be04"
+    },
+    {
+      "path": "crates/quest-polynomial/src/analysis.rs",
+      "sha256": "823700a49813596cbb62420631cd50787df7e5e45c811bd23da128ef18aa985a"
+    },
+    {
+      "path": "crates/quest-polynomial/src/basis.rs",
+      "sha256": "f143aff5f61b236a356d749d46bfc4148516e0569e43d5fcf61352cca8dff8cb"
+    },
+    {
+      "path": "crates/quest-polynomial/src/exact_target.rs",
+      "sha256": "3c6609f399bb6ace07e4edfbd8c541cf08a427b0f8b1c3b1082726acc6717a67"
+    },
+    {
+      "path": "crates/quest-polynomial/src/function.rs",
+      "sha256": "072f3ce37c3341b8bfe41038867b74c592a37fc08352c8f06c9c524dd2720390"
+    },
+    {
+      "path": "crates/quest-polynomial/src/lib.rs",
+      "sha256": "500b2633789634cd721b14434e9ff85c01fa79c6d2d6fb6a96a0798a8f2ac67e"
+    },
+    {
+      "path": "crates/quest-polynomial/src/norm.rs",
+      "sha256": "8d96ca72cde5b6f5405d370f289ef153c87a2aca134b747d8276c6586ece1039"
+    },
+    {
+      "path": "crates/quest-polynomial/src/polynomial.rs",
+      "sha256": "65d8b78b083efee1e68f418a89b437ba7dfd5a42836b8dd97b4805776444e560"
+    },
+    {
+      "path": "crates/quest-polynomial/src/remez/exchange.rs",
+      "sha256": "0989d57759feb1dba2c58a0c8daf3aaa3bea118ba7d34d1475e63450d52786f7"
+    },
+    {
+      "path": "crates/quest-polynomial/src/remez/linear.rs",
+      "sha256": "7b97a138fb1ec90730742d447bcf9c57481356a6901c74d0c52e7dbd5d2d4b63"
+    },
+    {
+      "path": "crates/quest-polynomial/src/remez/proof.rs",
+      "sha256": "c2153f4bf81a51ef1b2205b1542355fd19b56b32176250cdad53266da592b561"
+    },
+    {
+      "path": "crates/quest-polynomial/src/remez.rs",
+      "sha256": "ebf2387d3c2a3940e8db0ec1aef9bd4e65ee3f8a8358edfeb8d6d48e42618e16"
+    },
+    {
+      "path": "crates/quest-polynomial/src/typed.rs",
+      "sha256": "5c7ae9493867a24acb00c80b248003c203f8663e958910c188984f19d32600d9"
+    },
+    {
+      "path": "crates/quest-polynomial/tests/analysis.rs",
+      "sha256": "4820313a092b3d08f0f46072ca01524a440f847408672d25423c4ff92af67133"
+    },
+    {
+      "path": "crates/quest-polynomial/tests/bases.rs",
+      "sha256": "0416f0ea8c96b560396d3a7e5ee3bff5259f100524f75d05d98c687ae91dd01e"
+    },
+    {
+      "path": "crates/quest-polynomial/tests/export_admission.rs",
+      "sha256": "a2fa51b322b537f14cfb56707454eb9e79f5c28edea0f03e4cc9e978cfd296e7"
+    },
+    {
+      "path": "crates/quest-polynomial/tests/functions.rs",
+      "sha256": "22b8bffe2dfe289b3c7d10d2b664eddbfd66d59c725ef804e5f3be64f81accaf"
+    },
+    {
+      "path": "crates/quest-polynomial/tests/generic_storage.rs",
+      "sha256": "e4c0f75a7874b4e9563f994cd03dcf18bdd55f82f4db2d656ac53260c822894a"
+    },
+    {
+      "path": "crates/quest-polynomial/tests/linear_kernels.rs",
+      "sha256": "4b78f9b914576e90c045466acee96a54b29fccfcfac0f33c3eb295e1d3e49e90"
+    },
+    {
+      "path": "crates/quest-polynomial/tests/norms.rs",
+      "sha256": "4d61417bd5a3cb29d152bed395591993b0cd085713c310790a80397f4d4f454b"
+    },
+    {
+      "path": "crates/quest-polynomial/tests/remez_static.rs",
+      "sha256": "94cb20c7b12be6ae2e81fac3eeb43be3fd77d7a48bda4170895e99f3dd2d2f08"
+    },
+    {
+      "path": "crates/quest-polynomial/tests/static_core.rs",
+      "sha256": "49d2335c247a3c00f3a7838c14250be3af930354f93ce66bd6259764e5b11b3a"
+    },
+    {
+      "path": "crates/quest-polynomial/tests/warm_evaluation.rs",
+      "sha256": "1488adcbb74cab649bd66dd679fd10466ae0c26f19e86822e2f4c45a13767313"
+    },
+    {
+      "path": "crates/quest-qasm/Cargo.toml",
+      "sha256": "1c870883e496ac66b33433cfe037b78046443c54abefb254a1160bafa2af5a84"
+    },
+    {
+      "path": "crates/quest-qasm/src/admit.rs",
+      "sha256": "16585c0406f898bf01d68e1d44983d02db045faef3a33461490b3204853f492c"
+    },
+    {
+      "path": "crates/quest-qasm/src/export.rs",
+      "sha256": "178c2941fc0b8de659f68918127fdca4387a613d5d61bafa16d699f63e30e888"
+    },
+    {
+      "path": "crates/quest-qasm/src/lib.rs",
+      "sha256": "33b489123f9cc5702a6c46013bffce023cf50c11b32e67a8ad65c3c7f46a5d72"
+    },
+    {
+      "path": "crates/quest-qasm/src/registry.rs",
+      "sha256": "1ee147502563effac3ae47a850f93d423e6e6859672af0bfcf2e4bee66e12d8a"
+    },
+    {
+      "path": "crates/quest-qasm/src/resolve.rs",
+      "sha256": "ef173f3e38d64346406172057f22f8c7a5b8b0339f0dc9d8c289e47034859373"
+    },
+    {
+      "path": "crates/quest-qasm/src/stdlib.rs",
+      "sha256": "2e5c64d36cd21779b01cba448692c6572f0ddd39e4d4d4876988b661043ca440"
+    },
+    {
+      "path": "crates/quest-qasm/tests/admission.rs",
+      "sha256": "249297045ec5c94966325aa4eda1bf27e53536c8e581d64c94069bdb43a416c6"
+    },
+    {
+      "path": "crates/quest-qasm/tests/includes.rs",
+      "sha256": "4760dec6d1004e3194e402d79dc4fd8fed1893f7558b1f6a0b1ce1b1869bcec5"
+    },
+    {
+      "path": "crates/quest-qasm/tests/roundtrip.rs",
+      "sha256": "49dd993ccaf561b3935db32e1dc85cdec128a46c5907b5545abe65d9d7d4f44c"
+    },
+    {
+      "path": "crates/quest-qasm/tests/stdlib.rs",
+      "sha256": "e3e6929c305f29b8cc528b5ca09d9b84e73c9a507dd9eceab162939280099230"
+    },
+    {
+      "path": "crates/quest-qasm/tests/support/mod.rs",
+      "sha256": "83ffe8600afcda09239c2f244d543f8de7699d040becd0bd3f5a4bf08d46bc3d"
+    },
+    {
+      "path": "crates/quest-qsp/Cargo.toml",
+      "sha256": "4b5ee7d71cb5582ba38bf812c4d272a5dd1600cf13051f15f6275d60f1eaacc9"
+    },
+    {
+      "path": "crates/quest-qsp/benches/pipeline.rs",
+      "sha256": "ddc7ee0334cf2f8006c7eb8b259a1f9206221f8400e3ad1994be97e1b71cd95a"
+    },
+    {
+      "path": "crates/quest-qsp/examples/compare_cpp_branches.rs",
+      "sha256": "c2f59bef0bc899b08bdca4f5cc4efbbf6618fa333355c8e8a45851853166e279"
+    },
+    {
+      "path": "crates/quest-qsp/examples/qsp_tutorials.rs",
+      "sha256": "b9f9adf4bada83821623c000c2348146cfa8becd055616d38e20b5d10894b0a2"
+    },
+    {
+      "path": "crates/quest-qsp/src/admission.rs",
+      "sha256": "aaaeda16791ac215ba6b8fc9698182214c8151c5cd2248fedf2ae4c2b578177f"
+    },
+    {
+      "path": "crates/quest-qsp/src/artifact/json.rs",
+      "sha256": "688c36b766bd9e3ccb541c071aa815e9bf7102c12cc5e778fa2634b56f34345a"
+    },
+    {
+      "path": "crates/quest-qsp/src/artifact.rs",
+      "sha256": "1059f1ef8772948661860abfd9ea063f60dd5d4ab756eb93a2edda6d5427fc12"
+    },
+    {
+      "path": "crates/quest-qsp/src/certification/interval.rs",
+      "sha256": "fc74c04d8f4cd7dd6d269d96c55811fce018185185863a360eb5db85a7e5b884"
+    },
+    {
+      "path": "crates/quest-qsp/src/certification/mod.rs",
+      "sha256": "34f4518ebc18c151d00ee61d535ccb8fa8f7044ba0c12ba4bb9779b1189c0363"
+    },
+    {
+      "path": "crates/quest-qsp/src/certification/product.rs",
+      "sha256": "d4d07ad01f7fa32736b034f51320d672f66341c078dda5f7879da44cd39dcec0"
+    },
+    {
+      "path": "crates/quest-qsp/src/certification/projector.rs",
+      "sha256": "a6778ac1b82da2b5d9f20a48475514a5a006ba50a96cd633fc0e78d82eac9e1f"
+    },
+    {
+      "path": "crates/quest-qsp/src/certification/tests.rs",
+      "sha256": "2826383d98342a94977382dabe20dce839fc3bfd56d1168073c635279380f090"
+    },
+    {
+      "path": "crates/quest-qsp/src/kernel.rs",
+      "sha256": "af819cde45d85d842f37ade2b9172a20942851c748b57133cc1cb161d2c8ba32"
+    },
+    {
+      "path": "crates/quest-qsp/src/lib.rs",
+      "sha256": "4c55f0ae9f7d2eaaad09a187146bfd452adc9098f871c46915fb1407029dbed2"
+    },
+    {
+      "path": "crates/quest-qsp/src/offline/fft.rs",
+      "sha256": "8c944d2c576ffab7194410e2622cbdd49b0d28b2755d2e190d3e486c5041a457"
+    },
+    {
+      "path": "crates/quest-qsp/src/offline/kernels.rs",
+      "sha256": "fd0bccaa84732d4c53b7f60c7839efb9dd5c9700e6f5014ec5c3f519c49484d7"
+    },
+    {
+      "path": "crates/quest-qsp/src/offline/mod.rs",
+      "sha256": "786e4c1d2ce81770272425efaf8e2c353e40ef9dc27c0d0a186fc5b941c79695"
+    },
+    {
+      "path": "crates/quest-qsp/src/offline/number.rs",
+      "sha256": "4d2e0d17da1945fa2734e36673a78cf21f5066d6b3611385044b1e39fceacb7a"
+    },
+    {
+      "path": "crates/quest-qsp/src/precision.rs",
+      "sha256": "e25db8797cb4bf6be5b7e2b72c4be34499b6a989e88a6ffe077b78fe4212dc16"
+    },
+    {
+      "path": "crates/quest-qsp/src/sequence.rs",
+      "sha256": "05ab18fa8c15442d8ed8561ebba57ada8ffb56c1ea2fb23fbe4345fb6ade696e"
+    },
+    {
+      "path": "crates/quest-qsp/src/stages.rs",
+      "sha256": "25fc1d4d0550f550a831b302865a5fe6b6cb956e81c3bf4109a832a1de84265b"
+    },
+    {
+      "path": "crates/quest-qsp/tests/artifact.rs",
+      "sha256": "211fa3b1fef7defa9a6530528f8022feef29a14f1286224b772118f9adcaf3c1"
+    },
+    {
+      "path": "crates/quest-qsp/tests/certification.rs",
+      "sha256": "b63dfc96fdd0329d0b91721250cace44b76ec354dc82de33f0fc9f9c386f2e5a"
+    },
+    {
+      "path": "crates/quest-qsp/tests/completion_outer.rs",
+      "sha256": "c4a5a350001dabb50ea8a5d833146f49f88c465ab15a7732d1671f97ca2eb013"
+    },
+    {
+      "path": "crates/quest-qsp/tests/default_algorithm.rs",
+      "sha256": "5d4dc24f9bf1251d23971ae1d8145b9b4d4854a8d16fc18e1d60043113dca10d"
+    },
+    {
+      "path": "crates/quest-qsp/tests/float_conversion.rs",
+      "sha256": "bd192f04f946d402929b1b02c7563c137b8d55315902009ea71b00552e2093e6"
+    },
+    {
+      "path": "crates/quest-qsp/tests/imported.rs",
+      "sha256": "6f72a2c2a33ef5a9503dc34dbb74ba8dc43c1b4660f8d2f395fba0156a06deb8"
+    },
+    {
+      "path": "crates/quest-qsp/tests/mathcore_target.rs",
+      "sha256": "f39ffadfd8aaf18fc47d35615e6c89ec2134295750b99b83cd4d5ab9b48bec92"
+    },
+    {
+      "path": "crates/quest-qsp/tests/offline.rs",
+      "sha256": "7a9a86ed935555e0f6895e5675e1f2985463b733da10a8802728f5cda2c7e150"
+    },
+    {
+      "path": "crates/quest-qsp/tests/offline_retry_policy.rs",
+      "sha256": "1d8fc95eec5ac83390a42d3d84b417e7f1d66e30a53c10985b4ac4732d20c966"
+    },
+    {
+      "path": "crates/quest-qsp/tests/parallel.rs",
+      "sha256": "9a7c317432d3801762a496b08ddbd97ba068e143229a9ebb25dd5bbf9fd93bf6"
+    },
+    {
+      "path": "crates/quest-qsp/tests/phase_conversion.rs",
+      "sha256": "8d51a9afc28f4b593868848b15d3164cdc6a6364a9b95ab4df4f9502231133fe"
+    },
+    {
+      "path": "crates/quest-qsp/tests/precision_boundary.rs",
+      "sha256": "ede18e781e65dbc9172fdbc113f8f49ca60ef0652a6f7abeadc4ebb1444e637b"
+    },
+    {
+      "path": "crates/quest-qsp/tests/production.rs",
+      "sha256": "d7b6e7d26f17d9cc894c6ad2d5bbe7756e3d159557b0809e423513812ba670aa"
+    },
+    {
+      "path": "crates/quest-qsp/tests/projector_certificate.rs",
+      "sha256": "adfb48f6cc18a68e20122cc5f26ea1cbca12bb6acbb77ffc2d74d06860083d1f"
+    },
+    {
+      "path": "crates/quest-qsp/tests/rhw.rs",
+      "sha256": "fa8d0f70df95ba446746c703409b9aa4e06f480764626a43a9a49daa67e85090"
+    },
+    {
+      "path": "crates/quest-qsp/tests/tutorials.rs",
+      "sha256": "e9a10026a3c6054b9306b739b595b5be976607d3a548fe4593e9e1a776bc2152"
+    },
+    {
+      "path": "crates/quest-qsvt/Cargo.toml",
+      "sha256": "1d08791b41785fe182573130e7efc881589d26cab7340fa0998f11f12bbf4fa5"
+    },
+    {
+      "path": "crates/quest-qsvt/examples/portfolio_comparison/support.rs",
+      "sha256": "68f032f896db7aaece00e6019860a1f72a0240c7f999e7f07afcc2f192a4d5b1"
+    },
+    {
+      "path": "crates/quest-qsvt/examples/portfolio_comparison.rs",
+      "sha256": "c0bca0feb41a44bffcfe6acdf733d5ce53d3c300770e5d14b4fa136a6c397a79"
+    },
+    {
+      "path": "crates/quest-qsvt/examples/portfolio_resource_curves/support.rs",
+      "sha256": "b7fcf4405bbc4f2f60db5d7f60be147d127c27d1c6959e089af0b39cb26cec0a"
+    },
+    {
+      "path": "crates/quest-qsvt/examples/portfolio_resource_curves.rs",
+      "sha256": "f1652471232155ebbc9f7874629f262611a56835ef8247108dec6fd247254632"
+    },
+    {
+      "path": "crates/quest-qsvt/src/analysis/diagnostics.rs",
+      "sha256": "f28e3cd75915e8f7c5cbef03825afd5d81965d745c26ae1fb1863b7e69386814"
+    },
+    {
+      "path": "crates/quest-qsvt/src/analysis.rs",
+      "sha256": "b29429dc1bcc665d178627ef80655a36a1ef8ef9241ec50d8403c4aa710fb571"
+    },
+    {
+      "path": "crates/quest-qsvt/src/dense.rs",
+      "sha256": "6a12b161ac0d231d3cfe785b3e00f63a482b9dc19b9e62a26ff218b342099c7f"
+    },
+    {
+      "path": "crates/quest-qsvt/src/encoding.rs",
+      "sha256": "e828c62daa9c3c0eb1adfc8ecfb47ed611b708135db7d189add90ec25f9d3041"
+    },
+    {
+      "path": "crates/quest-qsvt/src/lib.rs",
+      "sha256": "912055b82428648c7e6ba5e037be4c8188b9480bba75438094cdb5383e988f70"
+    },
+    {
+      "path": "crates/quest-qsvt/src/matching.rs",
+      "sha256": "4e9ecb941e1dbbe97dea2255436f0a9393478952618a71724d28a46581bb86e3"
+    },
+    {
+      "path": "crates/quest-qsvt/src/matching_resource.rs",
+      "sha256": "d4b23e14bfce59e6094d638a25c1e74408e235ccc5c921981381ecf843527d69"
+    },
+    {
+      "path": "crates/quest-qsvt/src/matching_shard.rs",
+      "sha256": "418b4192349e5e3f288b46a7d446fdd97d952735f1631cdfc101b0a615d9c209"
+    },
+    {
+      "path": "crates/quest-qsvt/src/materialize.rs",
+      "sha256": "353b6b29fe7c06e9fc744e72d2df3a019f62562a9948a4ef85418062e3ad6493"
+    },
+    {
+      "path": "crates/quest-qsvt/src/matrix.rs",
+      "sha256": "d6d1532f487e4268eb01351e2451595cb89c8eb101954e7762f70bd5dda385df"
+    },
+    {
+      "path": "crates/quest-qsvt/src/owned_replay.rs",
+      "sha256": "73e39978e484f31a143d22387a9011d40a8a718c79fbc25da6df1217efaec662"
+    },
+    {
+      "path": "crates/quest-qsvt/src/pauli.rs",
+      "sha256": "c49916c1e90193e4cf943854eae20f51d3157d69f0b941450715a59e327dec06"
+    },
+    {
+      "path": "crates/quest-qsvt/src/portfolio/composition.rs",
+      "sha256": "61451b3cb8176e821c14db5d23128c2920205a3ffd36040595449559c4604844"
+    },
+    {
+      "path": "crates/quest-qsvt/src/portfolio/lcu_plan.rs",
+      "sha256": "db781ccfc3bc6524086395a20e371df60b36066d38e61a7ac255e51c24e2032a"
+    },
+    {
+      "path": "crates/quest-qsvt/src/portfolio/matching_bounds.rs",
+      "sha256": "4495756c513ed5607ae60445fafa20a6d3064e3ae09e0306af6800b5d26eb720"
+    },
+    {
+      "path": "crates/quest-qsvt/src/portfolio/mod.rs",
+      "sha256": "5b8f4160faf188c862edc2ecc761c05d83b45444bb555183d29efeaaec8a74f3"
+    },
+    {
+      "path": "crates/quest-qsvt/src/portfolio/qrom.rs",
+      "sha256": "7fa229f3e557bab36eda48efa34c2654545d555553cc19fd7dfa6249336d0397"
+    },
+    {
+      "path": "crates/quest-qsvt/src/portfolio/sparse_access.rs",
+      "sha256": "8c0f49f3c4595cbb7cfa9b170142decd0474cb20a2dd0f2c4472693d1b6291b8"
+    },
+    {
+      "path": "crates/quest-qsvt/src/portfolio/structured_maps.rs",
+      "sha256": "09fda5af0a469d30656b8d7c61a51a262f5482c5ea00ff00ded36af71a312d8a"
+    },
+    {
+      "path": "crates/quest-qsvt/src/projection.rs",
+      "sha256": "1f47ee2883fbd246e694fa9ef8e05a5ed139447eb9858b8d3161e8d2eceb1ad7"
+    },
+    {
+      "path": "crates/quest-qsvt/src/reciprocal.rs",
+      "sha256": "276db3b265a7de3ce272c37093b6ccf63fe304e90feaa0b98426a614a5dea538"
+    },
+    {
+      "path": "crates/quest-qsvt/src/replay.rs",
+      "sha256": "68f7311d8d8b9f1ad47b180edd905c161231c18ef620c24e3a9ead972ae7d614"
+    },
+    {
+      "path": "crates/quest-qsvt/src/replay_transform.rs",
+      "sha256": "bb797fb7abff1ff0a08ca2c84603e50412fed3d99a264da20bd6fa0b2e1f57d2"
+    },
+    {
+      "path": "crates/quest-qsvt/src/response.rs",
+      "sha256": "259d1a6539573fcf64519390c83c59e7400e7c812075b8ceed9af116131c06dd"
+    },
+    {
+      "path": "crates/quest-qsvt/src/routes.rs",
+      "sha256": "0d11954c7f90201aa3d0af8fb79e7880461ecbcbeb65bd4f4f98fe15f396238f"
+    },
+    {
+      "path": "crates/quest-qsvt/src/space.rs",
+      "sha256": "3d4485596c67f84d9625e47af1da1bdcd855fea7c6a4f61131a13356e7f688db"
+    },
+    {
+      "path": "crates/quest-qsvt/src/state_preparation.rs",
+      "sha256": "17cde8a01e3e298252f736936699b1ae04affc875f022bb49c23902c19120b4c"
+    },
+    {
+      "path": "crates/quest-qsvt/src/structured.rs",
+      "sha256": "a364afbaa26ef75c00f80538985dfcee0ce9a84b0616b294b7b14140ed40476e"
+    },
+    {
+      "path": "crates/quest-qsvt/src/structured_stencil.rs",
+      "sha256": "3bba1316602f6384ef39c625d38e00e0c96c24b79a28a49d6232502ddcbde020"
+    },
+    {
+      "path": "crates/quest-qsvt/src/transform.rs",
+      "sha256": "343a72d7431b321c11503e44706e50eb053924291a8641c367d1bdd876c3eef3"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/analysis.rs",
+      "sha256": "d6442cf5c5ced703185ada35a5e1ce37776ae66b76c40926d31ff2a848261762"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/compact_spaces.rs",
+      "sha256": "c50a38a6acf8019508452ac005ead90cfc6f74f8f3cc7ccc2de4cadfaad081ab"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/complex_hermitianized.rs",
+      "sha256": "8936861ff6ea0c17d7cfae115d0fb2082f1126705a6a17da9cfdd33fae1ac85f"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/dense_encoding.rs",
+      "sha256": "ecc9ad6015184e8e53877b6ba14146041880ad11cd884a328ca3b9a138006a7b"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/encodings.rs",
+      "sha256": "e7e06655a4f77e1df2ef23a906e82bb9a8128fe8de14fd000066307274228964"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/lcu_plan.rs",
+      "sha256": "544d98d48f8287d0eb8045b495b6fcf9743f998225e7fa490ec3156f7b2161ef"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/matching.rs",
+      "sha256": "4b259c29af753d58866d5bf8570c6b29ef5c4098773c43ab0272f66ffe214feb"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/matching_resource.rs",
+      "sha256": "8dee921fec7c6480482c5457f6a9718c5b4bbc7974cfeff6d4422cb62b70c462"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/matching_shards.rs",
+      "sha256": "30a4be1f672ded455c155e79c9133c7474cfc9d1e18163c750fb8b5a840bd0a4"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/materialization.rs",
+      "sha256": "adf14d64584f42f31886e52f3fc8734a08b9f4666867c996c7b17fcb321ab758"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/mathcore_target.rs",
+      "sha256": "a5aba35f65ae0e6a2c10103c37125476178edfc0f3cb7d75adc5673c67b34172"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/matrix_transforms.rs",
+      "sha256": "522ee3eac234ae1602a9249c29c9dc9c58ae2c7ed30cf2f85d0574e30ec33fb3"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/owned_replay.rs",
+      "sha256": "36ce3c2bc85a501c428f5d86ba6080b67385a9d5ab22a00831461ab0423c4703"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/pauli.rs",
+      "sha256": "4e9def42191fcecaab6c8090cc24e5d5384c98e89cda5a261353e12d55e227be"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/phase_conversion.rs",
+      "sha256": "49b7b3686e852396b890ae8c99ce0b90f2b303e31c2a787943ef1b98a73eb202"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/portfolio_comparison.rs",
+      "sha256": "a2759c1cafdf88f188548317d1a56eefb091ff26b60c95e2a953fcb087bbb45b"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/portfolio_composition.rs",
+      "sha256": "00cffbf69bd5806ee676a1779b1b077900f279a7855ff313f9a9e4469061a28b"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/portfolio_matching.rs",
+      "sha256": "78e2bb67ba713fa3bb97fea5c9013cc7a358effe48e3da5e1cac3c5c9a390dac"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/portfolio_resource_curves.rs",
+      "sha256": "d2a4f83c9fa6be90a365789d1bdf65a9619c3fa648c63ed7f54b148372aabb0c"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/portfolio_review_regressions.rs",
+      "sha256": "01de06ff4cc3d6b98b7c5bd4687081e11603e151bcbc140a89097a5282652fad"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/portfolio_sparse_access.rs",
+      "sha256": "adba543b40f25e1f7977f75499dd6d04cdeb7059f9568173422a517d8f040d91"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/portfolio_structured.rs",
+      "sha256": "5a950337176df0e9edffe1c30b30eeb16d0ded355c2c7fd5d5c0a0cd565cbc64"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/portfolio_support/mod.rs",
+      "sha256": "0de47f808d062dbd838e84ba8771c431daae882385c0a931551f1a980d021f4f"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/reciprocal.rs",
+      "sha256": "f19c854ee3cf65d5f242e2772d64c61e4baa7bee8bb4fcee6b955738e003e0f4"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/reciprocal_review.rs",
+      "sha256": "e01b716f2be2000395923bfd84c6867986e22d50cf9ec6a9f4519296f022a581"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/replay_transform.rs",
+      "sha256": "d64001dc4f45c9dbafaf032a59c3dc5cf4cf35059900440999b33f8da031e6fe"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/route_meaning.rs",
+      "sha256": "b90ea953f6827cae969280f6c82cab89986fa19e527cd37300d0d1b6459de747"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/state_preparation.rs",
+      "sha256": "c34383fd0be7eef45819744c8cecb9001784ed532ee8970ce3f4ca567e1d0055"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/structured.rs",
+      "sha256": "811b8c4865357d0883033335c0bfd5776be7e2769afbafae4baa85cde64c161e"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/structured_stencil.rs",
+      "sha256": "8efc90723d2247af9cd0523d7070258f67dee78e60666c96acc7480536a7b6eb"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/transform_schedule_factories.rs",
+      "sha256": "459c21802df628cdd53221db5a42f1810773141838dd94a0e2cd889f454de465"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/transforms.rs",
+      "sha256": "84b5c11ef309ab479365363f9230a06d893b4ed6a4620390742434006635e55e"
+    },
+    {
+      "path": "crates/quest-symbolic/Cargo.toml",
+      "sha256": "6b7a6747d8565181dbad50c1be533211f6f1c482ca8c0ba04de286b0ff990a4d"
+    },
+    {
+      "path": "crates/quest-symbolic/src/affine/mod.rs",
+      "sha256": "c65c005b1b41a0e8848825b9685f00dcbfbdea4fa1da204bee94e783b03eb17e"
+    },
+    {
+      "path": "crates/quest-symbolic/src/lib.rs",
+      "sha256": "5affde9223bdd21f17ef1024e24a5a7fe68b3b72f49f073894622406e589a181"
+    },
+    {
+      "path": "crates/quest-symbolic/src/source.rs",
+      "sha256": "c940d9ea31d8f4dd41064d7b78d890dec783f3f05be3cb290b7bf2fe199ed459"
+    },
+    {
+      "path": "crates/vendor/mathcore/Cargo.toml",
+      "sha256": "76310366d3ad2f6d840486827b8056fcd04b7b3c43a2d3c7e397200e47138818"
+    },
+    {
+      "path": "crates/vendor/mathcore/src/arithmetic.rs",
+      "sha256": "f602ceb5b329758f2d176d17cd2db5c790c8af09293535ef842e974467eaaf8b"
+    },
+    {
+      "path": "crates/vendor/mathcore/src/dyadic.rs",
+      "sha256": "3bd367d430b05173170d1932bb5bba6802fad525b3f027645e5da104bbc09be0"
+    },
+    {
+      "path": "crates/vendor/mathcore/src/dynamic.rs",
+      "sha256": "e78602fca4d0fd8c93c3e5a9cde531dabbfcae2ab5f80a29785ee2b137761178"
+    },
+    {
+      "path": "crates/vendor/mathcore/src/exact/mod.rs",
+      "sha256": "99f298427eab06a016261b56f3ca8b7680de6a0063e86b8bcee8b881e76ae836"
+    },
+    {
+      "path": "crates/vendor/mathcore/src/exact/tests.rs",
+      "sha256": "fc328cb95940ef1c8e8bc53ad15a619d121efa85d3b1aa940e24af4ac9cbacd4"
+    },
+    {
+      "path": "crates/vendor/mathcore/src/geometry.rs",
+      "sha256": "01032426e3586b55c67e224f20c89542c296d5f6d7878c1b004df79603b81706"
+    },
+    {
+      "path": "crates/vendor/mathcore/src/lib.rs",
+      "sha256": "10e9d9f09b4fcd40485407da8afdf6d977aacb0a06f2b58f4e0a1876a7b51859"
+    },
+    {
+      "path": "crates/vendor/mathcore/src/multivariate.rs",
+      "sha256": "5fac743ca8f72c577100decec86523f3b364bd66e4fc98c476abd56710292c29"
+    },
+    {
+      "path": "crates/vendor/mathcore/src/scalar.rs",
+      "sha256": "bc8494e1ea6e0a10ca80a6ff00226e4f12a5753e5908c876bf6139ac251b2b2f"
+    },
+    {
+      "path": "crates/vendor/mathcore/src/scope.rs",
+      "sha256": "825522214336900fa84d080f4f8bc0957be52dc3eafd6243086089f5d8a4b54c"
+    },
+    {
+      "path": "crates/vendor/mathcore/src/typed.rs",
+      "sha256": "4f832ee17ab2fc829c828940399a3fc49adb50edc1c7666aacebb73883e2d864"
+    },
+    {
+      "path": "crates/vendor/mathcore/tests/consolidation.rs",
+      "sha256": "b9ad5366a817b4d5e768befd3d7edc0e182ec65b077a28634ee6ca319c79fb46"
+    },
+    {
+      "path": "crates/vendor/mathcore/tests/geometry.rs",
+      "sha256": "b06e2151eb11145f3486dc1559049b406d601b3b04e72e1cd257e8cb59da2b01"
+    },
+    {
+      "path": "crates/vendor/mathcore/tests/scope_admission.rs",
+      "sha256": "968ab13c53fd60bd84bcbc6a484d5835093bafa25a953b67720741f1598efc47"
+    },
+    {
+      "path": "rust-toolchain.toml",
+      "sha256": "2fc9033f7ede8305e6496c9d2140f458773627be41ece35f2f383b489e719c83"
+    }
+  ],
+  "runtime": [
+    {
+      "path": "docs/verification/fixtures/quest-cfd/configuration_weak.py",
+      "sha256": "3739bfe519301922d5118f742eaea5740ac846c658296b1664e0176ddaf6311c"
+    },
+    {
+      "path": "docs/verification/fixtures/quest-cfd/campaign.py",
+      "sha256": "eb7b5fbcfa333b4861fedff42f5925147f61d45ae81998237eb5da828fc5a148"
+    },
+    {
+      "path": "docs/verification/fixtures/quest-cfd/test_configuration_weak.py",
+      "sha256": "b16c0b33c561d266e79eba80aeaecf766ecb5e02554a999121715863b8afc177"
+    }
+  ],
+  "binary_sha256": "481156a3201148eaefdbfb59fadb434071c6d53bfc87f02bfcb20ab0e23e2335"
+}

@@ -1,0 +1,47 @@
+{
+  "schema": "quest-portfolio-source-fingerprint-source-v2",
+  "scope": "Five owned implementation files,two focused test files,one method document. Shared record_fingerprint.rs/lib/Cargo and matching/IO changes independently CFD-owned.",
+  "files": [
+    {
+      "path": "crates/quest-qsvt/src/owned_replay.rs",
+      "bytes": 16098,
+      "sha256": "051b55a0c80c5635e75ed32357e61ea4939aa6705e0e05f2330c16c84ea01b97"
+    },
+    {
+      "path": "crates/quest-qsvt/src/portfolio/lcu_plan.rs",
+      "bytes": 13017,
+      "sha256": "b839e3ec150382cca4cca8bdb2a08212a74cc6f504de12efa505c3803d11f937"
+    },
+    {
+      "path": "crates/quest-qsvt/src/portfolio/structured_maps.rs",
+      "bytes": 17925,
+      "sha256": "90e98ee328f8b81d83abadcdedb79a909751b9b0410a81c5ddac9c388fa1bb03"
+    },
+    {
+      "path": "crates/quest-qsvt/src/structured.rs",
+      "bytes": 10857,
+      "sha256": "3239d7395b2889c281dd3c61f4084abce17ee2510e01540969fe1eee5dced3fa"
+    },
+    {
+      "path": "crates/quest-qsvt/src/structured_stencil.rs",
+      "bytes": 12458,
+      "sha256": "7dbeb910edfceec954fd822504d08d0f6e39eea6cc64f3413d3a38567ae54bc6"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/commutative_identities.rs",
+      "bytes": 7992,
+      "sha256": "67d54cb8ed0a511beb7883c7781e44d811333197560837c199610fc7a2e3f31b"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/structured.rs",
+      "bytes": 3393,
+      "sha256": "7d15f1a46bb4c106c4776681d21d4768bcb5c74d7ef072523632e4d8818990e3"
+    },
+    {
+      "path": "docs/research/portfolio-source-fingerprints.md",
+      "bytes": 3407,
+      "sha256": "1880e596265b39a071f36b3b1075dff647060719631dc0a720f2a3ea594a1159"
+    }
+  ],
+  "path_raw_digest_aggregate_sha256": "2e9a6d9343ca15fa68d8745fe8e297f22c35bab0d2e1940126f9ec738d86726d"
+}

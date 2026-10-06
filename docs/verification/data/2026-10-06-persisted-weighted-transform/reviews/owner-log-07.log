@@ -1,0 +1,7 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.00s
+     Running `target/debug/quest-consumer-json-review`
+raw=6598 freeze=334658 payload=522893 stages=71654 row=595583 actual_buffer=131072 simultaneous=1321202 io_guard=1048576
+
+thread 'main' (3) panicked at src/main.rs:123:398:
+accepted JSON owners exceed declared I/O envelope
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

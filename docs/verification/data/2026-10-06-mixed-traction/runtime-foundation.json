@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "date_utc": "2026-10-06",
+  "command": "cargo test -p quest-cfd --test mixed_physical_mesh --test mixed_physical_boundary --test physical_boundary",
+  "environment": {
+    "QUEST_ROOT": "/path/to/matching/quest",
+    "MPICC": "/path/to/matching/mpicc"
+  },
+  "exit_code": 0,
+  "elapsed_seconds": 2.166864879996865,
+  "source_manifest_sha256": "f78a83806015929e453b149b0eb621e518b70d273ed3df01ca78f7f8677d54b7",
+  "source_files": [
+    {
+      "path": "crates/quest-cfd/src/physical_space.rs",
+      "sha256": "821968393a65bc869cd811de40a6ef6747a4df2eca23c8450b85c292cbefebbc"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/mixed_mesh.rs",
+      "sha256": "5d9a0d836eda2717cd78a1c2919ffab45673f211acfe3505ffae01c02db08b5b"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/mesh.rs",
+      "sha256": "469d7619e59e5b83bba5f516b6608527eada2f9bf62be4df18e8bced815e3e0f"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/mesh_geometry.rs",
+      "sha256": "4b63cc9de148dba2a7a1eafe64018dfe6f65312c75072e55bbfa9a511401252e"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/mesh_topology.rs",
+      "sha256": "e9dc83d29815ad2fdaa9531dd39869d9326eac4f4d4b7cb8d4b49d6ed8319091"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/operators.rs",
+      "sha256": "ac730d188dd7223f1c9c8efeac74e19449bd6332883873865b9a0f62dc0fcc96"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/pressure.rs",
+      "sha256": "36086cf5873424227b30b69edc4d8d8134a05bb7478747630b0e43eb4a993ea7"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/boundary.rs",
+      "sha256": "1e31ab0945a33a1245de4aa89f21d4f0e58fa8d0fd367c8f8554b5b2e24cc9d3"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/constraint_qr.rs",
+      "sha256": "81221bfb507fe5c7db5fd678f23ad59d3359006da10f923f4fc60e7a38abd2e7"
+    },
+    {
+      "path": "crates/quest-cfd/src/physical_space/affine_lifting.rs",
+      "sha256": "ba4417e1f88d28f9bd7c2888f0870d47ab3b6789cc0ac035ecac78a91037dd84"
+    },
+    {
+      "path": "crates/quest-cfd/tests/mixed_physical_mesh.rs",
+      "sha256": "373ebde162f8a5ca8f798679402370f6fbd5bc7e57b4fe24a08dc0f60412f1fd"
+    },
+    {
+      "path": "crates/quest-cfd/tests/mixed_physical_boundary.rs",
+      "sha256": "00cc8cd7a32d28735f6d9a64536f5bca30bc1d9485c7e010450bdbedfa13cf54"
+    }
+  ],
+  "source_unchanged": true,
+  "log_sha256": "740d97417392ed7d4b0349cd9eb20121d867b51b10fd4c27f3bcd42f84a15f2f",
+  "scope": "focused mixed-traction foundation; not workspace, convergence, or quantum execution acceptance",
+  "tests": {
+    "passed": 17,
+    "failed": 0,
+    "ignored": 0,
+    "targets": {
+      "mixed_physical_boundary": 7,
+      "mixed_physical_mesh": 5,
+      "physical_boundary": 5
+    }
+  },
+  "log": "runtime-foundation.log",
+  "limitations": [
+    "Not a full-workspace verification",
+    "No OS process-memory cap imposed",
+    "No physical refinement or benchmark acceptance",
+    "No distributed mixed-mesh or quantum execution claim",
+    "Recorded source snapshot may differ from later consumer extensions"
+  ]
+}

@@ -11,7 +11,13 @@ use std::{collections::BTreeSet, ops::Range};
 mod batched;
 #[cfg(all(feature = "mpi", quest_native_mpi))]
 pub mod collective;
+mod cost;
 mod local_batch;
+#[cfg(all(feature = "mpi", quest_native_mpi))]
+mod staging;
+pub use cost::MatchingExecutionCost;
+#[cfg(all(feature = "mpi", quest_native_mpi))]
+pub mod preprocess;
 
 pub(super) struct MatchingLayout {
 	pub(super) count: QubitCount,
@@ -150,22 +156,6 @@ pub(super) fn read_local(
 	.context("reading matching local amplitude")?;
 	Ok(quest_qsvt::Complex64::new(value[0].re, value[0].im))
 }
-#[cfg(all(feature = "mpi", quest_native_mpi))]
-pub(super) fn write_local(
-	register: &mut Register<'_, StateVector>,
-	index: usize,
-	value: quest_qsvt::Complex64,
-) -> crate::Result<()> {
-	quest_sys::write_local_qureg_amps(
-		register.pin(),
-		i64::try_from(index).map_err(|_| crate::Error::Overflow)?,
-		&[quest_sys::QuestComplex {
-			re: value.re,
-			im: value.im,
-		}],
-	)
-	.context("writing matching local amplitude")
-}
 pub(super) fn reserve_descriptor<'env>(
 	resources: &'env RuntimeResources,
 	shard: &MatchingShard,
@@ -208,8 +198,8 @@ pub struct PreparedMatching<'env> {
 	scratch: Register<'env, StateVector>,
 	layout: MatchingLayout,
 	shard: MatchingShard,
-	_reservation: Reservation<'env>,
-	_workspace_reservation: Reservation<'env>,
+	reservation: Reservation<'env>,
+	workspace_reservation: Reservation<'env>,
 	workspace: local_batch::Workspace,
 }
 impl Environment {
@@ -236,20 +226,31 @@ impl Environment {
 		let layout = MatchingLayout::new(shard.header(), count, targets)?;
 		validate_single(&shard)?;
 		let reservation = reserve_descriptor(&self.resources, &shard, &layout)?;
-		let workspace_reservation = self.resources.reserve(local_batch::Workspace::bytes())?;
+		let mut workspacereservation = self.resources.reserve(
+			local_batch::Workspace::bytes()
+				.checked_add(size_of::<local_batch::Workspace>())
+				.ok_or(crate::Error::Overflow)?,
+		)?;
 		let workspace = local_batch::Workspace::new()?;
+		workspacereservation.resize(workspace.retained_bytes()?)?;
 		let scratch = self.resources.state_vector(count)?;
 		Ok(PreparedMatching {
 			scratch,
 			layout,
 			shard,
-			_reservation: reservation,
-			_workspace_reservation: workspace_reservation,
+			reservation,
+			workspace_reservation: workspacereservation,
 			workspace,
 		})
 	}
 }
 impl PreparedMatching<'_> {
+	pub(crate) const fn resources(&self) -> &RuntimeResources {
+		self.scratch.resources()
+	}
+	pub(crate) const fn native_accounted_bytes(&self) -> usize {
+		self.scratch.accounted_bytes()
+	}
 	#[must_use]
 	pub fn targets(&self) -> &[usize] {
 		&self.layout.targets
@@ -262,6 +263,59 @@ impl PreparedMatching<'_> {
 	pub const fn shard(&self) -> &MatchingShard {
 		&self.shard
 	}
+	/// Modeled native allocation plus actual sparse/target/workspace capacities charged to the owner.
+	/// # Errors
+	/// Rejects retained-byte overflow.
+	pub fn retained_bytes(&self) -> Result<usize> {
+		self.scratch
+			.accounted_bytes()
+			.checked_add(self.reservation.bytes())
+			.and_then(|n| n.checked_add(self.workspace_reservation.bytes()))
+			.ok_or(crate::Error::Overflow)
+			.map_err(Into::into)
+	}
+	fn admit_entry(
+		&self,
+		register: &Register<'_, StateVector>,
+		outer_mask: usize,
+		outer_value: usize,
+	) -> crate::Result<(Vec<i32>, Vec<i32>)> {
+		if self.layout.header.color_qubits > 0
+			&& register.deployment().is_distributed()
+			&& register.deployment().local_amplitudes() < 2
+		{
+			return Err(crate::Error::Unsupported(
+				"matching color Hadamards require two local amplitudes",
+			));
+		}
+		if !std::ptr::eq(register.resources(), self.scratch.resources())
+			|| register.num_qubits() != self.layout.count
+		{
+			return Err(crate::Error::Value("matching register owner or width"));
+		}
+		self.layout.controls(outer_mask, outer_value)
+	}
+	/// Nonmutating complete owner/layout admission and checked execution ceilings.
+	/// Both directions have the same resource ceiling. Native failure during later apply may change state.
+	/// # Errors
+	/// Rejects mismatched register/controls or execution count overflow before mutation.
+	pub fn admit_apply(
+		&self,
+		register: &Register<'_, StateVector>,
+		_adjoint: bool,
+		outer_mask: usize,
+		outer_value: usize,
+	) -> Result<MatchingExecutionCost> {
+		self.admit_entry(register, outer_mask, outer_value)?;
+		Ok(MatchingExecutionCost::admit(
+			self.layout.count.dimension(),
+			1,
+			self.layout.flag()?,
+			self.layout.count.get(),
+			self.layout.header.color_qubits,
+			self.layout.header.record_count,
+		)?)
+	}
 	/// Apply U or U† to an arbitrary whole state, coherently controlled on outer
 	/// physical bits. Outer controls must be disjoint from all active targets.
 	/// # Errors
@@ -273,12 +327,7 @@ impl PreparedMatching<'_> {
 		outer_mask: usize,
 		outer_value: usize,
 	) -> Result<()> {
-		if !std::ptr::eq(register.resources(), self.scratch.resources())
-			|| register.num_qubits() != self.layout.count
-		{
-			return Err(crate::Error::Value("matching register owner or width").into());
-		}
-		let (positions, outcomes) = self.layout.controls(outer_mask, outer_value)?;
+		let (positions, outcomes) = self.admit_entry(register, outer_mask, outer_value)?;
 		self.layout.hadamards(register, &positions, &outcomes)?;
 		quest_sys::set_qureg_to_clone(self.scratch.pin(), &register.native)
 			.context("staging matching permutation")?;

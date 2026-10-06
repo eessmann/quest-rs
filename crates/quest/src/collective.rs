@@ -49,11 +49,15 @@
 //! ```
 use crate::{
 	Complex64, EnvironmentView, Error, Executable, MemoryBudget, Outcome, Probability, Program,
-	QubitCount, Register, Result, RunOutput, StateVector, environment::RuntimeResources,
-	error::BackendResult, values::reserve_vec,
+	QubitCount, Register, Result, RunOutput, StateVector,
+	environment::{Reservation, RuntimeResources},
+	error::BackendResult,
+	values::reserve_vec,
 };
 use quest_sys::mpi::{MpiCollectiveLane, MpiQuestEnvironment, MpiQuestEnvironmentBuilder};
-pub use quest_sys::mpi::{MpiCommunicator, MpiMessageStatus, MpiRuntime, MpiThreadView};
+pub use quest_sys::mpi::{
+	MpiCommunicator, MpiMessageStatus, MpiRuntime, MpiThreadView, SharedMemoryTopology, abort_job,
+};
 use std::cell::Cell;
 
 /// Builder carrying an admitted power-of-two communicator and threading support.
@@ -96,6 +100,25 @@ impl<'comm, 'runtime> CollectiveEnvironmentBuilder<'comm, 'runtime> {
 	}
 }
 
+/// Opaque accounting lease for caller-owned application storage.
+///
+/// This guard borrows its environment and releases its local charge on drop.
+/// It does not allocate caller storage, inspect it or enforce an allocator quota.
+/// Keep it alive for the complete external owner's retained lifetime; native
+/// rank/node admission includes the charge in already allocated application bytes.
+#[must_use = "Dropping this guard releases the external storage accounting charge"]
+pub struct CollectiveReservation<'env> {
+	_reservation: Reservation<'env>,
+	bytes: usize,
+}
+impl CollectiveReservation<'_> {
+	/// The admitted local byte declaration, excluding allocator bookkeeping.
+	#[must_use]
+	pub const fn bytes(&self) -> usize {
+		self.bytes
+	}
+}
+
 /// Unique collective runtime owner. Its borrowed resources must drop first.
 ///
 /// This owner exposes coherent state-vector execution only. Structured SSA,
@@ -128,6 +151,32 @@ impl<'comm, 'runtime> CollectiveEnvironment<'comm, 'runtime> {
 		EnvironmentView {
 			resources: &self.resources,
 		}
+	}
+	/// Borrow the communicator retained by this environment. The borrow cannot
+	/// outlive the environment's communicator/runtime owners. Caller collectives
+	/// and environment operations must execute in the same order on every rank;
+	/// release any collective lane before entering an environment operation.
+	#[must_use]
+	pub const fn communicator(&self) -> &'comm MpiCommunicator<'runtime> {
+		self.communicator
+	}
+	/// Charge externally owned application storage while its owner is retained.
+	///
+	/// Every rank calls in the same collective order. Local byte declarations
+	/// may legitimately differ; any local overflow/budget failure rejects all
+	/// ranks and releases successful peer charges. This accounts declared bytes
+	/// against the environment budget; it does not allocate or inspect storage.
+	/// Node placement/capacity remains the consuming operation's admission duty.
+	/// # Errors
+	/// Rejects collective operation mismatch, local budget overflow or MPI failure.
+	pub fn reserve_external_bytes(&self, local_bytes: usize) -> Result<CollectiveReservation<'_>> {
+		let id = self.identifier();
+		let mut lane = self.begin(0x4558_5442, id, 0, 0)?;
+		let reservation = agree_result(&mut lane, self.resources.reserve(local_bytes))?;
+		Ok(CollectiveReservation {
+			_reservation: reservation,
+			bytes: local_bytes,
+		})
 	}
 	#[must_use]
 	pub fn messages(&self) -> MpiThreadView<'_> {
@@ -418,6 +467,13 @@ impl CollectiveRegister<'_, '_, '_> {
 	pub const fn environment(&self) -> EnvironmentView<'_> {
 		self.environment.view()
 	}
+	/// Borrow the collective owner without extending its communicator/runtime
+	/// lifetime. Collective operations must retain the same ordering on all ranks;
+	/// callers must release communicator lanes before native register operations.
+	#[must_use]
+	pub const fn collective_environment(&self) -> &CollectiveEnvironment<'_, '_> {
+		self.environment
+	}
 	#[must_use]
 	pub const fn num_qubits(&self) -> QubitCount {
 		self.inner.num_qubits()
@@ -436,8 +492,11 @@ impl CollectiveRegister<'_, '_, '_> {
 		fatal(|| self.inner.init_plus());
 		Ok(())
 	}
-	/// Initialize from amplitudes supplied only by `root`. Host broadcast storage
-	/// is bounded by every rank's budget and released after initialization.
+	/// Initialize from amplitudes supplied only by `root`.
+	///
+	/// Three complete-state host buffers coexist on every rank: broadcast bytes,
+	/// Rust bridge values, and the C++ complex conversion. Their common reservation
+	/// is bounded by every rank's budget and released after native initialization.
 	/// # Errors
 	/// Rejects an invalid root, non-root input, bad length, nonfinite values, or any rank's budget failure.
 	pub fn init_pure_from_root(
@@ -472,7 +531,7 @@ impl CollectiveRegister<'_, '_, '_> {
 			let storage = self
 				.environment
 				.resources
-				.reserve(bytes.checked_mul(2).ok_or(Error::Overflow)?)?;
+				.reserve(bytes.checked_mul(3).ok_or(Error::Overflow)?)?;
 			let mut wire = reserve_vec(bytes)?;
 			wire.resize(bytes, 0);
 			let mut native = reserve_vec(count)?;

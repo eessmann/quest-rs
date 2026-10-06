@@ -50,18 +50,31 @@ fn publish_download(
 	let parent = destination
 		.parent()
 		.ok_or("catalog destination directory")?;
-	let mut temporary = tempfile::NamedTempFile::new_in(parent)?;
 	let limit = source
 		.size_bytes
 		.checked_add(1)
 		.ok_or("catalog download size overflow")?;
-	let received = std::io::copy(&mut reader.take(limit), &mut temporary)?;
-	if received != source.size_bytes {
-		return Err("catalog download size differs from the pinned manifest".into());
-	}
-	temporary.as_file().sync_all()?;
-	let catalog = InverseCatalog::open(temporary.path(), source, policy)?;
-	temporary.persist(destination)?;
+	let mut temporary = tempfile::NamedTempFile::new_in(parent)?;
+	let catalog = (|| -> Result<InverseCatalog, DynError> {
+		let received = std::io::copy(&mut reader.take(limit), &mut temporary)?;
+		if received != source.size_bytes {
+			return Err("catalog download size differs from the pinned manifest".into());
+		}
+		temporary.as_file().sync_all()?;
+		Ok(InverseCatalog::open(temporary.path(), source, policy)?)
+	})();
+	publish_staged(temporary, catalog, destination)
+}
+
+fn publish_staged<F>(
+	temporary: tempfile::NamedTempFile<F>,
+	catalog: Result<InverseCatalog, DynError>,
+	destination: &Path,
+) -> Result<InverseCatalog, DynError> {
+	// Close the descriptor before any error unlinks its path, including on NFS.
+	let path = temporary.into_temp_path();
+	let catalog = catalog?;
+	path.persist(destination)?;
 	Ok(catalog)
 }
 
@@ -77,6 +90,49 @@ mod tests {
 		))?)
 	}
 	const DATA: &[u8] = include_bytes!("../../quest-qsvt-io/data/pennylane/inverse.h5");
+
+	#[gtest]
+	fn failed_staging_closes_its_file_before_removing_its_path() -> googletest::Result<()> {
+		struct CloseObserver {
+			file: Option<fs::File>,
+			path: std::path::PathBuf,
+			closed_before_unlink: std::rc::Rc<std::cell::Cell<bool>>,
+		}
+		impl Drop for CloseObserver {
+			fn drop(&mut self) {
+				let bytes = self.file.as_ref().unwrap().metadata().unwrap().len();
+				let before_close = self.path.exists();
+				drop(self.file.take());
+				let after_close = self.path.exists();
+				eprintln!(
+					"staging-close witness: bytes={bytes} before_close_path={before_close} after_close_path={after_close} descriptor_closed=true"
+				);
+				self.closed_before_unlink.set(after_close);
+			}
+		}
+		let directory = tempfile::tempdir()?;
+		let (file, path) = tempfile::NamedTempFile::new_in(directory.path())?.into_parts();
+		file.set_len(256)?;
+		let staging_path = path.to_path_buf();
+		let observed = std::rc::Rc::new(std::cell::Cell::new(false));
+		let temporary = tempfile::NamedTempFile::from_parts(
+			CloseObserver {
+				file: Some(file),
+				path: staging_path.clone(),
+				closed_before_unlink: std::rc::Rc::clone(&observed),
+			},
+			path,
+		);
+		let result = publish_staged(
+			temporary,
+			Err(std::io::Error::other("interrupted download").into()),
+			&directory.path().join("inverse.h5"),
+		);
+		expect_true!(result.is_err());
+		expect_true!(observed.get());
+		expect_false!(staging_path.exists());
+		Ok(())
+	}
 
 	#[gtest]
 	fn pinned_download_replaces_only_after_full_validation() -> googletest::Result<()> {

@@ -123,6 +123,26 @@ wrappers therefore do not expose the full upstream communicator trait or raw
 handles. Callers must maintain matching
 collective/lifecycle order and configuration across ranks.
 
+`MpiCollectiveLane::send_receive_bytes_chunked` accepts logical byte slices
+larger than `i32::MAX` and exchanges frames bounded by that native count. All
+ranks participate in metadata admission: peers must select each other, tags
+must match, and each send length must equal the peer's receive length. The two
+directions may have unequal lengths or be empty. Invalid metadata returns on
+all ranks before receive buffers change. Callers admit buffer allocations
+collectively first; the method uses constant scratch storage. Native failures
+or unexpected receive counts after transport begins abort the job. Existing
+single-message methods retain their count limit.
+
+The explicit `mpi_large_count` example allocates and touches one logical buffer
+per rank, verifies every rank/offset-dependent byte in both directions, and
+writes per-rank JSON receipts. For example, after building with
+`cargo rustc -p quest-sys --features mpi --example mpi_large_count -- -C opt-level=2`,
+run the executable with `2147483664 "$RECEIPTS" --require-multihost` under a
+bounded two-node MPI supervisor with one rank per node. This crosses the real
+`i32::MAX` boundary with a 17-byte tail. The Linux probe enforces an 8 GiB
+address-space cap and collectively checks allocation admission. It verifies
+byte transport, not matching-kernel performance or beyond-memory capacity.
+
 rsmpi generally ignores MPI return codes and its destructors can panic.
 Consequently all exposed contexts retain MPI's fatal handler; ordinary
 collective preflight errors are agreed before rsmpi payload operations.

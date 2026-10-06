@@ -1,0 +1,6 @@
+<process-id> newfstatat(AT_FDCWD, "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake", {st_mode=S_IFREG|0644, st_size=9084, ...}, 0) = 0
+<process-id> openat(AT_FDCWD, "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake", O_RDONLY) = 4
+<process-id> newfstatat(AT_FDCWD, "/usr/share/cmake/Modules/CMakeCXXInformation.cmake", {st_mode=S_IFREG|0644, st_size=6262, ...}, 0) = 0
+<process-id> openat(AT_FDCWD, "/usr/share/cmake/Modules/CMakeCXXInformation.cmake", O_RDONLY) = 4
+<process-id> newfstatat(AT_FDCWD, "/usr/share/cmake/Modules/CMakeCXXInformation.cmake", {st_mode=S_IFREG|0644, st_size=6262, ...}, 0) = 0
+<process-id> openat(AT_FDCWD, "/usr/share/cmake/Modules/CMakeCXXInformation.cmake", O_RDONLY) = 4

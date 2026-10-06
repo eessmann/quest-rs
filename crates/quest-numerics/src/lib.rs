@@ -10,6 +10,7 @@ mod interval;
 pub mod observer;
 mod policy;
 pub mod sparse;
+pub mod sparse_stream;
 pub use sparse::{
 	MissingEntries, SparseFormat, SparseLimits, SparseMatrix, SparseMatrixBuilder, SparseNorms,
 	SuppliedEntries,
@@ -29,3 +30,5 @@ pub mod arithmetic;
 pub mod roots;
 
 pub mod shapes;
+
+pub mod constraint_chart;

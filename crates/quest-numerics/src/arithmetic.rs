@@ -44,18 +44,18 @@ pub enum ArithmeticError {
 	#[error("binary64 enclosure: {0}")]
 	Interval(#[from] crate::Error),
 }
-pub type ArithmeticResult<T> = Result<T, ArithmeticError>;
-#[derive(Clone, Debug, PartialEq)]
-pub enum ExactConstant {
-	Binary64(f64),
-	Integer(i64),
-	Rational(i64, u64),
-	Decimal(String),
-	Ratio {
-		numerator: String,
-		denominator: String,
-	},
+impl From<mathcore::arithmetic::ArithmeticError> for ArithmeticError {
+	fn from(error: mathcore::arithmetic::ArithmeticError) -> Self {
+		use mathcore::arithmetic::ArithmeticError as Core;
+		match error {
+			Core::Nonfinite => Self::Nonfinite,
+			Core::Interchange(s) => Self::Interchange(s),
+			Core::Domain(s) => Self::Domain(s),
+			Core::Budget(s) => Self::Budget(s),
+		}
+	}
 }
+pub type ArithmeticResult<T> = Result<T, ArithmeticError>;
 /// Exponent and work limits apply before mathematical shortcuts.
 ///
 /// Dashu uses bit precision and can retain one exact guard digit after add/sub.
@@ -77,181 +77,8 @@ impl Default for Precision {
 		}
 	}
 }
-pub trait Backend {
-	/// Admit a stored scalar without rounding or changing its value. Custom
-	/// backends whose scalar type does not enforce validity must override this
-	/// hook; the default trusts their scalar admission contract.
-	/// # Errors
-	/// Rejects invalid values or values outside the backend's resource policy.
-	fn validate(&self, value: &Self::Scalar) -> Result<(), Self::Error> {
-		let _ = value;
-		Ok(())
-	}
-
-	/// Account inline bytes and allocations owned by a scalar.
-	/// # Errors
-	/// Rejects invalid scalars or accounting overflow.
-	fn storage_bytes(&self, value: &Self::Scalar) -> Result<usize, Self::Error> {
-		let _ = value;
-		Ok(std::mem::size_of::<Self::Scalar>())
-	}
-	/// Upper bound for an output at this backend's selected precision.
-	fn working_scalar_bytes(&self) -> usize {
-		std::mem::size_of::<Self::Scalar>()
-	}
-
-	type Scalar: Clone;
-	type Error: From<ArithmeticError>;
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn visit(&mut self) -> Result<(), Self::Error> {
-		Ok(())
-	}
-	/// Reserve modeled work for an opaque kernel. The default preserves each
-	/// visit's effects and stops at its first error; wrappers may reserve the
-	/// whole batch conservatively before forwarding it to an inner backend.
-	/// # Errors
-	/// Propagates visit failures, including exhausted resource limits.
-	fn charge(&mut self, work: usize) -> Result<(), Self::Error> {
-		for _ in 0..work {
-			self.visit()?;
-		}
-		Ok(())
-	}
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn constant(&mut self, value: &ExactConstant) -> Result<Self::Scalar, Self::Error>;
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn point(&mut self, value: f64) -> Result<Self::Scalar, Self::Error> {
-		self.constant(&ExactConstant::Binary64(value))
-	}
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn add(&mut self, a: Self::Scalar, b: Self::Scalar) -> Result<Self::Scalar, Self::Error>;
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn sub(&mut self, a: Self::Scalar, b: Self::Scalar) -> Result<Self::Scalar, Self::Error>;
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn mul(&mut self, a: Self::Scalar, b: Self::Scalar) -> Result<Self::Scalar, Self::Error>;
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn div(&mut self, a: Self::Scalar, b: Self::Scalar) -> Result<Self::Scalar, Self::Error>;
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn neg(&mut self, a: Self::Scalar) -> Result<Self::Scalar, Self::Error>;
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn exp(&mut self, a: Self::Scalar) -> Result<Self::Scalar, Self::Error>;
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn ln(&mut self, a: Self::Scalar) -> Result<Self::Scalar, Self::Error>;
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn sin(&mut self, a: Self::Scalar) -> Result<Self::Scalar, Self::Error>;
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn cos(&mut self, a: Self::Scalar) -> Result<Self::Scalar, Self::Error>;
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn sqrt(&mut self, a: Self::Scalar) -> Result<Self::Scalar, Self::Error>;
-}
-/// Arithmetic on finite stored scalar values at a selected precision.
-///
-/// Implementations must validate finite inputs and implement the declared
-/// mathematical arithmetic and functions at their selected precision and rounding
-/// policy. Successful operations on the same stored operands denote the same
-/// mathematical operation; mutable caches and work counters may affect cost or
-/// resource errors, but must not change that meaning. `compare` returns `Equal`
-/// exactly when the stored scalars have the same mathematical value (including
-/// signed zeros). Polynomial support and numerical algorithms rely on these laws.
-pub trait PointBackend: Backend {
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn compare(&self, a: &Self::Scalar, b: &Self::Scalar) -> Result<Ordering, Self::Error>;
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn to_f64(&self, a: &Self::Scalar) -> Result<f64, Self::Error>;
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn pi(&mut self) -> Result<Self::Scalar, Self::Error>;
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn epsilon(&mut self) -> Result<Self::Scalar, Self::Error>;
-	fn precision_bits(&self) -> usize;
-}
-pub trait EnclosureBackend: Backend {
-	type Endpoint: Clone;
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn singleton(&mut self, value: &Self::Endpoint) -> Result<Self::Scalar, Self::Error>;
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn lower_endpoint(&self, value: &Self::Scalar) -> Result<Self::Endpoint, Self::Error>;
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn upper_endpoint(&self, value: &Self::Scalar) -> Result<Self::Endpoint, Self::Error>;
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn lower(&mut self, value: &Self::Scalar) -> Result<Self::Scalar, Self::Error> {
-		let x = self.lower_endpoint(value)?;
-		self.singleton(&x)
-	}
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn upper(&mut self, value: &Self::Scalar) -> Result<Self::Scalar, Self::Error> {
-		let x = self.upper_endpoint(value)?;
-		self.singleton(&x)
-	}
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn hull(&mut self, a: &Self::Scalar, b: &Self::Scalar) -> Result<Self::Scalar, Self::Error>;
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn intersection(
-		&mut self,
-		a: &Self::Scalar,
-		b: &Self::Scalar,
-	) -> Result<Option<Self::Scalar>, Self::Error>;
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn contains_zero(&self, a: &Self::Scalar) -> Result<bool, Self::Error>;
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn is_zero(&self, a: &Self::Scalar) -> Result<bool, Self::Error>;
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn strict_subset(&self, a: &Self::Scalar, b: &Self::Scalar) -> Result<bool, Self::Error>;
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn same(&self, a: &Self::Scalar, b: &Self::Scalar) -> Result<bool, Self::Error>;
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn midpoint(&mut self, a: &Self::Scalar) -> Result<Self::Scalar, Self::Error>;
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn bisect(
-		&mut self,
-		a: &Self::Scalar,
-	) -> Result<Option<(Self::Scalar, Self::Scalar)>, Self::Error>;
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn magnitude_lt_one(&self, a: &Self::Scalar) -> Result<bool, Self::Error>;
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn nonnegative(&self, a: &Self::Scalar) -> Result<bool, Self::Error>;
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn pi(&mut self) -> Result<Self::Scalar, Self::Error>;
-	/// # Errors
-	/// Rejects invalid domains, backend failures, or exhausted resource limits.
-	fn width_le(
-		&mut self,
-		a: &Self::Scalar,
-		tolerance: &Self::Endpoint,
-	) -> Result<bool, Self::Error>;
-}
+pub use mathcore::arithmetic::{Backend, EnclosureBackend, ExactConstant, PointBackend};
+use mathcore::arithmetic::{valid_decimal, valid_integer, valid_positive_integer};
 mod sealed {
 	pub trait Sealed {}
 }
@@ -264,13 +91,10 @@ mod sealed {
 pub trait CertifyingBackend: EnclosureBackend + sealed::Sealed {}
 #[derive(Default, Debug)]
 pub struct F64Backend;
-const fn finite(x: f64) -> ArithmeticResult<f64> {
-	if x.is_finite() {
-		Ok(x)
-	} else {
-		Err(ArithmeticError::Nonfinite)
-	}
+fn finite(x: f64) -> ArithmeticResult<f64> {
+	Ok(mathcore::scalar::finite(x)?)
 }
+
 // Keep adaptive exact imports outside the tiny binary64/AD constant hot path.
 fn round_exact_f64(c: &ExactConstant) -> ArithmeticResult<f64> {
 	// Resolve rounding from an outward enclosure; a fixed intermediate
@@ -313,6 +137,9 @@ impl Backend for F64Backend {
 	)]
 	#[inline]
 	fn constant(&mut self, c: &ExactConstant) -> ArithmeticResult<f64> {
+		if matches!(c, ExactConstant::Pi) {
+			return PointBackend::pi(self);
+		}
 		if let ExactConstant::Binary64(x) = c {
 			return finite(*x);
 		}
@@ -327,56 +154,68 @@ impl Backend for F64Backend {
 		finite(value)
 	}
 	fn add(&mut self, a: f64, b: f64) -> ArithmeticResult<f64> {
-		finite(a)?;
-		finite(b)?;
-		finite(a + b)
+		Ok(mathcore::scalar::binary(
+			a,
+			mathcore::scalar::BinaryOperation::Add,
+			b,
+		)?)
 	}
 	fn sub(&mut self, a: f64, b: f64) -> ArithmeticResult<f64> {
-		finite(a)?;
-		finite(b)?;
-		finite(a - b)
+		Ok(mathcore::scalar::binary(
+			a,
+			mathcore::scalar::BinaryOperation::Subtract,
+			b,
+		)?)
 	}
 	fn mul(&mut self, a: f64, b: f64) -> ArithmeticResult<f64> {
-		finite(a)?;
-		finite(b)?;
-		finite(a * b)
+		Ok(mathcore::scalar::binary(
+			a,
+			mathcore::scalar::BinaryOperation::Multiply,
+			b,
+		)?)
 	}
 	fn div(&mut self, a: f64, b: f64) -> ArithmeticResult<f64> {
-		finite(a)?;
-		finite(b)?;
-		if b == 0.0 {
-			return Err(ArithmeticError::Domain("division"));
-		}
-		finite(a / b)
+		Ok(mathcore::scalar::binary(
+			a,
+			mathcore::scalar::BinaryOperation::Divide,
+			b,
+		)?)
 	}
 	fn neg(&mut self, a: f64) -> ArithmeticResult<f64> {
-		finite(-a)
+		Ok(mathcore::scalar::unary(
+			a,
+			mathcore::scalar::UnaryOperation::Negate,
+		)?)
 	}
 	fn exp(&mut self, a: f64) -> ArithmeticResult<f64> {
-		finite(a)?;
-		finite(a.exp())
+		Ok(mathcore::scalar::unary(
+			a,
+			mathcore::scalar::UnaryOperation::Exp,
+		)?)
 	}
 	fn ln(&mut self, a: f64) -> ArithmeticResult<f64> {
-		finite(a)?;
-		if a <= 0.0 {
-			return Err(ArithmeticError::Domain("ln"));
-		}
-		finite(a.ln())
+		Ok(mathcore::scalar::unary(
+			a,
+			mathcore::scalar::UnaryOperation::Ln,
+		)?)
 	}
 	fn sqrt(&mut self, a: f64) -> ArithmeticResult<f64> {
-		finite(a)?;
-		if a < 0.0 {
-			return Err(ArithmeticError::Domain("sqrt"));
-		}
-		finite(a.sqrt())
+		Ok(mathcore::scalar::unary(
+			a,
+			mathcore::scalar::UnaryOperation::Sqrt,
+		)?)
 	}
 	fn sin(&mut self, a: f64) -> ArithmeticResult<f64> {
-		finite(a)?;
-		finite(a.sin())
+		Ok(mathcore::scalar::unary(
+			a,
+			mathcore::scalar::UnaryOperation::Sin,
+		)?)
 	}
 	fn cos(&mut self, a: f64) -> ArithmeticResult<f64> {
-		finite(a)?;
-		finite(a.cos())
+		Ok(mathcore::scalar::unary(
+			a,
+			mathcore::scalar::UnaryOperation::Cos,
+		)?)
 	}
 }
 impl PointBackend for F64Backend {
@@ -434,6 +273,9 @@ impl Backend for Interval64Backend {
 	)]
 	#[inline]
 	fn constant(&mut self, c: &ExactConstant) -> ArithmeticResult<Interval> {
+		if matches!(c, ExactConstant::Pi) {
+			return EnclosureBackend::pi(self);
+		}
 		if let ExactConstant::Binary64(x) = c {
 			return Ok(Interval::point(*x)?);
 		}
@@ -824,6 +666,9 @@ impl MpBackend {
 	}
 	fn import(&self, value: &ExactConstant, direction: BinaryRounding) -> ArithmeticResult<Binary> {
 		match value {
+			ExactConstant::Pi => Err(ArithmeticError::Domain(
+				"pi requires precision-aware backend lowering",
+			)),
 			ExactConstant::Binary64(value) => self.checked(exact_from_f64(
 				*value,
 				u32::try_from(self.precision.bits)
@@ -859,40 +704,6 @@ impl MpBackend {
 		}
 	}
 }
-fn valid_integer(s: &str) -> bool {
-	let s = s
-		.strip_prefix('-')
-		.or_else(|| s.strip_prefix('+'))
-		.unwrap_or(s);
-	!s.is_empty() && s.bytes().all(|x| x.is_ascii_digit())
-}
-fn valid_positive_integer(s: &str) -> bool {
-	valid_integer(s) && !s.starts_with('-') && s.bytes().any(|x| matches!(x, b'1'..=b'9'))
-}
-fn valid_decimal(s: &str) -> bool {
-	let s = s
-		.strip_prefix('-')
-		.or_else(|| s.strip_prefix('+'))
-		.unwrap_or(s);
-	let mut parts = s.split(['e', 'E']);
-	let m = parts.next().unwrap_or("");
-	let exp = parts.next();
-	if parts.next().is_some() || exp.is_some_and(|s| !valid_integer(s)) {
-		return false;
-	}
-	let mut dots = 0usize;
-	let mut digits = 0usize;
-	for c in m.bytes() {
-		if c == b'.' {
-			dots = dots.saturating_add(1);
-		} else if c.is_ascii_digit() {
-			digits = digits.saturating_add(1);
-		} else {
-			return false;
-		}
-	}
-	dots <= 1 && digits > 0
-}
 fn float_storage_bytes(words: usize) -> ArithmeticResult<usize> {
 	// Dashu keeps up to two words inline. Count actual stored words, including
 	// an add/sub guard digit, without treating a requested precision as storage.
@@ -924,6 +735,9 @@ impl Backend for MpBackend {
 		self.tick()
 	}
 	fn constant(&mut self, value: &ExactConstant) -> ArithmeticResult<Binary> {
+		if matches!(value, ExactConstant::Pi) {
+			return PointBackend::pi(self);
+		}
 		self.tick()?;
 		self.import(value, BinaryRounding::Nearest)
 	}
@@ -1061,6 +875,9 @@ impl Backend for MpIntervalBackend {
 		self.point.tick()
 	}
 	fn constant(&mut self, value: &ExactConstant) -> ArithmeticResult<MpInterval> {
+		if matches!(value, ExactConstant::Pi) {
+			return EnclosureBackend::pi(self);
+		}
 		self.point.tick()?;
 		self.interval(
 			self.point.import(value, BinaryRounding::Down)?,

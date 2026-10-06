@@ -6,6 +6,7 @@
 use crate::{
 	CfdError, PeriodicBdm1,
 	configuration::{ConfigurationGrid, ConfigurationObservables},
+	configuration_diagnostics::{ConcentrationDiagnostic, concentration},
 };
 use quest_numerics::{Complex64, SparseLimits, SparseMatrix};
 
@@ -23,6 +24,8 @@ pub struct TransportComparison {
 	pub coordinate_mean_error: f64,
 	pub energy_error: f64,
 	pub probability_drift: f64,
+	pub initial_concentration: ConcentrationDiagnostic,
+	pub final_concentration: ConcentrationDiagnostic,
 }
 fn step(
 	generator: &SparseMatrix,
@@ -134,5 +137,7 @@ pub fn compare_full_dg_transport(
 	let energy_error = (energy - lifted_observables.mean_kinetic_energy).abs();
 	let probability_drift =
 		(lifted_observables.probability - initial_observables.probability).abs();
-	Ok(TransportComparison {method:"classical full-DG trajectory ensemble versus classical full-coordinate KvN semidiscretization; no quantum execution".to_owned(),retained_coordinates:flow.dimension(),configuration_dimension:grid.dimension(),horizon,initial:initial_observables,lifted:lifted_observables,trajectory_mean_coordinates:means,trajectory_mean_kinetic_energy:energy,coordinate_mean_error,energy_error,probability_drift})
+	let initial_concentration = concentration(grid, initial, None)?;
+	let final_concentration = concentration(grid, &lifted, None)?;
+	Ok(TransportComparison {method:"classical full-DG trajectory ensemble versus classical full-coordinate KvN semidiscretization; no quantum execution".to_owned(),retained_coordinates:flow.dimension(),configuration_dimension:grid.dimension(),horizon,initial:initial_observables,lifted:lifted_observables,trajectory_mean_coordinates:means,trajectory_mean_kinetic_energy:energy,coordinate_mean_error,energy_error,probability_drift,initial_concentration,final_concentration})
 }

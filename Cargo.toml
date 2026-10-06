@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["crates/quest", "crates/quest-sys", "crates/quest-build", "crates/quest-compile", "crates/quest-symbolic", "crates/quest-macros", "crates/xtask", "crates/quest-language", "crates/quest-qasm", "crates/quest-math", "crates/quest-synthesis", "crates/quest-optimizer-protocol", "crates/quest-optimizer-worker", "crates/quest-optimizer-client", "crates/quest-numerics", "crates/quest-polynomial", "crates/quest-qsp", "crates/quest-qsvt", "crates/quest-qsvt-io", "crates/quest-qsvt-cli", "crates/quest-cfd"]
+members = ["crates/vendor/mathcore", "crates/quest", "crates/quest-sys", "crates/quest-build", "crates/quest-test-support", "crates/quest-compile", "crates/quest-symbolic", "crates/quest-macros", "crates/xtask", "crates/quest-language", "crates/quest-qasm", "crates/quest-math", "crates/quest-synthesis", "crates/quest-optimizer-protocol", "crates/quest-optimizer-worker", "crates/quest-optimizer-client", "crates/quest-numerics", "crates/quest-polynomial", "crates/quest-qsp", "crates/quest-qsvt", "crates/quest-qsvt-io", "crates/quest-qsvt-cli", "crates/quest-cfd"]
 default-members = ["crates/quest"]
 
 [workspace.package]
@@ -9,6 +9,7 @@ license = "MIT"
 repository = "https://github.com/eessmann/quest-rs"
 
 [workspace.dependencies]
+mathcore = { package = "quest-mathcore", path = "crates/vendor/mathcore", version = "0.3.1-quest.2" }
 dashu-base = { version = "0.6", default-features = false, features = ["std"] }
 dashu-int = { version = "0.6", default-features = false, features = ["std"] }
 dashu-ratio = { version = "0.6", default-features = false, features = ["std"] }
@@ -37,6 +38,10 @@ quest-language = { path = "crates/quest-language", version = "0.1" }
 color-eyre = { version = "0.6.5", default-features = false }
 quest-sys = { path = "crates/quest-sys", version = "0.2" }
 quest-build = { path = "crates/quest-build", version = "0.1" }
+quest-test-support = { path = "crates/quest-test-support", version = "0.1" }
+build-probe-mpi = "=0.1.6"
+cc = "1"
+pkg-config = "0.3"
 quest-compile = { path = "crates/quest-compile", version = "0.1", default-features = false }
 quest-symbolic = { path = "crates/quest-symbolic", version = "0.1" }
 quest-macros = { path = "crates/quest-macros", version = "0.1" }
@@ -61,7 +66,6 @@ syn = "3"
 quote = "1"
 proc-macro2 = "1"
 proc-macro-crate = "3"
-cmake = "0.1.58"
 cmake-file-api = "0.1.2"
 sha2 = "0.11"
 shlex = "2"

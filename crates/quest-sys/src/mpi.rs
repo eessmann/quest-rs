@@ -59,9 +59,7 @@ mod ffi {
 		fn mpi_available() -> bool;
 		fn mpi_quest_can_initialize() -> bool;
 		fn mpi_validate_rsmpi_abi(
-			comm_size: usize,
-			fint_size: usize,
-			status_size: usize,
+			layout: &[usize],
 			version: u32,
 			subversion: u32,
 			multiple: i32,
@@ -115,15 +113,33 @@ fn set_fatal_errors(comm: &SimpleCommunicator) {
 	}
 }
 
+const fn rsmpi_layout() -> [usize; 11] {
+	[
+		size_of::<rsmpi::ffi::MPI_Comm>(),
+		align_of::<rsmpi::ffi::MPI_Comm>(),
+		size_of::<rsmpi::ffi::RSMPI_Fint>(),
+		align_of::<rsmpi::ffi::RSMPI_Fint>(),
+		size_of::<rsmpi::ffi::MPI_Status>(),
+		align_of::<rsmpi::ffi::MPI_Status>(),
+		std::mem::offset_of!(rsmpi::ffi::MPI_Status, MPI_SOURCE),
+		std::mem::offset_of!(rsmpi::ffi::MPI_Status, MPI_TAG),
+		std::mem::offset_of!(rsmpi::ffi::MPI_Status, MPI_ERROR),
+		size_of::<rsmpi::ffi::MPI_Request>(),
+		align_of::<rsmpi::ffi::MPI_Request>(),
+	]
+}
+
 fn validate_rsmpi_abi() -> QuestResult<()> {
+	validate_rsmpi_layout(&rsmpi_layout())
+}
+
+fn validate_rsmpi_layout(layout: &[usize]) -> QuestResult<()> {
 	// SAFETY: this immutable constant is supplied by mpi-sys's compiled C shim
 	// and is readable before MPI initialization. Comparing generated layouts and
 	// constants also catches stale bindgen artifacts from an earlier MPICC.
 	let multiple = unsafe { rsmpi::ffi::RSMPI_THREAD_MULTIPLE };
 	map_quest_result(ffi::mpi_validate_rsmpi_abi(
-		size_of::<rsmpi::ffi::MPI_Comm>(),
-		size_of::<rsmpi::ffi::RSMPI_Fint>(),
-		size_of::<rsmpi::ffi::MPI_Status>(),
+		layout,
 		rsmpi::ffi::MPI_VERSION,
 		rsmpi::ffi::MPI_SUBVERSION,
 		multiple,
@@ -252,7 +268,7 @@ impl Drop for MpiRuntime {
 	}
 }
 
-/// Three owned rsmpi contexts borrowing their admitted runtime.
+/// Four owned rsmpi contexts borrowing their admitted runtime.
 ///
 /// Communicator creation, split, duplicate and Drop require matching collective
 /// order across ranks. Safe wrappers do not expose rsmpi ownership or raw handles.
@@ -262,8 +278,19 @@ pub struct MpiCommunicator<'runtime> {
 	application: Option<SimpleCommunicator>,
 	coordination: Option<SimpleCommunicator>,
 	quest: Option<SimpleCommunicator>,
+	transport: Option<SimpleCommunicator>,
 	runtime: &'runtime MpiRuntime,
 	lane: RefCell<()>,
+}
+
+/// Placement within the shared-memory domain of an admitted communicator.
+/// Leader ranks are relative to that communicator, including after a split.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SharedMemoryTopology {
+	pub leader_rank: i32,
+	pub local_rank: i32,
+	pub local_size: i32,
+	pub processor_name: String,
 }
 
 impl<'runtime> MpiCommunicator<'runtime> {
@@ -272,6 +299,8 @@ impl<'runtime> MpiCommunicator<'runtime> {
 		set_fatal_errors(&quest);
 		let coordination = mpi_call(|| source.duplicate());
 		set_fatal_errors(&coordination);
+		let transport = mpi_call(|| source.duplicate());
+		set_fatal_errors(&transport);
 		let application = mpi_call(|| source.duplicate());
 		set_fatal_errors(&application);
 		runtime.communicators.set(
@@ -285,6 +314,7 @@ impl<'runtime> MpiCommunicator<'runtime> {
 			application: Some(application),
 			coordination: Some(coordination),
 			quest: Some(quest),
+			transport: Some(transport),
 			runtime,
 			lane: RefCell::new(()),
 		}
@@ -305,6 +335,38 @@ impl<'runtime> MpiCommunicator<'runtime> {
 	}
 	pub fn size(&self) -> QuestResult<i32> {
 		Ok(mpi_call(|| self.application().size()))
+	}
+
+	/// Discover actual shared-memory placement using `MPI_COMM_TYPE_SHARED`.
+	/// All ranks call in the same collective order; no rank list is gathered.
+	///
+	/// # Errors
+	/// Returns a processor-name error collectively before use. The exclusive
+	/// borrow prevents entry while another coordination lane is alive.
+	pub fn shared_memory_topology(&mut self) -> QuestResult<SharedMemoryTopology> {
+		self.runtime.ensure_owner()?;
+		let rank = self.rank()?;
+		let shared = mpi_call(|| self.coordination().split_shared(rank));
+		set_fatal_errors(&shared);
+		let local_rank = mpi_call(|| shared.rank());
+		let local_size = mpi_call(|| shared.size());
+		let mut leader_rank = rank;
+		mpi_call(|| shared.process_at_rank(0).broadcast_into(&mut leader_rank));
+		let name = mpi_call(rsmpi::environment::processor_name);
+		let names_valid = agree(self.coordination(), name.is_ok());
+		mpi_call(|| drop(shared));
+		if !names_valid {
+			return Err(invalid(
+				"MPI processor names are not valid UTF-8 on every rank",
+			));
+		}
+		let processor_name = name.map_err(|_| invalid("invalid MPI processor name"))?;
+		Ok(SharedMemoryTopology {
+			leader_rank,
+			local_rank,
+			local_size,
+			processor_name,
+		})
 	}
 
 	pub fn duplicate(&mut self) -> QuestResult<Self> {
@@ -365,6 +427,7 @@ impl<'runtime> MpiCommunicator<'runtime> {
 			.map_err(|_| lifecycle("communicator already has a collective lane"))?;
 		Ok(MpiCollectiveLane {
 			communicator: self.coordination(),
+			transport: self.transport.as_ref().unwrap_or_else(|| abort_job()),
 			_exclusive: exclusive,
 		})
 	}
@@ -397,6 +460,7 @@ impl Drop for MpiCommunicator<'_> {
 		}
 		mpi_call(|| drop(self.application.take()));
 		mpi_call(|| drop(self.coordination.take()));
+		mpi_call(|| drop(self.transport.take()));
 		mpi_call(|| drop(self.quest.take()));
 		self.runtime.communicators.set(
 			self.runtime
@@ -489,6 +553,7 @@ fn broadcast(comm: &SimpleCommunicator, root: i32, data: &mut [u8]) -> QuestResu
 /// Exclusive owner-thread coordination lane, independent from application messages.
 pub struct MpiCollectiveLane<'communicator> {
 	communicator: &'communicator SimpleCommunicator,
+	transport: &'communicator SimpleCommunicator,
 	_exclusive: RefMut<'communicator, ()>,
 }
 impl MpiCollectiveLane<'_> {
@@ -496,14 +561,14 @@ impl MpiCollectiveLane<'_> {
 	/// Every participant must follow the same application protocol.
 	pub fn send_bytes(&mut self, data: &[u8], destination: i32, tag: i32) -> QuestResult<()> {
 		MpiThreadView {
-			communicator: self.communicator,
+			communicator: self.transport,
 		}
 		.send(data, destination, tag)
 	}
 	/// Receive bounded coordination data on the exclusive private lane.
 	pub fn receive_bytes(&mut self, data: &mut [u8], source: i32, tag: i32) -> QuestResult<usize> {
 		MpiThreadView {
-			communicator: self.communicator,
+			communicator: self.transport,
 		}
 		.receive(data, source, tag)
 	}
@@ -516,9 +581,118 @@ impl MpiCollectiveLane<'_> {
 		receive: &mut [u8],
 	) -> QuestResult<usize> {
 		MpiThreadView {
-			communicator: self.communicator,
+			communicator: self.transport,
 		}
 		.send_receive(send, peer, tag, receive, peer, tag)
+	}
+	/// Collectively admit reciprocal byte exchanges, then transfer bounded frames.
+	///
+	/// Every rank in this lane's communicator must call in the same order. Peers
+	/// must select each other (self is allowed), use the same tag, and provide
+	/// exactly matching send/receive lengths. The two directions may differ in
+	/// length, including zero. Logical slices may exceed `i32::MAX` bytes; each
+	/// native message contains at most `i32::MAX` bytes. No payload is allocated.
+	/// Callers must collectively admit their buffer allocations before calling.
+	///
+	/// Metadata validation uses constant scratch space and one broadcast per rank.
+	/// Invalid metadata returns collectively without changing receive buffers.
+	/// Native failures or unexpected counts after transport starts abort the job,
+	/// following the lane's existing fatal-error policy.
+	pub fn send_receive_bytes_chunked(
+		&mut self,
+		send: &[u8],
+		peer: i32,
+		tag: i32,
+		receive: &mut [u8],
+	) -> QuestResult<usize> {
+		self.exchange_byte_frames(
+			send,
+			peer,
+			tag,
+			receive,
+			usize::try_from(i32::MAX).unwrap_or_else(|_| abort_job()),
+		)
+	}
+
+	fn exchange_byte_frames(
+		&mut self,
+		send: &[u8],
+		peer: i32,
+		tag: i32,
+		receive: &mut [u8],
+		frame_bytes: usize,
+	) -> QuestResult<usize> {
+		let view = MpiThreadView {
+			communicator: self.transport,
+		};
+		let send_count = i64::try_from(send.len());
+		let receive_count = i64::try_from(receive.len());
+		let valid = view.validate(0, peer, tag).is_ok()
+			&& send_count.is_ok()
+			&& receive_count.is_ok()
+			&& frame_bytes > 0
+			&& i32::try_from(frame_bytes).is_ok();
+		if !agree(self.communicator, valid) {
+			return Err(invalid(
+				"invalid chunked MPI peer, tag, length or frame bound",
+			));
+		}
+		let rank = self.communicator.rank();
+		let metadata = [
+			i64::from(peer),
+			i64::from(tag),
+			send_count.unwrap_or_else(|_| abort_job()),
+			receive_count.unwrap_or_else(|_| abort_job()),
+			i64::try_from(frame_bytes).unwrap_or_else(|_| abort_job()),
+		];
+		let mut reciprocal = true;
+		for origin in 0..self.communicator.size() {
+			let mut announced = metadata;
+			mpi_call(|| {
+				self.communicator
+					.process_at_rank(origin)
+					.broadcast_into(&mut announced);
+			});
+			if origin == peer {
+				reciprocal = announced
+					== [
+						i64::from(rank),
+						metadata[1],
+						metadata[3],
+						metadata[2],
+						metadata[4],
+					];
+			}
+		}
+		if !agree(self.communicator, reciprocal) {
+			return Err(invalid(
+				"chunked MPI peers, tags or reciprocal lengths disagree",
+			));
+		}
+		let total = send.len().max(receive.len());
+		let mut start = 0;
+		while start < total {
+			let end = start
+				.checked_add(frame_bytes)
+				.unwrap_or_else(|| abort_job())
+				.min(total);
+			let outgoing = send
+				.get(start.min(send.len())..end.min(send.len()))
+				.unwrap_or_else(|| abort_job());
+			let receive_len = receive.len();
+			let incoming = receive
+				.get_mut(start.min(receive_len)..end.min(receive_len))
+				.unwrap_or_else(|| abort_job());
+			let expected = incoming.len();
+			let received = self
+				.send_receive_bytes(outgoing, peer, tag, incoming)
+				.unwrap_or_else(|_| abort_job());
+			if received != expected {
+				abort_job();
+			}
+			start = end;
+		}
+		Ok(receive.len())
 	}
 	pub fn broadcast_bytes(&mut self, root: i32, data: &mut [u8]) -> QuestResult<()> {
 		broadcast(self.communicator, root, data)
@@ -664,5 +838,145 @@ impl Drop for MpiQuestEnvironment<'_, '_> {
 			abort_job();
 		}
 		ffi::mpi_drop_quest();
+	}
+}
+
+#[cfg(test)]
+mod generated_abi_tests {
+	use super::*;
+	#[test]
+	fn request_size_and_alignment_mismatches_are_rejected_before_initialization() -> QuestResult<()>
+	{
+		let layout = rsmpi_layout();
+		validate_rsmpi_layout(&layout)?;
+		for slot in [9, 10] {
+			let mut mismatch = layout;
+			let value = mismatch
+				.get_mut(slot)
+				.ok_or_else(|| invalid("request layout slot"))?;
+			*value = value
+				.checked_add(1)
+				.ok_or_else(|| invalid("layout overflow"))?;
+			match validate_rsmpi_layout(&mismatch) {
+				Err(error) if error.to_string().contains("generated MPI ABI differs") => {}
+				_ => return Err(invalid("MPI_Request layout mismatch was not rejected")),
+			}
+		}
+		Ok(())
+	}
+
+	#[test]
+	fn same_size_alignment_override_is_rejected_before_initialization() -> QuestResult<()> {
+		validate_rsmpi_abi()?;
+		let mut layout = rsmpi_layout();
+		let alignment = layout
+			.get_mut(5)
+			.ok_or_else(|| invalid("status alignment slot"))?;
+		*alignment = alignment
+			.checked_add(1)
+			.ok_or_else(|| invalid("alignment overflow"))?;
+		let rejected = validate_rsmpi_layout(&layout);
+		match rejected {
+			Err(error) if error.to_string().contains("generated MPI ABI differs") => Ok(()),
+			_ => Err(invalid("same-size MPI alignment mismatch was not rejected")),
+		}
+	}
+}
+
+#[cfg(all(test, quest_native_mpi))]
+mod chunked_tests {
+	use super::*;
+	use googletest::prelude::*;
+
+	const fn pattern(rank: i32, offset: usize) -> u8 {
+		offset.to_le_bytes()[0]
+			.wrapping_mul(17)
+			.wrapping_add(rank.to_le_bytes()[0].wrapping_mul(31))
+	}
+
+	fn exercise(comm: &MpiCommunicator<'_>) -> googletest::Result<()> {
+		let rank = comm.rank()?;
+		let peer = rank ^ 1;
+		let mut lane = comm.collective_lane()?;
+		let different_pair_lengths = if rank < 2 { (0, 0) } else { (19, 5) };
+		for (even, odd) in [(19, 5), (0, 20), (20, 0), (0, 0), different_pair_lengths] {
+			let (send_len, receive_len) = if rank % 2 == 0 {
+				(even, odd)
+			} else {
+				(odd, even)
+			};
+			let send: Vec<_> = (0..send_len).map(|i| pattern(rank, i)).collect();
+			let mut receive = vec![255; receive_len];
+			verify_that!(
+				lane.exchange_byte_frames(&send, peer, 107, &mut receive, 7)?,
+				eq(receive_len)
+			)?;
+			verify_that!(
+				receive
+					.iter()
+					.enumerate()
+					.all(|(i, &b)| b == pattern(peer, i)),
+				eq(true)
+			)?;
+		}
+		let mut receive = [255; 5];
+		for fault in 0..6 {
+			let selected_peer = if rank == 0 && fault == 0 {
+				comm.size()?
+			} else if rank == 0 && fault == 1 {
+				rank
+			} else {
+				peer
+			};
+			let tag = if rank == 0 && fault == 2 { 108 } else { 107 };
+			let send: &[u8] = if rank == 0 && fault == 3 {
+				&[1; 4]
+			} else {
+				&[1; 5]
+			};
+			let limit = if rank == 0 && fault == 4 {
+				0
+			} else if rank == 0 && fault == 5 {
+				6
+			} else {
+				7
+			};
+			verify_that!(
+				lane.exchange_byte_frames(send, selected_peer, tag, &mut receive, limit)
+					.is_err(),
+				eq(true)
+			)?;
+			verify_that!(receive, eq([255; 5]))?;
+		}
+		verify_that!(
+			lane.exchange_byte_frames(&[9; 5], rank, 109, &mut receive, 3)?,
+			eq(5)
+		)?;
+		verify_that!(receive, eq([9; 5]))?;
+		Ok(())
+	}
+
+	#[gtest]
+	fn chunked_exchange_admits_peers_and_preserves_tails() -> googletest::Result<()> {
+		const NAME: &str = "mpi::chunked_tests::chunked_exchange_admits_peers_and_preserves_tails";
+		if std::env::var("QUEST_CHUNKED_MPI_TEST").as_deref() != Ok(NAME) {
+			let output =
+				quest_test_support::mpi::MpiTest::new(4, std::time::Duration::from_secs(60))?
+					.args(["--exact", NAME, "--nocapture", "--test-threads=1"])
+					.env("QUEST_CHUNKED_MPI_TEST", NAME)
+					.output()?;
+			verify_that!(
+				!output.status.timed_out && output.status.success(),
+				eq(true)
+			)?;
+			return Ok(());
+		}
+		let runtime = MpiRuntime::initialize()?;
+		let mut world = runtime.world()?;
+		quest_test_support::mpi::assert_rank_count(world.size()?)?;
+		exercise(&world)?;
+		let subgroup = world.split_power_of_two(2)?;
+		exercise(&subgroup)?;
+		Ok(())
 	}
 }

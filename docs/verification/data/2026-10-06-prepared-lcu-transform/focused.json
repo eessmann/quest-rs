@@ -1,0 +1,142 @@
+{
+  "schema": "quest-prepared-lcu-transform-focused-v1",
+  "recorded_utc": "2026-10-06T03:18:56.595685+00:00",
+  "status": "independently-approved-focused-stage",
+  "source_manifest": "source.json",
+  "source_manifest_sha256": "a21199b730258f1a75b370a89e1a8f6340f88749be02ced30684bc531eaed734",
+  "source_aggregate_sha256": "f13906bc93b8ca839883bc35089042a3278325ced30ba92538e53d4c4d21e130",
+  "initial_tested_manifest": "source-initial.json",
+  "initial_manifest_sha256": "a712e0a88633be6f28342c2205143c786251804fb382530eb259040c6481176c",
+  "resource_only_delta": [
+    "crates/quest/src/qsvt/matching_lcu_transform.rs",
+    "crates/quest/src/qsvt/matching_lcu_transform/collective.rs"
+  ],
+  "source_unchanged_through_final_independent_tests": true,
+  "method_document": "docs/research/prepared-lcu-transform.md",
+  "method_sha256": "528772fd6e3cac3dfbd513c209a74d2880374bd98abe6c1bd47c005d58a78f88",
+  "independent_final_checks": {
+    "resource_tests": 3,
+    "transform_fault_parent_tests": 1,
+    "transform_fault_subprocess_cases": 21,
+    "resource_and_fault_test_seconds": 11.38,
+    "cpu_parent_tests": 1,
+    "cpu_test_seconds": 0.07,
+    "whole_register_amplitudes": 512,
+    "cpu_independent_chebyshev_degrees": [
+      1,
+      3,
+      5
+    ],
+    "cpu_direct_complex_inverse_comparison": true,
+    "mpi_parent_tests": 1,
+    "mpi_parent_seconds": 4.16,
+    "mpi_requests": 7,
+    "mpi_requests_scope": "1/2/4/8 ranks, split communicators, plus zero/underflow inputs at 1/2 ranks",
+    "strict_scoped_clippy": true
+  },
+  "unchanged_component_independent_checks": {
+    "pure_factory_replay_reciprocal_tests": 18,
+    "qsp_actual_capacity_test": 1,
+    "mapped_projector_test": 1,
+    "legacy_matching_tests": 2,
+    "existing_lcu_fault_parents": 2,
+    "existing_lcu_admission_cases": 9,
+    "existing_lcu_fatal_cases": 4,
+    "qualification": "Verified on initial focused source; only the two separately retested native transform resource files changed."
+  },
+  "corrected_findings": [
+    {
+      "finding": "Rank-dependent checked node multiplication returned before collective agreement.",
+      "red_exit_code": 124,
+      "green_exit_code": 0,
+      "green_elapsed_seconds": 0.39,
+      "scope": "Two-rank metadata-only public probe; no huge allocation or actual large-count evidence."
+    },
+    {
+      "finding": "Communicator-dependent constructor and early admission loops were absent from the work ceiling.",
+      "correction": "Checked constructor and preflight coordination floors are collectively admitted before those loops.",
+      "scope": "Three allocation-free resource regressions plus final whole-state and MPI fault checks."
+    }
+  ],
+  "preserved_attempts": [
+    "Initial legacy MPI command was denied sandbox socket access; the escalated matching-native rerun passed.",
+    "Initial all-zero Wx Chebyshev and flag-as-system expectations were corrected as test fixtures, not production changes.",
+    "An initial filtered integration command selected zero tests; only the corrected unfiltered invocation supplies execution evidence."
+  ],
+  "logs": [
+    {
+      "scope": "final-source",
+      "private_log": "quest-lcu-transform-independent-fix-2-source.log",
+      "sha256": "a8848820697778964e173c6ccef68669e5e1639bc5e9578bf15f9949e4f73a0a"
+    },
+    {
+      "scope": "final-four-resource-and-fault-parent-tests",
+      "private_log": "quest-lcu-transform-independent-fix-2-admission.log",
+      "sha256": "f0815f2efc169e766f8fadcba10be61395918319ce9cce1d4fc0029affecba5b"
+    },
+    {
+      "scope": "final-cpu-and-seven-mpi-requests",
+      "private_log": "quest-lcu-transform-independent-fix-2-execution.log",
+      "sha256": "7acd9504f04dc142b60e44882df946793efd8e577b391e879796b3ad204a925b"
+    },
+    {
+      "scope": "final-strict-clippy",
+      "private_log": "quest-lcu-transform-independent-fix-2-clippy.log",
+      "sha256": "eef7563a49b09a73877053209c4658edab532dc10e04a4805cd29012993db9bd"
+    },
+    {
+      "scope": "unchanged-pure-factories",
+      "private_log": "quest-lcu-transform-independent-pure.log",
+      "sha256": "87cb2ac35b8d52ba876fcecf41d8bcb41791b098aa17488d3fa387b9f899879c"
+    },
+    {
+      "scope": "unchanged-pure-replay-and-reciprocal",
+      "private_log": "quest-lcu-transform-independent-pure-regressions.log",
+      "sha256": "725de478e325714cbc34d2bd7a4ff67d21603209102a8af6a1c911282f698629"
+    },
+    {
+      "scope": "unchanged-qsp-capacity",
+      "private_log": "quest-lcu-transform-independent-qsp-capacity.log",
+      "sha256": "20a15327e8deb046d9eee1d4d6b9bdc6081121958c74ea145c7cd936a048419e"
+    },
+    {
+      "scope": "unchanged-projector-core",
+      "private_log": "quest-lcu-transform-independent-core.log",
+      "sha256": "3af44f19c39113c7742e2a09f7e86f9eab572c67f97e6085c3004223c08e3346"
+    },
+    {
+      "scope": "initial-three-fault-parents",
+      "private_log": "quest-lcu-transform-independent-faults.log",
+      "sha256": "bd2385445f3c302458539fdd475a20b9f416fba7ac0f268cc8522b2883e182db"
+    },
+    {
+      "scope": "legacy-sandbox-denial",
+      "private_log": "quest-lcu-transform-independent-legacy.log",
+      "sha256": "d07080da14b4cea99f69a4be4f623166cbe72ef748c240b1921e58379242e1e3"
+    },
+    {
+      "scope": "legacy-escalated-two-tests",
+      "private_log": "quest-lcu-transform-independent-legacy-escalated.log",
+      "sha256": "b58bef2b592c089368fb21819ace15cc88dd7bdda24d09149930c1a3c5a83c0f"
+    },
+    {
+      "scope": "overflow-red-timeout",
+      "private_log": "quest-lcu-transform-overflow-red.log",
+      "sha256": "ee084721bae957ee7ad296c096deab7509ee8850d4f8863f4b9a00c39cda9455"
+    },
+    {
+      "scope": "overflow-green-common-error",
+      "private_log": "quest-lcu-transform-overflow-green.log",
+      "sha256": "9b593bc7a0f435c2148e08fd20c82741b63cba2d4dc917fa505e57fba5699611"
+    }
+  ],
+  "limitations": [
+    "Focused identities and private log hashes are not complete source-to-binary attestation.",
+    "Workspace checkpoint07 is separate; its results are not implied by these focused checks.",
+    "Only local CPU/MPICH simulation; no multi-host, actual huge-count, accelerator or hardware measurement.",
+    "Tiny complete test references are not production allocations or performance measurements.",
+    "Prior producer, synthesis, child preparation and caller-owned certificate costs remain separately admitted.",
+    "Uniform source, preparation, RHS and native execution errors and sampling success lower bounds remain unknown.",
+    "Distributed tensor, persisted loaded-child composition and physical-history decomposition are separate stages."
+  ]
+}

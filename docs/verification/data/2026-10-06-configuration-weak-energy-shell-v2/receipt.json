@@ -1,0 +1,164 @@
+{
+  "schema": "quest-configuration-weak-energy-shell-v2",
+  "fixed_row_id": "p2-c2-e1-w1_2",
+  "binary_sha256": "727ea4196c7c03fb20332dba5f0caa8467e5e64cf3d5ba1ece06b3152267227d",
+  "bounds": {
+    "address_space_bytes": 536870912,
+    "child_seconds": 180,
+    "captured_file_bytes": 4194304
+  },
+  "reference_sha256": "14664ebc2b353933ef9dabd3e9768f64e4ba5edfa9b4a5d6731e1fc8351d7d76",
+  "rows": [
+    {
+      "row_id": "p2-c2-e1-w1_2",
+      "process_status": "exited",
+      "exit_code": 0,
+      "elapsed_seconds": 0.11502250399644254,
+      "peak_rss_kib": 4128,
+      "child_elapsed_seconds": 0.09,
+      "timing": "p2-c2-e1-w1_2.time",
+      "timing_sha256": "085646402220e5ef4e504595d49db2474d52cf6d4d7fa65be56372ec5a817cb5",
+      "stdout": "p2-c2-e1-w1_2.json",
+      "stderr": "p2-c2-e1-w1_2.stderr",
+      "stdout_sha256": "b8e4ca7603f15bb3e93f418d0209a7f25e743d7ec4ab5c09b119e089090f8387",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validated": true,
+      "protocol_status": "completed"
+    }
+  ],
+  "comparison": {
+    "kind": "DG1-c4-vs-DG2-c2-quadrature-and-stencil",
+    "left": "p1-c4-e1-w1_2",
+    "right": "p2-c2-e1-w1_2",
+    "status": "finite-sensitivity-only",
+    "convergence_certified": false,
+    "sampled_inputs": {
+      "ensemble_sha256": [
+        "e7e097a5eafc4f4e5dfe6db30ae7049f3900cf231b9a6ef542311bcdd2e5cdcc",
+        "8c50734ced5a8fcdb84d19822d7186ff70db689adfe1279b08ac1ae924a0c69d"
+      ],
+      "mean_bias_left": [
+        -0.07430667020244772,
+        0.0849434945174027,
+        -0.06823075048690101,
+        -0.08641163965504778,
+        0.03999171542027446
+      ],
+      "mean_bias_right": [
+        -0.018517966285677562,
+        0.07076727442071684,
+        -0.06647397779992335,
+        -0.06494865407357099,
+        0.039983431115081416
+      ]
+    },
+    "metrics": [
+      {
+        "coordinate": 0,
+        "signed_defects": [
+          9.683926446622717e-18,
+          -2.0365096637022057e-17
+        ],
+        "generator_delta": -3.0049023083644774e-17,
+        "physical_delta": 0.0,
+        "defect_delta": -3.0049023083644774e-17,
+        "decomposition_roundoff": 0.0,
+        "reference_rate_resolved": false,
+        "defect_ratio": null
+      },
+      {
+        "coordinate": 1,
+        "signed_defects": [
+          0.06308415918323498,
+          0.12248033357434242
+        ],
+        "generator_delta": 0.09171590352037337,
+        "physical_delta": 0.03231972912926593,
+        "defect_delta": 0.059396174391107434,
+        "decomposition_roundoff": 0.0,
+        "reference_rate_resolved": true,
+        "defect_ratio": 1.9415386550304112
+      },
+      {
+        "coordinate": 2,
+        "signed_defects": [
+          2.832880784695811e-19,
+          -5.804755834732123e-19
+        ],
+        "generator_delta": -8.637636619427934e-19,
+        "physical_delta": 0.0,
+        "defect_delta": -8.637636619427934e-19,
+        "decomposition_roundoff": 0.0,
+        "reference_rate_resolved": false,
+        "defect_ratio": null
+      },
+      {
+        "coordinate": 3,
+        "signed_defects": [
+          -0.06706836605835179,
+          -0.1280932242962155
+        ],
+        "generator_delta": -0.10996064329480082,
+        "physical_delta": -0.04893578505693712,
+        "defect_delta": -0.061024858237863716,
+        "decomposition_roundoff": 1.3877787807814457e-17,
+        "reference_rate_resolved": true,
+        "defect_ratio": 1.9098903376409975
+      },
+      {
+        "coordinate": 4,
+        "signed_defects": [
+          0.007868358322449554,
+          0.015456907227140115
+        ],
+        "generator_delta": 0.004602238455035166,
+        "physical_delta": -0.002986310449655394,
+        "defect_delta": 0.007588548904690561,
+        "decomposition_roundoff": -1.734723475976807e-18,
+        "reference_rate_resolved": true,
+        "defect_ratio": 1.9644386533642404
+      },
+      {
+        "coordinate": "integrated_energy",
+        "signed_defects": [
+          -0.011648081111064412,
+          -0.022570349281720706
+        ],
+        "generator_delta": -0.05156969631755238,
+        "physical_delta": -0.040647428146896085,
+        "defect_delta": -0.010922268170656294,
+        "decomposition_roundoff": 0.0,
+        "reference_rate_resolved": true,
+        "defect_ratio": 1.9376881965804071
+      }
+    ],
+    "coordinate_reference_norms": [
+      0.0638850280686236,
+      0.12260264311911473
+    ],
+    "coordinate_reference_resolved": [
+      true,
+      true
+    ],
+    "energy_reference_resolved": [
+      true,
+      true
+    ],
+    "nonlinear_witness_resolved": [
+      true,
+      true
+    ],
+    "reference_sha256": "14664ebc2b353933ef9dabd3e9768f64e4ba5edfa9b4a5d6731e1fc8351d7d76",
+    "quadrature_weights_changed": true,
+    "pure_h_or_p_refinement": false,
+    "interpretation": "Different configuration weights and stencil; sampled physical expectation must be compared separately from generator rate."
+  },
+  "history_execution": false,
+  "quantum_execution": false,
+  "convergence_certified": false,
+  "provenance_status": "verified",
+  "provenance_unchanged": true,
+  "provenance_errors": [],
+  "binary_sha256_after": "727ea4196c7c03fb20332dba5f0caa8467e5e64cf3d5ba1ece06b3152267227d",
+  "reference_sha256_after": "14664ebc2b353933ef9dabd3e9768f64e4ba5edfa9b4a5d6731e1fc8351d7d76"
+}

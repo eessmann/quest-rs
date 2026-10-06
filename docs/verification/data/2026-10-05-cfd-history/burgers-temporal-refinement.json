@@ -1,0 +1,57 @@
+{
+  "status": "classical-validation-executed",
+  "case": "burgers",
+  "physical_cells": 4,
+  "physical_order": 1,
+  "physical_dimension": 8,
+  "carleman_order": 2,
+  "lift_dimension": 44,
+  "horizon": 0.1,
+  "reference": "same complete truncated hierarchy, RK4 4000 steps; no quantum execution",
+  "error_convention": "Euclidean norm in all normalized symmetric hierarchy coordinates at final endpoint",
+  "temporal_refinement": [
+    {
+      "temporal_order": 1,
+      "temporal_cells": 1,
+      "history_dimension": 88,
+      "full_hierarchy_endpoint_error": 0.00020667257648860046,
+      "relative_history_residual": 1.3243865675729827e-15
+    },
+    {
+      "temporal_order": 1,
+      "temporal_cells": 2,
+      "history_dimension": 176,
+      "full_hierarchy_endpoint_error": 5.522800850197697e-05,
+      "relative_history_residual": 1.2595393065193984e-15
+    },
+    {
+      "temporal_order": 1,
+      "temporal_cells": 4,
+      "history_dimension": 352,
+      "full_hierarchy_endpoint_error": 1.4280911985164969e-05,
+      "relative_history_residual": 1.3884799014059107e-15
+    },
+    {
+      "temporal_order": 2,
+      "temporal_cells": 1,
+      "history_dimension": 132,
+      "full_hierarchy_endpoint_error": 8.587889306636365e-07,
+      "relative_history_residual": 1.5372781098083675e-15
+    },
+    {
+      "temporal_order": 2,
+      "temporal_cells": 2,
+      "history_dimension": 264,
+      "full_hierarchy_endpoint_error": 4.256617445606398e-08,
+      "relative_history_residual": 2.698335940274989e-15
+    },
+    {
+      "temporal_order": 2,
+      "temporal_cells": 4,
+      "history_dimension": 528,
+      "full_hierarchy_endpoint_error": 3.5530954517708835e-09,
+      "relative_history_residual": 1.9200081261690526e-15
+    }
+  ],
+  "command": "cargo test -p quest-cfd --test classical_history -- --nocapture"
+}

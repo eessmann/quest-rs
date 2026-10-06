@@ -38,6 +38,11 @@ fn requested_modes_and_native_density_conversion() -> googletest::Result<()> {
 		threads == ExecutionMode::Enabled
 	);
 	expect_false!(state.deployment().is_distributed());
+	expect_eq!(state.deployment().host_array_bytes(), 64);
+	expect_eq!(
+		state.deployment().device_array_bytes(),
+		if gpu == ExecutionMode::Enabled { 64 } else { 0 }
+	);
 
 	let amplitudes = [
 		Complex64::new(0.4, 0.2),
@@ -55,6 +60,15 @@ fn requested_modes_and_native_density_conversion() -> googletest::Result<()> {
 
 	let density = state.to_density().or_fail()?;
 	expect_true!(density.deployment().is_density_matrix());
+	expect_eq!(density.deployment().host_array_bytes(), 256);
+	expect_eq!(
+		density.deployment().device_array_bytes(),
+		if gpu == ExecutionMode::Enabled {
+			256
+		} else {
+			0
+		}
+	);
 	expect_eq!(
 		density.deployment().is_gpu_accelerated(),
 		gpu == ExecutionMode::Enabled

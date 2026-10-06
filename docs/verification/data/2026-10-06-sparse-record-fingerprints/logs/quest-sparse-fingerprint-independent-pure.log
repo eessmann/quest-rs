@@ -1,0 +1,41 @@
+warning: `feature(generic_const_exprs)` is not supported with the next-generation trait solver
+ --> crates/quest-polynomial/src/lib.rs:1:30
+  |
+1 | #![feature(const_trait_impl, generic_const_exprs)]
+  |                              ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `-Znext-solver=globally` is currently enabled by default for testing
+  = note: reverted the setting to `-Znext-solver=coherence` for this crate
+  = note: the currently stable trait solver will be used for this crate
+  = note: see issues #160895 <https://github.com/rust-lang/rust/issues/160895> for more information
+
+warning: `quest-polynomial` (lib) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+     Running tests/matching_digest.rs (target/debug/build/quest-qsvt/ed1b4e5b3b608bd3/out/matching_digest-ed1b4e5b3b608bd3)
+
+running 3 tests
+test digest_work_counts_padded_blocks_and_rejects_overflow ... ok
+test opposite_phases_do_not_cancel_in_completed_record_admission ... ok
+test digest_retains_signed_zero_and_partition_order_independence ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/matching_resource.rs (target/debug/build/quest-qsvt/e63e750d43ecaa64/out/matching_resource-e63e750d43ecaa64)
+
+running 5 tests
+test touched_directory_replays_large_padding_with_bounded_workspace ... ok
+test resource_admission_rejects_broken_directory_and_work_before_gate_emission ... ok
+test resource_rejects_retained_capacity_and_gate_limits ... ok
+test completed_record_hashes_are_admitted_as_constructor_work ... ok
+test resource_stream_matches_complete_matching_unitary_and_exact_gate_adjoint ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/matching_shards.rs (target/debug/build/quest-qsvt/1d02d70ec13dee5d/out/matching_shards-1d02d70ec13dee5d)
+
+running 2 tests
+test matching_shard_admission_rejects_wrong_ownership_and_malformed_records ... ok
+test matching_shards_own_coefficients_and_completion_without_parent_storage ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

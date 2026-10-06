@@ -1,0 +1,86 @@
+{
+  "scope": "Three executed focused serializer fixtures, not the seven-row campaign",
+  "build": {
+    "schema": "quest-weak-protocol-focused-fixture-build-v1",
+    "scope": "Root Cargo/configuration plus all Rust/TOML/Cargo files in actual twelve local default compiler-artifact package closure; includes package tests; excludes unused quest and quest-sys native packages, external registry sources, environment, and non-Rust assets. This is not whole-process reproducible-build attestation.",
+    "local_package_manifests": [
+      "crates/quest-build/Cargo.toml",
+      "crates/quest-cfd/Cargo.toml",
+      "crates/quest-compile/Cargo.toml",
+      "crates/quest-language/Cargo.toml",
+      "crates/quest-math/Cargo.toml",
+      "crates/quest-numerics/Cargo.toml",
+      "crates/quest-polynomial/Cargo.toml",
+      "crates/quest-qasm/Cargo.toml",
+      "crates/quest-qsp/Cargo.toml",
+      "crates/quest-qsvt/Cargo.toml",
+      "crates/quest-symbolic/Cargo.toml",
+      "crates/vendor/mathcore/Cargo.toml"
+    ],
+    "source_files": 507,
+    "source_manifest_sha256": "fe90152dc5eed0d257e9888c1bbc1866a9d5ba578d940c2616f272345702e63d",
+    "source_before_after_equal": true,
+    "binary_sha256": "76f3f1b2e33702326df8a70f6118039ffcdead2488c227760af1f58521a14bb0",
+    "example_features": [],
+    "example_source_sha256": "9812be93fcf051b86684eebc4148ac045e69dc5f36b007d7da3cb986dc7c611d",
+    "command": [
+      "cargo",
+      "build",
+      "-p",
+      "quest-cfd",
+      "--example",
+      "configuration_weak",
+      "--message-format=json"
+    ],
+    "profile": {
+      "opt_level": "0",
+      "debuginfo": 1,
+      "debug_assertions": true,
+      "overflow_checks": true,
+      "test": false
+    },
+    "scope_of_execution": "Three serializer-compatibility focused fixtures only; not the seven-row campaign"
+  },
+  "execution": {
+    "scope": "Exactly three executed focused serializer fixtures; not the seven-row campaign",
+    "binary_sha256": "76f3f1b2e33702326df8a70f6118039ffcdead2488c227760af1f58521a14bb0",
+    "limits": {
+      "address_space_bytes": 536870912,
+      "seconds": 180,
+      "file_bytes": 4194304
+    },
+    "rows": [
+      {
+        "row_id": "p1-c3-e1-w1_2",
+        "fixture": "complete",
+        "process_status": "exited",
+        "exit_code": 0,
+        "elapsed_seconds": 0.3724293880004552,
+        "stdout_sha256": "be621e969bf6d2f925865682e9006aba0d2f0cf8d818b5b9a8f1ca87aaf02973",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "timing": "0.33 3952\n"
+      },
+      {
+        "row_id": "p2-c1-e1-w1_2",
+        "fixture": "sampling",
+        "process_status": "exited",
+        "exit_code": 0,
+        "elapsed_seconds": 0.004531086000497453,
+        "stdout_sha256": "9de1431eda62ad20dbecae4f880e5fe7883322822eb418e12a693eb0907144e9",
+        "stderr_sha256": "00455e7626839a05c97172bd5da000299645280dd16dd0af663db505b02953ef",
+        "timing": "0.00 3808\n"
+      },
+      {
+        "row_id": "p2-c3-e1-w1_2",
+        "fixture": "work",
+        "process_status": "exited",
+        "exit_code": 0,
+        "elapsed_seconds": 0.11488500999985263,
+        "stdout_sha256": "b38731314832ddd019147a9b3302d69e81df4119bd952dba1881909854c5553f",
+        "stderr_sha256": "cf247f85fff572f2633d7bbd6a1ce9e3e34b3c0c20f06849bddda2a0762b3060",
+        "timing": "0.07 5092\n"
+      }
+    ]
+  },
+  "source_before_after_execution_equal": true
+}

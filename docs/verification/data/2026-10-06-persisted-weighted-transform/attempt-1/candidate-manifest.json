@@ -1,0 +1,533 @@
+{
+  "schema": "quest-persisted-consumer-private-publication-candidates-v1",
+  "status": "private candidates only; publication/attempt2 pending root approval",
+  "physical_or_native_reruns": 0,
+  "original_input_bytes_unchanged": true,
+  "normalization": "Public candidate SHA hashes candidate bytes; original private SHA identifies original bytes and is never asserted to hash normalized bytes. Strings only; numeric JSON values retained. Source manifests are byte-original where already relative/generic.",
+  "source_scope": "Attempt1 source970 is audited workspace superset, not exact sixteen-package compiler input closure; compiler JSON records actual sixteen local manifest set. rustc/cargo executable hash identifies rustup launcher; version/profile captured separately. No hermetic/native-library transitive closure claim.",
+  "outcome_scope": "Attempt1 publication MPI8 failed153; six dependent jobs not run; no N32 inverse. Minimal initialization EFBIG diagnosis and corrected initialization success are separately scoped and do not establish future production success.",
+  "files": [
+    {
+      "path": "attempt-1/build-attestation.json",
+      "bytes": 2550,
+      "sha256": "eacb4c43e8b4b02628bc6bf2ac558dc8f2fd8d802fdb626af77a752fbd516346",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-final-build-1-attestation.json",
+      "original_bytes": 2535,
+      "original_sha256": "c2e27731293e8d8b1589235edfc24ac3ee9a44a37a63d4ecfe4c10749639825c",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "attempt-1/build-context-before.json",
+      "bytes": 173752,
+      "sha256": "9b1329471c7e0497752c720890a3bb98be3e50f5f37c692fa5d8f410df114cbb",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-final-build-1-before.json",
+      "original_bytes": 174317,
+      "original_sha256": "f961a3adcf3006e3f7ab30bfe8f7b410505ee3fbb8734a985265bbbbf041a629",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "attempt-1/build-context-after.json",
+      "bytes": 173752,
+      "sha256": "9b1329471c7e0497752c720890a3bb98be3e50f5f37c692fa5d8f410df114cbb",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-final-build-1-after.json",
+      "original_bytes": 174317,
+      "original_sha256": "f961a3adcf3006e3f7ab30bfe8f7b410505ee3fbb8734a985265bbbbf041a629",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "attempt-1/build-source-before.json",
+      "bytes": 153139,
+      "sha256": "21587e89a90d3281f22f3f633ac7bf5201aeb760574401cc182c08b11b2b7519",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-final-build-1-source-before.json",
+      "original_bytes": 153139,
+      "original_sha256": "21587e89a90d3281f22f3f633ac7bf5201aeb760574401cc182c08b11b2b7519",
+      "representation": "byte-original"
+    },
+    {
+      "path": "attempt-1/build-source-after.json",
+      "bytes": 153139,
+      "sha256": "21587e89a90d3281f22f3f633ac7bf5201aeb760574401cc182c08b11b2b7519",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-final-build-1-source-after.json",
+      "original_bytes": 153139,
+      "original_sha256": "21587e89a90d3281f22f3f633ac7bf5201aeb760574401cc182c08b11b2b7519",
+      "representation": "byte-original"
+    },
+    {
+      "path": "attempt-1/compiler-artifacts.jsonl",
+      "bytes": 288561,
+      "sha256": "e604569fdb5bd50de51fbec58f6f7db4cc616996f9f003b55eadaaad7c28686e",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-final-build-1-compiler-artifacts.jsonl",
+      "original_bytes": 301575,
+      "original_sha256": "fdc5ba0d08d959f1c999d6039d1ffba751434fb554eda544024d99a4a12c01b9",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "attempt-1/build.log",
+      "bytes": 326,
+      "sha256": "2af59c0466984a2b69cc4c0ccf8468d7877dd783825a237091482c6571a8acaf",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-final-build-1-build.log",
+      "original_bytes": 380,
+      "original_sha256": "85bd62a3d8edddeb0c0e031c97f4c681428e3ba690d455a4f7d617169658e120",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "attempt-1/execution-attestation.json",
+      "bytes": 2779,
+      "sha256": "212da6a6c8bbf5d81b128baa692a8e1476e79f3bde0fa9926aa17b6885d3ab88",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-final-execution-1.json",
+      "original_bytes": 2804,
+      "original_sha256": "bcb40281f025d3898988c3dcc8bcb0c673f642811c034f9c92d58804c89a2856",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "attempt-1/execution-context-before.json",
+      "bytes": 173752,
+      "sha256": "9b1329471c7e0497752c720890a3bb98be3e50f5f37c692fa5d8f410df114cbb",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-final-execution-1-before.json",
+      "original_bytes": 174317,
+      "original_sha256": "f961a3adcf3006e3f7ab30bfe8f7b410505ee3fbb8734a985265bbbbf041a629",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "attempt-1/execution-context-after.json",
+      "bytes": 173752,
+      "sha256": "9b1329471c7e0497752c720890a3bb98be3e50f5f37c692fa5d8f410df114cbb",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-final-execution-1-after.json",
+      "original_bytes": 174317,
+      "original_sha256": "f961a3adcf3006e3f7ab30bfe8f7b410505ee3fbb8734a985265bbbbf041a629",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "attempt-1/runner.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-final-execution-1-runner.log",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "representation": "byte-original"
+    },
+    {
+      "path": "attempt-1/receipt.json",
+      "bytes": 1999,
+      "sha256": "5426cd73301c5489b87543d09e629d1da2920b0a45ad0608ce589046013f592b",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-campaign-1/receipt.json",
+      "original_bytes": 1999,
+      "original_sha256": "5426cd73301c5489b87543d09e629d1da2920b0a45ad0608ce589046013f592b",
+      "representation": "byte-original"
+    },
+    {
+      "path": "attempt-1/publish.stdout",
+      "bytes": 561,
+      "sha256": "918ec4228f09fe4a759b238a242ce655f5f321e1eda22b226064e09f839d6c09",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-campaign-1/job-0.stdout",
+      "original_bytes": 555,
+      "original_sha256": "395f87919c57f29ace9a205bbcea70e123a80def08586fb63da9f79bdb1e0049",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "attempt-1/publish.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-weighted-campaign-1/job-0.stderr",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "representation": "byte-original"
+    },
+    {
+      "path": "attempt-1/independent-audit.json",
+      "bytes": 4348,
+      "sha256": "c489be574774408e2979a6d584ef0c21273f35e1db9d1bc45efebf89be191d94",
+      "original_private_identifier": "<workspace>/.superpowers/sdd/2026-10-05-sparse-mathcore-cfd/persisted-weighted-transform-attempt-1-independent-audit.json",
+      "original_bytes": 4228,
+      "original_sha256": "5e55f81dc1d8cda9982ba4121184c2a451b6fc18bbbbeaaf56e59f457c3031bd",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "attempt-1/independent-review.md",
+      "bytes": 6097,
+      "sha256": "76f504dc82aeb1bc3412b5ce940c1ef4ff27d29eea9ecbc9a352c047c8cc888a",
+      "original_private_identifier": "<workspace>/.superpowers/sdd/2026-10-05-sparse-mathcore-cfd/persisted-weighted-transform-attempt-1-independent-audit.md",
+      "original_bytes": 6067,
+      "original_sha256": "e0cd403f1b6790ad64e4d2fd9292ab8938a4fa2a3765b9779c3d41fb0c48dc05",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "attempt-1/consumer-source.json",
+      "bytes": 2778,
+      "sha256": "a1a1a1edc4700731aa83249450a2257a6a839b4a8827c74a70ef00a7157f9e58",
+      "original_private_identifier": "<workspace>/.superpowers/sdd/2026-10-05-sparse-mathcore-cfd/persisted-weighted-transform-consumer-source-final-fix-1.json",
+      "original_bytes": 2778,
+      "original_sha256": "a1a1a1edc4700731aa83249450a2257a6a839b4a8827c74a70ef00a7157f9e58",
+      "representation": "byte-original"
+    },
+    {
+      "path": "diagnosis/fsize-diagnosis.json",
+      "bytes": 8197,
+      "sha256": "524b57507dd494e523a9fb94bcf27fd17154e0ebfd0639fba678683ab427277a",
+      "original_private_identifier": "<workspace>/.superpowers/sdd/2026-10-05-sparse-mathcore-cfd/persisted-weighted-transform-fsize-diagnosis.json",
+      "original_bytes": 7915,
+      "original_sha256": "6b469395300a01c5eea56c789554c98a5a67ad6b644c2be1c1f7b69b306fb299",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "diagnosis/fsize-review.md",
+      "bytes": 4074,
+      "sha256": "ce96118450125d8c3e84118aef53bb79366bc2e3a1f45e679740962ae999ea65",
+      "original_private_identifier": "<workspace>/.superpowers/sdd/2026-10-05-sparse-mathcore-cfd/persisted-weighted-transform-fsize-diagnosis.md",
+      "original_bytes": 4046,
+      "original_sha256": "72d3a03c8375082c5de22b081234c4cd1fadfc1c55e42b58140d96406aa3c924",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "diagnosis/capture-focused.json",
+      "bytes": 2694,
+      "sha256": "5f74b67790068159b5fe808b89aece49cd519923ee3f81943eea894574d2d6f6",
+      "original_private_identifier": "<workspace>/.superpowers/sdd/2026-10-05-sparse-mathcore-cfd/persisted-weighted-transform-capture-fix-focused.json",
+      "original_bytes": 2589,
+      "original_sha256": "7d54cb64328e5f9ea4fa866b5a17678e6ee90fe3e3792ac7204217c153104f54",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "diagnosis/capture-review.md",
+      "bytes": 5368,
+      "sha256": "ac3510f210ec60a0172af8031e7f0ad29b979f683cbfdfc9388da91c0eca5096",
+      "original_private_identifier": "<workspace>/.superpowers/sdd/2026-10-05-sparse-mathcore-cfd/persisted-weighted-transform-capture-fix-report.md",
+      "original_bytes": 5323,
+      "original_sha256": "2e32ef82f95c5d6b22c596d8489fb4e1a9cacdada66565235c8bf0c852e86fba",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "diagnosis/capture-python-source.json",
+      "bytes": 1132,
+      "sha256": "407fe4fc823887bec31912a0076a75547a3c18c7dd35b9c77e9102775df02b0e",
+      "original_private_identifier": "<workspace>/.superpowers/sdd/2026-10-05-sparse-mathcore-cfd/persisted-weighted-transform-consumer-python-source-capture-fix-1.json",
+      "original_bytes": 1132,
+      "original_sha256": "407fe4fc823887bec31912a0076a75547a3c18c7dd35b9c77e9102775df02b0e",
+      "representation": "byte-original"
+    },
+    {
+      "path": "diagnosis/capture-combined-source.json",
+      "bytes": 2778,
+      "sha256": "fac76f206b3d7aca6e0b9c89e1b021c864084ed6c9724f617a35320d896ccdb1",
+      "original_private_identifier": "<workspace>/.superpowers/sdd/2026-10-05-sparse-mathcore-cfd/persisted-weighted-transform-consumer-source-capture-fix-1.json",
+      "original_bytes": 2778,
+      "original_sha256": "fac76f206b3d7aca6e0b9c89e1b021c864084ed6c9724f617a35320d896ccdb1",
+      "representation": "byte-original"
+    },
+    {
+      "path": "reviews/rust-independent-initial.json",
+      "bytes": 1868,
+      "sha256": "db5457ed0364122811d9707c806ffa6914f99302ee53be11a096ca4461cbd74b",
+      "original_private_identifier": "<workspace>/.superpowers/sdd/2026-10-05-sparse-mathcore-cfd/persisted-weighted-transform-consumer-independent-review-initial.json",
+      "original_bytes": 1793,
+      "original_sha256": "b1a2698b4a5e32eda23fe862cbf64223b6163a3c14394c3a3ed6f6d16b179cfb",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "reviews/rust-independent-final.json",
+      "bytes": 4011,
+      "sha256": "86ee12411606d3903889bc4bfba6207a9647c88abbd0cac2ca3b9d131dc1acc4",
+      "original_private_identifier": "<workspace>/.superpowers/sdd/2026-10-05-sparse-mathcore-cfd/persisted-weighted-transform-consumer-independent-review-final.json",
+      "original_bytes": 3891,
+      "original_sha256": "8b28f750bbf1cd6ce5cc84621390f9f277d97a1e1802acc9d39b151bc1301dd7",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "reviews/rust-independent-review.md",
+      "bytes": 9998,
+      "sha256": "8c6cc7aa66f8a2df8ef6f49cf620e3c3434c525c0c5a5338d4bca182f6c0a2a6",
+      "original_private_identifier": "<workspace>/.superpowers/sdd/2026-10-05-sparse-mathcore-cfd/persisted-weighted-transform-consumer-independent-review.md",
+      "original_bytes": 9923,
+      "original_sha256": "b1810067c9af81bc485670d32f3a98f0b43b89139f67c5e8193cddeec78695d4",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "reviews/rust-final-source.json",
+      "bytes": 1398,
+      "sha256": "94933d5f27352ccd56430d38d70fa7761c5f38b0a0afa5fee40afb4147608921",
+      "original_private_identifier": "<workspace>/.superpowers/sdd/2026-10-05-sparse-mathcore-cfd/persisted-weighted-transform-consumer-rust-source-fix-2.json",
+      "original_bytes": 1398,
+      "original_sha256": "94933d5f27352ccd56430d38d70fa7761c5f38b0a0afa5fee40afb4147608921",
+      "representation": "byte-original"
+    },
+    {
+      "path": "reviews/owner-focused-final.json",
+      "bytes": 4910,
+      "sha256": "a8f46905defda8f14e36d2d8c359198355cbe0ddeb7b982f344897260c6fe947",
+      "original_private_identifier": "<workspace>/.superpowers/sdd/2026-10-05-sparse-mathcore-cfd/persisted-weighted-transform-consumer-focused-final.json",
+      "original_bytes": 4700,
+      "original_sha256": "e40aeb2612d5dd2e9b082e6b692194c08db87986d111bdba9182a6a4bdaad6c4",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "reviews/root-initial-review.md",
+      "bytes": 3678,
+      "sha256": "50023590fe7aa70ea223176943e05bfa9aa418a7af0978851c8cb2ff24e4f078",
+      "original_private_identifier": "<workspace>/.superpowers/sdd/2026-10-05-sparse-mathcore-cfd/persisted-weighted-transform-consumer-root-review.md",
+      "original_bytes": 3618,
+      "original_sha256": "ca959e02358abebb8bf42f4cd58222345b3831abb51987dab81b605cd414fe0d",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "diagnosis/failing-init-receipt.json",
+      "bytes": 989,
+      "sha256": "43cad5ccac0945a4bf0e8de8e173df765d0c9df68f2d2e5a11d1fb84515259f8",
+      "original_private_identifier": "<private-artifacts>/quest-mpi-fsize-diagnostic/receipt.json",
+      "original_bytes": 959,
+      "original_sha256": "00b2e852a2fec56798941d78f6c039334ac315053ce7828ff5b70808d850314c",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "diagnosis/failing-init.stdout",
+      "bytes": 559,
+      "sha256": "943d275007e0f3e34c950764afb009e745aeb62bb84881fa2ed95f793027319f",
+      "original_private_identifier": "<private-artifacts>/quest-mpi-fsize-diagnostic/stdout",
+      "original_bytes": 553,
+      "original_sha256": "45950c9eb973a3d8b09b094bb688467fd7f0a91cd5de7cac7d9dba970734eacd",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "diagnosis/failing-init.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_private_identifier": "<private-artifacts>/quest-mpi-fsize-diagnostic/stderr",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "representation": "byte-original"
+    },
+    {
+      "path": "diagnosis/corrected-init-receipt.json",
+      "bytes": 1056,
+      "sha256": "2573168df5b12a3186687b06857f9540031eda0cdcb9a55abd06b1b61ed6c299",
+      "original_private_identifier": "<private-artifacts>/quest-mpi-fsize-diagnostic/capture-receipt.json",
+      "original_bytes": 1056,
+      "original_sha256": "2573168df5b12a3186687b06857f9540031eda0cdcb9a55abd06b1b61ed6c299",
+      "representation": "byte-original"
+    },
+    {
+      "path": "diagnosis/corrected-init.stdout",
+      "bytes": 296,
+      "sha256": "c1fb5890477bb72970aef26083307485f0c94c60703bea3252db36275d160433",
+      "original_private_identifier": "<private-artifacts>/quest-mpi-fsize-diagnostic/capture.stdout",
+      "original_bytes": 296,
+      "original_sha256": "c1fb5890477bb72970aef26083307485f0c94c60703bea3252db36275d160433",
+      "representation": "byte-original"
+    },
+    {
+      "path": "diagnosis/corrected-init.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_private_identifier": "<private-artifacts>/quest-mpi-fsize-diagnostic/capture.stderr",
+      "original_bytes": 0,
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "representation": "byte-original"
+    },
+    {
+      "path": "diagnosis/init.c",
+      "bytes": 432,
+      "sha256": "7f53384f29909e7984d4d0bd1442513ba6a2a5fcfe397dab09a32dfa014bbb00",
+      "original_private_identifier": "<private-artifacts>/quest-mpi-fsize-diagnostic/init.c",
+      "original_bytes": 432,
+      "original_sha256": "7f53384f29909e7984d4d0bd1442513ba6a2a5fcfe397dab09a32dfa014bbb00",
+      "representation": "byte-original"
+    },
+    {
+      "path": "diagnosis/failing-init-probe.py",
+      "bytes": 1181,
+      "sha256": "85d896f68bcba83ea6fbf4a960343220e19c11890363d170613534d1c5420c0e",
+      "original_private_identifier": "<private-artifacts>/quest-mpi-fsize-diagnostic/probe.py",
+      "original_bytes": 1166,
+      "original_sha256": "507c5d38b4e62f52f7a11d7b07bc33f1e0fc50215cbb4370f2754e79773996a3",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "diagnosis/corrected-init-probe.py",
+      "bytes": 876,
+      "sha256": "653e800bf6d058860c1fa05ce987f747a802e1487a06388126a4791739db2609",
+      "original_private_identifier": "<private-artifacts>/quest-mpi-fsize-diagnostic/capture-probe.py",
+      "original_bytes": 896,
+      "original_sha256": "13d59fcaa9075d07b53b3872ae2289194badf6c9ee7421896fde2903dfc005bf",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "diagnosis/transport-red.log",
+      "bytes": 703,
+      "sha256": "6588b3f6fe5a8530ba9a13db1522374875d5ff503e6907ddbe033bc6f569a7a4",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-capture-transport-red.log",
+      "original_bytes": 738,
+      "original_sha256": "6068d31248cfc0f72153fbb447b475045cd8285c7395f4087a27243f0dede1ec",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "diagnosis/capture-final-green.log",
+      "bytes": 124,
+      "sha256": "ebeaadd193f3a5551e2b5048e438c571a57beea228aa26c1d3c6a042218c008f",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-capture-final-green.log",
+      "original_bytes": 124,
+      "original_sha256": "ebeaadd193f3a5551e2b5048e438c571a57beea228aa26c1d3c6a042218c008f",
+      "representation": "byte-original"
+    },
+    {
+      "path": "reviews/pure.log",
+      "bytes": 2016,
+      "sha256": "0bc2dbb1370acb4f13fbb88ba3e72f5e95a81d2a421d9e4c4bdc64367dc7d03a",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-consumer-independent-fix-pure.log",
+      "original_bytes": 2070,
+      "original_sha256": "1ae9c077db2c12fce3c2abd46a4dea28123ccdaa252fc244a9a5807c8d4c07c3",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "reviews/cold.log",
+      "bytes": 1300,
+      "sha256": "cc2bc33cfce42bfe70bce53d37615c4099f02dbaf49e1b934725af7344d4145d",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-consumer-independent-fix-cold.log",
+      "original_bytes": 1354,
+      "original_sha256": "3606903a57b328b43cee8433d6e374ad17a321720863c04d5b2ce68b863e5c3b",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "reviews/clippy.log",
+      "bytes": 907,
+      "sha256": "0f35e7a6a6f832c1bdb7376b96b6b21ed85d5d50b62021615fb9d7fd4b4fda56",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-consumer-independent-fix-clippy.log",
+      "original_bytes": 926,
+      "original_sha256": "2ece08a8420eb8f013539667dc8feadd3ed6569bd56d7bc117b230281db72493",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "reviews/owner-log-01.log",
+      "bytes": 2016,
+      "sha256": "c67fb72bf22c8f987f4108d618c5e17a08ec95310f017a0c96976121023ee4d1",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-consumer-fix-1-pure-final.log",
+      "original_bytes": 2070,
+      "original_sha256": "c77063b6d320a740211b350c65d4050cef9f287655682d333044d9f4affe3e3c",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "reviews/owner-log-02.log",
+      "bytes": 1300,
+      "sha256": "36770c7fbf91c996cf8fdc2d3ab3f122c616ce242191e5aa4b4ebcad256063f8",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-consumer-fix-1-cold-final.log",
+      "original_bytes": 1354,
+      "original_sha256": "ab7c7cab82644d1720af7ffbc08608ab67bd9c304c42332be6fd77dbc338e6b2",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "reviews/owner-log-03.log",
+      "bytes": 963,
+      "sha256": "26c614ae6f580a21389f71bb632cbaf5ed3e004653d3e3797327401ad7ce02f0",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-consumer-final-handoff-clippy.log",
+      "original_bytes": 1017,
+      "original_sha256": "f7752031f13b9e2c520c1e1f4ae757ad529cad158ef8cc5e09a9a02825086737",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "reviews/owner-log-04.log",
+      "bytes": 2016,
+      "sha256": "0bc2dbb1370acb4f13fbb88ba3e72f5e95a81d2a421d9e4c4bdc64367dc7d03a",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-consumer-independent-fix-pure.log",
+      "original_bytes": 2070,
+      "original_sha256": "1ae9c077db2c12fce3c2abd46a4dea28123ccdaa252fc244a9a5807c8d4c07c3",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "reviews/owner-log-05.log",
+      "bytes": 1300,
+      "sha256": "cc2bc33cfce42bfe70bce53d37615c4099f02dbaf49e1b934725af7344d4145d",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-consumer-independent-fix-cold.log",
+      "original_bytes": 1354,
+      "original_sha256": "3606903a57b328b43cee8433d6e374ad17a321720863c04d5b2ce68b863e5c3b",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "reviews/owner-log-06.log",
+      "bytes": 907,
+      "sha256": "0f35e7a6a6f832c1bdb7376b96b6b21ed85d5d50b62021615fb9d7fd4b4fda56",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-consumer-independent-fix-clippy.log",
+      "original_bytes": 926,
+      "original_sha256": "2ece08a8420eb8f013539667dc8feadd3ed6569bd56d7bc117b230281db72493",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "reviews/owner-log-07.log",
+      "bytes": 428,
+      "sha256": "b1cac3b3e788ca6114040ed0c91022c75a2de6cc9f5fa2dc89734cd8f02f5f7f",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-consumer-json-independent-behavior-red.log",
+      "original_bytes": 428,
+      "original_sha256": "b1cac3b3e788ca6114040ed0c91022c75a2de6cc9f5fa2dc89734cd8f02f5f7f",
+      "representation": "byte-original"
+    },
+    {
+      "path": "reviews/owner-log-08.log",
+      "bytes": 344,
+      "sha256": "664b226dba74f560140d357e55a261b22f0a6b779cff4d847f97b9549f45e313",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-consumer-json-independent-move-green.log",
+      "original_bytes": 329,
+      "original_sha256": "4e88f985709ea8b7558832f02b2cff4e5f4ff0d814f6531d91e3d481f63be4b9",
+      "representation": "generic path/host/PID/transport-ID strings only; numeric JSON values unchanged"
+    },
+    {
+      "path": "reviews/owner-log-09.log",
+      "bytes": 113,
+      "sha256": "8e0a41aef6e6a7eab75b09946564b87114046d8efa604a1ed9cbdbf9fd3f65b7",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-runner-independent-tests.log",
+      "original_bytes": 113,
+      "original_sha256": "8e0a41aef6e6a7eab75b09946564b87114046d8efa604a1ed9cbdbf9fd3f65b7",
+      "representation": "byte-original"
+    },
+    {
+      "path": "reviews/owner-log-10.log",
+      "bytes": 665,
+      "sha256": "c19a4a92386235d37375d8cb533191d12297ce3e0146c4cdad5fec8bd4dfbf8c",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-runner-independent-probes.log",
+      "original_bytes": 665,
+      "original_sha256": "c19a4a92386235d37375d8cb533191d12297ce3e0146c4cdad5fec8bd4dfbf8c",
+      "representation": "byte-original"
+    },
+    {
+      "path": "reviews/owner-log-11.log",
+      "bytes": 115,
+      "sha256": "3e08c13427e9a3157ab54f123a42ee2f3191ac74b864e64ad0a01b2e486fdb5d",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-consumer-supervisor-final-green.log",
+      "original_bytes": 115,
+      "original_sha256": "3e08c13427e9a3157ab54f123a42ee2f3191ac74b864e64ad0a01b2e486fdb5d",
+      "representation": "byte-original"
+    },
+    {
+      "path": "reviews/owner-log-12.log",
+      "bytes": 163,
+      "sha256": "0820efcaa0a9b24a7d8348d7c3ec7424ec8b116b27a0b544b3f9021dc0efc245",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-supervisor-between-jobs-red.log",
+      "original_bytes": 163,
+      "original_sha256": "0820efcaa0a9b24a7d8348d7c3ec7424ec8b116b27a0b544b3f9021dc0efc245",
+      "representation": "byte-original"
+    },
+    {
+      "path": "reviews/owner-log-13.log",
+      "bytes": 163,
+      "sha256": "3c7d4626efa2d22abb7e3782cdf92dc9fb3251f98806f6d74d6fa6fba0c094fd",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-supervisor-between-jobs-green.log",
+      "original_bytes": 163,
+      "original_sha256": "3c7d4626efa2d22abb7e3782cdf92dc9fb3251f98806f6d74d6fa6fba0c094fd",
+      "representation": "byte-original"
+    },
+    {
+      "path": "reviews/owner-log-14.log",
+      "bytes": 116,
+      "sha256": "39bc226b92abaa2d1038b8f9a20f9fa11fc53c73ba920526e8f04ff4b77a655c",
+      "original_private_identifier": "<private-artifacts>/quest-persisted-consumer-supervisor-boundary-green.log",
+      "original_bytes": 116,
+      "original_sha256": "39bc226b92abaa2d1038b8f9a20f9fa11fc53c73ba920526e8f04ff4b77a655c",
+      "representation": "byte-original"
+    },
+    {
+      "path": "diagnosis/selected-syscalls.json",
+      "bytes": 9273,
+      "sha256": "200daae621f442598e320b4aeda7781d0285c9fa8fc588c7beb40afbc4aeed7b",
+      "representation": "derived selected redacted syscalls; full trace SHA references only"
+    }
+  ],
+  "full_traces_and_binaries_included": false,
+  "excluded_binary_sha256": "2bdc5ca75c018f9f5fe40b33d08050bb313f5b41b14901252ecaa4774426cf87",
+  "manifest_self_hash_excluded": true
+}

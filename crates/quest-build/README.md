@@ -21,15 +21,27 @@ not a prefix. `CMAKE_PREFIX_PATH` retains normal CMake package search and can
 supply dependencies alongside an explicit `QUEST_ROOT`. The removed `QUEST_DIR`,
 `QuEST_DIR` and `QuEST_ROOT` variables fail with migration guidance; unset them
 and select the prefix through `QUEST_ROOT`.
-Package discovery and compilation share the selected compiler and build profile.
-The compiled admission source verifies the supported version and configuration.
+`NativeBuildContext::from_cargo_env()` and `NativeBuildContext::for_tooling()`
+capture the native target, profile and environment for package discovery and
+bridge compilation. Existing `NativePackage` helpers delegate to this context.
+Standalone tooling discovery does not write Cargo directives to stdout.
+The compiled admission source verifies the supported version, configuration,
+architecture, platform and pointer width using the actual selected toolchain.
 On Darwin, `SDKROOT` must name an absolute installed macOS SDK; when absent,
 `xcrun --sdk macosx --show-sdk-path` selects it. The validated SDK is supplied as
 `CMAKE_OSX_SYSROOT` and shared with binding generation together with the evaluated
-compiler implicit system includes. Global `CXX` can select a Nix compiler wrapper;
-per-target compiler and header-search overrides remain rejected. Compiler target
-checks normalize Clang `arm64` to Rust `aarch64` on Darwin and accept Red Hat's
-`<arch>-redhat-linux` spelling for native GNU/Linux GCC.
+compiler implicit system includes. CMake selects the default compiler when no compiler is requested. Ordinary
+`CC`, `CXX`, `CFLAGS`, `CXXFLAGS`, `CPATH`, compiler search variables and
+`CMAKE_TOOLCHAIN_FILE` retain their native meanings. Cargo/cc-specific target
+spellings such as `CXXFLAGS_<target>` remain unsupported because CMake does not
+interpret them. Evaluated link constructs still have to satisfy the supported
+Cargo lowering rules below.
+
+The compiler invocation path and fixed arguments are retained separately from
+its canonical identity: a wrapper selected as `CC` is invoked as `CC`, even if
+that path is a symlink. No `-dumpmachine` command is required. Loaded-module
+state (`PE_ENV`, `LOADEDMODULES`, Cray and Lmod inputs) and ordinary compiler and
+header search variables are watched for Cargo rebuilds.
 
 For manual/Spack Linux builds, select a Rust target linker from the same GCC
 installation as `CXX`; loading Spack's `gcc` may leave the system `cc` unchanged.
@@ -99,8 +111,23 @@ without pkg-config metadata, including Fedora's `H5pubconf-64.h` layout. It
 retains its parallel-HDF5 rejection and matches the locked HDF5 dependency's
 discovery order.
 Indirect dependency deployment is the native installation's
-responsibility. Unsupported linker-state constructs produce an error instead of
-silently changing link semantics.
+responsibility. Linux whole-archive scopes are lowered in library order. Each `-lNAME` inside
+a scope is resolved using CMake's explicit and implicit search directories in
+order, preferring `.so` over `.a` within each directory. A selected shared
+library remains an ordinary shared dependency. A real archive uses Rust's
+`static:-bundle,+whole-archive,+verbatim` modifiers, so its unreferenced members
+remain included when linking a downstream executable through a Rust library.
+Scoped inputs are identified from bounded file-header reads: archive signatures
+or an ELF shared-object header. A filename suffix alone cannot establish that
+removing the scope preserves its meaning. Linker scripts inside a scope are
+rejected; ordinary shared-library linker scripts outside scopes remain supported.
+Split `-Wl` options, bundled `-Wl,--whole-archive,-lNAME,--no-whole-archive`
+options, `-Xlinker` forwarding and exact archive filenames are supported.
+Exact-file shadow checks include bridge archive directories.
+
+Unbalanced or nested scopes, unresolved scoped libraries, other order-sensitive
+linker constructs and repeated exact libraries that Rust cannot represent with
+link modifiers produce errors. Native archives are not copied or repackaged.
 
 ## Independent consumer acceptance
 
@@ -113,9 +140,20 @@ processes, including actual state-vector/density placement and clone checks.
 The default remains `cpu`; a requested unavailable backend fails.
 
 The Rust harness builds an independent workspace containing direct `quest-sys`,
-facade, wrapped and renamed consumers. It inspects platform loader metadata and resolved
-libraries, then runs quantum checks outside Cargo with loader overrides removed.
-Linux acceptance inspects ELF dynamic tags; Darwin acceptance uses Mach-O tools. These loader tools are acceptance dependencies,
-not production discovery dependencies. `--work-dir PATH` selects the preserved
-fixture/log directory. Actual GPU execution is separate from resolving GPU
-runtime libraries.
+facade, wrapped and renamed consumers. It preserves the compiler/module
+environment during compilation and, by default, during quantum checks outside
+Cargo.
+
+Test deployment without loader overrides separately:
+
+```sh
+cargo run --locked -p xtask -- check-native-consumers --loader-isolated
+```
+
+This mode inspects loader metadata and resolved libraries, then removes loader
+overrides for execution. Linux inspection uses ELF dynamic tags; Darwin uses
+Mach-O tools. These loader tools are acceptance dependencies, not production
+discovery dependencies. Report ordinary and loader-isolated results separately:
+a module-environment pass does not establish loader isolation. `--work-dir PATH`
+selects the preserved fixture/log directory. Actual GPU execution is separate
+from resolving GPU runtime libraries.

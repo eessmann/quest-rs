@@ -1,0 +1,53 @@
+info: experimental features enabled: benchmarks
+warning: `feature(generic_const_exprs)` is not supported with the next-generation trait solver
+ --> crates/quest-polynomial/src/lib.rs:1:30
+  |
+1 | #![feature(const_trait_impl, generic_const_exprs)]
+  |                              ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `-Znext-solver=globally` is currently enabled by default for testing
+  = note: reverted the setting to `-Znext-solver=coherence` for this crate
+  = note: the currently stable trait solver will be used for this crate
+  = note: see issues #160895 <https://github.com/rust-lang/rust/issues/160895> for more information
+
+   Compiling quest-qsvt-cli v0.1.0 (<workspace>/crates/quest-qsvt-cli)
+warning: `quest-polynomial` (lib) generated 1 warning
+warning: `quest-polynomial` (lib test) generated 1 warning (1 duplicate)
+   Compiling quest-sys v0.2.0 (<workspace>/crates/quest-sys)
+warning: `feature(generic_const_exprs)` is not supported with the next-generation trait solver
+ --> crates/quest-polynomial/tests/remez_static.rs:5:12
+  |
+5 | #![feature(generic_const_exprs)]
+  |            ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `-Znext-solver=globally` is currently enabled by default for testing
+  = note: reverted the setting to `-Znext-solver=coherence` for this crate
+  = note: the currently stable trait solver will be used for this crate
+  = note: see issues #160895 <https://github.com/rust-lang/rust/issues/160895> for more information
+
+warning: `feature(generic_const_exprs)` is not supported with the next-generation trait solver
+ --> crates/quest-polynomial/tests/functions.rs:1:41
+  |
+1 | #![feature(const_trait_impl, const_ops, generic_const_exprs)]
+  |                                         ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `-Znext-solver=globally` is currently enabled by default for testing
+  = note: reverted the setting to `-Znext-solver=coherence` for this crate
+  = note: the currently stable trait solver will be used for this crate
+  = note: see issues #160895 <https://github.com/rust-lang/rust/issues/160895> for more information
+
+warning: `quest-polynomial` (test "remez_static") generated 1 warning
+warning: `quest-polynomial` (test "functions") generated 1 warning
+warning: quest-sys@0.2.0: Using QuEST 4.3.0 from <quest-install> with /usr/bin/c++
+   Compiling quest-rs v0.1.0 (<workspace>/crates/quest)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.56s
+────────────
+ Nextest run ID d535dcf0-7ce5-414c-badc-92e31c7e52e2 with nextest profile: default
+    Starting 5 tests across 1 binary (37 tests and 283 binaries skipped)
+        PASS [   0.354s] (1/5) quest-build probe::tests::cargo_discovery_evaluates_the_selected_package_once
+        PASS [   0.377s] (2/5) quest-build probe::tests::cmake_build_evaluates_target_requirements_and_paths_with_spaces
+        PASS [   0.424s] (3/5) quest-build probe::tests::cargo_watches_external_inputs_without_watching_its_own_outputs
+        PASS [   0.718s] (4/5) quest-build probe::tests::cargo_profiles_and_explicit_cxx_remain_coherent_in_child_processes
+        PASS [   0.970s] (5/5) quest-build probe::tests::reconfiguration_uses_current_prefix_after_explicit_selection_is_removed
+────────────
+     Summary [   0.970s] 5 tests run: 5 passed, 37 skipped

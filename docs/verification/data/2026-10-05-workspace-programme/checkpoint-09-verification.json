@@ -1,0 +1,207 @@
+{
+  "schema": "quest.workspace-verification.checkpoint.v1",
+  "base_commit": "dd9a869ebe9952cf85a6411a180ed7b688f568fb",
+  "checkpoint": "09-fatal-witness-and-complete-local-gates",
+  "status": "passed declared local repository gates; scientific and external capacity acceptance separate",
+  "recorded_utc": "2026-10-06T07:10:48.843130+00:00",
+  "source_sha256": "2111d129965cb6a473fc8b376a3a839f68732f51267b618f706f5c48a0028669",
+  "source_file_count": 975,
+  "source_manifest": "checkpoint-09-source.json",
+  "source_manifest_sha256": "7a3a0498323f66e762eca788439ff9a45f5b212491e84edf0f3d836a64c302db",
+  "source_scope": "all existing tracked and untracked crate files including Markdown consumed by doctests; verification fixture sources/data; root Cargo manifests/lock and any repository .cargo configuration, Rust toolchain and nextest configuration. Excludes unrelated documentation/evidence, external registry/native install contents and arbitrary environment",
+  "source_unchanged_before_after": true,
+  "delta_from_checkpoint08": [
+    {
+      "path": "crates/quest/src/qsvt/matching/collective/failure_tests.rs",
+      "before_sha256": "9231d7a60ef93583e1799990c9b19ccc60ea338418541d5fdac55f21f0a56976",
+      "after_sha256": "95df58605b3f35ab3f8cadb5d4250c2c74e463931ab91644db8749af43d74fb4"
+    }
+  ],
+  "environment": {
+    "rust": "1.101.0-nightly db8f076d2",
+    "quest": "installed QuEST4.3.0, native source unchanged",
+    "mpi": "MPICH4.2.2; matching native ABI checked",
+    "hdf5": "serial",
+    "execution": "local CPU/MPI; original08wrapper environment and scheduling retained"
+  },
+  "gates": [
+    {
+      "name": "allfeatures",
+      "command": [
+        "cargo",
+        "nextest",
+        "run",
+        "--workspace",
+        "--all-features",
+        "--no-fail-fast"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 314.4211594619992,
+      "log_sha256": "96e505205dc1c52274cf01f6cf7894b4078448bd0e66ccf437f0681005abf8b5",
+      "published_log": {
+        "path": "checkpoint-09-logs/allfeatures.log",
+        "bytes": 213776,
+        "sha256": "d729f636a2e7ac6967ffd3208842ddf27f40935b0c05a0ef40cc8b399becf117",
+        "normalization": "generic workspace, home, temporary paths and thread process IDs; log_sha256 above binds original bytes"
+      },
+      "tests_run": 1645,
+      "passed": 1645,
+      "failed": 0,
+      "skipped": 6,
+      "seconds": 311.32
+    },
+    {
+      "name": "default",
+      "command": [
+        "cargo",
+        "nextest",
+        "run",
+        "--workspace",
+        "--no-fail-fast"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 93.30726444700122,
+      "log_sha256": "094e5d2eb6831032b08d61c21f016b7fe68d928a37049f3d28eee72a9e12d98c",
+      "published_log": {
+        "path": "checkpoint-09-logs/default.log",
+        "bytes": 188248,
+        "sha256": "4f8601d773a5f66a10a18d61d7b870b9d57a88db5874fa6ab1b8785a2bd3054e",
+        "normalization": "generic workspace, home, temporary paths and thread process IDs; log_sha256 above binds original bytes"
+      },
+      "tests_run": 1463,
+      "passed": 1463,
+      "failed": 0,
+      "skipped": 1,
+      "seconds": 86.759
+    },
+    {
+      "name": "doctests",
+      "command": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--all-features",
+        "--doc"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 4.043469548996654,
+      "log_sha256": "ccab66a80f1823f7306561caa7bf235ff386ef37782d44450314e48556c6dfa5",
+      "published_log": {
+        "path": "checkpoint-09-logs/doctests.log",
+        "bytes": 10979,
+        "sha256": "8486afa9c45c7b566be93db5232d762704c22807cac9826094a4c530d913cb97",
+        "normalization": "generic workspace, home, temporary paths and thread process IDs; log_sha256 above binds original bytes"
+      },
+      "passed": 65,
+      "failed": 0,
+      "ignored": 1,
+      "suites": 24
+    },
+    {
+      "name": "default-check",
+      "command": [
+        "cargo",
+        "check",
+        "--workspace",
+        "--all-targets"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.3565907729935134,
+      "log_sha256": "782b1f245a21f399c2351eeff0787937dec8bacd0ee6aaee16a391237c588c57",
+      "published_log": {
+        "path": "checkpoint-09-logs/default-check.log",
+        "bytes": 2173,
+        "sha256": "00e512a3afb5fedf28eb9df087fb957d94dcdba3f57b25b22595f72650286dc6",
+        "normalization": "generic workspace, home, temporary paths and thread process IDs; log_sha256 above binds original bytes"
+      }
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-features",
+        "--all-targets",
+        "--no-deps",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.1706201010019868,
+      "log_sha256": "cc1361a0cda2ef99ab4963ee23e62c4b96a4dcf95231cf925e44bdbe2fb1ebd2",
+      "published_log": {
+        "path": "checkpoint-09-logs/clippy.log",
+        "bytes": 2344,
+        "sha256": "0b82d98e867bd8a1d45db617cebe68f9196c63fe6f6be6efd910b74dfb7c38dc",
+        "normalization": "generic workspace, home, temporary paths and thread process IDs; log_sha256 above binds original bytes"
+      }
+    },
+    {
+      "name": "bindings",
+      "command": [
+        "cargo",
+        "run",
+        "--locked",
+        "-p",
+        "xtask",
+        "--",
+        "generate-quest-bindings",
+        "--check"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.3359004220037605,
+      "log_sha256": "ed10db02653853b71f12aeac9d27de98d07ff22327d0d59138a00e004be9f18f",
+      "published_log": {
+        "path": "checkpoint-09-logs/bindings.log",
+        "bytes": 22451,
+        "sha256": "184744d33f06ce37cdb84968deacc3e62b0fc0a6f93677d6493ebd8cd88c7344",
+        "normalization": "generic workspace, home, temporary paths and thread process IDs; log_sha256 above binds original bytes"
+      }
+    },
+    {
+      "name": "format",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--check"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 1.36506612499943,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_log": {
+        "path": "checkpoint-09-logs/format.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "normalization": "generic workspace, home, temporary paths and thread process IDs; log_sha256 above binds original bytes"
+      }
+    },
+    {
+      "name": "whitespace",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.013419456998235546,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "published_log": {
+        "path": "checkpoint-09-logs/whitespace.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "normalization": "generic workspace, home, temporary paths and thread process IDs; log_sha256 above binds original bytes"
+      }
+    }
+  ],
+  "historical_failures": "Checkpoint08 six failures remain immutable. Only an MPI test fixture changed, using durable error/peer witnesses with captured and suppressed stderr. No production/native-library or CMake installation fix was made. Recurring earlier CMake module-open cause remains unresolved; both final broad runs passed.",
+  "acceptance_exclusions": [
+    "Actual multi-host input exceeding each node memory cap",
+    "Actual huge-count transfers",
+    "Unavailable accelerator/other-platform validation",
+    "Physical CFD convergence and complete systematic error certificate",
+    "Literal published 3D wake boundary closure"
+  ]
+}

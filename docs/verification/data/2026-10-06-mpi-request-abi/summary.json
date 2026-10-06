@@ -1,0 +1,287 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-06",
+  "status": "local Linux MPI_Request ABI delta verified",
+  "scope": "MPI_Request size and alignment admission; no restricted matching-state implementation or native storage protocol attestation",
+  "source_sha256": {
+    "crates/quest-build/native/mpi_abi.c": "901a162a18b4214c37c84f80e92aa2f69ca09569603ea75bf7bae8d74dac22df",
+    "crates/quest-build/src/rsmpi.rs": "81b034d1f036dccea79ce1b4bf8ad5c71c48b0fc370c1c6df370c7f8453bc373",
+    "crates/quest-sys/src/mpi.rs": "ee407e113f7777d3243c411a5a66b23854ad89062cce2441f60f4c7607f555e2",
+    "crates/quest-sys/src/cxx_bindings/quest_mpi.cpp": "dfa5d7d1821ed1f8616a64998131f905c1576a9b25d4be7d8911133cb20801c6"
+  },
+  "reference_source_snapshot": "9adbef476110e8425bacee15882c006464a6d95b6a54ccb2269621e29af68233",
+  "reference_snapshot_results_validate_current_delta": false,
+  "verification_environment": {
+    "platform": "Linux",
+    "mpi_selection": "system MPICH compiler wrapper and matching installed QuEST MPI library",
+    "native_version_reported": "4.3.0",
+    "native_compiler_reported": "c++",
+    "network_mode": "Cargo locked and offline",
+    "paths": "Workspace, installed prefix, compiler-wrapper and temporary-directory paths are supplied by the local environment; personal paths are not reproduced in this record."
+  },
+  "verification_driver": {
+    "path": "target/mpi-request-abi/verify.sh",
+    "sha256": "f4d750c86d36e63e4e760e0d9b03a12e3ae430461e13d4add198203a87823768",
+    "checked_in": false
+  },
+  "verification": [
+    {
+      "stage": "nextest-mpi",
+      "command": [
+        "cargo",
+        "nextest",
+        "run",
+        "--locked",
+        "--offline",
+        "-p",
+        "quest-build",
+        "-p",
+        "quest-sys",
+        "--features",
+        "mpi",
+        "--no-fail-fast",
+        "--status-level",
+        "fail",
+        "--final-status-level",
+        "fail",
+        "--test-threads=4"
+      ],
+      "exit_status": 0,
+      "log": {
+        "path": "target/mpi-request-abi/nextest-mpi.log",
+        "sha256": "20f8db59552fe5952afb9a56dca3ed63b1dd5b118aa46c24198475de984e9cdc"
+      },
+      "status_file": {
+        "path": "target/mpi-request-abi/nextest-mpi.status",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "tests_passed": 111,
+      "tests_skipped": 0
+    },
+    {
+      "stage": "nextest-default",
+      "command": [
+        "cargo",
+        "nextest",
+        "run",
+        "--locked",
+        "--offline",
+        "-p",
+        "quest-sys",
+        "--no-fail-fast",
+        "--status-level",
+        "fail",
+        "--final-status-level",
+        "fail",
+        "--test-threads=4"
+      ],
+      "exit_status": 0,
+      "log": {
+        "path": "target/mpi-request-abi/nextest-default.log",
+        "sha256": "064599939db7669363c2c67977d48576171590eda917ff629e202b20b28dd40b"
+      },
+      "status_file": {
+        "path": "target/mpi-request-abi/nextest-default.status",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "tests_passed": 41,
+      "tests_skipped": 0
+    },
+    {
+      "stage": "doctests",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "-p",
+        "quest-sys",
+        "--features",
+        "mpi",
+        "--doc"
+      ],
+      "exit_status": 0,
+      "log": {
+        "path": "target/mpi-request-abi/doctests.log",
+        "sha256": "7ed3598d9fd4dc06575f3cffad748a30c7280db4d95ea0967bdace1d66d0b018"
+      },
+      "status_file": {
+        "path": "target/mpi-request-abi/doctests.status",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "tests_passed": 5,
+      "tests_failed": 0,
+      "tests_ignored": 0
+    },
+    {
+      "stage": "workspace-check",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "--offline",
+        "--workspace",
+        "--all-features"
+      ],
+      "exit_status": 0,
+      "log": {
+        "path": "target/mpi-request-abi/workspace-check.log",
+        "sha256": "15fd74b81c0fc3f274064e20e32eb9223359913b8bc916dcf7718d8c4148a0bb"
+      },
+      "status_file": {
+        "path": "target/mpi-request-abi/workspace-check.status",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      }
+    },
+    {
+      "stage": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--offline",
+        "-p",
+        "quest-build",
+        "-p",
+        "quest-sys",
+        "--all-targets",
+        "--features",
+        "mpi",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_status": 0,
+      "log": {
+        "path": "target/mpi-request-abi/clippy.log",
+        "sha256": "7177f2e5764ff46ea6ab1668cc00eb41efab65366e03fc6ddd7711adafed4b41"
+      },
+      "status_file": {
+        "path": "target/mpi-request-abi/clippy.status",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      }
+    },
+    {
+      "stage": "bindings",
+      "command": [
+        "cargo",
+        "run",
+        "--locked",
+        "--offline",
+        "-p",
+        "xtask",
+        "--",
+        "generate-quest-bindings",
+        "--check"
+      ],
+      "exit_status": 0,
+      "log": {
+        "path": "target/mpi-request-abi/bindings.log",
+        "sha256": "e5a45e52d5ec22a4c0075286b64ad03b041b99c5fe95e49ff6070801dc668114"
+      },
+      "status_file": {
+        "path": "target/mpi-request-abi/bindings.status",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      }
+    },
+    {
+      "stage": "fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_status": 0,
+      "log": {
+        "path": "target/mpi-request-abi/fmt.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "status_file": {
+        "path": "target/mpi-request-abi/fmt.status",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      }
+    },
+    {
+      "stage": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_status": 0,
+      "log": {
+        "path": "target/mpi-request-abi/diff.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "status_file": {
+        "path": "target/mpi-request-abi/diff.status",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      }
+    }
+  ],
+  "abi_contract": {
+    "build_witnesses": [
+      "C++ witness compiled through the installed QuEST CMake target",
+      "Independent C witness compiled through the MPI recipe selected for rsmpi"
+    ],
+    "request_fields": [
+      "sizeof(MPI_Request)",
+      "alignof(MPI_Request) in C++; _Alignof(MPI_Request) in C"
+    ],
+    "runtime_layout_fields": 11,
+    "runtime_request_size_slot": 9,
+    "runtime_request_alignment_slot": 10,
+    "runtime_admission_order": "Validate generated Rust layout against native C++ layout before rsmpi initialization or initialization-state queries.",
+    "safe_rust_helper": "validate_rsmpi_layout accepts a borrowed layout slice; production and mismatch tests share the existing guarded FFI constant read.",
+    "unsafe_free_ffi_claim": false
+  },
+  "regressions": {
+    "compiled_test": "rsmpi::tests::compiled_mpi_witness_rejects_request_size_and_alignment_mismatches",
+    "runtime_test": "mpi::generated_abi_tests::request_size_and_alignment_mismatches_are_rejected_before_initialization",
+    "existing_status_alignment_test": "mpi::generated_abi_tests::same_size_alignment_override_is_rejected_before_initialization",
+    "compiled_negative_controls": {
+      "languages": [
+        "C",
+        "C++"
+      ],
+      "unchanged_inputs": "Real MPI headers and loaded MPI library; only the request type seen by the witness is overridden.",
+      "reviewer_observed_cases": [
+        {
+          "case": "plain",
+          "request_size_bytes": 16,
+          "request_alignment_bytes": 1
+        },
+        {
+          "case": "larger",
+          "request_size_bytes": 32,
+          "request_alignment_bytes": 1
+        },
+        {
+          "case": "aligned",
+          "request_size_bytes": 16,
+          "request_alignment_bytes": 8
+        }
+      ],
+      "independent_review": "All six compiler executions distinguished size-only and alignment-only mismatches; reviewer tool transcript, not an additional saved raw-log file."
+    }
+  },
+  "boundaries": {
+    "current_delta_cirrus_execution": "GNU 538084 and Cray 538085 passed current-source ABI and one-/two-node smoke checks; see ../2026-10-06-torc-cirrus/summary.json",
+    "macos_execution": "not run",
+    "other_mpi_implementations": "not run",
+    "full_workspace_test_suite": "not rerun for this delta; workspace all-feature compilation checked",
+    "strict_clippy_scope": "quest-build and quest-sys, all targets, MPI feature",
+    "native_source_changes": false,
+    "restricted_matching_state_implemented": false,
+    "native_storage_protocol_attested": false,
+    "strict_capacity_closed": false,
+    "warnings": "Workspace check and binding generation retain the existing quest-polynomial Rust trait-solver compatibility warning; scoped strict Clippy succeeded."
+  },
+  "raw_artifacts": {
+    "location": "target/mpi-request-abi",
+    "checked_in": false,
+    "note": "Saved local logs and status files are identified by SHA256 above. This checked-in summary contains no workstation-specific paths."
+  }
+}

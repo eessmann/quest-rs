@@ -1,0 +1,29 @@
+{
+  "schema": "quest-cfd-box-window-revalidation.v1",
+  "recorded_utc": "2026-10-05T23:31:06.234754+00:00",
+  "physics_rerun": false,
+  "reports": [
+    {
+      "file": "release.json",
+      "sha256": "05cae182751900894837ac948a7a824ffb34514e7be53165f40c7d1270a62b73",
+      "attempts": 48,
+      "accepted": 42,
+      "classification_changes": 0
+    },
+    {
+      "file": "cavity-stability.json",
+      "sha256": "ab522526f8963207990deb7656186835cd9ddc0b880bf3d25a194f84dc028181",
+      "attempts": 2,
+      "accepted": 2,
+      "classification_changes": 0
+    }
+  ],
+  "validator_sources": {
+    "docs/verification/fixtures/quest-cfd/box_windows.py": "8d7390da00bbe9beea495414fbd1ef94426506426d1012c0f71eeb39de1801cf",
+    "docs/verification/fixtures/quest-cfd/campaign.py": "eb7b5fbcfa333b4861fedff42f5925147f61d45ae81998237eb5da828fc5a148",
+    "docs/verification/fixtures/quest-cfd/test_box_windows.py": "fc87645c4e88ec4109c46649231df5aa2694e5b3911654c0b80b5b77e6b25296"
+  },
+  "unit_tests_passed": 12,
+  "regression_log_sha256": "fc4b694ca223e702d46f6fae6cc95097401419b5c583fbba0fce0203d015988a",
+  "scope": "post-review semantic validation, not new execution, convergence, or total-error proof"
+}

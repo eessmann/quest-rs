@@ -1,0 +1,59 @@
+{
+  "schema": "quest-persisted-weighted-build-attestation-v1",
+  "status": "stable-pinned",
+  "command": [
+    "cargo",
+    "build",
+    "-p",
+    "quest-rs",
+    "--features",
+    "qsvt-io,mpi",
+    "--example",
+    "persisted_weighted_transform",
+    "--message-format=json"
+  ],
+  "consumer_source_manifest_sha256": "fac76f206b3d7aca6e0b9c89e1b021c864084ed6c9724f617a35320d896ccdb1",
+  "before_sha256": "498d511c9ebe4f2844fa4c8bf0ab4d9164126f63c5f261cbfd25e3a7a553fee7",
+  "source_manifest_sha256": "f23156126a0635452ca33a406ff2dd523cd269d70a1cbb1896670ad40a7c7bfb",
+  "scope": "all existing tracked and untracked crate files including Markdown consumed by doctests; verification fixture sources/data; root Cargo manifests/lock and any repository .cargo configuration, Rust toolchain and nextest configuration. Excludes unrelated documentation/evidence, external registry/native install contents and arbitrary environment",
+  "native_scope": "Installed QuEST headers, library and CMake files plus command executable identities/version output. External dependent shared libraries and registry source are not hashed; no hermetic-build claim.",
+  "build_exit_code": 0,
+  "after_sha256": "498d511c9ebe4f2844fa4c8bf0ab4d9164126f63c5f261cbfd25e3a7a553fee7",
+  "before_after_equal": true,
+  "binary_sha256": "2bdc5ca75c018f9f5fe40b33d08050bb313f5b41b14901252ecaa4774426cf87",
+  "binary_path": "<private-artifacts>/quest-persisted-weighted-final-binary-2",
+  "actual_local_package_manifests": [
+    "crates/quest-build/Cargo.toml",
+    "crates/quest-compile/Cargo.toml",
+    "crates/quest-language/Cargo.toml",
+    "crates/quest-macros/Cargo.toml",
+    "crates/quest-math/Cargo.toml",
+    "crates/quest-numerics/Cargo.toml",
+    "crates/quest-polynomial/Cargo.toml",
+    "crates/quest-qasm/Cargo.toml",
+    "crates/quest-qsp/Cargo.toml",
+    "crates/quest-qsvt-io/Cargo.toml",
+    "crates/quest-qsvt/Cargo.toml",
+    "crates/quest-symbolic/Cargo.toml",
+    "crates/quest-synthesis/Cargo.toml",
+    "crates/quest-sys/Cargo.toml",
+    "crates/quest/Cargo.toml",
+    "crates/vendor/mathcore/Cargo.toml"
+  ],
+  "source_files": 970,
+  "profile": {
+    "opt_level": "0",
+    "debuginfo": 1,
+    "debug_assertions": true,
+    "overflow_checks": true,
+    "test": false
+  },
+  "features": [
+    "mpi",
+    "qsvt",
+    "qsvt-io"
+  ],
+  "elapsed_seconds": 0.47857798500626814,
+  "compiler_artifacts_sha256": "d6f3a61e5c6bde209d1f2c18a714baa20f8414a0fbe5a56a05a17c7a8f288877",
+  "build_log_sha256": "76cd3b45406ee411fc25796c794c992022a0e26831c10df8eb2271e7a6b7ea71"
+}

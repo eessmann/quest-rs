@@ -1,0 +1,23 @@
+        FAIL [   1.435s] (1460/1645) quest-rs qsvt::matching::collective::failure_tests::native_rank_local_failure_aborts_blocked_peer
+  stdout ───
+
+    running 1 test
+    Value of: String::from_utf8_lossy(&output.stderr)
+    Expected: contains a substring "unrecoverable distributed MPI operation or cleanup failure"
+    Actual: "injecting checked matching partition failure after native execution\n",
+      which does not contain a substring "unrecoverable distributed MPI operation or cleanup failure"
+      at crates/quest/src/qsvt/matching/collective/failure_tests.rs:26:9
+
+    test qsvt::matching::collective::failure_tests::native_rank_local_failure_aborts_blocked_peer ... FAILED
+
+    failures:
+
+    failures:
+        qsvt::matching::collective::failure_tests::native_rank_local_failure_aborts_blocked_peer
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 38 filtered out; finished in 1.00s
+
+  stderr ───
+    Error: See failure output above
+
+

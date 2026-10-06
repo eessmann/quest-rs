@@ -1,0 +1,181 @@
+{
+  "schema": "quest-persisted-attempt-3-input-bindings-v1",
+  "scope": "All29 immutable inputs hash-checked;24HDF5 payload files are hash-only, text manifests copied separately",
+  "campaign_receipt_original_sha256": "f6a2edd59755625155b401e3de859c838bbe85be836b31c431ba527e4e26cfca",
+  "files": [
+    {
+      "path": "freeze.json",
+      "bytes": 5761,
+      "sha256": "d5a7aa8292b90e404afb8d65ef575447a63a17bd1e602bbe03e8404c2cbec36a",
+      "binary_payload_included": true
+    },
+    {
+      "path": "phases.json",
+      "bytes": 974,
+      "sha256": "51753f689cdca32c68a812c20df82e0b8b83643a8d587a6a12e8ac706d3de412",
+      "binary_payload_included": true
+    },
+    {
+      "path": "term-0/manifest.json",
+      "bytes": 8331,
+      "sha256": "6353075b2ff75f489ac6126402cb52de711ae8be8d5e5760c8076b87fc1dd1c6",
+      "binary_payload_included": true
+    },
+    {
+      "path": "term-0/matching-0000000000000000.h5",
+      "bytes": 6808,
+      "sha256": "3204b4ed9e248f2b5ae9b7861594accad295f433db30bc3ebe6843a2d6e6c132",
+      "binary_payload_included": false
+    },
+    {
+      "path": "term-0/matching-0000000000000001.h5",
+      "bytes": 6808,
+      "sha256": "f185c50afa2ba6a0e63f12c1a5dadf422f783db0c6c2b646826b300eacef957c",
+      "binary_payload_included": false
+    },
+    {
+      "path": "term-0/matching-0000000000000002.h5",
+      "bytes": 6808,
+      "sha256": "1c770c445e8ff8af44270e90fd90b0ce6e6d688688ab9dec8977c576801cc837",
+      "binary_payload_included": false
+    },
+    {
+      "path": "term-0/matching-0000000000000003.h5",
+      "bytes": 6808,
+      "sha256": "878e31aa3e70c3ad6e4dd1320c32a5b7bbf80420a7fb703fe967378d37262d8a",
+      "binary_payload_included": false
+    },
+    {
+      "path": "term-0/matching-0000000000000004.h5",
+      "bytes": 6808,
+      "sha256": "fe344d8803abb21a6c337873b36dfec383676841fc422413c3d861a799e68c95",
+      "binary_payload_included": false
+    },
+    {
+      "path": "term-0/matching-0000000000000005.h5",
+      "bytes": 6808,
+      "sha256": "b98e29e23fcea4ec30ad2d6dc4e36dabe76ac1bc9073b838080128c0fd47cd09",
+      "binary_payload_included": false
+    },
+    {
+      "path": "term-0/matching-0000000000000006.h5",
+      "bytes": 6808,
+      "sha256": "cee882986104f83e99cf5ee2e6c6349f84363f315e651deb9e43ebfec5c89141",
+      "binary_payload_included": false
+    },
+    {
+      "path": "term-0/matching-0000000000000007.h5",
+      "bytes": 6808,
+      "sha256": "71b3b83380062127ec419e6cc9f5c29974d91ba9feb55bb1bf8162a3c5d13191",
+      "binary_payload_included": false
+    },
+    {
+      "path": "term-1/manifest.json",
+      "bytes": 8332,
+      "sha256": "0ab2dab79da876c8468cc6e23555663801a05ad18546e6f918215d24ff5ccb22",
+      "binary_payload_included": true
+    },
+    {
+      "path": "term-1/matching-0000000000000000.h5",
+      "bytes": 6808,
+      "sha256": "d6639fc20c1f54505e7ab4309c34ef7e8391b8304e6e2d319492a3448fa4fce5",
+      "binary_payload_included": false
+    },
+    {
+      "path": "term-1/matching-0000000000000001.h5",
+      "bytes": 6808,
+      "sha256": "7819d3f2aebbd5230459ca000823554cbb130cdc54de8e8a6dfd02d0287bef08",
+      "binary_payload_included": false
+    },
+    {
+      "path": "term-1/matching-0000000000000002.h5",
+      "bytes": 6808,
+      "sha256": "862cb48fb2600e93fc721585bd8f6eb6408e60486f8eff55e9cf03c827cc965c",
+      "binary_payload_included": false
+    },
+    {
+      "path": "term-1/matching-0000000000000003.h5",
+      "bytes": 6808,
+      "sha256": "8d78565cf74c2889fd084b27d58f1f71724cda5cf4fa15b282e52e5695087c92",
+      "binary_payload_included": false
+    },
+    {
+      "path": "term-1/matching-0000000000000004.h5",
+      "bytes": 6808,
+      "sha256": "b53cca911831a08552bca6db971b5aaca44eb9b2d0661465a7fdc1f6387c5e6b",
+      "binary_payload_included": false
+    },
+    {
+      "path": "term-1/matching-0000000000000005.h5",
+      "bytes": 6808,
+      "sha256": "bc7eebba28b12d238e1bde0c7f6af993be798bbe46cf2824bab4fcbdf36a4eeb",
+      "binary_payload_included": false
+    },
+    {
+      "path": "term-1/matching-0000000000000006.h5",
+      "bytes": 6808,
+      "sha256": "da0a2ac674b90a9b4116d14c81576e59590b39660335fecf8564fda1a4ad181e",
+      "binary_payload_included": false
+    },
+    {
+      "path": "term-1/matching-0000000000000007.h5",
+      "bytes": 6808,
+      "sha256": "de85156cb05862055031a7c2b5194de6b39d71497bf9b7a34a7745d325104899",
+      "binary_payload_included": false
+    },
+    {
+      "path": "term-2/manifest.json",
+      "bytes": 8329,
+      "sha256": "c2598c49674058d9d7684e604d6e75b83c03f1b36e7678db97bd228b0d8dd605",
+      "binary_payload_included": true
+    },
+    {
+      "path": "term-2/matching-0000000000000000.h5",
+      "bytes": 6808,
+      "sha256": "0a262ed6c7dac21787b8489eb320de9430e28f6c115291533f762a125cf53175",
+      "binary_payload_included": false
+    },
+    {
+      "path": "term-2/matching-0000000000000001.h5",
+      "bytes": 6808,
+      "sha256": "8ba8f4c886c3b0456343f1368f62ce8f410cfd390e2446e01c829c505cc6fe57",
+      "binary_payload_included": false
+    },
+    {
+      "path": "term-2/matching-0000000000000002.h5",
+      "bytes": 6808,
+      "sha256": "66f2759fa138725a0a503563af558acb39398359293dfd2abd856013832c59fe",
+      "binary_payload_included": false
+    },
+    {
+      "path": "term-2/matching-0000000000000003.h5",
+      "bytes": 6808,
+      "sha256": "7a11a1ae93c947848ce3752ac298934c89883c013a22f268cdc4a5dce1f3c885",
+      "binary_payload_included": false
+    },
+    {
+      "path": "term-2/matching-0000000000000004.h5",
+      "bytes": 6808,
+      "sha256": "3528eb38cddd9faca8036ffb754f1e948f38aeb088703e34eec4e555732687b5",
+      "binary_payload_included": false
+    },
+    {
+      "path": "term-2/matching-0000000000000005.h5",
+      "bytes": 6808,
+      "sha256": "0140dfb1df4ad75da56d776a9667074419e3ef2a72054da6a9afbb524b1ca53a",
+      "binary_payload_included": false
+    },
+    {
+      "path": "term-2/matching-0000000000000006.h5",
+      "bytes": 6808,
+      "sha256": "9a3032335d9d5dc32ffede660df087dc562a70fe49b742202a7c9c08db6e8418",
+      "binary_payload_included": false
+    },
+    {
+      "path": "term-2/matching-0000000000000007.h5",
+      "bytes": 6808,
+      "sha256": "bb7efbdaedb570c431a95acf743b824920de6d078dadf851ba4673d779ef942c",
+      "binary_payload_included": false
+    }
+  ]
+}

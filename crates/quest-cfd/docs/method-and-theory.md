@@ -2,9 +2,9 @@
 
 `quest-cfd` starts with a complete finite-element approximation of an incompressible velocity field, transports probability over all its independent coordinates, and assembles that transport over an entire time interval as one linear system. This tutorial explains the mathematical objects that survive each change of representation. It describes the implemented research example, rather than asserting that every discretization or benchmark has converged.
 
-[Jemcov and Morris](https://arxiv.org/html/2605.19187v1) provide the starting point: a symmetrically ordered Koopman–von Neumann generator and a discretization that preserves its adjoint identity. Their examples use spectral truncations and their finite-domain treatment includes an absorbing channel. This crate instead supplies complete physical BDM1/P0 DG spaces, central configuration DG, and a causal global temporal DG inverse. Those choices are extensions implemented here; the absorbing channel is not implemented.
+[Jemcov and Morris](https://arxiv.org/html/2605.19187v1) provide the starting point: a symmetrically ordered Koopman–von Neumann generator and a discretization that preserves its adjoint identity. Their examples use spectral truncations and their finite-domain treatment includes an absorbing channel. This crate supplies complete physical BDM1/P0 and bounded BDM2/P1 DG spaces, central configuration DG, and a causal global temporal DG inverse. Those choices are extensions implemented here; the absorbing channel is not implemented. A separately truncated [Carleman history route](carleman-history.md) shares the complete physical dynamics and causal history machinery.
 
-For the encoding, reciprocal transformation and execution model, continue with [quantum and distributed execution](quantum-and-distributed.md). The [alternatives](alternatives.md) compare other formulations; [NEXT_STEPS](../NEXT_STEPS.md) separates future work from present behavior. The [2026-10-04 verification record](../../../docs/verification/2026-10-04-quest-cfd.md) is the dated evidence cited below, not a new run performed for this document.
+For the encoding, reciprocal transformation and execution model, continue with [quantum and distributed execution](quantum-and-distributed.md). The [alternatives](alternatives.md) compare other formulations; [NEXT_STEPS](../NEXT_STEPS.md) separates future work from present behavior. The [2026-10-04 verification record](../../../docs/verification/2026-10-04-quest-cfd.md) and [2026-10-05 implementation evidence](../../../docs/verification/2026-10-05-dual-history.md) identify the actual dated experiments; neither automatically validates later changes.
 
 ## 1. Three spaces, three different dimensions
 
@@ -14,7 +14,7 @@ The configuration domain $\Omega_a\subset\mathbb R^m$ contains those vectors $a$
 
 Finally, the history vector $x_H$ contains configuration amplitudes at every temporal DG node. With $n_t$ temporal coefficients it has $Nn_t$ entries. The history matrix is $A\in\mathbb C^{Nn_t\times Nn_t}$, and the global solve is $Ax_H=b$. These spaces should not be confused: physical DG resolution determines $m$, configuration resolution determines $N$, and temporal resolution determines $n_t$.
 
-A three-dimensional flow over time is a four-dimensional physical space–time problem. The KvN lift is instead an $m$-dimensional configuration problem plus time, where $m$ counts the complete independent DG velocity coefficients across the mesh. Refining a physical three-dimensional mesh increases $m$ and therefore the exponent in the configuration tensor. Amplitude encoding reduces the number of index qubits; it does not remove that tensor's classical storage, preparation, oracle or resolution costs.
+A three-dimensional flow over time is a four-dimensional physical space–time problem. The KvN lift is instead an $m$-dimensional configuration problem plus time, where $m$ counts the complete independent DG velocity coefficients across the mesh. Refining a physical three-dimensional mesh increases $m$ and therefore the exponent in the configuration tensor. Amplitude encoding reduces the number of index qubits; it does not remove the tensor's preparation, oracle, resolution or full simulated-state costs. The [generated KvN consumer](distributed-history.md#generated-full-coordinate-kvn-consumer) avoids storing its complete drift table, generator and RHS, while charging repeated complete physical-drift queries and coherent loading.
 
 ```mermaid
 flowchart TD
@@ -93,7 +93,7 @@ $$
  \dot a=F(a),\qquad F(a)=Q^Tr_h(\ell+Qa).
 $$
 
-Because the mass chart is orthonormal, no mass inverse appears in this expression. The lifting is constant in time; time-dependent normal data would require additional terms and are not supported by this construction. For homogeneous lifting, kinetic energy is $E(a)=\tfrac12\|a\|_2^2$. Generally,
+Because the mass chart is orthonormal, no mass inverse appears in this expression. This equation assumes constant lifting; the separate [scalar time-dependent lifting](#scalar-time-dependent-boundary-lifting) retains its derivative and scaled boundary terms. The [complete polynomial-time box source](generated-time-boundaries.md) additionally supports independent polynomial lifting, prescribed traces and body forces. Nonpolynomial data and moving geometry remain unsupported by that source. For homogeneous lifting, kinetic energy is $E(a)=\tfrac12\|a\|_2^2$. For the minimum-mass lifting used in this stationary chart, $Q^TM\ell=0$, so
 
 $$
  E(a)=\tfrac12(\ell+Qa)^TM(\ell+Qa)
@@ -102,7 +102,7 @@ $$
 
 The periodic unit square split into two triangles makes the accounting concrete. Twelve local velocity coefficients are constrained by six independent normal-trace equations across the diagonal and two periodic facet pairs. The two integrated divergence equations have one redundancy because the total divergence follows from periodic normal continuity. The constraint rank is therefore seven and $m=12-7=5$. Both uniform mean-flow modes remain. The generic triangular chart and original monomial fixture represent the same full space.
 
-The chart is a mathematically complete representation, but global constraint elimination need not preserve computational locality. $Q$ can be dense; evaluating $F$ can mix all independent coordinates. The reference computes dense elimination and reorthogonalization and rejects more than 768 local velocity coefficients before full chart assembly. Sparse configuration matrices do not remove this physical preprocessing cost. Likewise, algebraic topology counts for larger meshes do not constitute a constructed chart or an executed flow solve.
+The chart is a mathematically complete representation, but global constraint elimination need not preserve computational locality. $Q$ can be dense; evaluating $F$ can mix all independent coordinates. The reference computes dense elimination and reorthogonalization and rejects more than 768 local velocity coefficients before full chart assembly. The separate [generated distributed box chart](physical-space.md#generated-constraints-and-distributed-complete-charts) retains local Householder factors and dense local fill rather than global $Q$; its factorization and globally coupled queries remain charged. Neither sparse configuration rows nor algebraic topology counts establish a scalable physical drift or an executed flow solve.
 
 ## 5. Pressure remains a physical diagnostic
 
@@ -118,7 +118,7 @@ $$
 
 For unequal cell volumes this differs from an unweighted sum of coefficients. The recovery basis uses volume ratios when eliminating the final pressure unknown. Natural outlet traction instead fixes the pressure level; adding a mean-zero condition there would change the open-boundary problem.
 
-Momentum residuals are checked in the original local coefficient equations, alongside divergence and prescribed-boundary residuals. These checks distinguish a valid complete constrained evolution from a coordinate calculation that merely looks divergence-free. They do not establish mesh accuracy: a coarse P0 pressure can satisfy its discrete equations while poorly resolving the physical pressure field.
+Momentum residuals are checked in the original local coefficient equations, alongside divergence and prescribed-boundary residuals. These checks distinguish a valid complete constrained evolution from a coordinate calculation that merely looks divergence-free. They do not establish mesh accuracy: a coarse P0 pressure can satisfy its discrete equations while poorly resolving the physical pressure field. The [distributed supplied-force wrapper](physical-space.md#distributed-physical-pressure-from-a-broken-force) separately implements full P0/P1 pressure and compensating normal-multiplier gauge recovery; independent source review and pure/MPI 1/2/4/8-rank/split checks passed. The generated complete box force now supplies both autonomous and [polynomial-time distributed drift and KvN history](generated-time-boundaries.md). Time-dependent pressure uses the original acceleration $Q\dot a+\dot\ell$, and recovery rejects mixed prior query times/states before its globally coupled queries. These implementations retain full coordinates; their tiny MPI/reference checks are not physical convergence evidence.
 
 ## 6. From a nonlinear trajectory to linear probability transport
 
@@ -220,6 +220,16 @@ $$
  \qquad B=K\otimes I_N-T_t\otimes G.
 $$
 
+The shared `HistoryDynamics` recipe also admits $\dot z=G(t)z+f(t)$.
+At node $t_{c,r}$ the diagonal generator block is $-m_rG(t_{c,r})$
+and the right-hand side receives $m_rf(t_{c,r})$, with
+$m_r=\Delta t\,w_r^t/2$. Generator entries are visited once per node under
+an admitted maximum count; the source uses one reusable vector. This supports
+Carleman's external degree-zero source without adding a normalized constant
+coordinate. The same assembly accepts full-coordinate KvN generators. The
+history builder checks finite entries, coordinate bounds and concurrent storage;
+recipe-internal construction and work retain their own budgets.
+
 The previous slab's right trace enters the current slab's left test equation with coefficient $-1$. Only the first left equation receives $z_0$. The assembled $A$ is block lower triangular in slab order. It stores the whole requested horizon, including two separate traces at temporal interfaces. A solver may approximate its inverse globally; no sequence of classical nonlinear steps is substituted for this history construction.
 
 Even when $G$ is skew-adjoint, $A$ is non-Hermitian because of the causal temporal traces. The implementation passes this matrix directly to singular-value transformation. It does not form $A^\dagger A$, which would change conditioning and the operator being encoded. History unknowns are spatially mass-weighted $z$ values; temporal quadrature weights remain separate metadata. A normalized entire history state is therefore not automatically a normalized final-time probability distribution.
@@ -231,7 +241,7 @@ $$
  \qquad \frac{B+B^\dagger}{2}=\frac12I
 $$
 
-when $G$ is exactly skew-adjoint. In the stored floating-point matrix, outward interval arithmetic bounds each slab's Hermitian defect by $\varepsilon_H$, giving $c=1/2-\varepsilon_H>0$. Then $\|B^{-1}\|_2\leq c^{-1}$. The off-diagonal causal trace blocks have norm one. For $n_s$ slabs, the finite triangular inverse expansion yields
+when $G$ is exactly skew-adjoint. For each stored slab, outward interval arithmetic forms $H=(B+B^\dagger)/2$ and proves $c=\min_i(H_{ii}-\sum_{j\ne i}|H_{ij}|)>0$. This preserves the sign of dissipative diagonal terms and also applies to nonnormal Carleman histories; it does not infer norm decay from eigenvalues. Then $\|B^{-1}\|_2\leq c^{-1}$. The off-diagonal causal trace blocks have norm one. For $n_s$ slabs, the finite triangular inverse expansion yields
 
 $$
  \|A^{-1}\|_2\leq\sum_{k=1}^{n_s}c^{-k},
@@ -239,7 +249,32 @@ $$
                   \left(\sum_{k=1}^{n_s}c^{-k}\right)^{-1}.
 $$
 
-A sparse outward bound on $\sqrt{\|A\|_1\|A\|_\infty}$ supplies the upper endpoint. The bound can deteriorate rapidly with the number of slabs; it establishes an enclosure, not favorable long-time complexity. Failure of positive coercivity or representability rejects built-in spectral admission. Temporal DG2 assembly exists, but the current CFD solve workflow rejects it: no built-in bound or external-evidence input is available there. Supporting such a solve requires separate spectral evidence rather than borrowing the DG1 proof.
+A sparse outward bound on $\sqrt{\|A\|_1\|A\|_\infty}$ supplies the upper endpoint. The bound can deteriorate rapidly with the number of slabs; it establishes an enclosure, not favorable long-time complexity. Failure of the sufficient bound or representability rejects built-in spectral admission.
+
+DG2 uses a separate inverse-preconditioner argument. Its temporal matrix and
+exact inverse are
+
+$$
+K_2=\begin{pmatrix}
+1/2&2/3&-1/6\\-2/3&0&2/3\\1/6&-2/3&1/2
+\end{pmatrix},\qquad
+Q=K_2^{-1}=\begin{pmatrix}
+1&-1/2&1\\1&5/8&-1/2\\1&1&1
+\end{pmatrix}.
+$$
+
+For every stored diagonal slab $B_c$, interval arithmetic encloses
+$E_c=(Q\otimes I)B_c-I$. Sparse absolute row and column sums give
+$\delta\geq\max_c\|E_c\|_2$. Since $\|Q\|_2\leq3$, when
+$\delta<1$ the Neumann estimate gives $\|B_c^{-1}\|_2\leq b=3/(1-\delta)$.
+The same causal expansion then yields
+$\sigma_{\min}(A)\geq(\sum_{k=1}^{n_s}b^k)^{-1}$.
+This proof includes the rounding in the stored temporal matrix and works for
+nonnormal, time-dependent generators when the residual bound is admitted.
+It does not infer norm decay from negative eigenvalues. A rejected bound leaves
+construction and other independently supplied evidence conceptually distinct.
+The reference tests check a forced manufactured solution at every DG node and
+compare a small nonnormal history against an independent dense inverse.
 
 ## 10. Initialization, observables and independent error budgets
 
@@ -262,8 +297,78 @@ $$
 
 The code reports coordinate means, variances, physical kinetic energy and probability in outermost configuration cells. Physical reference enstrophy is $\tfrac12\sum_K\int_K|\nabla_x\times u|^2$, using the broken, cellwise curl rather than a distributional curl containing facet jumps. Reported gradient dissipation is $\nu\sum_K\int_K|\nabla_xu|^2$ with the broken gradient. It is not the complete SIP energy form, which also contains consistency and penalty terms. Volume-mean outputs divide these integrated diagnostics by physical domain volume. On a two-cell axis every cell is an outermost cell: smoke boundary probability near one cannot establish negligible truncation leakage. Narrowing $\epsilon$, expanding the domain and refining the grid are different experiments; narrowing an unresolved bump changes the numerical problem rather than demonstrating convergence.
 
-The classical transport comparison independently evolves the same complete DG ODE from each occupied initial configuration point, weights trajectories by initial probability, and compares ensemble means and energy with the lifted calculation. Both references use classical RK4 and expose integration error. Agreement is evidence about that ensemble and discretization, not quantum execution or every physical benchmark.
+The classical transport comparison independently evolves the same complete DG ODE from each occupied initial configuration point, weights trajectories by initial probability, and compares ensemble means and energy with the lifted calculation. Both references use classical RK4 and expose integration error. Agreement is evidence about that ensemble and discretization, not quantum execution or every physical benchmark. The [KvN refinement receipts](kvn-refinement.md) separate configuration/order/width probes from corrected fixed-spacing domain probes, preserve support-policy rejection and show unresolved boundary occupation. Their RK4 time study is distinct from [temporal DG history refinement](../../../docs/verification/2026-10-05-dual-history.md#independent-temporal-refinement).
 
 The dated smoke receipt records $m=5$, $N=1024$, one DG1 slab, history dimension 2048 and horizon 0.01. Scalar and QuEST CPU circuit simulations reported relative history residual about $5.26\times10^{-6}$. Their five-coordinate physical state is complete, but the configuration grid and initial width are coarse. The receipt explicitly leaves physical convergence unestablished. [Recorded construction and execution](../../../docs/verification/data/2026-10-04-quest-cfd/smoke.json).
 
 A defensible convergence study keeps physical mesh/order, initial regularization width, configuration domain, configuration resolution, temporal resolution and algebraic inverse accuracy independently visible. Encoding, circuit execution and observable sampling add further errors. A small $\|Ax_H-b\|/\|b\|$ checks the assembled history system; its translation to solution error also depends on conditioning. It cannot by itself bound any of the preceding physical approximation errors. The separate [next-steps plan](../NEXT_STEPS.md) states which of those acceptance requirements remain open.
+
+## Scalar time-dependent boundary lifting
+
+The bounded simplex reference supports a fixed geometry and constraint kernel
+with every prescribed velocity trace multiplied by a differentiable scalar
+`g(t)`. If `l` is the complete minimum-mass lifting and `Q` is the complete
+homogeneous mass-orthonormal chart, reconstruction and evolution are
+
+\[
+ u=Qa+g(t)l,\qquad
+ \dot a=Q^T\{r_h(Qa+g l,g)-M l\dot g\}.
+\]
+
+The residual rescales both the SIP prescribed trace and the exterior convective
+trace. Pressure reconstruction uses the full physical acceleration
+`Q a_dot + g_dot l`. Although `Q^T M l` is zero to the accuracy of the chart,
+the derivative term is retained explicitly. The public
+`drift_with_boundary_scale` and `reconstruct_pressure_with_boundary_scale`
+methods take both `g` and its derivative; callers cannot omit the derivative
+by passing only a time-dependent velocity.
+
+`PolynomialOde::from_simplex_bdm1_affine_boundary` supports
+`g(t)=offset+rate*t` through bounded centered polarization of the known quadratic
+residual. MathCore retains the resulting exact dyadic coefficients and treats
+time as the final external symbol. All physical coordinates remain present;
+time is not added as a physical coordinate in the lift. The adapter reports
+its numerical extraction probes and roundoff diagnostic. General independent
+boundary functions, moving geometry and convective-outlet dynamics are separate
+formulations, not consequences of this scalar-lifting API.
+
+
+## Complete polynomial-time box lifting and body force
+
+The [generated time-data API](generated-time-boundaries.md) retains every owned
+cell's full polynomial coefficients for `ell(t)`, prescribed exterior traces and
+body acceleration. It supports uniform BDM1/P0 and BDM2/P1 periodic or prescribed
+Dirichlet boxes in two and three dimensions. MathCore prepares the time powers
+and their derivatives once. A fixed collective halo checks each coefficient's
+complete divergence and normal-trace constraints, including prescribed nonzero
+normal data. There is no global lifting, mesh or chart matrix in this producer.
+
+For a supplied compatible lifting, including any homogeneous component, the
+complete equation is
+
+\[
+ c=Qa+\ell(t),\qquad
+ \dot a=Q^T\bigl[f_h(c,g(t),b(t))-M\dot\ell(t)\bigr].
+\]
+
+The original force and the effective force after subtracting `M ell_dot` remain
+separate. Pressure reconstruction checks the original momentum equation with
+`Q a_dot + ell_dot`. An arbitrary supplied lifting need not be mass-orthogonal
+to `Q`; its energy is the complete quadratic form
+`0.5*(Q a + ell)^T M (Q a + ell)`, including the cross term. No homogeneous
+lifting component is discarded to recover the stationary simplification above.
+
+`prepare_time_box_kvn_history_inverse` evaluates this drift at each actual
+left/right temporal quadrature time under the fixed collective row schedule.
+Time stays an external parameter, and body acceleration changes the drift rather
+than creating an additive KvN amplitude source. This is the existing mass-lumped
+temporal DG rule, not exact integration of arbitrary high-degree time products.
+Complete DG1/DG2 history comparisons and nonzero inverse preparation are tested;
+they do not claim a time-dependent inverse replay or physical convergence.
+
+The implementation charges owned source storage, constraint factorization and
+queries, coefficient evaluation, collective identity checks and global history
+construction. Numerical coefficient/pressure residuals are not exact rank or
+constraint certificates. Mixed/curved generated meshes, nonpolynomial boundary
+data and the literal Neumann-farfield/convective-outlet wake remain separate
+requirements; natural traction is not relabeled as those boundary conditions.

@@ -1,0 +1,207 @@
+{
+  "schema": "quest-cfd-capped-cylinder-window-v1",
+  "binary_sha256": "1c3351208d61beb0af0af36fa25506159e72f107e266ff373d5a739a846a6761",
+  "source_sha256": {
+    "crates/quest-cfd/examples/cylinder_window.rs": "3b9313b5fc13208d2eba371539ab044d6edf8a4fa1fa8ff9aa82619dc51f4a1f",
+    "crates/quest-cfd/src/cylinder.rs": "855baaa5c178b6372fe8a7e17290d19c9466178aba32e94e58f1d751d2c0dd4b",
+    "crates/quest-cfd/src/observations.rs": "b88a34d4efe24a68b24b42726ca22eefdabb9b2ae0af519606f4e2f3e32c2520",
+    "crates/quest-cfd/src/simplex.rs": "2c4c4e220969548c254bcddfe7ccc3f310c06be75443aea3461e1d46e8f38c92",
+    "crates/quest-cfd/src/bdm.rs": "0480e7c7cf4e393c4a5819ba5e4296957e6374ed85f0df1ff020a967805f2b85",
+    "crates/quest-cfd/src/cases.rs": "68858f2d8c758576b7fa0837c2d13def9533802c0e48538a02011d79a88f2030",
+    "crates/quest-cfd/src/lib.rs": "a0db2f6dcdc635724cfda7908b1ae9f91dc425c532fdc54e62b1a2c804681298",
+    "crates/quest-cfd/Cargo.toml": "19440f106f95312c40c74aa111dbfdb1f44f75dea1de130b1a8a9461e2863e46",
+    "Cargo.toml": "69aa4b537e7c5cda9a92a13f81e4d745cd0e05355df42f2e6a1f1cec973a8ca0",
+    "crates/quest-cfd/cases/shedding2d.json": "26db584dfddc74994347198475e8743f2a06bc28c00794971e7a4a7a8249049e",
+    "Cargo.lock": "fefe6a70afb1e37ca18587b76c8ad2df392ca16bef9e5d595d5f6457a514222f"
+  },
+  "build_profile": "caller-selected prebuilt binary; recorded build command required",
+  "parameters": [
+    "--short-window",
+    "--dt",
+    "0.0001",
+    "--steps",
+    "10",
+    "--stride",
+    "2",
+    "--observation-start",
+    "0",
+    "--observation-end",
+    "0.001"
+  ],
+  "timeout_seconds": 120,
+  "process_address_space_cap_bytes": 536870912,
+  "cap_kind": "Linux RLIMIT_AS hard/soft; not RSS/node enforcement",
+  "completed": true,
+  "benchmark_converged": false,
+  "source_identity_claim": "source and prebuilt binary hashed independently",
+  "status": "completed",
+  "exit_code": 0,
+  "elapsed_seconds": 0.08672503699926892,
+  "last_reported_progress": {
+    "completed_steps": 10,
+    "time": 0.001,
+    "observations_completed": 5
+  },
+  "native_receipt": {
+    "schema": "quest-cfd-cylinder-window-v1",
+    "status": "completed",
+    "parameters": {
+      "reynolds": 100,
+      "angular_sectors": 4,
+      "radial_layers": 1,
+      "dt": 0.0001,
+      "steps": 10,
+      "stride": 2,
+      "observation_start": 0.0,
+      "observation_end": 0.001,
+      "short_window": true,
+      "max_steps": 1000000,
+      "max_work": 1000000000000,
+      "max_bytes": 67108864,
+      "max_trace_bytes": 65536,
+      "max_residual": 1e-06,
+      "minimum_cycles": 2,
+      "minimum_samples_per_cycle": 8,
+      "maximum_period_variation": 0.1,
+      "lift_amplitude_floor": 1e-10
+    },
+    "completed": true,
+    "convergence_certified": false,
+    "quantum_execution": false,
+    "elapsed_seconds": 0.083623667,
+    "process": {
+      "address_space_cap_bytes": 536870912,
+      "rss_high_water_bytes": 5545984,
+      "address_space_high_water_bytes": 7421952
+    },
+    "progress": {
+      "completed_steps": 10,
+      "time": 0.001,
+      "observations_completed": 6
+    },
+    "result": {
+      "admission": {
+        "frozen_window": false,
+        "observation_steps": [
+          0,
+          10
+        ],
+        "sample_count": 6,
+        "trace_bytes": 192,
+        "aggregate_work": 742195968,
+        "construction_work": 226492416,
+        "integration_work": 81592320,
+        "observation_work": 434110464,
+        "analysis_work": 768,
+        "local_velocity_upper_bound": 96,
+        "peak_managed_upper_bound_bytes": 12845248
+      },
+      "manifest": {
+        "id": "shedding2d",
+        "dimension": 2,
+        "geometry": "[0,2.2]x[0,0.41] minus disk center (0.2,0.2), diameter 0.1",
+        "reynolds": [
+          100
+        ],
+        "reference_velocity": 1.0,
+        "reference_length": 0.1,
+        "boundaries": [
+          "inlet u_x=6*y*(0.41-y)/0.41^2, u_y=0 (mean 1, peak 1.5)",
+          "no slip on cylinder and channel walls",
+          "outlet (nu*grad(u)-p*I)*n=0; unsymmetrized traction convention"
+        ],
+        "initial_condition": "u=0 in interior with prescribed inlet boundary; no-slip cylinder; outlet fixes pressure level",
+        "time_window": [
+          0.0,
+          8.0
+        ],
+        "measurement_window": [
+          4.0,
+          8.0
+        ],
+        "measurement_minimum_cycles": null,
+        "observables": [
+          "Cd=2*Fx/(rho*U_mean^2*D), full pressure plus viscous traction",
+          "Cl=2*Fy/(rho*U_mean^2*D)",
+          "St=f_lift*D/U_mean from measured periodic lift",
+          "pressure difference p(0.15,0.2)-p(0.25,0.2)"
+        ],
+        "provenance": "DFG 2D-2 Re100 geometry/inflow; fixed project observation window. https://www.featflow.de/en/benchmarks/cfdbenchmarking/flow/dfg_benchmark2_re100.html"
+      },
+      "independent_dimension": 20,
+      "local_velocity_dimension": 96,
+      "constraint_rank": 76,
+      "cylinder_segments": 8,
+      "maximum_geometry_deviation": 0.012927373322406078,
+      "pressure_convention": "p(front)-p(back); probes (0.15,0.2),(0.25,0.2); arithmetic mean of incident fluid P0 traces; natural-outflow pressure level",
+      "force_convention": "full pressure plus unsymmetrized viscous traction; Cd/Cl=2F/(rho*U_mean^2*D), rho=1,U_mean=1,D=0.1",
+      "maximum_momentum_residual": 4.3076653355456074e-13,
+      "maximum_continuity_residual": 6.831868404333363e-12,
+      "maximum_boundary_residual": 4.3348657996489237e-13,
+      "trace": [
+        {
+          "time": 0.0,
+          "drag": 34.6170536504826,
+          "lift": -45.127004416010706,
+          "pressure_difference": 49.40876169286567
+        },
+        {
+          "time": 0.0002,
+          "drag": 26.57549773234484,
+          "lift": -35.692199842319035,
+          "pressure_difference": 38.5359375915161
+        },
+        {
+          "time": 0.0004,
+          "drag": 25.393886240329348,
+          "lift": -34.15946626079993,
+          "pressure_difference": 36.89371309855652
+        },
+        {
+          "time": 0.0006000000000000001,
+          "drag": 24.893374665358888,
+          "lift": -33.42323181751583,
+          "pressure_difference": 36.161356816452276
+        },
+        {
+          "time": 0.0008,
+          "drag": 24.472245119242178,
+          "lift": -32.78265769373732,
+          "pressure_difference": 35.53553531918166
+        },
+        {
+          "time": 0.001,
+          "drag": 24.071093281620563,
+          "lift": -32.16773138916951,
+          "pressure_difference": 34.93753972481591
+        }
+      ],
+      "statistics": {
+        "window": [
+          0.0,
+          0.001
+        ],
+        "sample_count": 6,
+        "mean_drag": 26.13581544466537,
+        "mean_lift": -34.940984703392445,
+        "lift_rms": 35.12327453567828,
+        "lift_standard_deviation": 3.573793791745867,
+        "mean_pressure_difference": 37.85993870690947,
+        "frequency": null,
+        "frequency_unavailable_reason": "insufficient complete upward-crossing periods",
+        "policy": {
+          "minimum_cycles": 2,
+          "minimum_samples_per_cycle": 8,
+          "maximum_relative_period_variation": 0.1,
+          "lift_amplitude_floor": 1e-10,
+          "max_samples": 6,
+          "max_work": 768
+        },
+        "periodicity_certified": false
+      }
+    },
+    "error": null
+  },
+  "sources_changed_during_run": false,
+  "diagnostics": ""
+}

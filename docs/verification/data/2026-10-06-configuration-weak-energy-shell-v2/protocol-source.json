@@ -1,0 +1,50 @@
+[
+  {
+    "path": "crates/quest-cfd/src/configuration_weak.rs",
+    "sha256": "c8de797c42ac8b73e196c664b7878cd5dbfe355ee79925289e019082112d09be"
+  },
+  {
+    "path": "crates/quest-cfd/examples/configuration_weak.rs",
+    "sha256": "21740bee48ac0a43d47a99e1f4eb2dbc7e9035089e8a768c1946fd9cb6da9080"
+  },
+  {
+    "path": "crates/quest-cfd/examples/configuration_weak_energy_shell_v2.rs",
+    "sha256": "abc73664fe76be9e3638e09c3e8332b5d6092ee936bd6cb663ff4a2ebe575ac7"
+  },
+  {
+    "path": "crates/quest-cfd/examples/support/configuration_weak_protocol.rs",
+    "sha256": "b7ab23e6c46a8395c85c7e3263c70ec75a68b7afef0099729e867df7f9af9fa3"
+  },
+  {
+    "path": "docs/verification/fixtures/quest-cfd/configuration_weak.py",
+    "sha256": "b7fb96c7569829f0d9ff974443b903e23b89070114f1a1b4a869649481aac7c9"
+  },
+  {
+    "path": "docs/verification/fixtures/quest-cfd/configuration_weak_energy_shell_v2.py",
+    "sha256": "f4ea3ab2904b50de2e3caffd1759c9bbf1024000fd74ee9581c6c03d9fdfcb70"
+  },
+  {
+    "path": "docs/verification/fixtures/quest-cfd/test_configuration_weak.py",
+    "sha256": "b16c0b33c561d266e79eba80aeaecf766ecb5e02554a999121715863b8afc177"
+  },
+  {
+    "path": "docs/verification/fixtures/quest-cfd/test_configuration_weak_energy_shell_v2.py",
+    "sha256": "43bf1d4e37635b8a56afe96a4dd7868d7d6a50795dcb4ddd63fbf68512290394"
+  },
+  {
+    "path": "crates/quest-cfd/docs/configuration-weak-energy-shell-v2.md",
+    "sha256": "07bdcf1aa3a40872fd1c67387d8e05b1d5a20a02c0fffd1e750dea5632bf5a1a"
+  },
+  {
+    "path": "docs/verification/fixtures/quest-cfd/configuration_weak_energy_shell_v2_fixtures/grid_failure.json",
+    "sha256": "3c201b05f048b525144e6bbffe1f2beda4d3ec284df5645a6f32175dd3106800"
+  },
+  {
+    "path": "docs/verification/fixtures/quest-cfd/configuration_weak_energy_shell_v2_fixtures/provenance.json",
+    "sha256": "e1bf3f1f65b5e752a558d15fbb6728a68fffc6fab811081c43d03bc807203529"
+  },
+  {
+    "path": "docs/verification/data/2026-10-06-configuration-weak-campaign/p1-c4-e1-w1_2.json",
+    "sha256": "14664ebc2b353933ef9dabd3e9768f64e4ba5edfa9b4a5d6731e1fc8351d7d76"
+  }
+]

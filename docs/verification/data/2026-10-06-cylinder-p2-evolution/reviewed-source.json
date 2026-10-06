@@ -1,0 +1,62 @@
+[
+  {
+    "path": "crates/quest-cfd/src/reference_rk4.rs",
+    "sha256": "4d5331723e3b39d361a9a51166a87e7e85ef576b5ea900cba829f2c22b109b62"
+  },
+  {
+    "path": "crates/quest-cfd/src/cylinder_evolution.rs",
+    "sha256": "479e9e2e0ba2c79319d9600bfeb9a02c308962c0a071028e64fff5632c862e1a"
+  },
+  {
+    "path": "crates/quest-cfd/src/cylinder_high_order.rs",
+    "sha256": "771c2fcea77f6ce1f286f326506bc4ea88f04eb31c0ca83ba7d89a428a3a3a78"
+  },
+  {
+    "path": "crates/quest-cfd/src/polynomial.rs",
+    "sha256": "711eef613c6222f46a48b0b592f02f16c32ac6ce506ef5e526926c4c16f42ec0"
+  },
+  {
+    "path": "crates/quest-cfd/src/lib.rs",
+    "sha256": "ce58e1ed77510bc431127ea2f4428389442ac79c2fba51227fb220ef4ce7d019"
+  },
+  {
+    "path": "crates/quest-cfd/src/physical_space/boundary.rs",
+    "sha256": "4484c5c8c181bbc3795b2fe5f830786920ae5b32922f23995410a0c08f9be07a"
+  },
+  {
+    "path": "crates/quest-cfd/tests/cylinder_evolution.rs",
+    "sha256": "98b1f45afb27c1907b88db2d8ea4afa17ed5da961891f68c3003386be3eedbcd"
+  },
+  {
+    "path": "crates/quest-cfd/tests/polynomial_rk4.rs",
+    "sha256": "59987b3fff96f74d3d91981c1cea321787459ef96505530e0d9cb2e8a8118433"
+  },
+  {
+    "path": "crates/quest-cfd/tests/test_cylinder_evolution_runner.py",
+    "sha256": "fd18f3999972832939f143d65f37f1617824a528f275f11c9815cd95d118b1b0"
+  },
+  {
+    "path": "crates/quest-cfd/examples/cylinder_p2_evolution.rs",
+    "sha256": "9d77df4c63d8bdd75bed40964e412c59663e9514618ad2e7f5bf383f04ac66a6"
+  },
+  {
+    "path": "crates/quest-cfd/examples/cylinder_p2_evolution.py",
+    "sha256": "e125bb3ffc4782c16b7ef289975e375c9d7978155ea7f8f809f59afc40cc33ae"
+  },
+  {
+    "path": "crates/quest-cfd/docs/cylinder-p2-evolution.md",
+    "sha256": "2ac878cf473d00bd65f8a8182de57e76988d4ff054370fb7bd9ae167f6b48d20"
+  },
+  {
+    "path": "crates/quest-cfd/docs/cylinder-high-order.md",
+    "sha256": "3f05f21902ad53e33f262033e1b02935d79a9d1d17847ff0f8cfbe7d475b2795"
+  },
+  {
+    "path": "docs/verification/fixtures/quest-cfd/campaign.py",
+    "sha256": "eb7b5fbcfa333b4861fedff42f5925147f61d45ae81998237eb5da828fc5a148"
+  },
+  {
+    "path": "docs/verification/data/2026-10-06-cylinder-p2/runtime-snapshot.json",
+    "sha256": "df31ccef904e6d7ae59c0ea71f8cbd763d79674a858161dac799b9ba72a92986"
+  }
+]

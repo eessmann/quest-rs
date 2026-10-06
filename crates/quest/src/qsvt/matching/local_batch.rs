@@ -20,6 +20,21 @@ impl Workspace {
 			),
 		)
 	}
+	pub(super) fn retained_bytes(&self) -> crate::Result<usize> {
+		[
+			(self.indices.capacity(), size_of::<i64>()),
+			(self.outputs.capacity(), size_of::<i64>()),
+			(self.columns.capacity(), size_of::<MatchingColumn>()),
+			(self.values.capacity(), size_of::<quest_sys::QuestComplex>()),
+		]
+		.into_iter()
+		.try_fold(size_of::<Self>(), |sum, (count, width)| {
+			count
+				.checked_mul(width)
+				.and_then(|n| sum.checked_add(n))
+				.ok_or(crate::Error::Overflow)
+		})
+	}
 	pub(super) fn new() -> crate::Result<Self> {
 		Ok(Self {
 			indices: reserve_vec(PAIRS.saturating_mul(2))?,

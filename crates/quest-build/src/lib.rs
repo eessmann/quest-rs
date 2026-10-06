@@ -5,13 +5,16 @@
 //! Final executables emit direct dependency RUNPATHs. Installed native libraries
 //! remain responsible for the runtime paths of their own dependencies.
 
+mod context;
 mod hdf5;
+mod link;
 mod probe;
-pub use hdf5::emit_serial_hdf5_runtime_paths;
+pub use context::NativeBuildContext;
+pub use hdf5::{SerialHdf5, discover_serial_hdf5, emit_serial_hdf5_runtime_paths};
 
 mod package;
 mod rsmpi;
-pub use rsmpi::verify_rsmpi_compatibility;
+pub use rsmpi::{MpiSelection, MpiSource, probe_rsmpi, verify_rsmpi_compatibility};
 
 pub use package::{BridgeInputs, HeaderContext, NativePackage};
 
@@ -59,8 +62,7 @@ const REMOVED_QUEST_ENV_VARS: &[&str] = &["QUEST_DIR", "QuEST_DIR", "QuEST_ROOT"
 /// # Errors
 /// Returns an error for missing Cargo context, unsupported overrides or packages.
 pub fn discover_from_env() -> Result<NativePackage> {
-	let (work, host, target) = cargo_context()?;
-	probe::discover(&work, &host, &target, None)
+	NativeBuildContext::from_cargo_env()?.discover()
 }
 
 /// Compile generated CXX and wrapper sources through the imported `CMake` target.
@@ -68,20 +70,7 @@ pub fn discover_from_env() -> Result<NativePackage> {
 /// # Errors
 /// Returns an error when discovery, ABI validation or `CMake` compilation fails.
 pub fn build_bridge(inputs: &BridgeInputs) -> Result<NativePackage> {
-	let (work, host, target) = cargo_context()?;
-	probe::discover(&work, &host, &target, Some(inputs))
-}
-
-fn cargo_context() -> Result<(PathBuf, String, String)> {
-	watch_environment();
-	let host = env::var("HOST").map_err(|_| {
-		invalid("HOST is missing; use discover_for_tooling outside Cargo build scripts")
-	})?;
-	let target = env::var("TARGET").map_err(|_| {
-		invalid("TARGET is missing; use discover_for_tooling outside Cargo build scripts")
-	})?;
-	let work = env::var_os("OUT_DIR").ok_or_else(|| invalid("OUT_DIR is missing"))?;
-	Ok((PathBuf::from(work).join("quest-native"), host, target))
+	NativeBuildContext::from_cargo_env()?.build_bridge(inputs)
 }
 
 /// Discover an installation for tooling without Cargo build-script variables.
@@ -92,20 +81,7 @@ pub fn discover_for_tooling(
 	work_directory: impl AsRef<Path>,
 	target: Option<&str>,
 ) -> Result<NativePackage> {
-	watch_environment();
-	let rustc = env::var_os("RUSTC").unwrap_or_else(|| "rustc".into());
-	let output = run(Command::new(rustc).arg("-vV"))?;
-	let text = String::from_utf8_lossy(&output.stdout);
-	let host = text
-		.lines()
-		.find_map(|line| line.strip_prefix("host: "))
-		.ok_or_else(|| invalid("rustc -vV did not identify its host"))?;
-	probe::discover(
-		&absolute(work_directory.as_ref())?,
-		host,
-		target.unwrap_or(host),
-		None,
-	)
+	NativeBuildContext::for_tooling(work_directory, target)?.discover()
 }
 
 /// Emit evaluated final-link options and direct library RUNPATHs.
@@ -136,7 +112,7 @@ pub(crate) fn reject_obsolete_environment(
 	Ok(())
 }
 
-fn watch_environment() {
+pub(crate) fn watch_environment() {
 	for name in QUEST_ENV_VARS
 		.iter()
 		.chain(REMOVED_QUEST_ENV_VARS)
@@ -159,6 +135,29 @@ fn watch_environment() {
 			"CXXFLAGS",
 			"CC",
 			"CFLAGS",
+			"CPATH",
+			"CPLUS_INCLUDE_PATH",
+			"C_INCLUDE_PATH",
+			"OBJC_INCLUDE_PATH",
+			"LIBRARY_PATH",
+			"COMPILER_PATH",
+			"GCC_EXEC_PREFIX",
+			"LDFLAGS",
+			"PE_ENV",
+			"LOADEDMODULES",
+			"LMOD_FAMILY_COMPILER",
+			"LMOD_FAMILY_MPI",
+			"CRAYPE_VERSION",
+			"CRAYPE_LINK_TYPE",
+			"CRAY_CPU_TARGET",
+			"CRAY_CPU_TARGETS",
+			"CRAY_LD_LIBRARY_PATH",
+			"CRAY_MPICH_DIR",
+			"CRAYPE_DIR",
+			"CRAY_CC",
+			"CRAY_CXX",
+			"CMAKE_BUILD_PARALLEL_LEVEL",
+			"NUM_JOBS",
 			"LD_LIBRARY_PATH",
 			"LD_PRELOAD",
 			"LD_AUDIT",
@@ -184,14 +183,15 @@ pub(crate) fn validate_target(host: &str, target: &str) -> Result<()> {
 	Ok(())
 }
 
-// Compiler and header-search overrides can make discovery and bridge compilation
-// disagree. Admit the single global CXX compiler selection, and reject other
-// overrides until their interaction with both CMake entry points is supported.
+// Cargo/cc-specific spellings have no CMake meaning. Global compiler and search
+// environment variables are deliberately inherited by the one CMake project.
 fn compiler_override_variables(target: &str) -> Vec<String> {
 	let target_underscores = target.replace(['-', '.'], "_");
 	let mut names = Vec::new();
 	for base in [
+		"CC",
 		"CXX",
+		"CFLAGS",
 		"CXXFLAGS",
 		"CXXSTDLIB",
 		"CMAKE_TOOLCHAIN_FILE",
@@ -203,28 +203,8 @@ fn compiler_override_variables(target: &str) -> Vec<String> {
 			format!("HOST_{base}"),
 			format!("TARGET_{base}"),
 		]);
-		// Global CXX and prefix paths are shared by both discovery entry points.
-		if !matches!(base, "CXX" | "CMAKE_PREFIX_PATH") {
-			names.push(base.into());
-		}
 	}
-	names.extend(
-		[
-			"CPATH",
-			"CPLUS_INCLUDE_PATH",
-			"C_INCLUDE_PATH",
-			"OBJC_INCLUDE_PATH",
-			"GCC_EXEC_PREFIX",
-			"COMPILER_PATH",
-			"LIBRARY_PATH",
-			"CRATE_CC_NO_DEFAULTS",
-		]
-		.into_iter()
-		.map(str::to_owned),
-	);
-	if !target.ends_with("-apple-darwin") {
-		names.push("SDKROOT".into());
-	}
+	names.extend(["CXXSTDLIB".into(), "CRATE_CC_NO_DEFAULTS".into()]);
 	names
 }
 
@@ -242,41 +222,30 @@ fn reject_compiler_overrides(
 	Ok(())
 }
 
+#[cfg(test)]
 pub(crate) fn validate_compiler_environment(
 	target: &str,
-	selected_compiler: Option<&Path>,
+	_selected_compiler: Option<&Path>,
 ) -> Result<()> {
-	for name in compiler_override_variables(target) {
-		println!("cargo:rerun-if-env-changed={name}");
-	}
-	reject_obsolete_environment(|name| env::var_os(name))?;
-	reject_compiler_overrides(target, |name| env::var_os(name))?;
-	if let (Some(compiler), Some(requested)) = (selected_compiler, env::var_os("CXX")) {
-		let requested = PathBuf::from(requested);
-		let resolved = if requested.components().count() == 1 {
-			env::var_os("PATH").and_then(|paths| {
-				env::split_paths(&paths)
-					.map(|directory| directory.join(&requested))
-					.find(|candidate| candidate.is_file())
-			})
-		} else {
-			Some(requested)
-		};
-		let resolved = resolved
-			.and_then(|path| fs::canonicalize(path).ok())
-			.ok_or_else(|| invalid("CXX must name a compiler executable"))?;
-		if resolved != compiler {
-			return Err(invalid(
-				"CXX differs from the C++ compiler selected by CMake; use a fresh build directory",
-			));
+	if env::var_os("OUT_DIR").is_some() {
+		for name in compiler_override_variables(target) {
+			println!("cargo:rerun-if-env-changed={name}");
 		}
 	}
-	Ok(())
+	reject_obsolete_environment(|name| env::var_os(name))?;
+	reject_compiler_overrides(target, |name| env::var_os(name))
 }
 
 #[derive(Debug)]
+#[expect(
+	clippy::struct_excessive_bools,
+	reason = "Independent installed SDK capabilities, not a state machine"
+)]
 pub(crate) struct HeaderConfiguration {
 	version: String,
+	openmp_enabled: bool,
+	gpu_enabled: bool,
+	cuquantum_enabled: bool,
 	mpi_enabled: bool,
 	subcommunicators_enabled: bool,
 }
@@ -328,6 +297,9 @@ pub(crate) fn parse_header_configuration(header: &str) -> Result<HeaderConfigura
 	}
 	Ok(HeaderConfiguration {
 		version: format!("4.3.{patch}"),
+		openmp_enabled: flag("QUEST_COMPILE_OMP")?,
+		gpu_enabled: flag("QUEST_COMPILE_CUDA")?,
+		cuquantum_enabled: flag("QUEST_COMPILE_CUQUANTUM")?,
 		mpi_enabled,
 		subcommunicators_enabled,
 	})
@@ -374,12 +346,6 @@ pub fn runtime_link_args(target_os: &str, directories: &[PathBuf]) -> Result<Vec
 			format!("-Wl,-rpath,{}", paths.join(":")),
 		])
 	}
-}
-
-pub(crate) fn explicit_prefix() -> Result<Option<PathBuf>> {
-	env::var_os("QUEST_ROOT")
-		.map(|candidate| installation_prefix(Path::new(&candidate)))
-		.transpose()
 }
 
 fn installation_prefix(candidate: &Path) -> Result<PathBuf> {
@@ -523,10 +489,9 @@ mod tests {
 	}
 
 	#[gtest]
-	fn rejects_compiler_flags_and_header_search_overrides() -> googletest::Result<()> {
+	fn rejects_only_unmapped_target_specific_compiler_overrides() -> googletest::Result<()> {
 		let target = "x86_64-unknown-linux-gnu";
 		for name in [
-			"CXXFLAGS",
 			"HOST_CXXFLAGS",
 			"TARGET_CXXFLAGS",
 			"CXXFLAGS_x86_64-unknown-linux-gnu",
@@ -536,10 +501,6 @@ mod tests {
 			"HOST_CMAKE_TOOLCHAIN_FILE",
 			"CMAKE_TOOLCHAIN_FILE_x86_64_unknown_linux_gnu",
 			"HOST_CMAKE_PREFIX_PATH",
-			"CPATH",
-			"CPLUS_INCLUDE_PATH",
-			"GCC_EXEC_PREFIX",
-			"COMPILER_PATH",
 			"CRATE_CC_NO_DEFAULTS",
 		] {
 			let error = reject_compiler_overrides(target, |candidate| {
@@ -551,6 +512,30 @@ mod tests {
 		reject_compiler_overrides(target, |_| None).or_fail()?;
 		reject_compiler_overrides(target, |name| (name == "CXX").then(|| "c++".into()))
 			.or_fail()?;
+		Ok(())
+	}
+
+	#[gtest]
+	fn ordinary_native_toolchain_environment_is_admitted() -> googletest::Result<()> {
+		for key in [
+			"CC",
+			"CXX",
+			"CFLAGS",
+			"CXXFLAGS",
+			"CPATH",
+			"C_INCLUDE_PATH",
+			"CPLUS_INCLUDE_PATH",
+			"LIBRARY_PATH",
+			"COMPILER_PATH",
+			"GCC_EXEC_PREFIX",
+			"CMAKE_TOOLCHAIN_FILE",
+			"PE_ENV",
+			"LOADEDMODULES",
+		] {
+			reject_compiler_overrides("x86_64-unknown-linux-gnu", |name| {
+				(name == key).then(|| "selected".into())
+			})?;
+		}
 		Ok(())
 	}
 

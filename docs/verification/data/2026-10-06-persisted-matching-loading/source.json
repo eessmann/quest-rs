@@ -1,0 +1,36 @@
+{
+  "schema": "quest-persisted-loader-capacity-source-v1",
+  "scope": "Seven loader/runtime/IO implementation and private-test Rust files only; excludes dependencies, native QuEST, documentation, ledger, public unchanged tests, telemetry/consumer and all historical bridge/checkpoint artifacts. No whole-workspace build identity claim.",
+  "aggregate_algorithm": "SHA-256 of sorted relative path UTF8 + NUL + lowercase content SHA256 hex + LF",
+  "aggregate_sha256": "a0e5437a9f67decf6d33418aded51a26a390d2c0f0a94900dbe89ca4e7f4d401",
+  "files": [
+    {
+      "path": "crates/quest-qsvt-io/src/sharded_matching.rs",
+      "sha256": "f158e533b22c984842bf6a822bacf0276f9b9bc46975c367dbc1e728c848f72d"
+    },
+    {
+      "path": "crates/quest-qsvt-io/src/sharded_matching/capacity_tests.rs",
+      "sha256": "875c44073170541382f08512f50bf08eb6ba428ddcccd441936a19abdf861caf"
+    },
+    {
+      "path": "crates/quest-qsvt-io/src/sharded_matching/manifest_decode.rs",
+      "sha256": "ba72a50d5e13c8aa4607f43cbb5342a5e51bf7765b7bb093d0fe15bef5bee95f"
+    },
+    {
+      "path": "crates/quest/src/qsvt/persisted_matching.rs",
+      "sha256": "a706079d7ef17182d75e8e0ffc4e1e9d5dc79ff1c343888fd4cd82651e6a2d4e"
+    },
+    {
+      "path": "crates/quest/src/qsvt/persisted_matching/directory.rs",
+      "sha256": "7d7b8c412ca187266baa6dd7144a32cf3a4609a95872d41872f11e9cb25f836b"
+    },
+    {
+      "path": "crates/quest/src/qsvt/persisted_matching/loading.rs",
+      "sha256": "2b5032d3c3a182c9eed36cf452afd3dac060ad0f4557547659866c7f3893e28b"
+    },
+    {
+      "path": "crates/quest/src/qsvt/persisted_matching/loading/capacity_tests.rs",
+      "sha256": "ddb1cc71bbdfc636f042ba0e6cd3b86b345b3138360061e39d8ced406a7c6617"
+    }
+  ]
+}

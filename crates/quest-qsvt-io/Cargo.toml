@@ -14,6 +14,7 @@ serde = { workspace = true, features = ["derive"] }
 sha2.workspace = true
 tempfile.workspace = true
 quest-numerics.workspace = true
+quest-qsvt.workspace = true
 quest-qsp.workspace = true
 quest-polynomial.workspace = true
 serde_json = { workspace = true, features = ["float_roundtrip"] }

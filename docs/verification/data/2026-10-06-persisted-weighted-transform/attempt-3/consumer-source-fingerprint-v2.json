@@ -1,0 +1,85 @@
+{
+  "schema": "quest-persisted-weighted-consumer-source-v1",
+  "files": [
+    {
+      "path": "Cargo.lock",
+      "bytes": 99694,
+      "sha256": "87c8778d0676952202ef6d3d7d7333853d4d3748bea96331383844fd7013f54c"
+    },
+    {
+      "path": "crates/quest/Cargo.toml",
+      "bytes": 1588,
+      "sha256": "1e4b06e6bb76a5a6050a9f3bb02accf78e9d00d4749d017a0045acc803750c35"
+    },
+    {
+      "path": "crates/quest/examples/persisted_weighted_transform.rs",
+      "bytes": 7505,
+      "sha256": "00e208d91468ddb204e6f3c43ca8af67476fe1e3b2f496a6b9da4f0d4cecf673"
+    },
+    {
+      "path": "crates/quest/examples/persisted_weighted_transform/execution.rs",
+      "bytes": 15151,
+      "sha256": "bf0caa2f11c0c3aa8a7e82bc3b89f1850d1f767811f958a5c61887e31d12d813"
+    },
+    {
+      "path": "crates/quest/examples/persisted_weighted_transform/phases.rs",
+      "bytes": 13467,
+      "sha256": "5624d1c42f8b0bb4bd7754f9987982c516cf2958243c864f46f4cd1c1e6717eb"
+    },
+    {
+      "path": "crates/quest/examples/persisted_weighted_transform/policy.rs",
+      "bytes": 4265,
+      "sha256": "af0f5a9fe18422fdc1d0bd4bc641cf1ff38652a56aa11d912944eb36f397bbf7"
+    },
+    {
+      "path": "crates/quest/examples/persisted_weighted_transform/runtime.rs",
+      "bytes": 29263,
+      "sha256": "1a3d7bd04c8f6d91ab834b298e7cbc1dd8872578d4c98123d0b8fb47def0bce9"
+    },
+    {
+      "path": "crates/quest/tests/persisted_weighted_transform.rs",
+      "bytes": 10957,
+      "sha256": "cc81cc88da634463a4fc809b53a31a4d7f64b3c10fd4f3853dabd9220224a0d4"
+    },
+    {
+      "path": "docs/research/persisted-weighted-transform.md",
+      "bytes": 13588,
+      "sha256": "0523cffe6d4db34fce51b0f4118b1c59c9fbe627d542f64eb5498b80fc8507fe"
+    },
+    {
+      "path": "docs/verification/fixtures/persisted-weighted-transform/fixtures/compile-completed-provenance.json",
+      "bytes": 1127,
+      "sha256": "62cbe9703e691e13971f6efbd0bf67a76c8a2578a748a683c1f04a3e2ce74622"
+    },
+    {
+      "path": "docs/verification/fixtures/persisted-weighted-transform/fixtures/compile-completed.json",
+      "bytes": 11131,
+      "sha256": "e0a089496ede2f418afeae36329a88876dcd4e866ea780cb902533a875d5eee2"
+    },
+    {
+      "path": "docs/verification/fixtures/persisted-weighted-transform/fixtures/frame-rejected.json",
+      "bytes": 965,
+      "sha256": "e3e82848e0e626d78429c28f5b9d546a921be4b629a5adfc763dedeedb42735e"
+    },
+    {
+      "path": "docs/verification/fixtures/persisted-weighted-transform/fixtures/loader-rejected.json",
+      "bytes": 1046,
+      "sha256": "f1027fdf3ed72b4716d0bf3d15865b4dee6d56a36aea007f38c2385d0c2cf8be"
+    },
+    {
+      "path": "docs/verification/fixtures/persisted-weighted-transform/fixtures/provenance.json",
+      "bytes": 921,
+      "sha256": "bb09344cf8f6526b0c1eb4335e0e51d493c49b14b062e327ca4750b8f3fa084c"
+    },
+    {
+      "path": "docs/verification/fixtures/persisted-weighted-transform/run.py",
+      "bytes": 33549,
+      "sha256": "dc4b40e7731c86d507308a7f5cab0f5915503d849696072aa4455ad7f07490cf"
+    },
+    {
+      "path": "docs/verification/fixtures/persisted-weighted-transform/test_run.py",
+      "bytes": 28140,
+      "sha256": "10784baada6bc4620ab585aa1dca26d60d30eef4f7fd625bc445c093d70c53ac"
+    }
+  ]
+}

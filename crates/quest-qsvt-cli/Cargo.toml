@@ -24,6 +24,7 @@ hdf5-metno = { workspace = true, features = ["complex"] }
 rayon = { workspace = true, optional = true }
 
 [dev-dependencies]
+quest-test-support.workspace = true
 googletest.workspace = true
 tempfile.workspace = true
 

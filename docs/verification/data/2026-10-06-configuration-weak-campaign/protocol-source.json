@@ -1,0 +1,46 @@
+[
+  {
+    "path": "crates/quest-cfd/Cargo.toml",
+    "sha256": "b513e7badd6ff4f9ad6cbb5938332f7fea5754e1c862687500ce5589efb1dcbd"
+  },
+  {
+    "path": "crates/quest-cfd/examples/configuration_weak.rs",
+    "sha256": "8c776b6aa61a5ab8e549e609f67ddec69879e20484eeac486d1c803125cf7819"
+  },
+  {
+    "path": "crates/quest-cfd/docs/configuration-weak-experiment.md",
+    "sha256": "dbe2b82a6dd67666cd65ef4bcc2e80378ee251d837f4dcffb39610a42191eaec"
+  },
+  {
+    "path": "docs/verification/fixtures/quest-cfd/configuration_weak.py",
+    "sha256": "3739bfe519301922d5118f742eaea5740ac846c658296b1664e0176ddaf6311c"
+  },
+  {
+    "path": "docs/verification/fixtures/quest-cfd/test_configuration_weak.py",
+    "sha256": "b16c0b33c561d266e79eba80aeaecf766ecb5e02554a999121715863b8afc177"
+  },
+  {
+    "path": "docs/verification/fixtures/quest-cfd/configuration_weak_fixtures/complete.json",
+    "sha256": "be621e969bf6d2f925865682e9006aba0d2f0cf8d818b5b9a8f1ca87aaf02973"
+  },
+  {
+    "path": "docs/verification/fixtures/quest-cfd/configuration_weak_fixtures/failure-provenance.json",
+    "sha256": "3d5341069c093482fb5b81d5fa54068ebd80e2ba58fdcbb1d0ef3e46c24bb615"
+  },
+  {
+    "path": "docs/verification/fixtures/quest-cfd/configuration_weak_fixtures/grid_failure.json",
+    "sha256": "150479dd94eae36cabfb847878af05091aea81f2d4fb8bea6e185b445872a305"
+  },
+  {
+    "path": "docs/verification/fixtures/quest-cfd/configuration_weak_fixtures/provenance.json",
+    "sha256": "6785e8d8c7f6687cb9529199b7e367af7fd244650daf79000562ccd85bd735f8"
+  },
+  {
+    "path": "docs/verification/fixtures/quest-cfd/configuration_weak_fixtures/sampling.json",
+    "sha256": "9de1431eda62ad20dbecae4f880e5fe7883322822eb418e12a693eb0907144e9"
+  },
+  {
+    "path": "docs/verification/fixtures/quest-cfd/configuration_weak_fixtures/work.json",
+    "sha256": "b38731314832ddd019147a9b3302d69e81df4119bd952dba1881909854c5553f"
+  }
+]

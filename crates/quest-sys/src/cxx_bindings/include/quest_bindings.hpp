@@ -275,6 +275,12 @@ void read_local_indexed_qureg_amps(const Qureg& qureg,
 void write_local_indexed_qureg_amps(Qureg& qureg,
                                    rust::Slice<const std::int64_t> indices,
                                    rust::Slice<const QuestComplex> values);
+void validate_cpu_communication_buffer(const Qureg& qureg);
+void stage_cpu_communication_buffer(Qureg& qureg);
+void set_cpu_communication_buffer_indexed(
+    Qureg& qureg, rust::Slice<const std::int64_t> indices,
+    rust::Slice<const QuestComplex> values);
+void commit_cpu_communication_buffer(Qureg& qureg);
 void add_qureg(Qureg& out, const Qureg& source);
 
 void set_density_qureg_amps(Qureg& qureg,

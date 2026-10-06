@@ -1,0 +1,101 @@
+{
+  "complete": true,
+  "scope": "transport-only; actual INT_MAX-byte frame plus17-byte tail in both directions",
+  "launcher_seconds": 10.16034916206263,
+  "rows": [
+    {
+      "allocated_capacity": 2147483664,
+      "baseline_address_space_bytes": 229568512,
+      "complete": true,
+      "exceeds_i32_max": true,
+      "logical_bytes": 2147483664,
+      "mem_available_before_bytes": 790004367360,
+      "mpi_thread_multiple": true,
+      "omp_num_threads": "288",
+      "peak_as_bytes": 2377068544,
+      "peak_rss_bytes": 2286198784,
+      "process_as_cap_bytes": 8589934592,
+      "processor_name": "cs-n0000",
+      "rank": 0,
+      "ranks": 2,
+      "rounds": [
+        {
+          "every_byte_verified": true,
+          "first_frame_bytes": 2147483647,
+          "last_frame_bytes": 17,
+          "native_frames": 2,
+          "pattern_seconds": 2.128382428,
+          "received_bytes": 0,
+          "sender": 0,
+          "sent_bytes": 2147483664,
+          "transport_seconds": 0.113788816,
+          "verify_seconds": 2.293908039
+        },
+        {
+          "every_byte_verified": true,
+          "first_frame_bytes": 2147483647,
+          "last_frame_bytes": 17,
+          "native_frames": 2,
+          "pattern_seconds": 0.067309089,
+          "received_bytes": 2147483664,
+          "sender": 1,
+          "sent_bytes": 0,
+          "transport_seconds": 0.155423923,
+          "verify_seconds": 2.295001317
+        }
+      ],
+      "schema": "quest-mpi-large-count-v1",
+      "scope": "checked chunked logical-byte transport; no matching-kernel or beyond-memory capacity claim",
+      "shared_memory_leader_rank": 0,
+      "shared_memory_local_size": 1,
+      "touch_seconds": 0.099053461
+    },
+    {
+      "allocated_capacity": 2147483664,
+      "baseline_address_space_bytes": 229568512,
+      "complete": true,
+      "exceeds_i32_max": true,
+      "logical_bytes": 2147483664,
+      "mem_available_before_bytes": 797743734784,
+      "mpi_thread_multiple": true,
+      "omp_num_threads": "288",
+      "peak_as_bytes": 2377068544,
+      "peak_rss_bytes": 2287325184,
+      "process_as_cap_bytes": 8589934592,
+      "processor_name": "cs-n0001",
+      "rank": 1,
+      "ranks": 2,
+      "rounds": [
+        {
+          "every_byte_verified": true,
+          "first_frame_bytes": 2147483647,
+          "last_frame_bytes": 17,
+          "native_frames": 2,
+          "pattern_seconds": 0.066801621,
+          "received_bytes": 2147483664,
+          "sender": 0,
+          "sent_bytes": 0,
+          "transport_seconds": 0.113788684,
+          "verify_seconds": 2.288730567
+        },
+        {
+          "every_byte_verified": true,
+          "first_frame_bytes": 2147483647,
+          "last_frame_bytes": 17,
+          "native_frames": 2,
+          "pattern_seconds": 2.122273268,
+          "received_bytes": 0,
+          "sender": 1,
+          "sent_bytes": 2147483664,
+          "transport_seconds": 0.155425115,
+          "verify_seconds": 2.289300577
+        }
+      ],
+      "schema": "quest-mpi-large-count-v1",
+      "scope": "checked chunked logical-byte transport; no matching-kernel or beyond-memory capacity claim",
+      "shared_memory_leader_rank": 1,
+      "shared_memory_local_size": 1,
+      "touch_seconds": 0.101201487
+    }
+  ]
+}

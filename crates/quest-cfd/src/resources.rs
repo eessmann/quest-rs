@@ -179,3 +179,53 @@ pub fn estimate_symbolic(request: &ResourceRequest) -> Result<SymbolicEstimate, 
 		status: "symbolic full-resource estimate; no operator or quantum execution".to_owned(),
 	})
 }
+
+/// Fixed-order symmetric Carleman accounting retaining every physical coordinate.
+///
+/// Degree zero is an external source. This counts representation storage, not an
+/// adequate truncation order, a prepared encoding, or an accurate quantum solve.
+/// # Errors
+/// Rejects invalid counts and bounds arbitrary-width integer metadata/work.
+#[allow(
+	clippy::arithmetic_side_effects,
+	reason = "Checked machine counts and exact arbitrary-width dimensions"
+)]
+pub fn estimate_carleman(
+	request: &ResourceRequest,
+	order: usize,
+) -> Result<ResourceEstimate, CfdError> {
+	let m = request
+		.local_velocity_dimension
+		.checked_sub(request.constraint_rank)
+		.filter(|m| *m > 0)
+		.ok_or(CfdError::InvalidInput(
+			"positive complete kernel dimension required",
+		))?;
+	if request.time_elements == 0
+		|| request.temporal_coefficients == 0
+		|| request.statevector_budget_bytes.len() > 1_048_576
+	{
+		return Err(CfdError::InvalidInput("invalid Carleman resource metadata"));
+	}
+	let budget = request
+		.statevector_budget_bytes
+		.parse::<UBig>()
+		.map_err(|_| CfdError::InvalidInput("invalid byte budget"))?;
+	let configuration = crate::carleman::symmetric_dimension(&UBig::from(m), order)?;
+	let history = &configuration
+		* UBig::from(request.time_elements)
+		* UBig::from(request.temporal_coefficients);
+	let data_qubits = (&history - UBig::ONE).bit_len();
+	let total_qubits = data_qubits
+		.checked_add(request.auxiliary_qubits)
+		.filter(|q| *q <= 1_048_576)
+		.ok_or(CfdError::InvalidInput("Carleman resource metadata budget"))?;
+	let bytes = UBig::from(16_u8) << total_qubits;
+	Ok(ResourceEstimate {
+        independent_dimension: m,
+        configuration_dimension: configuration.to_string(),
+        history_dimension: history.to_string(), data_qubits, total_qubits,
+        statevector_bytes: bytes.to_string(), fits_statevector_budget: bytes <= budget,
+        status: "fixed-order symmetric Carleman representation estimate; truncation accuracy and circuit resources unverified".into(),
+    })
+}

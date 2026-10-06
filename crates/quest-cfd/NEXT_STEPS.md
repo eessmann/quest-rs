@@ -21,7 +21,35 @@ rsmpi/native MPI; independent bounded classical references.
 [method and theory](docs/method-and-theory.md),
 [quantum/distributed contract](docs/quantum-and-distributed.md).
 
-**Status date:** 2026-10-05. This is a development backlog and proposed sequence,
+**Workspace programme:** The approved
+[sparse operators, MathCore and dual-history implementation programme](../../docs/superpowers/plans/2026-10-05-sparse-mathcore-cfd.md)
+extends this backlog. Its delivery order takes precedence over the sequence
+below: sparse/MPI foundations, workspace MathCore consolidation, encoding
+portfolio, Burgers/Carleman, KdV and the remaining DG foundation, then campaigns.
+The numbered CFD tasks below retain their acceptance requirements. The new
+Carleman route is an explicitly truncated comparison solver over the same full
+physical coordinates; it does not replace full-KvN acceptance.
+
+The programme also makes workspace-wide MathCore consolidation an implementation
+requirement: shared algebra must replace duplicate implementations and have
+real consumers in the symbolic, numerical, polynomial, language/compiler,
+QSP/QSVT and CFD layers. Adding an unused optional dependency is insufficient.
+
+Matching resources now use [version-two record fingerprints](../../docs/verification/2026-10-06-sparse-record-fingerprints.md),
+with explicit rejection of old persisted manifests. The
+[portfolio identity repair](../../docs/verification/2026-10-06-portfolio-source-fingerprints.md)
+also covers weighted and structured source records. Both retain separate
+operator and unitary identities, charge digest work/storage where their APIs
+support those budgets, and preserve historical evidence. These are integrity
+corrections, not new physical-accuracy or capacity results.
+
+The [persisted weighted inverse campaign](../../docs/verification/2026-10-06-persisted-weighted-transform.md)
+now connects publication from eight ranks, one phase compilation and reuse of
+the same files on 1/2/4/8 ranks and split groups. Its fixed dimension-32 inverse
+passes the declared residual criterion. Physical-history decompositions,
+equal-accuracy comparisons and actual multi-host capacity remain distinct work.
+
+**Status date:** 2026-10-06. This is a development backlog and proposed sequence,
 not an implementation or benchmark acceptance report. File names marked
 **proposed** below do not denote existing APIs. Paths beginning `src/`, `tests/`
 and `cases/` are relative to this crate; `crates/...` paths are relative to the
@@ -36,14 +64,101 @@ and QuEST CPU backends. It also records 1/2/4/8-rank matching tests, split
 communicators, source-integrity checks and native mid-execution abort coverage.
 Those are dated results, not checks rerun while writing this document.
 
-| Area | Existing foundation | Remaining acceptance |
+The [dual-history implementation evidence](../../docs/verification/2026-10-05-dual-history.md)
+records the newer scoped results. The full programme remains open; the detailed
+checkboxes below describe acceptance gates, including obligations beyond the
+implemented APIs.
+
+Additional current scope is documented by the [generated MPI history consumers](docs/distributed-history.md),
+[complete distributed box-drift history](../../docs/verification/2026-10-05-generated-box-kvn-history.md),
+[generated polynomial-time box data and history](docs/generated-time-boundaries.md),
+[KvN configuration diagnostics](docs/kvn-refinement.md),
+[bounded portfolio comparison](../quest-qsvt/docs/portfolio-comparison.md) and
+[real capped local sparse pipeline](../../docs/verification/2026-10-05-sparse-capacity.md).
+Those chapters distinguish modeled memory, actual process caps, numerical checks
+and unresolved physical accuracy; historical test totals are not current-tree acceptance.
+
+The [paired-history fixture](docs/paired-history.md) now initializes both lifts
+from the same complete sampled ensemble and compares their physical moments with
+trajectories of the original DG system. Its dated receipts preserve resource
+rejections separately from successful histories. The
+[exterior configuration-flux diagnostic](../../docs/verification/2026-10-06-configuration-flux.md)
+also distinguishes inward/outward trace rates from outer-cell occupation. These
+APIs support Task 1; neither establishes integrated leakage or independent
+configuration/regularization convergence.
+
+The [initial weak-generator diagnostic](docs/configuration-weak.md) adds complete
+complex-amplitude contractions and original-force coordinate/energy comparisons.
+Its [focused verification](../../docs/verification/2026-10-06-configuration-weak.md)
+retains the larger DG2 work rejection. The subsequent
+[seven-row fixed campaign](../../docs/verification/2026-10-06-configuration-weak-campaign.md)
+completed three requests and retained three work rejections and one sampling
+rejection. Initial mean bias and a constant-energy support degeneracy prevent a
+configuration-convergence claim. A separate
+[DG2/two-cell diagnostic](../../docs/verification/2026-10-06-configuration-weak-energy-shell-v2.md)
+completed with nonconstant occupied energy, but retained unresolved
+concentration and a larger energy-rate defect under changed quadrature.
+Resolving those errors and global-history
+convergence remain open; this initial-rate operation does not replace either.
+
+The [closed affine mesh stage](docs/affine-mesh.md) extends Task 2 with complete
+BDM1/P0 and BDM2/P1 spaces on admitted unequal cells, shared exact MathCore
+geometry, topology checks, weighted pressure and polynomial boundary data. Its
+[verification and runnable exact fixtures](../../docs/verification/2026-10-06-affine-mesh.md)
+retain the full spaces and explicit constructor/query limits. The subsequent
+[mixed-boundary foundation](docs/mixed-traction.md) adds explicit velocity and
+mechanical-traction facets, full open-domain rank, absolute pressure and
+canonical polynomial-time lifting. Its
+[exact and runtime evidence](../../docs/verification/2026-10-06-mixed-traction.md)
+is limited to bounded affine assembly. Curved and mixed-order meshes,
+generated distributed arbitrary geometry and physical convergence remain open;
+neither stage closes Task 2's gate.
+
+The [P2 cylinder snapshot](docs/cylinder-high-order.md) applies that foundation
+to a versioned polygonal DFG source and complete quadratic inlet data. Its
+[fixed exact-rank calculation](../../docs/verification/2026-10-06-cylinder-p2.md)
+retains all 54 independent coordinates. The later [bounded evolution](docs/cylinder-p2-evolution.md)
+advances that full space over `[0,0.0001]`; its [three-row record](../../docs/verification/2026-10-06-cylinder-p2-evolution.md)
+preserves completed integration separately from failed temporal accuracy. The
+official DFG measurement cycle remains open.
+
+| Area | Implemented and scoped-tested foundation | Remaining acceptance |
 | --- | --- | --- |
-| Physical DG | Full BDM1/P0 triangles/tetrahedra; stationary lifting; momentum and pressure reconstruction | Higher order, scalable complete constraints, time-dependent lifting, approved 3D wake boundaries |
-| Configuration/time | Central DG1/DG2 configuration; causal global DG1/DG2 time; algebraic weighted-adjoint checks | Nonlinear independent refinement campaign; useful higher-order/long-history spectral evidence |
-| Encodings | Owned weighted matchings, tensor shifts, weighted arithmetic stencils, compact projectors/schedules | Complete paper-specific base/PREP/UNPREP and source preparation without any full-node matrix |
-| Execution | Portable gate reference; prepared CPU/MPI matching and QSVT schedules; local-partition access | Distributed CFD workflow, scalable routing, all fault classes, multi-host capacity |
-| Physical cases | Six manifests/nine Reynolds configurations; coarse snapshots for eight configurations | Published-window statistics, profile/force validation, geometry refinement, 3D wake execution |
-| Estimates | Untruncated arbitrary-width exact/symbolic dimensions | Encoding-specific ancillas, preparation/query/measurement cost and error-dependent resource curves |
+| Shared algebra | Maintained MathCore exact/dynamic/polynomial/backend foundation; migrated consumers and prepared physical kernels ([contract](../../docs/research/shared-algebra.md)) | Final workspace checks and cross-platform acceptance |
+| Physical DG | Full BDM1/P0 and BDM2/P1 box/affine spaces; [complete polynomial-time lifting, prescribed traces and body forces](../../docs/verification/2026-10-05-polynomial-boundary-lifting.md); [bounded mixed traction and canonical lifting](docs/mixed-traction.md); original-coordinate pressure recovery; [owned-cell polynomial-time box lifting, traces, body force, drift/pressure and history construction](docs/generated-time-boundaries.md) with explicit cost | Distributed arbitrary mixed/curved geometry, nonpolynomial boundary functions, literal 3D wake pressure/outlet closure |
+| Lift/time | Full KvN configuration DG; complete ordered/symmetric Carleman references; stateless Carleman and full-coordinate KvN row/scalar consumers; forced DG1/DG2 streamed inverse | Independent physical/configuration/domain/regularization convergence; longer-history conditioning and certified generated spectra |
+| Carleman evidence | Actual coefficient bounds; optional logarithmic-contraction/scaled-forcing truncation bound; Burgers/KdV order studies | Conservation-aware certificates with all means; validated total reconstruction errors and accuracy-dependent orders |
+| Encodings | Matching baseline, weighted LCU/tensor sums, supported SCC arithmetic constructions, explicit sparse-access QROM; compact schedules, independent same-matrix comparison and constructed portable resource curves; [prepared matching weighted composition on CPU/MPI](../../docs/verification/2026-10-06-distributed-weighted-matching.md) and its [owning QSVT transform](../../docs/verification/2026-10-06-prepared-lcu-transform.md), with whole-unitary, independent polynomial/inverse and collective-failure evidence | Distributed tensor and persisted-resource portfolio extensions, physical-history decomposition, native/equal-accuracy comparisons across sizes, approximation contracts for later compression |
+| Sparse execution | Generated sharded producer, immutable HDF5 resources, bounded replay, local-owner CPU/MPI matching, coherent RHS, streamed inverse and real capped local pipeline; [consuming persisted preparation](../../docs/verification/2026-10-06-persisted-matching-preparation.md), [actual-capacity loader admission](../../docs/verification/2026-10-06-persisted-matching-loading.md) and [cumulative composition routing receipts](../../docs/verification/2026-10-06-prepared-routing-telemetry.md); [same-file weighted inverse execution](../../docs/verification/2026-10-06-persisted-weighted-transform.md); [Cirrus execution and scaling on 2/4/8 nodes](../../docs/verification/2026-10-06-cirrus-capacity.md); [real large-count chunked transport](../../docs/verification/2026-10-06-large-count-mpi.md) | Broader physical-history portfolio integration; additional fault classes; completed execution with canonical input larger than each node's verified cap |
+| Constraints | Cell-whitened distributed Householder chart; generated BDM1/BDM2 box constraints; full null-tail queries; independently reviewed supplied-force pressure/gauge wrapper and complete generated physical drift, tested at 1/2/4/8 ranks and split communicators; collectively scheduled full-coordinate autonomous and polynomial-time box KvN history construction | Certified numerical-rank/pressure error and larger-mesh physical/history convergence |
+| Physical cases | Six physical manifests; coarse snapshots; full-coordinate Burgers/doubled-field KdV demonstrations; bounded refinements; 3D cavity transverse-plane and reflection diagnostics; completed coarse BDM1 DFG eight-second classical window with no resolved shedding frequency; complete P2 cylinder snapshot and bounded trajectory consumer with retained temporal accuracy failure | Accepted P2 temporal accuracy; published-window/profile/force convergence, geometry studies, literal 3D wake execution |
+| Observables | Reviewed probability-weighted KvN energy and exact temporal-node readout; [bounded prepared physical observables](docs/physical-observation-recovery.md); conditional shot estimates; [coherent temporal interpolation](docs/temporal-observations.md); [composed CPU/MPI inverse/time postselection and readout](docs/distributed-temporal-observation.md), with explicit slab/side, original-normalized joint probability and physical scale | General coherent pressure/traction/value oracles; validated systematic bias and repeated measurement campaigns including every temporal preparation/execution cost |
+| Estimates | Arbitrary-width untruncated KvN and complete symmetric Carleman dimensions; [constructed H-adjoint/RHS/inverse costs](docs/constructed-resources.md), actual layout/ancilla counts, conditional sampling work and twelve DG1/DG2 curves retaining rejected stages | Accuracy-dependent mesh/order/precision and broader benchmark comparisons; certified joint success and systematic observable error |
+
+The 512 MiB-capped classical campaign is a small local reference study; it does
+not test stored input larger than one node. Its short Navier–Stokes transients
+are not the published measurement windows. The full-T=0.1 scalar demonstrations
+remain separate from the executed Burgers quantum inverses. The later
+[full T=0.1 Burgers run](../../docs/verification/2026-10-05-dual-history.md#full-frozen-burgers-window)
+uses bounded interval spectral evidence and retains its omitted phase certificate
+and coarse physical-error limits.
+The separately [capped DFG window](../../docs/verification/2026-10-05-cylinder-window.md)
+does reach `[4,8]`, but its coarse polygon produces nearly constant asymmetric
+lift and no admitted Strouhal candidate. This is recorded as an unresolved
+physical result, with explicit geometry error, rather than benchmark acceptance.
+
+The later [full-window box campaign](../../docs/verification/2026-10-06-box-windows.md)
+reaches T=10/20 for Taylor–Green and T=100 for both cavities, with independent
+physical-order/mesh and selected temporal comparisons. Its 44 completed
+snapshots across 50 attempts retain chart-size and unstable-step rejections.
+They are coarse classical results; the published-profile/continuum acceptance
+above remains open. The higher-order reference has an explicit, reported
+integration-work override with its old default preserved.
+
+The optional `--certify-carleman` route applies only to `--lift carleman` with
+`reference`, `build`, or `solve`. It certifies continuous hierarchy truncation
+for the recorded polynomial ODE under explicitly checked sufficient conditions;
+it does not certify all solver errors. Estimates cannot satisfy this flag.
 
 ## Global constraints
 
@@ -85,7 +200,7 @@ Those are dated results, not checks rerun while writing this document.
 
 ## Sequence and parallel work
 
-Start with Task 1's error/experiment contract and Task 6's distributed source
+Within the original CFD backlog, start with Task 1's error/experiment contract and Task 6's distributed source
 contract. They address the two largest gaps between the present smoke test and
 scientific use. Physical work (Tasks 2–3), spectral work (Task 4), and structured
 encoding work (Task 5) can then proceed independently against those contracts.
@@ -188,8 +303,14 @@ extending `drift`. If lifting depends on time, retain its derivative in the
 complete constrained ODE. A nonautonomous lift must be evaluated consistently
 at temporal quadrature nodes in the global history.
 
-- [ ] Write manufactured time-dependent lifting tests with original-coordinate
+- [x] Write manufactured time-dependent lifting tests with original-coordinate
   momentum and continuity residuals, not only a projected-coordinate check.
+  The bounded polynomial reference and generated owned-cell box source cover
+  BDM1/P0 and BDM2/P1 in 2D/3D, complete prescribed traces/body forces, retained
+  homogeneous lifting, `ell_dot`, physical pressure and exact temporal-node
+  evaluation. MPI 1/2/4/8/split tests compare the complete history. See the
+  [supported contract and limits](docs/generated-time-boundaries.md); these tests
+  do not close the separate literal wake or convergence gates below.
 - [ ] Derive and implement the 3D wake's Neumann far field and convective outlet,
   including their energy balance and initial/boundary compatibility. Count any
   added boundary state in the full KvN dimension.
@@ -311,14 +432,16 @@ and RHS preparation, collectively admitted spectral/error evidence and reusable
 prepared schedules. The current `--backend quest-cpu` CLI is a bounded local
 workflow; a future distributed option must not silently reuse its full buffers.
 
-- [ ] Prepare the mass-weighted RHS by bounded local chunks with collective
+- [x] Prepare the mass-weighted RHS by bounded local chunks with collective
   failure agreement. Track global normalization without broadcasting the state.
 - [ ] Decode energy, broken-curl enstrophy, probes and pressure/traction-derived
   forces through specified operators/reductions. Count classical simulator
   reductions separately from a future quantum measurement algorithm.
-- [ ] Record success of the signal/flag projections and selected-time readout
+- [x] Record success of the signal/flag projections and selected-time readout
   separately. Account normalization and temporal weights when converting a
-  history-state observable to a physical-time observable.
+  history-state observable to a physical-time observable. Exact DG nodal selection
+  and arbitrary-time coherent interpolation with composed CPU/MPI postselection
+  are implemented; repeated quantum measurement campaigns remain separate.
 - [ ] Supply a sampling confidence/error contract and an admitted observable
   construction cost. Reserve full-field output for small explicitly budgeted
   references; record its output-size cost.
@@ -331,20 +454,65 @@ sharded path.
 ### Task 9 — Faults, scheduling efficiency and actual multi-host capacity
 
 **Files:** Extend `crates/quest/src/qsvt/matching/`,
-`crates/quest-sys/src/mpi.rs`, checked native adapters and MPI tests. Proposed:
-`docs/verification/fixtures/quest-cfd/capacity.py` and a versioned receipt schema.
+`crates/quest-sys/src/mpi.rs`, checked native adapters and MPI tests. Use
+declarative Torc workflows for the proposed campaign orchestration, with a
+versioned receipt schema and safe Rust scientific validation; do not add a new
+Python capacity controller. The [Torc assessment](../../docs/research/torc-cirrus.md)
+records the inspected source pin, supported configuration and deployment gates.
 
 **Interfaces:** Reuse admitted buffers and a separate transport context. Preserve
 count checks, ownership/lifetime rules and collective preflight; distinguish
 recoverable admission errors from fatal errors after mutation.
 
+The [Cirrus campaign](../../docs/verification/2026-10-06-cirrus-capacity.md)
+now supplies actual two-, four- and eight-node execution, with one MPI rank per
+exclusive node and native OpenMP enabled. It also records original input bytes,
+enforced process caps, placement, stage timings and sampled node memory. The
+canonical input remains below every cap, so this is execution/scaling evidence;
+the capacity checkbox below remains open. Fixed-size end-to-end time increased
+with node count, principally in the measured loading stage. Profile that stage's
+work and communication before selecting an optimization or claiming a cause.
+The [phase measurements](../../docs/verification/2026-10-06-matching-load-phases.md)
+attribute about 95–98% of two-, four- and eight-node loading time to portable
+replay admission in the measured optimized probe. Native resource loading now
+has a separate checked entry point. Completed GNU/Cray comparisons preserve
+forward-state hashes and roundtrip accuracy while reducing loading time.
+The [controlled-profile storage bound](../../docs/research/distributed-capacity-memory.md)
+shows that this particular two-register experiment cannot close the strict
+capacity gate on eight or fewer nodes by increasing its input dimensions alone.
+The [memory follow-up](../../docs/verification/2026-10-06-sparse-capacity-followup.md)
+separates corrected producer accounting, native array payload and resource-only
+loading from that still-open execution-design requirement.
+The subsequent [buffer-reuse stage](../../docs/verification/2026-10-06-matching-buffer-reuse.md)
+removes the second distributed register and passes local and GNU/Cray
+whole-unitary, 1/2/4/8-rank and bounded post-mutation failure tests. It halves
+actual native array payload while retaining the generic input reservation.
+Operation-specific peak admission and verified whole-node enforcement remain
+required; rank process limits alone cannot close strict capacity.
+The [compute-node enforcement diagnostic](../../docs/verification/2026-10-06-node-enforcement.md)
+observed a root-owned site job limit and no writable Slurm delegation. HugeTLB
+coverage and a smaller aggregate application cap remain unverified. Resolve
+that enforcement contract before claiming an oversized-input capacity result.
+Under the user's documented-tools-only Cirrus policy, the small aggregate cap
+is unsupported: record it and move on without custom process limits, cgroup
+changes or replacement deployment mechanisms. The earlier capped runner is
+retained for historical validation and local experiments; it rejects new Slurm
+execution. The restricted-state design remains deferred.
+
+- [ ] Establish a supported Torc server/database deployment, validate its manual
+  Slurm/direct execution route and replace active Python orchestration. Keep
+  genuine node requirements, the eight-node aggregate allocation limit and all
+  failed attempts. Retain historical fixtures and receipts. Unsupported
+  deployment requirements are reported without workarounds.
 - [ ] Inject allocation failures before native construction and at agreed
   execution checkpoints, malformed count/data packets, delayed peers and
   mid-execution native failures. Enforce an external timeout and verify all peers
   return or terminate; preserve the existing native-abort regression.
-- [ ] Test large-count chunk logic with an injectable small test ceiling, then
-  run an actual large-count environment. The synthetic ceiling does not replace
-  the latter evidence.
+- [x] Test large-count chunk logic with an injectable small test ceiling, then
+  run an actual large-count environment. [GNU and Cray two-node probes](../../docs/verification/2026-10-06-large-count-mpi.md)
+  exchanged and fully verified 2,147,483,664 bytes in each direction. Each native
+  frame still fits a signed int; MPI-4 large-count calls were not exercised.
+  Matching routing retains its separate bounded-message path.
 - [ ] Replace replicated global-index scans/all-peer rounds where measurements
   justify it. Retest the whole unitary before reporting any speedup.
 - [ ] Run 1/2/4/8 ranks and split communicators under local memory caps, then
@@ -396,9 +564,12 @@ sources. First compare direct evolution of the same skew-adjoint full-KvN
 operator with the global history inverse at equal physical error and observable
 requirements. Then evaluate Schrödingerisation, alternative reciprocal synthesis,
 and structure-aware preconditioning with their additional coordinates, recovery,
-loading and measurement costs included. Carleman truncation, hybrid Oseen/Newton
-updates and approximate tensor compression require separately labeled research
-branches; they do not close the primary full-KvN requirements.
+loading and measurement costs included. The approved workspace programme adds
+Carleman as a separately labelled history-solver route, with coefficient and
+stability evidence, order refinement, complete physical coordinates and distinct
+preparation/readout costs. Hybrid Oseen/Newton updates and approximate tensor
+compression remain later research alternatives. None closes the full-KvN
+requirements by substitution.
 
 ## Verification and delivery for each implementation stage
 

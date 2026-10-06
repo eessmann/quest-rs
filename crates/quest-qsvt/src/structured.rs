@@ -62,12 +62,15 @@ pub struct TensorShiftEncoding {
 	num_qubits: usize,
 	shifts: Arc<[ShiftRegister]>,
 	gate_count: usize,
+	source_identity: u64,
+	identity_work: usize,
 }
 impl TensorShiftEncoding {
 	/// Freeze disjoint modular shift recipes without enumerating basis indices.
 	///
 	/// # Errors
 	/// Rejects overlapping/out-of-range registers, storage and width overflow.
+	/// Storage admission includes the fixed record-digest stack with live recipe owners.
 	pub fn new(
 		num_qubits: usize,
 		shifts: Vec<ShiftRegister>,
@@ -79,9 +82,11 @@ impl TensorShiftEncoding {
 			.checked_mul(size_of::<ShiftRegister>())
 			.and_then(|b| b.checked_mul(2))
 			.and_then(|b| b.checked_add(size_of::<Self>()))
+			.and_then(|b| b.checked_add(crate::RECORD_FINGERPRINT_SCRATCH_BYTES))
 			.ok_or(Error::Budget("structured shift storage"))?;
 		admit(bytes, policy)?;
 		let mut occupied = 0_usize;
+		let mut identity_work = 0_usize;
 		for &shift in &shifts {
 			if shift
 				.start
@@ -95,12 +100,20 @@ impl TensorShiftEncoding {
 				return Err(Error::Encoding("structured tensor shifts overlap"));
 			}
 			occupied |= mask;
+			if shift.offset != 0 {
+				identity_work = identity_work
+					.checked_add(crate::record_fingerprint_work(3)?)
+					.ok_or(Error::Budget("structured identity work"))?;
+			}
 		}
 		let mut result = Self {
 			num_qubits,
 			shifts: Arc::from(shifts),
 			gate_count: 0,
+			source_identity: 0,
+			identity_work,
 		};
+		result.source_identity = crate::owned_replay::shift_source_identity(&result)?;
 		let mut count = 0_usize;
 		result.visit_gates(false, |_| {
 			count = count
@@ -121,6 +134,16 @@ impl TensorShiftEncoding {
 			.and_then(|n| n.checked_add(size_of::<Self>()))
 			.and_then(|n| n.checked_add(2_usize.checked_mul(size_of::<usize>())?))
 			.ok_or(Error::Budget("structured shift storage"))
+	}
+	/// Modeled SHA record work performed once during construction. Clones retain
+	/// this original construction cost; descriptor reads reuse the immutable ID.
+	/// The byte-only numerical policy does not impose a work ceiling.
+	#[must_use]
+	pub const fn source_fingerprint_work(&self) -> usize {
+		self.identity_work
+	}
+	pub(crate) const fn cached_source_identity(&self) -> u64 {
+		self.source_identity
 	}
 	/// Physical width.
 	#[must_use]

@@ -11,13 +11,13 @@ pub struct BridgeInputs {
 	pub include_directories: Vec<PathBuf>,
 }
 
-/// `CMake`-evaluated C++ header context for binding generation.
+/// ``CMake``-evaluated C++ header context for binding generation.
 #[derive(Clone, Debug, Default)]
 pub struct HeaderContext {
 	pub include_dirs: Vec<PathBuf>,
 	/// Evaluated compiler implicit system includes (including the C++ library).
 	pub implicit_include_dirs: Vec<PathBuf>,
-	/// Evaluated Darwin SDK shared by `CMake` and binding generation.
+	/// Evaluated Darwin SDK shared by ``CMake`` and binding generation.
 	pub sysroot: Option<PathBuf>,
 	pub system_include_dirs: Vec<PathBuf>,
 	pub definitions: Vec<String>,
@@ -26,14 +26,30 @@ pub struct HeaderContext {
 
 /// An installed package and its evaluated consumer requirements.
 #[derive(Clone, Debug)]
+#[expect(
+	clippy::struct_excessive_bools,
+	reason = "Independent installed SDK capabilities, not a state machine"
+)]
 pub struct NativePackage {
 	/// Validated native Cargo target triple.
 	pub target: String,
+	/// Evaluated `CMake` configuration used by the bridge and executable witnesses.
+	pub profile: String,
 	pub prefix: PathBuf,
 	pub version: String,
 	pub mpi_enabled: bool,
 	pub subcommunicators_enabled: bool,
+	/// Canonical compiler identity; never invoke a symlink target in place of its wrapper.
 	pub compiler: PathBuf,
+	/// The executable path selected by `CMake`, preserving wrapper invocation identity.
+	pub compiler_invocation: PathBuf,
+	pub compiler_arguments: Vec<String>,
+	pub implicit_link_dirs: Vec<PathBuf>,
+	pub cmake: PathBuf,
+	pub dynamic_loader_libraries: Vec<String>,
+	pub openmp_enabled: bool,
+	pub gpu_enabled: bool,
+	pub cuquantum_enabled: bool,
 	pub compiler_id: String,
 	pub compiler_version: String,
 	pub headers: HeaderContext,
@@ -71,7 +87,7 @@ impl NativePackage {
 		);
 	}
 
-	/// Emit the `CMake` bridge archive and ordered native library requirements.
+	/// Emit the ``CMake`` bridge archive and ordered native library requirements.
 	///
 	/// # Errors
 	/// Returns an error for paths or options that Cargo cannot represent.
@@ -198,11 +214,20 @@ mod tests {
 		fs::write(&library, "selected").or_fail()?;
 		let mut package = NativePackage {
 			target: "x86_64-unknown-linux-gnu".into(),
+			profile: "Release".into(),
 			prefix: fixture.path().to_owned(),
 			version: "4.3.9".into(),
 			mpi_enabled: false,
 			subcommunicators_enabled: false,
 			compiler: PathBuf::new(),
+			compiler_invocation: PathBuf::new(),
+			compiler_arguments: Vec::new(),
+			implicit_link_dirs: Vec::new(),
+			cmake: PathBuf::from("cmake"),
+			dynamic_loader_libraries: Vec::new(),
+			openmp_enabled: false,
+			gpu_enabled: false,
+			cuquantum_enabled: false,
 			compiler_id: String::new(),
 			compiler_version: String::new(),
 			headers: HeaderContext::default(),

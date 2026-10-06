@@ -1,0 +1,116 @@
+{
+  "files": [
+    {
+      "path": "/usr/bin/cmake",
+      "bytes": 10339944,
+      "sha256": "6ada98c4f457916b95b0a9b3fdd1d5618b3fbe0ee777c6c5aee8203763eb4068",
+      "mode": "0o755",
+      "rpm_record": [
+        "/usr/bin/cmake",
+        "10339944",
+        "1774137600",
+        "6ada98c4f457916b95b0a9b3fdd1d5618b3fbe0ee777c6c5aee8203763eb4068",
+        "0100755",
+        "root",
+        "root",
+        "0",
+        "0",
+        "0",
+        "X"
+      ],
+      "rpm_size_and_digest_match": true
+    },
+    {
+      "path": "/usr/bin/c++",
+      "bytes": 1508440,
+      "sha256": "579d25c2d1e45abeed0c63a517b5c52f6d09ea811a787bf7a7c677a7fd0726f6",
+      "mode": "0o755",
+      "rpm_record": [
+        "/usr/bin/c++",
+        "1508440",
+        "1787097600",
+        "579d25c2d1e45abeed0c63a517b5c52f6d09ea811a787bf7a7c677a7fd0726f6",
+        "0100755",
+        "root",
+        "root",
+        "0",
+        "0",
+        "0",
+        "X"
+      ],
+      "rpm_size_and_digest_match": true
+    },
+    {
+      "path": "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake",
+      "bytes": 9084,
+      "sha256": "7a3fd563ddcf0c62b8b78cc56e9a084b90fa174b73060b4ba57f820af1afab55",
+      "mode": "0o644",
+      "rpm_record": [
+        "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake",
+        "9084",
+        "1773754156",
+        "7a3fd563ddcf0c62b8b78cc56e9a084b90fa174b73060b4ba57f820af1afab55",
+        "0100644",
+        "root",
+        "root",
+        "0",
+        "0",
+        "0",
+        "X"
+      ],
+      "rpm_size_and_digest_match": true
+    },
+    {
+      "path": "/usr/share/cmake/Modules/CMakeCXXInformation.cmake",
+      "bytes": 6262,
+      "sha256": "477236eeaa4a4d0300b9cd8ec349b24d8876090211ede11a3bed50ab22f0b440",
+      "mode": "0o644",
+      "rpm_record": [
+        "/usr/share/cmake/Modules/CMakeCXXInformation.cmake",
+        "6262",
+        "1773754156",
+        "477236eeaa4a4d0300b9cd8ec349b24d8876090211ede11a3bed50ab22f0b440",
+        "0100644",
+        "root",
+        "root",
+        "0",
+        "0",
+        "0",
+        "X"
+      ],
+      "rpm_size_and_digest_match": true
+    }
+  ],
+  "limits": {
+    "RLIMIT_NOFILE": [
+      1048576,
+      1048576
+    ],
+    "RLIMIT_AS": [
+      -1,
+      -1
+    ],
+    "RLIMIT_FSIZE": [
+      -1,
+      -1
+    ],
+    "RLIMIT_NPROC": [
+      123943,
+      123943
+    ]
+  },
+  "environment": {
+    "PATH": "<home-alias>/.codex<private-artifacts>/arg0/codex-arg0oRR6ZG:<home-alias>/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:<home-alias>/.cabal/bin:<home-alias>/.ghcup/bin:<home-alias>/.local/bin:<home-alias>/.cabal/bin:<home-alias>/.ghcup/bin:<home-alias>/.local/bin:<home-alias>/.cabal/bin:<home-alias>/.ghcup/bin:<home-alias>/.cargo/bin:<home-alias>/.nix-profile/bin:/nix/var/nix/profiles/default/bin:/usr/lib64/mpich/bin:/usr/share/Modules/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:<home-alias>/.local/share/JetBrains/Toolbox/scripts:<home-alias>/Projects/opt/cuda/bin:<home-alias>/Projects/opt/cuda/bin:/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:<home-alias>/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/usr/lib/chatgpt/resources:<home-alias>/.local/share/JetBrains/Toolbox/scripts",
+    "CMAKE_ROOT": null,
+    "CMAKE_MODULE_PATH": null,
+    "CMAKE": null,
+    "CMAKE_TOOLCHAIN_FILE": null,
+    "CMAKE_PREFIX_PATH": "/usr/lib64/mpich",
+    "CC": null,
+    "CXX": null,
+    "LD_PRELOAD": null,
+    "LD_LIBRARY_PATH": "/usr/lib64/mpich/lib:<home-alias>/Projects/opt/cuda/lib64:<home-alias>/Projects/opt/cuda/lib64"
+  },
+  "proc_file_nr": "9277\t0\t9223372036854775807\n",
+  "mount": "TARGET SOURCE    FSTYPE  OPTIONS\n/      composefs overlay ro,nosuid,nodev,relatime,seclabel,lowerdir+=/run/ostree/.private/cfsroot-lower,datadir+=/sysroot/ostree/repo/objects,upperdir=/run/ostree/.private/root/upper,workdir=/run/ostree/.private/root/work,redirect_dir=on,uuid=on,metacopy=on\n"
+}

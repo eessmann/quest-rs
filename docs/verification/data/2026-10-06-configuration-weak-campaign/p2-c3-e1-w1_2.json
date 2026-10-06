@@ -1,0 +1,207 @@
+{
+  "schema": "quest-configuration-weak-row-v1",
+  "status": "diagnostic-rejected",
+  "phase": "contraction admission",
+  "error": "see retained phase, resource receipt and bounded stderr",
+  "request": {
+    "row_id": "p2-c3-e1-w1_2",
+    "order": 2,
+    "cells": 3,
+    "extent": 1.0,
+    "width": 0.5,
+    "center": [
+      0.15,
+      -0.1,
+      0.07,
+      0.11,
+      -0.04
+    ],
+    "viscosity": 0.01,
+    "time": 0.0,
+    "physical_dimension": 5,
+    "minimum_support_samples": 2,
+    "nonlinear_witness": true
+  },
+  "limits": {
+    "max_bytes": 268435456,
+    "max_source_work": 1000000000,
+    "max_physical_work": 100000000000,
+    "max_physical_calls": 1000000
+  },
+  "plan": {
+    "axis_dimension": 9,
+    "dimension": 59049,
+    "input_work": 243060736,
+    "state_payload_bytes": 944784
+  },
+  "input_resources": {
+    "input_work": 243060736,
+    "peak_bytes": 8521328,
+    "grid_bytes": 1192,
+    "state_capacity_bytes": 944784,
+    "support_capacity_bytes": 40,
+    "metadata_capacity_bytes": 416,
+    "statistics_capacity_bytes": 120,
+    "declared_source_external_bytes": 132720,
+    "declared_query_extra_bytes": 0,
+    "serializer_bytes": 65536,
+    "helper_bytes": 65536
+  },
+  "sampling": {
+    "distinct_samples": [
+      3,
+      3,
+      3,
+      3,
+      3
+    ],
+    "minimum_required": 2,
+    "maximum_distinct_spacing": 0.3333333333333335,
+    "width_per_spacing": 1.4999999999999993,
+    "support_margin": 0.35,
+    "support_intersects_boundary": false,
+    "policy_passed": true,
+    "convergence_certified": false
+  },
+  "represented_grid": {
+    "axis_dimension": 9,
+    "dimension": 59049,
+    "nodes": [
+      -1.0,
+      -0.6666666666666667,
+      -0.33333333333333337,
+      -0.33333333333333337,
+      0.0,
+      0.33333333333333326,
+      0.33333333333333326,
+      0.6666666666666665,
+      1.0
+    ],
+    "weights": [
+      0.1111111111111111,
+      0.4444444444444444,
+      0.1111111111111111,
+      0.1111111111111111,
+      0.4444444444444444,
+      0.1111111111111111,
+      0.1111111111111111,
+      0.4444444444444444,
+      0.1111111111111111
+    ],
+    "node_bits": [
+      13830554455654793216,
+      13827552055903212886,
+      13823048456275842390,
+      13823048456275842390,
+      0,
+      4599676419421066580,
+      4599676419421066580,
+      4604180019048437076,
+      4607182418800017408
+    ],
+    "weight_bits": [
+      4592670820000712476,
+      4601678019255453468,
+      4592670820000712476,
+      4592670820000712476,
+      4601678019255453468,
+      4592670820000712476,
+      4592670820000712476,
+      4601678019255453468,
+      4592670820000712476
+    ],
+    "lower_bits": 13830554455654793216,
+    "upper_bits": 4607182418800017408,
+    "spacing_bits": 4604180019048437077,
+    "grid_sha256": "3730ded72812efa39659706a508b0028387366d68a27e5d14d60db66f615c327",
+    "derivative_sha256": "0ba19ab8af3cacf200b0fe90de28c23de762f0841b1172f7b652d36f55067f01"
+  },
+  "initial": {
+    "probability": 1.0000000000000053,
+    "coordinate_means": [
+      0.10291453220559835,
+      -0.07874632968248815,
+      0.06086157346289871,
+      0.08376859546642006,
+      -0.03736838597569653
+    ],
+    "coordinate_variances": [
+      0.02371344312947472,
+      0.02026783191515715,
+      0.018804648623327817,
+      0.02096461527627394,
+      0.018495215978300682
+    ],
+    "mean_minus_continuum_center": [
+      -0.04708546779440165,
+      0.021253670317511852,
+      -0.009138426537101299,
+      -0.026231404533579944,
+      0.0026316140243034733
+    ],
+    "standard_deviations_per_spacing": [
+      0.4619750947456716,
+      0.42709540765081305,
+      0.4113901282359,
+      0.4343748812793683,
+      0.4079913526102067
+    ],
+    "maximum_coefficient_probability": 0.2579192068292025,
+    "effective_coefficients": 11.79364611100564,
+    "outer_cell_occupation": 0.4672206811878693,
+    "zero_exterior_trace": true,
+    "supported_coefficients": 3125,
+    "ensemble_sha256": "7550a8259fdd7188e20f08d442f4e51459259552960dfffda28b97d23c679f87"
+  },
+  "source": {
+    "physical_recipe_sha256": "ea45a42dec15863d4174b91a8e57756e37d2a69ef76f5c21dd9d816320597de7",
+    "chart_mass_residual": 6.661338147750939e-16,
+    "constraint_residual": 4.440892098500626e-16,
+    "extraction_probe_error": 3.552713678800501e-15,
+    "extraction_scaled_error": 1.2212453270876722e-15,
+    "coefficient_roundoff_estimate": 1.3201465701918065e-13,
+    "residual_evaluations": 58,
+    "resources": {
+      "source_work": 100000000,
+      "caller_declared_input_preparation_work": null,
+      "physical_work": 5800000,
+      "physical_calls": 58,
+      "physical_calls_attempted": 58,
+      "constructor_peak_bytes": 8521328,
+      "retained_source_bytes": 206897,
+      "grid_bytes": 0,
+      "accessible_state_bytes": 0,
+      "external_bytes": 132720,
+      "result_bytes": 0,
+      "scratch_bytes": 0,
+      "peak_bytes": 8521328,
+      "supported_rows": 0,
+      "row_query_work": 0,
+      "maximum_row_entries": 0
+    }
+  },
+  "diagnostic_resources": {
+    "source_work": 2272068448,
+    "caller_declared_input_preparation_work": 243060736,
+    "physical_work": 630900000,
+    "physical_calls": 6309,
+    "physical_calls_attempted": 58,
+    "constructor_peak_bytes": 8521328,
+    "retained_source_bytes": 206897,
+    "grid_bytes": 1192,
+    "accessible_state_bytes": 944784,
+    "external_bytes": 132720,
+    "result_bytes": 1048,
+    "scratch_bytes": 16384,
+    "peak_bytes": 8521328,
+    "supported_rows": 3125,
+    "row_query_work": 513696,
+    "maximum_row_entries": 25
+  },
+  "validated_rows": 59049,
+  "visited_rows": 0,
+  "diagnostic": null,
+  "quantum_execution": false,
+  "history_execution": false,
+  "convergence_certified": false
+}

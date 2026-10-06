@@ -27,15 +27,7 @@ struct Admission<'a> {
 }
 impl<'a> Admission<'a> {
 	fn targets(&self, count: usize) -> Result<()> {
-		let required = 1usize
-			.checked_shl(u32::try_from(count).map_err(|_| Error::Overflow)?)
-			.ok_or(Error::Overflow)?;
-		if self.local < required {
-			return Err(Error::Unsupported(
-				"distributed communication buffer cannot hold the gate's mixed amplitudes",
-			));
-		}
-		Ok(())
+		crate::native_admission::admit_dense_partition(self.local, count)
 	}
 	fn operation(
 		&mut self,
@@ -74,14 +66,18 @@ impl<'a> Admission<'a> {
 				controls,
 			} => {
 				if !matrix.is_diagonal() {
-					self.targets(
-						targets
-							.len()
-							.checked_add(controls.len())
-							.and_then(|n| n.checked_add(inherited))
-							.ok_or(Error::Overflow)?
-							.max(1),
-					)?;
+					if matrix.unitary_evidence().is_some() {
+						self.targets(targets.len().max(1))?;
+					} else {
+						self.targets(
+							targets
+								.len()
+								.checked_add(controls.len())
+								.and_then(|n| n.checked_add(inherited))
+								.ok_or(Error::Overflow)?
+								.max(1),
+						)?;
+					}
 				}
 			}
 			Operation::Oracle {
@@ -211,6 +207,38 @@ mod tests {
 				.unwrap();
 			let plan = builder.finish().unwrap().bind(&[]).unwrap().plan().unwrap();
 			assert_eq!(admit(&plan, 4, 4096).is_ok(), accepted);
+		}
+	}
+}
+
+#[cfg(test)]
+mod unitary_controls_tests {
+	use super::*;
+	#[test]
+	fn dense_unitary_uses_target_count_and_general_keeps_embedding_bound() {
+		let values = faer::Mat::from_fn(2, 2, |r, c| crate::Complex64::new(f64::from(r != c), 0.));
+		let general = quest_compile::NumericalOperator::from_view(
+			&values,
+			quest_compile::MatrixPolicy::default(),
+		)
+		.unwrap();
+		let unitary = general
+			.clone()
+			.admit_unitary(1e-12, quest_compile::MatrixPolicy::default(), 64)
+			.unwrap();
+		for (matrix, accepted) in [(general, false), (unitary, true)] {
+			let mut builder = quest_compile::QuantumRegionBuilder::new(4, 0).unwrap();
+			let controls = [0, 1, 3]
+				.into_iter()
+				.map(|q| quest_compile::Control::new(builder.qubit(q).unwrap(), ControlState::One))
+				.collect::<Vec<_>>();
+			builder
+				.numerical(matrix, &[builder.qubit(2).unwrap()], &controls)
+				.unwrap();
+			let plan = builder.finish().unwrap().bind(&[]).unwrap().plan().unwrap();
+			for ranks in [2, 4] {
+				assert_eq!(admit(&plan, ranks, 4096).is_ok(), accepted);
+			}
 		}
 	}
 }

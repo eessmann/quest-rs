@@ -3,17 +3,28 @@
 
 pub mod analysis;
 mod pauli;
+pub mod portfolio;
 pub mod reciprocal;
 pub mod replay_transform;
+pub mod state_preparation;
 pub use pauli::{PauliDecomposition, PauliLimits, decompose_pauli};
 mod dense;
 mod encoding;
 mod matching;
+pub mod matching_resource;
 mod matching_shard;
+mod record_fingerprint;
+pub use record_fingerprint::{
+	RECORD_FINGERPRINT_SCRATCH_BYTES, record_fingerprint, record_fingerprint_work,
+};
 mod materialize;
 mod matrix;
 pub use matching_shard::{MatchingColumn, MatchingHeader, MatchingShard};
+mod owned_replay;
 mod replay;
+pub use owned_replay::{
+	CompactProjector, EncodingDescriptor, EncodingErrors, EncodingLayout, ReplayEncoding,
+};
 mod structured;
 pub use structured::{ShiftRegister, TensorShiftEncoding};
 mod structured_stencil;

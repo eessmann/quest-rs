@@ -1,0 +1,16 @@
+{
+  "status": "executed bounded native circuit and independent identical-DG trajectory comparison",
+  "working_tree_base": "dd9a869ebe9952cf85a6411a180ed7b688f568fb",
+  "physical_dimension": 8,
+  "carleman_order": 2,
+  "horizon": 0.001,
+  "classical_rk4_steps": 100,
+  "absolute_coordinate_error": 1.9317986836122028e-08,
+  "relative_coordinate_error": 4.351988901331037e-06,
+  "full_default_window_convergence": false,
+  "optional_projector_phase_certificate": false,
+  "independent_preparation_error_certificate": false,
+  "multi_host_capacity": false,
+  "quantum_advantage_claimed": false,
+  "error_note": "Combined observed error includes hierarchy truncation, temporal DG and executed inverse; this single comparison does not separate them."
+}

@@ -1,0 +1,21 @@
+{
+  "schema": "quest-cfd-paired-followup-admission-explanation-v1",
+  "scope": "post-run source-formula explanation; not a child execution or changed raw outcome",
+  "request": {
+    "History": {
+      "lift": "Kvn",
+      "time_cells": 2,
+      "time_order": 1
+    }
+  },
+  "dimension": 243,
+  "time_nodes": 4,
+  "row_queries_per_node": 2,
+  "recipe_row_query_work": 513696,
+  "row_query_total": 998625024,
+  "readout_work": 746496,
+  "nonlinear_diagnostic_work": 3637726,
+  "aggregate_source_work": 1003009246,
+  "max_source_work": 1000000000,
+  "retry_after_this_rejection": false
+}

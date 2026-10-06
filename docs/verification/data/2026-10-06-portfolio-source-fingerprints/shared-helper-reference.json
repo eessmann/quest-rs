@@ -1,0 +1,14 @@
+{
+  "schema": "quest-portfolio-shared-record-helper-reference-v1",
+  "scope": "Independent root portfolio verification checked both8owner and18helper/matching manifests; these are26 scoped hashes, not a transitive build closure",
+  "shared_manifest_original_sha256": "5ff27a818e1aa6e32e2a2f53690bccea5fdcf44036fd44c792c0186319abf41d",
+  "shared_manifest_file_count": 18,
+  "published_reference": "../2026-10-06-sparse-record-fingerprints/source.json",
+  "portfolio_manifest_original_sha256": "5065fe0f67b69d6986906cfa18e907faf3ffdaea5057ba88a5ae1bb1dafcf5a5",
+  "owner_files": 8,
+  "new_tests": 7,
+  "affected_tests": 41,
+  "test_targets": 10,
+  "tests_and_clippy_independent": true,
+  "native_campaigns_here": 0
+}

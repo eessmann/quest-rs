@@ -1,6 +1,6 @@
 # Block encodings, inverse transforms, and distributed execution
 
-This tutorial explains the quantum-circuit layer of `quest-cfd` and its classical distributed execution. It describes the current implementation and evidence recorded on **2026-10-04**, reviewed on 2026-10-05. The executed examples are state-vector simulations. They establish neither quantum hardware performance nor physical convergence of the CFD model. Read [method and theory](method-and-theory.md) for the physical discretization, [alternatives](alternatives.md) for competing approaches, and [NEXT_STEPS](../NEXT_STEPS.md) for outstanding work.
+This tutorial explains the quantum-circuit layer of `quest-cfd` and its classical distributed execution as of **2026-10-05**. Dated 2026-10-04 receipts below remain historical evidence. The executed examples are state-vector simulations. They establish neither quantum hardware performance nor physical convergence of the CFD model. Read [method and theory](method-and-theory.md) for the physical discretization, [alternatives](alternatives.md) for competing approaches, and [NEXT_STEPS](../NEXT_STEPS.md) for outstanding work.
 
 ## 1. Which vector space is being encoded?
 
@@ -24,7 +24,7 @@ $$
 A x=b,\qquad A\in\mathbb C^{D\times D},\qquad D=NT.
 $$
 
-The history unknown concatenates configuration amplitudes at temporal nodes. It has configuration mass scaling but no additional temporal square-root mass scaling. Uniform coefficient sampling therefore differs from temporal quadrature sampling. The right-hand side injects the initial condition into the first temporal source block. The solver encodes this nonsymmetric $A$ directly through its adjoint, without forming normal equations. See [configuration assembly](../src/configuration.rs) and [history assembly](../src/history.rs).
+The history unknown concatenates configuration amplitudes at temporal nodes. It has configuration mass scaling but no additional temporal square-root mass scaling. Uniform coefficient sampling therefore differs from temporal quadrature sampling. The right-hand side injects the initial condition into the first temporal source block and adds the external lifted source at every temporal quadrature node. The solver encodes this nonsymmetric $A$ directly through its adjoint, without forming normal equations. See [configuration assembly](../src/configuration.rs) and [history assembly](../src/history.rs).
 
 ## 2. The block-encoding identity
 
@@ -52,7 +52,30 @@ the shifts can be described without enumerating basis states. [`TensorShiftEncod
 
 [`StructuredStencilEncoding`](../../quest-qsvt/src/structured_stencil.rs) freezes the complex weights and shift recipes. It removes zero-weight terms, pads the number of labels to $K=2^{\lceil\log_2\max(1,L)\rceil}$, and uses $\beta=\max_t|w_t|$, $\alpha=K\beta$. Uniform color preparation, a color-conditioned flag rotation and phase, and the selected arithmetic shift yield the block $B/\alpha$. Unused labels produce failure amplitudes. Coincident shifts can add in the matrix, so $\beta$ here is the largest **term weight**, not necessarily the largest assembled matrix entry.
 
-The implementation stores recipes and coefficients, not CSR rows or a permutation table of length $N$. This is useful structural input access. It does not implement the complete base, preamplified, or PREP/UNPREP constructions studied by [Sünderhauf, Campbell, and Camps](https://arxiv.org/abs/2302.10949v2). Their paper separates normalization and data-loading costs for structured matrices. The current uniform-color weighted stencil has its own explicit normalization; no coefficient-weighted PREP identity or complete paper implementation is claimed.
+This original stencil implementation stores recipes and coefficients, not CSR rows or a permutation table of length $N$. The newer [encoding portfolio](../../quest-qsvt/docs/portfolio.md) separately implements the supported arithmetic base and PREP/UNPREP constructions from [Sünderhauf, Campbell, and Camps](https://arxiv.org/abs/2302.10949v2). Its column map is identity, its row map is a reversible tensor shift, and nonwrapping stencils have explicit range flags. PREP is restricted to label-preserving maps satisfying the required commutation identity. Its nominal normalization is $\sum_t|w_t|$; base normalization is $K\beta$. Complex phases, padded labels and failure flags retain their whole-unitary behavior. Preamplification and hierarchical compression remain unimplemented experiments.
+
+The portfolio also supplies weighted LCU with $\alpha=\sum_t|w_t|\alpha_t$, tensor products, Kronecker sums, per-matching coefficient bounds, and explicit sparse-access QROM. Stored QROM compilation, lookup/unlookup, precision registers and elementary gates are charged. Classical CSR access and MPI exchanges do not stand in for coherent lookup. Equal successful blocks need not mean equal whole unitaries: descriptors retain both operator and construction identities.
+
+The [prepared CPU/MPI weighted composition](../../../docs/verification/2026-10-06-distributed-weighted-matching.md)
+and [owning QSVT transform](../../../docs/research/prepared-lcu-transform.md)
+execute compatible matching children through this shared schedule. A
+[consuming persistence bridge](../../../docs/research/persisted-matching-preparation.md)
+transfers exclusive loaded resources into native preparation with collective
+ownership and overlap admission. These components have focused independent
+tests; their integrated same-file persisted inverse experiment is separate.
+Generic distributed tensor composition is not implied by the matching path.
+
+The [measured bounded comparison](../../quest-qsvt/docs/portfolio-comparison.md)
+extracts the same four-site complex circulant from eight eligible constructions.
+It records normalization, actual primitive/PREP/SELECT counts, workspace, QROM
+precision, managed memory and constructor timing. It compares successful blocks;
+each construction's own control/adjoint semantics are checked separately. One
+small debug fixture is not a native performance or equal-accuracy campaign.
+The separate [constructed resource curves](../../quest-qsvt/docs/portfolio-resource-curves.md)
+extend six of those schemes across four sizes without allocating a simulator
+state. Counts derive from actual descriptors and replay, including ancillas and
+adjoints, while the special half-period shift and missing complete CFD accuracy
+costs remain explicit.
 
 ## 4. Stored sparse matrices: weighted matchings
 
@@ -145,15 +168,15 @@ $$
 (\epsilon_{\rm poly}+\epsilon_{\rm projector}+\epsilon_{\rm execution}).
 $$
 
-The execution premise must cover encoding and arithmetic errors. Spectral evidence also matters: analytic bounds, dense validation, and caller-supplied premises retain their distinct provenance. Built-in history inverse evidence currently supports admitted DG1 cases; unsupported temporal orders or overflowing bounds remain explicit limitations.
+The execution premise must cover encoding and arithmetic errors. Spectral evidence also matters: analytic bounds, dense validation, and caller-supplied premises retain their distinct provenance. Built-in history inverse evidence supports admitted DG1 and DG2 cases through separate sufficient bounds; unavailable or overflowing bounds remain explicit limitations.
 
-History spectral evidence combines DG1 coercivity and causal inverse estimates with a bound on the finite-precision Hermitian defect. The upper bound uses $\sqrt{\|A\|_1\|A\|_\infty}$, computed from absolute column and row sums. These enclosures concern the directly assembled history operator; they do not silently replace it with a normal-equation surrogate.
+DG1 evidence uses an outward Gershgorin lower bound on the stored slab Hermitian part, retaining the sign of viscous dissipation. DG2 instead bounds the interval residual of the exact small temporal inverse applied to each stored slab. Both feed the finite causal inverse estimate; neither assumes normality of a Carleman generator. See the [derivation](method-and-theory.md#9-one-causal-temporal-system-over-the-whole-horizon). The upper bound uses $\sqrt{\|A\|_1\|A\|_\infty}$, computed from absolute column and row sums. These enclosures concern the directly assembled history operator; they do not silently replace it with a normal-equation surrogate.
 
 The CLI additionally computes a binary64 sparse residual of the decoded solution and rejects excessive residuals. That measured check is useful, but is not an independent interval proof. Neither it nor a uniform response certificate bounds physical discretization, configuration-boundary leakage, initial regularization, or observable bias.
 
 ## 7. Preparation, success, and measurement costs
 
-The current solver constructs a full classical RHS vector and initializes a simulator state from it. It does not supply an efficient coherent loader for arbitrary CFD amplitudes. Likewise, reading every successful amplitude from a simulator is a classical verification facility, not a scalable quantum readout procedure.
+The bounded CLI constructs a full classical RHS, then defaults to an explicit coherent amplitude-tree preparation circuit. Direct simulator initialization is separately selected and labelled. The [distributed history adapter](distributed-history.md) compiles the same kind of preparation from scalar callbacks and sharded tree resources, without retaining a full RHS or dense isometry on any rank. Its table, compilation work, elementary gates and native scratch remain charged. This generic stored-data loader does not imply efficient access for arbitrary exponentially large physical data. Full-amplitude readback in local references and scalar MPI reductions are simulator verification facilities; they are distinct from a quantum measurement algorithm.
 
 In the ideal inverse model, the success probability is
 
@@ -167,6 +190,14 @@ For a bounded diagonal observable, accepted computational-basis samples can esti
 
 A useful cost assessment therefore includes classical discretization and sparse preprocessing, synthesis and certification, coherent input access, each full transform attempt, its success rate, and observable sampling. A logarithmic register size alone establishes no quantum advantage. Quantum hardware gate depth, precision, fault-tolerance overhead, and a competing classical observable solver would also be needed for a meaningful comparison.
 
+The [coherent RHS contract](../../../docs/research/coherent-rhs-preparation.md)
+records the implemented amplitude-tree baseline, its scalar-query/table/gate
+costs and whole-unitary controls/adjoints. The generated KvN consumer uses it at
+MPI 1–2 ranks; the broader [streamed history tests](distributed-history.md)
+separately cover 1/2/4/8 ranks and split communicators. These are finite simulator
+checks. Observation-window API/native-example validation and a complete quantum
+measurement cost for published CFD statistics remain pending.
+
 ## 8. Symbolic dimensions versus admitted execution
 
 The symbolic resource planner can express $N=J^m$, $D=NT$, and exponential state-vector storage without materializing those quantities as arrays. Large physical coordinate counts can therefore be discussed honestly as symbolic formulas. This is an estimate, not admission to an executable encoding or simulator.
@@ -177,13 +208,24 @@ Executable basis indices must fit checked machine-width arithmetic and the nativ
 
 An immutable [`MatchingShard`](../../quest-qsvt/src/matching_shard.rs) owns records whose original source column satisfies $j\bmod P=r$, for rank $r$ among admitted power-of-two parts $P$. Records include completed destinations and flag rotation/phase parameters. Missing records imply identity permutation and zero successful coefficient. Completion-only transitions must still be present. Adjoint execution uses the same original-column coefficient owner, reading the forward destination before applying the inverse operation.
 
-The scalar header includes dimensions, layout, normalization, source identity, expected completed-record count, and a commutative record digest. Collective preparation checks agreement, ownership, aggregate count/digest, and permutation validity. The FNV-based source identity and wrapping digest detect ordinary inconsistency and accidental corruption; they are **not cryptographic authentication**, collision-proof equality, or proof that the physical discretization was correct. Constructing shards from a global encoding remains a convenience producer. A distributed sparse producer/loader that avoids global source storage is pending.
+The scalar header includes dimensions, layout, normalization, source identity, expected completed-record count, and a commutative record digest. Collective preparation checks agreement, ownership, aggregate count/digest, and permutation validity. The compatibility FNV identity and wrapping digest detect ordinary inconsistency; they are not cryptographic authentication. The [sharded producer and persistence layer](../../../docs/research/distributed-matching.md) additionally retain SHA-256 file integrity and a canonical semantic digest. It consumes locally generated COO or CSR partitions, preserves duplicate ordinals, performs bounded canonicalization and synchronous endpoint-arbitrated coloring, and completes permutations through distributed path records. A complete CSR is never required before partitioning. Immutable serial-HDF5 logical buckets can be reloaded at a different compatible rank count; manifest publication follows collective success. Neither digest proves the physical discretization correct.
 
 The [local native API](../../quest/src/qsvt/matching.rs) and [collective runtime](../../quest/src/qsvt/matching/collective.rs) prepare owned coefficients, reusable buffers, and a native scratch partition. `CollectiveEnvironment::state_vector_local` admits local state storage explicitly. Bounded local reads and writes avoid a whole-state gather; `init_pure_from_root` is a separate full-host initialization path, not a distributed RHS generator. The prepared objects borrow their live environment and communicator/runtime, so those owners must outlive execution and destruction. This CPU/MPI lane uses the initializing MPI thread; the fused accelerator path is unsupported.
 
-[Batched routing](../../quest/src/qsvt/matching/batched.rs) selects at most 64 flag pairs globally, with at most 128 amplitude records per rank and 5120-byte wire buffers. It routes requests to state owners, amplitudes to coefficient owners, and results to destination owners. Native indexed access handles whole local batches. Outputs go into scratch while reads see the unchanged input, preserving permutations across batches; scratch is installed after completion. The [transform runtime](../../quest/src/qsvt/matching_transform.rs) also streams compact projector phases.
+[Batched routing](../../quest/src/qsvt/matching/batched.rs) selects at most 64 flag pairs per bounded batch, with at most 128 amplitude records per rank and 5120-byte wire buffers. Each rank traverses its own state partition, routes requests to coefficient owners and results to destination owners. Native indexed access handles whole local batches. Outputs go into scratch while reads see the unchanged input, preserving permutations across batches; scratch is installed after completion. The [transform runtime](../../quest/src/qsvt/matching_transform.rs) also streams compact projector phases. Resource-backed portable replay visits owned chunks forward or backward without retaining the gate stream.
 
-Bounded buffers do not imply scalable communication. Every rank scans the global basis range, and routing uses all-peer count/payload exchanges. Three phases produce $6(P-1)$ exchanges per rank per batch. Count conversions are checked, but large-count jobs and multi-host behavior have not been accepted. Preparation errors can be agreed before mutation. A transport/native failure or panic during collective mutation triggers job abort to avoid stranded peers; the current abort uses `MPI_COMM_WORLD`, including when work used a split communicator. This is neither rollback nor recoverable task isolation.
+[Cumulative composition telemetry](../../../docs/research/prepared-routing-telemetry.md)
+collects every successful matching child and QSVT source query in a completed
+application. It clears before each application attempt, so admission failure
+cannot expose a preceding success as the current result. These local counters
+measure matching payload; native internal, PREP/projector, constructor,
+coordinator and MPI protocol traffic remain outside their scope. Their absence
+is unknown traffic, not measured zero. Global reductions and process-memory
+observations require separately admitted work.
+
+Bounded buffers do not imply scalable communication. Owner batches remain serialized with all-peer rounds, so local traversal removes replicated global scans without establishing a speedup. A separate transport context carries chunked sends and receives; checked native adapters contain buffer access. Rank/node admission accounts native partitions, immutable resources and scratch, while measured RSS remains separate. Count conversions are checked, but actual huge-count jobs and multi-host behavior remain open acceptance. Preparation errors can be agreed before mutation. A transport/native failure or panic during collective mutation triggers job abort to avoid stranded peers; the current abort uses `MPI_COMM_WORLD`, including when work used a split communicator. This is neither rollback nor recoverable task isolation.
+
+Native dense gates have separate limits: inspected QuEST 4.3.0 replicates every `CompMatr`, and a $k$-target dense gate requires $2^k\leq2^n/P$ on an $n$-qubit distributed statevector. `DiagMatr` is also replicated; the full-state diagonal density-matrix path gathers its diagonal. [Native admission](../../quest/src/native_admission.rs) reports these constraints, native indices and peak storage. The matching route avoids a dense $U$ while retaining the complete simulated state partition.
 
 ## 10. Reading the recorded evidence
 
@@ -204,4 +246,16 @@ The separate [MPI receipt](../../../docs/verification/data/2026-10-04-quest-cfd/
 
 Times include intermediate differential readback. Byte counts cover one adjoint query's application count/payload traffic, excluding collective, native, and protocol overhead. These are correctness diagnostics, not scaling benchmarks or distributed CFD solves.
 
-The [acceptance receipt](../../../docs/verification/data/2026-10-04-quest-cfd/acceptance.json) records 1,237 passing tests and three existing scale skips, alongside native ABI and formatting/lint checks. Acceptance still excludes multi-host scale, complete distributed source/RHS production, forced allocator and malformed-transport fault injection, complete paper PREP/UNPREP encodings, and a converged physical observable error budget. Those boundaries guide the experiments in [NEXT_STEPS](../NEXT_STEPS.md).
+The historical [acceptance receipt](../../../docs/verification/data/2026-10-04-quest-cfd/acceptance.json) records 1,237 passing tests and three existing scale skips, alongside native ABI and formatting/lint checks. New source/RHS production, supported paper encodings and streamed inverse integration have separate [2026-10-05 evidence](../../../docs/verification/2026-10-05-dual-history.md); the older test count does not validate the new tree. Multi-host scale, actual large-count transport, additional fault classes and converged physical observable error budgets remain open in [NEXT_STEPS](../NEXT_STEPS.md).
+
+Current scoped receipts also include [Burgers/KdV lift and temporal studies](../../../docs/verification/2026-10-05-dual-history.md),
+[classical KvN resolution diagnostics](kvn-refinement.md), the
+[same-matrix encoding comparison](../../quest-qsvt/docs/portfolio-comparison.md),
+and [real capped local sparse pipeline](../../../docs/verification/2026-10-05-sparse-capacity.md).
+The last runs source-owned generation, publication, reload and repeated native
+controlled forward/adjoint replay at 1/2/4/8 ranks under Linux rank address-space
+caps. Its modeled node envelope and sum of rank RSS high-water marks are distinct
+from a physical-node RSS cap. It does not execute large CFD histories or input
+larger than every node's memory. The supplied-force distributed pressure wrapper
+has separate [focused numerical checks](physical-space.md#distributed-physical-pressure-from-a-broken-force),
+with independent review pending and generated nonlinear physical force still open.

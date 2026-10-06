@@ -1,0 +1,2143 @@
+{
+  "acceptance": {
+    "actual_native_array_reduction": "half of v4 at each tested P2/P4/P8 placement; borrowed input communication buffer and no owned scratch Qureg",
+    "comparison": "v4 is a distinct 8e02 source and executable; stored inputs match exactly; no controlled timing speedup claim",
+    "conservative_reservations": "generic register ledger remains conservative; native array payload is not RSS or total process memory",
+    "focused_mpi": "passed in both compiler lanes",
+    "sampling": "rank PID RSS/AS sampled every 20 ms; may miss peaks; high-water sums are separate observations",
+    "source_scope": "9ad source excludes the later whole-node acceptance metadata correction; all actual cases were and remain open",
+    "strict_capacity": "open: 4 MiB stored input is below every 8 GiB rank process cap; whole-node enforcement remains unverified",
+    "threading": "288 requested threads and native multithreading enabled; actual OpenMP team size unmeasured; producer/loading/matching pair arithmetic/routing remain serial",
+    "whole_node_enforcement": "unverified: rank RLIMIT_AS and sampled rank PIDs exclude allocation coordinator, launchers and external helpers"
+  },
+  "complete": true,
+  "lanes": [
+    {
+      "base_native_build_job": "536807",
+      "build": {
+        "artifacts": {
+          "archive_sha256": "425b45ec133b62ce5bc67ef2ba6a87b15fb915680bc3ecfd0b67ba0627b8f229",
+          "sparse_capacity_sha256": "a870cd8fd4c4c0f37173f1f9e68a00899369fc102c58c6972ebe7059b90bb610"
+        },
+        "job_id": "537488",
+        "receipt_sha256": {
+          "archive-list.stderr": "6d3dbebae0c9d52827655d771c2ca5232abbf9f5f3754cc80a8180b0652c382a",
+          "archive-list.stdout": "ce8e406190bdd8651bedd0d5afe0cbfadb84a85e5fcecc27323f05f1f0c4cf0b",
+          "artifacts.json": "f558fa3c2db979651483506ec2c3e29c3d0bfd10eaf0988d3b51202d74642033",
+          "base-build-profile.json": "ff5b86538552c11c3b5564e6400279b4ec9a9e6a351ea005ed4751667abe7a35",
+          "build-complete": "706d2396e919be0ea25a7af461ddaa61eb135264a55b62ecffd07f5403058f04",
+          "commands.json": "4d95665b13a78bf8e8134098041b3938cfe9c5f699a3bcda8d1e2d729edd60ee",
+          "completion.json": "c582413bf8fe8430b035f4f4bf6d9b699955386c4f204558c6381894538238e3",
+          "example-build.stderr": "1337f6d3a12cfabc26db6207a9f375fa5c93248dbd0fd0880c915e47136cc667",
+          "example-build.stdout": "e74d5a07f251bac6f9a6a1509d8663c46c4ace41b04ca86fcc2b119b5681ab59",
+          "executed-entry.json": "0bfb3243395e08a3ae44aace433206a3e7388f259ca92fba4e1bb87f9876e490",
+          "executed-entry.sh": "0495bba5074c440e409797b5caa3fb1d3a79793260b74edca24b3cdba980a05d",
+          "measurement-profile.json": "ddbd15b30521f245ff450a0483cf8f49c61d2d515f953c8bf2f015e375da2a2d",
+          "runtime-environment.json": "80f96a9a0cee0e73ab0c2b83a005f0969289415c47a9759885bdbd01c430c428",
+          "source-snapshot.json": "5ba178bba8005f2165e750fad28fc3e38095bb5cf50ade95f5bf83b2ccf2cf81",
+          "test-archive.stderr": "7832935928ca02543dd9dc9a84769011f97ec8edc5b0ccf0793f15622b20d87c",
+          "test-archive.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "test-inventory.json": "86148fdccd77ae33389e56b1a1d5002acc85542ede4046b05186667897cca65a"
+        },
+        "remote_archive_example_and_binary_rehash_verified": true,
+        "scheduler_elapsed_seconds": 111,
+        "scheduler_exit_code": "0:0",
+        "scheduler_state": "COMPLETED",
+        "stage_seconds": {
+          "archive-list": 0.7446573479101062,
+          "example-build": 82.97621943219565,
+          "nextest-version": 0.7162648399826139,
+          "test-archive": 9.219847426982597
+        },
+        "test_inventory": {
+          "binaries": [
+            {
+              "binary": "collective_initialization_budget",
+              "bytes": 2728048,
+              "kind": "test",
+              "package": "quest-rs",
+              "relative_path": "target/debug/build/quest-rs/e445ca6c56e50b40/out/collective_initialization_budget-e445ca6c56e50b40",
+              "sha256": "4f2c97e560bf20d469f043bc44bd3e04643fd996f7144d4b3ca03379a326ad8f",
+              "tests": [
+                "root_initialization_accounts_for_three_live_global_buffers"
+              ]
+            },
+            {
+              "binary": "matching_collective",
+              "bytes": 8162456,
+              "kind": "test",
+              "package": "quest-rs",
+              "relative_path": "target/debug/build/quest-rs/ca4acc29f56972e5/out/matching_collective-ca4acc29f56972e5",
+              "sha256": "ae184138deab3834fb650ce882e9c51e32457ad22c30a3de07b703881d779629",
+              "tests": [
+                "buffer_reuse::distributed_matching_reuses_native_buffer_without_width_scaled_scratch",
+                "collective_matching_shards_route_all_sectors_without_global_storage"
+              ]
+            },
+            {
+              "binary": "matching_lcu_collective",
+              "bytes": 8470896,
+              "kind": "test",
+              "package": "quest-rs",
+              "relative_path": "target/debug/build/quest-rs/5d06bda6f3b1fe07/out/matching_lcu_collective-5d06bda6f3b1fe07",
+              "sha256": "3e11c9e619875b6f9a453b8de397925de134dde4675ce16fdc767b5fbd53e524",
+              "tests": [
+                "sharded_weighted_matching_whole_register_and_standalone_adjoint"
+              ]
+            },
+            {
+              "binary": "matching_lcu_transform_collective",
+              "bytes": 3681208,
+              "kind": "test",
+              "package": "quest-rs",
+              "relative_path": "target/debug/build/quest-rs/236728ddde129783/out/matching_lcu_transform_collective-236728ddde129783",
+              "sha256": "431ba437d9b6a180ba037134b0b58c2cf3caf7eff8402fe54419bca51f636ac7",
+              "tests": [
+                "sharded_lcu_transform_whole_register_and_standalone_adjoint"
+              ]
+            },
+            {
+              "binary": "matching_load_statistics",
+              "bytes": 4169040,
+              "kind": "test",
+              "package": "quest-rs",
+              "relative_path": "target/debug/build/quest-rs/4549b74f5c92b3e1/out/matching_load_statistics-4549b74f5c92b3e1",
+              "sha256": "0dc5d7eced09d1e2708e60bbc6b6282ebec76a90518ca81c8bd6ee873f232d42",
+              "tests": [
+                "loader_reports_actual_phase_work_without_replicating_records"
+              ]
+            },
+            {
+              "binary": "matching_persisted",
+              "bytes": 9667088,
+              "kind": "test",
+              "package": "quest-rs",
+              "relative_path": "target/debug/build/quest-rs/b1e51e8435bcb8eb/out/matching_persisted-b1e51e8435bcb8eb",
+              "sha256": "d5273c9340764a1dbdb7c0e17a2ae640675033bbfc4cabf2a08acc19ecb82a71",
+              "tests": [
+                "persisted_gate_replay_and_collective_restart"
+              ]
+            },
+            {
+              "binary": "matching_persisted_preparation",
+              "bytes": 9577448,
+              "kind": "test",
+              "package": "quest-rs",
+              "relative_path": "target/debug/build/quest-rs/74ed7fc3baf6e218/out/matching_persisted_preparation-74ed7fc3baf6e218",
+              "sha256": "e5255a27dc11ab7cca35b2eba4380cff869aed6c1a2d31b2120955a14874f280",
+              "tests": [
+                "consuming_persisted_preparation_admits_ownership_and_whole_unitary"
+              ]
+            },
+            {
+              "binary": "persisted_weighted_transform",
+              "bytes": 5126384,
+              "kind": "test",
+              "package": "quest-rs",
+              "relative_path": "target/debug/build/quest-rs/4efc5cbebb3d4c93/out/persisted_weighted_transform-4efc5cbebb3d4c93",
+              "sha256": "73c5a23da5388befccf8328c325be9591e2a46a5d457907cb3f093fb51b7c903",
+              "tests": [
+                "consumer_pair_packet_rejects_incomplete_status_before_decode",
+                "distributed_consumer_readout_uses_matching_packets",
+                "immutable_persisted_three_term_cold_whole_u_and_literal_adjoint"
+              ]
+            },
+            {
+              "binary": "quest",
+              "bytes": 11910824,
+              "kind": "lib",
+              "package": "quest-rs",
+              "relative_path": "target/debug/build/quest-rs/4525ddbd21d33bcd/out/quest-4525ddbd21d33bcd",
+              "sha256": "5b5219156b367abc0a290ecad231f7714185dabc008f3a7de5932f650fd50cca",
+              "tests": [
+                "qsvt::matching::collective::buffer_tests::rank_local_buffer_admission_rejects_before_opening_hadamards",
+                "qsvt::matching::collective::failure_tests::native_rank_local_failure_aborts_blocked_peer",
+                "qsvt::matching::collective::failure_tests::staged_write_failure_aborts_blocked_peer",
+                "qsvt::matching::collective::preparation_tests::incoming_actual_capacity_rejects_before_validation_protocol"
+              ]
+            },
+            {
+              "binary": "communication_buffer",
+              "bytes": 1906784,
+              "kind": "test",
+              "package": "quest-sys",
+              "relative_path": "target/debug/build/quest-sys/b60bff6c735193d5/out/communication_buffer-b60bff6c735193d5",
+              "sha256": "3908179b0c658d9dbe79f698f6b401ddf2abe3d84e3ae4334954d68d067d848a",
+              "tests": [
+                "communication_buffer_staging_is_isolated_and_checked"
+              ]
+            }
+          ],
+          "test_count": 16
+        }
+      },
+      "capacity_cases": [
+        {
+          "capacity_closed": false,
+          "compiler": "gnu",
+          "decoded_original_records": 131072,
+          "dimension": 65536,
+          "distinct_observed_hosts": 2,
+          "job_id": "537490",
+          "launcher_seconds": 4.66013689013198,
+          "load_phase_max_seconds": {
+            "manifest_and_admission": 0.001739775,
+            "read_validate": 0.067455477,
+            "replay_admission": 0.0,
+            "reverse_directory": 1.076021431,
+            "total": 1.145258861
+          },
+          "load_reverse_broadcasts": 262148,
+          "loading_route": "resource-only-native",
+          "managed_rank_budget_bytes": 4294967296,
+          "maximum_sample_error": 8.673617379884035e-19,
+          "median_rank_max_roundtrip_seconds": 0.316985481,
+          "native_array_payload": [
+            {
+              "input": {
+                "device_bytes": 0,
+                "host_bytes": 8388608
+              },
+              "scope": "native array payload only; excludes allocator, MPI, OpenMP stacks and other temporaries",
+              "scratch": null,
+              "scratch_mode": "borrowed-input-communication-buffer",
+              "total_device_bytes": 0,
+              "total_host_bytes": 8388608
+            },
+            {
+              "input": {
+                "device_bytes": 0,
+                "host_bytes": 8388608
+              },
+              "scope": "native array payload only; excludes allocator, MPI, OpenMP stacks and other temporaries",
+              "scratch": null,
+              "scratch_mode": "borrowed-input-communication-buffer",
+              "total_device_bytes": 0,
+              "total_host_bytes": 8388608
+            }
+          ],
+          "native_live_reserved_bytes": [
+            20480968,
+            20480968
+          ],
+          "native_multithreading_enabled": true,
+          "native_openmp_team_size": null,
+          "node_memory": [
+            {
+              "enforced_rank_process_address_space_cap_bytes": 8589934592,
+              "ranks": [
+                0
+              ],
+              "sampled_maximum_sum_rank_address_space_bytes": 2788442112,
+              "sampled_maximum_sum_rank_rss_bytes": 237109248,
+              "sampling": {
+                "interval_milliseconds": 20,
+                "max_sample_span_seconds": 4.0234e-05,
+                "maximum_sum_address_space_bytes": 2788442112,
+                "maximum_sum_rss_bytes": 237109248,
+                "pids": 1,
+                "samples": 146
+              },
+              "shared_memory_leader_rank": 0,
+              "sum_rank_rss_high_water_bound_bytes": 237109248,
+              "whole_node_enforced_memory_cap_bytes": null
+            },
+            {
+              "enforced_rank_process_address_space_cap_bytes": 8589934592,
+              "ranks": [
+                1
+              ],
+              "sampled_maximum_sum_rank_address_space_bytes": 2787762176,
+              "sampled_maximum_sum_rank_rss_bytes": 237768704,
+              "sampling": {
+                "interval_milliseconds": 20,
+                "max_sample_span_seconds": 3.3292e-05,
+                "maximum_sum_address_space_bytes": 2787762176,
+                "maximum_sum_rss_bytes": 237768704,
+                "pids": 1,
+                "samples": 146
+              },
+              "shared_memory_leader_rank": 1,
+              "sum_rank_rss_high_water_bound_bytes": 237768704,
+              "whole_node_enforced_memory_cap_bytes": null
+            }
+          ],
+          "nodes": 2,
+          "norms": [
+            0.9999999999999999,
+            0.9999999999999999
+          ],
+          "observed_host_sha256": [
+            "13efa90db94a0ca384396a6c83d1cca8754b87a792a46407346b795db155cf94",
+            "fb3061b7cd09d5cbdbd6e99b685ebcfd87bd94d22f0775aaab05f31ad5a886b3"
+          ],
+          "omp_stack_allowance_bytes": 2407530496,
+          "original_shard_sha256": [
+            "8331f2a980921fb683ff5b3e25af3979ac1f74761f64a84ae28e3f065e30df15",
+            "349b3014c041e0e1317c27e1a812e64c141aaef2c15b5a38ecb0ec8f926bcfb2"
+          ],
+          "original_stored_input_bytes": 4194304,
+          "persisted_encoding_bytes": 10499376,
+          "portable_replay_admission": "unrun",
+          "rank_process_address_space_cap_bytes": 8589934592,
+          "rank_receipt_sha256": [
+            "a9b87386813ea9b7b859d6afa7eeffe0e6c11a89fc696e1096d45f41150b080c",
+            "c67040080680a716942a8b9097c8290c9d43e22d1fa46d74afc5e45b3a601e5e"
+          ],
+          "ranks": 2,
+          "receipt_schema_version": 5,
+          "receipt_sha256": {
+            "artifacts.json": "f558fa3c2db979651483506ec2c3e29c3d0bfd10eaf0988d3b51202d74642033",
+            "base-build-profile.json": "ff5b86538552c11c3b5564e6400279b4ec9a9e6a351ea005ed4751667abe7a35",
+            "capacity.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "capacity.stdout": "839a678d399429303c8045cc688a80bff341322df2b140daa8076dc1d638856b",
+            "capacity/case-0-n65536/launcher.log": "9c3389d860f2397c354c8e31cba7b8c34729c62921952e04db27a626523da7d5",
+            "capacity/case-0-n65536/launcher.log.supervision.json": "c2c8636d4c6d72359e18ca4f720a0832abdcdbb38ac371fe1de91f4921a7fc2c",
+            "capacity/case-0-n65536/manifest.json": "65a9ae7c3ad5fdc77116ad55872fbe810bc6b20411a81ea2817926038eb280d7",
+            "capacity/completion.json": "dbf469e954a8332922734efe503c5f1ef410f4aca5c2f6e2482556695f6b2052",
+            "commands.json": "e973d9a3ded4be4abe5c7cee6530fce52019336d0cb89f76544b4e578f1b2fdb",
+            "completion.json": "1701324f9836388fa386402ff461cc12c6ea98f59de4ce416d0e3b2b78b9e95d",
+            "executed-entry.json": "9f59985ffee60b55e7d55a58b0166101509705fca3bce7001ebf4189acf6125f",
+            "executed-entry.sh": "ffb559137bd3ec671b8fa79f7c3e554647d78809d967b2d56e63a6d2607c2ef9",
+            "measurement-profile.json": "ddbd15b30521f245ff450a0483cf8f49c61d2d515f953c8bf2f015e375da2a2d",
+            "resolved-build.json": "6317252f8da234d810dc48e0702846e65cbf90e00ccd3f1dae067553d1330317",
+            "runtime-environment.json": "655ac6412d21ee282fc1338606213dabe94e08f6b9a205235c5389be428db79b",
+            "source-snapshot.json": "5ba178bba8005f2165e750fad28fc3e38095bb5cf50ade95f5bf83b2ccf2cf81"
+          },
+          "repetitions": 3,
+          "requested_openmp_threads_per_rank": 288,
+          "roundtrip_max_seconds": [
+            0.325539641,
+            0.316985481,
+            0.314582251
+          ],
+          "scheduler_elapsed_seconds": 23,
+          "scheduler_exit_code": "0:0",
+          "scheduler_state": "COMPLETED",
+          "stage_max_seconds": {
+            "execution": 0.956310359,
+            "load": 1.146057752,
+            "persistence": 0.096835668,
+            "prepare": 0.234368071,
+            "preprocessing": 0.452358575
+          },
+          "v4_comparison": {
+            "executable_sha256": "09b60954556d489dc9d85d264e986ff08a9077589f970687bc8ac40ea9cc57be",
+            "identical_stored_input_shard_hashes": true,
+            "job_id": "537410",
+            "median_rank_max_roundtrip_seconds": 0.324831727,
+            "native_total_host_array_bytes_per_rank": [
+              16777216,
+              16777216
+            ],
+            "source_digest": "8e02c49a7acf70a84f0c55aa40caba647024090a8cd72ffd3267bb72d8d3925b",
+            "timing_scope": "Separate allocations and executables; descriptive timings, not a controlled speedup claim.",
+            "v5_to_v4_native_array_ratio": 0.5
+          },
+          "whole_node_enforcement_verified": false
+        },
+        {
+          "capacity_closed": false,
+          "compiler": "gnu",
+          "decoded_original_records": 131072,
+          "dimension": 65536,
+          "distinct_observed_hosts": 4,
+          "job_id": "537491",
+          "launcher_seconds": 6.193420819938183,
+          "load_phase_max_seconds": {
+            "manifest_and_admission": 0.002278466,
+            "read_validate": 0.056779792,
+            "replay_admission": 0.0,
+            "reverse_directory": 1.769794218,
+            "total": 1.828972375
+          },
+          "load_reverse_broadcasts": 524304,
+          "loading_route": "resource-only-native",
+          "managed_rank_budget_bytes": 4294967296,
+          "maximum_sample_error": 8.673617379884035e-19,
+          "median_rank_max_roundtrip_seconds": 0.454210234,
+          "native_array_payload": [
+            {
+              "input": {
+                "device_bytes": 0,
+                "host_bytes": 4194304
+              },
+              "scope": "native array payload only; excludes allocator, MPI, OpenMP stacks and other temporaries",
+              "scratch": null,
+              "scratch_mode": "borrowed-input-communication-buffer",
+              "total_device_bytes": 0,
+              "total_host_bytes": 4194304
+            },
+            {
+              "input": {
+                "device_bytes": 0,
+                "host_bytes": 4194304
+              },
+              "scope": "native array payload only; excludes allocator, MPI, OpenMP stacks and other temporaries",
+              "scratch": null,
+              "scratch_mode": "borrowed-input-communication-buffer",
+              "total_device_bytes": 0,
+              "total_host_bytes": 4194304
+            },
+            {
+              "input": {
+                "device_bytes": 0,
+                "host_bytes": 4194304
+              },
+              "scope": "native array payload only; excludes allocator, MPI, OpenMP stacks and other temporaries",
+              "scratch": null,
+              "scratch_mode": "borrowed-input-communication-buffer",
+              "total_device_bytes": 0,
+              "total_host_bytes": 4194304
+            },
+            {
+              "input": {
+                "device_bytes": 0,
+                "host_bytes": 4194304
+              },
+              "scope": "native array payload only; excludes allocator, MPI, OpenMP stacks and other temporaries",
+              "scratch": null,
+              "scratch_mode": "borrowed-input-communication-buffer",
+              "total_device_bytes": 0,
+              "total_host_bytes": 4194304
+            }
+          ],
+          "native_live_reserved_bytes": [
+            10257352,
+            10257352,
+            10257352,
+            10257352
+          ],
+          "native_multithreading_enabled": true,
+          "native_openmp_team_size": null,
+          "node_memory": [
+            {
+              "enforced_rank_process_address_space_cap_bytes": 8589934592,
+              "ranks": [
+                0
+              ],
+              "sampled_maximum_sum_rank_address_space_bytes": 2776080384,
+              "sampled_maximum_sum_rank_rss_bytes": 225292288,
+              "sampling": {
+                "interval_milliseconds": 20,
+                "max_sample_span_seconds": 3.8992e-05,
+                "maximum_sum_address_space_bytes": 2776080384,
+                "maximum_sum_rss_bytes": 225292288,
+                "pids": 1,
+                "samples": 208
+              },
+              "shared_memory_leader_rank": 0,
+              "sum_rank_rss_high_water_bound_bytes": 225292288,
+              "whole_node_enforced_memory_cap_bytes": null
+            },
+            {
+              "enforced_rank_process_address_space_cap_bytes": 8589934592,
+              "ranks": [
+                1
+              ],
+              "sampled_maximum_sum_rank_address_space_bytes": 2776010752,
+              "sampled_maximum_sum_rank_rss_bytes": 226697216,
+              "sampling": {
+                "interval_milliseconds": 20,
+                "max_sample_span_seconds": 4.0604e-05,
+                "maximum_sum_address_space_bytes": 2776010752,
+                "maximum_sum_rss_bytes": 226697216,
+                "pids": 1,
+                "samples": 208
+              },
+              "shared_memory_leader_rank": 1,
+              "sum_rank_rss_high_water_bound_bytes": 226697216,
+              "whole_node_enforced_memory_cap_bytes": null
+            },
+            {
+              "enforced_rank_process_address_space_cap_bytes": 8589934592,
+              "ranks": [
+                2
+              ],
+              "sampled_maximum_sum_rank_address_space_bytes": 2775941120,
+              "sampled_maximum_sum_rank_rss_bytes": 228732928,
+              "sampling": {
+                "interval_milliseconds": 20,
+                "max_sample_span_seconds": 3.2632e-05,
+                "maximum_sum_address_space_bytes": 2775941120,
+                "maximum_sum_rss_bytes": 228732928,
+                "pids": 1,
+                "samples": 208
+              },
+              "shared_memory_leader_rank": 2,
+              "sum_rank_rss_high_water_bound_bytes": 228732928,
+              "whole_node_enforced_memory_cap_bytes": null
+            },
+            {
+              "enforced_rank_process_address_space_cap_bytes": 8589934592,
+              "ranks": [
+                3
+              ],
+              "sampled_maximum_sum_rank_address_space_bytes": 2776010752,
+              "sampled_maximum_sum_rank_rss_bytes": 217608192,
+              "sampling": {
+                "interval_milliseconds": 20,
+                "max_sample_span_seconds": 5.5278e-05,
+                "maximum_sum_address_space_bytes": 2776010752,
+                "maximum_sum_rss_bytes": 217608192,
+                "pids": 1,
+                "samples": 208
+              },
+              "shared_memory_leader_rank": 3,
+              "sum_rank_rss_high_water_bound_bytes": 217608192,
+              "whole_node_enforced_memory_cap_bytes": null
+            }
+          ],
+          "nodes": 4,
+          "norms": [
+            0.9999999999999999,
+            0.9999999999999999,
+            0.9999999999999999,
+            0.9999999999999999
+          ],
+          "observed_host_sha256": [
+            "20d0a235b5850fff9c3a18b2f654a2800f1639eecd438209a00ca45942d28388",
+            "11fb6ed22169ad0288a5e1b67b419f07a40903415f8a048fe7096e4b4a3b3b5b",
+            "fc36ab777f87807af289035c16b6ef2bfc8ac9e89460907f3822d53746b08306",
+            "69878cd8d5fa9297c941923db86daa059c00398c5c7c57b2d389ff1228046608"
+          ],
+          "omp_stack_allowance_bytes": 2407530496,
+          "original_shard_sha256": [
+            "7b73b5bffd1fbf683b65df58e6e7ef2bebd30291feb4b342ab2e7f7326a47a6f",
+            "1dafa29bc89022d34397dfe6a74da78d42e948cb27941b7e69633643a68427b1",
+            "e23039151e49a8c377fe9d851dc37e520c775416bfcdc7a76d91edbab9cf64e2",
+            "e927e917629cb15c7bb65edd0ef5df2b309fff5951c0f3f0806736572b7af249"
+          ],
+          "original_stored_input_bytes": 4194304,
+          "persisted_encoding_bytes": 10512992,
+          "portable_replay_admission": "unrun",
+          "rank_process_address_space_cap_bytes": 8589934592,
+          "rank_receipt_sha256": [
+            "5d585805a33aee0d41d9e487c23ea3b7aaa189171ae4c18ee0788b82454d52f5",
+            "c226eecb94be6a1fe06d0d1ad2db32dce5f9ae02a6fb8cb5fead6518893c98c8",
+            "61bda8a1293b5eaa69fe46d00097083942a03574772ab24212344e4773a5d874",
+            "16c2c1311541629e360949eda0f2e296b9563ff750b4422ce8c410c671d22578"
+          ],
+          "ranks": 4,
+          "receipt_schema_version": 5,
+          "receipt_sha256": {
+            "artifacts.json": "f558fa3c2db979651483506ec2c3e29c3d0bfd10eaf0988d3b51202d74642033",
+            "base-build-profile.json": "ff5b86538552c11c3b5564e6400279b4ec9a9e6a351ea005ed4751667abe7a35",
+            "capacity.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "capacity.stdout": "a929f517326c7b75f9b0d39489d518c0ba888e1cbe4fd3d0f75bb335d4d61dda",
+            "capacity/case-0-n65536/launcher.log": "32eee0426a8bd07a14c317502ca5d7e425ccfcf51f5cfc0f022d64a1f9f2580f",
+            "capacity/case-0-n65536/launcher.log.supervision.json": "d74a07fc0eb51d4788e9b0bba31b621f66ed45ab17b77c93d62343ca5cd20033",
+            "capacity/case-0-n65536/manifest.json": "b19b950fdf795360343b88ed324d49336a924fd548312e74adeb436a50339613",
+            "capacity/completion.json": "26ccbe59d61d48b0d091af295a05988d2eafbc596af26dcd1c9467ef95805f61",
+            "commands.json": "5c07159546077cbc2c7e7a6947ad3f976a25b0280324a8b867b251b86b007992",
+            "completion.json": "a6639289961d09a729933f646b47871d7d4126d66d44e6ffb2e840dcc887cbb9",
+            "executed-entry.json": "f5241bde72674640c93e21c2ac6f288f497fbe74e34dee22f00d67e58b537bc3",
+            "executed-entry.sh": "ffb559137bd3ec671b8fa79f7c3e554647d78809d967b2d56e63a6d2607c2ef9",
+            "measurement-profile.json": "ddbd15b30521f245ff450a0483cf8f49c61d2d515f953c8bf2f015e375da2a2d",
+            "resolved-build.json": "6317252f8da234d810dc48e0702846e65cbf90e00ccd3f1dae067553d1330317",
+            "runtime-environment.json": "36025f826ed8fb4f2cb3fd6b5dccacd6be4367af7feee9c20b565d527ec0e893",
+            "source-snapshot.json": "5ba178bba8005f2165e750fad28fc3e38095bb5cf50ade95f5bf83b2ccf2cf81"
+          },
+          "repetitions": 3,
+          "requested_openmp_threads_per_rank": 288,
+          "roundtrip_max_seconds": [
+            0.454210234,
+            0.455337108,
+            0.446313614
+          ],
+          "scheduler_elapsed_seconds": 23,
+          "scheduler_exit_code": "0:0",
+          "scheduler_state": "COMPLETED",
+          "stage_max_seconds": {
+            "execution": 1.354906348,
+            "load": 1.829542436,
+            "persistence": 0.109702549,
+            "prepare": 0.30200788,
+            "preprocessing": 0.535050897
+          },
+          "v4_comparison": {
+            "executable_sha256": "09b60954556d489dc9d85d264e986ff08a9077589f970687bc8ac40ea9cc57be",
+            "identical_stored_input_shard_hashes": true,
+            "job_id": "537411",
+            "median_rank_max_roundtrip_seconds": 0.462618999,
+            "native_total_host_array_bytes_per_rank": [
+              8388608,
+              8388608,
+              8388608,
+              8388608
+            ],
+            "source_digest": "8e02c49a7acf70a84f0c55aa40caba647024090a8cd72ffd3267bb72d8d3925b",
+            "timing_scope": "Separate allocations and executables; descriptive timings, not a controlled speedup claim.",
+            "v5_to_v4_native_array_ratio": 0.5
+          },
+          "whole_node_enforcement_verified": false
+        },
+        {
+          "capacity_closed": false,
+          "compiler": "gnu",
+          "decoded_original_records": 131072,
+          "dimension": 65536,
+          "distinct_observed_hosts": 8,
+          "job_id": "537492",
+          "launcher_seconds": 8.552416132995859,
+          "load_phase_max_seconds": {
+            "manifest_and_admission": 0.00324452,
+            "read_validate": 0.053077017,
+            "replay_admission": 0.0,
+            "reverse_directory": 2.945960506,
+            "total": 3.002668032
+          },
+          "load_reverse_broadcasts": 1048640,
+          "loading_route": "resource-only-native",
+          "managed_rank_budget_bytes": 4294967296,
+          "maximum_sample_error": 8.673617379884035e-19,
+          "median_rank_max_roundtrip_seconds": 0.951701568,
+          "native_array_payload": [
+            {
+              "input": {
+                "device_bytes": 0,
+                "host_bytes": 2097152
+              },
+              "scope": "native array payload only; excludes allocator, MPI, OpenMP stacks and other temporaries",
+              "scratch": null,
+              "scratch_mode": "borrowed-input-communication-buffer",
+              "total_device_bytes": 0,
+              "total_host_bytes": 2097152
+            },
+            {
+              "input": {
+                "device_bytes": 0,
+                "host_bytes": 2097152
+              },
+              "scope": "native array payload only; excludes allocator, MPI, OpenMP stacks and other temporaries",
+              "scratch": null,
+              "scratch_mode": "borrowed-input-communication-buffer",
+              "total_device_bytes": 0,
+              "total_host_bytes": 2097152
+            },
+            {
+              "input": {
+                "device_bytes": 0,
+                "host_bytes": 2097152
+              },
+              "scope": "native array payload only; excludes allocator, MPI, OpenMP stacks and other temporaries",
+              "scratch": null,
+              "scratch_mode": "borrowed-input-communication-buffer",
+              "total_device_bytes": 0,
+              "total_host_bytes": 2097152
+            },
+            {
+              "input": {
+                "device_bytes": 0,
+                "host_bytes": 2097152
+              },
+              "scope": "native array payload only; excludes allocator, MPI, OpenMP stacks and other temporaries",
+              "scratch": null,
+              "scratch_mode": "borrowed-input-communication-buffer",
+              "total_device_bytes": 0,
+              "total_host_bytes": 2097152
+            },
+            {
+              "input": {
+                "device_bytes": 0,
+                "host_bytes": 2097152
+              },
+              "scope": "native array payload only; excludes allocator, MPI, OpenMP stacks and other temporaries",
+              "scratch": null,
+              "scratch_mode": "borrowed-input-communication-buffer",
+              "total_device_bytes": 0,
+              "total_host_bytes": 2097152
+            },
+            {
+              "input": {
+                "device_bytes": 0,
+                "host_bytes": 2097152
+              },
+              "scope": "native array payload only; excludes allocator, MPI, OpenMP stacks and other temporaries",
+              "scratch": null,
+              "scratch_mode": "borrowed-input-communication-buffer",
+              "total_device_bytes": 0,
+              "total_host_bytes": 2097152
+            },
+            {
+              "input": {
+                "device_bytes": 0,
+                "host_bytes": 2097152
+              },
+              "scope": "native array payload only; excludes allocator, MPI, OpenMP stacks and other temporaries",
+              "scratch": null,
+              "scratch_mode": "borrowed-input-communication-buffer",
+              "total_device_bytes": 0,
+              "total_host_bytes": 2097152
+            },
+            {
+              "input": {
+                "device_bytes": 0,
+                "host_bytes": 2097152
+              },
+              "scope": "native array payload only; excludes allocator, MPI, OpenMP stacks and other temporaries",
+              "scratch": null,
+              "scratch_mode": "borrowed-input-communication-buffer",
+              "total_device_bytes": 0,
+              "total_host_bytes": 2097152
+            }
+          ],
+          "native_live_reserved_bytes": [
+            5145544,
+            5145544,
+            5145544,
+            5145544,
+            5145544,
+            5145544,
+            5145544,
+            5145544
+          ],
+          "native_multithreading_enabled": true,
+          "native_openmp_team_size": null,
+          "node_memory": [
+            {
+              "enforced_rank_process_address_space_cap_bytes": 8589934592,
+              "ranks": [
+                0
+              ],
+              "sampled_maximum_sum_rank_address_space_bytes": 2758914048,
+              "sampled_maximum_sum_rank_rss_bytes": 212914176,
+              "sampling": {
+                "interval_milliseconds": 20,
+                "max_sample_span_seconds": 3.3163e-05,
+                "maximum_sum_address_space_bytes": 2758914048,
+                "maximum_sum_rss_bytes": 212914176,
+                "pids": 1,
+                "samples": 351
+              },
+              "shared_memory_leader_rank": 0,
+              "sum_rank_rss_high_water_bound_bytes": 212914176,
+              "whole_node_enforced_memory_cap_bytes": null
+            },
+            {
+              "enforced_rank_process_address_space_cap_bytes": 8589934592,
+              "ranks": [
+                1
+              ],
+              "sampled_maximum_sum_rank_address_space_bytes": 2758914048,
+              "sampled_maximum_sum_rank_rss_bytes": 212914176,
+              "sampling": {
+                "interval_milliseconds": 20,
+                "max_sample_span_seconds": 5.3345e-05,
+                "maximum_sum_address_space_bytes": 2758914048,
+                "maximum_sum_rss_bytes": 212914176,
+                "pids": 1,
+                "samples": 350
+              },
+              "shared_memory_leader_rank": 1,
+              "sum_rank_rss_high_water_bound_bytes": 212914176,
+              "whole_node_enforced_memory_cap_bytes": null
+            },
+            {
+              "enforced_rank_process_address_space_cap_bytes": 8589934592,
+              "ranks": [
+                2
+              ],
+              "sampled_maximum_sum_rank_address_space_bytes": 2758909952,
+              "sampled_maximum_sum_rank_rss_bytes": 202780672,
+              "sampling": {
+                "interval_milliseconds": 20,
+                "max_sample_span_seconds": 3.0869e-05,
+                "maximum_sum_address_space_bytes": 2758909952,
+                "maximum_sum_rss_bytes": 202780672,
+                "pids": 1,
+                "samples": 350
+              },
+              "shared_memory_leader_rank": 2,
+              "sum_rank_rss_high_water_bound_bytes": 202780672,
+              "whole_node_enforced_memory_cap_bytes": null
+            },
+            {
+              "enforced_rank_process_address_space_cap_bytes": 8589934592,
+              "ranks": [
+                3
+              ],
+              "sampled_maximum_sum_rank_address_space_bytes": 2758914048,
+              "sampled_maximum_sum_rank_rss_bytes": 208338944,
+              "sampling": {
+                "interval_milliseconds": 20,
+                "max_sample_span_seconds": 2.9657e-05,
+                "maximum_sum_address_space_bytes": 2758914048,
+                "maximum_sum_rss_bytes": 208338944,
+                "pids": 1,
+                "samples": 351
+              },
+              "shared_memory_leader_rank": 3,
+              "sum_rank_rss_high_water_bound_bytes": 208338944,
+              "whole_node_enforced_memory_cap_bytes": null
+            },
+            {
+              "enforced_rank_process_address_space_cap_bytes": 8589934592,
+              "ranks": [
+                4
+              ],
+              "sampled_maximum_sum_rank_address_space_bytes": 2758914048,
+              "sampled_maximum_sum_rank_rss_bytes": 212914176,
+              "sampling": {
+                "interval_milliseconds": 20,
+                "max_sample_span_seconds": 2.9867e-05,
+                "maximum_sum_address_space_bytes": 2758914048,
+                "maximum_sum_rss_bytes": 212914176,
+                "pids": 1,
+                "samples": 351
+              },
+              "shared_memory_leader_rank": 4,
+              "sum_rank_rss_high_water_bound_bytes": 212914176,
+              "whole_node_enforced_memory_cap_bytes": null
+            },
+            {
+              "enforced_rank_process_address_space_cap_bytes": 8589934592,
+              "ranks": [
+                5
+              ],
+              "sampled_maximum_sum_rank_address_space_bytes": 2758909952,
+              "sampled_maximum_sum_rank_rss_bytes": 212914176,
+              "sampling": {
+                "interval_milliseconds": 20,
+                "max_sample_span_seconds": 6.7777e-05,
+                "maximum_sum_address_space_bytes": 2758909952,
+                "maximum_sum_rss_bytes": 212914176,
+                "pids": 1,
+                "samples": 350
+              },
+              "shared_memory_leader_rank": 5,
+              "sum_rank_rss_high_water_bound_bytes": 212914176,
+              "whole_node_enforced_memory_cap_bytes": null
+            },
+            {
+              "enforced_rank_process_address_space_cap_bytes": 8589934592,
+              "ranks": [
+                6
+              ],
+              "sampled_maximum_sum_rank_address_space_bytes": 2758909952,
+              "sampled_maximum_sum_rank_rss_bytes": 210890752,
+              "sampling": {
+                "interval_milliseconds": 20,
+                "max_sample_span_seconds": 3.5005e-05,
+                "maximum_sum_address_space_bytes": 2758909952,
+                "maximum_sum_rss_bytes": 210890752,
+                "pids": 1,
+                "samples": 351
+              },
+              "shared_memory_leader_rank": 6,
+              "sum_rank_rss_high_water_bound_bytes": 210890752,
+              "whole_node_enforced_memory_cap_bytes": null
+            },
+            {
+              "enforced_rank_process_address_space_cap_bytes": 8589934592,
+              "ranks": [
+                7
+              ],
+              "sampled_maximum_sum_rank_address_space_bytes": 2758909952,
+              "sampled_maximum_sum_rank_rss_bytes": 208195584,
+              "sampling": {
+                "interval_milliseconds": 20,
+                "max_sample_span_seconds": 2.8926e-05,
+                "maximum_sum_address_space_bytes": 2758909952,
+                "maximum_sum_rss_bytes": 208195584,
+                "pids": 1,
+                "samples": 350
+              },
+              "shared_memory_leader_rank": 7,
+              "sum_rank_rss_high_water_bound_bytes": 208195584,
+              "whole_node_enforced_memory_cap_bytes": null
+            }
+          ],
+          "nodes": 8,
+          "norms": [
+            0.9999999999999999,
+            0.9999999999999999,
+            0.9999999999999999,
+            0.9999999999999999,
+            0.9999999999999999,
+            0.9999999999999999,
+            0.9999999999999999,
+            0.9999999999999999
+          ],
+          "observed_host_sha256": [
+            "d6631e498df526dd31566cf8815a6a570d1ead3a412a111ebcbcea61be743c58",
+            "c12057e2da467d74dbb49541c4421ca91d37f19a49c8eda78b79f47b52a0bf6a",
+            "6a31ae538ceb2e547fd17344f502f717f5cdc84bce627473e21008ffa0da6fce",
+            "1c3c9ea0578d0740a83173882fa0f2008ae1b48c9abe32f9a30fe56f76103c51",
+            "7703b5c03db98643f14cdd8927af5d8afc2f59b6433a3efdd5eecc51fa2acfa4",
+            "266c5a7871c4d0ca4d365fad0cf73de2dfc25fe107fc817832aacfd605fb93ac",
+            "269e3b341609b573c427e2102b56a1cb9f86ebea301336908bddca3c4fd811d3",
+            "01630dc17fa3fce1729d33504d623b954687c2c850cb3f8dfe7187a66db29390"
+          ],
+          "omp_stack_allowance_bytes": 2407530496,
+          "original_shard_sha256": [
+            "773aacf448d2054d518dbf29045f7721d5e3fd03b2635630d31d41406758f3fe",
+            "25358c7d0380ebfaa3acb07b82eb3174344f56eb72c2f33c4b425a1664134a22",
+            "d501b47b54967bfa79fbff08df8e078160dbdadfdc4de4289be8179ea186c5d7",
+            "5007862f369cd2635a7fd28cba6b6994e97ef5c36d116486836558481e07dfca",
+            "d15a8075543a3a38c83c39d613a2885cb616cc1a0f5be476fffad804d4db67fd",
+            "76ee718ddd8159b818fe78264d0311b322f76929ff3d4b87d6cf3deef54fe9bf",
+            "1f66ac272e0aa61440e581d4997add842660e3a15d15f7c82e1519545cd9c355",
+            "7d8c3e82c036bda620a1e4d7718ae4597eacfdb1bc766b9a848659e817ee354c"
+          ],
+          "original_stored_input_bytes": 4194304,
+          "persisted_encoding_bytes": 10540224,
+          "portable_replay_admission": "unrun",
+          "rank_process_address_space_cap_bytes": 8589934592,
+          "rank_receipt_sha256": [
+            "7c0b1b82e2846afe080600ec4f537320bb61f00784f6cd5a153116cc0ed49e6b",
+            "83dbc1c1cf6bfc05e83a7598064ea8f2f918d89ce7a3c737bd1f7b0926ee76d0",
+            "b495d9ef798ae26b81859d4e1b891f2902e93a21fe093d79c89866729cf3a55b",
+            "e24161fb774ec96a1d42130abeae73dc270f66822899051d96ca090d43d8e249",
+            "da3d44953e6428693a176abb4088eb8829e19ef7e8b87278cdfa99a10156c4a2",
+            "51a1a18f892f53bceb6bb7dad768cd12ee303e7f20c04ae25eea8677cfcb08f4",
+            "c716990747284aa48c6972418757342cba2c524fedcb63e14d50a08b8cc95487",
+            "729c27aca5a5b74748d7559b8be6861fa93814049f5d4d71b8211c87e2b05d19"
+          ],
+          "ranks": 8,
+          "receipt_schema_version": 5,
+          "receipt_sha256": {
+            "artifacts.json": "f558fa3c2db979651483506ec2c3e29c3d0bfd10eaf0988d3b51202d74642033",
+            "base-build-profile.json": "ff5b86538552c11c3b5564e6400279b4ec9a9e6a351ea005ed4751667abe7a35",
+            "capacity.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "capacity.stdout": "d75699674bfc04f7b276df7d7654dc0a963a5406d28a1adb3824d820b814b955",
+            "capacity/case-0-n65536/launcher.log": "8dedff9f495155d4115718ef09be02a9d2f0865f4fcae800b54970fde2cbe2d3",
+            "capacity/case-0-n65536/launcher.log.supervision.json": "717b4785ec0f3ab78211df6081fce5765f713a434833e8d9d9c8a9d04e3848ac",
+            "capacity/case-0-n65536/manifest.json": "204186a558fdab8018aaf9155240ada90428817758a38b72fd280bc2e4fd67f7",
+            "capacity/completion.json": "bf7035f315948cddd3dcd494e19f7c34b4bb168b90d4fdb108e1ab6cb67654c2",
+            "commands.json": "adde443271b749d78ede9b7d35278d9cd66f47d1cae5a30e5662174157c22f8b",
+            "completion.json": "905e2abb1ec45e733f68baf51449f7ac55e08f7680e0a8ed409dd02f026b1814",
+            "executed-entry.json": "193ef438ba3e214f9598617402ced3982b93ba78901ac3455ab9d935ad1b64ac",
+            "executed-entry.sh": "ffb559137bd3ec671b8fa79f7c3e554647d78809d967b2d56e63a6d2607c2ef9",
+            "measurement-profile.json": "ddbd15b30521f245ff450a0483cf8f49c61d2d515f953c8bf2f015e375da2a2d",
+            "resolved-build.json": "6317252f8da234d810dc48e0702846e65cbf90e00ccd3f1dae067553d1330317",
+            "runtime-environment.json": "c0369c51afc638c519f6c53db7a2fe6ddb9d30d69cde5a055ae71bf5ea5db38c",
+            "source-snapshot.json": "5ba178bba8005f2165e750fad28fc3e38095bb5cf50ade95f5bf83b2ccf2cf81"
+          },
+          "repetitions": 3,
+          "requested_openmp_threads_per_rank": 288,
+          "roundtrip_max_seconds": [
+            0.952796116,
+            0.951701568,
+            0.940839589
+          ],
+          "scheduler_elapsed_seconds": 24,
+          "scheduler_exit_code": "0:0",
+          "scheduler_state": "COMPLETED",
+          "stage_max_seconds": {
+            "execution": 2.844413818,
+            "load": 3.002998336,
+            "persistence": 0.118862081,
+            "prepare": 0.341504187,
+            "preprocessing": 0.682524285
+          },
+          "v4_comparison": {
+            "executable_sha256": "09b60954556d489dc9d85d264e986ff08a9077589f970687bc8ac40ea9cc57be",
+            "identical_stored_input_shard_hashes": true,
+            "job_id": "537412",
+            "median_rank_max_roundtrip_seconds": 0.96152353,
+            "native_total_host_array_bytes_per_rank": [
+              4194304,
+              4194304,
+              4194304,
+              4194304,
+              4194304,
+              4194304,
+              4194304,
+              4194304
+            ],
+            "source_digest": "8e02c49a7acf70a84f0c55aa40caba647024090a8cd72ffd3267bb72d8d3925b",
+            "timing_scope": "Separate allocations and executables; descriptive timings, not a controlled speedup claim.",
+            "v5_to_v4_native_array_ratio": 0.5
+          },
+          "whole_node_enforcement_verified": false
+        }
+      ],
+      "compiler": "gnu",
+      "focused": {
+        "child_exit_status_counts": {
+          "0": 59,
+          "143": 4
+        },
+        "expected_fatal_children": [
+          {
+            "exit_status": 143,
+            "seconds": 1.835038459,
+            "step": "537489.2",
+            "timed_out": false
+          },
+          {
+            "exit_status": 143,
+            "seconds": 1.120627162,
+            "step": "537489.3",
+            "timed_out": false
+          },
+          {
+            "exit_status": 143,
+            "seconds": 1.054382021,
+            "step": "537489.4",
+            "timed_out": false
+          },
+          {
+            "exit_status": 143,
+            "seconds": 1.085181163,
+            "step": "537489.5",
+            "timed_out": false
+          }
+        ],
+        "fatal_scope": "Original native-range and staged-buffer-write fatal fixtures, stderr captured and suppressed. Passing parents check both rank witnesses, original checked error, absent after-return witnesses and bounded non-timeout termination. Temporary witness files are checked by tests, not retained as standalone raw files.",
+        "intentionally_skipped_tests": 37,
+        "job_id": "537489",
+        "mpi_launches": 63,
+        "mpi_world_size_counts": {
+          "1": 13,
+          "2": 20,
+          "3": 1,
+          "4": 19,
+          "8": 10
+        },
+        "nextest_seconds": 70.488,
+        "passed_tests": 16,
+        "post_execution_binary_hashes_unchanged": true,
+        "receipt_sha256": {
+          "archive-list.stderr": "b4d934050710448e9b809393ebcb5bce34602feb003fc4e254970d11f749c8be",
+          "archive-list.stdout": "7b8bf7f82c5ccd8208e376452680d13e6430bda0d98b92fa2c52221c4a12e710",
+          "artifacts.json": "f558fa3c2db979651483506ec2c3e29c3d0bfd10eaf0988d3b51202d74642033",
+          "base-build-profile.json": "ff5b86538552c11c3b5564e6400279b4ec9a9e6a351ea005ed4751667abe7a35",
+          "commands.json": "65bb3cf69461a94c1acc1dfc633b9f324c35e17a7c8362c3b6b9145b3d367028",
+          "completion.json": "ebe95be4ce3d8e9645e90ec79ca827a4ce70017acfe69b09ec9a80b39812d370",
+          "executed-entry.json": "43f75c39f63d19cc37a38dae7443ff903c3b18f9f8d342915dd3c79ac8efa040",
+          "executed-entry.sh": "9d2533d3a618162b5f9781fd7e5f54ea34d00e399e3cecbdd92807bc0fa63a18",
+          "focused-tests.stderr": "620821c74882b94dcdde9b20a03db9835ccf75f56a84836095cde71105bce5b3",
+          "focused-tests.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "measurement-profile.json": "ddbd15b30521f245ff450a0483cf8f49c61d2d515f953c8bf2f015e375da2a2d",
+          "resolved-build.json": "6317252f8da234d810dc48e0702846e65cbf90e00ccd3f1dae067553d1330317",
+          "runtime-environment.json": "8cb6aecca8d5ed84130f40ab80e9935f770ed20afcd476b6c1664222d8926244",
+          "source-snapshot.json": "5ba178bba8005f2165e750fad28fc3e38095bb5cf50ade95f5bf83b2ccf2cf81",
+          "test-inventory.json": "86148fdccd77ae33389e56b1a1d5002acc85542ede4046b05186667897cca65a"
+        },
+        "runtime_rebuilt": false,
+        "scheduler_elapsed_seconds": 92,
+        "scheduler_exit_code": "0:0",
+        "scheduler_state": "COMPLETED"
+      },
+      "profile": {
+        "base_profile_sha256": "ff5b86538552c11c3b5564e6400279b4ec9a9e6a351ea005ed4751667abe7a35",
+        "base_source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+        "compiler_version": "g++ (GCC) 14.2.1 20250110 (Red Hat 14.2.1-7)",
+        "debug_information": false,
+        "hdf5": "central serial cray-hdf5/1.14.3.5",
+        "incremental": false,
+        "measurement_profile_sha256": "ddbd15b30521f245ff450a0483cf8f49c61d2d515f953c8bf2f015e375da2a2d",
+        "modules": [
+          "craype-x86-turin",
+          "libfabric/2.3.1",
+          "craype-network-ofi",
+          "perftools-base/25.03.0",
+          "xpmem/1.0.1-1.5_1_gfb6998056825",
+          "cse_env/0.2",
+          "epcc-setup-env",
+          "load-epcc-module",
+          "gcc-native/14.2",
+          "craype/2.7.34",
+          "cray-dsmml/0.3.1",
+          "cray-mpich/8.1.32",
+          "cray-libsci/25.03.0",
+          "PrgEnv-gnu/8.6.0",
+          "gmake/4.4.1-oeqgnsk <H>",
+          "cmake/4.1.2",
+          "cray-hdf5/1.14.3.5"
+        ],
+        "native_source_changed": false,
+        "native_source_revision": "503552065045eaf89baba85e6cd6aad728525554",
+        "optimization_level": 2,
+        "rust_linker_flags": [],
+        "rustc_version": "rustc 1.101.0-nightly (282215592 2026-10-04)"
+      }
+    },
+    {
+      "base_native_build_job": "536808",
+      "build": {
+        "artifacts": {
+          "archive_sha256": "acbb2a9b5ea7ee6e6439251ec499705d4af458b86c1d74333e8893055704f664",
+          "sparse_capacity_sha256": "588ee76021707a6cf2aa503dd57fb8f27c03f873ded84f9b2ad33370b1ece6f9"
+        },
+        "job_id": "537493",
+        "receipt_sha256": {
+          "archive-list.stderr": "155af851786aae4a919c7cf9aada6eb269438256a61c13d9586cc2fb2eee48f0",
+          "archive-list.stdout": "bb8ca0ea833a28be7666d5155d33816058df23bac5faea559e1a143fe60ab7cf",
+          "artifacts.json": "a0a100c299f9569def694db4a4e264f10de470e41c704e35a80858c0316eefb4",
+          "base-build-profile.json": "c7828fb7c4d397c8cfdee3d39d14002ba5aa05f6e93c7c15665811967f03b292",
+          "build-complete": "706d2396e919be0ea25a7af461ddaa61eb135264a55b62ecffd07f5403058f04",
+          "commands.json": "421a5b337ad50868d7a0833f6c9920e7d090fc61ded41005ad4bfd8ba27364a2",
+          "completion.json": "e34a1ace5b815443d39996f38f19189c60c79e220efeaf11b70bc449a3cf1099",
+          "example-build.stderr": "3cdf72362cd0800a6f84dc8fbbad7baa9119a73c001dbb5787d9aa6f5d8ef9fe",
+          "example-build.stdout": "ebf49541baea0154f98df2ff705cd8227f2f2cafd61af3a8e127f7be95e401c2",
+          "executed-entry.json": "1feda5bfb732259d5542e2a5bb8c50f8c2879530d21d057d40db39b30853fdd2",
+          "executed-entry.sh": "0495bba5074c440e409797b5caa3fb1d3a79793260b74edca24b3cdba980a05d",
+          "measurement-profile.json": "b5f30d96208d4192ae83357c9e308d1cf45dff629a8170d063d84d40ac74b4cc",
+          "runtime-environment.json": "0150cf738ad2759f638bcb6fc45058fa70323348f8f57824b1f9e1000849a944",
+          "source-snapshot.json": "5ba178bba8005f2165e750fad28fc3e38095bb5cf50ade95f5bf83b2ccf2cf81",
+          "test-archive.stderr": "1887b1311cc9ae37e7c938a6721e5b29a273d94a159f36e58bf182c4426b8b5d",
+          "test-archive.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "test-inventory.json": "6fbaf96deebce22f4018d6db5c8082d50f809c3fc2d7fdc34a6d65afe0738a49"
+        },
+        "remote_archive_example_and_binary_rehash_verified": true,
+        "scheduler_elapsed_seconds": 112,
+        "scheduler_exit_code": "0:0",
+        "scheduler_state": "COMPLETED",
+        "stage_seconds": {
+          "archive-list": 0.7415971311274916,
+          "example-build": 83.32515218202025,
+          "nextest-version": 0.6665505419950932,
+          "test-archive": 9.220816957997158
+        },
+        "test_inventory": {
+          "binaries": [
+            {
+              "binary": "collective_initialization_budget",
+              "bytes": 2763312,
+              "kind": "test",
+              "package": "quest-rs",
+              "relative_path": "target/debug/build/quest-rs/4666a58c24b303b6/out/collective_initialization_budget-4666a58c24b303b6",
+              "sha256": "7b93b600042f47d2b7f9115c641a8f9b9064f16ca0abde02494210cb2765a331",
+              "tests": [
+                "root_initialization_accounts_for_three_live_global_buffers"
+              ]
+            },
+            {
+              "binary": "matching_collective",
+              "bytes": 8197064,
+              "kind": "test",
+              "package": "quest-rs",
+              "relative_path": "target/debug/build/quest-rs/88ce794094da7434/out/matching_collective-88ce794094da7434",
+              "sha256": "b02aea6da1a02b81178cc77f946cb1d9e313f517fd859a015c271fb89de3877c",
+              "tests": [
+                "buffer_reuse::distributed_matching_reuses_native_buffer_without_width_scaled_scratch",
+                "collective_matching_shards_route_all_sectors_without_global_storage"
+              ]
+            },
+            {
+              "binary": "matching_lcu_collective",
+              "bytes": 8505920,
+              "kind": "test",
+              "package": "quest-rs",
+              "relative_path": "target/debug/build/quest-rs/43b104e380a021ba/out/matching_lcu_collective-43b104e380a021ba",
+              "sha256": "7e0a7567da2e8e16105f8c82a70f8440def5a3efbd702402d99a7c28ec48e060",
+              "tests": [
+                "sharded_weighted_matching_whole_register_and_standalone_adjoint"
+              ]
+            },
+            {
+              "binary": "matching_lcu_transform_collective",
+              "bytes": 3718248,
+              "kind": "test",
+              "package": "quest-rs",
+              "relative_path": "target/debug/build/quest-rs/af75d872f87533a6/out/matching_lcu_transform_collective-af75d872f87533a6",
+              "sha256": "ec999ad6fdfdedddeffc4f9b8ffd702a3fc98e8a3da85a7d5b272a04445ab00f",
+              "tests": [
+                "sharded_lcu_transform_whole_register_and_standalone_adjoint"
+              ]
+            },
+            {
+              "binary": "matching_load_statistics",
+              "bytes": 4210616,
+              "kind": "test",
+              "package": "quest-rs",
+              "relative_path": "target/debug/build/quest-rs/a39a128074cc9053/out/matching_load_statistics-a39a128074cc9053",
+              "sha256": "82144c3d01f519d70164b8c122b5bc5c1a3ff682735761576b728aa48cead71b",
+              "tests": [
+                "loader_reports_actual_phase_work_without_replicating_records"
+              ]
+            },
+            {
+              "binary": "matching_persisted",
+              "bytes": 9702472,
+              "kind": "test",
+              "package": "quest-rs",
+              "relative_path": "target/debug/build/quest-rs/f313c8db17c2761d/out/matching_persisted-f313c8db17c2761d",
+              "sha256": "38ea68d9fa55f76c20404c7ab6193fae384bc3c2b41a9a8224f2a8603049f385",
+              "tests": [
+                "persisted_gate_replay_and_collective_restart"
+              ]
+            },
+            {
+              "binary": "matching_persisted_preparation",
+              "bytes": 9610912,
+              "kind": "test",
+              "package": "quest-rs",
+              "relative_path": "target/debug/build/quest-rs/1d0d3f1041f98f49/out/matching_persisted_preparation-1d0d3f1041f98f49",
+              "sha256": "a00548f3a4c2a9909a4c3218ee472521b5acc9c66368ca535d77cca6671d4183",
+              "tests": [
+                "consuming_persisted_preparation_admits_ownership_and_whole_unitary"
+              ]
+            },
+            {
+              "binary": "persisted_weighted_transform",
+              "bytes": 5160808,
+              "kind": "test",
+              "package": "quest-rs",
+              "relative_path": "target/debug/build/quest-rs/366de5d4f51bd511/out/persisted_weighted_transform-366de5d4f51bd511",
+              "sha256": "8f69ba4761e9bb298b20066831e891c4fb9abe2f11e7c10a5ac3b8550f8b78f7",
+              "tests": [
+                "consumer_pair_packet_rejects_incomplete_status_before_decode",
+                "distributed_consumer_readout_uses_matching_packets",
+                "immutable_persisted_three_term_cold_whole_u_and_literal_adjoint"
+              ]
+            },
+            {
+              "binary": "quest",
+              "bytes": 11947448,
+              "kind": "lib",
+              "package": "quest-rs",
+              "relative_path": "target/debug/build/quest-rs/b96744f92cf1f9c4/out/quest-b96744f92cf1f9c4",
+              "sha256": "fa3718080fc415945bba67bf605aa9063ffacc409024aff51a5d8a25532bb129",
+              "tests": [
+                "qsvt::matching::collective::buffer_tests::rank_local_buffer_admission_rejects_before_opening_hadamards",
+                "qsvt::matching::collective::failure_tests::native_rank_local_failure_aborts_blocked_peer",
+                "qsvt::matching::collective::failure_tests::staged_write_failure_aborts_blocked_peer",
+                "qsvt::matching::collective::preparation_tests::incoming_actual_capacity_rejects_before_validation_protocol"
+              ]
+            },
+            {
+              "binary": "communication_buffer",
+              "bytes": 1942560,
+              "kind": "test",
+              "package": "quest-sys",
+              "relative_path": "target/debug/build/quest-sys/15fc9f5973d2d31b/out/communication_buffer-15fc9f5973d2d31b",
+              "sha256": "519314dd895e501b342712d1883cae94892b9551401f4c2b641e9d9309e21cc0",
+              "tests": [
+                "communication_buffer_staging_is_isolated_and_checked"
+              ]
+            }
+          ],
+          "test_count": 16
+        }
+      },
+      "capacity_cases": [
+        {
+          "capacity_closed": false,
+          "compiler": "cray",
+          "decoded_original_records": 131072,
+          "dimension": 65536,
+          "distinct_observed_hosts": 2,
+          "job_id": "537615",
+          "launcher_seconds": 4.176037665922195,
+          "load_phase_max_seconds": {
+            "manifest_and_admission": 0.001813103,
+            "read_validate": 0.068425235,
+            "replay_admission": 0.0,
+            "reverse_directory": 1.109333474,
+            "total": 1.179617964
+          },
+          "load_reverse_broadcasts": 262148,
+          "loading_route": "resource-only-native",
+          "managed_rank_budget_bytes": 4294967296,
+          "maximum_sample_error": 8.673617379884035e-19,
+          "median_rank_max_roundtrip_seconds": 0.327614845,
+          "native_array_payload": [
+            {
+              "input": {
+                "device_bytes": 0,
+                "host_bytes": 8388608
+              },
+              "scope": "native array payload only; excludes allocator, MPI, OpenMP stacks and other temporaries",
+              "scratch": null,
+              "scratch_mode": "borrowed-input-communication-buffer",
+              "total_device_bytes": 0,
+              "total_host_bytes": 8388608
+            },
+            {
+              "input": {
+                "device_bytes": 0,
+                "host_bytes": 8388608
+              },
+              "scope": "native array payload only; excludes allocator, MPI, OpenMP stacks and other temporaries",
+              "scratch": null,
+              "scratch_mode": "borrowed-input-communication-buffer",
+              "total_device_bytes": 0,
+              "total_host_bytes": 8388608
+            }
+          ],
+          "native_live_reserved_bytes": [
+            20480968,
+            20480968
+          ],
+          "native_multithreading_enabled": true,
+          "native_openmp_team_size": null,
+          "node_memory": [
+            {
+              "enforced_rank_process_address_space_cap_bytes": 8589934592,
+              "ranks": [
+                0
+              ],
+              "sampled_maximum_sum_rank_address_space_bytes": 2742865920,
+              "sampled_maximum_sum_rank_rss_bytes": 176889856,
+              "sampling": {
+                "interval_milliseconds": 20,
+                "max_sample_span_seconds": 5.063e-05,
+                "maximum_sum_address_space_bytes": 2742865920,
+                "maximum_sum_rss_bytes": 176889856,
+                "pids": 1,
+                "samples": 151
+              },
+              "shared_memory_leader_rank": 0,
+              "sum_rank_rss_high_water_bound_bytes": 176889856,
+              "whole_node_enforced_memory_cap_bytes": null
+            },
+            {
+              "enforced_rank_process_address_space_cap_bytes": 8589934592,
+              "ranks": [
+                1
+              ],
+              "sampled_maximum_sum_rank_address_space_bytes": 2742861824,
+              "sampled_maximum_sum_rank_rss_bytes": 182001664,
+              "sampling": {
+                "interval_milliseconds": 20,
+                "max_sample_span_seconds": 5.2223e-05,
+                "maximum_sum_address_space_bytes": 2742861824,
+                "maximum_sum_rss_bytes": 182001664,
+                "pids": 1,
+                "samples": 151
+              },
+              "shared_memory_leader_rank": 1,
+              "sum_rank_rss_high_water_bound_bytes": 182001664,
+              "whole_node_enforced_memory_cap_bytes": null
+            }
+          ],
+          "nodes": 2,
+          "norms": [
+            0.9999999999999999,
+            0.9999999999999999
+          ],
+          "observed_host_sha256": [
+            "20d0a235b5850fff9c3a18b2f654a2800f1639eecd438209a00ca45942d28388",
+            "11fb6ed22169ad0288a5e1b67b419f07a40903415f8a048fe7096e4b4a3b3b5b"
+          ],
+          "omp_stack_allowance_bytes": 2407530496,
+          "original_shard_sha256": [
+            "8331f2a980921fb683ff5b3e25af3979ac1f74761f64a84ae28e3f065e30df15",
+            "349b3014c041e0e1317c27e1a812e64c141aaef2c15b5a38ecb0ec8f926bcfb2"
+          ],
+          "original_stored_input_bytes": 4194304,
+          "persisted_encoding_bytes": 10499376,
+          "portable_replay_admission": "unrun",
+          "rank_process_address_space_cap_bytes": 8589934592,
+          "rank_receipt_sha256": [
+            "e1f38bf44ae52695b470069f6765c1a0f8b49942c31de37c84723d547d5c6fe6",
+            "b8177b8446b8cd6c6fd896b2a7f5183a7029bb18ab6939d0652086364ff965ee"
+          ],
+          "ranks": 2,
+          "receipt_schema_version": 5,
+          "receipt_sha256": {
+            "artifacts.json": "a0a100c299f9569def694db4a4e264f10de470e41c704e35a80858c0316eefb4",
+            "base-build-profile.json": "c7828fb7c4d397c8cfdee3d39d14002ba5aa05f6e93c7c15665811967f03b292",
+            "capacity.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "capacity.stdout": "7751163d4b500723b2d90f48818ae8f3a43ba409a35ac8c5972e6b8189929a44",
+            "capacity/case-0-n65536/launcher.log": "f7cc00edf90f77443cbdc23879cad3d12c043a1741a5fd26e7bd1ebe3daf9b18",
+            "capacity/case-0-n65536/launcher.log.supervision.json": "1372be7e47b15d4ffe8326c3503d9c0dd3e90bdb82f650fe473ba0bbc077d0c4",
+            "capacity/case-0-n65536/manifest.json": "65a9ae7c3ad5fdc77116ad55872fbe810bc6b20411a81ea2817926038eb280d7",
+            "capacity/completion.json": "d883fa9e91049b610e8851f49bf1bd28c5089ea29affcdba0bdaa25351c49087",
+            "commands.json": "ec69bda08162694423aeec6825ad7c293d90c261d36084a752ff75649385e78c",
+            "completion.json": "ecabf4e1b48cff9ab4200d2a5c2a5282b65de19ad7853a4e0c190414d2394c76",
+            "executed-entry.json": "c893f8fa2e57f15c3ab0ba8885bba8256b4be2348ddfa97b6b0886adb4d0590c",
+            "executed-entry.sh": "ffb559137bd3ec671b8fa79f7c3e554647d78809d967b2d56e63a6d2607c2ef9",
+            "measurement-profile.json": "b5f30d96208d4192ae83357c9e308d1cf45dff629a8170d063d84d40ac74b4cc",
+            "resolved-build.json": "3ebea68022ffd85731526924fbfd4eac35027dc7ebec78121e6711c4c2f4170d",
+            "runtime-environment.json": "38593c57fb7464ae678ed07333ed1ee4548e57c6f9f81d1428284ad49c2f07b2",
+            "source-snapshot.json": "5ba178bba8005f2165e750fad28fc3e38095bb5cf50ade95f5bf83b2ccf2cf81"
+          },
+          "repetitions": 3,
+          "requested_openmp_threads_per_rank": 288,
+          "roundtrip_max_seconds": [
+            0.334060316,
+            0.327614845,
+            0.325962677
+          ],
+          "scheduler_elapsed_seconds": 23,
+          "scheduler_exit_code": "0:0",
+          "scheduler_state": "COMPLETED",
+          "stage_max_seconds": {
+            "execution": 0.98733648,
+            "load": 1.180167392,
+            "persistence": 0.09767526,
+            "prepare": 0.250546972,
+            "preprocessing": 0.474694923
+          },
+          "v4_comparison": {
+            "executable_sha256": "2e425bfa2acf9cf2ec8ac5c6bc369f632a65cd48576375537109d9b621e50a6b",
+            "identical_stored_input_shard_hashes": true,
+            "job_id": "537405",
+            "median_rank_max_roundtrip_seconds": 0.339370499,
+            "native_total_host_array_bytes_per_rank": [
+              16777216,
+              16777216
+            ],
+            "source_digest": "8e02c49a7acf70a84f0c55aa40caba647024090a8cd72ffd3267bb72d8d3925b",
+            "timing_scope": "Separate allocations and executables; descriptive timings, not a controlled speedup claim.",
+            "v5_to_v4_native_array_ratio": 0.5
+          },
+          "whole_node_enforcement_verified": false
+        },
+        {
+          "capacity_closed": false,
+          "compiler": "cray",
+          "decoded_original_records": 131072,
+          "dimension": 65536,
+          "distinct_observed_hosts": 4,
+          "job_id": "537616",
+          "launcher_seconds": 6.224625245900825,
+          "load_phase_max_seconds": {
+            "manifest_and_admission": 0.002460957,
+            "read_validate": 0.055976767,
+            "replay_admission": 0.0,
+            "reverse_directory": 1.821571612,
+            "total": 1.880132246
+          },
+          "load_reverse_broadcasts": 524304,
+          "loading_route": "resource-only-native",
+          "managed_rank_budget_bytes": 4294967296,
+          "maximum_sample_error": 8.673617379884035e-19,
+          "median_rank_max_roundtrip_seconds": 0.470606528,
+          "native_array_payload": [
+            {
+              "input": {
+                "device_bytes": 0,
+                "host_bytes": 4194304
+              },
+              "scope": "native array payload only; excludes allocator, MPI, OpenMP stacks and other temporaries",
+              "scratch": null,
+              "scratch_mode": "borrowed-input-communication-buffer",
+              "total_device_bytes": 0,
+              "total_host_bytes": 4194304
+            },
+            {
+              "input": {
+                "device_bytes": 0,
+                "host_bytes": 4194304
+              },
+              "scope": "native array payload only; excludes allocator, MPI, OpenMP stacks and other temporaries",
+              "scratch": null,
+              "scratch_mode": "borrowed-input-communication-buffer",
+              "total_device_bytes": 0,
+              "total_host_bytes": 4194304
+            },
+            {
+              "input": {
+                "device_bytes": 0,
+                "host_bytes": 4194304
+              },
+              "scope": "native array payload only; excludes allocator, MPI, OpenMP stacks and other temporaries",
+              "scratch": null,
+              "scratch_mode": "borrowed-input-communication-buffer",
+              "total_device_bytes": 0,
+              "total_host_bytes": 4194304
+            },
+            {
+              "input": {
+                "device_bytes": 0,
+                "host_bytes": 4194304
+              },
+              "scope": "native array payload only; excludes allocator, MPI, OpenMP stacks and other temporaries",
+              "scratch": null,
+              "scratch_mode": "borrowed-input-communication-buffer",
+              "total_device_bytes": 0,
+              "total_host_bytes": 4194304
+            }
+          ],
+          "native_live_reserved_bytes": [
+            10257352,
+            10257352,
+            10257352,
+            10257352
+          ],
+          "native_multithreading_enabled": true,
+          "native_openmp_team_size": null,
+          "node_memory": [
+            {
+              "enforced_rank_process_address_space_cap_bytes": 8589934592,
+              "ranks": [
+                0
+              ],
+              "sampled_maximum_sum_rank_address_space_bytes": 2733555712,
+              "sampled_maximum_sum_rank_rss_bytes": 168706048,
+              "sampling": {
+                "interval_milliseconds": 20,
+                "max_sample_span_seconds": 5.1071e-05,
+                "maximum_sum_address_space_bytes": 2733555712,
+                "maximum_sum_rss_bytes": 168706048,
+                "pids": 1,
+                "samples": 213
+              },
+              "shared_memory_leader_rank": 0,
+              "sum_rank_rss_high_water_bound_bytes": 168706048,
+              "whole_node_enforced_memory_cap_bytes": null
+            },
+            {
+              "enforced_rank_process_address_space_cap_bytes": 8589934592,
+              "ranks": [
+                1
+              ],
+              "sampled_maximum_sum_rank_address_space_bytes": 2733555712,
+              "sampled_maximum_sum_rank_rss_bytes": 175919104,
+              "sampling": {
+                "interval_milliseconds": 20,
+                "max_sample_span_seconds": 5.7751e-05,
+                "maximum_sum_address_space_bytes": 2733555712,
+                "maximum_sum_rss_bytes": 175919104,
+                "pids": 1,
+                "samples": 213
+              },
+              "shared_memory_leader_rank": 1,
+              "sum_rank_rss_high_water_bound_bytes": 175919104,
+              "whole_node_enforced_memory_cap_bytes": null
+            },
+            {
+              "enforced_rank_process_address_space_cap_bytes": 8589934592,
+              "ranks": [
+                2
+              ],
+              "sampled_maximum_sum_rank_address_space_bytes": 2733555712,
+              "sampled_maximum_sum_rank_rss_bytes": 173907968,
+              "sampling": {
+                "interval_milliseconds": 20,
+                "max_sample_span_seconds": 4.9458e-05,
+                "maximum_sum_address_space_bytes": 2733555712,
+                "maximum_sum_rss_bytes": 173907968,
+                "pids": 1,
+                "samples": 213
+              },
+              "shared_memory_leader_rank": 2,
+              "sum_rank_rss_high_water_bound_bytes": 173907968,
+              "whole_node_enforced_memory_cap_bytes": null
+            },
+            {
+              "enforced_rank_process_address_space_cap_bytes": 8589934592,
+              "ranks": [
+                3
+              ],
+              "sampled_maximum_sum_rank_address_space_bytes": 2733543424,
+              "sampled_maximum_sum_rank_rss_bytes": 175742976,
+              "sampling": {
+                "interval_milliseconds": 20,
+                "max_sample_span_seconds": 5.9864e-05,
+                "maximum_sum_address_space_bytes": 2733543424,
+                "maximum_sum_rss_bytes": 175742976,
+                "pids": 1,
+                "samples": 213
+              },
+              "shared_memory_leader_rank": 3,
+              "sum_rank_rss_high_water_bound_bytes": 175742976,
+              "whole_node_enforced_memory_cap_bytes": null
+            }
+          ],
+          "nodes": 4,
+          "norms": [
+            0.9999999999999999,
+            0.9999999999999999,
+            0.9999999999999999,
+            0.9999999999999999
+          ],
+          "observed_host_sha256": [
+            "20d0a235b5850fff9c3a18b2f654a2800f1639eecd438209a00ca45942d28388",
+            "11fb6ed22169ad0288a5e1b67b419f07a40903415f8a048fe7096e4b4a3b3b5b",
+            "fc36ab777f87807af289035c16b6ef2bfc8ac9e89460907f3822d53746b08306",
+            "69878cd8d5fa9297c941923db86daa059c00398c5c7c57b2d389ff1228046608"
+          ],
+          "omp_stack_allowance_bytes": 2407530496,
+          "original_shard_sha256": [
+            "7b73b5bffd1fbf683b65df58e6e7ef2bebd30291feb4b342ab2e7f7326a47a6f",
+            "1dafa29bc89022d34397dfe6a74da78d42e948cb27941b7e69633643a68427b1",
+            "e23039151e49a8c377fe9d851dc37e520c775416bfcdc7a76d91edbab9cf64e2",
+            "e927e917629cb15c7bb65edd0ef5df2b309fff5951c0f3f0806736572b7af249"
+          ],
+          "original_stored_input_bytes": 4194304,
+          "persisted_encoding_bytes": 10512992,
+          "portable_replay_admission": "unrun",
+          "rank_process_address_space_cap_bytes": 8589934592,
+          "rank_receipt_sha256": [
+            "d9e49d92a3de26c112b0e161433224dbaa9819b8e039cd00dbec94e7cb1652e9",
+            "14d97b1fd707e22d980aea64eda553bdf625607e44e23e60eea27e66867bb3fe",
+            "2c5391b8126978a527872ecc3e5696c2bf3fe9b39b487d96a50f609c78710c0a",
+            "fef687032543b4b54e471841cb698ccd7f2c5ee9e2d6c25e674c76e3d4eebf3d"
+          ],
+          "ranks": 4,
+          "receipt_schema_version": 5,
+          "receipt_sha256": {
+            "artifacts.json": "a0a100c299f9569def694db4a4e264f10de470e41c704e35a80858c0316eefb4",
+            "base-build-profile.json": "c7828fb7c4d397c8cfdee3d39d14002ba5aa05f6e93c7c15665811967f03b292",
+            "capacity.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "capacity.stdout": "6bad46380325db084ed91d307e9c44ecfc912cd615356debc43cc78b34b3ddef",
+            "capacity/case-0-n65536/launcher.log": "3bf41aa722e9956e21dd4f3bad4053b2ae8ed9aa801216e3af0ab15eb6977371",
+            "capacity/case-0-n65536/launcher.log.supervision.json": "c2d677fde48340fa8609bdfabf1ed7ce33afc9fcf43f950d216cec0640289816",
+            "capacity/case-0-n65536/manifest.json": "b19b950fdf795360343b88ed324d49336a924fd548312e74adeb436a50339613",
+            "capacity/completion.json": "dedbaf7f08927c4250e23b336f55fb13098505127d9510597ff0aafb834973ad",
+            "commands.json": "f6e4605779f069d75c038f1e31ce196ab05987c7d5173701297255cbc4f2efa7",
+            "completion.json": "3d9dfc2bf2cfbb7e5090ceb969abd2d4378f3f0b1232b0c0a831a1454ef95f0d",
+            "executed-entry.json": "13093878dd9f744dddafbef70bd2b15a8e94f28aa07b0bd4d3327e7aa795e47e",
+            "executed-entry.sh": "ffb559137bd3ec671b8fa79f7c3e554647d78809d967b2d56e63a6d2607c2ef9",
+            "measurement-profile.json": "b5f30d96208d4192ae83357c9e308d1cf45dff629a8170d063d84d40ac74b4cc",
+            "resolved-build.json": "3ebea68022ffd85731526924fbfd4eac35027dc7ebec78121e6711c4c2f4170d",
+            "runtime-environment.json": "ded469f46f6ddec6b031099db22b59fb79c441a696992ab2caefe3ddf1a4566f",
+            "source-snapshot.json": "5ba178bba8005f2165e750fad28fc3e38095bb5cf50ade95f5bf83b2ccf2cf81"
+          },
+          "repetitions": 3,
+          "requested_openmp_threads_per_rank": 288,
+          "roundtrip_max_seconds": [
+            0.472369637,
+            0.470606528,
+            0.462976837
+          ],
+          "scheduler_elapsed_seconds": 24,
+          "scheduler_exit_code": "0:0",
+          "scheduler_state": "COMPLETED",
+          "stage_max_seconds": {
+            "execution": 1.405538726,
+            "load": 1.880415775,
+            "persistence": 0.095198935,
+            "prepare": 0.313346425,
+            "preprocessing": 0.54519368
+          },
+          "v4_comparison": {
+            "executable_sha256": "2e425bfa2acf9cf2ec8ac5c6bc369f632a65cd48576375537109d9b621e50a6b",
+            "identical_stored_input_shard_hashes": true,
+            "job_id": "537406",
+            "median_rank_max_roundtrip_seconds": 0.489635361,
+            "native_total_host_array_bytes_per_rank": [
+              8388608,
+              8388608,
+              8388608,
+              8388608
+            ],
+            "source_digest": "8e02c49a7acf70a84f0c55aa40caba647024090a8cd72ffd3267bb72d8d3925b",
+            "timing_scope": "Separate allocations and executables; descriptive timings, not a controlled speedup claim.",
+            "v5_to_v4_native_array_ratio": 0.5
+          },
+          "whole_node_enforcement_verified": false
+        },
+        {
+          "capacity_closed": false,
+          "compiler": "cray",
+          "decoded_original_records": 131072,
+          "dimension": 65536,
+          "distinct_observed_hosts": 8,
+          "job_id": "537617",
+          "launcher_seconds": 9.709601311944425,
+          "load_phase_max_seconds": {
+            "manifest_and_admission": 0.003193963,
+            "read_validate": 0.063477594,
+            "replay_admission": 0.0,
+            "reverse_directory": 3.116759492,
+            "total": 3.183838987
+          },
+          "load_reverse_broadcasts": 1048640,
+          "loading_route": "resource-only-native",
+          "managed_rank_budget_bytes": 4294967296,
+          "maximum_sample_error": 8.673617379884035e-19,
+          "median_rank_max_roundtrip_seconds": 1.041104853,
+          "native_array_payload": [
+            {
+              "input": {
+                "device_bytes": 0,
+                "host_bytes": 2097152
+              },
+              "scope": "native array payload only; excludes allocator, MPI, OpenMP stacks and other temporaries",
+              "scratch": null,
+              "scratch_mode": "borrowed-input-communication-buffer",
+              "total_device_bytes": 0,
+              "total_host_bytes": 2097152
+            },
+            {
+              "input": {
+                "device_bytes": 0,
+                "host_bytes": 2097152
+              },
+              "scope": "native array payload only; excludes allocator, MPI, OpenMP stacks and other temporaries",
+              "scratch": null,
+              "scratch_mode": "borrowed-input-communication-buffer",
+              "total_device_bytes": 0,
+              "total_host_bytes": 2097152
+            },
+            {
+              "input": {
+                "device_bytes": 0,
+                "host_bytes": 2097152
+              },
+              "scope": "native array payload only; excludes allocator, MPI, OpenMP stacks and other temporaries",
+              "scratch": null,
+              "scratch_mode": "borrowed-input-communication-buffer",
+              "total_device_bytes": 0,
+              "total_host_bytes": 2097152
+            },
+            {
+              "input": {
+                "device_bytes": 0,
+                "host_bytes": 2097152
+              },
+              "scope": "native array payload only; excludes allocator, MPI, OpenMP stacks and other temporaries",
+              "scratch": null,
+              "scratch_mode": "borrowed-input-communication-buffer",
+              "total_device_bytes": 0,
+              "total_host_bytes": 2097152
+            },
+            {
+              "input": {
+                "device_bytes": 0,
+                "host_bytes": 2097152
+              },
+              "scope": "native array payload only; excludes allocator, MPI, OpenMP stacks and other temporaries",
+              "scratch": null,
+              "scratch_mode": "borrowed-input-communication-buffer",
+              "total_device_bytes": 0,
+              "total_host_bytes": 2097152
+            },
+            {
+              "input": {
+                "device_bytes": 0,
+                "host_bytes": 2097152
+              },
+              "scope": "native array payload only; excludes allocator, MPI, OpenMP stacks and other temporaries",
+              "scratch": null,
+              "scratch_mode": "borrowed-input-communication-buffer",
+              "total_device_bytes": 0,
+              "total_host_bytes": 2097152
+            },
+            {
+              "input": {
+                "device_bytes": 0,
+                "host_bytes": 2097152
+              },
+              "scope": "native array payload only; excludes allocator, MPI, OpenMP stacks and other temporaries",
+              "scratch": null,
+              "scratch_mode": "borrowed-input-communication-buffer",
+              "total_device_bytes": 0,
+              "total_host_bytes": 2097152
+            },
+            {
+              "input": {
+                "device_bytes": 0,
+                "host_bytes": 2097152
+              },
+              "scope": "native array payload only; excludes allocator, MPI, OpenMP stacks and other temporaries",
+              "scratch": null,
+              "scratch_mode": "borrowed-input-communication-buffer",
+              "total_device_bytes": 0,
+              "total_host_bytes": 2097152
+            }
+          ],
+          "native_live_reserved_bytes": [
+            5145544,
+            5145544,
+            5145544,
+            5145544,
+            5145544,
+            5145544,
+            5145544,
+            5145544
+          ],
+          "native_multithreading_enabled": true,
+          "native_openmp_team_size": null,
+          "node_memory": [
+            {
+              "enforced_rank_process_address_space_cap_bytes": 8589934592,
+              "ranks": [
+                0
+              ],
+              "sampled_maximum_sum_rank_address_space_bytes": 2717863936,
+              "sampled_maximum_sum_rank_rss_bytes": 162942976,
+              "sampling": {
+                "interval_milliseconds": 20,
+                "max_sample_span_seconds": 4.4671e-05,
+                "maximum_sum_address_space_bytes": 2717863936,
+                "maximum_sum_rss_bytes": 162942976,
+                "pids": 1,
+                "samples": 372
+              },
+              "shared_memory_leader_rank": 0,
+              "sum_rank_rss_high_water_bound_bytes": 162942976,
+              "whole_node_enforced_memory_cap_bytes": null
+            },
+            {
+              "enforced_rank_process_address_space_cap_bytes": 8589934592,
+              "ranks": [
+                1
+              ],
+              "sampled_maximum_sum_rank_address_space_bytes": 2717863936,
+              "sampled_maximum_sum_rank_rss_bytes": 155607040,
+              "sampling": {
+                "interval_milliseconds": 20,
+                "max_sample_span_seconds": 5.3084e-05,
+                "maximum_sum_address_space_bytes": 2717863936,
+                "maximum_sum_rss_bytes": 155607040,
+                "pids": 1,
+                "samples": 372
+              },
+              "shared_memory_leader_rank": 1,
+              "sum_rank_rss_high_water_bound_bytes": 155607040,
+              "whole_node_enforced_memory_cap_bytes": null
+            },
+            {
+              "enforced_rank_process_address_space_cap_bytes": 8589934592,
+              "ranks": [
+                2
+              ],
+              "sampled_maximum_sum_rank_address_space_bytes": 2717863936,
+              "sampled_maximum_sum_rank_rss_bytes": 162349056,
+              "sampling": {
+                "interval_milliseconds": 20,
+                "max_sample_span_seconds": 5.7702e-05,
+                "maximum_sum_address_space_bytes": 2717863936,
+                "maximum_sum_rss_bytes": 162349056,
+                "pids": 1,
+                "samples": 372
+              },
+              "shared_memory_leader_rank": 2,
+              "sum_rank_rss_high_water_bound_bytes": 162349056,
+              "whole_node_enforced_memory_cap_bytes": null
+            },
+            {
+              "enforced_rank_process_address_space_cap_bytes": 8589934592,
+              "ranks": [
+                3
+              ],
+              "sampled_maximum_sum_rank_address_space_bytes": 2717863936,
+              "sampled_maximum_sum_rank_rss_bytes": 157986816,
+              "sampling": {
+                "interval_milliseconds": 20,
+                "max_sample_span_seconds": 4.399e-05,
+                "maximum_sum_address_space_bytes": 2717863936,
+                "maximum_sum_rss_bytes": 157986816,
+                "pids": 1,
+                "samples": 372
+              },
+              "shared_memory_leader_rank": 3,
+              "sum_rank_rss_high_water_bound_bytes": 157986816,
+              "whole_node_enforced_memory_cap_bytes": null
+            },
+            {
+              "enforced_rank_process_address_space_cap_bytes": 8589934592,
+              "ranks": [
+                4
+              ],
+              "sampled_maximum_sum_rank_address_space_bytes": 2717863936,
+              "sampled_maximum_sum_rank_rss_bytes": 162123776,
+              "sampling": {
+                "interval_milliseconds": 20,
+                "max_sample_span_seconds": 4.3459e-05,
+                "maximum_sum_address_space_bytes": 2717863936,
+                "maximum_sum_rss_bytes": 162123776,
+                "pids": 1,
+                "samples": 372
+              },
+              "shared_memory_leader_rank": 4,
+              "sum_rank_rss_high_water_bound_bytes": 162123776,
+              "whole_node_enforced_memory_cap_bytes": null
+            },
+            {
+              "enforced_rank_process_address_space_cap_bytes": 8589934592,
+              "ranks": [
+                5
+              ],
+              "sampled_maximum_sum_rank_address_space_bytes": 2717863936,
+              "sampled_maximum_sum_rank_rss_bytes": 158556160,
+              "sampling": {
+                "interval_milliseconds": 20,
+                "max_sample_span_seconds": 5.6339e-05,
+                "maximum_sum_address_space_bytes": 2717863936,
+                "maximum_sum_rss_bytes": 158556160,
+                "pids": 1,
+                "samples": 372
+              },
+              "shared_memory_leader_rank": 5,
+              "sum_rank_rss_high_water_bound_bytes": 158556160,
+              "whole_node_enforced_memory_cap_bytes": null
+            },
+            {
+              "enforced_rank_process_address_space_cap_bytes": 8589934592,
+              "ranks": [
+                6
+              ],
+              "sampled_maximum_sum_rank_address_space_bytes": 2717863936,
+              "sampled_maximum_sum_rank_rss_bytes": 160276480,
+              "sampling": {
+                "interval_milliseconds": 20,
+                "max_sample_span_seconds": 5.5999e-05,
+                "maximum_sum_address_space_bytes": 2717863936,
+                "maximum_sum_rss_bytes": 160276480,
+                "pids": 1,
+                "samples": 372
+              },
+              "shared_memory_leader_rank": 6,
+              "sum_rank_rss_high_water_bound_bytes": 160276480,
+              "whole_node_enforced_memory_cap_bytes": null
+            },
+            {
+              "enforced_rank_process_address_space_cap_bytes": 8589934592,
+              "ranks": [
+                7
+              ],
+              "sampled_maximum_sum_rank_address_space_bytes": 2717863936,
+              "sampled_maximum_sum_rank_rss_bytes": 148783104,
+              "sampling": {
+                "interval_milliseconds": 20,
+                "max_sample_span_seconds": 4.3609e-05,
+                "maximum_sum_address_space_bytes": 2717863936,
+                "maximum_sum_rss_bytes": 148783104,
+                "pids": 1,
+                "samples": 372
+              },
+              "shared_memory_leader_rank": 7,
+              "sum_rank_rss_high_water_bound_bytes": 148783104,
+              "whole_node_enforced_memory_cap_bytes": null
+            }
+          ],
+          "nodes": 8,
+          "norms": [
+            0.9999999999999999,
+            0.9999999999999999,
+            0.9999999999999999,
+            0.9999999999999999,
+            0.9999999999999999,
+            0.9999999999999999,
+            0.9999999999999999,
+            0.9999999999999999
+          ],
+          "observed_host_sha256": [
+            "d6631e498df526dd31566cf8815a6a570d1ead3a412a111ebcbcea61be743c58",
+            "c12057e2da467d74dbb49541c4421ca91d37f19a49c8eda78b79f47b52a0bf6a",
+            "6a31ae538ceb2e547fd17344f502f717f5cdc84bce627473e21008ffa0da6fce",
+            "1c3c9ea0578d0740a83173882fa0f2008ae1b48c9abe32f9a30fe56f76103c51",
+            "7703b5c03db98643f14cdd8927af5d8afc2f59b6433a3efdd5eecc51fa2acfa4",
+            "266c5a7871c4d0ca4d365fad0cf73de2dfc25fe107fc817832aacfd605fb93ac",
+            "269e3b341609b573c427e2102b56a1cb9f86ebea301336908bddca3c4fd811d3",
+            "01630dc17fa3fce1729d33504d623b954687c2c850cb3f8dfe7187a66db29390"
+          ],
+          "omp_stack_allowance_bytes": 2407530496,
+          "original_shard_sha256": [
+            "773aacf448d2054d518dbf29045f7721d5e3fd03b2635630d31d41406758f3fe",
+            "25358c7d0380ebfaa3acb07b82eb3174344f56eb72c2f33c4b425a1664134a22",
+            "d501b47b54967bfa79fbff08df8e078160dbdadfdc4de4289be8179ea186c5d7",
+            "5007862f369cd2635a7fd28cba6b6994e97ef5c36d116486836558481e07dfca",
+            "d15a8075543a3a38c83c39d613a2885cb616cc1a0f5be476fffad804d4db67fd",
+            "76ee718ddd8159b818fe78264d0311b322f76929ff3d4b87d6cf3deef54fe9bf",
+            "1f66ac272e0aa61440e581d4997add842660e3a15d15f7c82e1519545cd9c355",
+            "7d8c3e82c036bda620a1e4d7718ae4597eacfdb1bc766b9a848659e817ee354c"
+          ],
+          "original_stored_input_bytes": 4194304,
+          "persisted_encoding_bytes": 10540224,
+          "portable_replay_admission": "unrun",
+          "rank_process_address_space_cap_bytes": 8589934592,
+          "rank_receipt_sha256": [
+            "87726d9c0b8052d612fcfb8ee8a92b17d9f25b471ec283616baa6779c04afc86",
+            "1f04101f66a877bffbcb11932c21bd7c8f27acd39a943924360b13133e302ec4",
+            "61b3918fdde7e96f360ffde0f18dd02613e0f32504493c9a8c915d5a577cbcd9",
+            "7f3af2234471899a48b8c5e7ab7fc339a2c7ecb712e300a62a75deecd3fa07d9",
+            "3de9fd1656c6621b911c8ffb7e4a124bab7af80a646c6d7fc873bac72c788d53",
+            "462e94e87d7296881317baa2c7a05fd0cd52999aae11b61fb23c00e6d1227b38",
+            "e19cad8d98069413e37563a8e864ace9062c1ffbb54cf9481d69b5021eb6eb2d",
+            "cc0aa69bec942ea99e41e51c8b7e6770b5bb4b16a5579ebb06ef026b39c17b93"
+          ],
+          "ranks": 8,
+          "receipt_schema_version": 5,
+          "receipt_sha256": {
+            "artifacts.json": "a0a100c299f9569def694db4a4e264f10de470e41c704e35a80858c0316eefb4",
+            "base-build-profile.json": "c7828fb7c4d397c8cfdee3d39d14002ba5aa05f6e93c7c15665811967f03b292",
+            "capacity.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "capacity.stdout": "f7eb97e47754783d1dae4e434a191138a77e10f7debbfb52b0b1ad94d7cca37d",
+            "capacity/case-0-n65536/launcher.log": "30d9c1c21a8cd8d58d93b650fa53718af0925f12688a46038168b40a73b7865a",
+            "capacity/case-0-n65536/launcher.log.supervision.json": "f3e38e24965367573760e00d1d1221ec8ee1b190891e61f3db9739d2f60ed377",
+            "capacity/case-0-n65536/manifest.json": "204186a558fdab8018aaf9155240ada90428817758a38b72fd280bc2e4fd67f7",
+            "capacity/completion.json": "b49f56670eed25f2014dc85a65894d6f0901641a4da33c51c3093bfe2842b05d",
+            "commands.json": "02c6ae4b7554b3002338145626c5dc8251487cf1c71f635f22a8972b48daa405",
+            "completion.json": "ad184f3162ec4b0723f362f0c1a51f5ae6bed040668a0385ca1afe8d229d3388",
+            "executed-entry.json": "04cf478835aeb7c7f179db95dd4eea27e18cbaa3da25335e3a77ec6005c998fa",
+            "executed-entry.sh": "ffb559137bd3ec671b8fa79f7c3e554647d78809d967b2d56e63a6d2607c2ef9",
+            "measurement-profile.json": "b5f30d96208d4192ae83357c9e308d1cf45dff629a8170d063d84d40ac74b4cc",
+            "resolved-build.json": "3ebea68022ffd85731526924fbfd4eac35027dc7ebec78121e6711c4c2f4170d",
+            "runtime-environment.json": "d3b5d03ecceba94d0c58b00b898a82b01a3ee035771db21c742dc45282cec61d",
+            "source-snapshot.json": "5ba178bba8005f2165e750fad28fc3e38095bb5cf50ade95f5bf83b2ccf2cf81"
+          },
+          "repetitions": 3,
+          "requested_openmp_threads_per_rank": 288,
+          "roundtrip_max_seconds": [
+            1.057001093,
+            1.00846181,
+            1.041104853
+          ],
+          "scheduler_elapsed_seconds": 28,
+          "scheduler_exit_code": "0:0",
+          "scheduler_state": "COMPLETED",
+          "stage_max_seconds": {
+            "execution": 3.106252945,
+            "load": 3.184045333,
+            "persistence": 0.104867424,
+            "prepare": 0.356693951,
+            "preprocessing": 0.676446939
+          },
+          "v4_comparison": {
+            "executable_sha256": "2e425bfa2acf9cf2ec8ac5c6bc369f632a65cd48576375537109d9b621e50a6b",
+            "identical_stored_input_shard_hashes": true,
+            "job_id": "537407",
+            "median_rank_max_roundtrip_seconds": 1.053290047,
+            "native_total_host_array_bytes_per_rank": [
+              4194304,
+              4194304,
+              4194304,
+              4194304,
+              4194304,
+              4194304,
+              4194304,
+              4194304
+            ],
+            "source_digest": "8e02c49a7acf70a84f0c55aa40caba647024090a8cd72ffd3267bb72d8d3925b",
+            "timing_scope": "Separate allocations and executables; descriptive timings, not a controlled speedup claim.",
+            "v5_to_v4_native_array_ratio": 0.5
+          },
+          "whole_node_enforcement_verified": false
+        }
+      ],
+      "compiler": "cray",
+      "focused": {
+        "child_exit_status_counts": {
+          "0": 59,
+          "143": 4
+        },
+        "expected_fatal_children": [
+          {
+            "exit_status": 143,
+            "seconds": 1.993499817,
+            "step": "537494.2",
+            "timed_out": false
+          },
+          {
+            "exit_status": 143,
+            "seconds": 1.15650349,
+            "step": "537494.3",
+            "timed_out": false
+          },
+          {
+            "exit_status": 143,
+            "seconds": 1.151850107,
+            "step": "537494.4",
+            "timed_out": false
+          },
+          {
+            "exit_status": 143,
+            "seconds": 1.065743498,
+            "step": "537494.5",
+            "timed_out": false
+          }
+        ],
+        "fatal_scope": "Original native-range and staged-buffer-write fatal fixtures, stderr captured and suppressed. Passing parents check both rank witnesses, original checked error, absent after-return witnesses and bounded non-timeout termination. Temporary witness files are checked by tests, not retained as standalone raw files.",
+        "intentionally_skipped_tests": 37,
+        "job_id": "537494",
+        "mpi_launches": 63,
+        "mpi_world_size_counts": {
+          "1": 13,
+          "2": 20,
+          "3": 1,
+          "4": 19,
+          "8": 10
+        },
+        "nextest_seconds": 70.318,
+        "passed_tests": 16,
+        "post_execution_binary_hashes_unchanged": true,
+        "receipt_sha256": {
+          "archive-list.stderr": "c97613665258dbefd4a00f3c730d3c8c8987765c326d8afd2d680e7aaedfd822",
+          "archive-list.stdout": "050209f9d9d6e65812912b79796e412298e208694005f338994ab5addfbb9e66",
+          "artifacts.json": "a0a100c299f9569def694db4a4e264f10de470e41c704e35a80858c0316eefb4",
+          "base-build-profile.json": "c7828fb7c4d397c8cfdee3d39d14002ba5aa05f6e93c7c15665811967f03b292",
+          "commands.json": "498d5359f869a051ef6df07c3626a14e154cd69e00d11f915ae386053be9d90c",
+          "completion.json": "ee1d8a25f7bedabb9cdcd9c1da1e0b3496f5c10e68a49928d71851d3e46d9218",
+          "executed-entry.json": "12cbd40b90c3d20f6a306bba5bd31d74155ec0c985ce0fb8dd1d7a9fde0a1431",
+          "executed-entry.sh": "9d2533d3a618162b5f9781fd7e5f54ea34d00e399e3cecbdd92807bc0fa63a18",
+          "focused-tests.stderr": "1b6e55a4df45ccf9cb57e135ec0073ca8775f1307df330249aaf5707e2852bdd",
+          "focused-tests.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "measurement-profile.json": "b5f30d96208d4192ae83357c9e308d1cf45dff629a8170d063d84d40ac74b4cc",
+          "resolved-build.json": "3ebea68022ffd85731526924fbfd4eac35027dc7ebec78121e6711c4c2f4170d",
+          "runtime-environment.json": "08bc397e30d24fbfc4900facc5dd33d85c4522a088162991c47fac3ae4e7ae0e",
+          "source-snapshot.json": "5ba178bba8005f2165e750fad28fc3e38095bb5cf50ade95f5bf83b2ccf2cf81",
+          "test-inventory.json": "6fbaf96deebce22f4018d6db5c8082d50f809c3fc2d7fdc34a6d65afe0738a49"
+        },
+        "runtime_rebuilt": false,
+        "scheduler_elapsed_seconds": 90,
+        "scheduler_exit_code": "0:0",
+        "scheduler_state": "COMPLETED"
+      },
+      "profile": {
+        "base_profile_sha256": "c7828fb7c4d397c8cfdee3d39d14002ba5aa05f6e93c7c15665811967f03b292",
+        "base_source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+        "compiler_version": "Cray clang version 19.0.0  (cc4d36e4ff3377d45f0e6e892b5dacd82009a0ca)",
+        "debug_information": false,
+        "hdf5": "central serial cray-hdf5/1.14.3.5",
+        "incremental": false,
+        "measurement_profile_sha256": "b5f30d96208d4192ae83357c9e308d1cf45dff629a8170d063d84d40ac74b4cc",
+        "modules": [
+          "craype-x86-turin",
+          "libfabric/2.3.1",
+          "craype-network-ofi",
+          "perftools-base/25.03.0",
+          "xpmem/1.0.1-1.5_1_gfb6998056825",
+          "cce/19.0.0",
+          "cse_env/0.2",
+          "craype/2.7.34",
+          "cray-dsmml/0.3.1",
+          "cray-mpich/8.1.32",
+          "PrgEnv-cray/8.6.0",
+          "epcc-setup-env",
+          "load-epcc-module",
+          "cmake/4.1.2",
+          "cray-hdf5/1.14.3.5"
+        ],
+        "native_source_changed": false,
+        "native_source_revision": "503552065045eaf89baba85e6cd6aad728525554",
+        "optimization_level": 2,
+        "rust_linker_flags": [
+          "-C",
+          "linker-features=-lld",
+          "-C",
+          "link-arg=-mno-daz-ftz"
+        ],
+        "rustc_version": "rustc 1.101.0-nightly (282215592 2026-10-04)"
+      }
+    }
+  ],
+  "payload_manifest_sha256": "8c2314adc2b87758e4d84f557d7866ec6aa562865558ba2a0933cd75f1ae2ebb",
+  "payload_sha256": {
+    "build.sh": "0495bba5074c440e409797b5caa3fb1d3a79793260b74edca24b3cdba980a05d",
+    "capacity.sh": "ffb559137bd3ec671b8fa79f7c3e554647d78809d967b2d56e63a6d2607c2ef9",
+    "catalog.json": "a49100fae5b00da9cd9eba40a4286f460cf6b634a390412d56bdc0a3d7f6486b",
+    "common.sh": "ddfa81216e7d4b61835805a27cafd044546d045dcf4df051b93d79c5643f900a",
+    "focused.sh": "9d2533d3a618162b5f9781fd7e5f54ea34d00e399e3cecbdd92807bc0fa63a18",
+    "harness.py": "87648daa71426e525e2c69434e4dd030212b74ea1bf68564ec4b9920c40397cd"
+  },
+  "raw_evidence": "$BUFFER_REUSE_RECEIPTS/<compiler>/<build|focused-results|capacity-results>/<job>/",
+  "scheduler": {
+    "build_cpus": 8,
+    "build_nodes": 1,
+    "exclusive_nodes": true,
+    "focused_allocation_nodes": 8,
+    "max_concurrent_nodes": 8,
+    "physical_cores_requested": true,
+    "runtime_cpus_per_task": 288,
+    "runtime_ranks_per_node": 1
+  },
+  "schema": "quest-cirrus-matching-buffer-reuse-results-v1",
+  "scope": "Both GNU and Cray focused archived MPI tests and three controlled resource-only native U/Udagger capacity cases per compiler. No full-workspace Cirrus rerun.",
+  "source_archive_sha256": "5965a49b185e1ca056c5153c5f814613d7eeb39ddc7ff8e28575d0bf8bb03cf7",
+  "source_digest": "9adbef476110e8425bacee15882c006464a6d95b6a54ccb2269621e29af68233",
+  "source_files": 2559,
+  "totals": {
+    "capacity_cases": 6,
+    "capacity_rank_receipts": 28,
+    "decoded_original_records": 786432,
+    "expected_fatal_child_exits": 8,
+    "focused_parent_tests_passed": 32,
+    "mpi_test_launches": 126
+  },
+  "v4_comparison_record": {
+    "path": "../2026-10-06-sparse-capacity-followup/capacity-v4.json",
+    "sha256": "b1a707b7368283881276a92a1241c0d6c7d02828f5622db65e85f4219fbf1c83",
+    "source_digest": "8e02c49a7acf70a84f0c55aa40caba647024090a8cd72ffd3267bb72d8d3925b"
+  }
+}

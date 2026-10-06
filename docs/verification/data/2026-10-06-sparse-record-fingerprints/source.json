@@ -1,0 +1,97 @@
+{
+  "schema": "sparse-record-fingerprint-v2-source-v1",
+  "previous_manifest_sha256": "54023f8cd266cd58128e6ee60b5465fd247d17ef4b739f48a47acf811654ae4f",
+  "delta": "Only test checked-arithmetic/style and justified test-only panic lint allowances. All production behavior unchanged from first freeze.",
+  "files": [
+    {
+      "path": "Cargo.lock",
+      "bytes": 99694,
+      "sha256": "87c8778d0676952202ef6d3d7d7333853d4d3748bea96331383844fd7013f54c"
+    },
+    {
+      "path": "crates/quest-qsvt/Cargo.toml",
+      "bytes": 658,
+      "sha256": "88857a382e49ba71f97e4bdd8dceaa37c8e5e5025624dabb2fcaabe63161b546"
+    },
+    {
+      "path": "crates/quest-qsvt/src/lib.rs",
+      "bytes": 4399,
+      "sha256": "576036178e8a7f2a2be771da7dd14560b05446a9d072f0b99453e35e2caab5e9"
+    },
+    {
+      "path": "crates/quest-qsvt/src/record_fingerprint.rs",
+      "bytes": 2176,
+      "sha256": "9df4a35c7a97eeb6b9830b6567cb5eb580b1e7ebee408da19eda6468957bd05d"
+    },
+    {
+      "path": "crates/quest-qsvt/src/matching_shard.rs",
+      "bytes": 11582,
+      "sha256": "638d4019ff812d4bf96ab625fae49583b47aaaf5ffbd92675cb0ec1a464a1b9c"
+    },
+    {
+      "path": "crates/quest-qsvt/src/matching_resource.rs",
+      "bytes": 20468,
+      "sha256": "dfe33fed3241c56b754921c1b2582b75d889dda7f6914f2c49ab76e8f28de7ca"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/matching_digest.rs",
+      "bytes": 2997,
+      "sha256": "bfa279ad56207733a16951e7dfa77e233e1e6dba26baf1c5d6b594c40f79dae8"
+    },
+    {
+      "path": "crates/quest-qsvt/tests/matching_resource.rs",
+      "bytes": 6900,
+      "sha256": "9cee1724f7c4a7f23da6108edd277dea2a38d4e00d2d74eaff63814fb708ba64"
+    },
+    {
+      "path": "crates/quest-qsvt-io/src/sharded_matching.rs",
+      "bytes": 27010,
+      "sha256": "b22fb928a340cf47ab089093a007eb14201c4366c1591144aa32d2ee0d62bade"
+    },
+    {
+      "path": "crates/quest-qsvt-io/tests/sharded_matching.rs",
+      "bytes": 11682,
+      "sha256": "b505af22ae7443e7ea30f52b1a60464c433b934ede92c5783499c517fc7b7ffb"
+    },
+    {
+      "path": "crates/quest/src/qsvt/matching/preprocess.rs",
+      "bytes": 13111,
+      "sha256": "f848ecac86798ed07ca06fd701e6005f708e24ca7922477002cbc40736ca3db1"
+    },
+    {
+      "path": "crates/quest/src/qsvt/matching/preprocess/transport.rs",
+      "bytes": 10487,
+      "sha256": "0b6dbcd97082e35f11d3bd15a62e7d60a66b6c62fd8952049b3fc1e73f04d66c"
+    },
+    {
+      "path": "crates/quest/src/qsvt/matching/collective.rs",
+      "bytes": 26316,
+      "sha256": "f3abfefce349da8a16ca43d8d0d9b3e2d261b62ace55dde193790d2451aefb8a"
+    },
+    {
+      "path": "crates/quest/src/qsvt/persisted_matching.rs",
+      "bytes": 22408,
+      "sha256": "71247e348febaddb70d2eebb79929af22872af6779957d171d87b1e7ed9755f5"
+    },
+    {
+      "path": "crates/quest/src/qsvt/persisted_matching/preparation.rs",
+      "bytes": 13816,
+      "sha256": "fc5bb9e1ee5ed74f982fa7c34cd4f474e04e1637e77e8c49e9d24a85e0ff1575"
+    },
+    {
+      "path": "crates/quest/tests/matching_preprocess.rs",
+      "bytes": 9566,
+      "sha256": "66ff952fcd318678852f5bf6a24536fb9998e4f444d03a9d7365d7ae7c05821f"
+    },
+    {
+      "path": "crates/quest/tests/matching_collective.rs",
+      "bytes": 15671,
+      "sha256": "f477811b8e6a7c8e5b37e513e34a1f6261d4cd4736f00581fb5b72c89990c9a9"
+    },
+    {
+      "path": "docs/research/sparse-record-fingerprints.md",
+      "bytes": 5257,
+      "sha256": "6cdbb7f59c83be54363a7a2478a5cfdc97a2493d3a2a6d98263fae5deb8b8a09"
+    }
+  ]
+}

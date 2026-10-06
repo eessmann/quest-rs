@@ -1,0 +1,140 @@
+{
+  "schema": "quest-configuration-weak-energy-shell-v2-publication-v1",
+  "status": "published after independent source and saved-result review",
+  "physical_children": 1,
+  "build_attempts": 1,
+  "retries": 0,
+  "history_execution": false,
+  "quantum_execution": false,
+  "convergence_certified": false,
+  "normalization": "Raw row/receipt/timing/stderr, relative build-source and protocol-source files remain byte-original. Other marked files replace workspace/home/temp path prefixes only; original private SHA values are retained and are not asserted to hash the normalized bytes.",
+  "source_scope": "Actual twelve-package default compiler-artifact closure,509 source/configuration files; excludes unused native packages, external registry source, non-Rust assets and arbitrary environment. Compiler resolved hash identifies rustup launcher; versions and profile captured separately. Not hermetic.",
+  "candidate_manifest_sha256": "8f5967bb3796bc250a0c6b78187324819a37b002792a8c55c1431f407a784bea",
+  "files": [
+    {
+      "path": "p2-c2-e1-w1_2.json",
+      "bytes": 7126,
+      "sha256": "b8e4ca7603f15bb3e93f418d0209a7f25e743d7ec4ab5c09b119e089090f8387",
+      "original_private_identifier": "<private-artifacts>/quest-weak-shell-v2-execution-1/p2-c2-e1-w1_2.json",
+      "original_sha256": "b8e4ca7603f15bb3e93f418d0209a7f25e743d7ec4ab5c09b119e089090f8387",
+      "representation": "byte-original"
+    },
+    {
+      "path": "p2-c2-e1-w1_2.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_private_identifier": "<private-artifacts>/quest-weak-shell-v2-execution-1/p2-c2-e1-w1_2.stderr",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "representation": "byte-original"
+    },
+    {
+      "path": "p2-c2-e1-w1_2.time",
+      "bytes": 10,
+      "sha256": "085646402220e5ef4e504595d49db2474d52cf6d4d7fa65be56372ec5a817cb5",
+      "original_private_identifier": "<private-artifacts>/quest-weak-shell-v2-execution-1/p2-c2-e1-w1_2.time",
+      "original_sha256": "085646402220e5ef4e504595d49db2474d52cf6d4d7fa65be56372ec5a817cb5",
+      "representation": "byte-original"
+    },
+    {
+      "path": "receipt.json",
+      "bytes": 5351,
+      "sha256": "b969804f27e37ca8e6d8e973e45940996fe21a1e2f541478d5b9a6a059134f19",
+      "original_private_identifier": "<private-artifacts>/quest-weak-shell-v2-execution-1/receipt.json",
+      "original_sha256": "b969804f27e37ca8e6d8e973e45940996fe21a1e2f541478d5b9a6a059134f19",
+      "representation": "byte-original"
+    },
+    {
+      "path": "analysis.json",
+      "bytes": 11089,
+      "sha256": "a5b6686c2caa776c5a640abebfe729bb3b1436c6392b7e0991deca7dd6b37a3a",
+      "original_private_identifier": "<private-artifacts>/quest-weak-shell-v2-analysis.json",
+      "original_sha256": "a049b918966b50cc5d56cc9d1fedec0dbdf61c44c6f2b07c20098157bfe69e3d",
+      "representation": "generic-path normalization only"
+    },
+    {
+      "path": "build-attestation.json",
+      "bytes": 2232,
+      "sha256": "70a38931eaf312a30f86a43cea93a91b381b4efb91a0f32d67c6d4a118093158",
+      "original_private_identifier": "<private-artifacts>/quest-weak-shell-v2-build-1-attestation.json",
+      "original_sha256": "efece0afe5cea98b1254e32af71759e485cbbe087ebe20ff9013581eeb6afc9b",
+      "representation": "generic-path normalization only"
+    },
+    {
+      "path": "build-source.json",
+      "bytes": 75010,
+      "sha256": "93d4944c110624d2a83dd987499efb6770eb963257af29af0caf4c888ac3e05b",
+      "original_private_identifier": "<private-artifacts>/quest-weak-shell-v2-build-1-source-before.json",
+      "original_sha256": "93d4944c110624d2a83dd987499efb6770eb963257af29af0caf4c888ac3e05b",
+      "representation": "byte-original"
+    },
+    {
+      "path": "build-context.json",
+      "bytes": 83451,
+      "sha256": "770b0044d01c2c447216138f96c7fcbbbd5cac4dd2b59a3cb4e69b35bfde6eeb",
+      "original_private_identifier": "<private-artifacts>/quest-weak-shell-v2-build-1-before.json",
+      "original_sha256": "13f74e60158b1b8fa4f06b41702958216a8caeb006af0d3425103f87d0478197",
+      "representation": "generic-path normalization only"
+    },
+    {
+      "path": "compiler-artifacts.jsonl",
+      "bytes": 157360,
+      "sha256": "9ebd680043a74550e54997a4e9b7b05d838bc8a238f7dd2b6ba4fcfc23305002",
+      "original_private_identifier": "<private-artifacts>/quest-weak-shell-v2-build-1-compiler-artifacts.jsonl",
+      "original_sha256": "7b68736ff77837f02d1cdcbc19b8160838dd0ced1ed9f9b722093d110b910e54",
+      "representation": "generic-path normalization only"
+    },
+    {
+      "path": "build.log",
+      "bytes": 133,
+      "sha256": "b36045515684ae710c0ab943454aa0eccfe7762c81dc6e9618d07fadfffb27ea",
+      "original_private_identifier": "<private-artifacts>/quest-weak-shell-v2-build-1-build.log",
+      "original_sha256": "24c452f17036b35c01807d04feae91b5b5c86dc03d4e75e3d2662a48839a55d3",
+      "representation": "generic-path normalization only"
+    },
+    {
+      "path": "execution-attestation.json",
+      "bytes": 1714,
+      "sha256": "232f76334e69281a129fdad2a91781466f3d44776b545d69764b113c63aab572",
+      "original_private_identifier": "<private-artifacts>/quest-weak-shell-v2-execution-attestation-1.json",
+      "original_sha256": "0326c148da0548fef12d99ac7e22ca78516df0dd376279b3f12b999e4bdffb81",
+      "representation": "generic-path normalization only"
+    },
+    {
+      "path": "execution-context.json",
+      "bytes": 83825,
+      "sha256": "25aaa7286c3e10dcf09b1977e3b70bf9cd716260a5c0ddca63e497d323f2f3fc",
+      "original_private_identifier": "<private-artifacts>/quest-weak-shell-v2-execution-attestation-1-before.json",
+      "original_sha256": "bf1a74ed21653419a7e4dd8df85be994d8009d00149b2997c68d05adbe6815e8",
+      "representation": "generic-path normalization only"
+    },
+    {
+      "path": "private-artifact-manifest.json",
+      "bytes": 4501,
+      "sha256": "bb4acadc31e2c32a1ee3da054370a131581370461c76391223eff05a44d61b1c",
+      "original_private_identifier": "<private-artifacts>/quest-weak-shell-v2-artifact-manifest.json",
+      "original_sha256": "51aff7994caaf08608cb634a2e90b1fecb233c9d4872c24f7777ac73e5c97df1",
+      "representation": "generic-path normalization only"
+    },
+    {
+      "path": "protocol-source.json",
+      "bytes": 2098,
+      "sha256": "8265d007d88ce0252a4c938339847ba080bcee5d06b1c8c9dea16b8952e182ef",
+      "original_private_identifier": "<workspace>/.superpowers/sdd/2026-10-05-sparse-mathcore-cfd/configuration-weak-energy-shell-v2-fix-1-source-manifest.json",
+      "original_sha256": "8265d007d88ce0252a4c938339847ba080bcee5d06b1c8c9dea16b8952e182ef",
+      "representation": "byte-original"
+    },
+    {
+      "path": "verification-references.json",
+      "bytes": 2682,
+      "sha256": "34fc50cc8980e54721bc61303493c2032796d9ed7eaa46566bb9d552b277512b",
+      "representation": "root derived verification index after independent saved-result review",
+      "candidate_sha256": "5de7a4ac4b82cb9730be7a61d845d8b38530fcf56a001ec0699d326528266c3c"
+    },
+    {
+      "path": "independent-review.json",
+      "representation": "byte-original saved-only independent review",
+      "bytes": 5664,
+      "sha256": "56bae3172e672278ca1c2223dc33b748075a90a9634dd2cca4461e69896979c5"
+    }
+  ]
+}

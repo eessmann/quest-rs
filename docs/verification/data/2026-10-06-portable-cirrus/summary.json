@@ -1,0 +1,2768 @@
+{
+  "schema_version": 1,
+  "campaign_source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+  "records": [
+    {
+      "id": "cirrus-gnu-build",
+      "kind": "workspace-build",
+      "source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+      "source_relation": "campaign",
+      "compiler_profile": "gnu",
+      "environment_mode": "modules",
+      "scheduler": {
+        "job_id": "536807",
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "allocation": {
+        "nodes": 1,
+        "exclusive": true,
+        "cpus_per_task": 8
+      },
+      "scope": {
+        "packages": [
+          "workspace"
+        ],
+        "selection": "all-feature tests compiled; MPI bridge and xtask built; generated bindings checked; mpi,qsvt-io examples built",
+        "cargo_jobs_max": 8
+      },
+      "outcome": {
+        "status": "passed",
+        "elapsed_seconds": 157,
+        "observations": {
+          "native_doctor_stages": {
+            "native_context": "passed",
+            "native_discovery": "passed",
+            "binding_parser": "passed",
+            "mpi_selection": "passed",
+            "serial_hdf5_selection": "passed",
+            "selectors": "passed"
+          }
+        }
+      },
+      "claims": [
+        "Build checks completed and the source digest was reverified before the completion marker."
+      ],
+      "limitations": [
+        "Compilation alone does not establish runtime acceptance."
+      ],
+      "evidence": [
+        {
+          "path": "receipts/gnu-build-536807/build-complete",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-build-536807/source-digest",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-build-536807/build-profile.json",
+          "sha256": "ff5b86538552c11c3b5564e6400279b4ec9a9e6a351ea005ed4751667abe7a35",
+          "size_bytes": 2032,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-build-536807/native-doctor.json",
+          "sha256": "dd5d141ec0e944c8b0d62b4294d3edf86093768589a1e2c0b566ec0eec8f3130",
+          "size_bytes": 6166,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-build-536807/build-script.sha256",
+          "sha256": "a5bc63dc914184251aba7c256b8bd183968276519058e21c3e0345fa5d48cc70",
+          "size_bytes": 68,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-build-536807/runtime-env.sha256",
+          "sha256": "114b33bc5315214f4752a47072451273a2aeaec4b96453bf1ac1c3747176c3ee",
+          "size_bytes": 68,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-build-536807/snapshot-verifier.sha256",
+          "sha256": "c343e845e748d32200057045c13e7ad8431b9996ad097a8bedfc9896fd57496f",
+          "size_bytes": 68,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-build-536807/rustflags.json",
+          "sha256": "fcaea896b227b40a29f6a6df7ca21dbb7d245a315e4a29204f880bf0692df401",
+          "size_bytes": 59,
+          "visibility": "private-original"
+        }
+      ],
+      "native_revision": "503552065045eaf89baba85e6cd6aad728525554",
+      "rustflags": []
+    },
+    {
+      "id": "cirrus-cray-build",
+      "kind": "workspace-build",
+      "source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+      "source_relation": "campaign",
+      "compiler_profile": "cray",
+      "environment_mode": "modules",
+      "scheduler": {
+        "job_id": "536808",
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "allocation": {
+        "nodes": 1,
+        "exclusive": true,
+        "cpus_per_task": 8
+      },
+      "scope": {
+        "packages": [
+          "workspace"
+        ],
+        "selection": "all-feature tests compiled; MPI bridge and xtask built; generated bindings checked; mpi,qsvt-io examples built",
+        "cargo_jobs_max": 8
+      },
+      "outcome": {
+        "status": "passed",
+        "elapsed_seconds": 162,
+        "observations": {
+          "native_doctor_stages": {
+            "native_context": "passed",
+            "native_discovery": "passed",
+            "binding_parser": "passed",
+            "mpi_selection": "passed",
+            "serial_hdf5_selection": "passed",
+            "selectors": "passed"
+          }
+        }
+      },
+      "claims": [
+        "Build checks completed and the source digest was reverified before the completion marker."
+      ],
+      "limitations": [
+        "Compilation alone does not establish runtime acceptance."
+      ],
+      "evidence": [
+        {
+          "path": "receipts/cray-build-536808/build-complete",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-build-536808/source-digest",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-build-536808/build-profile.json",
+          "sha256": "c7828fb7c4d397c8cfdee3d39d14002ba5aa05f6e93c7c15665811967f03b292",
+          "size_bytes": 2251,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-build-536808/native-doctor.json",
+          "sha256": "1ac29af29b7429d5eb5b559248e413053fded68603385e9c2045ae4bfebac4f3",
+          "size_bytes": 6190,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-build-536808/build-script.sha256",
+          "sha256": "a5bc63dc914184251aba7c256b8bd183968276519058e21c3e0345fa5d48cc70",
+          "size_bytes": 68,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-build-536808/runtime-env.sha256",
+          "sha256": "114b33bc5315214f4752a47072451273a2aeaec4b96453bf1ac1c3747176c3ee",
+          "size_bytes": 68,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-build-536808/snapshot-verifier.sha256",
+          "sha256": "c343e845e748d32200057045c13e7ad8431b9996ad097a8bedfc9896fd57496f",
+          "size_bytes": 68,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-build-536808/rustflags.json",
+          "sha256": "4dab4a7621328d8b0a72fb8193e9df21c5889296b54444941087e50d3e39e9f2",
+          "size_bytes": 120,
+          "visibility": "private-original"
+        }
+      ],
+      "native_revision": "503552065045eaf89baba85e6cd6aad728525554",
+      "rustflags": [
+        "-C",
+        "linker-features=-lld",
+        "-C",
+        "link-arg=-mno-daz-ftz"
+      ]
+    },
+    {
+      "id": "cirrus-cray-smoke",
+      "kind": "selected-mpi-tests",
+      "source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+      "source_relation": "campaign",
+      "compiler_profile": "cray",
+      "environment_mode": "modules",
+      "scheduler": {
+        "job_id": "536811",
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "allocation": {
+        "nodes": 2,
+        "exclusive": true,
+        "cpus_per_task": 288,
+        "mpi_ranks_per_node": 1
+      },
+      "scope": {
+        "packages": [
+          "quest-rs"
+        ],
+        "selection": [
+          "mpi_survives_quest_drop_and_reinitialization_is_rejected",
+          "mpi_threaded_views_exchange_and_collectives_agree",
+          "mpi_collective_preflight_rejects_mismatch_on_every_rank",
+          "mpi_distributed_drop_with_live_resource_aborts_job",
+          "collective_rejects_different_classical_results_and_step_counts"
+        ],
+        "rank_counts": [
+          1,
+          2
+        ],
+        "native_threading": "test-selected"
+      },
+      "outcome": {
+        "status": "passed",
+        "tests": {
+          "passed": 5,
+          "failed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 79
+      },
+      "claims": [
+        "All five selected MPI smoke cases passed under the final Cray module profile."
+      ],
+      "limitations": [
+        "Expected fatal-cleanup child failure is part of its passing parent test; scheduler step failure alone is not a smoke failure.",
+        "This selected stage does not establish the full workspace matrix."
+      ],
+      "evidence": [
+        {
+          "path": "receipts/cray-smoke-536811/tests-complete",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-smoke-536811/source-digest",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-smoke-536811/nextest-status",
+          "sha256": "4101f14e1488e790706c17968ed69e6017e60d7a2986779c811c5e371b2f02e9",
+          "size_bytes": 287,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-smoke-536811/tests.log",
+          "sha256": "8d77a9d99fd92d1695c2716a508f99356c7dc1e2fd5ae3eb068de79c02783c7a",
+          "size_bytes": 12340,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-smoke-536811/build-profile.json",
+          "sha256": "c7828fb7c4d397c8cfdee3d39d14002ba5aa05f6e93c7c15665811967f03b292",
+          "size_bytes": 2251,
+          "visibility": "private-original"
+        }
+      ]
+    },
+    {
+      "id": "cirrus-cray-consumers-module",
+      "kind": "native-consumer",
+      "source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+      "source_relation": "campaign",
+      "compiler_profile": "cray",
+      "environment_mode": "modules",
+      "scheduler": {
+        "job_id": "536810",
+        "state": "FAILED",
+        "exit_code": "1:0"
+      },
+      "allocation": {
+        "nodes": 1,
+        "exclusive": true,
+        "cpus_per_task": 8
+      },
+      "scope": {
+        "packages": [
+          "direct quest-sys consumer",
+          "quest-rs facade",
+          "generated wrapper",
+          "renamed dependency"
+        ],
+        "selection": "CPU and OpenMP numerical checks plus native mode discovery"
+      },
+      "outcome": {
+        "status": "passed",
+        "numerical_cases": {
+          "passed": 10,
+          "failed": 0
+        },
+        "native_mode_checks": {
+          "passed": 2,
+          "failed": 0
+        },
+        "omp_threads": 8
+      },
+      "claims": [
+        "All ten numerical cases and two native mode checks passed with the supported module environment."
+      ],
+      "limitations": [
+        "The enclosing job failed because its separate loader-isolated stage failed."
+      ],
+      "evidence": [
+        {
+          "path": "receipts/cray-native-consumers-536810/module-status",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "size_bytes": 2,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-consumers-536810/module.log",
+          "sha256": "6726d6981b199d85a50797837fa7c132402cabeda459fe80e16d13d6f1ea36f9",
+          "size_bytes": 953,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-consumers-536810/source-digest",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-consumers-536810/build-profile.json",
+          "sha256": "c7828fb7c4d397c8cfdee3d39d14002ba5aa05f6e93c7c15665811967f03b292",
+          "size_bytes": 2251,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-consumers-536810/module/direct-cpu-dm-run.log",
+          "sha256": "d9008f553627bd704f26bc8ad2f68ec4690f363d51b5cf4a09b6274a5e5ac2a8",
+          "size_bytes": 206,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-consumers-536810/module/direct-cpu-modes-run.log",
+          "sha256": "3067952158e715888482ebcf56ac9858bafd957c3d8c43189dc283cca3316000",
+          "size_bytes": 580,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-consumers-536810/module/direct-cpu-sv-run.log",
+          "sha256": "66b26c22e18f0a7c53e4332ba7d1bbb3d019db0264186ef499dd423eb3d24798",
+          "size_bytes": 205,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-consumers-536810/module/direct-omp-dm-run.log",
+          "sha256": "08f40ddae8e3816c5461904458c57181d5560ac8e84289c410168a41b358185f",
+          "size_bytes": 206,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-consumers-536810/module/direct-omp-modes-run.log",
+          "sha256": "ecc8d48666ae10641443455313a6d6b4eb1a3c04bc0cae79e0972f241021437f",
+          "size_bytes": 580,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-consumers-536810/module/direct-omp-sv-run.log",
+          "sha256": "17d6f9321cd6b09106ae9cac116ca30a44860839c18211d398811a43f84651fc",
+          "size_bytes": 205,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-consumers-536810/module/facade-cpu-run.log",
+          "sha256": "6c557f9f5d08927c562d0bd2988470f692302d940a34b06b5adc3f17d7cb5dcb",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-consumers-536810/module/facade-omp-run.log",
+          "sha256": "9308aaab88e799be3c56b82a947d565d99416bd706a705c6fc07a8b3da7808cc",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-consumers-536810/module/renamed-cpu-run.log",
+          "sha256": "6c557f9f5d08927c562d0bd2988470f692302d940a34b06b5adc3f17d7cb5dcb",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-consumers-536810/module/renamed-omp-run.log",
+          "sha256": "9308aaab88e799be3c56b82a947d565d99416bd706a705c6fc07a8b3da7808cc",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-consumers-536810/module/wrapped-cpu-run.log",
+          "sha256": "6c557f9f5d08927c562d0bd2988470f692302d940a34b06b5adc3f17d7cb5dcb",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-consumers-536810/module/wrapped-omp-run.log",
+          "sha256": "9308aaab88e799be3c56b82a947d565d99416bd706a705c6fc07a8b3da7808cc",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        }
+      ]
+    },
+    {
+      "id": "cirrus-cray-consumers-isolated",
+      "kind": "native-consumer",
+      "source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+      "source_relation": "campaign",
+      "compiler_profile": "cray",
+      "environment_mode": "loader-isolated",
+      "scheduler": {
+        "job_id": "536810",
+        "state": "FAILED",
+        "exit_code": "1:0"
+      },
+      "allocation": {
+        "nodes": 1,
+        "exclusive": true,
+        "cpus_per_task": 8
+      },
+      "scope": {
+        "packages": [
+          "direct quest-sys consumer",
+          "quest-rs facade",
+          "generated wrapper",
+          "renamed dependency"
+        ],
+        "selection": "CPU and OpenMP numerical checks plus native mode discovery"
+      },
+      "outcome": {
+        "status": "failed",
+        "missing_libraries": [
+          "libfabric.so.1"
+        ],
+        "runtime_executed": false
+      },
+      "claims": [],
+      "limitations": [
+        "Loader-isolated closure fails on libfabric.so.1, an indirect Cray MPI dependency; no isolated runtime acceptance is claimed."
+      ],
+      "evidence": [
+        {
+          "path": "receipts/cray-native-consumers-536810/isolated-status",
+          "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+          "size_bytes": 2,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-consumers-536810/isolated.log",
+          "sha256": "41c75a24d81650b3ae2f389078319dbca11712346b2d077c28acaac653628d61",
+          "size_bytes": 436,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-consumers-536810/isolated/direct-ldd.log",
+          "sha256": "e7641b43139515f14451b44cd6ae00ece2f1585ac5ab803ac6824cea70812fec",
+          "size_bytes": 1841,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-consumers-536810/isolated/direct-readelf.log",
+          "sha256": "44c099ecbbddb9fd3a1e984ffcb821cd9ed42cff5357511623a0844e3c775cc4",
+          "size_bytes": 2914,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-consumers-536810/source-digest",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-consumers-536810/build-profile.json",
+          "sha256": "c7828fb7c4d397c8cfdee3d39d14002ba5aa05f6e93c7c15665811967f03b292",
+          "size_bytes": 2251,
+          "visibility": "private-original"
+        }
+      ]
+    },
+    {
+      "id": "cirrus-gnu-tooling-io",
+      "kind": "targeted-tests",
+      "source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+      "source_relation": "campaign",
+      "compiler_profile": "gnu",
+      "environment_mode": "modules",
+      "scheduler": {
+        "job_id": "536809",
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "allocation": {
+        "nodes": 4,
+        "ranks_per_node": 1,
+        "cpus_per_rank": 288
+      },
+      "scope": {
+        "packages": [
+          "quest-build",
+          "xtask",
+          "quest-qsvt-io"
+        ],
+        "selection": "all features; one test thread"
+      },
+      "outcome": {
+        "status": "passed",
+        "tests": {
+          "passed": 170,
+          "failed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 84.776
+      },
+      "claims": [
+        "Selected package tests passed on EPCCFS with the GNU module profile."
+      ],
+      "limitations": [
+        "A targeted package run does not establish full workspace acceptance."
+      ],
+      "evidence": [
+        {
+          "path": "receipts/gnu-regressions-536809/io-tooling.log",
+          "sha256": "404ed1bc5244f2d1645ed4a21e338f9492c4159214772166ae4c004d278b7416",
+          "size_bytes": 65212,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-regressions-536809/source-digest",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-regressions-536809/complete",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-regressions-536809/status",
+          "sha256": "c2cf127142d7caf82197f86e4cff7602667c372c45144ca106229f63cec2d6e1",
+          "size_bytes": 19,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-regressions-536809/script.sha256",
+          "sha256": "0a8bf89888ea67816fc0e5dfca53196e7886e5c5935b0d3652af1a36ccbb2635",
+          "size_bytes": 68,
+          "visibility": "private-original"
+        }
+      ]
+    },
+    {
+      "id": "cirrus-gnu-collective-history",
+      "kind": "targeted-tests",
+      "source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+      "source_relation": "campaign",
+      "compiler_profile": "gnu",
+      "environment_mode": "modules",
+      "scheduler": {
+        "job_id": "536809",
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "allocation": {
+        "nodes": 4,
+        "ranks_per_node": 1,
+        "cpus_per_rank": 288
+      },
+      "scope": {
+        "packages": [
+          "quest-cfd"
+        ],
+        "selection": "box_kvn_history::tests::complete_generated_history_has_no_independent_collective_readers",
+        "rank_counts": [
+          1,
+          2,
+          4
+        ]
+      },
+      "outcome": {
+        "status": "passed",
+        "tests": {
+          "passed": 1,
+          "failed": 0,
+          "skipped": 35
+        },
+        "elapsed_seconds": 21.002
+      },
+      "claims": [
+        "Selected history test passed at 1, 2 and 4 ranks with one rank per node."
+      ],
+      "limitations": [
+        "35 tests were excluded by the exact selection."
+      ],
+      "evidence": [
+        {
+          "path": "receipts/gnu-regressions-536809/cfd.log",
+          "sha256": "014bb877cd074f01d8f5469b48ddffe7948be9b71b558f2d6c6b45817dce01c5",
+          "size_bytes": 12937,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-regressions-536809/source-digest",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-regressions-536809/complete",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        }
+      ]
+    },
+    {
+      "id": "cirrus-supervisor-timeout",
+      "kind": "supervisor-timeout",
+      "source_digest": "6a6b4ee4a69aace3da90eafa8bc2bf0644e88eb21af5fef778b6b0b515bbc3c5",
+      "source_relation": "earlier-probe",
+      "compiler_profile": "gnu",
+      "environment_mode": "modules",
+      "scheduler": {
+        "job_id": "536795",
+        "state": "COMPLETED",
+        "exit_code": "0:0"
+      },
+      "allocation": {
+        "nodes": 2,
+        "ranks_per_node": 1,
+        "cpus_per_rank": 288
+      },
+      "scope": {
+        "packages": [
+          "quest-test-support"
+        ],
+        "selection": "standalone supervisor-timeout fixture; two sequential Slurm steps",
+        "rank_counts": [
+          2
+        ]
+      },
+      "outcome": {
+        "status": "passed",
+        "elapsed_seconds": 5.403,
+        "observations": {
+          "child_started": true,
+          "timed_out": true,
+          "cancellation_accepted": true,
+          "termination_confirmed": true,
+          "allocation_reused": true
+        }
+      },
+      "claims": [
+        "An owned timed-out step was cancelled and a new step succeeded in the same allocation."
+      ],
+      "limitations": [
+        "This probe used an earlier source snapshot and is not a final-source workspace run.",
+        "No native numerical result is established by this scheduler probe."
+      ],
+      "evidence": [
+        {
+          "path": "receipts/supervisor-timeout-536795/result.log",
+          "sha256": "8fcd538b1272203b969fcef4a606aeb6b39976a0618b019ddbfd53b810fa3717",
+          "size_bytes": 1940,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/supervisor-timeout-536795/complete",
+          "sha256": "9a11dfd705f6c199d57afa635078c105bbc823d753f89dbb4dc31b288d532084",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/supervisor-timeout-536795/source.sha256",
+          "sha256": "255480c141b058db4058b88d1fcfb20964bec26d484bab71c563b5cd394f6499",
+          "size_bytes": 160,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/supervisor-timeout-536795/src/main.rs",
+          "sha256": "8a1239a73e330c17aefe62ce1e4950c0745b6813b88b3183ee3299efd20cae8e",
+          "size_bytes": 1673,
+          "visibility": "private-original"
+        }
+      ]
+    },
+    {
+      "source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+      "source_relation": "campaign",
+      "compiler_profile": "cray",
+      "environment_mode": "modules",
+      "scheduler": {
+        "job_id": "536812",
+        "state": "FAILED",
+        "exit_code": "100:0"
+      },
+      "allocation": {
+        "nodes": 8,
+        "exclusive": true,
+        "mpi_ranks_per_node": 1,
+        "cpus_per_task": 288
+      },
+      "id": "cirrus-cray-workspace-original",
+      "kind": "workspace-tests",
+      "scope": {
+        "packages": [
+          "workspace"
+        ],
+        "selection": "all features; Nextest; one test thread; no fail fast",
+        "rank_counts": [
+          1,
+          2,
+          4,
+          8
+        ],
+        "native_threading": "test-selected"
+      },
+      "outcome": {
+        "status": "failed",
+        "tests": {
+          "passed": 1689,
+          "failed": 4,
+          "skipped": 6
+        },
+        "elapsed_seconds": 1170.563,
+        "runner_exit_status": 100,
+        "failing_tests": [
+          "quest-build link::tests::downstream_archive_order_survives_rust_library_dependency",
+          "quest-build link::tests::downstream_whole_archive_selects_shared_then_includes_all_real_archive_members",
+          "quest-compile::compile_fail invalid_dsl_and_semantic_capabilities_are_rejected",
+          "quest-rs::compile_fail runtime_ownership_and_kind_contracts"
+        ]
+      },
+      "claims": [
+        "The full selected test matrix ran to completion; all thirteen shard I/O cleanup tests passed on EPCCFS."
+      ],
+      "limitations": [
+        "Two direct-rustc link fixtures bypassed Cargo linker flags.",
+        "Two trybuild UI harnesses failed while linking host dependencies before checking UI cases.",
+        "Later focused corrections do not change this original run outcome.",
+        "Six skipped tests remain outside this execution evidence."
+      ],
+      "evidence": [
+        {
+          "path": "receipts/cray-workspace-536812/tests.log",
+          "sha256": "29b2f4629bb04d6c00f177f15e072e7609e1683622ff484c6a71409fe459883d",
+          "size_bytes": 905869,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-workspace-536812/nextest-status",
+          "sha256": "eea8254c7500ba3de996aa8ad6af399183f04e17d4a8102fde539dbc93a90012",
+          "size_bytes": 4,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-workspace-536812/source-digest",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-workspace-536812/source-verified-after-by-review",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-workspace-536812/build-profile.json",
+          "sha256": "c7828fb7c4d397c8cfdee3d39d14002ba5aa05f6e93c7c15665811967f03b292",
+          "size_bytes": 2251,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-workspace-536812/status",
+          "sha256": "c45500f676b2ba2562b733b99a41ec8da60240059c27570e82e8ddbeedb868a1",
+          "size_bytes": 31,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-workspace-536812/scheduler.txt",
+          "sha256": "ac06c09818c1afd364696d2d6c325fa218a5501df9bf1f2b150a0fec1a33664c",
+          "size_bytes": 7776,
+          "visibility": "private-original"
+        }
+      ]
+    },
+    {
+      "source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+      "source_relation": "campaign",
+      "compiler_profile": "cray",
+      "environment_mode": "modules",
+      "scheduler": {
+        "job_id": "536812",
+        "state": "FAILED",
+        "exit_code": "100:0"
+      },
+      "allocation": {
+        "nodes": 8,
+        "exclusive": true,
+        "mpi_ranks_per_node": 1,
+        "cpus_per_task": 288
+      },
+      "id": "cirrus-cray-doctests-original",
+      "kind": "doctests",
+      "scope": {
+        "packages": [
+          "workspace"
+        ],
+        "selection": "all features; cargo test --doc"
+      },
+      "outcome": {
+        "status": "failed",
+        "tests": {
+          "passed": 0,
+          "failed": 1,
+          "skipped": 0
+        },
+        "runner_exit_status": 101,
+        "first_failure": "quest-compile/src/lib.rs line 8"
+      },
+      "claims": [],
+      "limitations": [
+        "rustdoc did not inherit the Cray no-lld linker policy.",
+        "Cargo stopped at the first package containing an executable doctest; later package doctests were not run."
+      ],
+      "evidence": [
+        {
+          "path": "receipts/cray-workspace-536812/doctests.log",
+          "sha256": "a6a66d34280526f794c8c26f9f73d74676e05685b3d833f6f702c6db2aa555fd",
+          "size_bytes": 31224,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-workspace-536812/doctest-status",
+          "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+          "size_bytes": 4,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-workspace-536812/source-digest",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-workspace-536812/source-verified-after-by-review",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        }
+      ]
+    },
+    {
+      "id": "cirrus-gnu-link-fixtures-corrected",
+      "kind": "focused-tests",
+      "source_digest": "d17fdbabf41d9f437c2c28e149db124a432d45f46315194631324d83ff0f52eb",
+      "source_relation": "test-fixture-correction",
+      "compiler_profile": "gnu",
+      "environment_mode": "modules",
+      "scheduler": {
+        "job_id": "536853",
+        "state": "COMPLETED",
+        "exit_code": "0:0",
+        "elapsed_seconds": 85
+      },
+      "allocation": {
+        "nodes": 1,
+        "exclusive": true,
+        "cpus_per_task": 8
+      },
+      "scope": {
+        "packages": [
+          "quest-build"
+        ],
+        "selection": "all-feature tests and strict all-target Clippy"
+      },
+      "outcome": {
+        "status": "passed",
+        "tests": {
+          "passed": 59,
+          "failed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 51.275,
+        "runner_exit_status": 0,
+        "clippy_exit_status": 0
+      },
+      "claims": [
+        "Direct rustc fixture consumers honor the native Cargo linker and flags."
+      ],
+      "limitations": [
+        "The follow-up source changes the test module and four documentation files; production link code remains byte-identical to the campaign source.",
+        "This focused result does not replace the original workspace outcome."
+      ],
+      "production_link_code_sha256": "48b371984d4671b8bfdb4aa76acd2f370072f331efb46dc4f4dd4c78a0b03492",
+      "evidence": [
+        {
+          "path": "receipts/gnu-fixture-536853/build-profile.json",
+          "sha256": "230fcb01e16edc5e5c7a23e17b0fbfdba524081e233fec186f6cab045cc63254",
+          "size_bytes": 2032,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-fixture-536853/clippy-status",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "size_bytes": 2,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-fixture-536853/clippy.log",
+          "sha256": "76e3f62f6914c09519578885cd76f45603a65d259583c81e6955a559c7b5d042",
+          "size_bytes": 1246,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-fixture-536853/focused-complete",
+          "sha256": "9ec4fea016475be2c9d1da33171cf27f4f609ceb31f9ebb1b7ef1563b7d88103",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-fixture-536853/scheduler.txt",
+          "sha256": "001e7e46705327352c72e356cbf51280fcea3700f473473961f884deaf2734d3",
+          "size_bytes": 91,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-fixture-536853/script.sha256",
+          "sha256": "2ad9dbeb70fe43ba9e2aeeb1a5a33fbdb9b00595b40e7225f4163b97352e493c",
+          "size_bytes": 68,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-fixture-536853/source-digest",
+          "sha256": "9ec4fea016475be2c9d1da33171cf27f4f609ceb31f9ebb1b7ef1563b7d88103",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-fixture-536853/tests-status",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "size_bytes": 2,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-fixture-536853/tests.log",
+          "sha256": "ec788dc6c40869079587093c2c5b7ff007c9d664a127d480b16f3701fc4fe756",
+          "size_bytes": 22875,
+          "visibility": "private-original"
+        }
+      ]
+    },
+    {
+      "id": "cirrus-cray-link-fixtures-corrected",
+      "kind": "focused-tests",
+      "source_digest": "d17fdbabf41d9f437c2c28e149db124a432d45f46315194631324d83ff0f52eb",
+      "source_relation": "test-fixture-correction",
+      "compiler_profile": "cray",
+      "environment_mode": "modules",
+      "scheduler": {
+        "job_id": "536854",
+        "state": "COMPLETED",
+        "exit_code": "0:0",
+        "elapsed_seconds": 75
+      },
+      "allocation": {
+        "nodes": 1,
+        "exclusive": true,
+        "cpus_per_task": 8
+      },
+      "scope": {
+        "packages": [
+          "quest-build"
+        ],
+        "selection": "all-feature tests and strict all-target Clippy"
+      },
+      "outcome": {
+        "status": "passed",
+        "tests": {
+          "passed": 59,
+          "failed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 45.173,
+        "runner_exit_status": 0,
+        "clippy_exit_status": 0
+      },
+      "claims": [
+        "Direct rustc fixture consumers honor the native Cargo linker and flags."
+      ],
+      "limitations": [
+        "The follow-up source changes the test module and four documentation files; production link code remains byte-identical to the campaign source.",
+        "This focused result does not replace the original workspace outcome."
+      ],
+      "production_link_code_sha256": "48b371984d4671b8bfdb4aa76acd2f370072f331efb46dc4f4dd4c78a0b03492",
+      "evidence": [
+        {
+          "path": "receipts/cray-fixture-536854/build-profile.json",
+          "sha256": "60b22d8223e8d5c05b593a1f3f7f2da3be0fa38061510d4c9fb142a1fc4ef28a",
+          "size_bytes": 2251,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-fixture-536854/clippy-status",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "size_bytes": 2,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-fixture-536854/clippy.log",
+          "sha256": "312c030e25ac632b0f8a044fd744a62c0c20335393b2b6a7e8a99620a1a31143",
+          "size_bytes": 1246,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-fixture-536854/focused-complete",
+          "sha256": "9ec4fea016475be2c9d1da33171cf27f4f609ceb31f9ebb1b7ef1563b7d88103",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-fixture-536854/scheduler.txt",
+          "sha256": "0720469094cf8cea611427a2bb1eba85e3a60975520dec4cb6ec46800aab0c93",
+          "size_bytes": 91,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-fixture-536854/script.sha256",
+          "sha256": "2ad9dbeb70fe43ba9e2aeeb1a5a33fbdb9b00595b40e7225f4163b97352e493c",
+          "size_bytes": 68,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-fixture-536854/source-digest",
+          "sha256": "9ec4fea016475be2c9d1da33171cf27f4f609ceb31f9ebb1b7ef1563b7d88103",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-fixture-536854/tests-status",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "size_bytes": 2,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-fixture-536854/tests.log",
+          "sha256": "92bbb32ed4ac247bb15aa89715d5eac5c0cd9415e5ac856b7ccc304d7c9ecedb",
+          "size_bytes": 22877,
+          "visibility": "private-original"
+        }
+      ]
+    },
+    {
+      "id": "cirrus-cray-native-ui-first-profile",
+      "kind": "native-ui-tests",
+      "source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+      "source_relation": "campaign-with-profile-override",
+      "compiler_profile": "cray",
+      "environment_mode": "modules",
+      "scheduler": {
+        "job_id": "536865",
+        "state": "FAILED",
+        "exit_code": "100:0",
+        "elapsed_seconds": 246
+      },
+      "allocation": {
+        "nodes": 1,
+        "exclusive": true,
+        "cpus_per_task": 8
+      },
+      "scope": {
+        "packages": [
+          "quest-compile",
+          "quest-rs"
+        ],
+        "selection": "compile_fail test binaries; all features; native-only trybuild target policy",
+        "profile_override": [
+          "--cfg",
+          "trybuild_no_target"
+        ]
+      },
+      "outcome": {
+        "status": "failed",
+        "tests": {
+          "passed": 2,
+          "failed": 1,
+          "skipped": 0
+        },
+        "elapsed_seconds": 164.433,
+        "runner_exit_status": 100,
+        "ui_cases": {
+          "passed": 26,
+          "failed": 1
+        }
+      },
+      "claims": [
+        "Native-only target policy admitted the host dependencies and preserved semantic compile failures."
+      ],
+      "limitations": [
+        "One unchanged expected diagnostic mismatched because encoded flags omitted trybuild --verbose; the compiler still rejected Environment as not Send.",
+        "The profile overrides the pinned trybuild diagnostic defaults and is superseded by a separately recorded corrected profile."
+      ],
+      "evidence": [
+        {
+          "path": "receipts/cray-native-ui-536865/base-build-profile.json",
+          "sha256": "c7828fb7c4d397c8cfdee3d39d14002ba5aa05f6e93c7c15665811967f03b292",
+          "size_bytes": 2251,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-536865/nextest-status",
+          "sha256": "eea8254c7500ba3de996aa8ad6af399183f04e17d4a8102fde539dbc93a90012",
+          "size_bytes": 4,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-536865/recipe.sha256",
+          "sha256": "faf65993a883efcd7a845e3e4f75edb5bb96d6b46db439c517a0923c2e35b3f8",
+          "size_bytes": 68,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-536865/scheduler.txt",
+          "sha256": "9c5e11b561acfb4692f1a12d3395239288be7dca4ce83cd5309e0c392d982dc7",
+          "size_bytes": 92,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-536865/source-digest",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-536865/source-verified-after",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-536865/tests.log",
+          "sha256": "31f440023344e5d58efe2a5873e7b1e9a1e011f94de4b4cd953090f22d44e0dc",
+          "size_bytes": 96207,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-536865/ui-profile.json",
+          "sha256": "3b2c27f79a5791893f9df057d28f6239a79acdc66e36b96dbc7eabaab3060a03",
+          "size_bytes": 749,
+          "visibility": "private-original"
+        }
+      ]
+    },
+    {
+      "id": "cirrus-cray-native-ui-all-features",
+      "kind": "native-ui-tests",
+      "source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+      "source_relation": "campaign-with-profile-override",
+      "compiler_profile": "cray",
+      "environment_mode": "modules",
+      "scheduler": {
+        "job_id": "537112",
+        "state": "COMPLETED",
+        "exit_code": "0:0",
+        "elapsed_seconds": 256
+      },
+      "allocation": {
+        "nodes": 1,
+        "exclusive": true,
+        "cpus_per_task": 8
+      },
+      "scope": {
+        "packages": [
+          "quest-compile",
+          "quest-rs"
+        ],
+        "selection": "both compile_fail binaries; all features; native-only trybuild profile",
+        "profile_override": [
+          "--cfg",
+          "trybuild_no_target",
+          "--cfg",
+          "trybuild",
+          "--verbose",
+          "-A",
+          "dead_code",
+          "--diagnostic-width=140"
+        ]
+      },
+      "outcome": {
+        "status": "passed",
+        "tests": {
+          "passed": 3,
+          "failed": 0,
+          "skipped": 0
+        },
+        "elapsed_seconds": 169.127,
+        "runner_exit_status": 0,
+        "ui_cases": {
+          "passed": 27,
+          "failed": 0
+        }
+      },
+      "claims": [
+        "All original UI cases and expected diagnostics passed; the additional ownership trait assertion also passed."
+      ],
+      "limitations": [
+        "This native-only profile is separate from the original workspace invocation; cross-target UI behavior was not exercised."
+      ],
+      "evidence": [
+        {
+          "path": "receipts/cray-native-ui-537112/base-build-profile.json",
+          "sha256": "c7828fb7c4d397c8cfdee3d39d14002ba5aa05f6e93c7c15665811967f03b292",
+          "size_bytes": 2251,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-537112/nextest-status",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "size_bytes": 2,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-537112/recipe.sha256",
+          "sha256": "c3912d8cc7d5d4470b68e11976f1e832f41cdfb0cc0c789373dd2a27cdde91bf",
+          "size_bytes": 68,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-537112/scheduler.txt",
+          "sha256": "7046df0e29cea3388a4bd5a8441b5f2de4868aef9a8dc7919987cc73ec870bf2",
+          "size_bytes": 94,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-537112/source-digest",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-537112/source-verified-after",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-537112/tests.log",
+          "sha256": "d2a86971096215472eddc2ad99c07c1f931af1981c8afd547a7e469f74f9adbc",
+          "size_bytes": 91323,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-537112/ui-complete",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-537112/ui-profile.json",
+          "sha256": "3f7ce6990ec0dab20ef3063c95276dcc389c5e5a80642b966459914b61613552",
+          "size_bytes": 914,
+          "visibility": "private-original"
+        }
+      ]
+    },
+    {
+      "id": "cirrus-gnu-default-acceptance-original",
+      "kind": "default-tests-and-checks",
+      "source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+      "source_relation": "campaign",
+      "compiler_profile": "gnu",
+      "environment_mode": "modules",
+      "scheduler": {
+        "job_id": "536827",
+        "state": "FAILED",
+        "exit_code": "1:0",
+        "elapsed_seconds": 862
+      },
+      "allocation": {
+        "nodes": 1,
+        "exclusive": true,
+        "cpus_per_task": 8
+      },
+      "scope": {
+        "packages": [
+          "workspace"
+        ],
+        "selection": "default-feature tests and doctests; default/all-feature checks and strict all-target Clippy; formatting"
+      },
+      "outcome": {
+        "status": "failed",
+        "stage_exit_statuses": {
+          "fmt": 1,
+          "default-check": 0,
+          "all-features-check": 0,
+          "default-nextest": 0,
+          "default-doctests": 0,
+          "default-clippy": 0,
+          "all-features-clippy": 0
+        },
+        "tests": {
+          "passed": 1509,
+          "failed": 0,
+          "skipped": 1
+        },
+        "test_elapsed_seconds": 570.203,
+        "default_doctests": {
+          "passed": 55,
+          "failed": 0,
+          "ignored": 1
+        }
+      },
+      "claims": [
+        "Default and all-feature workspace checks and strict all-target Clippy passed.",
+        "All 1,509 default-feature tests and 55 executable doctests passed; one test and one doctest were skipped or ignored."
+      ],
+      "limitations": [
+        "Formatting failed on the frozen source; the later local formatting correction does not alter this receipt."
+      ],
+      "evidence": [
+        {
+          "path": "receipts/gnu-default-acceptance-536827/source-digest",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-default-acceptance-536827/build-profile.json",
+          "sha256": "ff5b86538552c11c3b5564e6400279b4ec9a9e6a351ea005ed4751667abe7a35",
+          "size_bytes": 2032,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-default-acceptance-536827/stages.txt",
+          "sha256": "ce468378fe434e62ac22e1549e4a14fee408fbbc2725bf5192b146da3d97f74e",
+          "size_bytes": 119,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-default-acceptance-536827/status",
+          "sha256": "52237be46a9c64f4e09b38597887a293cfe575c02b4575d32f789a8f6c5253ca",
+          "size_bytes": 29,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-default-acceptance-536827/fmt.log",
+          "sha256": "eb5393c278fc42995a39be3cae153fdfae7bb4abbbaf674c82e40d0f02fa5e53",
+          "size_bytes": 614,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-default-acceptance-536827/default-nextest.log",
+          "sha256": "1ea68379aec9fa0c61d94e8102cab03cb0602c00af3f8b3d21fce652f3ee3d2a",
+          "size_bytes": 635946,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-default-acceptance-536827/default-doctests.log",
+          "sha256": "7d8b0a9379a60ec2261b4382bbda86278212743a727633b5bacea05580cec41c",
+          "size_bytes": 10825,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-default-acceptance-536827/default-check.log",
+          "sha256": "484135d8dfac284a1d26e9c96ba14f5e02e7026004955cab33e6f631ac681a20",
+          "size_bytes": 14907,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-default-acceptance-536827/all-features-check.log",
+          "sha256": "753a71f6297680ea3bcc59e72f54681208b13676ea97a7f88539be78a73589a7",
+          "size_bytes": 10844,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-default-acceptance-536827/default-clippy.log",
+          "sha256": "f97899b2f51624f22ea0423f9eab7b2ae7f15387c701120ffde26a706a473a9a",
+          "size_bytes": 7739,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-default-acceptance-536827/all-features-clippy.log",
+          "sha256": "c950c7b24f80273116a695494d90897d4264184ddb9d31c0ecfc704b9e762ce1",
+          "size_bytes": 7414,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-default-acceptance-536827/executed-script.sha256",
+          "sha256": "088c30aff7f7931cb72f5c5670c85a8152d1fa3f384547c9393dd51137d1816b",
+          "size_bytes": 68,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/final-acceptance-scheduler.txt",
+          "sha256": "3f7b46cd155f49c5781cee1ad8186d2decb9217f0156bee42c04c3a289e37855",
+          "size_bytes": 375,
+          "visibility": "private-original"
+        }
+      ]
+    },
+    {
+      "id": "cirrus-cray-default-acceptance-original",
+      "kind": "default-tests-and-checks",
+      "source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+      "source_relation": "campaign",
+      "compiler_profile": "cray",
+      "environment_mode": "modules",
+      "scheduler": {
+        "job_id": "536828",
+        "state": "FAILED",
+        "exit_code": "1:0",
+        "elapsed_seconds": 685
+      },
+      "allocation": {
+        "nodes": 1,
+        "exclusive": true,
+        "cpus_per_task": 8
+      },
+      "scope": {
+        "packages": [
+          "workspace"
+        ],
+        "selection": "default-feature tests and doctests; default/all-feature checks and strict all-target Clippy; formatting"
+      },
+      "outcome": {
+        "status": "failed",
+        "stage_exit_statuses": {
+          "fmt": 1,
+          "default-check": 0,
+          "all-features-check": 0,
+          "default-nextest": 100,
+          "default-doctests": 101,
+          "default-clippy": 0,
+          "all-features-clippy": 0
+        },
+        "tests": {
+          "passed": 1504,
+          "failed": 5,
+          "skipped": 1
+        },
+        "test_elapsed_seconds": 406.421,
+        "default_doctests": {
+          "passed": 0,
+          "failed": 1,
+          "ignored": 0,
+          "remaining_packages": "not run"
+        },
+        "failing_tests": [
+          "quest-rs::compile_fail runtime_ownership_and_kind_contracts",
+          "xtask::bin/xtask qsvt_catalog::tests::failed_download_keeps_the_previous_file_and_cleans_staging",
+          "quest-rs::compile_fail runtime_ownership_and_kind_contracts",
+          "xtask::bin/xtask qsvt_catalog::tests::failed_download_keeps_the_previous_file_and_cleans_staging"
+        ]
+      },
+      "claims": [
+        "Default and all-feature workspace checks and strict all-target Clippy passed."
+      ],
+      "limitations": [
+        "Formatting failed on the frozen source; the later local formatting correction does not alter this receipt.",
+        "Four link/UI harness failures match the original all-feature run; offline catalog staging cleanup also failed on EPCCFS.",
+        "Original default doctests failed to link before later packages ran."
+      ],
+      "evidence": [
+        {
+          "path": "receipts/cray-default-acceptance-536828/source-digest",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-default-acceptance-536828/build-profile.json",
+          "sha256": "c7828fb7c4d397c8cfdee3d39d14002ba5aa05f6e93c7c15665811967f03b292",
+          "size_bytes": 2251,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-default-acceptance-536828/stages.txt",
+          "sha256": "dda48e9d7ccaf6f9c277da29b9a2be54fe69006872f9463a21303baab7fbe89c",
+          "size_bytes": 123,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-default-acceptance-536828/status",
+          "sha256": "52237be46a9c64f4e09b38597887a293cfe575c02b4575d32f789a8f6c5253ca",
+          "size_bytes": 29,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-default-acceptance-536828/fmt.log",
+          "sha256": "eb5393c278fc42995a39be3cae153fdfae7bb4abbbaf674c82e40d0f02fa5e53",
+          "size_bytes": 614,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-default-acceptance-536828/default-nextest.log",
+          "sha256": "f799f3c1545b2bd1cc27a13a22924859fac4a2fe9be3f9d39906d2fae9dfd249",
+          "size_bytes": 624151,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-default-acceptance-536828/default-doctests.log",
+          "sha256": "2c7e25aa4002069a77eb59116d90506547e7f6e7abf34aeaf2ca09c225e8cc9a",
+          "size_bytes": 28176,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-default-acceptance-536828/default-check.log",
+          "sha256": "29b8742b1f5180e0da271f95932e798bd4664c6a54b20b9cee669cf22bcb1f9f",
+          "size_bytes": 14908,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-default-acceptance-536828/all-features-check.log",
+          "sha256": "45ef4a136f59d99bb89b0a84cfafa8e4fec5432feb843a0722d1248685c3b1af",
+          "size_bytes": 10851,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-default-acceptance-536828/default-clippy.log",
+          "sha256": "7044af4e9d2ea2ba8d76cf65d254be80a9415068170f9892ea5488122ba9a7ef",
+          "size_bytes": 7740,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-default-acceptance-536828/all-features-clippy.log",
+          "sha256": "6a8d17e82c2ab5900bb813bf907fe775748d51888fa5f3324d831d2d41c79dc6",
+          "size_bytes": 7421,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-default-acceptance-536828/executed-script.sha256",
+          "sha256": "088c30aff7f7931cb72f5c5670c85a8152d1fa3f384547c9393dd51137d1816b",
+          "size_bytes": 68,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/final-acceptance-scheduler.txt",
+          "sha256": "3f7b46cd155f49c5781cee1ad8186d2decb9217f0156bee42c04c3a289e37855",
+          "size_bytes": 375,
+          "visibility": "private-original"
+        }
+      ]
+    },
+    {
+      "id": "cirrus-cray-doctests-corrected-default",
+      "kind": "doctests",
+      "source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+      "source_relation": "campaign-with-profile-override",
+      "compiler_profile": "cray",
+      "environment_mode": "modules",
+      "scheduler": {
+        "job_id": "537107",
+        "state": "COMPLETED",
+        "exit_code": "0:0",
+        "elapsed_seconds": 76
+      },
+      "allocation": {
+        "nodes": 1,
+        "exclusive": true,
+        "cpus_per_task": 8
+      },
+      "scope": {
+        "packages": [
+          "workspace"
+        ],
+        "selection": "default doctests",
+        "rustdoc_flags": [
+          "-C",
+          "linker-features=-lld",
+          "-C",
+          "link-arg=-mno-daz-ftz"
+        ]
+      },
+      "outcome": {
+        "status": "passed",
+        "tests": {
+          "passed": 55,
+          "failed": 0,
+          "ignored": 1
+        },
+        "runner_exit_status": 0
+      },
+      "claims": [
+        "The named rustdoc-only override passed with the admitted native and rustc profile unchanged."
+      ],
+      "limitations": [
+        "The corrected profile does not replace original doctest failures."
+      ],
+      "evidence": [
+        {
+          "path": "receipts/cray-doctests-corrected-537107/base-source-digest",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-doctests-corrected-537107/base-build-profile.json",
+          "sha256": "c7828fb7c4d397c8cfdee3d39d14002ba5aa05f6e93c7c15665811967f03b292",
+          "size_bytes": 2251,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-doctests-corrected-537107/rustdoc-override.json",
+          "sha256": "ff2cacc82d8c36880e79fb120af59fde80d110cc79c26e53f23c3d8b60ebadfa",
+          "size_bytes": 257,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-doctests-corrected-537107/adapter.sha256",
+          "sha256": "9606603625da8c5e3abef46f286fc17958095aa3d684c64d63fae4d1fa643495",
+          "size_bytes": 68,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-doctests-corrected-537107/doctests-complete",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-doctests-corrected-537107/default-status",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "size_bytes": 2,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-doctests-corrected-537107/default.log",
+          "sha256": "a4166bda695e794bddd6225ce2f77cf6f0e6467d0694e0753efb2207718e9018",
+          "size_bytes": 10246,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/final-acceptance-scheduler.txt",
+          "sha256": "3f7b46cd155f49c5781cee1ad8186d2decb9217f0156bee42c04c3a289e37855",
+          "size_bytes": 375,
+          "visibility": "private-original"
+        }
+      ]
+    },
+    {
+      "id": "cirrus-cray-doctests-corrected-all-features",
+      "kind": "doctests",
+      "source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+      "source_relation": "campaign-with-profile-override",
+      "compiler_profile": "cray",
+      "environment_mode": "modules",
+      "scheduler": {
+        "job_id": "537107",
+        "state": "COMPLETED",
+        "exit_code": "0:0",
+        "elapsed_seconds": 76
+      },
+      "allocation": {
+        "nodes": 1,
+        "exclusive": true,
+        "cpus_per_task": 8
+      },
+      "scope": {
+        "packages": [
+          "workspace"
+        ],
+        "selection": "all-features doctests",
+        "rustdoc_flags": [
+          "-C",
+          "linker-features=-lld",
+          "-C",
+          "link-arg=-mno-daz-ftz"
+        ]
+      },
+      "outcome": {
+        "status": "passed",
+        "tests": {
+          "passed": 65,
+          "failed": 0,
+          "ignored": 1
+        },
+        "runner_exit_status": 0
+      },
+      "claims": [
+        "The named rustdoc-only override passed with the admitted native and rustc profile unchanged."
+      ],
+      "limitations": [
+        "The corrected profile does not replace original doctest failures."
+      ],
+      "evidence": [
+        {
+          "path": "receipts/cray-doctests-corrected-537107/base-source-digest",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-doctests-corrected-537107/base-build-profile.json",
+          "sha256": "c7828fb7c4d397c8cfdee3d39d14002ba5aa05f6e93c7c15665811967f03b292",
+          "size_bytes": 2251,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-doctests-corrected-537107/rustdoc-override.json",
+          "sha256": "ff2cacc82d8c36880e79fb120af59fde80d110cc79c26e53f23c3d8b60ebadfa",
+          "size_bytes": 257,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-doctests-corrected-537107/adapter.sha256",
+          "sha256": "9606603625da8c5e3abef46f286fc17958095aa3d684c64d63fae4d1fa643495",
+          "size_bytes": 68,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-doctests-corrected-537107/doctests-complete",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-doctests-corrected-537107/all-features-status",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "size_bytes": 2,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-doctests-corrected-537107/all-features.log",
+          "sha256": "abd154a01767b4bbee7aceee1c7a3988db30c2390d6a1b34c588f8eabad541a8",
+          "size_bytes": 11294,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/final-acceptance-scheduler.txt",
+          "sha256": "3f7b46cd155f49c5781cee1ad8186d2decb9217f0156bee42c04c3a289e37855",
+          "size_bytes": 375,
+          "visibility": "private-original"
+        }
+      ]
+    },
+    {
+      "id": "cirrus-gnu-installed-consumers-modules",
+      "kind": "installed-consumers",
+      "source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+      "source_relation": "campaign",
+      "compiler_profile": "gnu",
+      "environment_mode": "modules",
+      "scheduler": {
+        "job_id": "536833",
+        "state": "FAILED",
+        "exit_code": "1:0",
+        "elapsed_seconds": 120
+      },
+      "allocation": {
+        "nodes": 1,
+        "exclusive": true,
+        "cpus_per_task": 8
+      },
+      "scope": {
+        "packages": [
+          "direct quest-sys",
+          "quest-rs facade",
+          "renamed dependency",
+          "wrapper dependency"
+        ],
+        "selection": "CPU and OpenMP installed native consumers"
+      },
+      "outcome": {
+        "status": "passed",
+        "runner_exit_status": 0,
+        "numerical_runs_passed": 10,
+        "native_mode_checks_passed": 2
+      },
+      "claims": [
+        "All module-environment numerical consumers and native execution-mode checks passed."
+      ],
+      "limitations": [
+        "The parent batch failed in its separate loader-isolated stage."
+      ],
+      "evidence": [
+        {
+          "path": "receipts/gnu-native-consumers-536833/source-digest",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-native-consumers-536833/build-profile.json",
+          "sha256": "ff5b86538552c11c3b5564e6400279b4ec9a9e6a351ea005ed4751667abe7a35",
+          "size_bytes": 2032,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-native-consumers-536833/module-status",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "size_bytes": 2,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-native-consumers-536833/executed-script.sha256",
+          "sha256": "b6a67e88e3a4023a1dfb90a0a5eadb7d08f7b05e74fc02c2db0b69508f891e29",
+          "size_bytes": 68,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-native-consumers-536833/module/direct-cpu-dm-run.log",
+          "sha256": "d9008f553627bd704f26bc8ad2f68ec4690f363d51b5cf4a09b6274a5e5ac2a8",
+          "size_bytes": 206,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-native-consumers-536833/module/direct-cpu-modes-run.log",
+          "sha256": "3067952158e715888482ebcf56ac9858bafd957c3d8c43189dc283cca3316000",
+          "size_bytes": 580,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-native-consumers-536833/module/direct-cpu-sv-run.log",
+          "sha256": "66b26c22e18f0a7c53e4332ba7d1bbb3d019db0264186ef499dd423eb3d24798",
+          "size_bytes": 205,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-native-consumers-536833/module/direct-omp-dm-run.log",
+          "sha256": "08f40ddae8e3816c5461904458c57181d5560ac8e84289c410168a41b358185f",
+          "size_bytes": 206,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-native-consumers-536833/module/direct-omp-modes-run.log",
+          "sha256": "ecc8d48666ae10641443455313a6d6b4eb1a3c04bc0cae79e0972f241021437f",
+          "size_bytes": 580,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-native-consumers-536833/module/direct-omp-sv-run.log",
+          "sha256": "17d6f9321cd6b09106ae9cac116ca30a44860839c18211d398811a43f84651fc",
+          "size_bytes": 205,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-native-consumers-536833/module/facade-cpu-run.log",
+          "sha256": "6c557f9f5d08927c562d0bd2988470f692302d940a34b06b5adc3f17d7cb5dcb",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-native-consumers-536833/module/facade-omp-run.log",
+          "sha256": "9308aaab88e799be3c56b82a947d565d99416bd706a705c6fc07a8b3da7808cc",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-native-consumers-536833/module/renamed-cpu-run.log",
+          "sha256": "6c557f9f5d08927c562d0bd2988470f692302d940a34b06b5adc3f17d7cb5dcb",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-native-consumers-536833/module/renamed-omp-run.log",
+          "sha256": "9308aaab88e799be3c56b82a947d565d99416bd706a705c6fc07a8b3da7808cc",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-native-consumers-536833/module/wrapped-cpu-run.log",
+          "sha256": "6c557f9f5d08927c562d0bd2988470f692302d940a34b06b5adc3f17d7cb5dcb",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-native-consumers-536833/module/wrapped-omp-run.log",
+          "sha256": "9308aaab88e799be3c56b82a947d565d99416bd706a705c6fc07a8b3da7808cc",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/final-acceptance-scheduler.txt",
+          "sha256": "3f7b46cd155f49c5781cee1ad8186d2decb9217f0156bee42c04c3a289e37855",
+          "size_bytes": 375,
+          "visibility": "private-original"
+        }
+      ]
+    },
+    {
+      "id": "cirrus-gnu-installed-consumers-loader-isolated",
+      "kind": "installed-consumers",
+      "source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+      "source_relation": "campaign",
+      "compiler_profile": "gnu",
+      "environment_mode": "loader-isolated",
+      "scheduler": {
+        "job_id": "536833",
+        "state": "FAILED",
+        "exit_code": "1:0",
+        "elapsed_seconds": 120
+      },
+      "allocation": {
+        "nodes": 1,
+        "exclusive": true,
+        "cpus_per_task": 8
+      },
+      "scope": {
+        "packages": [
+          "direct quest-sys",
+          "quest-rs facade",
+          "renamed dependency",
+          "wrapper dependency"
+        ],
+        "selection": "CPU and OpenMP installed native consumers"
+      },
+      "outcome": {
+        "status": "failed",
+        "runner_exit_status": 1,
+        "missing_libraries": [
+          "libfabric.so.1"
+        ]
+      },
+      "claims": [],
+      "limitations": [
+        "Removing the loader environment left an indirect MPI libfabric dependency unresolved; no isolated runtime execution is claimed."
+      ],
+      "evidence": [
+        {
+          "path": "receipts/gnu-native-consumers-536833/source-digest",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-native-consumers-536833/build-profile.json",
+          "sha256": "ff5b86538552c11c3b5564e6400279b4ec9a9e6a351ea005ed4751667abe7a35",
+          "size_bytes": 2032,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-native-consumers-536833/isolated-status",
+          "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+          "size_bytes": 2,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-native-consumers-536833/isolated/direct-ldd.log",
+          "sha256": "0ab1c013cbbca6513817bc68389d2ca4290966ea0a1eb49592044071bba5dbb2",
+          "size_bytes": 1360,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/gnu-native-consumers-536833/isolated/direct-readelf.log",
+          "sha256": "7823b84a19b73b700661a95cac580cd08bd4cdabad8a28b32e90ce95b87f6c28",
+          "size_bytes": 2269,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/final-acceptance-scheduler.txt",
+          "sha256": "3f7b46cd155f49c5781cee1ad8186d2decb9217f0156bee42c04c3a289e37855",
+          "size_bytes": 375,
+          "visibility": "private-original"
+        }
+      ]
+    },
+    {
+      "id": "cirrus-cray-native-ui-maintained-default",
+      "kind": "native-ui-tests",
+      "source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+      "source_relation": "campaign-with-driver-and-profile-override",
+      "compiler_profile": "cray",
+      "environment_mode": "modules",
+      "scheduler": {
+        "job_id": "537135",
+        "state": "COMPLETED",
+        "exit_code": "0:0",
+        "elapsed_seconds": 161
+      },
+      "allocation": {
+        "nodes": 1,
+        "exclusive": true,
+        "cpus_per_task": 8
+      },
+      "scope": {
+        "packages": [
+          "quest-compile",
+          "quest-rs"
+        ],
+        "selection": "maintained native-ui stage; default features; both unchanged compile_fail binaries"
+      },
+      "outcome": {
+        "status": "passed",
+        "tests": {
+          "passed": 3,
+          "failed": 0,
+          "skipped": 0
+        },
+        "ui_cases": {
+          "passed": 27,
+          "failed": 0
+        },
+        "elapsed_seconds": 99.265,
+        "runner_exit_status": 0
+      },
+      "claims": [
+        "The maintained coordinator admitted the matching build and native target, ran every selected UI case with unchanged diagnostics, and reverified source before publishing completion."
+      ],
+      "limitations": [
+        "The original test-routing.json incorrectly labels a workspace filter and rerouted base count although base is null and this standalone job ran no base suite.",
+        "A later reporting-only correction removes those unused base fields for standalone UI runs; test selection, flags, and target admission are unchanged.",
+        "This focused stage does not constitute another full workspace run."
+      ],
+      "tested_coordinator_sha256": "02936a4d228a84fbc4ff10acdbaac4fb3d707253e192a1e3229455fd1d4e1a54",
+      "tested_helper_sha256": "de3f6b866e327cd21ceac0f4ec2a63e85dde2cf43a5c24cfcb6a45debcec5a17",
+      "maintained_helper_after_reporting_correction_sha256": "7de0c76fae5c85408c4465502b1c2f126ca41d6e60d58157bf3668087b297b07",
+      "evidence": [
+        {
+          "path": "receipts/cray-native-ui-maintained-537135/build-profile.json",
+          "sha256": "c7828fb7c4d397c8cfdee3d39d14002ba5aa05f6e93c7c15665811967f03b292",
+          "size_bytes": 2251,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-maintained-537135/build-receipt-path",
+          "sha256": "c853393051b428d962d2577eff4e09c8ed73df2de1bdebf40cb4602d15242a1d",
+          "size_bytes": 114,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-maintained-537135/modules.txt",
+          "sha256": "f5d648c8bf61cb94f937cffc0969166adc8b1bda5a27658b370d5a134ac88fee",
+          "size_bytes": 260,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-maintained-537135/mpi-launcher.sha256",
+          "sha256": "df897357f21ed9d095aa9c2ab77cf0674e16e8907efb0684679d054ad45accb5",
+          "size_bytes": 68,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-maintained-537135/native-prefix",
+          "sha256": "432082b39816968965f1a4e137a2bcf9d98262ef21909323bc6fa128aa7609ae",
+          "size_bytes": 92,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-maintained-537135/native-ui-admission.json",
+          "sha256": "df7c9c0fcf74f2c78af9d426d185acddb02f461f6d2de36c778a2653c47fdc3f",
+          "size_bytes": 193,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-maintained-537135/native-ui-helper.sha256",
+          "sha256": "6d266ba46c3bf011a184791baae69976c00e5b218403f74fda10ce1436213f68",
+          "size_bytes": 68,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-maintained-537135/native-ui-profile.json",
+          "sha256": "894142a13645962fdf7509ace5f94a652d1d856da81bd022987773069d2dfc00",
+          "size_bytes": 893,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-maintained-537135/native-ui-rustflags",
+          "sha256": "10dc7b9f450ac6264456f4f5ebecf189216d2cfd30e15e0f55d84b789855aa0d",
+          "size_bytes": 134,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-maintained-537135/native-ui-status",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "size_bytes": 2,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-maintained-537135/native-ui.log",
+          "sha256": "16b0c9d652b7bc754979d14d1be6cb2f2cc74b7eff49e1031e31e644a1de70c4",
+          "size_bytes": 86248,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-maintained-537135/runtime-env.sha256",
+          "sha256": "114b33bc5315214f4752a47072451273a2aeaec4b96453bf1ac1c3747176c3ee",
+          "size_bytes": 68,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-maintained-537135/runtime-environment.json",
+          "sha256": "645a8b723345031e7eb43e09689f64cece6c6cf59b9e02cb4cf6c222d0b47b90",
+          "size_bytes": 1202,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-maintained-537135/scheduler.txt",
+          "sha256": "b2a852ca9c6a14c47e4fa908bcdd549ffb0e5f70d017fb20c13f4676107d7e82",
+          "size_bytes": 94,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-maintained-537135/snapshot-verifier.sha256",
+          "sha256": "c343e845e748d32200057045c13e7ad8431b9996ad097a8bedfc9896fd57496f",
+          "size_bytes": 68,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-maintained-537135/source-digest",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-maintained-537135/source-snapshot.json",
+          "sha256": "f595a4950d3308f1ff118cc491003b6ad180c0c8707354466ad151814e71ca0a",
+          "size_bytes": 560393,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-maintained-537135/status",
+          "sha256": "aad28253153ff015bc8cda46f16395a36f1b87de6a24fe1a0194e1d39b96c541",
+          "size_bytes": 29,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-maintained-537135/target-directory",
+          "sha256": "7a73f451cb0ff12e3191c15d3d61499dd287198bdaa90ad91e40823fb306f8e0",
+          "size_bytes": 158,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-maintained-537135/test-routing.json",
+          "sha256": "162989cea6775bba574fae8877281d7e567705d1fa2a41e26d224a2c96d6a7fd",
+          "size_bytes": 414,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-maintained-537135/test-script.sha256",
+          "sha256": "8ee9c6e412751be3df1aa0e9e5139ba5d93720159379ef4dbb3d7be66c64f011",
+          "size_bytes": 68,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-maintained-537135/test-stage",
+          "sha256": "a0e9d4dde80f120eed0dd8fc0f78b15f2d07e8fdb35792c07b98e26abc08c7bc",
+          "size_bytes": 10,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-maintained-537135/tests-complete",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-native-ui-maintained-537135/tests.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0,
+          "visibility": "private-original"
+        }
+      ]
+    },
+    {
+      "id": "cirrus-cray-catalog-setup-537136",
+      "kind": "focused-module-probe-setup",
+      "source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+      "source_relation": "campaign-with-source-module-override",
+      "compiler_profile": "cray",
+      "environment_mode": "modules",
+      "scheduler": {
+        "job_id": "537136",
+        "state": "FAILED",
+        "exit_code": "1:0",
+        "elapsed_seconds": 15
+      },
+      "allocation": {
+        "nodes": 1,
+        "exclusive": true,
+        "cpus_per_task": 8
+      },
+      "scope": {
+        "packages": [
+          "xtask qsvt_catalog module"
+        ],
+        "selection": "focused offline EPCCFS cleanup probe preparation"
+      },
+      "outcome": {
+        "status": "failed",
+        "reason": "Probe setup failed before compilation because the cluster Python lacks tomllib."
+      },
+      "claims": [],
+      "limitations": [
+        "This setup failure supplies no corrected-module runtime acceptance."
+      ],
+      "evidence": [
+        {
+          "path": "receipts/cray-catalog-cleanup-537136/base-source-digest",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-catalog-cleanup-537136/base-build-profile.json",
+          "sha256": "c7828fb7c4d397c8cfdee3d39d14002ba5aa05f6e93c7c15665811967f03b292",
+          "size_bytes": 2251,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-catalog-cleanup-537136/executed-script.sha256",
+          "sha256": "73233cd4994edb084fb613c2f2acdad5d293d0447e558c9079566b5cb0a1b11b",
+          "size_bytes": 68,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-catalog-cleanup-537136/payload-sha256.json",
+          "sha256": "3a60a5639a3311b0dced8ed44b27a5d84f2134bf3cf77966544a9716a17207e6",
+          "size_bytes": 627,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-catalog-cleanup-537136/scope.txt",
+          "sha256": "7acdf92f5f52c6796ddf224d50c34b14d10a2d17b9b00f02cf5341f488fe5c11",
+          "size_bytes": 127,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-catalog-cleanup-537136/status",
+          "sha256": "582792755db110837bf6b2a4e68c5316d491f12ef0698e3c15203d7d3fd512b0",
+          "size_bytes": 42,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-catalog-cleanup-537136/probe.log",
+          "sha256": "92ab57b90f7b833f753013f303bb1a122ba5a298b0036c85db1364c8e6ce6ffe",
+          "size_bytes": 120,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/catalog-proof-scheduler.txt",
+          "sha256": "cf1d6da5b05b2cf24cb1c356265ba6d97d1f4c1e610a36001bdeded660c677d3",
+          "size_bytes": 261,
+          "visibility": "private-original"
+        }
+      ]
+    },
+    {
+      "id": "cirrus-cray-catalog-setup-537139",
+      "kind": "focused-module-probe-setup",
+      "source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+      "source_relation": "campaign-with-source-module-override",
+      "compiler_profile": "cray",
+      "environment_mode": "modules",
+      "scheduler": {
+        "job_id": "537139",
+        "state": "FAILED",
+        "exit_code": "1:0",
+        "elapsed_seconds": 51
+      },
+      "allocation": {
+        "nodes": 1,
+        "exclusive": true,
+        "cpus_per_task": 8
+      },
+      "scope": {
+        "packages": [
+          "xtask qsvt_catalog module"
+        ],
+        "selection": "focused offline EPCCFS cleanup probe preparation"
+      },
+      "outcome": {
+        "status": "failed",
+        "reason": "The negative-control source failed to compile because its generic error type lacked Send; the corrected production module was not exercised."
+      },
+      "claims": [],
+      "limitations": [
+        "This setup failure supplies no corrected-module runtime acceptance."
+      ],
+      "evidence": [
+        {
+          "path": "receipts/cray-catalog-cleanup-537139/base-source-digest",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-catalog-cleanup-537139/base-build-profile.json",
+          "sha256": "c7828fb7c4d397c8cfdee3d39d14002ba5aa05f6e93c7c15665811967f03b292",
+          "size_bytes": 2251,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-catalog-cleanup-537139/executed-script.sha256",
+          "sha256": "d66d85367ab84a51e07ff8570c4bb00a7f98bfbb881c0302077e9a65c098389c",
+          "size_bytes": 68,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-catalog-cleanup-537139/payload-sha256.json",
+          "sha256": "3a60a5639a3311b0dced8ed44b27a5d84f2134bf3cf77966544a9716a17207e6",
+          "size_bytes": 627,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-catalog-cleanup-537139/scope.txt",
+          "sha256": "7acdf92f5f52c6796ddf224d50c34b14d10a2d17b9b00f02cf5341f488fe5c11",
+          "size_bytes": 127,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-catalog-cleanup-537139/status",
+          "sha256": "5943c12f19187ea4f8d8b7164edb6f6aebdf1f0a1665b86259b560e0b2f4defd",
+          "size_bytes": 29,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-catalog-cleanup-537139/probe.log",
+          "sha256": "e9d62ecfecd32f02873a18efe73f5231f2ed05caee621a8c04ecb4dd56f44f7c",
+          "size_bytes": 4090,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-catalog-cleanup-537139/red-status",
+          "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+          "size_bytes": 4,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-catalog-cleanup-537139/red.log",
+          "sha256": "437308539c3de03344698a67c80bc372fcb08500b455ab37f0394d0e985bde54",
+          "size_bytes": 10787,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/catalog-proof-scheduler.txt",
+          "sha256": "cf1d6da5b05b2cf24cb1c356265ba6d97d1f4c1e610a36001bdeded660c677d3",
+          "size_bytes": 261,
+          "visibility": "private-original"
+        }
+      ]
+    },
+    {
+      "id": "cirrus-cray-catalog-cleanup-corrected",
+      "kind": "focused-module-tests",
+      "source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+      "source_relation": "campaign-with-source-module-override",
+      "source_module": "crates/xtask/src/qsvt_catalog.rs",
+      "source_module_sha256": "06379c5bc6b14c290a03b28ce6124ea60b83bce3630bd807210b192c2ff5b5e1",
+      "compiler_profile": "cray",
+      "environment_mode": "modules",
+      "scheduler": {
+        "job_id": "537141",
+        "state": "COMPLETED",
+        "exit_code": "0:0",
+        "elapsed_seconds": 58
+      },
+      "allocation": {
+        "nodes": 1,
+        "exclusive": true,
+        "cpus_per_task": 8
+      },
+      "scope": {
+        "packages": [
+          "xtask qsvt_catalog module"
+        ],
+        "selection": "exact corrected module; offline EPCCFS red/green cleanup proof"
+      },
+      "outcome": {
+        "status": "passed",
+        "tests": {
+          "passed": 3,
+          "failed": 0,
+          "skipped": 0
+        },
+        "runner_exit_status": 0,
+        "negative_control": {
+          "expected_failure": true,
+          "runner_exit_status": 101,
+          "failed_tests": 1,
+          "bytes_written": 256
+        }
+      },
+      "claims": [
+        "The unchanged-order negative control reproduced removal before file close; the corrected module closed the descriptor before removing the staging path.",
+        "All registry dependency identities matched the baseline source and the admitted native/compiler profile was retained."
+      ],
+      "limitations": [
+        "This exact-module proof is not a full workspace rerun and does not replace the original Cray default-feature failure."
+      ],
+      "evidence": [
+        {
+          "path": "receipts/cray-catalog-cleanup-537141/base-source-digest",
+          "sha256": "65b84171f0d17d94ba506799a19b777d9163999be65ff11c227c42b41911edf2",
+          "size_bytes": 65,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-catalog-cleanup-537141/base-build-profile.json",
+          "sha256": "c7828fb7c4d397c8cfdee3d39d14002ba5aa05f6e93c7c15665811967f03b292",
+          "size_bytes": 2251,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-catalog-cleanup-537141/tested-module.sha256",
+          "sha256": "72b2cc5f96eadb03fcc2106c4b147d77a0312a2bd5e86648e5f0eb4083fe0c5d",
+          "size_bytes": 86,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-catalog-cleanup-537141/dependency-identities.json",
+          "sha256": "f690ce764aff36e5af5681b9468ba0e4e16b21c294703a576ca088a6907db039",
+          "size_bytes": 43200,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-catalog-cleanup-537141/executed-script.sha256",
+          "sha256": "d66d85367ab84a51e07ff8570c4bb00a7f98bfbb881c0302077e9a65c098389c",
+          "size_bytes": 68,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-catalog-cleanup-537141/payload-sha256.json",
+          "sha256": "fa995962ce7b7d8170d658d18744494299a94dd48c3a1c0e6b748b62119c3fa0",
+          "size_bytes": 627,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-catalog-cleanup-537141/red-status",
+          "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+          "size_bytes": 4,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-catalog-cleanup-537141/red.log",
+          "sha256": "ccc8a2cbaabbf98ce519ff248e602cc7112a9709355baef1f594372928cdf173",
+          "size_bytes": 10135,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-catalog-cleanup-537141/green-status",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "size_bytes": 2,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-catalog-cleanup-537141/green.log",
+          "sha256": "5ec2810aa4674d9efda0a2e605dad77961ad0e2de6c5d5ff7828498b3e36474e",
+          "size_bytes": 1854,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-catalog-cleanup-537141/complete.txt",
+          "sha256": "27f58922753dd8b2db3f8e79e17e56ce41ac37f4d7f56a264718691a8a893af6",
+          "size_bytes": 58,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-catalog-cleanup-537141/scope.txt",
+          "sha256": "7acdf92f5f52c6796ddf224d50c34b14d10a2d17b9b00f02cf5341f488fe5c11",
+          "size_bytes": 127,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/cray-catalog-cleanup-537141/status",
+          "sha256": "8722fb8360256f0ffdc69176dedae0c9a1128e813f73da86890597da376aa9df",
+          "size_bytes": 29,
+          "visibility": "private-original"
+        },
+        {
+          "path": "receipts/catalog-proof-scheduler.txt",
+          "sha256": "cf1d6da5b05b2cf24cb1c356265ba6d97d1f4c1e610a36001bdeded660c677d3",
+          "size_bytes": 261,
+          "visibility": "private-original"
+        }
+      ]
+    }
+  ],
+  "open_acceptance": [
+    {
+      "scope": "Final GNU and Cray default-feature and strict-Clippy acceptance",
+      "status": "failed",
+      "job_ids": [
+        "536827",
+        "536828"
+      ],
+      "reason": "Original receipts retain formatting failures; Cray additionally retains five test failures and a doctest link failure. Both strict-Clippy feature selections passed."
+    },
+    {
+      "scope": "macOS native build and runtime",
+      "status": "not-run",
+      "reason": "macOS runner unavailable"
+    },
+    {
+      "scope": "Actual large-count MPI transfer",
+      "status": "not-run",
+      "reason": "No transfer exceeding the legacy MPI count range was executed"
+    },
+    {
+      "scope": "Strict capacity closure",
+      "status": "open",
+      "reason": "No admitted successful execution yet exceeds the declared serial memory threshold"
+    },
+    {
+      "scope": "Cray loader-isolated installed consumer",
+      "status": "failed",
+      "reason": "Indirect libfabric.so.1 dependency unresolved with loader environment removed"
+    },
+    {
+      "scope": "Original Cray workspace complete pass",
+      "status": "failed",
+      "reason": "Original source8d85 run retains four test-harness failures"
+    },
+    {
+      "scope": "GNU loader-isolated installed consumer",
+      "status": "failed",
+      "reason": "Indirect libfabric.so.1 dependency unresolved with loader environment removed"
+    },
+    {
+      "scope": "Whole-workspace Cirrus rerun after focused corrections",
+      "status": "not-run",
+      "reason": "Focused link, native UI, rustdoc, and catalog proofs are recorded separately from original workspace outcomes."
+    }
+  ],
+  "capacity_context": {
+    "strict_capacity_closed": false,
+    "completed_cases_by_compiler": {
+      "gnu": 7,
+      "cray": 6
+    },
+    "largest_executed_original_input_bytes": 8388608,
+    "oversized_attempt": {
+      "job_id": "536794",
+      "dimension": 268435456,
+      "original_input_files_written": 0,
+      "original_input_bytes_written": 0,
+      "outcome": "rejected before source materialization",
+      "capacity_closed": false
+    },
+    "runs": [
+      {
+        "job_id": "536732",
+        "compiler_profile": "gnu",
+        "source_digest": "6a6b4ee4a69aace3da90eafa8bc2bf0644e88eb21af5fef778b6b0b515bbc3c5",
+        "source_relation": "earlier-probe",
+        "execution_complete": true,
+        "capacity_closed": false,
+        "completed_cases": 3,
+        "max_executed_original_input_bytes": 4194304,
+        "executable_sha256": "dc03b1449ca08c01bf8686e45b55e4416d8ad9c76a68c2e8830e97061b935e19",
+        "lane": "gnu_scaling",
+        "evidence": {
+          "path": "receipts/capacity-job-536732/completion.json",
+          "sha256": "a697790f6b22440028e8beabf0c87a64f86f3425fec2159b04f4935c931d53e5",
+          "size_bytes": 36247,
+          "visibility": "private-original"
+        }
+      },
+      {
+        "job_id": "536733",
+        "compiler_profile": "gnu",
+        "source_digest": "6a6b4ee4a69aace3da90eafa8bc2bf0644e88eb21af5fef778b6b0b515bbc3c5",
+        "source_relation": "earlier-probe",
+        "execution_complete": true,
+        "capacity_closed": false,
+        "completed_cases": 2,
+        "max_executed_original_input_bytes": 4194304,
+        "executable_sha256": "dc03b1449ca08c01bf8686e45b55e4416d8ad9c76a68c2e8830e97061b935e19",
+        "lane": "gnu_scaling",
+        "evidence": {
+          "path": "receipts/capacity-job-536733/completion.json",
+          "sha256": "7b8b328aa7f043039535750d9d1baaeaa6047a881393177026774b0ca130f27e",
+          "size_bytes": 46536,
+          "visibility": "private-original"
+        }
+      },
+      {
+        "job_id": "536734",
+        "compiler_profile": "gnu",
+        "source_digest": "6a6b4ee4a69aace3da90eafa8bc2bf0644e88eb21af5fef778b6b0b515bbc3c5",
+        "source_relation": "earlier-probe",
+        "execution_complete": true,
+        "capacity_closed": false,
+        "completed_cases": 1,
+        "max_executed_original_input_bytes": 4194304,
+        "executable_sha256": "dc03b1449ca08c01bf8686e45b55e4416d8ad9c76a68c2e8830e97061b935e19",
+        "lane": "gnu_scaling",
+        "evidence": {
+          "path": "receipts/capacity-job-536734/completion.json",
+          "sha256": "25184ea9b9af6480cef4adc344c7f1afe4bb9a9ebf7ebd3c067e84950f1ad646",
+          "size_bytes": 45876,
+          "visibility": "private-original"
+        }
+      },
+      {
+        "job_id": "536793",
+        "compiler_profile": "gnu",
+        "source_digest": "6a6b4ee4a69aace3da90eafa8bc2bf0644e88eb21af5fef778b6b0b515bbc3c5",
+        "source_relation": "earlier-probe",
+        "execution_complete": true,
+        "capacity_closed": false,
+        "completed_cases": 1,
+        "max_executed_original_input_bytes": 8388608,
+        "executable_sha256": "dc03b1449ca08c01bf8686e45b55e4416d8ad9c76a68c2e8830e97061b935e19",
+        "lane": "gnu_growth",
+        "evidence": {
+          "path": "receipts/capacity-job-536793/completion.json",
+          "sha256": "423ae1709c11089ba5059085bf9c9ad4b6f3c7b34ee0dab374c54481810cf904",
+          "size_bytes": 45972,
+          "visibility": "private-original"
+        }
+      },
+      {
+        "job_id": "536794",
+        "compiler_profile": "gnu",
+        "source_digest": "6a6b4ee4a69aace3da90eafa8bc2bf0644e88eb21af5fef778b6b0b515bbc3c5",
+        "source_relation": "earlier-probe",
+        "execution_complete": false,
+        "capacity_closed": false,
+        "completed_cases": 0,
+        "max_executed_original_input_bytes": 0,
+        "executable_sha256": "dc03b1449ca08c01bf8686e45b55e4416d8ad9c76a68c2e8830e97061b935e19",
+        "lane": "gnu_admission",
+        "evidence": {
+          "path": "receipts/capacity-job-536794/completion.json",
+          "sha256": "d259f5aceea2bec6822ed15056ac049bf99e59e5a8032245b4b3e52961c0dabb",
+          "size_bytes": 1194,
+          "visibility": "private-original"
+        }
+      },
+      {
+        "job_id": "536815",
+        "compiler_profile": "cray",
+        "source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+        "source_relation": "campaign",
+        "execution_complete": true,
+        "capacity_closed": false,
+        "completed_cases": 1,
+        "max_executed_original_input_bytes": 4194304,
+        "executable_sha256": "ead3182f24a42742f7a88f25cf2468b77190769abfbde010d7247be5b92a39c7",
+        "lane": "cray_strong",
+        "evidence": {
+          "path": "receipts/capacity-job-536815/completion.json",
+          "sha256": "c51cfd1d527f0f74500bd1784373f644b0a76be66b6ff115e098a96ec4bbdd68",
+          "size_bytes": 12844,
+          "visibility": "private-original"
+        }
+      },
+      {
+        "job_id": "536816",
+        "compiler_profile": "cray",
+        "source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+        "source_relation": "campaign",
+        "execution_complete": true,
+        "capacity_closed": false,
+        "completed_cases": 1,
+        "max_executed_original_input_bytes": 4194304,
+        "executable_sha256": "ead3182f24a42742f7a88f25cf2468b77190769abfbde010d7247be5b92a39c7",
+        "lane": "cray_strong",
+        "evidence": {
+          "path": "receipts/capacity-job-536816/completion.json",
+          "sha256": "22942874ef7c20062a69a71ad195cd903442a3763b9571f97a325ea21180213a",
+          "size_bytes": 23851,
+          "visibility": "private-original"
+        }
+      },
+      {
+        "job_id": "536817",
+        "compiler_profile": "cray",
+        "source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+        "source_relation": "campaign",
+        "execution_complete": true,
+        "capacity_closed": false,
+        "completed_cases": 1,
+        "max_executed_original_input_bytes": 4194304,
+        "executable_sha256": "ead3182f24a42742f7a88f25cf2468b77190769abfbde010d7247be5b92a39c7",
+        "lane": "cray_strong",
+        "evidence": {
+          "path": "receipts/capacity-job-536817/completion.json",
+          "sha256": "ae6f93bd9668abfbcd5b444704d8fa85e064feb736e24196d922603531fe8b22",
+          "size_bytes": 45924,
+          "visibility": "private-original"
+        }
+      },
+      {
+        "job_id": "536862",
+        "compiler_profile": "cray",
+        "source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+        "source_relation": "campaign",
+        "execution_complete": true,
+        "capacity_closed": false,
+        "completed_cases": 1,
+        "max_executed_original_input_bytes": 1048576,
+        "executable_sha256": "f3645280b7339a4ece6add7654ecc6aa546b7dc6f7b72913400754387e58fc1e",
+        "lane": "cray_weak",
+        "evidence": {
+          "path": "receipts/capacity-job-536862/completion.json",
+          "sha256": "ca6736256fab0799027f3aa0a4f6bf12a71e3ccde70544f76816404778c19f9f",
+          "size_bytes": 12807,
+          "visibility": "private-original"
+        }
+      },
+      {
+        "job_id": "536863",
+        "compiler_profile": "cray",
+        "source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+        "source_relation": "campaign",
+        "execution_complete": true,
+        "capacity_closed": false,
+        "completed_cases": 1,
+        "max_executed_original_input_bytes": 2097152,
+        "executable_sha256": "f3645280b7339a4ece6add7654ecc6aa546b7dc6f7b72913400754387e58fc1e",
+        "lane": "cray_weak",
+        "evidence": {
+          "path": "receipts/capacity-job-536863/completion.json",
+          "sha256": "0af5ae1e14f08bdcac984bb9c21984fac26d952599d91e8b87cc7f049119b5d7",
+          "size_bytes": 23803,
+          "visibility": "private-original"
+        }
+      },
+      {
+        "job_id": "536864",
+        "compiler_profile": "cray",
+        "source_digest": "8d85c0e8075cec3057b4da14055c73ebc35bb04ab4b01b155153f678bdfa0f4d",
+        "source_relation": "campaign",
+        "execution_complete": true,
+        "capacity_closed": false,
+        "completed_cases": 1,
+        "max_executed_original_input_bytes": 4194304,
+        "executable_sha256": "f3645280b7339a4ece6add7654ecc6aa546b7dc6f7b72913400754387e58fc1e",
+        "lane": "cray_weak",
+        "evidence": {
+          "path": "receipts/capacity-job-536864/completion.json",
+          "sha256": "54650f14b1c9b5e779a57cb9ead0708096e879963093d1392566b91804aec582",
+          "size_bytes": 45870,
+          "visibility": "private-original"
+        }
+      }
+    ],
+    "limitations": [
+      "Completed inputs remain below the strict original-input memory threshold.",
+      "No actual large-count MPI payload transfer was executed.",
+      "The rejected oversized request did not materialize or execute a 16 GiB input.",
+      "Cray weak-scaling points share one frozen executable identity; the earlier strong-scaling points use a separately recorded executable from the same source and native profile.",
+      "RLIMIT_AS applies to each MPI rank process; no whole-node or cgroup memory cap is established by these receipts."
+    ],
+    "detailed_report": "docs/verification/2026-10-06-cirrus-capacity.md",
+    "per_rank_process_address_space_cap_bytes": 8589934592
+  }
+}

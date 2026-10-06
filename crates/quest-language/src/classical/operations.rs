@@ -55,15 +55,21 @@ pub(super) fn binary(
 	if let ScalarType::Float(width) = lhs.ty {
 		let left = lhs.to_f64()?;
 		let right = rhs.to_f64()?;
-		let value = match operator {
-			B::Add => left + right,
-			B::Subtract => left - right,
-			B::Multiply => left * right,
-			B::Divide if right != 0.0 => left / right,
-			B::Divide => return Err(ValueError::DivisionByZero),
-			B::Power => left.powf(right),
+		let operation = match operator {
+			B::Add => mathcore::scalar::BinaryOperation::Add,
+			B::Subtract => mathcore::scalar::BinaryOperation::Subtract,
+			B::Multiply => mathcore::scalar::BinaryOperation::Multiply,
+			B::Divide => mathcore::scalar::BinaryOperation::Divide,
+			B::Power => mathcore::scalar::BinaryOperation::Power,
 			_ => return Err(ValueError::Type),
 		};
+		let value =
+			mathcore::scalar::binary(left, operation, right).map_err(|error| match error {
+				mathcore::arithmetic::ArithmeticError::Domain("division") => {
+					ValueError::DivisionByZero
+				}
+				_ => ValueError::NonFinite,
+			})?;
 		return ScalarValue::floating(width, value);
 	}
 	if let ScalarType::Int(width) = lhs.ty {
@@ -223,21 +229,28 @@ pub(super) fn function(name: &str, arguments: &[ScalarValue]) -> Result<ScalarVa
 		}
 	}
 	let value = argument.to_f64()?;
-	let result = match name {
-		"sin" => value.sin(),
-		"cos" => value.cos(),
-		"tan" => value.tan(),
-		"arcsin" => value.asin(),
-		"arccos" => value.acos(),
-		"arctan" => value.atan(),
-		"exp" => value.exp(),
-		"ln" | "log" => value.ln(),
-		"sqrt" => value.sqrt(),
-		"floor" => value.floor(),
-		"ceil" | "ceiling" => value.ceil(),
-		"round" => value.round_ties_even(),
-		"abs" => value.abs(),
-		_ => return Err(ValueError::Function(name.into())),
+	let shared = match name {
+		"sin" => Some(mathcore::scalar::UnaryOperation::Sin),
+		"cos" => Some(mathcore::scalar::UnaryOperation::Cos),
+		"exp" => Some(mathcore::scalar::UnaryOperation::Exp),
+		"ln" | "log" => Some(mathcore::scalar::UnaryOperation::Ln),
+		"sqrt" => Some(mathcore::scalar::UnaryOperation::Sqrt),
+		_ => None,
+	};
+	let result = if let Some(operation) = shared {
+		mathcore::scalar::unary(value, operation).map_err(|_| ValueError::NonFinite)?
+	} else {
+		match name {
+			"tan" => value.tan(),
+			"arcsin" => value.asin(),
+			"arccos" => value.acos(),
+			"arctan" => value.atan(),
+			"floor" => value.floor(),
+			"ceil" | "ceiling" => value.ceil(),
+			"round" => value.round_ties_even(),
+			"abs" => value.abs(),
+			_ => return Err(ValueError::Function(name.into())),
+		}
 	};
 	ScalarValue::floating(
 		if let ScalarType::Float(width) = argument.ty {

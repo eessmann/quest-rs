@@ -1,0 +1,82 @@
+{
+  "schema": "quest-persisted-weighted-execution-attestation-v1",
+  "status": "one-campaign-outcome-retained",
+  "command": [
+    "timeout",
+    "--kill-after=10s",
+    "1500s",
+    "python3",
+    "-B",
+    "<workspace>/docs/verification/fixtures/persisted-weighted-transform/run.py",
+    "--binary",
+    "<private-artifacts>/quest-persisted-weighted-final-binary-4",
+    "--binary-sha256",
+    "7acd0d38dc30a81aa299ad5704a28d7c2e0acec00f0d4a4a5f20f584759dcab9",
+    "--source-manifest",
+    ".superpowers/sdd/2026-10-05-sparse-mathcore-cfd/persisted-weighted-transform-consumer-source-readout-fix.json",
+    "--repository",
+    "<workspace>",
+    "--output-directory",
+    "<private-artifacts>/quest-persisted-weighted-campaign-4",
+    "--build-attestation",
+    "<private-artifacts>/quest-persisted-weighted-final-build-4-attestation.json"
+  ],
+  "consumer_source_manifest_sha256": "dc69f1e3a848b6ebf368f6b0ac2a09e4573e5601cae0b06452ea38b352b8963c",
+  "binary_sha256": "7acd0d38dc30a81aa299ad5704a28d7c2e0acec00f0d4a4a5f20f584759dcab9",
+  "build_attestation_sha256": "fd59fe4164397f1abccdae411e292f2cd63897ce1c62ee8fc10dc1660748b3ec",
+  "before_sha256": "9dcf3171035b7a13bc0804ff33959175fbbe939032b771d23f4552dbe6d9c1b8",
+  "scope": "Exactly one invocation of reviewed seven-job local campaign under GNU timeout1500s plus10s forced cleanup grace, with coordinated active child-group cleanup; no retries or cap/tolerance/source substitutions. Typed rejected and accuracy-failed outcomes remain outcomes, not successful solves.",
+  "runner_exit_code": 0,
+  "elapsed_seconds": 6.537869480001973,
+  "runner_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "receipt_sha256": "a9fb283e26c948dc2c2e5ff6871559fae968692173b54981515cc90fd19ea89f",
+  "campaign_status": "completed",
+  "outcomes": [
+    {
+      "index": 0,
+      "mode": "publish",
+      "world_parts": 8,
+      "status": "completed"
+    },
+    {
+      "index": 1,
+      "mode": "compile",
+      "world_parts": 1,
+      "status": "completed"
+    },
+    {
+      "index": 2,
+      "mode": "replay",
+      "world_parts": 1,
+      "status": "completed"
+    },
+    {
+      "index": 3,
+      "mode": "replay",
+      "world_parts": 2,
+      "status": "completed"
+    },
+    {
+      "index": 4,
+      "mode": "replay",
+      "world_parts": 4,
+      "status": "completed"
+    },
+    {
+      "index": 5,
+      "mode": "replay",
+      "world_parts": 8,
+      "status": "completed"
+    },
+    {
+      "index": 6,
+      "mode": "split",
+      "world_parts": 4,
+      "status": "completed"
+    }
+  ],
+  "after_sha256": "9dcf3171035b7a13bc0804ff33959175fbbe939032b771d23f4552dbe6d9c1b8",
+  "before_after_equal": true,
+  "binary_unchanged": true,
+  "build_attestation_unchanged": true
+}

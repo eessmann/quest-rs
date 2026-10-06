@@ -1,0 +1,2568 @@
+{
+  "schema": "quest-cfd-capped-cylinder-window-v1",
+  "binary_sha256": "1c3351208d61beb0af0af36fa25506159e72f107e266ff373d5a739a846a6761",
+  "source_sha256": {
+    "crates/quest-cfd/examples/cylinder_window.rs": "3b9313b5fc13208d2eba371539ab044d6edf8a4fa1fa8ff9aa82619dc51f4a1f",
+    "crates/quest-cfd/src/cylinder.rs": "855baaa5c178b6372fe8a7e17290d19c9466178aba32e94e58f1d751d2c0dd4b",
+    "crates/quest-cfd/src/observations.rs": "b88a34d4efe24a68b24b42726ca22eefdabb9b2ae0af519606f4e2f3e32c2520",
+    "crates/quest-cfd/src/simplex.rs": "2c4c4e220969548c254bcddfe7ccc3f310c06be75443aea3461e1d46e8f38c92",
+    "crates/quest-cfd/src/bdm.rs": "0480e7c7cf4e393c4a5819ba5e4296957e6374ed85f0df1ff020a967805f2b85",
+    "crates/quest-cfd/src/cases.rs": "68858f2d8c758576b7fa0837c2d13def9533802c0e48538a02011d79a88f2030",
+    "crates/quest-cfd/src/lib.rs": "a0db2f6dcdc635724cfda7908b1ae9f91dc425c532fdc54e62b1a2c804681298",
+    "crates/quest-cfd/Cargo.toml": "19440f106f95312c40c74aa111dbfdb1f44f75dea1de130b1a8a9461e2863e46",
+    "Cargo.toml": "69aa4b537e7c5cda9a92a13f81e4d745cd0e05355df42f2e6a1f1cec973a8ca0",
+    "crates/quest-cfd/cases/shedding2d.json": "26db584dfddc74994347198475e8743f2a06bc28c00794971e7a4a7a8249049e",
+    "Cargo.lock": "fefe6a70afb1e37ca18587b76c8ad2df392ca16bef9e5d595d5f6457a514222f"
+  },
+  "build_profile": "caller-selected prebuilt binary; recorded build command required",
+  "parameters": [
+    "--max-work",
+    "1000000000000"
+  ],
+  "timeout_seconds": 120,
+  "process_address_space_cap_bytes": 536870912,
+  "cap_kind": "Linux RLIMIT_AS hard/soft; not RSS/node enforcement",
+  "completed": true,
+  "benchmark_converged": false,
+  "source_identity_claim": "source and prebuilt binary hashed independently",
+  "status": "completed",
+  "exit_code": 0,
+  "elapsed_seconds": 84.38467867299914,
+  "last_reported_progress": {
+    "completed_steps": 80000,
+    "time": 8.0,
+    "observations_completed": 400
+  },
+  "native_receipt": {
+    "schema": "quest-cfd-cylinder-window-v1",
+    "status": "completed",
+    "parameters": {
+      "reynolds": 100,
+      "angular_sectors": 4,
+      "radial_layers": 1,
+      "dt": 0.0001,
+      "steps": 80000,
+      "stride": 100,
+      "observation_start": 4.0,
+      "observation_end": 8.0,
+      "short_window": false,
+      "max_steps": 1000000,
+      "max_work": 1000000000000,
+      "max_bytes": 67108864,
+      "max_trace_bytes": 65536,
+      "max_residual": 1e-06,
+      "minimum_cycles": 2,
+      "minimum_samples_per_cycle": 8,
+      "maximum_period_variation": 0.1,
+      "lift_amplitude_floor": 1e-10
+    },
+    "completed": true,
+    "convergence_certified": false,
+    "quantum_execution": false,
+    "elapsed_seconds": 84.379841323,
+    "process": {
+      "address_space_cap_bytes": 536870912,
+      "rss_high_water_bytes": 5419008,
+      "address_space_high_water_bytes": 7421952
+    },
+    "progress": {
+      "completed_steps": 80000,
+      "time": 8.0,
+      "observations_completed": 401
+    },
+    "result": {
+      "admission": {
+        "frozen_window": true,
+        "observation_steps": [
+          40000,
+          80000
+        ],
+        "sample_count": 401,
+        "trace_bytes": 12832,
+        "aggregate_work": 681978153088,
+        "construction_work": 226492416,
+        "integration_work": 652738560000,
+        "observation_work": 29013049344,
+        "analysis_work": 51328,
+        "local_velocity_upper_bound": 96,
+        "peak_managed_upper_bound_bytes": 12857888
+      },
+      "manifest": {
+        "id": "shedding2d",
+        "dimension": 2,
+        "geometry": "[0,2.2]x[0,0.41] minus disk center (0.2,0.2), diameter 0.1",
+        "reynolds": [
+          100
+        ],
+        "reference_velocity": 1.0,
+        "reference_length": 0.1,
+        "boundaries": [
+          "inlet u_x=6*y*(0.41-y)/0.41^2, u_y=0 (mean 1, peak 1.5)",
+          "no slip on cylinder and channel walls",
+          "outlet (nu*grad(u)-p*I)*n=0; unsymmetrized traction convention"
+        ],
+        "initial_condition": "u=0 in interior with prescribed inlet boundary; no-slip cylinder; outlet fixes pressure level",
+        "time_window": [
+          0.0,
+          8.0
+        ],
+        "measurement_window": [
+          4.0,
+          8.0
+        ],
+        "measurement_minimum_cycles": null,
+        "observables": [
+          "Cd=2*Fx/(rho*U_mean^2*D), full pressure plus viscous traction",
+          "Cl=2*Fy/(rho*U_mean^2*D)",
+          "St=f_lift*D/U_mean from measured periodic lift",
+          "pressure difference p(0.15,0.2)-p(0.25,0.2)"
+        ],
+        "provenance": "DFG 2D-2 Re100 geometry/inflow; fixed project observation window. https://www.featflow.de/en/benchmarks/cfdbenchmarking/flow/dfg_benchmark2_re100.html"
+      },
+      "independent_dimension": 20,
+      "local_velocity_dimension": 96,
+      "constraint_rank": 76,
+      "cylinder_segments": 8,
+      "maximum_geometry_deviation": 0.012927373322406078,
+      "pressure_convention": "p(front)-p(back); probes (0.15,0.2),(0.25,0.2); arithmetic mean of incident fluid P0 traces; natural-outflow pressure level",
+      "force_convention": "full pressure plus unsymmetrized viscous traction; Cd/Cl=2F/(rho*U_mean^2*D), rho=1,U_mean=1,D=0.1",
+      "maximum_momentum_residual": 7.527312106958561e-14,
+      "maximum_continuity_residual": 3.5491609651217004e-12,
+      "maximum_boundary_residual": 1.6388279622248092e-13,
+      "trace": [
+        {
+          "time": 4.0,
+          "drag": 6.771790853522793,
+          "lift": -6.028855954056376,
+          "pressure_difference": 7.504546235233317
+        },
+        {
+          "time": 4.01,
+          "drag": 6.7717908529448385,
+          "lift": -6.028855955089938,
+          "pressure_difference": 7.5045462351538745
+        },
+        {
+          "time": 4.0200000000000005,
+          "drag": 6.771790852390695,
+          "lift": -6.028855956080903,
+          "pressure_difference": 7.504546235077697
+        },
+        {
+          "time": 4.03,
+          "drag": 6.771790851859359,
+          "lift": -6.028855957031044,
+          "pressure_difference": 7.504546235004634
+        },
+        {
+          "time": 4.04,
+          "drag": 6.771790851349945,
+          "lift": -6.028855957942074,
+          "pressure_difference": 7.504546234934626
+        },
+        {
+          "time": 4.05,
+          "drag": 6.7717908508615,
+          "lift": -6.028855958815567,
+          "pressure_difference": 7.504546234867487
+        },
+        {
+          "time": 4.0600000000000005,
+          "drag": 6.771790850393178,
+          "lift": -6.028855959653054,
+          "pressure_difference": 7.5045462348031045
+        },
+        {
+          "time": 4.07,
+          "drag": 6.771790849944141,
+          "lift": -6.0288559604560765,
+          "pressure_difference": 7.504546234741385
+        },
+        {
+          "time": 4.08,
+          "drag": 6.771790849513617,
+          "lift": -6.028855961226,
+          "pressure_difference": 7.504546234682206
+        },
+        {
+          "time": 4.09,
+          "drag": 6.771790849100823,
+          "lift": -6.028855961964201,
+          "pressure_difference": 7.504546234625469
+        },
+        {
+          "time": 4.1000000000000005,
+          "drag": 6.77179084870503,
+          "lift": -6.028855962672011,
+          "pressure_difference": 7.504546234571057
+        },
+        {
+          "time": 4.11,
+          "drag": 6.771790848325527,
+          "lift": -6.0288559633506384,
+          "pressure_difference": 7.504546234518877
+        },
+        {
+          "time": 4.12,
+          "drag": 6.771790847961677,
+          "lift": -6.028855964001326,
+          "pressure_difference": 7.504546234468876
+        },
+        {
+          "time": 4.13,
+          "drag": 6.771790847612805,
+          "lift": -6.028855964625213,
+          "pressure_difference": 7.504546234420914
+        },
+        {
+          "time": 4.140000000000001,
+          "drag": 6.771790847278308,
+          "lift": -6.028855965223393,
+          "pressure_difference": 7.50454623437493
+        },
+        {
+          "time": 4.15,
+          "drag": 6.771790846957604,
+          "lift": -6.028855965796951,
+          "pressure_difference": 7.504546234330858
+        },
+        {
+          "time": 4.16,
+          "drag": 6.771790846650087,
+          "lift": -6.0288559663468675,
+          "pressure_difference": 7.504546234288583
+        },
+        {
+          "time": 4.17,
+          "drag": 6.771790846355262,
+          "lift": -6.028855966874131,
+          "pressure_difference": 7.504546234248066
+        },
+        {
+          "time": 4.180000000000001,
+          "drag": 6.7717908460725385,
+          "lift": -6.028855967379636,
+          "pressure_difference": 7.504546234209169
+        },
+        {
+          "time": 4.19,
+          "drag": 6.771790845801513,
+          "lift": -6.02885596786438,
+          "pressure_difference": 7.504546234171935
+        },
+        {
+          "time": 4.2,
+          "drag": 6.771790845541623,
+          "lift": -6.028855968329122,
+          "pressure_difference": 7.504546234136203
+        },
+        {
+          "time": 4.21,
+          "drag": 6.771790845292449,
+          "lift": -6.028855968774727,
+          "pressure_difference": 7.504546234101953
+        },
+        {
+          "time": 4.220000000000001,
+          "drag": 6.7717908450535385,
+          "lift": -6.028855969201978,
+          "pressure_difference": 7.504546234069121
+        },
+        {
+          "time": 4.23,
+          "drag": 6.771790844824467,
+          "lift": -6.028855969611621,
+          "pressure_difference": 7.504546234037626
+        },
+        {
+          "time": 4.24,
+          "drag": 6.7717908446048325,
+          "lift": -6.028855970004403,
+          "pressure_difference": 7.504546234007437
+        },
+        {
+          "time": 4.25,
+          "drag": 6.771790844394241,
+          "lift": -6.028855970380995,
+          "pressure_difference": 7.504546233978486
+        },
+        {
+          "time": 4.26,
+          "drag": 6.771790844192333,
+          "lift": -6.028855970742066,
+          "pressure_difference": 7.504546233950732
+        },
+        {
+          "time": 4.2700000000000005,
+          "drag": 6.771790843998744,
+          "lift": -6.028855971088266,
+          "pressure_difference": 7.504546233924122
+        },
+        {
+          "time": 4.28,
+          "drag": 6.771790843813115,
+          "lift": -6.028855971420208,
+          "pressure_difference": 7.5045462338985995
+        },
+        {
+          "time": 4.29,
+          "drag": 6.771790843635161,
+          "lift": -6.028855971738497,
+          "pressure_difference": 7.504546233874159
+        },
+        {
+          "time": 4.3,
+          "drag": 6.771790843464514,
+          "lift": -6.028855972043648,
+          "pressure_difference": 7.504546233850695
+        },
+        {
+          "time": 4.3100000000000005,
+          "drag": 6.771790843300895,
+          "lift": -6.028855972336227,
+          "pressure_difference": 7.504546233828194
+        },
+        {
+          "time": 4.32,
+          "drag": 6.771790843144017,
+          "lift": -6.028855972616751,
+          "pressure_difference": 7.504546233806622
+        },
+        {
+          "time": 4.33,
+          "drag": 6.771790842993612,
+          "lift": -6.028855972885741,
+          "pressure_difference": 7.504546233785954
+        },
+        {
+          "time": 4.34,
+          "drag": 6.771790842849402,
+          "lift": -6.028855973143641,
+          "pressure_difference": 7.504546233766135
+        },
+        {
+          "time": 4.3500000000000005,
+          "drag": 6.771790842711127,
+          "lift": -6.028855973390923,
+          "pressure_difference": 7.504546233747124
+        },
+        {
+          "time": 4.36,
+          "drag": 6.771790842578548,
+          "lift": -6.028855973628011,
+          "pressure_difference": 7.504546233728895
+        },
+        {
+          "time": 4.37,
+          "drag": 6.7717908424514315,
+          "lift": -6.028855973855329,
+          "pressure_difference": 7.504546233711423
+        },
+        {
+          "time": 4.38,
+          "drag": 6.77179084232955,
+          "lift": -6.028855974073289,
+          "pressure_difference": 7.5045462336946755
+        },
+        {
+          "time": 4.390000000000001,
+          "drag": 6.771790842212699,
+          "lift": -6.028855974282258,
+          "pressure_difference": 7.504546233678607
+        },
+        {
+          "time": 4.4,
+          "drag": 6.77179084210066,
+          "lift": -6.028855974482622,
+          "pressure_difference": 7.504546233663209
+        },
+        {
+          "time": 4.41,
+          "drag": 6.771790841993222,
+          "lift": -6.0288559746747525,
+          "pressure_difference": 7.504546233648437
+        },
+        {
+          "time": 4.42,
+          "drag": 6.7717908418902235,
+          "lift": -6.028855974858947,
+          "pressure_difference": 7.504546233634283
+        },
+        {
+          "time": 4.430000000000001,
+          "drag": 6.771790841791456,
+          "lift": -6.028855975035544,
+          "pressure_difference": 7.504546233620694
+        },
+        {
+          "time": 4.44,
+          "drag": 6.771790841696765,
+          "lift": -6.028855975204903,
+          "pressure_difference": 7.504546233607687
+        },
+        {
+          "time": 4.45,
+          "drag": 6.7717908416059895,
+          "lift": -6.028855975367266,
+          "pressure_difference": 7.504546233595223
+        },
+        {
+          "time": 4.46,
+          "drag": 6.771790841518932,
+          "lift": -6.028855975522925,
+          "pressure_difference": 7.5045462335832465
+        },
+        {
+          "time": 4.470000000000001,
+          "drag": 6.771790841435475,
+          "lift": -6.028855975672212,
+          "pressure_difference": 7.504546233571789
+        },
+        {
+          "time": 4.48,
+          "drag": 6.771790841355428,
+          "lift": -6.028855975815286,
+          "pressure_difference": 7.504546233560761
+        },
+        {
+          "time": 4.49,
+          "drag": 6.771790841278718,
+          "lift": -6.028855975952537,
+          "pressure_difference": 7.504546233550235
+        },
+        {
+          "time": 4.5,
+          "drag": 6.771790841205143,
+          "lift": -6.02885597608408,
+          "pressure_difference": 7.5045462335401165
+        },
+        {
+          "time": 4.51,
+          "drag": 6.7717908411346,
+          "lift": -6.0288559762102265,
+          "pressure_difference": 7.504546233530418
+        },
+        {
+          "time": 4.5200000000000005,
+          "drag": 6.771790841066972,
+          "lift": -6.028855976331175,
+          "pressure_difference": 7.504546233521124
+        },
+        {
+          "time": 4.53,
+          "drag": 6.771790841002128,
+          "lift": -6.028855976447144,
+          "pressure_difference": 7.50454623351221
+        },
+        {
+          "time": 4.54,
+          "drag": 6.7717908409399525,
+          "lift": -6.02885597655833,
+          "pressure_difference": 7.504546233503666
+        },
+        {
+          "time": 4.55,
+          "drag": 6.771790840880332,
+          "lift": -6.028855976664933,
+          "pressure_difference": 7.504546233495464
+        },
+        {
+          "time": 4.5600000000000005,
+          "drag": 6.7717908408231775,
+          "lift": -6.028855976767134,
+          "pressure_difference": 7.504546233487604
+        },
+        {
+          "time": 4.57,
+          "drag": 6.771790840768375,
+          "lift": -6.02885597686516,
+          "pressure_difference": 7.50454623348007
+        },
+        {
+          "time": 4.58,
+          "drag": 6.771790840715826,
+          "lift": -6.028855976959123,
+          "pressure_difference": 7.504546233472848
+        },
+        {
+          "time": 4.59,
+          "drag": 6.7717908406654415,
+          "lift": -6.028855977049218,
+          "pressure_difference": 7.504546233465918
+        },
+        {
+          "time": 4.6000000000000005,
+          "drag": 6.771790840617143,
+          "lift": -6.028855977135612,
+          "pressure_difference": 7.5045462334592905
+        },
+        {
+          "time": 4.61,
+          "drag": 6.771790840570833,
+          "lift": -6.0288559772184325,
+          "pressure_difference": 7.504546233452929
+        },
+        {
+          "time": 4.62,
+          "drag": 6.771790840526424,
+          "lift": -6.02885597729784,
+          "pressure_difference": 7.5045462334468205
+        },
+        {
+          "time": 4.63,
+          "drag": 6.771790840483842,
+          "lift": -6.028855977374011,
+          "pressure_difference": 7.504546233440967
+        },
+        {
+          "time": 4.640000000000001,
+          "drag": 6.771790840443013,
+          "lift": -6.028855977447006,
+          "pressure_difference": 7.504546233435352
+        },
+        {
+          "time": 4.65,
+          "drag": 6.771790840403869,
+          "lift": -6.028855977516989,
+          "pressure_difference": 7.504546233429966
+        },
+        {
+          "time": 4.66,
+          "drag": 6.771790840366349,
+          "lift": -6.028855977584123,
+          "pressure_difference": 7.504546233424824
+        },
+        {
+          "time": 4.67,
+          "drag": 6.771790840330357,
+          "lift": -6.028855977648467,
+          "pressure_difference": 7.504546233419864
+        },
+        {
+          "time": 4.680000000000001,
+          "drag": 6.771790840295853,
+          "lift": -6.02885597771016,
+          "pressure_difference": 7.50454623341512
+        },
+        {
+          "time": 4.69,
+          "drag": 6.771790840262778,
+          "lift": -6.028855977769328,
+          "pressure_difference": 7.5045462334105775
+        },
+        {
+          "time": 4.7,
+          "drag": 6.771790840231061,
+          "lift": -6.028855977826055,
+          "pressure_difference": 7.50454623340622
+        },
+        {
+          "time": 4.71,
+          "drag": 6.771790840200644,
+          "lift": -6.028855977880436,
+          "pressure_difference": 7.50454623340203
+        },
+        {
+          "time": 4.720000000000001,
+          "drag": 6.771790840171483,
+          "lift": -6.0288559779325706,
+          "pressure_difference": 7.504546233398019
+        },
+        {
+          "time": 4.73,
+          "drag": 6.7717908401435265,
+          "lift": -6.02885597798257,
+          "pressure_difference": 7.504546233394176
+        },
+        {
+          "time": 4.74,
+          "drag": 6.771790840116719,
+          "lift": -6.028855978030517,
+          "pressure_difference": 7.504546233390496
+        },
+        {
+          "time": 4.75,
+          "drag": 6.771790840091036,
+          "lift": -6.028855978076481,
+          "pressure_difference": 7.504546233386982
+        },
+        {
+          "time": 4.76,
+          "drag": 6.771790840066389,
+          "lift": -6.028855978120548,
+          "pressure_difference": 7.504546233383589
+        },
+        {
+          "time": 4.7700000000000005,
+          "drag": 6.771790840042763,
+          "lift": -6.028855978162798,
+          "pressure_difference": 7.50454623338034
+        },
+        {
+          "time": 4.78,
+          "drag": 6.771790840020116,
+          "lift": -6.028855978203323,
+          "pressure_difference": 7.504546233377237
+        },
+        {
+          "time": 4.79,
+          "drag": 6.771790839998389,
+          "lift": -6.028855978242153,
+          "pressure_difference": 7.504546233374246
+        },
+        {
+          "time": 4.8,
+          "drag": 6.771790839977562,
+          "lift": -6.02885597827941,
+          "pressure_difference": 7.50454623337138
+        },
+        {
+          "time": 4.8100000000000005,
+          "drag": 6.7717908399575855,
+          "lift": -6.028855978315103,
+          "pressure_difference": 7.504546233368629
+        },
+        {
+          "time": 4.82,
+          "drag": 6.771790839938439,
+          "lift": -6.028855978349344,
+          "pressure_difference": 7.5045462333659945
+        },
+        {
+          "time": 4.83,
+          "drag": 6.771790839920085,
+          "lift": -6.028855978382174,
+          "pressure_difference": 7.504546233363476
+        },
+        {
+          "time": 4.84,
+          "drag": 6.771790839902483,
+          "lift": -6.02885597841365,
+          "pressure_difference": 7.504546233361053
+        },
+        {
+          "time": 4.8500000000000005,
+          "drag": 6.771790839885616,
+          "lift": -6.028855978443827,
+          "pressure_difference": 7.504546233358745
+        },
+        {
+          "time": 4.86,
+          "drag": 6.771790839869429,
+          "lift": -6.0288559784727624,
+          "pressure_difference": 7.504546233356516
+        },
+        {
+          "time": 4.87,
+          "drag": 6.771790839853914,
+          "lift": -6.028855978500505,
+          "pressure_difference": 7.504546233354381
+        },
+        {
+          "time": 4.88,
+          "drag": 6.771790839839046,
+          "lift": -6.028855978527112,
+          "pressure_difference": 7.50454623335235
+        },
+        {
+          "time": 4.890000000000001,
+          "drag": 6.771790839824776,
+          "lift": -6.028855978552611,
+          "pressure_difference": 7.504546233350373
+        },
+        {
+          "time": 4.9,
+          "drag": 6.771790839811107,
+          "lift": -6.028855978577067,
+          "pressure_difference": 7.504546233348501
+        },
+        {
+          "time": 4.91,
+          "drag": 6.771790839797995,
+          "lift": -6.0288559786005145,
+          "pressure_difference": 7.504546233346698
+        },
+        {
+          "time": 4.92,
+          "drag": 6.771790839785422,
+          "lift": -6.028855978622986,
+          "pressure_difference": 7.504546233344964
+        },
+        {
+          "time": 4.930000000000001,
+          "drag": 6.771790839773378,
+          "lift": -6.028855978644561,
+          "pressure_difference": 7.504546233343316
+        },
+        {
+          "time": 4.94,
+          "drag": 6.77179083976181,
+          "lift": -6.028855978665206,
+          "pressure_difference": 7.5045462333417134
+        },
+        {
+          "time": 4.95,
+          "drag": 6.771790839750736,
+          "lift": -6.028855978685031,
+          "pressure_difference": 7.504546233340207
+        },
+        {
+          "time": 4.96,
+          "drag": 6.771790839740111,
+          "lift": -6.028855978704036,
+          "pressure_difference": 7.504546233338743
+        },
+        {
+          "time": 4.970000000000001,
+          "drag": 6.771790839729933,
+          "lift": -6.0288559787222695,
+          "pressure_difference": 7.504546233337354
+        },
+        {
+          "time": 4.98,
+          "drag": 6.771790839720169,
+          "lift": -6.028855978739729,
+          "pressure_difference": 7.504546233336013
+        },
+        {
+          "time": 4.99,
+          "drag": 6.7717908397108015,
+          "lift": -6.028855978756476,
+          "pressure_difference": 7.50454623333472
+        },
+        {
+          "time": 5.0,
+          "drag": 6.771790839701821,
+          "lift": -6.028855978772511,
+          "pressure_difference": 7.504546233333482
+        },
+        {
+          "time": 5.010000000000001,
+          "drag": 6.771790839693215,
+          "lift": -6.028855978787917,
+          "pressure_difference": 7.504546233332304
+        },
+        {
+          "time": 5.0200000000000005,
+          "drag": 6.7717908396849635,
+          "lift": -6.028855978802679,
+          "pressure_difference": 7.504546233331174
+        },
+        {
+          "time": 5.03,
+          "drag": 6.771790839677039,
+          "lift": -6.028855978816839,
+          "pressure_difference": 7.504546233330078
+        },
+        {
+          "time": 5.04,
+          "drag": 6.771790839669461,
+          "lift": -6.0288559788304115,
+          "pressure_difference": 7.504546233329043
+        },
+        {
+          "time": 5.05,
+          "drag": 6.771790839662192,
+          "lift": -6.02885597884343,
+          "pressure_difference": 7.504546233328046
+        },
+        {
+          "time": 5.0600000000000005,
+          "drag": 6.771790839655197,
+          "lift": -6.028855978855887,
+          "pressure_difference": 7.504546233327071
+        },
+        {
+          "time": 5.07,
+          "drag": 6.771790839648511,
+          "lift": -6.028855978867833,
+          "pressure_difference": 7.504546233326153
+        },
+        {
+          "time": 5.08,
+          "drag": 6.771790839642111,
+          "lift": -6.02885597887932,
+          "pressure_difference": 7.504546233325286
+        },
+        {
+          "time": 5.09,
+          "drag": 6.77179083963596,
+          "lift": -6.02885597889032,
+          "pressure_difference": 7.504546233324437
+        },
+        {
+          "time": 5.1000000000000005,
+          "drag": 6.771790839630062,
+          "lift": -6.02885597890087,
+          "pressure_difference": 7.5045462333236355
+        },
+        {
+          "time": 5.11,
+          "drag": 6.771790839624418,
+          "lift": -6.028855978910972,
+          "pressure_difference": 7.504546233322861
+        },
+        {
+          "time": 5.12,
+          "drag": 6.771790839618991,
+          "lift": -6.028855978920671,
+          "pressure_difference": 7.504546233322113
+        },
+        {
+          "time": 5.13,
+          "drag": 6.771790839613794,
+          "lift": -6.028855978929964,
+          "pressure_difference": 7.504546233321394
+        },
+        {
+          "time": 5.140000000000001,
+          "drag": 6.7717908396088,
+          "lift": -6.028855978938849,
+          "pressure_difference": 7.504546233320692
+        },
+        {
+          "time": 5.15,
+          "drag": 6.771790839604013,
+          "lift": -6.0288559789473855,
+          "pressure_difference": 7.504546233320026
+        },
+        {
+          "time": 5.16,
+          "drag": 6.77179083959946,
+          "lift": -6.028855978955599,
+          "pressure_difference": 7.5045462333194255
+        },
+        {
+          "time": 5.17,
+          "drag": 6.771790839595085,
+          "lift": -6.028855978963465,
+          "pressure_difference": 7.504546233318843
+        },
+        {
+          "time": 5.180000000000001,
+          "drag": 6.771790839590859,
+          "lift": -6.0288559789709835,
+          "pressure_difference": 7.504546233318246
+        },
+        {
+          "time": 5.19,
+          "drag": 6.771790839586794,
+          "lift": -6.028855978978178,
+          "pressure_difference": 7.504546233317658
+        },
+        {
+          "time": 5.2,
+          "drag": 6.771790839582959,
+          "lift": -6.028855978985149,
+          "pressure_difference": 7.504546233317173
+        },
+        {
+          "time": 5.21,
+          "drag": 6.771790839579261,
+          "lift": -6.028855978991792,
+          "pressure_difference": 7.504546233316681
+        },
+        {
+          "time": 5.220000000000001,
+          "drag": 6.77179083957566,
+          "lift": -6.028855978998107,
+          "pressure_difference": 7.504546233316134
+        },
+        {
+          "time": 5.23,
+          "drag": 6.771790839572281,
+          "lift": -6.028855979004253,
+          "pressure_difference": 7.504546233315715
+        },
+        {
+          "time": 5.24,
+          "drag": 6.771790839568979,
+          "lift": -6.028855979010054,
+          "pressure_difference": 7.504546233315219
+        },
+        {
+          "time": 5.25,
+          "drag": 6.7717908395658855,
+          "lift": -6.028855979015719,
+          "pressure_difference": 7.504546233314846
+        },
+        {
+          "time": 5.260000000000001,
+          "drag": 6.7717908395628434,
+          "lift": -6.028855979021067,
+          "pressure_difference": 7.504546233314391
+        },
+        {
+          "time": 5.2700000000000005,
+          "drag": 6.7717908395599755,
+          "lift": -6.02885597902624,
+          "pressure_difference": 7.5045462333140165
+        },
+        {
+          "time": 5.28,
+          "drag": 6.771790839557192,
+          "lift": -6.028855979031154,
+          "pressure_difference": 7.50454623331361
+        },
+        {
+          "time": 5.29,
+          "drag": 6.771790839554568,
+          "lift": -6.028855979035915,
+          "pressure_difference": 7.5045462333132775
+        },
+        {
+          "time": 5.3,
+          "drag": 6.771790839552,
+          "lift": -6.028855979040428,
+          "pressure_difference": 7.504546233312892
+        },
+        {
+          "time": 5.3100000000000005,
+          "drag": 6.771790839549602,
+          "lift": -6.028855979044844,
+          "pressure_difference": 7.50454623331261
+        },
+        {
+          "time": 5.32,
+          "drag": 6.7717908395472115,
+          "lift": -6.028855979048956,
+          "pressure_difference": 7.504546233312212
+        },
+        {
+          "time": 5.33,
+          "drag": 6.771790839545015,
+          "lift": -6.028855979053001,
+          "pressure_difference": 7.504546233311965
+        },
+        {
+          "time": 5.34,
+          "drag": 6.771790839542858,
+          "lift": -6.0288559790568375,
+          "pressure_difference": 7.504546233311659
+        },
+        {
+          "time": 5.3500000000000005,
+          "drag": 6.7717908395407695,
+          "lift": -6.028855979060503,
+          "pressure_difference": 7.504546233311343
+        },
+        {
+          "time": 5.36,
+          "drag": 6.771790839538849,
+          "lift": -6.028855979064089,
+          "pressure_difference": 7.504546233311139
+        },
+        {
+          "time": 5.37,
+          "drag": 6.771790839536922,
+          "lift": -6.028855979067434,
+          "pressure_difference": 7.50454623331084
+        },
+        {
+          "time": 5.38,
+          "drag": 6.771790839535101,
+          "lift": -6.028855979070667,
+          "pressure_difference": 7.504546233310574
+        },
+        {
+          "time": 5.390000000000001,
+          "drag": 6.771790839533396,
+          "lift": -6.028855979073817,
+          "pressure_difference": 7.50454623331038
+        },
+        {
+          "time": 5.4,
+          "drag": 6.771790839531723,
+          "lift": -6.028855979076796,
+          "pressure_difference": 7.504546233310144
+        },
+        {
+          "time": 5.41,
+          "drag": 6.77179083953007,
+          "lift": -6.028855979079594,
+          "pressure_difference": 7.50454623330986
+        },
+        {
+          "time": 5.42,
+          "drag": 6.7717908395285535,
+          "lift": -6.02885597908238,
+          "pressure_difference": 7.504546233309677
+        },
+        {
+          "time": 5.430000000000001,
+          "drag": 6.771790839527131,
+          "lift": -6.028855979085051,
+          "pressure_difference": 7.504546233309529
+        },
+        {
+          "time": 5.44,
+          "drag": 6.771790839525695,
+          "lift": -6.028855979087555,
+          "pressure_difference": 7.504546233309307
+        },
+        {
+          "time": 5.45,
+          "drag": 6.771790839524305,
+          "lift": -6.028855979089913,
+          "pressure_difference": 7.504546233309064
+        },
+        {
+          "time": 5.46,
+          "drag": 6.771790839523037,
+          "lift": -6.028855979092263,
+          "pressure_difference": 7.5045462333089255
+        },
+        {
+          "time": 5.470000000000001,
+          "drag": 6.77179083952182,
+          "lift": -6.0288559790945255,
+          "pressure_difference": 7.504546233308792
+        },
+        {
+          "time": 5.48,
+          "drag": 6.771790839520621,
+          "lift": -6.028855979096644,
+          "pressure_difference": 7.504546233308615
+        },
+        {
+          "time": 5.49,
+          "drag": 6.771790839519436,
+          "lift": -6.0288559790986325,
+          "pressure_difference": 7.504546233308405
+        },
+        {
+          "time": 5.5,
+          "drag": 6.771790839518337,
+          "lift": -6.028855979100573,
+          "pressure_difference": 7.504546233308245
+        },
+        {
+          "time": 5.510000000000001,
+          "drag": 6.771790839517316,
+          "lift": -6.02885597910249,
+          "pressure_difference": 7.504546233308137
+        },
+        {
+          "time": 5.5200000000000005,
+          "drag": 6.771790839516335,
+          "lift": -6.0288559791043435,
+          "pressure_difference": 7.504546233308043
+        },
+        {
+          "time": 5.53,
+          "drag": 6.771790839515376,
+          "lift": -6.028855979106067,
+          "pressure_difference": 7.504546233307918
+        },
+        {
+          "time": 5.54,
+          "drag": 6.77179083951442,
+          "lift": -6.028855979107688,
+          "pressure_difference": 7.504546233307746
+        },
+        {
+          "time": 5.55,
+          "drag": 6.771790839513488,
+          "lift": -6.028855979109209,
+          "pressure_difference": 7.504546233307563
+        },
+        {
+          "time": 5.5600000000000005,
+          "drag": 6.771790839512642,
+          "lift": -6.028855979110728,
+          "pressure_difference": 7.504546233307455
+        },
+        {
+          "time": 5.57,
+          "drag": 6.771790839511855,
+          "lift": -6.028855979112222,
+          "pressure_difference": 7.504546233307375
+        },
+        {
+          "time": 5.58,
+          "drag": 6.7717908395111,
+          "lift": -6.028855979113661,
+          "pressure_difference": 7.5045462333073
+        },
+        {
+          "time": 5.59,
+          "drag": 6.771790839510366,
+          "lift": -6.028855979115013,
+          "pressure_difference": 7.5045462333072255
+        },
+        {
+          "time": 5.6000000000000005,
+          "drag": 6.771790839509643,
+          "lift": -6.028855979116319,
+          "pressure_difference": 7.504546233307128
+        },
+        {
+          "time": 5.61,
+          "drag": 6.7717908395089115,
+          "lift": -6.028855979117484,
+          "pressure_difference": 7.504546233306975
+        },
+        {
+          "time": 5.62,
+          "drag": 6.771790839508213,
+          "lift": -6.028855979118626,
+          "pressure_difference": 7.504546233306833
+        },
+        {
+          "time": 5.63,
+          "drag": 6.771790839507581,
+          "lift": -6.0288559791197365,
+          "pressure_difference": 7.504546233306749
+        },
+        {
+          "time": 5.640000000000001,
+          "drag": 6.771790839506995,
+          "lift": -6.028855979120859,
+          "pressure_difference": 7.50454623330668
+        },
+        {
+          "time": 5.65,
+          "drag": 6.771790839506429,
+          "lift": -6.028855979121914,
+          "pressure_difference": 7.50454623330663
+        },
+        {
+          "time": 5.66,
+          "drag": 6.771790839505869,
+          "lift": -6.028855979122921,
+          "pressure_difference": 7.504546233306558
+        },
+        {
+          "time": 5.67,
+          "drag": 6.771790839505367,
+          "lift": -6.0288559791239145,
+          "pressure_difference": 7.5045462333065185
+        },
+        {
+          "time": 5.680000000000001,
+          "drag": 6.771790839504856,
+          "lift": -6.028855979124852,
+          "pressure_difference": 7.504546233306469
+        },
+        {
+          "time": 5.69,
+          "drag": 6.7717908395043755,
+          "lift": -6.028855979125734,
+          "pressure_difference": 7.504546233306401
+        },
+        {
+          "time": 5.7,
+          "drag": 6.771790839503884,
+          "lift": -6.028855979126578,
+          "pressure_difference": 7.5045462333063355
+        },
+        {
+          "time": 5.71,
+          "drag": 6.771790839503408,
+          "lift": -6.028855979127329,
+          "pressure_difference": 7.50454623330622
+        },
+        {
+          "time": 5.720000000000001,
+          "drag": 6.7717908395029225,
+          "lift": -6.028855979128074,
+          "pressure_difference": 7.504546233306106
+        },
+        {
+          "time": 5.73,
+          "drag": 6.771790839502505,
+          "lift": -6.028855979128771,
+          "pressure_difference": 7.504546233306025
+        },
+        {
+          "time": 5.74,
+          "drag": 6.7717908395021205,
+          "lift": -6.028855979129488,
+          "pressure_difference": 7.504546233305991
+        },
+        {
+          "time": 5.75,
+          "drag": 6.7717908395017385,
+          "lift": -6.028855979130219,
+          "pressure_difference": 7.504546233305948
+        },
+        {
+          "time": 5.760000000000001,
+          "drag": 6.771790839501391,
+          "lift": -6.028855979130868,
+          "pressure_difference": 7.504546233305902
+        },
+        {
+          "time": 5.7700000000000005,
+          "drag": 6.771790839501036,
+          "lift": -6.028855979131505,
+          "pressure_difference": 7.50454623330587
+        },
+        {
+          "time": 5.78,
+          "drag": 6.771790839500716,
+          "lift": -6.028855979132104,
+          "pressure_difference": 7.504546233305831
+        },
+        {
+          "time": 5.79,
+          "drag": 6.771790839500415,
+          "lift": -6.028855979132717,
+          "pressure_difference": 7.504546233305817
+        },
+        {
+          "time": 5.800000000000001,
+          "drag": 6.7717908395001,
+          "lift": -6.0288559791333025,
+          "pressure_difference": 7.504546233305772
+        },
+        {
+          "time": 5.8100000000000005,
+          "drag": 6.771790839499819,
+          "lift": -6.028855979133822,
+          "pressure_difference": 7.504546233305756
+        },
+        {
+          "time": 5.82,
+          "drag": 6.771790839499541,
+          "lift": -6.028855979134331,
+          "pressure_difference": 7.5045462333057245
+        },
+        {
+          "time": 5.83,
+          "drag": 6.7717908394992685,
+          "lift": -6.028855979134848,
+          "pressure_difference": 7.5045462333056925
+        },
+        {
+          "time": 5.84,
+          "drag": 6.771790839499017,
+          "lift": -6.02885597913537,
+          "pressure_difference": 7.504546233305687
+        },
+        {
+          "time": 5.8500000000000005,
+          "drag": 6.771790839498775,
+          "lift": -6.028855979135806,
+          "pressure_difference": 7.504546233305652
+        },
+        {
+          "time": 5.86,
+          "drag": 6.771790839498526,
+          "lift": -6.028855979136196,
+          "pressure_difference": 7.504546233305614
+        },
+        {
+          "time": 5.87,
+          "drag": 6.771790839498279,
+          "lift": -6.028855979136606,
+          "pressure_difference": 7.504546233305572
+        },
+        {
+          "time": 5.88,
+          "drag": 6.771790839498058,
+          "lift": -6.028855979136994,
+          "pressure_difference": 7.504546233305527
+        },
+        {
+          "time": 5.890000000000001,
+          "drag": 6.77179083949782,
+          "lift": -6.028855979137356,
+          "pressure_difference": 7.504546233305463
+        },
+        {
+          "time": 5.9,
+          "drag": 6.771790839497564,
+          "lift": -6.0288559791376555,
+          "pressure_difference": 7.50454623330536
+        },
+        {
+          "time": 5.91,
+          "drag": 6.771790839497351,
+          "lift": -6.028855979137973,
+          "pressure_difference": 7.504546233305309
+        },
+        {
+          "time": 5.92,
+          "drag": 6.771790839497161,
+          "lift": -6.028855979138334,
+          "pressure_difference": 7.504546233305286
+        },
+        {
+          "time": 5.930000000000001,
+          "drag": 6.7717908394969895,
+          "lift": -6.028855979138596,
+          "pressure_difference": 7.504546233305259
+        },
+        {
+          "time": 5.94,
+          "drag": 6.771790839496827,
+          "lift": -6.028855979138896,
+          "pressure_difference": 7.504546233305238
+        },
+        {
+          "time": 5.95,
+          "drag": 6.771790839496674,
+          "lift": -6.028855979139207,
+          "pressure_difference": 7.504546233305222
+        },
+        {
+          "time": 5.96,
+          "drag": 6.771790839496519,
+          "lift": -6.028855979139515,
+          "pressure_difference": 7.504546233305202
+        },
+        {
+          "time": 5.970000000000001,
+          "drag": 6.771790839496359,
+          "lift": -6.028855979139817,
+          "pressure_difference": 7.504546233305179
+        },
+        {
+          "time": 5.98,
+          "drag": 6.771790839496233,
+          "lift": -6.028855979140116,
+          "pressure_difference": 7.504546233305186
+        },
+        {
+          "time": 5.99,
+          "drag": 6.7717908394960835,
+          "lift": -6.028855979140355,
+          "pressure_difference": 7.504546233305158
+        },
+        {
+          "time": 6.0,
+          "drag": 6.771790839495961,
+          "lift": -6.028855979140569,
+          "pressure_difference": 7.5045462333051365
+        },
+        {
+          "time": 6.010000000000001,
+          "drag": 6.771790839495839,
+          "lift": -6.028855979140781,
+          "pressure_difference": 7.504546233305133
+        },
+        {
+          "time": 6.0200000000000005,
+          "drag": 6.771790839495719,
+          "lift": -6.0288559791409835,
+          "pressure_difference": 7.504546233305117
+        },
+        {
+          "time": 6.03,
+          "drag": 6.771790839495605,
+          "lift": -6.02885597914121,
+          "pressure_difference": 7.504546233305117
+        },
+        {
+          "time": 6.04,
+          "drag": 6.7717908394955,
+          "lift": -6.028855979141428,
+          "pressure_difference": 7.504546233305113
+        },
+        {
+          "time": 6.050000000000001,
+          "drag": 6.771790839495389,
+          "lift": -6.028855979141641,
+          "pressure_difference": 7.504546233305096
+        },
+        {
+          "time": 6.0600000000000005,
+          "drag": 6.771790839495299,
+          "lift": -6.028855979141864,
+          "pressure_difference": 7.504546233305108
+        },
+        {
+          "time": 6.07,
+          "drag": 6.771790839495191,
+          "lift": -6.0288559791420635,
+          "pressure_difference": 7.50454623330509
+        },
+        {
+          "time": 6.08,
+          "drag": 6.7717908394951,
+          "lift": -6.028855979142247,
+          "pressure_difference": 7.504546233305069
+        },
+        {
+          "time": 6.09,
+          "drag": 6.771790839495006,
+          "lift": -6.028855979142388,
+          "pressure_difference": 7.504546233305051
+        },
+        {
+          "time": 6.1000000000000005,
+          "drag": 6.771790839494921,
+          "lift": -6.02885597914254,
+          "pressure_difference": 7.504546233305044
+        },
+        {
+          "time": 6.11,
+          "drag": 6.771790839494836,
+          "lift": -6.02885597914269,
+          "pressure_difference": 7.504546233305035
+        },
+        {
+          "time": 6.12,
+          "drag": 6.771790839494742,
+          "lift": -6.028855979142832,
+          "pressure_difference": 7.504546233305005
+        },
+        {
+          "time": 6.13,
+          "drag": 6.771790839494668,
+          "lift": -6.028855979142965,
+          "pressure_difference": 7.504546233304993
+        },
+        {
+          "time": 6.140000000000001,
+          "drag": 6.771790839494597,
+          "lift": -6.0288559791431044,
+          "pressure_difference": 7.504546233304996
+        },
+        {
+          "time": 6.15,
+          "drag": 6.771790839494544,
+          "lift": -6.0288559791432625,
+          "pressure_difference": 7.5045462333050175
+        },
+        {
+          "time": 6.16,
+          "drag": 6.77179083949448,
+          "lift": -6.02885597914337,
+          "pressure_difference": 7.504546233305019
+        },
+        {
+          "time": 6.17,
+          "drag": 6.771790839494421,
+          "lift": -6.028855979143491,
+          "pressure_difference": 7.504546233305028
+        },
+        {
+          "time": 6.180000000000001,
+          "drag": 6.771790839494367,
+          "lift": -6.028855979143586,
+          "pressure_difference": 7.504546233305021
+        },
+        {
+          "time": 6.19,
+          "drag": 6.771790839494309,
+          "lift": -6.028855979143689,
+          "pressure_difference": 7.5045462333050175
+        },
+        {
+          "time": 6.2,
+          "drag": 6.771790839494242,
+          "lift": -6.028855979143782,
+          "pressure_difference": 7.5045462333050015
+        },
+        {
+          "time": 6.21,
+          "drag": 6.771790839494202,
+          "lift": -6.02885597914389,
+          "pressure_difference": 7.504546233305007
+        },
+        {
+          "time": 6.220000000000001,
+          "drag": 6.771790839494147,
+          "lift": -6.028855979143984,
+          "pressure_difference": 7.504546233304991
+        },
+        {
+          "time": 6.23,
+          "drag": 6.771790839494098,
+          "lift": -6.028855979144102,
+          "pressure_difference": 7.504546233304987
+        },
+        {
+          "time": 6.24,
+          "drag": 6.771790839494066,
+          "lift": -6.028855979144217,
+          "pressure_difference": 7.504546233305007
+        },
+        {
+          "time": 6.25,
+          "drag": 6.771790839494015,
+          "lift": -6.028855979144314,
+          "pressure_difference": 7.504546233304991
+        },
+        {
+          "time": 6.260000000000001,
+          "drag": 6.771790839493953,
+          "lift": -6.028855979144419,
+          "pressure_difference": 7.504546233304968
+        },
+        {
+          "time": 6.2700000000000005,
+          "drag": 6.771790839493899,
+          "lift": -6.028855979144474,
+          "pressure_difference": 7.504546233304939
+        },
+        {
+          "time": 6.28,
+          "drag": 6.771790839493859,
+          "lift": -6.028855979144528,
+          "pressure_difference": 7.504546233304929
+        },
+        {
+          "time": 6.29,
+          "drag": 6.771790839493824,
+          "lift": -6.028855979144628,
+          "pressure_difference": 7.504546233304943
+        },
+        {
+          "time": 6.300000000000001,
+          "drag": 6.771790839493768,
+          "lift": -6.028855979144685,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 6.3100000000000005,
+          "drag": 6.771790839493752,
+          "lift": -6.028855979144761,
+          "pressure_difference": 7.504546233304941
+        },
+        {
+          "time": 6.32,
+          "drag": 6.771790839493714,
+          "lift": -6.028855979144835,
+          "pressure_difference": 7.504546233304941
+        },
+        {
+          "time": 6.33,
+          "drag": 6.771790839493679,
+          "lift": -6.028855979144898,
+          "pressure_difference": 7.504546233304943
+        },
+        {
+          "time": 6.340000000000001,
+          "drag": 6.771790839493655,
+          "lift": -6.028855979144986,
+          "pressure_difference": 7.504546233304957
+        },
+        {
+          "time": 6.3500000000000005,
+          "drag": 6.771790839493621,
+          "lift": -6.02885597914502,
+          "pressure_difference": 7.504546233304943
+        },
+        {
+          "time": 6.36,
+          "drag": 6.771790839493588,
+          "lift": -6.028855979145087,
+          "pressure_difference": 7.504546233304941
+        },
+        {
+          "time": 6.37,
+          "drag": 6.771790839493552,
+          "lift": -6.028855979145114,
+          "pressure_difference": 7.504546233304932
+        },
+        {
+          "time": 6.38,
+          "drag": 6.771790839493539,
+          "lift": -6.0288559791451775,
+          "pressure_difference": 7.504546233304936
+        },
+        {
+          "time": 6.390000000000001,
+          "drag": 6.771790839493499,
+          "lift": -6.02885597914522,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 6.4,
+          "drag": 6.771790839493479,
+          "lift": -6.02885597914528,
+          "pressure_difference": 7.504546233304916
+        },
+        {
+          "time": 6.41,
+          "drag": 6.7717908394934465,
+          "lift": -6.028855979145298,
+          "pressure_difference": 7.504546233304895
+        },
+        {
+          "time": 6.42,
+          "drag": 6.771790839493434,
+          "lift": -6.028855979145355,
+          "pressure_difference": 7.504546233304902
+        },
+        {
+          "time": 6.430000000000001,
+          "drag": 6.771790839493408,
+          "lift": -6.028855979145382,
+          "pressure_difference": 7.504546233304888
+        },
+        {
+          "time": 6.44,
+          "drag": 6.771790839493388,
+          "lift": -6.028855979145424,
+          "pressure_difference": 7.504546233304884
+        },
+        {
+          "time": 6.45,
+          "drag": 6.771790839493354,
+          "lift": -6.028855979145449,
+          "pressure_difference": 7.504546233304868
+        },
+        {
+          "time": 6.46,
+          "drag": 6.77179083949335,
+          "lift": -6.028855979145489,
+          "pressure_difference": 7.504546233304881
+        },
+        {
+          "time": 6.470000000000001,
+          "drag": 6.771790839493332,
+          "lift": -6.028855979145504,
+          "pressure_difference": 7.504546233304874
+        },
+        {
+          "time": 6.48,
+          "drag": 6.771790839493324,
+          "lift": -6.0288559791455425,
+          "pressure_difference": 7.504546233304886
+        },
+        {
+          "time": 6.49,
+          "drag": 6.771790839493304,
+          "lift": -6.0288559791455665,
+          "pressure_difference": 7.504546233304877
+        },
+        {
+          "time": 6.5,
+          "drag": 6.7717908394932795,
+          "lift": -6.028855979145586,
+          "pressure_difference": 7.504546233304872
+        },
+        {
+          "time": 6.510000000000001,
+          "drag": 6.7717908394932795,
+          "lift": -6.028855979145626,
+          "pressure_difference": 7.50454623330489
+        },
+        {
+          "time": 6.5200000000000005,
+          "drag": 6.771790839493262,
+          "lift": -6.028855979145633,
+          "pressure_difference": 7.504546233304881
+        },
+        {
+          "time": 6.53,
+          "drag": 6.771790839493253,
+          "lift": -6.02885597914567,
+          "pressure_difference": 7.504546233304893
+        },
+        {
+          "time": 6.54,
+          "drag": 6.771790839493252,
+          "lift": -6.028855979145687,
+          "pressure_difference": 7.504546233304902
+        },
+        {
+          "time": 6.550000000000001,
+          "drag": 6.771790839493234,
+          "lift": -6.028855979145701,
+          "pressure_difference": 7.504546233304902
+        },
+        {
+          "time": 6.5600000000000005,
+          "drag": 6.771790839493233,
+          "lift": -6.028855979145722,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 6.57,
+          "drag": 6.771790839493219,
+          "lift": -6.028855979145746,
+          "pressure_difference": 7.504546233304918
+        },
+        {
+          "time": 6.58,
+          "drag": 6.77179083949321,
+          "lift": -6.028855979145754,
+          "pressure_difference": 7.504546233304925
+        },
+        {
+          "time": 6.590000000000001,
+          "drag": 6.7717908394931925,
+          "lift": -6.028855979145775,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 6.6000000000000005,
+          "drag": 6.7717908394931765,
+          "lift": -6.02885597914579,
+          "pressure_difference": 7.504546233304911
+        },
+        {
+          "time": 6.61,
+          "drag": 6.771790839493167,
+          "lift": -6.028855979145811,
+          "pressure_difference": 7.504546233304909
+        },
+        {
+          "time": 6.62,
+          "drag": 6.771790839493161,
+          "lift": -6.028855979145821,
+          "pressure_difference": 7.504546233304909
+        },
+        {
+          "time": 6.63,
+          "drag": 6.771790839493153,
+          "lift": -6.02885597914584,
+          "pressure_difference": 7.504546233304907
+        },
+        {
+          "time": 6.640000000000001,
+          "drag": 6.77179083949314,
+          "lift": -6.028855979145849,
+          "pressure_difference": 7.504546233304904
+        },
+        {
+          "time": 6.65,
+          "drag": 6.771790839493132,
+          "lift": -6.028855979145879,
+          "pressure_difference": 7.5045462333049
+        },
+        {
+          "time": 6.66,
+          "drag": 6.771790839493121,
+          "lift": -6.0288559791458605,
+          "pressure_difference": 7.504546233304895
+        },
+        {
+          "time": 6.67,
+          "drag": 6.771790839493124,
+          "lift": -6.028855979145878,
+          "pressure_difference": 7.504546233304902
+        },
+        {
+          "time": 6.680000000000001,
+          "drag": 6.771790839493113,
+          "lift": -6.028855979145889,
+          "pressure_difference": 7.504546233304897
+        },
+        {
+          "time": 6.69,
+          "drag": 6.771790839493117,
+          "lift": -6.028855979145915,
+          "pressure_difference": 7.504546233304904
+        },
+        {
+          "time": 6.7,
+          "drag": 6.77179083949311,
+          "lift": -6.028855979145904,
+          "pressure_difference": 7.504546233304904
+        },
+        {
+          "time": 6.71,
+          "drag": 6.77179083949311,
+          "lift": -6.028855979145917,
+          "pressure_difference": 7.504546233304907
+        },
+        {
+          "time": 6.720000000000001,
+          "drag": 6.771790839493091,
+          "lift": -6.0288559791459235,
+          "pressure_difference": 7.504546233304897
+        },
+        {
+          "time": 6.73,
+          "drag": 6.771790839493097,
+          "lift": -6.02885597914594,
+          "pressure_difference": 7.5045462333049056
+        },
+        {
+          "time": 6.74,
+          "drag": 6.771790839493091,
+          "lift": -6.028855979145944,
+          "pressure_difference": 7.504546233304902
+        },
+        {
+          "time": 6.75,
+          "drag": 6.771790839493086,
+          "lift": -6.028855979145951,
+          "pressure_difference": 7.5045462333048985
+        },
+        {
+          "time": 6.760000000000001,
+          "drag": 6.771790839493091,
+          "lift": -6.028855979145963,
+          "pressure_difference": 7.504546233304904
+        },
+        {
+          "time": 6.7700000000000005,
+          "drag": 6.771790839493079,
+          "lift": -6.028855979145968,
+          "pressure_difference": 7.504546233304904
+        },
+        {
+          "time": 6.78,
+          "drag": 6.7717908394930815,
+          "lift": -6.02885597914598,
+          "pressure_difference": 7.5045462333049056
+        },
+        {
+          "time": 6.79,
+          "drag": 6.77179083949307,
+          "lift": -6.028855979145972,
+          "pressure_difference": 7.504546233304902
+        },
+        {
+          "time": 6.800000000000001,
+          "drag": 6.771790839493073,
+          "lift": -6.028855979145998,
+          "pressure_difference": 7.504546233304907
+        },
+        {
+          "time": 6.8100000000000005,
+          "drag": 6.771790839493068,
+          "lift": -6.0288559791460035,
+          "pressure_difference": 7.5045462333049056
+        },
+        {
+          "time": 6.82,
+          "drag": 6.771790839493059,
+          "lift": -6.028855979146002,
+          "pressure_difference": 7.504546233304897
+        },
+        {
+          "time": 6.83,
+          "drag": 6.77179083949305,
+          "lift": -6.028855979146008,
+          "pressure_difference": 7.504546233304888
+        },
+        {
+          "time": 6.840000000000001,
+          "drag": 6.771790839493046,
+          "lift": -6.028855979146021,
+          "pressure_difference": 7.50454623330489
+        },
+        {
+          "time": 6.8500000000000005,
+          "drag": 6.771790839493053,
+          "lift": -6.028855979146035,
+          "pressure_difference": 7.504546233304904
+        },
+        {
+          "time": 6.86,
+          "drag": 6.771790839493043,
+          "lift": -6.028855979146037,
+          "pressure_difference": 7.504546233304897
+        },
+        {
+          "time": 6.87,
+          "drag": 6.771790839493047,
+          "lift": -6.028855979146051,
+          "pressure_difference": 7.504546233304904
+        },
+        {
+          "time": 6.88,
+          "drag": 6.771790839493042,
+          "lift": -6.028855979146037,
+          "pressure_difference": 7.504546233304897
+        },
+        {
+          "time": 6.890000000000001,
+          "drag": 6.771790839493042,
+          "lift": -6.028855979146044,
+          "pressure_difference": 7.5045462333049
+        },
+        {
+          "time": 6.9,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146044,
+          "pressure_difference": 7.504546233304897
+        },
+        {
+          "time": 6.91,
+          "drag": 6.771790839493034,
+          "lift": -6.028855979146046,
+          "pressure_difference": 7.504546233304895
+        },
+        {
+          "time": 6.92,
+          "drag": 6.771790839493034,
+          "lift": -6.028855979146059,
+          "pressure_difference": 7.504546233304897
+        },
+        {
+          "time": 6.930000000000001,
+          "drag": 6.771790839493034,
+          "lift": -6.028855979146059,
+          "pressure_difference": 7.504546233304895
+        },
+        {
+          "time": 6.94,
+          "drag": 6.771790839493031,
+          "lift": -6.028855979146059,
+          "pressure_difference": 7.504546233304891
+        },
+        {
+          "time": 6.95,
+          "drag": 6.771790839493031,
+          "lift": -6.028855979146061,
+          "pressure_difference": 7.504546233304895
+        },
+        {
+          "time": 6.96,
+          "drag": 6.771790839493035,
+          "lift": -6.02885597914607,
+          "pressure_difference": 7.5045462333049
+        },
+        {
+          "time": 6.970000000000001,
+          "drag": 6.771790839493033,
+          "lift": -6.028855979146065,
+          "pressure_difference": 7.5045462333048985
+        },
+        {
+          "time": 6.98,
+          "drag": 6.771790839493029,
+          "lift": -6.028855979146075,
+          "pressure_difference": 7.5045462333048985
+        },
+        {
+          "time": 6.99,
+          "drag": 6.77179083949302,
+          "lift": -6.0288559791460665,
+          "pressure_difference": 7.504546233304891
+        },
+        {
+          "time": 7.0,
+          "drag": 6.771790839493024,
+          "lift": -6.028855979146079,
+          "pressure_difference": 7.504546233304897
+        },
+        {
+          "time": 7.010000000000001,
+          "drag": 6.7717908394930175,
+          "lift": -6.028855979146077,
+          "pressure_difference": 7.504546233304895
+        },
+        {
+          "time": 7.0200000000000005,
+          "drag": 6.771790839493029,
+          "lift": -6.028855979146079,
+          "pressure_difference": 7.504546233304904
+        },
+        {
+          "time": 7.03,
+          "drag": 6.771790839493024,
+          "lift": -6.028855979146083,
+          "pressure_difference": 7.504546233304897
+        },
+        {
+          "time": 7.04,
+          "drag": 6.771790839493029,
+          "lift": -6.028855979146082,
+          "pressure_difference": 7.5045462333048985
+        },
+        {
+          "time": 7.050000000000001,
+          "drag": 6.771790839493029,
+          "lift": -6.028855979146082,
+          "pressure_difference": 7.504546233304897
+        },
+        {
+          "time": 7.0600000000000005,
+          "drag": 6.771790839493028,
+          "lift": -6.028855979146082,
+          "pressure_difference": 7.5045462333048985
+        },
+        {
+          "time": 7.07,
+          "drag": 6.771790839493034,
+          "lift": -6.028855979146086,
+          "pressure_difference": 7.5045462333049056
+        },
+        {
+          "time": 7.08,
+          "drag": 6.771790839493034,
+          "lift": -6.0288559791460905,
+          "pressure_difference": 7.504546233304907
+        },
+        {
+          "time": 7.090000000000001,
+          "drag": 6.77179083949303,
+          "lift": -6.028855979146084,
+          "pressure_difference": 7.504546233304904
+        },
+        {
+          "time": 7.1000000000000005,
+          "drag": 6.771790839493029,
+          "lift": -6.028855979146095,
+          "pressure_difference": 7.504546233304904
+        },
+        {
+          "time": 7.11,
+          "drag": 6.77179083949303,
+          "lift": -6.028855979146083,
+          "pressure_difference": 7.504546233304907
+        },
+        {
+          "time": 7.12,
+          "drag": 6.7717908394930255,
+          "lift": -6.028855979146088,
+          "pressure_difference": 7.5045462333049
+        },
+        {
+          "time": 7.130000000000001,
+          "drag": 6.771790839493029,
+          "lift": -6.028855979146086,
+          "pressure_difference": 7.5045462333048985
+        },
+        {
+          "time": 7.140000000000001,
+          "drag": 6.771790839493037,
+          "lift": -6.0288559791460905,
+          "pressure_difference": 7.504546233304909
+        },
+        {
+          "time": 7.15,
+          "drag": 6.7717908394930255,
+          "lift": -6.0288559791460825,
+          "pressure_difference": 7.504546233304895
+        },
+        {
+          "time": 7.16,
+          "drag": 6.77179083949303,
+          "lift": -6.028855979146079,
+          "pressure_difference": 7.504546233304902
+        },
+        {
+          "time": 7.17,
+          "drag": 6.771790839493026,
+          "lift": -6.028855979146079,
+          "pressure_difference": 7.504546233304897
+        },
+        {
+          "time": 7.180000000000001,
+          "drag": 6.771790839493029,
+          "lift": -6.028855979146079,
+          "pressure_difference": 7.5045462333049
+        },
+        {
+          "time": 7.19,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146086,
+          "pressure_difference": 7.504546233304907
+        },
+        {
+          "time": 7.2,
+          "drag": 6.771790839493033,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304902
+        },
+        {
+          "time": 7.21,
+          "drag": 6.771790839493037,
+          "lift": -6.028855979146089,
+          "pressure_difference": 7.504546233304907
+        },
+        {
+          "time": 7.220000000000001,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146097,
+          "pressure_difference": 7.504546233304918
+        },
+        {
+          "time": 7.23,
+          "drag": 6.771790839493034,
+          "lift": -6.0288559791460905,
+          "pressure_difference": 7.504546233304911
+        },
+        {
+          "time": 7.24,
+          "drag": 6.7717908394930335,
+          "lift": -6.028855979146083,
+          "pressure_difference": 7.504546233304909
+        },
+        {
+          "time": 7.25,
+          "drag": 6.7717908394930415,
+          "lift": -6.028855979146097,
+          "pressure_difference": 7.504546233304916
+        },
+        {
+          "time": 7.260000000000001,
+          "drag": 6.77179083949304,
+          "lift": -6.028855979146091,
+          "pressure_difference": 7.504546233304913
+        },
+        {
+          "time": 7.2700000000000005,
+          "drag": 6.77179083949304,
+          "lift": -6.028855979146089,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.28,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146091,
+          "pressure_difference": 7.504546233304913
+        },
+        {
+          "time": 7.29,
+          "drag": 6.7717908394930415,
+          "lift": -6.028855979146101,
+          "pressure_difference": 7.504546233304916
+        },
+        {
+          "time": 7.300000000000001,
+          "drag": 6.771790839493037,
+          "lift": -6.028855979146095,
+          "pressure_difference": 7.504546233304911
+        },
+        {
+          "time": 7.3100000000000005,
+          "drag": 6.7717908394930335,
+          "lift": -6.028855979146095,
+          "pressure_difference": 7.5045462333049056
+        },
+        {
+          "time": 7.32,
+          "drag": 6.77179083949303,
+          "lift": -6.0288559791461,
+          "pressure_difference": 7.504546233304909
+        },
+        {
+          "time": 7.33,
+          "drag": 6.7717908394930335,
+          "lift": -6.028855979146087,
+          "pressure_difference": 7.504546233304909
+        },
+        {
+          "time": 7.340000000000001,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146095,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.3500000000000005,
+          "drag": 6.7717908394930415,
+          "lift": -6.028855979146098,
+          "pressure_difference": 7.50454623330492
+        },
+        {
+          "time": 7.36,
+          "drag": 6.77179083949304,
+          "lift": -6.028855979146104,
+          "pressure_difference": 7.50454623330492
+        },
+        {
+          "time": 7.37,
+          "drag": 6.7717908394930415,
+          "lift": -6.028855979146091,
+          "pressure_difference": 7.504546233304913
+        },
+        {
+          "time": 7.380000000000001,
+          "drag": 6.7717908394930335,
+          "lift": -6.028855979146095,
+          "pressure_difference": 7.504546233304907
+        },
+        {
+          "time": 7.390000000000001,
+          "drag": 6.77179083949304,
+          "lift": -6.028855979146097,
+          "pressure_difference": 7.504546233304918
+        },
+        {
+          "time": 7.4,
+          "drag": 6.771790839493034,
+          "lift": -6.0288559791460905,
+          "pressure_difference": 7.504546233304909
+        },
+        {
+          "time": 7.41,
+          "drag": 6.771790839493033,
+          "lift": -6.028855979146095,
+          "pressure_difference": 7.504546233304909
+        },
+        {
+          "time": 7.42,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146099,
+          "pressure_difference": 7.504546233304913
+        },
+        {
+          "time": 7.430000000000001,
+          "drag": 6.77179083949304,
+          "lift": -6.028855979146097,
+          "pressure_difference": 7.504546233304918
+        },
+        {
+          "time": 7.44,
+          "drag": 6.77179083949304,
+          "lift": -6.028855979146101,
+          "pressure_difference": 7.504546233304916
+        },
+        {
+          "time": 7.45,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.46,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.470000000000001,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.48,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.49,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.5,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.510000000000001,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.5200000000000005,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.53,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.54,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.550000000000001,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.5600000000000005,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.57,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.58,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.590000000000001,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.6000000000000005,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.61,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.62,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.630000000000001,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.640000000000001,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.65,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.66,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.67,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.680000000000001,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.69,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.7,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.71,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.720000000000001,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.73,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.74,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.75,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.760000000000001,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.7700000000000005,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.78,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.79,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.800000000000001,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.8100000000000005,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.82,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.83,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.840000000000001,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.8500000000000005,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.86,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.87,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.880000000000001,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.890000000000001,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.9,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.91,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.920000000000001,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.930000000000001,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.94,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.95,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.96,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.970000000000001,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.98,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 7.99,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        },
+        {
+          "time": 8.0,
+          "drag": 6.771790839493038,
+          "lift": -6.028855979146092,
+          "pressure_difference": 7.504546233304914
+        }
+      ],
+      "statistics": {
+        "window": [
+          4.0,
+          8.0
+        ],
+        "sample_count": 401,
+        "mean_drag": 6.771790840326831,
+        "mean_lift": -6.028855977654911,
+        "lift_rms": 6.0288559776549135,
+        "lift_standard_deviation": 4.061082885875831e-09,
+        "mean_pressure_difference": 7.504546233419452,
+        "frequency": null,
+        "frequency_unavailable_reason": "insufficient complete upward-crossing periods",
+        "policy": {
+          "minimum_cycles": 2,
+          "minimum_samples_per_cycle": 8,
+          "maximum_relative_period_variation": 0.1,
+          "lift_amplitude_floor": 1e-10,
+          "max_samples": 401,
+          "max_work": 51328
+        },
+        "periodicity_certified": false
+      }
+    },
+    "error": null
+  },
+  "sources_changed_during_run": false,
+  "diagnostics": ""
+}

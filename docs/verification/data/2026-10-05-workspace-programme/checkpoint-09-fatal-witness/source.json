@@ -1,0 +1,20 @@
+{
+  "schema": "quest-matching-fatal-witness-source-v1",
+  "scope": "Test-only MPI fatal acceptance oracle. Production Rust/C++ and native QuEST unchanged.",
+  "historical_checkpoint_source_sha256": "83373206f9f5239a83d2737b20e14a9e0e2d9b90d8daae4c3ff65f0b1f45b228",
+  "files": [
+    {
+      "path": "crates/quest/src/qsvt/matching/collective/failure_tests.rs",
+      "bytes": 5562,
+      "sha256": "95df58605b3f35ab3f8cadb5d4250c2c74e463931ab91644db8749af43d74fb4"
+    }
+  ],
+  "source_delta": [
+    {
+      "path": "crates/quest/src/qsvt/matching/collective/failure_tests.rs",
+      "before_sha256": "9231d7a60ef93583e1799990c9b19ccc60ea338418541d5fdac55f21f0a56976",
+      "after_sha256": "95df58605b3f35ab3f8cadb5d4250c2c74e463931ab91644db8749af43d74fb4"
+    }
+  ],
+  "other_historical_files_unchanged": 974
+}

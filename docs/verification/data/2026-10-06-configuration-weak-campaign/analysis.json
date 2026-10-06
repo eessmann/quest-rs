@@ -1,0 +1,956 @@
+{
+  "schema": "quest-weak-campaign-saved-output-analysis-v1",
+  "scope": "Analysis of the seven saved outputs only; no physical child rerun. Revalidated original schema/stream hashes and rederived pair receipts.",
+  "counts": {
+    "completed": 3,
+    "sampling_rejected": 1,
+    "work_rejected": 3,
+    "timeout": 0,
+    "malformed": 0
+  },
+  "rows": [
+    {
+      "row_id": "p1-c3-e1-w1_2",
+      "status": "completed",
+      "phase": "complete",
+      "dimension": 7776,
+      "input_work": 32997376,
+      "source_work": 633420032,
+      "managed_peak_bytes": 8520776,
+      "physical_calls_attempted": 2107,
+      "physical_calls_planned": 2107,
+      "validated_rows": 7776,
+      "visited_rows": 1024,
+      "distinct_support_counts": [
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "input": {
+        "probability": 0.9999999999999988,
+        "coordinate_means": [
+          0.33333333333295756,
+          -0.3305622763802354,
+          0.3004337475078768,
+          0.33263135654547005,
+          -0.20873335123721481
+        ],
+        "coordinate_variances": [
+          2.5215053944863315e-13,
+          0.0018396925454265932,
+          0.020850674469485745,
+          0.00046749175383146107,
+          0.06754149919239283
+        ],
+        "mean_minus_continuum_center": [
+          0.18333333333295757,
+          -0.23056227638023538,
+          0.23043374750787682,
+          0.22263135654547006,
+          -0.1687333512372148
+        ],
+        "standard_deviations_per_spacing": [
+          7.532189016211851e-07,
+          0.06433745586522546,
+          0.21659643938980833,
+          0.03243233642710292,
+          0.3898312111451363
+        ],
+        "maximum_coefficient_probability": 0.024029705667874324,
+        "effective_coefficients": 51.264362951310574,
+        "outer_cell_occupation": 0.9687499999999996,
+        "zero_exterior_trace": true,
+        "supported_coefficients": 1024,
+        "ensemble_sha256": "d3d9cdc82d1b897bc6d1766b655c73b95c3e0ca975efdf0922445a5a0f302151"
+      },
+      "source_identity": "ea45a42dec15863d4174b91a8e57756e37d2a69ef76f5c21dd9d816320597de7",
+      "grid_sha256": "3bf2e7f2bc8c6384b6209323de0fd72d13fc71bbe70985575af5f354a4888ab1",
+      "grid_spacing_bits": 4604180019048437077,
+      "diagnostic": {
+        "source_identity": 11936425925803643088,
+        "time": 0.0,
+        "dimension": 7776,
+        "probability": 0.9999999999999988,
+        "probability_rate": -1.1119577481011333e-15,
+        "expectation": [
+          0.3333333333329577,
+          -0.3305622763802356,
+          0.30043374750787716,
+          0.3326313565454702,
+          -0.2087333512372149,
+          0.2777777777777796
+        ],
+        "raw_skew_rate": [
+          5.9221833166589535e-16,
+          -0.012081465415328499,
+          1.2143064331837664e-16,
+          -0.004907065728230375,
+          -0.021937301467821066,
+          3.325790164099289e-17
+        ],
+        "normalized_rate": [
+          9.62870914365856e-16,
+          -0.012081465415328866,
+          4.555002766508206e-16,
+          -0.004907065728230005,
+          -0.0219373014678213,
+          3.4213505389131016e-16
+        ],
+        "physical_rate": [
+          0.0,
+          0.5658992242160666,
+          0.0,
+          -0.909701134088484,
+          0.895550235831936,
+          -0.9898408764875858
+        ],
+        "absolute_defect": [
+          9.62870914365856e-16,
+          0.5779806896313955,
+          4.555002766508206e-16,
+          0.904794068360254,
+          0.9174875372997573,
+          0.9898408764875861
+        ],
+        "scaled_defect": [
+          9.62870914365856e-16,
+          0.5779806896313955,
+          4.555002766508206e-16,
+          0.904794068360254,
+          0.9174875372997573,
+          0.9898408764875861
+        ],
+        "zero_exterior_trace": true,
+        "outer_cell_occupation": 0.9687499999999996,
+        "coordinate_standard_deviations": [
+          5.021459344141234e-07,
+          0.04289163724348365,
+          0.14439762625987232,
+          0.02162155761806862,
+          0.25988747409675755
+        ],
+        "maximum_coefficient_probability": 0.024029705667874324,
+        "effective_coefficients": 51.264362951310574,
+        "nonlinear_mean_square": 0.14814814814814964,
+        "cartesian_energy_discrepancy": 1.5543122344752192e-15,
+        "chart_mass_residual": 6.661338147750939e-16,
+        "extraction_probe_error": 3.552713678800501e-15,
+        "convergence_certified": false
+      },
+      "coordinate_defect_norm": 1.4122667470513695,
+      "energy_absolute_defect": 0.9898408764875861,
+      "process_elapsed_seconds": 0.36560895000002347,
+      "child_elapsed_seconds": 0.33,
+      "peak_rss_kib": 4628
+    },
+    {
+      "row_id": "p1-c4-e1-w1_2",
+      "status": "completed",
+      "phase": "complete",
+      "dimension": 32768,
+      "input_work": 135397376,
+      "source_work": 838195456,
+      "managed_peak_bytes": 8521048,
+      "physical_calls_attempted": 2107,
+      "physical_calls_planned": 2107,
+      "validated_rows": 32768,
+      "visited_rows": 1024,
+      "distinct_support_counts": [
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "input": {
+        "probability": 1.0000000000000007,
+        "coordinate_means": [
+          0.07569332979755228,
+          -0.015056505482597309,
+          0.00176924951309899,
+          0.023588360344952215,
+          -8.284579725541271e-06
+        ],
+        "coordinate_variances": [
+          0.032117184722935024,
+          0.007301554383951166,
+          0.000881494512709894,
+          0.01123776942871283,
+          4.142221228509464e-06
+        ],
+        "mean_minus_continuum_center": [
+          -0.07430667020244772,
+          0.0849434945174027,
+          -0.06823075048690101,
+          -0.08641163965504778,
+          0.03999171542027446
+        ],
+        "standard_deviations_per_spacing": [
+          0.3584253602798498,
+          0.17089826662609736,
+          0.05937994653786391,
+          0.2120166920665713,
+          0.0040704895177408155
+        ],
+        "maximum_coefficient_probability": 0.024420058336874734,
+        "effective_coefficients": 50.61318737700851,
+        "outer_cell_occupation": 0.11266482599886893,
+        "zero_exterior_trace": true,
+        "supported_coefficients": 1024,
+        "ensemble_sha256": "e7e097a5eafc4f4e5dfe6db30ae7049f3900cf231b9a6ef542311bcdd2e5cdcc"
+      },
+      "source_identity": "ea45a42dec15863d4174b91a8e57756e37d2a69ef76f5c21dd9d816320597de7",
+      "grid_sha256": "a7de829d0075cf5fd6eaaa84e0bf14a57ad99ea08b08dca8fc33a22730f4b351",
+      "grid_spacing_bits": 4602678819172646912,
+      "diagnostic": {
+        "source_identity": 11936425925803643088,
+        "time": 0.0,
+        "dimension": 32768,
+        "probability": 1.0000000000000007,
+        "probability_rate": -2.7503159797347132e-17,
+        "expectation": [
+          0.0756933297975523,
+          -0.0150565054825973,
+          0.0017692495130989894,
+          0.023588360344952222,
+          -8.284579725541292e-06,
+          0.029028932429481506
+        ],
+        "raw_skew_rate": [
+          7.602120701607341e-18,
+          0.09741181003522373,
+          2.3462812638944105e-19,
+          -0.12084943021650382,
+          0.0046270104038335265,
+          -0.0557220626638904
+        ],
+        "normalized_rate": [
+          9.683926446622717e-18,
+          0.09741181003522373,
+          2.832880784695811e-19,
+          -0.12084943021650382,
+          0.0046270104038335265,
+          -0.0557220626638904
+        ],
+        "physical_rate": [
+          0.0,
+          0.03432765085198875,
+          0.0,
+          -0.05378106415815204,
+          -0.0032413479186160278,
+          -0.044073981552825985
+        ],
+        "absolute_defect": [
+          9.683926446622717e-18,
+          0.06308415918323498,
+          2.832880784695811e-19,
+          0.06706836605835179,
+          0.007868358322449554,
+          0.011648081111064412
+        ],
+        "scaled_defect": [
+          9.683926446622717e-18,
+          0.06308415918323498,
+          2.832880784695811e-19,
+          0.06706836605835179,
+          0.007868358322449554,
+          0.011648081111064412
+        ],
+        "zero_exterior_trace": true,
+        "outer_cell_occupation": 0.11266482599886893,
+        "coordinate_standard_deviations": [
+          0.1792126801399249,
+          0.08544913331304868,
+          0.029689973268931955,
+          0.10600834603328566,
+          0.0020352447588704078
+        ],
+        "maximum_coefficient_probability": 0.024420058336874734,
+        "effective_coefficients": 50.61318737700851,
+        "nonlinear_mean_square": 4.802347078967703e-07,
+        "cartesian_energy_discrepancy": 3.552713678800501e-15,
+        "chart_mass_residual": 6.661338147750939e-16,
+        "extraction_probe_error": 3.552713678800501e-15,
+        "convergence_certified": false
+      },
+      "coordinate_defect_norm": 0.09241043192347531,
+      "energy_absolute_defect": 0.011648081111064412,
+      "process_elapsed_seconds": 0.36545087799459,
+      "child_elapsed_seconds": 0.35,
+      "peak_rss_kib": 4940
+    },
+    {
+      "row_id": "p1-c5-e1-w1_2",
+      "status": "diagnostic-rejected",
+      "phase": "contraction admission",
+      "dimension": 100000,
+      "input_work": 410812416,
+      "source_work": 1942677760,
+      "managed_peak_bytes": 8521320,
+      "physical_calls_attempted": 58,
+      "physical_calls_planned": 4667,
+      "validated_rows": 100000,
+      "visited_rows": 0,
+      "distinct_support_counts": [
+        3,
+        2,
+        2,
+        3,
+        2
+      ],
+      "input": {
+        "probability": 0.9999999999999926,
+        "coordinate_means": [
+          0.14809795937085712,
+          -0.09566858500041998,
+          0.06534023300461869,
+          0.10611520523265033,
+          -0.03664047948208431
+        ],
+        "coordinate_variances": [
+          0.018123287842416687,
+          0.03084752184401799,
+          0.03573065395090261,
+          0.028739563218432622,
+          0.03865747526332323
+        ],
+        "mean_minus_continuum_center": [
+          -0.0019020406291428704,
+          0.004331414999580022,
+          -0.004659766995381315,
+          -0.003884794767349667,
+          0.0033595205179156942
+        ],
+        "standard_deviations_per_spacing": [
+          0.33655690308639374,
+          0.4390865649562878,
+          0.4725638445682669,
+          0.42381867598679956,
+          0.4915376083228729
+        ],
+        "maximum_coefficient_probability": 0.0060347342873701,
+        "effective_coefficients": 367.42428955861044,
+        "outer_cell_occupation": 8.795845660633331e-05,
+        "zero_exterior_trace": true,
+        "supported_coefficients": 2304,
+        "ensemble_sha256": "e79ed987736c2f70fa369ca031ba649b6111d43978a540fec6705c0ec19f372d"
+      },
+      "source_identity": "ea45a42dec15863d4174b91a8e57756e37d2a69ef76f5c21dd9d816320597de7",
+      "grid_sha256": "d4f8ed9dd3111f3ecb2fa2d9ac945f97b10ca8c05394234e788186179551780c",
+      "grid_spacing_bits": 4600877379321698714,
+      "diagnostic": null,
+      "coordinate_defect_norm": null,
+      "energy_absolute_defect": null,
+      "process_elapsed_seconds": 0.1651925760015729,
+      "child_elapsed_seconds": 0.12,
+      "peak_rss_kib": 5648
+    },
+    {
+      "row_id": "p2-c1-e1-w1_2",
+      "status": "sampling-rejected",
+      "phase": "sampling policy",
+      "dimension": 243,
+      "input_work": 2093056,
+      "source_work": null,
+      "managed_peak_bytes": 196608,
+      "physical_calls_attempted": 0,
+      "physical_calls_planned": 0,
+      "validated_rows": 0,
+      "visited_rows": 0,
+      "distinct_support_counts": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "input": null,
+      "source_identity": null,
+      "grid_sha256": "74545c7e3b7c39dd468e9eb23a806db7249ef30c67fe341a7066ccf64d232ca4",
+      "grid_spacing_bits": 4611686018427387904,
+      "diagnostic": null,
+      "coordinate_defect_norm": null,
+      "energy_absolute_defect": null,
+      "process_elapsed_seconds": 0.0047287369961850345,
+      "child_elapsed_seconds": 0.0,
+      "peak_rss_kib": 4072
+    },
+    {
+      "row_id": "p2-c3-e1-w1_2",
+      "status": "diagnostic-rejected",
+      "phase": "contraction admission",
+      "dimension": 59049,
+      "input_work": 243060736,
+      "source_work": 2272068448,
+      "managed_peak_bytes": 8521328,
+      "physical_calls_attempted": 58,
+      "physical_calls_planned": 6309,
+      "validated_rows": 59049,
+      "visited_rows": 0,
+      "distinct_support_counts": [
+        3,
+        3,
+        3,
+        3,
+        3
+      ],
+      "input": {
+        "probability": 1.0000000000000053,
+        "coordinate_means": [
+          0.10291453220559835,
+          -0.07874632968248815,
+          0.06086157346289871,
+          0.08376859546642006,
+          -0.03736838597569653
+        ],
+        "coordinate_variances": [
+          0.02371344312947472,
+          0.02026783191515715,
+          0.018804648623327817,
+          0.02096461527627394,
+          0.018495215978300682
+        ],
+        "mean_minus_continuum_center": [
+          -0.04708546779440165,
+          0.021253670317511852,
+          -0.009138426537101299,
+          -0.026231404533579944,
+          0.0026316140243034733
+        ],
+        "standard_deviations_per_spacing": [
+          0.4619750947456716,
+          0.42709540765081305,
+          0.4113901282359,
+          0.4343748812793683,
+          0.4079913526102067
+        ],
+        "maximum_coefficient_probability": 0.2579192068292025,
+        "effective_coefficients": 11.79364611100564,
+        "outer_cell_occupation": 0.4672206811878693,
+        "zero_exterior_trace": true,
+        "supported_coefficients": 3125,
+        "ensemble_sha256": "7550a8259fdd7188e20f08d442f4e51459259552960dfffda28b97d23c679f87"
+      },
+      "source_identity": "ea45a42dec15863d4174b91a8e57756e37d2a69ef76f5c21dd9d816320597de7",
+      "grid_sha256": "3730ded72812efa39659706a508b0028387366d68a27e5d14d60db66f615c327",
+      "grid_spacing_bits": 4604180019048437077,
+      "diagnostic": null,
+      "coordinate_defect_norm": null,
+      "energy_absolute_defect": null,
+      "process_elapsed_seconds": 0.11500062499544583,
+      "child_elapsed_seconds": 0.07,
+      "peak_rss_kib": 5364
+    },
+    {
+      "row_id": "p1-c5-e5_3-w1_2",
+      "status": "diagnostic-rejected",
+      "phase": "contraction admission",
+      "dimension": 100000,
+      "input_work": 410812416,
+      "source_work": 1389000960,
+      "managed_peak_bytes": 8521320,
+      "physical_calls_attempted": 58,
+      "physical_calls_planned": 2107,
+      "validated_rows": 100000,
+      "visited_rows": 0,
+      "distinct_support_counts": [
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "input": {
+        "probability": 0.9999999999999982,
+        "coordinate_means": [
+          0.33333333333295767,
+          -0.3305622763802354,
+          0.300433747507877,
+          0.3326313565454702,
+          -0.20873335123721481
+        ],
+        "coordinate_variances": [
+          2.521505394486856e-13,
+          0.0018396925454265973,
+          0.020850674469485846,
+          0.0004674917538314703,
+          0.0675414991923928
+        ],
+        "mean_minus_continuum_center": [
+          0.18333333333295768,
+          -0.23056227638023538,
+          0.23043374750787698,
+          0.22263135654547023,
+          -0.1687333512372148
+        ],
+        "standard_deviations_per_spacing": [
+          7.532189016212632e-07,
+          0.06433745586522552,
+          0.2165964393898088,
+          0.032432336427103234,
+          0.3898312111451361
+        ],
+        "maximum_coefficient_probability": 0.02402970566787433,
+        "effective_coefficients": 51.26436295131057,
+        "outer_cell_occupation": 0.0,
+        "zero_exterior_trace": true,
+        "supported_coefficients": 1024,
+        "ensemble_sha256": "a816427c7ce37db340eef7609b5d60783d079539bf2c8b6fb638bf85367272bd"
+      },
+      "source_identity": "ea45a42dec15863d4174b91a8e57756e37d2a69ef76f5c21dd9d816320597de7",
+      "grid_sha256": "7a00850cc6f75f83c65323ff4726eced4098270693a8b090decde5e2b8ccc952",
+      "grid_spacing_bits": 4604180019048437078,
+      "diagnostic": null,
+      "coordinate_defect_norm": null,
+      "energy_absolute_defect": null,
+      "process_elapsed_seconds": 0.1651067159982631,
+      "child_elapsed_seconds": 0.12,
+      "peak_rss_kib": 5348
+    },
+    {
+      "row_id": "p1-c3-e1-w3_5",
+      "status": "completed",
+      "phase": "complete",
+      "dimension": 7776,
+      "input_work": 32997376,
+      "source_work": 633420032,
+      "managed_peak_bytes": 8520776,
+      "physical_calls_attempted": 2107,
+      "physical_calls_planned": 2107,
+      "validated_rows": 7776,
+      "visited_rows": 1024,
+      "distinct_support_counts": [
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "input": {
+        "probability": 1.000000000000002,
+        "coordinate_means": [
+          0.3136155404328298,
+          -0.24071938893128478,
+          0.1756341949811306,
+          0.2595064873202343,
+          -0.10246524355872594
+        ],
+        "coordinate_variances": [
+          0.012756403910136055,
+          0.05316528690366006,
+          0.08026374066444233,
+          0.04376749414982494,
+          0.10061198497356243
+        ],
+        "mean_minus_continuum_center": [
+          0.1636155404328298,
+          -0.14071938893128477,
+          0.10563419498113058,
+          0.1495064873202343,
+          -0.06246524355872594
+        ],
+        "standard_deviations_per_spacing": [
+          0.1694163770059026,
+          0.34586398415162445,
+          0.4249628413108554,
+          0.31381023220587645,
+          0.4757908849384521
+        ],
+        "maximum_coefficient_probability": 0.011588875826189218,
+        "effective_coefficients": 158.9577529951991,
+        "outer_cell_occupation": 0.9687500000000001,
+        "zero_exterior_trace": true,
+        "supported_coefficients": 1024,
+        "ensemble_sha256": "2aaf517be6bb88adb7bc9d644dc729848a5340715f4e893599f966734734b7ed"
+      },
+      "source_identity": "ea45a42dec15863d4174b91a8e57756e37d2a69ef76f5c21dd9d816320597de7",
+      "grid_sha256": "3bf2e7f2bc8c6384b6209323de0fd72d13fc71bbe70985575af5f354a4888ab1",
+      "grid_spacing_bits": 4604180019048437077,
+      "diagnostic": {
+        "source_identity": 11936425925803643088,
+        "time": 0.0,
+        "dimension": 7776,
+        "probability": 1.000000000000002,
+        "probability_rate": 2.0296264668928643e-15,
+        "expectation": [
+          0.3136155404328294,
+          -0.24071938893128486,
+          0.17563419498113084,
+          0.25950648732023407,
+          -0.10246524355872626,
+          0.2777777777777771
+        ],
+        "raw_skew_rate": [
+          4.518954654919574e-16,
+          -0.025534226627721132,
+          3.287300986976043e-16,
+          -0.016231240716834076,
+          -0.02019521679015237,
+          4.987329993433311e-16
+        ],
+        "normalized_rate": [
+          -1.8462693579942115e-16,
+          -0.025534226627720643,
+          -2.7741711927520013e-17,
+          -0.016231240716834603,
+          -0.02019521679015216,
+          -6.505213034912879e-17
+        ],
+        "physical_rate": [
+          0.0,
+          0.47501284167831115,
+          0.0,
+          -0.6433978996794832,
+          0.42479593752110184,
+          -1.0046349413606066
+        ],
+        "absolute_defect": [
+          1.8462693579942115e-16,
+          0.5005470683060318,
+          2.7741711927520013e-17,
+          0.6271666589626487,
+          0.444991154311254,
+          1.0046349413606066
+        ],
+        "scaled_defect": [
+          1.8462693579942115e-16,
+          0.5005470683060318,
+          2.7741711927520013e-17,
+          0.6271666589626487,
+          0.444991154311254,
+          1.0
+        ],
+        "zero_exterior_trace": true,
+        "outer_cell_occupation": 0.9687500000000001,
+        "coordinate_standard_deviations": [
+          0.11294425133726843,
+          0.23057598943441618,
+          0.28330856087390366,
+          0.20920682147058453,
+          0.3171939232923015
+        ],
+        "maximum_coefficient_probability": 0.011588875826189218,
+        "effective_coefficients": 158.9577529951991,
+        "nonlinear_mean_square": 0.14814814814814867,
+        "cartesian_energy_discrepancy": 1.5543122344752192e-15,
+        "chart_mass_residual": 6.661338147750939e-16,
+        "extraction_probe_error": 3.552713678800501e-15,
+        "convergence_certified": false
+      },
+      "coordinate_defect_norm": 0.917552457965972,
+      "energy_absolute_defect": 1.0046349413606066,
+      "process_elapsed_seconds": 0.36556232899602037,
+      "child_elapsed_seconds": 0.33,
+      "peak_rss_kib": 4584
+    }
+  ],
+  "comparisons": [
+    {
+      "kind": "h-3-4",
+      "left": "p1-c3-e1-w1_2",
+      "right": "p1-c4-e1-w1_2",
+      "status": "finite-sensitivity-only",
+      "convergence_certified": false,
+      "sampled_inputs": {
+        "ensemble_sha256": [
+          "d3d9cdc82d1b897bc6d1766b655c73b95c3e0ca975efdf0922445a5a0f302151",
+          "e7e097a5eafc4f4e5dfe6db30ae7049f3900cf231b9a6ef542311bcdd2e5cdcc"
+        ],
+        "mean_bias_left": [
+          0.18333333333295757,
+          -0.23056227638023538,
+          0.23043374750787682,
+          0.22263135654547006,
+          -0.1687333512372148
+        ],
+        "mean_bias_right": [
+          -0.07430667020244772,
+          0.0849434945174027,
+          -0.06823075048690101,
+          -0.08641163965504778,
+          0.03999171542027446
+        ]
+      },
+      "metrics": [
+        {
+          "coordinate": 0,
+          "signed_defects": [
+            9.62870914365856e-16,
+            9.683926446622717e-18
+          ],
+          "generator_delta": -9.531869879192334e-16,
+          "physical_delta": 0.0,
+          "defect_delta": -9.531869879192334e-16,
+          "decomposition_roundoff": 0.0,
+          "reference_rate_resolved": false,
+          "defect_ratio": null
+        },
+        {
+          "coordinate": 1,
+          "signed_defects": [
+            -0.5779806896313955,
+            0.06308415918323498
+          ],
+          "generator_delta": 0.1094932754505526,
+          "physical_delta": -0.5315715733640779,
+          "defect_delta": 0.6410648488146304,
+          "decomposition_roundoff": 5.551115123125783e-17,
+          "reference_rate_resolved": true,
+          "defect_ratio": 0.10914579036103544
+        },
+        {
+          "coordinate": 2,
+          "signed_defects": [
+            4.555002766508206e-16,
+            2.832880784695811e-19
+          ],
+          "generator_delta": -4.55216988572351e-16,
+          "physical_delta": 0.0,
+          "defect_delta": -4.55216988572351e-16,
+          "decomposition_roundoff": 0.0,
+          "reference_rate_resolved": false,
+          "defect_ratio": null
+        },
+        {
+          "coordinate": 3,
+          "signed_defects": [
+            0.904794068360254,
+            -0.06706836605835179
+          ],
+          "generator_delta": -0.11594236448827382,
+          "physical_delta": 0.855920069930332,
+          "defect_delta": -0.9718624344186058,
+          "decomposition_roundoff": -4.163336342344337e-17,
+          "reference_rate_resolved": true,
+          "defect_ratio": 0.07412555895718777
+        },
+        {
+          "coordinate": 4,
+          "signed_defects": [
+            -0.9174875372997573,
+            0.007868358322449554
+          ],
+          "generator_delta": 0.026564311871654825,
+          "physical_delta": -0.8987915837505521,
+          "defect_delta": 0.9253558956222069,
+          "decomposition_roundoff": 6.938893903907228e-17,
+          "reference_rate_resolved": true,
+          "defect_ratio": 0.008575983871788375
+        },
+        {
+          "coordinate": "integrated_energy",
+          "signed_defects": [
+            0.9898408764875861,
+            -0.011648081111064412
+          ],
+          "generator_delta": -0.05572206266389074,
+          "physical_delta": 0.9457668949347598,
+          "defect_delta": -1.0014889575986505,
+          "decomposition_roundoff": -5.551115123125783e-17,
+          "reference_rate_resolved": true,
+          "defect_ratio": 0.011767629916837946
+        }
+      ],
+      "coordinate_reference_norms": [
+        1.3963553667418822,
+        0.0638850280686236
+      ],
+      "coordinate_reference_resolved": [
+        true,
+        true
+      ],
+      "energy_reference_resolved": [
+        true,
+        true
+      ],
+      "nonlinear_witness_resolved": [
+        true,
+        true
+      ]
+    },
+    {
+      "kind": "h-4-5",
+      "left": "p1-c4-e1-w1_2",
+      "right": "p1-c5-e1-w1_2",
+      "status": "unavailable",
+      "convergence_certified": false,
+      "sampled_inputs": {
+        "ensemble_sha256": [
+          "e7e097a5eafc4f4e5dfe6db30ae7049f3900cf231b9a6ef542311bcdd2e5cdcc",
+          "e79ed987736c2f70fa369ca031ba649b6111d43978a540fec6705c0ec19f372d"
+        ],
+        "mean_bias_left": [
+          -0.07430667020244772,
+          0.0849434945174027,
+          -0.06823075048690101,
+          -0.08641163965504778,
+          0.03999171542027446
+        ],
+        "mean_bias_right": [
+          -0.0019020406291428704,
+          0.004331414999580022,
+          -0.004659766995381315,
+          -0.003884794767349667,
+          0.0033595205179156942
+        ]
+      },
+      "reason": "rates require both completed requests"
+    },
+    {
+      "kind": "intended-fixed-spacing-domain",
+      "left": "p1-c3-e1-w1_2",
+      "right": "p1-c5-e5_3-w1_2",
+      "status": "unavailable",
+      "convergence_certified": false,
+      "sampled_inputs": {
+        "ensemble_sha256": [
+          "d3d9cdc82d1b897bc6d1766b655c73b95c3e0ca975efdf0922445a5a0f302151",
+          "a816427c7ce37db340eef7609b5d60783d079539bf2c8b6fb638bf85367272bd"
+        ],
+        "mean_bias_left": [
+          0.18333333333295757,
+          -0.23056227638023538,
+          0.23043374750787682,
+          0.22263135654547006,
+          -0.1687333512372148
+        ],
+        "mean_bias_right": [
+          0.18333333333295768,
+          -0.23056227638023538,
+          0.23043374750787698,
+          0.22263135654547023,
+          -0.1687333512372148
+        ]
+      },
+      "reason": "rates require both completed requests"
+    },
+    {
+      "kind": "width-sensitivity",
+      "left": "p1-c3-e1-w1_2",
+      "right": "p1-c3-e1-w3_5",
+      "status": "finite-sensitivity-only",
+      "convergence_certified": false,
+      "sampled_inputs": {
+        "ensemble_sha256": [
+          "d3d9cdc82d1b897bc6d1766b655c73b95c3e0ca975efdf0922445a5a0f302151",
+          "2aaf517be6bb88adb7bc9d644dc729848a5340715f4e893599f966734734b7ed"
+        ],
+        "mean_bias_left": [
+          0.18333333333295757,
+          -0.23056227638023538,
+          0.23043374750787682,
+          0.22263135654547006,
+          -0.1687333512372148
+        ],
+        "mean_bias_right": [
+          0.1636155404328298,
+          -0.14071938893128477,
+          0.10563419498113058,
+          0.1495064873202343,
+          -0.06246524355872594
+        ]
+      },
+      "metrics": [
+        {
+          "coordinate": 0,
+          "signed_defects": [
+            9.62870914365856e-16,
+            -1.8462693579942115e-16
+          ],
+          "generator_delta": -1.1474978501652772e-15,
+          "physical_delta": 0.0,
+          "defect_delta": -1.1474978501652772e-15,
+          "decomposition_roundoff": 0.0,
+          "reference_rate_resolved": false,
+          "defect_ratio": null
+        },
+        {
+          "coordinate": 1,
+          "signed_defects": [
+            -0.5779806896313955,
+            -0.5005470683060318
+          ],
+          "generator_delta": -0.013452761212391777,
+          "physical_delta": -0.0908863825377555,
+          "defect_delta": 0.07743362132536369,
+          "decomposition_roundoff": 2.949029909160572e-17,
+          "reference_rate_resolved": true,
+          "defect_ratio": 0.8660273211294539
+        },
+        {
+          "coordinate": 2,
+          "signed_defects": [
+            4.555002766508206e-16,
+            -2.7741711927520013e-17
+          ],
+          "generator_delta": -4.832419885783406e-16,
+          "physical_delta": 0.0,
+          "defect_delta": -4.832419885783406e-16,
+          "decomposition_roundoff": 0.0,
+          "reference_rate_resolved": false,
+          "defect_ratio": null
+        },
+        {
+          "coordinate": 3,
+          "signed_defects": [
+            0.904794068360254,
+            0.6271666589626487
+          ],
+          "generator_delta": -0.011324174988604597,
+          "physical_delta": 0.2663032344090007,
+          "defect_delta": -0.27762740939760533,
+          "decomposition_roundoff": 1.0408340855860843e-17,
+          "reference_rate_resolved": true,
+          "defect_ratio": 0.6931595607155717
+        },
+        {
+          "coordinate": 4,
+          "signed_defects": [
+            -0.9174875372997573,
+            -0.444991154311254
+          ],
+          "generator_delta": 0.0017420846776691375,
+          "physical_delta": -0.4707542983108342,
+          "defect_delta": 0.47249638298850327,
+          "decomposition_roundoff": 7.28583859910259e-17,
+          "reference_rate_resolved": true,
+          "defect_ratio": 0.48501057095652794
+        },
+        {
+          "coordinate": "integrated_energy",
+          "signed_defects": [
+            0.9898408764875861,
+            1.0046349413606066
+          ],
+          "generator_delta": -4.0718718424043895e-16,
+          "physical_delta": -0.014794064873020818,
+          "defect_delta": 0.014794064873020485,
+          "decomposition_roundoff": -7.412027685289198e-17,
+          "reference_rate_resolved": true,
+          "defect_ratio": 1.0149459021388536
+        }
+      ],
+      "coordinate_reference_norms": [
+        1.3963553667418822,
+        0.9055659255988525
+      ],
+      "coordinate_reference_resolved": [
+        true,
+        true
+      ],
+      "energy_reference_resolved": [
+        true,
+        true
+      ],
+      "nonlinear_witness_resolved": [
+        true,
+        true
+      ]
+    }
+  ],
+  "history_execution": false,
+  "quantum_execution": false,
+  "convergence_certified": false
+}

@@ -1,0 +1,431 @@
+{
+  "schema": "quest-cfd-resolved-nonlinear-box-higher-budget-v1",
+  "status": "completed",
+  "complete": true,
+  "separately_approved_budget": true,
+  "historical_fixed64MiB_rejection_preserved": "rejected.json",
+  "rank_trials": [
+    {
+      "ranks": 1,
+      "status": "completed_fixed_acceptance",
+      "science": {
+        "accuracy": {
+          "endpoint_signal_relative_lower": 0.0010705802564112412,
+          "generated_reference_matrix_difference_upper": 9.98946320399209e-16,
+          "inverse_error_relative_upper": 3.277937244506261e-08,
+          "inverse_relative_residual": 3.278914534296887e-08,
+          "observed_change_relative_lower": 0.0007571491489761896,
+          "reference_forward_allowance_upper": 3.768074114767363e-15,
+          "reference_relative_residual": 6.900887221344367e-16,
+          "reference_residual_norm_upper": 1.3638625697884315e-18,
+          "signal_relative_lower": 0.000757169540449309
+        },
+        "all_sector_forward_adjoint_roundtrip_passed": true,
+        "budgets": {
+          "bounded_reference_byte_cap": 134217728,
+          "bounded_reference_dimension_cap": 512,
+          "certificate_bytes_per_owner": 268435456,
+          "history_memory_cap_bytes": 1073741824,
+          "history_node_memory_cap_bytes": 2147483648,
+          "native_memory_cap_bytes": 67108864,
+          "os_address_space_bytes_per_rank": 3221225472,
+          "reference_modeled_peak_bytes": 3962208,
+          "source_memory_cap_bytes": 536870912,
+          "source_node_memory_cap_bytes": 1073741824
+        },
+        "completed_inverse_replays": 3,
+        "encoding": {
+          "alpha": 8.0,
+          "approximation_error_bound": 2.3769796259754337e-07,
+          "approximation_tolerance": 1e-06,
+          "degree": 449,
+          "execution_error_premise": null,
+          "physical_rescaling": 0.018118219855533184,
+          "projector_response_bound": 2.960774582083121e-14,
+          "qubits": 15,
+          "reciprocal_scale": 0.007517309741553294,
+          "spectral_lower": 0.5,
+          "spectral_upper": 1.15716229818343
+        },
+        "first_inverse_elapsed_seconds": 215.711759803,
+        "layout": {
+          "center": [
+            0.04,
+            -0.03,
+            0.02,
+            0.05,
+            -0.01
+          ],
+          "configuration_nodes": 243,
+          "configuration_order": 2,
+          "history_dimension": 486,
+          "horizon": 0.1,
+          "physical_coordinates": 5,
+          "temporal_order": 1,
+          "time_slabs": 1,
+          "width": 0.55
+        },
+        "measurement": {
+          "sampling_probability_lower_bound": null,
+          "success_probability_measured": 0.007233277405598698
+        },
+        "native_inverse_cumulative_seconds": 83.619452809,
+        "ranks": 1,
+        "rhs_initialization_seconds": 0.068274946,
+        "schema": "quest-cfd-resolved-nonlinear-box-v1",
+        "scope": {
+          "certified_total_quantum_error": false,
+          "complete_nonlinear_generator": true,
+          "configuration_boundary_resolved": false,
+          "empirical_native_separation": true,
+          "physical_convergence_established": false,
+          "resolved_discrete_nonlinear_response": true,
+          "same_physical_ensemble_across_rank_counts": false
+        },
+        "source": {
+          "actual_producer_source_drift_calls": 11016,
+          "additional_reference_source_drift_calls": 11016,
+          "local_spool_sha256": [
+            87,
+            161,
+            42,
+            110,
+            47,
+            73,
+            218,
+            27,
+            36,
+            91,
+            187,
+            90,
+            47,
+            73,
+            133,
+            176,
+            13,
+            215,
+            150,
+            253,
+            104,
+            191,
+            244,
+            233,
+            237,
+            38,
+            84,
+            144,
+            8,
+            153,
+            12,
+            237
+          ],
+          "modeled_source_node_peak_bytes": 145652,
+          "modeled_source_peak_bytes": 145652,
+          "recipe_metadata_sha256": [
+            194,
+            8,
+            172,
+            4,
+            0,
+            162,
+            13,
+            49,
+            225,
+            88,
+            19,
+            128,
+            175,
+            116,
+            152,
+            127,
+            235,
+            3,
+            20,
+            207,
+            14,
+            230,
+            63,
+            147,
+            201,
+            117,
+            143,
+            238,
+            129,
+            50,
+            174,
+            157
+          ],
+          "source_identity": "2a91e0f924a57c2f"
+        },
+        "three_replays_elapsed_seconds": 271.751711925,
+        "timings": {
+          "phase_synthesis_seconds": 0.032494167,
+          "projector_certification_seconds": 186.077803334,
+          "reciprocal_construction_seconds": 0.012339505,
+          "rhs_compilation_seconds": 0.000259851,
+          "streamed_preprocessing_seconds": 1.910613897
+        }
+      },
+      "rank_process_metrics": [
+        {
+          "completed": true,
+          "metrics": {
+            "current_rss_bytes": 236490752,
+            "hard_address_space_limit_bytes": 3221225472,
+            "peak_rss_bytes": 318713856,
+            "soft_address_space_limit_bytes": 3221225472,
+            "world_rank": "0"
+          },
+          "rank_trial_seconds": 274.552564702
+        }
+      ],
+      "external_process_metrics": [
+        {
+          "elapsed_seconds": 274.82,
+          "max_rss_bytes": 318713856,
+          "exit_code": 0
+        }
+      ],
+      "external_process_rank_association": "not independently assigned within the two-rank group",
+      "sum_individual_peak_rss_upper_bytes": 318713856,
+      "node_rss_scope": "sum of separate process peak RSS values; conservative bound, not simultaneous node RSS or shared-page measurement"
+    },
+    {
+      "ranks": 2,
+      "status": "completed_fixed_acceptance",
+      "science": {
+        "accuracy": {
+          "endpoint_signal_relative_lower": 0.002151542755957922,
+          "generated_reference_matrix_difference_upper": 1.1571988190074952e-15,
+          "inverse_error_relative_upper": 6.108231047071118e-08,
+          "inverse_relative_residual": 6.111003015693383e-08,
+          "observed_change_relative_lower": 0.0015215484075200558,
+          "reference_forward_allowance_upper": 3.8265773256085435e-15,
+          "reference_relative_residual": 5.467307247673511e-16,
+          "reference_residual_norm_upper": 1.1650795815907903e-18,
+          "signal_relative_lower": 0.0015215902462357982
+        },
+        "all_sector_forward_adjoint_roundtrip_passed": true,
+        "budgets": {
+          "bounded_reference_byte_cap": 134217728,
+          "bounded_reference_dimension_cap": 512,
+          "certificate_bytes_per_owner": 268435456,
+          "history_memory_cap_bytes": 1073741824,
+          "history_node_memory_cap_bytes": 2147483648,
+          "native_memory_cap_bytes": 67108864,
+          "os_address_space_bytes_per_rank": 3221225472,
+          "reference_modeled_peak_bytes": 3962208,
+          "source_memory_cap_bytes": 536870912,
+          "source_node_memory_cap_bytes": 1073741824
+        },
+        "completed_inverse_replays": 3,
+        "encoding": {
+          "alpha": 8.0,
+          "approximation_error_bound": 2.3769796259754337e-07,
+          "approximation_tolerance": 1e-06,
+          "degree": 449,
+          "execution_error_premise": null,
+          "physical_rescaling": 0.018118219855533184,
+          "projector_response_bound": 2.960774582083121e-14,
+          "qubits": 15,
+          "reciprocal_scale": 0.007517309741553294,
+          "spectral_lower": 0.5,
+          "spectral_upper": 1.1232825939489801
+        },
+        "first_inverse_elapsed_seconds": 262.915673048,
+        "layout": {
+          "center": [
+            0.04,
+            -0.03,
+            0.02,
+            0.05,
+            -0.01
+          ],
+          "configuration_nodes": 243,
+          "configuration_order": 2,
+          "history_dimension": 486,
+          "horizon": 0.1,
+          "physical_coordinates": 5,
+          "temporal_order": 1,
+          "time_slabs": 1,
+          "width": 0.55
+        },
+        "measurement": {
+          "sampling_probability_lower_bound": null,
+          "success_probability_measured": 0.007233289991843661
+        },
+        "native_inverse_cumulative_seconds": 90.300274569,
+        "ranks": 2,
+        "rhs_initialization_seconds": 0.044028339,
+        "schema": "quest-cfd-resolved-nonlinear-box-v1",
+        "scope": {
+          "certified_total_quantum_error": false,
+          "complete_nonlinear_generator": true,
+          "configuration_boundary_resolved": false,
+          "empirical_native_separation": true,
+          "physical_convergence_established": false,
+          "resolved_discrete_nonlinear_response": true,
+          "same_physical_ensemble_across_rank_counts": false
+        },
+        "source": {
+          "actual_producer_source_drift_calls": 11016,
+          "additional_reference_source_drift_calls": 11016,
+          "local_spool_sha256": [
+            177,
+            90,
+            244,
+            207,
+            5,
+            24,
+            67,
+            41,
+            110,
+            121,
+            98,
+            11,
+            34,
+            10,
+            177,
+            81,
+            43,
+            29,
+            133,
+            248,
+            7,
+            246,
+            139,
+            161,
+            183,
+            28,
+            179,
+            105,
+            127,
+            208,
+            72,
+            126
+          ],
+          "modeled_source_node_peak_bytes": 279256,
+          "modeled_source_peak_bytes": 139628,
+          "recipe_metadata_sha256": [
+            194,
+            8,
+            172,
+            4,
+            0,
+            162,
+            13,
+            49,
+            225,
+            88,
+            19,
+            128,
+            175,
+            116,
+            152,
+            127,
+            235,
+            3,
+            20,
+            207,
+            14,
+            230,
+            63,
+            147,
+            201,
+            117,
+            143,
+            238,
+            129,
+            50,
+            174,
+            157
+          ],
+          "source_identity": "464fef94caea7077"
+        },
+        "three_replays_elapsed_seconds": 320.76188797,
+        "timings": {
+          "phase_synthesis_seconds": 0.033228622,
+          "projector_certification_seconds": 227.501431634,
+          "reciprocal_construction_seconds": 0.012761638,
+          "rhs_compilation_seconds": 0.000459292,
+          "streamed_preprocessing_seconds": 2.831501125
+        }
+      },
+      "rank_process_metrics": [
+        {
+          "completed": true,
+          "metrics": {
+            "current_rss_bytes": 236781568,
+            "hard_address_space_limit_bytes": 3221225472,
+            "peak_rss_bytes": 318214144,
+            "soft_address_space_limit_bytes": 3221225472,
+            "world_rank": "0"
+          },
+          "rank_trial_seconds": 324.634669019
+        },
+        {
+          "completed": true,
+          "metrics": {
+            "current_rss_bytes": 236802048,
+            "hard_address_space_limit_bytes": 3221225472,
+            "peak_rss_bytes": 319246336,
+            "soft_address_space_limit_bytes": 3221225472,
+            "world_rank": "1"
+          },
+          "rank_trial_seconds": 324.634890621
+        }
+      ],
+      "external_process_metrics": [
+        {
+          "elapsed_seconds": 324.91,
+          "max_rss_bytes": 318214144,
+          "exit_code": 0
+        },
+        {
+          "elapsed_seconds": 324.91,
+          "max_rss_bytes": 319246336,
+          "exit_code": 0
+        }
+      ],
+      "external_process_rank_association": "not independently assigned within the two-rank group",
+      "sum_individual_peak_rss_upper_bytes": 637460480,
+      "node_rss_scope": "sum of separate process peak RSS values; conservative bound, not simultaneous node RSS or shared-page measurement"
+    }
+  ],
+  "source_identity": {
+    "build_manifest": "higher-budget-source.json",
+    "build_source_sha256": "14099492749b6777b259d7ae20672d5f4fa25eef9b51dce96bf6a4b0d842cd38",
+    "build_source_files": 685,
+    "before_after_build_source_identical": true,
+    "binary_sha256": "5b5709d688d799919ee3566bd17449fc459efbdcb6936569527a45acbde68998",
+    "copied_immutable_binary_used": true,
+    "installed_dependency_sha256": {
+      "libQuEST.so.4": "2128fd71d6effd5ae463f9f92ff467032f09089a07cdb9ba7a5d565719b95396",
+      "libmpi.so.12": "0df63252269108bde9fe3bd0765f3597a2db8534f2ba0475d2bb609028bacdb6"
+    },
+    "native_version": "QuEST4.3.0",
+    "mpi_abi": "MPICH4.2.2",
+    "owned_fixture_sha256": "bebd416f1e2487bb7cd75fd5e128734be881edff8087de84894b765713ae1046"
+  },
+  "launch_policy": {
+    "child_timeout_seconds": 600,
+    "one_rank_must_pass_before_two_rank": true,
+    "further_budget_relaxation_performed": false,
+    "phase_certificate_mandatory": true,
+    "per_rank_RLIMIT_AS_verified": true,
+    "OS_address_space_limit_bytes": 3221225472,
+    "OS_limit_sum_two_local_ranks_bytes": 6442450944,
+    "OS_node_RSS_or_cgroup_limit_enforced": false
+  },
+  "wrapper_exit_code": 0,
+  "primary_log_sha256": "41a16680c2f4c904c584f503993ca38c8a619dd386b77cce9e59b9faf35c1857",
+  "scope": {
+    "resolved_complete_coarse_discrete_nonlinear_inverse_signal": true,
+    "same_physical_ensemble_across_rank_counts": false,
+    "configuration_boundary_resolved": false,
+    "physical_convergence_established": false,
+    "certified_total_quantum_error": false,
+    "multihost_evidence": false,
+    "fault_tolerant_hardware_cost": null
+  }
+}

@@ -1,0 +1,1266 @@
+{
+  "schema": "quest-cfd-box-window-comparisons.v1",
+  "scope": "derived adjacent fixed-axis diagnostic differences, not spatial norms or convergence bounds",
+  "source_sha256": {
+    "initial-debug.json": "692cc2a82dde33a5908e384bd511060442e6a114b1547cdcb38ef71c5f59ba93",
+    "initial-debug-revalidated.json": "6aec520e926f1b462ae1adcb789f3b27aa9ed6c6379704df2514feea1f4488cb",
+    "higher-work-debug.json": "e6f50cabd9a65556c72173da5acdf065af554e10a023f2ba144d1197ea55bd4e",
+    "release.json": "05cae182751900894837ac948a7a824ffb34514e7be53165f40c7d1270a62b73",
+    "cavity-stability.json": "ab522526f8963207990deb7656186835cd9ddc0b880bf3d25a194f84dc028181"
+  },
+  "binary_sha256": "65e24fd6237d59a8d16cc6a6bfd8e301a016b1dbbf18cd4bb8861c71b4022af6",
+  "full_build_attestation": false,
+  "release_status_counts": {
+    "classical-window-executed": 42,
+    "rejected-failed-or-invalid": 6
+  },
+  "cavity_followup_status_counts": {
+    "classical-window-executed": 2
+  },
+  "release_total_child_seconds": 78.41276394899978,
+  "release_maximum_process_rss_kib": 10760,
+  "comparisons": [
+    {
+      "case": "tgv2d",
+      "reynolds": 100,
+      "horizon": 10,
+      "axis": "mesh",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 0,
+        "order": 1,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 1,
+        "order": 1,
+        "mesh": 2,
+        "dt": 0.01
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 0.0006442338105611275,
+        "mean_enstrophy": 0.000451630096628012,
+        "mean_gradient_dissipation": 3.079594075328481e-06,
+        "steady_residual_l2": 0.02733133004271838,
+        "analytic_velocity_error_l2": 0.0522805125254,
+        "analytic_pressure_error_l2": 0.0759109754821542
+      },
+      "maximum_centerline_velocity_component_change": null
+    },
+    {
+      "case": "tgv2d",
+      "reynolds": 100,
+      "horizon": 10,
+      "axis": "order",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 0,
+        "order": 1,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 3,
+        "order": 2,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 0.0006727577562871665,
+        "mean_enstrophy": 0.00033126470529464924,
+        "mean_gradient_dissipation": 1.4182584773823232e-06,
+        "steady_residual_l2": 0.020143276430585492,
+        "analytic_velocity_error_l2": 0.04794837498276472,
+        "analytic_pressure_error_l2": 0.10400913988775262
+      },
+      "maximum_centerline_velocity_component_change": null
+    },
+    {
+      "case": "tgv2d",
+      "reynolds": 100,
+      "horizon": 10,
+      "axis": "mesh",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 1,
+        "order": 1,
+        "mesh": 2,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 2,
+        "order": 1,
+        "mesh": 4,
+        "dt": 0.01
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 0.07242197215131356,
+        "mean_enstrophy": 0.16897587820363194,
+        "mean_gradient_dissipation": 0.0034141293021393653,
+        "steady_residual_l2": 0.04877521455161037,
+        "analytic_velocity_error_l2": 1.1522811086716382,
+        "analytic_pressure_error_l2": 0.01947407783546673
+      },
+      "maximum_centerline_velocity_component_change": null
+    },
+    {
+      "case": "tgv2d",
+      "reynolds": 100,
+      "horizon": 10,
+      "axis": "order",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 1,
+        "order": 1,
+        "mesh": 2,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 4,
+        "order": 2,
+        "mesh": 2,
+        "dt": 0.01
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 0.07971667679533949,
+        "mean_enstrophy": 0.16486758014784245,
+        "mean_gradient_dissipation": 0.0032830747677515533,
+        "steady_residual_l2": 0.02431222032398747,
+        "analytic_velocity_error_l2": 1.031005034950995,
+        "analytic_pressure_error_l2": 0.038515163458510804
+      },
+      "maximum_centerline_velocity_component_change": null
+    },
+    {
+      "case": "tgv2d",
+      "reynolds": 100,
+      "horizon": 10,
+      "axis": "dt",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 1,
+        "order": 1,
+        "mesh": 2,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 6,
+        "order": 1,
+        "mesh": 2,
+        "dt": 0.005
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 5.13581148095521e-15,
+        "mean_enstrophy": 7.259476952486185e-33,
+        "mean_gradient_dissipation": 2.791651187560723e-17,
+        "steady_residual_l2": 2.1687165951966847e-13,
+        "analytic_velocity_error_l2": 5.666578317686799e-13,
+        "analytic_pressure_error_l2": 0.0
+      },
+      "maximum_centerline_velocity_component_change": null
+    },
+    {
+      "case": "tgv2d",
+      "reynolds": 100,
+      "horizon": 10,
+      "axis": "order",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 2,
+        "order": 1,
+        "mesh": 4,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 5,
+        "order": 2,
+        "mesh": 4,
+        "dt": 0.01
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 0.06952426384734442,
+        "mean_enstrophy": 0.12322380613085102,
+        "mean_gradient_dissipation": 0.0024979923613108706,
+        "steady_residual_l2": 0.07494001746891936,
+        "analytic_velocity_error_l2": 1.7564621455295644,
+        "analytic_pressure_error_l2": 0.750740136002545
+      },
+      "maximum_centerline_velocity_component_change": null
+    },
+    {
+      "case": "tgv2d",
+      "reynolds": 100,
+      "horizon": 10,
+      "axis": "mesh",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 3,
+        "order": 2,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 4,
+        "order": 2,
+        "mesh": 2,
+        "dt": 0.01
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 0.07974520074106553,
+        "mean_enstrophy": 0.16474721475650908,
+        "mean_gradient_dissipation": 0.003281413432153607,
+        "steady_residual_l2": 0.017124166711854585,
+        "analytic_velocity_error_l2": 1.0266728974083597,
+        "analytic_pressure_error_l2": 0.010416999052912379
+      },
+      "maximum_centerline_velocity_component_change": null
+    },
+    {
+      "case": "tgv2d",
+      "reynolds": 100,
+      "horizon": 10,
+      "axis": "mesh",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 4,
+        "order": 2,
+        "mesh": 2,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 5,
+        "order": 2,
+        "mesh": 4,
+        "dt": 0.01
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 0.06222955920331849,
+        "mean_enstrophy": 0.1273321041866405,
+        "mean_gradient_dissipation": 0.0026290468956986827,
+        "steady_residual_l2": 0.09940301169654225,
+        "analytic_velocity_error_l2": 1.8777382192502077,
+        "analytic_pressure_error_l2": 0.769781221625589
+      },
+      "maximum_centerline_velocity_component_change": null
+    },
+    {
+      "case": "tgv2d",
+      "reynolds": 100,
+      "horizon": 10,
+      "axis": "dt",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 5,
+        "order": 2,
+        "mesh": 4,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 7,
+        "order": 2,
+        "mesh": 4,
+        "dt": 0.005
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 5.0558446318405e-12,
+        "mean_enstrophy": 7.039813176845655e-12,
+        "mean_gradient_dissipation": 1.2412206679135451e-13,
+        "steady_residual_l2": 3.298999962098037e-11,
+        "analytic_velocity_error_l2": 3.924174318825635e-10,
+        "analytic_pressure_error_l2": 3.020439454104462e-11
+      },
+      "maximum_centerline_velocity_component_change": null
+    },
+    {
+      "case": "tgv3d",
+      "reynolds": 100,
+      "horizon": 20,
+      "axis": "mesh",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 8,
+        "order": 1,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 9,
+        "order": 1,
+        "mesh": 2,
+        "dt": 0.01
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 6.202735758129446e-06,
+        "mean_enstrophy": 2.4582435095379724e-05,
+        "mean_gradient_dissipation": 6.598151438954693e-07,
+        "steady_residual_l2": 0.007304317437551971
+      },
+      "maximum_centerline_velocity_component_change": null
+    },
+    {
+      "case": "tgv3d",
+      "reynolds": 100,
+      "horizon": 20,
+      "axis": "order",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 8,
+        "order": 1,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 10,
+        "order": 2,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 1.0634509994274054e-05,
+        "mean_enstrophy": 2.659563235595419e-06,
+        "mean_gradient_dissipation": 7.86511257979725e-09,
+        "steady_residual_l2": 0.0008506084730104677
+      },
+      "maximum_centerline_velocity_component_change": null
+    },
+    {
+      "case": "tgv3d",
+      "reynolds": 100,
+      "horizon": 20,
+      "axis": "dt",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 8,
+        "order": 1,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 12,
+        "order": 1,
+        "mesh": 1,
+        "dt": 0.005
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 1.799097979968134e-18,
+        "mean_enstrophy": 6.098637220230962e-19,
+        "mean_gradient_dissipation": 2.1175823681357508e-20,
+        "steady_residual_l2": 1.7078352620991666e-15
+      },
+      "maximum_centerline_velocity_component_change": null
+    },
+    {
+      "case": "tgv3d",
+      "reynolds": 100,
+      "horizon": 20,
+      "axis": "dt",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 10,
+        "order": 2,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 13,
+        "order": 2,
+        "mesh": 1,
+        "dt": 0.005
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 1.3784614183616484e-17,
+        "mean_enstrophy": 2.187547289578956e-17,
+        "mean_gradient_dissipation": 4.890159432515491e-19,
+        "steady_residual_l2": 1.5493682725686853e-14
+      },
+      "maximum_centerline_velocity_component_change": null
+    },
+    {
+      "case": "tgv3d",
+      "reynolds": 100,
+      "horizon": 20,
+      "axis": "order",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 12,
+        "order": 1,
+        "mesh": 1,
+        "dt": 0.005
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 13,
+        "order": 2,
+        "mesh": 1,
+        "dt": 0.005
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 1.063450999428604e-05,
+        "mean_enstrophy": 2.6595632356166845e-06,
+        "mean_gradient_dissipation": 7.86511258026509e-09,
+        "steady_residual_l2": 0.0008506084730242535
+      },
+      "maximum_centerline_velocity_component_change": null
+    },
+    {
+      "case": "tgv3d",
+      "reynolds": 1600,
+      "horizon": 20,
+      "axis": "mesh",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 14,
+        "order": 1,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 15,
+        "order": 1,
+        "mesh": 2,
+        "dt": 0.01
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 0.005250366061405212,
+        "mean_enstrophy": 0.04586358621550009,
+        "mean_gradient_dissipation": 4.687093161268471e-05,
+        "steady_residual_l2": 0.240214257818803
+      },
+      "maximum_centerline_velocity_component_change": null
+    },
+    {
+      "case": "tgv3d",
+      "reynolds": 1600,
+      "horizon": 20,
+      "axis": "order",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 14,
+        "order": 1,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 16,
+        "order": 2,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 0.006424866753533601,
+        "mean_enstrophy": 0.019463662151261944,
+        "mean_gradient_dissipation": 2.589270767506068e-05,
+        "steady_residual_l2": 0.16904428585091774
+      },
+      "maximum_centerline_velocity_component_change": null
+    },
+    {
+      "case": "tgv3d",
+      "reynolds": 1600,
+      "horizon": 20,
+      "axis": "dt",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 14,
+        "order": 1,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 18,
+        "order": 1,
+        "mesh": 1,
+        "dt": 0.005
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 2.6020852139652106e-18,
+        "mean_enstrophy": 3.903127820947816e-18,
+        "mean_gradient_dissipation": 5.082197683525802e-21,
+        "steady_residual_l2": 6.938893903907228e-18
+      },
+      "maximum_centerline_velocity_component_change": null
+    },
+    {
+      "case": "tgv3d",
+      "reynolds": 1600,
+      "horizon": 20,
+      "axis": "dt",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 16,
+        "order": 2,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 19,
+        "order": 2,
+        "mesh": 1,
+        "dt": 0.005
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 2.9906632725840154e-15,
+        "mean_enstrophy": 5.672545766444159e-15,
+        "mean_gradient_dissipation": 7.785926851161529e-18,
+        "steady_residual_l2": 8.776313009661862e-14
+      },
+      "maximum_centerline_velocity_component_change": null
+    },
+    {
+      "case": "tgv3d",
+      "reynolds": 1600,
+      "horizon": 20,
+      "axis": "order",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 18,
+        "order": 1,
+        "mesh": 1,
+        "dt": 0.005
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 19,
+        "order": 2,
+        "mesh": 1,
+        "dt": 0.005
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 0.006424866753530613,
+        "mean_enstrophy": 0.019463662151256274,
+        "mean_gradient_dissipation": 2.58927076750529e-05,
+        "steady_residual_l2": 0.16904428585082998
+      },
+      "maximum_centerline_velocity_component_change": null
+    },
+    {
+      "case": "cavity2d",
+      "reynolds": 100,
+      "horizon": 100,
+      "axis": "mesh",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 20,
+        "order": 1,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 21,
+        "order": 1,
+        "mesh": 2,
+        "dt": 0.01
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 0.025406903345360502,
+        "mean_enstrophy": 1.2674956256500678,
+        "mean_gradient_dissipation": 0.02630035827655709,
+        "steady_residual_l2": 1.4023503192572562e-15
+      },
+      "maximum_centerline_velocity_component_change": 0.6092586079413485
+    },
+    {
+      "case": "cavity2d",
+      "reynolds": 100,
+      "horizon": 100,
+      "axis": "order",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 20,
+        "order": 1,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 23,
+        "order": 2,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 0.022007726496168847,
+        "mean_enstrophy": 1.4532262495608395,
+        "mean_gradient_dissipation": 0.028810093368110135,
+        "steady_residual_l2": 1.2786180736850428e-15
+      },
+      "maximum_centerline_velocity_component_change": 0.4941383794374923
+    },
+    {
+      "case": "cavity2d",
+      "reynolds": 100,
+      "horizon": 100,
+      "axis": "mesh",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 21,
+        "order": 1,
+        "mesh": 2,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 22,
+        "order": 1,
+        "mesh": 4,
+        "dt": 0.01
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 0.011315159404280118,
+        "mean_enstrophy": 1.8892087990449926,
+        "mean_gradient_dissipation": 0.03871942236305039,
+        "steady_residual_l2": 2.3832482332310833e-16
+      },
+      "maximum_centerline_velocity_component_change": 0.3814459855913519
+    },
+    {
+      "case": "cavity2d",
+      "reynolds": 100,
+      "horizon": 100,
+      "axis": "order",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 21,
+        "order": 1,
+        "mesh": 2,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 24,
+        "order": 2,
+        "mesh": 2,
+        "dt": 0.01
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 0.01586862349652487,
+        "mean_enstrophy": 2.58591607337058,
+        "mean_gradient_dissipation": 0.05039626366482295,
+        "steady_residual_l2": 3.566689789818546e-16
+      },
+      "maximum_centerline_velocity_component_change": 0.5493693142961189
+    },
+    {
+      "case": "cavity2d",
+      "reynolds": 100,
+      "horizon": 100,
+      "axis": "dt",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 21,
+        "order": 1,
+        "mesh": 2,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 26,
+        "order": 1,
+        "mesh": 2,
+        "dt": 0.005
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 5.551115123125783e-17,
+        "mean_enstrophy": 4.6629367034256575e-15,
+        "mean_gradient_dissipation": 9.367506770274758e-17,
+        "steady_residual_l2": 1.707331958608382e-15
+      },
+      "maximum_centerline_velocity_component_change": 6.661338147750939e-16
+    },
+    {
+      "case": "cavity2d",
+      "reynolds": 100,
+      "horizon": 100,
+      "axis": "mesh",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 23,
+        "order": 2,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 24,
+        "order": 2,
+        "mesh": 2,
+        "dt": 0.01
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 0.019267800345716526,
+        "mean_enstrophy": 2.4001854494598085,
+        "mean_gradient_dissipation": 0.0478865285732699,
+        "steady_residual_l2": 2.329367334096412e-16
+      },
+      "maximum_centerline_velocity_component_change": 0.584043796809801
+    },
+    {
+      "case": "cavity2d",
+      "reynolds": 1000,
+      "horizon": 100,
+      "axis": "mesh",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 28,
+        "order": 1,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 29,
+        "order": 1,
+        "mesh": 2,
+        "dt": 0.01
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 0.01403206994084443,
+        "mean_enstrophy": 0.4259664208234146,
+        "mean_gradient_dissipation": 0.001001178242272758,
+        "steady_residual_l2": 1.162163433248811e-15
+      },
+      "maximum_centerline_velocity_component_change": 0.4606316290420753
+    },
+    {
+      "case": "cavity2d",
+      "reynolds": 1000,
+      "horizon": 100,
+      "axis": "order",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 28,
+        "order": 1,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 31,
+        "order": 2,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 0.01501315676249437,
+        "mean_enstrophy": 0.7531181027324573,
+        "mean_gradient_dissipation": 0.001542476892131553,
+        "steady_residual_l2": 1.1965229953169856e-15
+      },
+      "maximum_centerline_velocity_component_change": 0.4070063809674706
+    },
+    {
+      "case": "cavity2d",
+      "reynolds": 1000,
+      "horizon": 100,
+      "axis": "mesh",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 29,
+        "order": 1,
+        "mesh": 2,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 30,
+        "order": 1,
+        "mesh": 4,
+        "dt": 0.01
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 0.024617204547019406,
+        "mean_enstrophy": 1.4501449857519475,
+        "mean_gradient_dissipation": 0.003069296796931342,
+        "steady_residual_l2": 3.0677085418426685e-09
+      },
+      "maximum_centerline_velocity_component_change": 0.35414314073490777
+    },
+    {
+      "case": "cavity2d",
+      "reynolds": 1000,
+      "horizon": 100,
+      "axis": "order",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 29,
+        "order": 1,
+        "mesh": 2,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 32,
+        "order": 2,
+        "mesh": 2,
+        "dt": 0.01
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 0.04523871139467528,
+        "mean_enstrophy": 2.7734076865601716,
+        "mean_gradient_dissipation": 0.0054156970879851935,
+        "steady_residual_l2": 7.334540801022953e-08
+      },
+      "maximum_centerline_velocity_component_change": 0.521313861780216
+    },
+    {
+      "case": "cavity2d",
+      "reynolds": 1000,
+      "horizon": 100,
+      "axis": "dt",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 29,
+        "order": 1,
+        "mesh": 2,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 34,
+        "order": 1,
+        "mesh": 2,
+        "dt": 0.005
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 2.636779683484747e-16,
+        "mean_enstrophy": 3.3306690738754696e-16,
+        "mean_gradient_dissipation": 3.903127820947816e-18,
+        "steady_residual_l2": 1.5676782019564383e-15
+      },
+      "maximum_centerline_velocity_component_change": 3.9621084191310274e-15
+    },
+    {
+      "case": "cavity2d",
+      "reynolds": 1000,
+      "horizon": 100,
+      "axis": "order",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 30,
+        "order": 1,
+        "mesh": 4,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 33,
+        "order": 2,
+        "mesh": 4,
+        "dt": 0.01
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 0.03584044849449541,
+        "mean_enstrophy": 4.7824772136653415,
+        "mean_gradient_dissipation": 0.008991807573470356,
+        "steady_residual_l2": 3.063984431443339e-07
+      },
+      "maximum_centerline_velocity_component_change": 0.299891970569599
+    },
+    {
+      "case": "cavity2d",
+      "reynolds": 1000,
+      "horizon": 100,
+      "axis": "mesh",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 31,
+        "order": 2,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 32,
+        "order": 2,
+        "mesh": 2,
+        "dt": 0.01
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 0.044257624573025345,
+        "mean_enstrophy": 2.446256004651129,
+        "mean_gradient_dissipation": 0.004874398438126398,
+        "steady_residual_l2": 7.334540797586997e-08
+      },
+      "maximum_centerline_velocity_component_change": 0.5222659849914966
+    },
+    {
+      "case": "cavity2d",
+      "reynolds": 1000,
+      "horizon": 100,
+      "axis": "mesh",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 32,
+        "order": 2,
+        "mesh": 2,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 33,
+        "order": 2,
+        "mesh": 4,
+        "dt": 0.01
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 0.015218941646839533,
+        "mean_enstrophy": 3.459214512857118,
+        "mean_gradient_dissipation": 0.006645407282416503,
+        "steady_residual_l2": 2.36120743675947e-07
+      },
+      "maximum_centerline_velocity_component_change": 0.4757373012932137
+    },
+    {
+      "case": "cavity2d",
+      "reynolds": 1000,
+      "horizon": 100,
+      "axis": "dt",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 33,
+        "order": 2,
+        "mesh": 4,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 35,
+        "order": 2,
+        "mesh": 4,
+        "dt": 0.005
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 2.8033131371785203e-14,
+        "mean_enstrophy": 8.180123245438153e-13,
+        "mean_gradient_dissipation": 1.5629858518551032e-15,
+        "steady_residual_l2": 1.2954918518484821e-14
+      },
+      "maximum_centerline_velocity_component_change": 2.2537527399890678e-13
+    },
+    {
+      "case": "cavity3d",
+      "reynolds": 100,
+      "horizon": 100,
+      "axis": "mesh",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 36,
+        "order": 1,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 37,
+        "order": 1,
+        "mesh": 2,
+        "dt": 0.01
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 0.01704438951770127,
+        "mean_enstrophy": 0.9180928566866864,
+        "mean_gradient_dissipation": 0.019048350957711183,
+        "steady_residual_l2": 3.494423687164021e-16
+      },
+      "maximum_centerline_velocity_component_change": 0.5554749578282623
+    },
+    {
+      "case": "cavity3d",
+      "reynolds": 100,
+      "horizon": 100,
+      "axis": "order",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 36,
+        "order": 1,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 38,
+        "order": 2,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 0.017574226494406625,
+        "mean_enstrophy": 1.2109811731679307,
+        "mean_gradient_dissipation": 0.024782008686103765,
+        "steady_residual_l2": 4.898940472202515e-16
+      },
+      "maximum_centerline_velocity_component_change": 0.6144837567815855
+    },
+    {
+      "case": "cavity3d",
+      "reynolds": 100,
+      "horizon": 100,
+      "axis": "dt",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 36,
+        "order": 1,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 40,
+        "order": 1,
+        "mesh": 1,
+        "dt": 0.005
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 9.540979117872439e-18,
+        "mean_enstrophy": 2.7755575615628914e-17,
+        "mean_gradient_dissipation": 9.75781955236954e-19,
+        "steady_residual_l2": 5.802606403365595e-16
+      },
+      "maximum_centerline_velocity_component_change": 1.942890293094024e-16
+    },
+    {
+      "case": "cavity3d",
+      "reynolds": 100,
+      "horizon": 100,
+      "axis": "dt",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 38,
+        "order": 2,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 41,
+        "order": 2,
+        "mesh": 1,
+        "dt": 0.005
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 5.204170427930421e-17,
+        "mean_enstrophy": 1.3322676295501878e-15,
+        "mean_gradient_dissipation": 4.5102810375396984e-17,
+        "steady_residual_l2": 1.7357723997618787e-15
+      },
+      "maximum_centerline_velocity_component_change": 6.661338147750939e-16
+    },
+    {
+      "case": "cavity3d",
+      "reynolds": 100,
+      "horizon": 100,
+      "axis": "order",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 40,
+        "order": 1,
+        "mesh": 1,
+        "dt": 0.005
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 41,
+        "order": 2,
+        "mesh": 1,
+        "dt": 0.005
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 0.017574226494406583,
+        "mean_enstrophy": 1.2109811731679294,
+        "mean_gradient_dissipation": 0.02478200868610372,
+        "steady_residual_l2": 1.6454058066455708e-15
+      },
+      "maximum_centerline_velocity_component_change": 0.6144837567815851
+    },
+    {
+      "case": "cavity3d",
+      "reynolds": 1000,
+      "horizon": 100,
+      "axis": "mesh",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 42,
+        "order": 1,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 43,
+        "order": 1,
+        "mesh": 2,
+        "dt": 0.01
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 0.010533751722940222,
+        "mean_enstrophy": 0.3839073711905263,
+        "mean_gradient_dissipation": 0.0008613083808115654,
+        "steady_residual_l2": 7.532879863311363e-16
+      },
+      "maximum_centerline_velocity_component_change": 0.4090291838246467
+    },
+    {
+      "case": "cavity3d",
+      "reynolds": 1000,
+      "horizon": 100,
+      "axis": "order",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 42,
+        "order": 1,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 44,
+        "order": 2,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 0.012229917670332366,
+        "mean_enstrophy": 0.6768500442444149,
+        "mean_gradient_dissipation": 0.0014184024673484419,
+        "steady_residual_l2": 6.3376770148229e-16
+      },
+      "maximum_centerline_velocity_component_change": 0.43897768452947733
+    },
+    {
+      "case": "cavity3d",
+      "reynolds": 1000,
+      "horizon": 100,
+      "axis": "dt",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 42,
+        "order": 1,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 46,
+        "order": 1,
+        "mesh": 1,
+        "dt": 0.005
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 5.984795992119984e-17,
+        "mean_enstrophy": 3.8163916471489756e-17,
+        "mean_gradient_dissipation": 8.199278929421627e-19,
+        "steady_residual_l2": 6.454991555218923e-16
+      },
+      "maximum_centerline_velocity_component_change": 1.4988010832439613e-15
+    },
+    {
+      "case": "cavity3d",
+      "reynolds": 1000,
+      "horizon": 100,
+      "axis": "dt",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 44,
+        "order": 2,
+        "mesh": 1,
+        "dt": 0.01
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 47,
+        "order": 2,
+        "mesh": 1,
+        "dt": 0.005
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 1.734723475976807e-18,
+        "mean_enstrophy": 8.881784197001252e-15,
+        "mean_gradient_dissipation": 1.6479873021779667e-17,
+        "steady_residual_l2": 1.3190365729215995e-15
+      },
+      "maximum_centerline_velocity_component_change": 3.3584246494910985e-15
+    },
+    {
+      "case": "cavity3d",
+      "reynolds": 1000,
+      "horizon": 100,
+      "axis": "order",
+      "from": {
+        "file": "release.json",
+        "experiment_index": 46,
+        "order": 1,
+        "mesh": 1,
+        "dt": 0.005
+      },
+      "to": {
+        "file": "release.json",
+        "experiment_index": 47,
+        "order": 2,
+        "mesh": 1,
+        "dt": 0.005
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 0.012229917670332303,
+        "mean_enstrophy": 0.6768500442444237,
+        "mean_gradient_dissipation": 0.0014184024673484575,
+        "steady_residual_l2": 1.3073051188819972e-15
+      },
+      "maximum_centerline_velocity_component_change": 0.43897768452948105
+    },
+    {
+      "case": "cavity2d",
+      "reynolds": 100,
+      "horizon": 100,
+      "axis": "dt",
+      "from": {
+        "file": "cavity-stability.json",
+        "experiment_index": 0,
+        "order": 2,
+        "mesh": 4,
+        "dt": 0.0025
+      },
+      "to": {
+        "file": "cavity-stability.json",
+        "experiment_index": 1,
+        "order": 2,
+        "mesh": 4,
+        "dt": 0.00125
+      },
+      "absolute_diagnostic_changes": {
+        "mean_kinetic_energy": 1.2212453270876722e-15,
+        "mean_enstrophy": 7.993605777301127e-15,
+        "mean_gradient_dissipation": 1.8041124150158794e-16,
+        "steady_residual_l2": 6.2350113491878914e-15
+      },
+      "maximum_centerline_velocity_component_change": 1.637578961322106e-14
+    }
+  ],
+  "quantum_execution": false,
+  "physical_benchmark_convergence_established": false,
+  "notes": [
+    "Actual process RLIMIT_AS512MiB and45s timeout per release/followup attempt.",
+    "Explicit higher-order2e12 modeled integration work per attempt; original lower default remains unchanged.",
+    "An initial validator expected nested higher-order data incorrectly. Original receipts remain unchanged; corrected revalidation changed one classification only.",
+    "Release and followup use the identical immutable optimized binary.",
+    "A steady residual and nearly equal temporal snapshots do not bound physical discretization error."
+  ]
+}

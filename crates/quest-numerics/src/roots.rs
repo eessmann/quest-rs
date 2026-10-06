@@ -85,11 +85,13 @@ fn checked_center<B: EnclosureBackend>(
 	let lo = b.lower(c)?;
 	let hi = b.upper(c)?;
 	if !b.same(&lo, &hi)? {
-		return Err(ArithmeticError::Domain("non-singleton center").into());
+		return Err(mathcore::arithmetic::ArithmeticError::Domain("non-singleton center").into());
 	}
 	let intersection = b.intersection(x, c)?;
 	if intersection.is_none() {
-		return Err(ArithmeticError::Domain("center outside interval").into());
+		return Err(
+			mathcore::arithmetic::ArithmeticError::Domain("center outside interval").into(),
+		);
 	}
 	Ok(())
 }
@@ -299,7 +301,7 @@ where
 	result
 		.unresolved
 		.try_reserve_exact(1)
-		.map_err(|_| ArithmeticError::Budget("root recovery allocation"))?;
+		.map_err(|_| mathcore::arithmetic::ArithmeticError::Budget("root recovery allocation"))?;
 	let admission = (|| -> Result<_, B::Error> {
 		b.validate(&input)?;
 		b.width_le(&input, tolerance)?;
@@ -329,7 +331,8 @@ where
 	}
 	let mut pending = Vec::new();
 	if pending.try_reserve_exact(1).is_err() {
-		result.failure = Some(ArithmeticError::Budget("root allocation").into());
+		result.failure =
+			Some(mathcore::arithmetic::ArithmeticError::Budget("root allocation").into());
 		result.unresolved.push(input);
 		return Ok(result);
 	}
@@ -475,20 +478,19 @@ where
 			}
 			pending
 				.try_reserve_exact(recovery_slots.saturating_sub(pending.len()))
-				.map_err(|_| ArithmeticError::Budget("root allocation"))?;
+				.map_err(|_| mathcore::arithmetic::ArithmeticError::Budget("root allocation"))?;
 			result
 				.covered
 				.try_reserve_exact(covered.len())
-				.map_err(|_| ArithmeticError::Budget("root allocation"))?;
+				.map_err(|_| mathcore::arithmetic::ArithmeticError::Budget("root allocation"))?;
 			result
 				.unresolved
 				.try_reserve_exact(unresolved.len())
-				.map_err(|_| ArithmeticError::Budget("root allocation"))?;
+				.map_err(|_| mathcore::arithmetic::ArithmeticError::Budget("root allocation"))?;
 			if excluded {
-				result
-					.excluded
-					.try_reserve_exact(1)
-					.map_err(|_| ArithmeticError::Budget("root allocation"))?;
+				result.excluded.try_reserve_exact(1).map_err(|_| {
+					mathcore::arithmetic::ArithmeticError::Budget("root allocation")
+				})?;
 			}
 			// Recheck actual capacities: allocation implementations may provide
 			// more than requested. Never commit a step beyond the byte budget.
@@ -569,7 +571,9 @@ where
 				.checked_add(N.checked_mul(8)?)?
 				.checked_add(32)
 		})
-		.ok_or(ArithmeticError::Budget("vector shape"))?;
+		.ok_or(mathcore::arithmetic::ArithmeticError::Budget(
+			"vector shape",
+		))?;
 	let mut scalar_bytes = b.working_scalar_bytes();
 	for x in input
 		.iter()
@@ -628,11 +632,10 @@ where
 	let zero = b.point(0.0)?;
 	let mut matrix = Vec::new();
 	matrix
-		.try_reserve_exact(
-			N.checked_mul(N)
-				.ok_or(ArithmeticError::Budget("matrix shape"))?,
-		)
-		.map_err(|_| ArithmeticError::Budget("matrix allocation"))?;
+		.try_reserve_exact(N.checked_mul(N).ok_or(
+			mathcore::arithmetic::ArithmeticError::Budget("matrix shape"),
+		)?)
+		.map_err(|_| mathcore::arithmetic::ArithmeticError::Budget("matrix allocation"))?;
 	let mut rhs = std::array::from_fn::<_, N, _>(|_| zero.clone());
 	for i in 0..N {
 		for k in 0..N {
@@ -680,12 +683,12 @@ where
 	let mut branches = Vec::new();
 	branches
 		.try_reserve_exact(limits.max_boxes)
-		.map_err(|_| ArithmeticError::Budget("vector branches"))?;
+		.map_err(|_| mathcore::arithmetic::ArithmeticError::Budget("vector branches"))?;
 	branches.push(displacement);
 	for i in 0..N {
 		let mut next = Vec::new();
 		next.try_reserve_exact(limits.max_boxes)
-			.map_err(|_| ArithmeticError::Budget("vector branches"))?;
+			.map_err(|_| mathcore::arithmetic::ArithmeticError::Budget("vector branches"))?;
 		for branch in &branches {
 			let mut residual = rhs[i].clone();
 			for k in 0..N {

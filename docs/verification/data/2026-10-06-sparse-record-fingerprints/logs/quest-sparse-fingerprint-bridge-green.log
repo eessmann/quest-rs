@@ -1,0 +1,25 @@
+warning: quest-sys@0.2.0: Using QuEST 4.3.0 from <quest-install> with /usr/bin/c++
+warning: quest-sys@0.2.0: Verified rsmpi MPICC <matching-mpicc> matches QuEST MPI ABI and loaded library
+warning: `feature(generic_const_exprs)` is not supported with the next-generation trait solver
+ --> crates/quest-polynomial/src/lib.rs:1:30
+  |
+1 | #![feature(const_trait_impl, generic_const_exprs)]
+  |                              ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `-Znext-solver=globally` is currently enabled by default for testing
+  = note: reverted the setting to `-Znext-solver=coherence` for this crate
+  = note: the currently stable trait solver will be used for this crate
+  = note: see issues #160895 <https://github.com/rust-lang/rust/issues/160895> for more information
+
+warning: `quest-polynomial` (lib) generated 1 warning
+   Compiling quest-qsvt v0.1.0 (<workspace>/crates/quest-qsvt)
+   Compiling quest-qsvt-io v0.1.0 (<workspace>/crates/quest-qsvt-io)
+   Compiling quest-rs v0.1.0 (<workspace>/crates/quest)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.15s
+     Running tests/matching_persisted_preparation.rs (target/debug/build/quest-rs/96cd17cb55abdf3f/out/matching_persisted_preparation-96cd17cb55abdf3f)
+
+running 1 test
+test consuming_persisted_preparation_admits_ownership_and_whole_unitary ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.99s
+

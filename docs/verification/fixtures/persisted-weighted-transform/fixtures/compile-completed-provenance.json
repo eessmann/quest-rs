@@ -1,0 +1,15 @@
+{
+  "schema": "quest-persisted-weighted-transform-compile-fixture-v1",
+  "scope": "exact saved attempt2 compile-child receipt; schema regression only, no inverse execution or identity certificate",
+  "file": "compile-completed.json",
+  "bytes": 11131,
+  "sha256": "e0a089496ede2f418afeae36329a88876dcd4e866ea780cb902533a875d5eee2",
+  "campaign_attempt": 2,
+  "campaign_status": "publish completed; compile child completed but driver rejected legitimate zero P1 transport field; five replays not-run",
+  "binary_sha256": "2bdc5ca75c018f9f5fe40b33d08050bb313f5b41b14901252ecaa4774426cf87",
+  "consumer_source_manifest_sha256": "fac76f206b3d7aca6e0b9c89e1b021c864084ed6c9724f617a35320d896ccdb1",
+  "capture_policy": "parent-owned bounded pipes; no imposed global filesystem quota",
+  "source_identity_status": "additive noncryptographic header collision under independent investigation; not evidence that distinct sources are equal",
+  "campaign_receipt_sha256": "e1d70846a4f0252cac1e3133a0137aef4f64d42b0e3fc19b882cdb9638dc0130",
+  "build_attestation_sha256": "402ffda301f248570d877eee8e30b38199ac805ca6c63d8888e7a5ad697891d9"
+}

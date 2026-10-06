@@ -536,6 +536,50 @@ impl Compiler {
 			span,
 		)
 	}
+	// Check skipped operands without executing their domain-sensitive arithmetic.
+	fn constant_type(&self, expression: &Expression) -> Result<ScalarType, SemanticError> {
+		match &expression.kind {
+			E::Number(text) => Ok(ScalarValue::parse_number(text)
+				.map_err(SemanticError::from)?
+				.ty()),
+			E::BitString(text) => Ok(ScalarValue::bitstring(text)
+				.map_err(SemanticError::from)?
+				.ty()),
+			E::Bool(_) => Ok(ScalarType::Bool),
+			E::Name(_) => Ok(self.const_eval(expression)?.ty()),
+			E::Unary(operator, value) => self
+				.constant_type(value)?
+				.unary_result(*operator)
+				.map_err(SemanticError::from),
+			E::Binary(operator, left, right) => self
+				.constant_type(left)?
+				.binary_result(*operator, self.constant_type(right)?)
+				.map_err(SemanticError::from),
+			E::Call(name, arguments) => {
+				let types = arguments
+					.iter()
+					.map(|arg| self.constant_type(arg))
+					.collect::<Result<Vec<_>, _>>()?;
+				ScalarType::function_result(name, &types).map_err(SemanticError::from)
+			}
+			E::Cast(ty, value) => {
+				let Type::Scalar(target) = self.resolve_type(ty)? else {
+					return Err(SemanticError::new(
+						ErrorKind::Type,
+						"scalar constant cast required",
+					));
+				};
+				if !self.constant_type(value)?.can_explicitly_cast_to(target) {
+					return Err(SemanticError::new(ErrorKind::Type, "invalid scalar cast"));
+				}
+				Ok(target)
+			}
+			_ => Err(SemanticError::new(
+				ErrorKind::Type,
+				"compile-time scalar constant required",
+			)),
+		}
+	}
 	pub fn const_eval(&self, expression: &Expression) -> Result<ScalarValue, SemanticError> {
 		match &expression.kind {
 			E::Number(text) => ScalarValue::parse_number(text).map_err(SemanticError::from),
@@ -567,10 +611,34 @@ impl Compiler {
 				.const_eval(value)?
 				.unary(*operator)
 				.map_err(SemanticError::from),
-			E::Binary(operator, left, right) => self
-				.const_eval(left)?
-				.binary(*operator, &self.const_eval(right)?)
-				.map_err(SemanticError::from),
+			E::Binary(operator, left, right) => {
+				let left = self.const_eval(left)?;
+				if matches!(
+					operator,
+					syntax::BinaryOperator::And | syntax::BinaryOperator::Or
+				) {
+					left.ty()
+						.binary_result(*operator, self.constant_type(right)?)
+						.map_err(SemanticError::from)?;
+					let operation = if *operator == syntax::BinaryOperator::And {
+						mathcore::scalar::BooleanOperation::And
+					} else {
+						mathcore::scalar::BooleanOperation::Or
+					};
+					let value = mathcore::scalar::boolean(
+						left.to_bool().map_err(SemanticError::from)?,
+						operation,
+						|| {
+							self.const_eval(right)?
+								.to_bool()
+								.map_err(SemanticError::from)
+						},
+					)?;
+					return Ok(ScalarValue::boolean(value));
+				}
+				left.binary(*operator, &self.const_eval(right)?)
+					.map_err(SemanticError::from)
+			}
 			E::Call(name, arguments) => {
 				let values = arguments
 					.iter()

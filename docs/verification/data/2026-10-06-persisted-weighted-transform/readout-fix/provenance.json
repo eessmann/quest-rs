@@ -1,0 +1,136 @@
+{
+  "schema": "persisted-weighted-readout-public-provenance-v1",
+  "publication_status": "private candidates only; root owns publication",
+  "normalization": "Text logs/reports replace absolute workspace/install/compiler and temporary paths with generic placeholders. Byte-identical numeric/source JSON copies are labeled individually. Original hashes remain separate.",
+  "scientific_payload_numbers_changed": false,
+  "new_tests_builds_or_scientific_jobs_during_preparation": 0,
+  "root_original_log_hash_verified": true,
+  "files": [
+    {
+      "path": "source.json",
+      "bytes": 456,
+      "sha256": "82be7c38a1cef657236bf428da0c791a93b4812d858e0139a86743837057517f",
+      "original_label": "persisted-readout-tag-fix-source.json",
+      "original_bytes": 456,
+      "original_sha256": "82be7c38a1cef657236bf428da0c791a93b4812d858e0139a86743837057517f",
+      "transformation": "byte-identical"
+    },
+    {
+      "path": "consumer-source.json",
+      "bytes": 3234,
+      "sha256": "dc69f1e3a848b6ebf368f6b0ac2a09e4573e5601cae0b06452ea38b352b8963c",
+      "original_label": "persisted-weighted-transform-consumer-source-readout-fix.json",
+      "original_bytes": 3234,
+      "original_sha256": "dc69f1e3a848b6ebf368f6b0ac2a09e4573e5601cae0b06452ea38b352b8963c",
+      "transformation": "byte-identical"
+    },
+    {
+      "path": "diagnosis.json",
+      "bytes": 2307,
+      "sha256": "00bdec375040da9f013e3043e7bfa8dc3707398261260394d70a233f3846eca4",
+      "original_label": "persisted-weighted-readout-tag-diagnosis.json",
+      "original_bytes": 2307,
+      "original_sha256": "00bdec375040da9f013e3043e7bfa8dc3707398261260394d70a233f3846eca4",
+      "transformation": "byte-identical"
+    },
+    {
+      "path": "diagnosis.md",
+      "bytes": 3835,
+      "sha256": "70b20e2f435d61f58e12eb25d411a88c522962a6ceae0f33a552904be5b80da1",
+      "original_label": "persisted-weighted-readout-tag-diagnosis.md",
+      "original_bytes": 3835,
+      "original_sha256": "70b20e2f435d61f58e12eb25d411a88c522962a6ceae0f33a552904be5b80da1",
+      "transformation": "byte-identical"
+    },
+    {
+      "path": "root-verification.json",
+      "bytes": 979,
+      "sha256": "102d404eb2c632a07dde35d36de2a91f9ffe43e067bfc76e8a0f4d8029eb9ca8",
+      "original_label": "persisted-readout-root-verification.json",
+      "original_bytes": 979,
+      "original_sha256": "102d404eb2c632a07dde35d36de2a91f9ffe43e067bfc76e8a0f4d8029eb9ca8",
+      "transformation": "byte-identical"
+    },
+    {
+      "path": "root-green.log",
+      "bytes": 2759,
+      "sha256": "130560eefc631c8ab70e794b9b2faed15396cad434905f98c996ec63acbda384",
+      "original_label": "quest-persisted-readout-root-green.log",
+      "original_bytes": 2858,
+      "original_sha256": "7612a8fc8e7a1f024bd6035204bae87b07ff2806fbef1c831a201c250eff7514",
+      "transformation": "generic path normalization only"
+    },
+    {
+      "path": "fixture-compile-failure.log",
+      "bytes": 1539,
+      "sha256": "38ef581c5f3150b5131f706dea063dd1b5735dc9080ea62eb77e0bf7fdf696d9",
+      "original_label": "quest-persisted-readout-tag-red.log",
+      "original_bytes": 1638,
+      "original_sha256": "dbcbd5e31f36b69c13875456f82bdb172efc95b912ba4b64c4b5327899eb8a53",
+      "transformation": "generic path normalization only"
+    },
+    {
+      "path": "behavior-red.log",
+      "bytes": 2003,
+      "sha256": "839226d479512a40190ed23e763d3c6caa77b2c1b030d8fcd134476826ca83e9",
+      "original_label": "quest-persisted-readout-tag-behavior-red.log",
+      "original_bytes": 2067,
+      "original_sha256": "957a5904de9d205db71fd07375dd7dbc5e604f1db6cb8fa3479b5007c42e3bf7",
+      "transformation": "generic path normalization only"
+    },
+    {
+      "path": "initial-clippy-failure.log",
+      "bytes": 2541,
+      "sha256": "c346587b9793dc07e09320e49ce7078d79f37f527fd01fc3be14bf21bf160fe0",
+      "original_label": "quest-persisted-readout-tag-clippy.log",
+      "original_bytes": 2710,
+      "original_sha256": "017373a3302d2c475ec5097f51bbdcbd190e4bb710202a4cd330652acd10f309",
+      "transformation": "generic path normalization only"
+    },
+    {
+      "path": "final-clippy.log",
+      "bytes": 953,
+      "sha256": "20ed5da04c95ea1ea54262ee3ccd81c2b762c06590c1bec959c30ea1448fa868",
+      "original_label": "quest-persisted-readout-tag-clippy-final.log",
+      "original_bytes": 1017,
+      "original_sha256": "18470176a6d9904cfe14202288ad7b0c8c7851b945dcaa6ff50b9d61c046c412",
+      "transformation": "generic path normalization only"
+    },
+    {
+      "path": "final-green.log",
+      "bytes": 1646,
+      "sha256": "1d97accc79cbdeab69d614666e6ed03133a6ef320a062d19c9e192ea456ae19a",
+      "original_label": "quest-persisted-readout-tag-final-green.log",
+      "original_bytes": 1710,
+      "original_sha256": "c388520d4573c6d407663597c67903fd9e569e2e8c1608fc8a9760c40b5b6c9a",
+      "transformation": "generic path normalization only"
+    },
+    {
+      "path": "focused.json",
+      "bytes": 4603,
+      "sha256": "4fcc6c1936b19fcf2cfd3a2be1a7b77ad5ba1c612f5db26c076a2ac0320017d7",
+      "original_label": "persisted-readout-tag-fix-focused.json",
+      "original_bytes": 2931,
+      "original_sha256": "88420ac417949b4e46d3279f2947eaa06f6523f1631c81424fed4684d039a314",
+      "transformation": "relative/generic artifact labels and added normalized-log provenance; original numeric fields unchanged"
+    },
+    {
+      "path": "report.md",
+      "bytes": 4917,
+      "sha256": "b133094cf1a4e89cdecdba08cd45a608eb1cb0b6143ffb3ec9ed2e4e29e6e2f5",
+      "original_label": "persisted-readout-tag-fix-report.md",
+      "original_bytes": 4955,
+      "original_sha256": "940e20d72ad8da4b5df8fbe2f7398b89a145483550a042874e01635da4abe904",
+      "transformation": "generic path and public manifest/receipt label normalization only"
+    },
+    {
+      "path": "README.md",
+      "bytes": 2148,
+      "sha256": "bf843e7a76f5dacde44de527854786b414d24dd40b36b5dd12dcc216f2c1664e",
+      "original_label": "README.md",
+      "original_bytes": 2148,
+      "original_sha256": "bf843e7a76f5dacde44de527854786b414d24dd40b36b5dd12dcc216f2c1664e",
+      "transformation": "byte-identical"
+    }
+  ]
+}

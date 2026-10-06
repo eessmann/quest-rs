@@ -1,0 +1,34 @@
+{
+  "schema": "quest-weak-shell-v2-execution-attestation-v1",
+  "scope": "Exactly one attempted p2-c2-e1-w1_2 child via reviewed runner; 512 MiB address-space, 180 seconds, 4 MiB captured-file caps. No retries or replacement. Child GNU time RSS is observational, not managed memory; unavailable timing remains unknown. No history or quantum execution.",
+  "command": [
+    "python3",
+    "-B",
+    "<workspace>/docs/verification/fixtures/quest-cfd/configuration_weak_energy_shell_v2.py",
+    "<private-artifacts>/quest-weak-shell-v2-binary-1",
+    "<private-artifacts>/quest-weak-shell-v2-execution-1"
+  ],
+  "status": "one-attempt-retained",
+  "before_sha256": "bf1a74ed21653419a7e4dd8df85be994d8009d00149b2997c68d05adbe6815e8",
+  "build_attestation_sha256": "efece0afe5cea98b1254e32af71759e485cbbe087ebe20ff9013581eeb6afc9b",
+  "owned_manifest_sha256": "8265d007d88ce0252a4c938339847ba080bcee5d06b1c8c9dea16b8952e182ef",
+  "binary_sha256": "727ea4196c7c03fb20332dba5f0caa8467e5e64cf3d5ba1ece06b3152267227d",
+  "reference_sha256": "14664ebc2b353933ef9dabd3e9768f64e4ba5edfa9b4a5d6731e1fc8351d7d76",
+  "runner_exit_code": 0,
+  "elapsed_seconds": 0.23556592000386445,
+  "runner_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "receipt_sha256": "b969804f27e37ca8e6d8e973e45940996fe21a1e2f541478d5b9a6a059134f19",
+  "rows_retained": 1,
+  "row_outcomes": [
+    {
+      "row_id": "p2-c2-e1-w1_2",
+      "process_status": "exited",
+      "validated": true,
+      "protocol_status": "completed"
+    }
+  ],
+  "runner_provenance_unchanged": true,
+  "after_sha256": "bf1a74ed21653419a7e4dd8df85be994d8009d00149b2997c68d05adbe6815e8",
+  "before_after_equal": true,
+  "source_changes": []
+}

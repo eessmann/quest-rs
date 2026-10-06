@@ -1,4 +1,6 @@
-//! Immutable numerical payloads. Numerical admission never grants exact-unitary semantics.
+//! Immutable numerical payloads with optional checked numerical unitary evidence.
+//!
+//! Numerical evidence never grants exact symbolic inverse or cancellation semantics.
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
 	#[error("invalid finite numerical value")]
@@ -102,6 +104,7 @@ pub struct NumericalOperator {
 	bytes: usize,
 	num_qubits: usize,
 	diagonal: bool,
+	unitary: Option<UnitaryEvidence>,
 }
 impl NumericalOperator {
 	pub(crate) fn storage_identity(&self) -> usize {
@@ -163,6 +166,7 @@ impl NumericalOperator {
 			matrix: Arc::new(matrix),
 			bytes,
 			num_qubits,
+			unitary: None,
 		})
 	}
 	#[must_use]
@@ -185,6 +189,52 @@ impl NumericalOperator {
 	#[must_use]
 	pub const fn is_diagonal(&self) -> bool {
 		self.diagonal
+	}
+
+	/// Validate this individual opaque operator, retaining the immutable matrix.
+	///
+	/// Work bounds conservatively count complex Gram products and reductions.
+	/// This does not grant exact symbolic inverse/cancellation privileges; derived
+	/// matrices must be admitted independently before using numerical unitary dispatch.
+	/// # Errors
+	/// Rejects invalid tolerance, exhausted work/storage, or excess Gram residual.
+	pub fn admit_unitary(
+		mut self,
+		tolerance: f64,
+		policy: MatrixPolicy,
+		max_work: usize,
+	) -> Result<Self> {
+		let dimension = self.dimension();
+		let square = dimension
+			.checked_mul(dimension)
+			.ok_or(Error::Budget("unitary work overflow"))?;
+		let work = square
+			.checked_mul(dimension)
+			.and_then(|n| n.checked_mul(2))
+			.and_then(|n| square.checked_mul(3).and_then(|extra| n.checked_add(extra)))
+			.ok_or(Error::Budget("unitary work overflow"))?;
+		if work > max_work {
+			return Err(Error::Budget("unitary validation work"));
+		}
+		let checked = self.check_unitary(tolerance, policy)?;
+		self.unitary = Some(UnitaryEvidence {
+			residual: checked.residual,
+			tolerance: checked.tolerance,
+		});
+		Ok(self)
+	}
+	/// Independent per-operator numerical evidence, never inferred from an enclosing oracle.
+	#[must_use]
+	pub const fn unitary_evidence(&self) -> Option<UnitaryEvidence> {
+		self.unitary
+	}
+	/// Versioned deterministic evidence identity. General storage uses a separate mode.
+	#[must_use]
+	pub const fn evidence_identity(&self) -> [u64; 3] {
+		match self.unitary {
+			None => [0, 0, 0],
+			Some(evidence) => [1, evidence.residual.to_bits(), evidence.tolerance.to_bits()],
+		}
 	}
 
 	/// Embed logical targets and signed controls into a larger ordered interface.
@@ -314,6 +364,24 @@ impl NumericalOperator {
 			residual,
 			tolerance,
 		})
+	}
+}
+
+/// Immutable provenance of bounded per-operator Gram/Frobenius validation.
+/// Only `NumericalOperator::admit_unitary` can attach this evidence to storage.
+#[derive(Debug, Clone, Copy)]
+pub struct UnitaryEvidence {
+	residual: f64,
+	tolerance: f64,
+}
+impl UnitaryEvidence {
+	#[must_use]
+	pub const fn residual(self) -> f64 {
+		self.residual
+	}
+	#[must_use]
+	pub const fn tolerance(self) -> f64 {
+		self.tolerance
 	}
 }
 

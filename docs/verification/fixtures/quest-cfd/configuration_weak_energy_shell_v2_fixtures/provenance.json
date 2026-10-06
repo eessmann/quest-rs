@@ -1,0 +1,19 @@
+{
+  "scope": "cfg(test)-only failure before grid allocation through the real additive producer/serializer; no physical diagnostic execution",
+  "schema": "quest-weak-energy-shell-v2-schema-fixture-v1",
+  "fixture_sha256": "3c201b05f048b525144e6bbffe1f2beda4d3ec284df5645a6f32175dd3106800",
+  "capture_log_sha256": "7171c37199d4e608b4ba742349db9e238a61e2d211e5a5e71389e69c823d1886",
+  "test_command": [
+    "cargo",
+    "test",
+    "-p",
+    "quest-cfd",
+    "--example",
+    "configuration_weak_energy_shell_v2",
+    "additive_grid_fault",
+    "--",
+    "--nocapture"
+  ],
+  "physical_source_constructed": false,
+  "grid_constructed": false
+}

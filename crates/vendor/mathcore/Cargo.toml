@@ -1,0 +1,22 @@
+[package]
+name = "quest-mathcore"
+version = "0.3.1-quest.2"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Maintained bounded exact algebra and shared ordered expression core"
+
+[lib]
+name = "mathcore"
+
+[dependencies]
+dashu-base.workspace = true
+dashu-int.workspace = true
+dashu-ratio.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+googletest.workspace = true
+
+[lints]
+workspace = true

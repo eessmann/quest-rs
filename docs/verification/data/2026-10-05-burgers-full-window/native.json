@@ -1,0 +1,138 @@
+{
+  "construction": {
+    "all_independent_coordinates_retained": true,
+    "case": "burgers",
+    "coefficient_evidence": {
+      "autonomous_linear_quadratic": true,
+      "forcing_norm_upper": 0.0,
+      "linear_norm_upper": 184.9367459430387,
+      "logarithmic_norm_upper": 5.329070518200751e-15,
+      "quadratic_norm_lower": 3.771236166328253,
+      "quadratic_norm_upper": 17.281975195754306,
+      "theorem_status": "coefficient bounds only; complete Carleman convergence hypotheses not certified"
+    },
+    "coefficient_extraction": {
+      "status": "MathCore exact polynomial forms with recorded quadrature coefficients"
+    },
+    "continuous_carleman_truncation_certificate": null,
+    "exact_zero_trajectory": false,
+    "explicit_scale_override": null,
+    "history_dimension": 176,
+    "history_nonzeros": 1332,
+    "horizon": 0.1,
+    "independent_coordinates": 8,
+    "lift": "carleman",
+    "lift_dimension": 44,
+    "lift_order": 2,
+    "normal_equations": false,
+    "physical_cells_1d": 4,
+    "physical_diagnostics": {
+      "manifest": {
+        "amplitude": 0.01,
+        "boundary": "zero Dirichlet, imposed through entropy-conservative boundary flux and SIP",
+        "cells": 4,
+        "domain": [
+          0.0,
+          1.0
+        ],
+        "horizon": 0.1,
+        "order": 1,
+        "temporal_cells": 2,
+        "temporal_order": 1,
+        "viscosity": 0.1
+      },
+      "physical_dimension": 8
+    },
+    "physical_order": 1,
+    "physical_scale": 0.008886099114058446,
+    "quantum_execution": false,
+    "representation": "all normalized symmetric monomials; degree zero is external forcing",
+    "scaling_evidence": {
+      "corrected_forcing_hypothesis": true,
+      "initial_norm": 0.004443049557029223,
+      "rc_upper": null,
+      "scale": 0.008886099114058446,
+      "status": "experimental full-coordinate scale; insufficient theorem evidence is not divergence"
+    },
+    "scaling_evidence_applies_to_override": true,
+    "spectral_bound_rejection": "case execution is unsupported: analytic temporal DG1 spectral bound unavailable: slab evidence and a finite representable causal inverse bound required",
+    "spectral_bounds": null,
+    "status": "construction-only",
+    "theorem_convergence_certified": false,
+    "time_cells": 2,
+    "time_order": 1,
+    "truncation_accuracy_established": false
+  },
+  "final_observables": {
+    "combined_inverse_degree_time_probability": 0.0003519161310767142,
+    "degree_one_and_final_time_probability_given_inverse": 0.1851061534673142,
+    "energy": 8.183660535329161e-06,
+    "final_time_selection_probability_given_inverse": 0.2234894157178121,
+    "history_inverse_success_probability": 0.0019011584676403264,
+    "imaginary_lift_norm": 1.748631588371592e-14,
+    "lift_chain_rule_truncation_defect": 0.002438813728323994,
+    "observable_recovery": "bounded full-state readout; sampling cost not certified",
+    "physical_coordinates": [
+      -1.588932257606415e-07,
+      0.0014210466180835037,
+      0.0014210889177954883,
+      0.0020226387368245395,
+      0.0020228907444623206,
+      0.0014396458965515444,
+      0.0014396940941601493,
+      1.6251691930966929e-07
+    ],
+    "physical_reconstruction_defect": 5.792552044282349e-08,
+    "physical_scale": 0.008886099114058446,
+    "solution_norm": 1.0581986907064134,
+    "truncation_accuracy_established": false
+  },
+  "physical_convergence_established": false,
+  "reference_spectrum": {
+    "history_dimension": 176,
+    "inverse_candidate_norm_upper": 4.704750188529219,
+    "modeled_peak_bytes": 1061232,
+    "modeled_work": 357406720,
+    "residual_norm_upper": 1.1988054789461291e-14,
+    "seconds": 0.453511343,
+    "spectral_lower": 0.2125511366019211,
+    "spectral_upper": 8.114704934678985,
+    "status": "bounded classical spectral certificate for the stored history; no quantum execution",
+    "temporal_order": 1
+  },
+  "solve": {
+    "alpha": 48.959999999999994,
+    "approximation_error_bound": 6.544541315640317e-08,
+    "backend": "QuEST CPU execution of the complete matching QSVT unitary",
+    "conversion_roundoff_estimate": 1.3986057012068527e-11,
+    "history_dimension": 176,
+    "physical_rescaling": 24.269345298064977,
+    "polynomial_degree": 7555,
+    "projector_response_bound": null,
+    "qubits": 14,
+    "reciprocal_scale": 0.00047046307295205516,
+    "relative_residual": 1.617782466050946e-07,
+    "residual_tolerance": 0.01,
+    "retained_physical_coordinates": 8,
+    "rhs_norm": 0.5590169943749473,
+    "rhs_preparation": "coherent amplitude-tree circuit",
+    "rhs_preparation_coefficients": 511,
+    "rhs_preparation_error_bound": null,
+    "rhs_preparation_gates": 1274,
+    "spectral_lower": 0.2125511366019211,
+    "spectral_upper": 8.114704934678985,
+    "status": "quantum-circuit-reference-executed",
+    "success_probability": 0.0019011584676403264,
+    "timings": {
+      "backend_preparation_seconds": 0.006850102,
+      "certification_seconds": 0.001402138,
+      "execution_seconds": 83.492489904,
+      "preprocessing_seconds": 2.935689677,
+      "readout_seconds": 0.000763125,
+      "rhs_compilation_seconds": 4.4551e-05,
+      "rhs_preparation_seconds": 0.019881361,
+      "synthesis_seconds": 0.911796033,
+      "transfer_seconds": 0.0
+    }
+  }
+}

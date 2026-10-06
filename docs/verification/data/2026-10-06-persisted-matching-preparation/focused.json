@@ -1,0 +1,165 @@
+{
+  "schema": "quest-persisted-matching-preparation-focused-v1",
+  "recorded_date": "2026-10-06",
+  "status": "independently-approved-focused-stage",
+  "source_manifest": "source.json",
+  "source_manifest_sha256": "131fa971f4a378647a0e0f55579ea961c601c4e12876f18e052b5be2cb401164",
+  "source_aggregate_sha256": "4b684544be3a29b7f857138fa9cabad099657e8e5d5f74f2877c27dac47b59c0",
+  "initial_reviewed_manifest": "source-initial.json",
+  "initial_manifest_sha256": "575cdca9d2d3e318568ddf59f402acf92ca281fe99137e7eac5a36019dcd0f28",
+  "initial_source_aggregate_sha256": "ff53437baf2688a960ed6baec6e7b7f12f4aeed099910a81b279cf374c2166ff",
+  "final_delta": [
+    "crates/quest/tests/matching_persisted_preparation.rs"
+  ],
+  "source_unchanged_through_final_independent_test": true,
+  "method_document": "docs/research/persisted-matching-preparation.md",
+  "method_sha256": "9e7d3fce552100b0fd231d7d267809f10ca96136e9a95e6bfc9196e22c8abfb9",
+  "independent_final_check": {
+    "parent_tests_passed": 1,
+    "mpi_jobs": 5,
+    "ranks": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "split_groups": "world4 into two independent2-rank groups",
+    "seconds": 2.95,
+    "prior_child_survives_later_budget_rejection": true,
+    "whole_register_amplitudes": 128,
+    "forward_and_standalone_adjoint": true
+  },
+  "unchanged_initial_independent_checks": {
+    "private_tests_passed": 3,
+    "private_mpi_fault_jobs": 10,
+    "private_test_seconds": 5.37,
+    "actual_capacity_parent_tests_passed": 1,
+    "actual_capacity_mpi_ranks": [
+      1,
+      2
+    ],
+    "actual_capacity_test_seconds": 1.06,
+    "strict_scoped_clippy": true
+  },
+  "owner_checks": {
+    "selected_top_level_tests_passed": 8,
+    "legacy_top_level_tests_passed": 3,
+    "final_scoped_clippy": true,
+    "owned_formatting": true
+  },
+  "fixes": [
+    {
+      "kind": "owning-api",
+      "detail": "Consume an exclusive loaded snapshot using atomic Arc unwrapping, common-admit conversion/metadata/whole-live capacity and acquire native source ownership before releasing temporary accounting."
+    },
+    {
+      "kind": "actual-native-capacity",
+      "detail": "Resize permutation-validation reservation to actual incoming Vec capacity and re-admit rank/node peak before fill or routing; a real128KiB cfg(test) excess allocation rejects under64KiB environment."
+    },
+    {
+      "kind": "coverage",
+      "detail": "Final test-only delta retains a prepared child through a later rank0 conversion-budget failure and then verifies its full controlled U and standalone adjoint."
+    }
+  ],
+  "logs": [
+    {
+      "scope": "owner: behavior/API red",
+      "private_log": "quest-persisted-preparation-api-red.log",
+      "sha256": "978a1d07fa3f3a851d8fd5788d9dc7fd713dcf3c21e6fda12b25817a8b5f20c0"
+    },
+    {
+      "scope": "owner: behavior/API red",
+      "private_log": "quest-persisted-preparation-alias-red.log",
+      "sha256": "837845a8847c2dd87e1e16cdcc0d352ef7a2ef5ae0aa618e1bb53e8fe879ce67"
+    },
+    {
+      "scope": "owner: behavior/API red",
+      "private_log": "quest-native-validation-capacity-red.log",
+      "sha256": "a8bd29b6262fd58946d1ddddc9b3aeaf5dca1068ed501564413823df4095d69d"
+    },
+    {
+      "scope": "owner: invalid setup rejection despite filename",
+      "private_log": "quest-persisted-preparation-faults-setup-rejection.log",
+      "sha256": "c6f6eb4d0eeca9ce7748cd5fba10cf609fb08bcdc174e3baa4c0a73fa5ac0a89"
+    },
+    {
+      "scope": "owner: invalid setup rejection despite filename",
+      "private_log": "quest-persisted-preparation-faults-green.log",
+      "sha256": "f963ade138c9e1c8ec48e32e2860d86f931ee7103c08c039f317071a469e5ee1"
+    },
+    {
+      "scope": "owner: final green",
+      "private_log": "quest-persisted-preparation-whole-u-final.log",
+      "sha256": "79d2e64e7682118c5ae07622424ea3c941311227f226be4748331219edb04d71"
+    },
+    {
+      "scope": "owner: final green",
+      "private_log": "quest-persisted-preparation-faults-final.log",
+      "sha256": "2711edb04b11befbb1a4f47f5a38f2bc9153c1405b34babfa5f1ded886c59763"
+    },
+    {
+      "scope": "owner: final green",
+      "private_log": "quest-native-validation-capacity-final.log",
+      "sha256": "65ff3820c1e27828210b60c26eab85c4903079469f7fb3af90d1ada92e33a66f"
+    },
+    {
+      "scope": "owner: final green",
+      "private_log": "quest-persisted-preparation-legacy-final.log",
+      "sha256": "68609e5f0a5c78aa758626c656623b645a5ccdee77e3c87a0452686bfd797003"
+    },
+    {
+      "scope": "owner: final green",
+      "private_log": "quest-persisted-preparation-clippy-final.log",
+      "sha256": "2aee2c8a0844dc9822f946875db8135cdb2f46ebcb6730711561d8e3379272ec"
+    },
+    {
+      "scope": "owner: final prior-child budget matrix green",
+      "private_log": "quest-persisted-preparation-prior-child-final.log",
+      "sha256": "c9457236c7ad9b645e745d8b6e91cfb92d9c68746e57aee717bec5651c5bf079"
+    },
+    {
+      "scope": "owner: blocked separate telemetry WIP",
+      "private_log": "quest-persisted-preparation-prior-child-clippy.log",
+      "sha256": "e79b97bec8f85c0da53b5a5074f23aaed97ef7925ffffc292335c09dcc4bc265"
+    },
+    {
+      "scope": "owner: final currentchecked lib/public-test Clippy green",
+      "private_log": "quest-persisted-preparation-prior-child-clippy-complete.log",
+      "sha256": "4d5d3078ef2697e93d97415ea4353731c9da3b79d772b28c9dd83a46bc08136c"
+    },
+    {
+      "scope": "independent-final-prior-child",
+      "private_log": "quest-persisted-bridge-independent-prior-child.log",
+      "sha256": "27a8ee141530ce24e2df71440ef7f9bb394aafe16c2b485c762ad92cf8109381"
+    },
+    {
+      "scope": "independent-initial-positive",
+      "private_log": "quest-persisted-bridge-independent-positive.log",
+      "sha256": "10d87d92540d536b57b45d715eeddf2496d6fd7ab18da76151004a012abe2761"
+    },
+    {
+      "scope": "independent-initial-private-faults",
+      "private_log": "quest-persisted-bridge-independent-faults.log",
+      "sha256": "f24f51db845c0452e73e6c2e1a1d0eb9e536e3f18a2bd25871e512f2249a26e0"
+    },
+    {
+      "scope": "independent-initial-actual-capacity",
+      "private_log": "quest-persisted-bridge-independent-capacity.log",
+      "sha256": "cb70e4318262629142299e7c5941d6ba0512f06f27360bed6904929da2953464"
+    },
+    {
+      "scope": "independent-initial-clippy",
+      "private_log": "quest-persisted-bridge-independent-clippy.log",
+      "sha256": "2ece08a8420eb8f013539667dc8feadd3ed6569bd56d7bc117b230281db72493"
+    }
+  ],
+  "limitations": [
+    "Six focused Rust file identities exclude dependencies and do not attest a complete executable build.",
+    "This stage follows immutable workspace checkpoint07; no newer broad workspace gate is claimed.",
+    "Each focused test job generates its own tiny source; same-file multi-rank reload plus LCU/QSVT pipeline execution is a later stage.",
+    "Returned rank_peak_bytes/node_peak_bytes are conservative admitted caps; planned_rank_peak_bytes predicts boundary overlap and is not measured high-water storage.",
+    "Prior loading must be admitted by the caller; this bridge does not retrospectively admit IO or close the separately identified loader actual-capacity boundary.",
+    "No native QuEST changes, accelerator path, actual multi-host/huge-count capacity or total scientific inverse-accuracy claim.",
+    "Matching application payload envelopes exclude native/coordinator/MPI protocol traffic, allocator overhead and process RSS."
+  ]
+}

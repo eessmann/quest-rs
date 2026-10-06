@@ -1,0 +1,49 @@
+{
+  "schema": "quest-weak-shell-v2-verification-references-v1",
+  "status": "source review and independent saved-result review passed; diagnostic-only acceptance",
+  "method_document": "crates/quest-cfd/docs/configuration-weak-energy-shell-v2.md",
+  "method_sha256": "07bdcf1aa3a40872fd1c67387d8e05b1d5a20a02c0fffd1e750dea5632bf5a1a",
+  "independent_source_review_identifier": "<private-ledger>/configuration-weak-energy-shell-v2-root-review.md",
+  "independent_source_review_sha256": "5a2302ea33b1abd9ff4cce16490c58b4d3077dbd12ac33dec6773f510b862d2b",
+  "commands": [
+    "cargo test -p quest-cfd --lib configuration_weak",
+    "cargo test -p quest-cfd --example configuration_weak --example configuration_weak_energy_shell_v2",
+    "python3 -B docs/verification/fixtures/quest-cfd/test_configuration_weak.py",
+    "python3 -B docs/verification/fixtures/quest-cfd/test_configuration_weak_energy_shell_v2.py",
+    "cargo clippy -p quest-cfd --lib --tests --example configuration_weak --example configuration_weak_energy_shell_v2 --no-deps -- -D warnings"
+  ],
+  "checks": [
+    {
+      "log_identifier": "<private-artifacts>/quest-weak-shell-root-library.log",
+      "sha256": "a9f490647b094fd4c65181848820bd9768b3695596c49efd3d7c3f9da5dc21a3",
+      "scope": "five library tests"
+    },
+    {
+      "log_identifier": "<private-artifacts>/quest-weak-shell-root-examples.log",
+      "sha256": "ee0c9cfbcef5e30b5aad3b98eab3925c2f8b8cb15bda60087deb5c2887db7e73",
+      "scope": "six shared tests per entry; not twelve independent mathematics cases"
+    },
+    {
+      "log_identifier": "<private-artifacts>/quest-weak-shell-root-original-python.log",
+      "sha256": "3e3d21d02a357e0794ad1052a7a8db512f7f65cbb298148132b50d93d7e3cc5e",
+      "scope": "eleven original Python groups"
+    },
+    {
+      "log_identifier": "<private-artifacts>/quest-weak-shell-root-provenance-fix.log",
+      "sha256": "d39dd11df0295fc768dff7e3a0fb428d0085e94c546d09a5e7374a8a0e965241",
+      "scope": "eight additive Python groups"
+    },
+    {
+      "log_identifier": "<private-artifacts>/quest-weak-shell-root-clippy.log",
+      "sha256": "d55371a4ba0498fc8b5cff689826dd5ad392ef839772ad28511a10624bf4d778",
+      "scope": "strict selected library/tests/example Clippy"
+    }
+  ],
+  "new_physical_executions": 1,
+  "build_attempts": 1,
+  "retries": 0,
+  "convergence_certified": false,
+  "independent_saved_result_review_identifier": "<private-ledger>/configuration-weak-energy-shell-v2-saved-result-independent-review.md",
+  "independent_saved_result_review_sha256": "734f0573811fd57c5b0fecd625c92faca4435136cafeb038b670ea363c397095",
+  "independent_saved_result_artifact": "independent-review.json"
+}

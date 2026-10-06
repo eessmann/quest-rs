@@ -1,0 +1,23 @@
+warning: `feature(generic_const_exprs)` is not supported with the next-generation trait solver
+ --> <workspace>/crates/quest-polynomial/src/lib.rs:1:30
+  |
+1 | #![feature(const_trait_impl, generic_const_exprs)]
+  |                              ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `-Znext-solver=globally` is currently enabled by default for testing
+  = note: reverted the setting to `-Znext-solver=coherence` for this crate
+  = note: the currently stable trait solver will be used for this crate
+  = note: see issues #160895 <https://github.com/rust-lang/rust/issues/160895> for more information
+
+warning: `quest-polynomial` (lib) generated 1 warning
+   Compiling quest-sparse-digest-independent v0.1.0 (<temporary>/quest-sparse-digest-independent)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.32s
+     Running `target/debug/quest-sparse-digest-independent`
+positive_digest=11977456413700156624 negative_digest=11977456413700156624 equal=true
+altered_phase_admitted=true identical_descriptors=true original_phase=0+1i altered_phase=0-1i
+
+thread 'main' (4) panicked at src/main.rs:12:2:
+assertion `left != right` failed: opposite whole-unitary phases must not systematically collide
+  left: (4, 11977456413700156624)
+ right: (4, 11977456413700156624)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

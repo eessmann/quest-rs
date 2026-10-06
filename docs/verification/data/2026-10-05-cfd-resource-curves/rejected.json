@@ -1,0 +1,1722 @@
+{
+  "carleman_order": 2,
+  "equal_accuracy_comparison": false,
+  "history_build_peak_scope": "unavailable; preceding bounded stored history baseline is timed separately",
+  "native_dispatch_or_fault_tolerant_costs": null,
+  "physical_order": 1,
+  "quantum_execution": false,
+  "rows": [
+    {
+      "all_physical_coordinates": 5,
+      "configuration_boundary": "periodic central; bump touches boundary; not boundary-resolved",
+      "configuration_nodes": 32,
+      "configuration_order": 1,
+      "exact_zero_generator": true,
+      "generator_nonzeros": 0,
+      "history_build_peak_bytes": null,
+      "history_build_seconds": 0.003317181,
+      "horizon": 0.001,
+      "lift": "kvn",
+      "physical_order": 1,
+      "physical_response_accuracy_established": false,
+      "resources": {
+        "caller_external_retained_bytes": 368,
+        "count_work": 20,
+        "encoding": {
+          "construction_peak_bytes": 66048,
+          "constructor_count_pass_gates": 292,
+          "count": {
+            "accepted_work": 20,
+            "adjoint": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "forward": {
+              "control_occurrences": 136,
+              "controlled_gates": 19,
+              "gates": 20,
+              "h": 1,
+              "maximum_controls": 8,
+              "phase": 9,
+              "ry": 10,
+              "x": 0
+            },
+            "observed_emissions": 21,
+            "rejection": "QSVT resource limit: shared resource count allowance"
+          },
+          "descriptor": {
+            "auxiliary_qubits_including_signal": 3,
+            "binary64_parameters": true,
+            "clean_workspace_mask": 129,
+            "clean_workspace_value": 0,
+            "cols": 64,
+            "construction_identity": 9934796114877373332,
+            "data_qubits": 6,
+            "encoding_error_bound": null,
+            "encoding_qubits": 8,
+            "inverse_qubits": 9,
+            "left": {
+              "fixed_mask": 129,
+              "fixed_value": 0,
+              "logical_end": 64,
+              "logical_start": 0
+            },
+            "normalization": 1.0,
+            "preparation_error_bound": 0.0,
+            "right": {
+              "fixed_mask": 129,
+              "fixed_value": 0,
+              "logical_end": 64,
+              "logical_start": 0
+            },
+            "rows": 64,
+            "source_identity": 6616675773051646181,
+            "system_mask": 126,
+            "workspace_mask": 129
+          },
+          "matching_scan_work_model_ceiling": 5824736,
+          "retained_bytes": 17200
+        },
+        "history_dimension": 64,
+        "history_nonzeros": 128,
+        "history_retained_bytes": 4848,
+        "inverse": null,
+        "inverse_rejection": null,
+        "managed_peak_byte_envelope": 74856,
+        "memory_scope": "whole live borrowed history + declared caller payload + constructor/synthesis managed envelopes; receipt formatting, allocator bookkeeping, opaque backend/RSS and preceding physical/history build peak excluded",
+        "observation_retained_bytes": 0,
+        "observation_scratch_bytes": 0,
+        "primitive_cost_scope": "portable X/H/Ry/scalar Phase with signed controls; no Clifford+T decomposition, native dispatch-work or hardware depth claim",
+        "quantum_execution": false,
+        "rhs_norm": 1.0,
+        "rhs_preparation": {
+          "coefficients": 127,
+          "compile_work": 1280,
+          "construction_peak_bytes": 4272,
+          "constructor_declared_gates": 314,
+          "count": {
+            "accepted_work": 0,
+            "adjoint": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "forward": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "observed_emissions": 0,
+            "rejection": "count allowance exhausted before replay"
+          },
+          "error_bound": null,
+          "norm": 1.0,
+          "padded_dimension": 64,
+          "qubits": 6,
+          "retained_bytes": 1200
+        },
+        "sampling": null,
+        "sampling_rejection": null,
+        "status": "constructed-resources-partial",
+        "timings": {
+          "count_seconds": 9.9851e-05,
+          "rhs_compilation_seconds": 1.343e-05,
+          "sampling_validation_seconds": 0.0,
+          "source_construction_seconds": 0.000277651,
+          "synthesis_seconds": 0.0
+        }
+      },
+      "time_cells": 1,
+      "time_order": 1
+    },
+    {
+      "all_physical_coordinates": 5,
+      "configuration_boundary": "periodic central; bump touches boundary; not boundary-resolved",
+      "configuration_nodes": 243,
+      "configuration_order": 2,
+      "exact_zero_generator": false,
+      "generator_nonzeros": 1384,
+      "history_build_peak_bytes": null,
+      "history_build_seconds": 0.023144054,
+      "horizon": 0.001,
+      "lift": "kvn",
+      "physical_order": 1,
+      "physical_response_accuracy_established": false,
+      "resources": {
+        "caller_external_retained_bytes": 520,
+        "count_work": 20,
+        "encoding": {
+          "construction_peak_bytes": 1915392,
+          "constructor_count_pass_gates": 19609,
+          "count": {
+            "accepted_work": 20,
+            "adjoint": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "forward": {
+              "control_occurrences": 206,
+              "controlled_gates": 16,
+              "gates": 20,
+              "h": 4,
+              "maximum_controls": 14,
+              "phase": 7,
+              "ry": 9,
+              "x": 0
+            },
+            "observed_emissions": 21,
+            "rejection": "QSVT resource limit: shared resource count allowance"
+          },
+          "descriptor": {
+            "auxiliary_qubits_including_signal": 6,
+            "binary64_parameters": true,
+            "clean_workspace_mask": 15361,
+            "clean_workspace_value": 0,
+            "cols": 486,
+            "construction_identity": 10517932386498530538,
+            "data_qubits": 9,
+            "encoding_error_bound": null,
+            "encoding_qubits": 14,
+            "inverse_qubits": 15,
+            "left": {
+              "fixed_mask": 15361,
+              "fixed_value": 0,
+              "logical_end": 486,
+              "logical_start": 0
+            },
+            "normalization": 8.0,
+            "preparation_error_bound": 0.0,
+            "right": {
+              "fixed_mask": 15361,
+              "fixed_value": 0,
+              "logical_end": 486,
+              "logical_start": 0
+            },
+            "rows": 486,
+            "source_identity": 219753177532330529,
+            "system_mask": 1022,
+            "workspace_mask": 15361
+          },
+          "matching_scan_work_model_ceiling": 56792049920,
+          "retained_bytes": 505728
+        },
+        "history_dimension": 486,
+        "history_nonzeros": 3740,
+        "history_retained_bytes": 101664,
+        "inverse": null,
+        "inverse_rejection": null,
+        "managed_peak_byte_envelope": 2111232,
+        "memory_scope": "whole live borrowed history + declared caller payload + constructor/synthesis managed envelopes; receipt formatting, allocator bookkeeping, opaque backend/RSS and preceding physical/history build peak excluded",
+        "observation_retained_bytes": 0,
+        "observation_scratch_bytes": 0,
+        "primitive_cost_scope": "portable X/H/Ry/scalar Phase with signed controls; no Clifford+T decomposition, native dispatch-work or hardware depth claim",
+        "quantum_execution": false,
+        "rhs_norm": 1.0000000000000004,
+        "rhs_preparation": {
+          "coefficients": 1023,
+          "compile_work": 13312,
+          "construction_peak_bytes": 32528,
+          "constructor_declared_gates": 2554,
+          "count": {
+            "accepted_work": 0,
+            "adjoint": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "forward": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "observed_emissions": 0,
+            "rejection": "count allowance exhausted before replay"
+          },
+          "error_bound": null,
+          "norm": 1.0,
+          "padded_dimension": 512,
+          "qubits": 9,
+          "retained_bytes": 8368
+        },
+        "sampling": null,
+        "sampling_rejection": null,
+        "status": "constructed-resources-partial",
+        "timings": {
+          "count_seconds": 0.002649957,
+          "rhs_compilation_seconds": 7.57e-05,
+          "sampling_validation_seconds": 0.0,
+          "source_construction_seconds": 0.267406985,
+          "synthesis_seconds": 0.0
+        }
+      },
+      "time_cells": 1,
+      "time_order": 1
+    },
+    {
+      "all_physical_coordinates": 5,
+      "fixed_lift_order": 2,
+      "history_build_peak_bytes": null,
+      "history_build_seconds": 0.007581788,
+      "horizon": 0.001,
+      "lift": "symmetric-carleman",
+      "lift_dimension": 20,
+      "physical_order": 1,
+      "physical_scale": 0.2,
+      "resources": {
+        "caller_external_retained_bytes": 0,
+        "count_work": 20,
+        "encoding": {
+          "construction_peak_bytes": 99840,
+          "constructor_count_pass_gates": 952,
+          "count": {
+            "accepted_work": 20,
+            "adjoint": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "forward": {
+              "control_occurrences": 166,
+              "controlled_gates": 15,
+              "gates": 20,
+              "h": 5,
+              "maximum_controls": 12,
+              "phase": 7,
+              "ry": 8,
+              "x": 0
+            },
+            "observed_emissions": 21,
+            "rejection": "QSVT resource limit: shared resource count allowance"
+          },
+          "descriptor": {
+            "auxiliary_qubits_including_signal": 7,
+            "binary64_parameters": true,
+            "clean_workspace_mask": 3969,
+            "clean_workspace_value": 0,
+            "cols": 40,
+            "construction_identity": 3055634303576824880,
+            "data_qubits": 6,
+            "encoding_error_bound": null,
+            "encoding_qubits": 12,
+            "inverse_qubits": 13,
+            "left": {
+              "fixed_mask": 3969,
+              "fixed_value": 0,
+              "logical_end": 40,
+              "logical_start": 0
+            },
+            "normalization": 16.14592,
+            "preparation_error_bound": 0.0,
+            "right": {
+              "fixed_mask": 3969,
+              "fixed_value": 0,
+              "logical_end": 40,
+              "logical_start": 0
+            },
+            "rows": 40,
+            "source_identity": 13282727590305210213,
+            "system_mask": 126,
+            "workspace_mask": 3969
+          },
+          "matching_scan_work_model_ceiling": 15818984,
+          "retained_bytes": 29584
+        },
+        "history_dimension": 40,
+        "history_nonzeros": 194,
+        "history_retained_bytes": 6720,
+        "inverse": null,
+        "inverse_rejection": null,
+        "managed_peak_byte_envelope": 111544,
+        "memory_scope": "whole live borrowed history + declared caller payload + constructor/synthesis managed envelopes; receipt formatting, allocator bookkeeping, opaque backend/RSS and preceding physical/history build peak excluded",
+        "observation_retained_bytes": 0,
+        "observation_scratch_bytes": 0,
+        "primitive_cost_scope": "portable X/H/Ry/scalar Phase with signed controls; no Clifford+T decomposition, native dispatch-work or hardware depth claim",
+        "quantum_execution": false,
+        "rhs_norm": 0.3954823004889093,
+        "rhs_preparation": {
+          "coefficients": 127,
+          "compile_work": 1280,
+          "construction_peak_bytes": 3888,
+          "constructor_declared_gates": 314,
+          "count": {
+            "accepted_work": 0,
+            "adjoint": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "forward": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "observed_emissions": 0,
+            "rejection": "count allowance exhausted before replay"
+          },
+          "error_bound": null,
+          "norm": 0.3954823004889093,
+          "padded_dimension": 64,
+          "qubits": 6,
+          "retained_bytes": 1200
+        },
+        "sampling": null,
+        "sampling_rejection": null,
+        "status": "constructed-resources-partial",
+        "timings": {
+          "count_seconds": 0.000181661,
+          "rhs_compilation_seconds": 1.08e-05,
+          "sampling_validation_seconds": 0.0,
+          "source_construction_seconds": 0.001072006,
+          "synthesis_seconds": 0.0
+        }
+      },
+      "time_cells": 1,
+      "time_order": 1,
+      "truncation_accuracy_established": false
+    },
+    {
+      "all_physical_coordinates": 5,
+      "configuration_boundary": "periodic central; bump touches boundary; not boundary-resolved",
+      "configuration_nodes": 32,
+      "configuration_order": 1,
+      "exact_zero_generator": true,
+      "generator_nonzeros": 0,
+      "history_build_peak_bytes": null,
+      "history_build_seconds": 0.003372102,
+      "horizon": 0.001,
+      "lift": "kvn",
+      "physical_order": 1,
+      "physical_response_accuracy_established": false,
+      "resources": {
+        "caller_external_retained_bytes": 368,
+        "count_work": 20,
+        "encoding": {
+          "construction_peak_bytes": 147968,
+          "constructor_count_pass_gates": 744,
+          "count": {
+            "accepted_work": 20,
+            "adjoint": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "forward": {
+              "control_occurrences": 163,
+              "controlled_gates": 18,
+              "gates": 20,
+              "h": 2,
+              "maximum_controls": 10,
+              "phase": 8,
+              "ry": 10,
+              "x": 0
+            },
+            "observed_emissions": 21,
+            "rejection": "QSVT resource limit: shared resource count allowance"
+          },
+          "descriptor": {
+            "auxiliary_qubits_including_signal": 4,
+            "binary64_parameters": true,
+            "clean_workspace_mask": 769,
+            "clean_workspace_value": 0,
+            "cols": 128,
+            "construction_identity": 2937023535567646535,
+            "data_qubits": 7,
+            "encoding_error_bound": null,
+            "encoding_qubits": 10,
+            "inverse_qubits": 11,
+            "left": {
+              "fixed_mask": 769,
+              "fixed_value": 0,
+              "logical_end": 128,
+              "logical_start": 0
+            },
+            "normalization": 4.0,
+            "preparation_error_bound": 0.0,
+            "right": {
+              "fixed_mask": 769,
+              "fixed_value": 0,
+              "logical_end": 128,
+              "logical_start": 0
+            },
+            "rows": 128,
+            "source_identity": 11853271134415314789,
+            "system_mask": 254,
+            "workspace_mask": 769
+          },
+          "matching_scan_work_model_ceiling": 45269248,
+          "retained_bytes": 39312
+        },
+        "history_dimension": 128,
+        "history_nonzeros": 288,
+        "history_retained_bytes": 10256,
+        "inverse": null,
+        "inverse_rejection": null,
+        "managed_peak_byte_envelope": 166536,
+        "memory_scope": "whole live borrowed history + declared caller payload + constructor/synthesis managed envelopes; receipt formatting, allocator bookkeeping, opaque backend/RSS and preceding physical/history build peak excluded",
+        "observation_retained_bytes": 0,
+        "observation_scratch_bytes": 0,
+        "primitive_cost_scope": "portable X/H/Ry/scalar Phase with signed controls; no Clifford+T decomposition, native dispatch-work or hardware depth claim",
+        "quantum_execution": false,
+        "rhs_norm": 1.0,
+        "rhs_preparation": {
+          "coefficients": 255,
+          "compile_work": 2816,
+          "construction_peak_bytes": 8368,
+          "constructor_declared_gates": 634,
+          "count": {
+            "accepted_work": 0,
+            "adjoint": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "forward": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "observed_emissions": 0,
+            "rejection": "count allowance exhausted before replay"
+          },
+          "error_bound": null,
+          "norm": 1.0,
+          "padded_dimension": 128,
+          "qubits": 7,
+          "retained_bytes": 2224
+        },
+        "sampling": null,
+        "sampling_rejection": null,
+        "status": "constructed-resources-partial",
+        "timings": {
+          "count_seconds": 0.000223391,
+          "rhs_compilation_seconds": 1.735e-05,
+          "sampling_validation_seconds": 0.0,
+          "source_construction_seconds": 0.001013076,
+          "synthesis_seconds": 0.0
+        }
+      },
+      "time_cells": 2,
+      "time_order": 1
+    },
+    {
+      "all_physical_coordinates": 5,
+      "configuration_boundary": "periodic central; bump touches boundary; not boundary-resolved",
+      "configuration_nodes": 243,
+      "configuration_order": 2,
+      "exact_zero_generator": false,
+      "generator_nonzeros": 1384,
+      "history_build_peak_bytes": null,
+      "history_build_seconds": 0.027676662,
+      "horizon": 0.001,
+      "lift": "kvn",
+      "physical_order": 1,
+      "physical_response_accuracy_established": false,
+      "resources": {
+        "caller_external_retained_bytes": 520,
+        "count_work": 20,
+        "encoding": {
+          "construction_peak_bytes": 3954688,
+          "constructor_count_pass_gates": 42983,
+          "count": {
+            "accepted_work": 20,
+            "adjoint": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "forward": {
+              "control_occurrences": 221,
+              "controlled_gates": 16,
+              "gates": 20,
+              "h": 4,
+              "maximum_controls": 15,
+              "phase": 7,
+              "ry": 9,
+              "x": 0
+            },
+            "observed_emissions": 21,
+            "rejection": "QSVT resource limit: shared resource count allowance"
+          },
+          "descriptor": {
+            "auxiliary_qubits_including_signal": 6,
+            "binary64_parameters": true,
+            "clean_workspace_mask": 30721,
+            "clean_workspace_value": 0,
+            "cols": 972,
+            "construction_identity": 3482209243101928905,
+            "data_qubits": 10,
+            "encoding_error_bound": null,
+            "encoding_qubits": 15,
+            "inverse_qubits": 16,
+            "left": {
+              "fixed_mask": 30721,
+              "fixed_value": 0,
+              "logical_end": 972,
+              "logical_start": 0
+            },
+            "normalization": 16.0,
+            "preparation_error_bound": 0.0,
+            "right": {
+              "fixed_mask": 30721,
+              "fixed_value": 0,
+              "logical_end": 972,
+              "logical_start": 0
+            },
+            "rows": 972,
+            "source_identity": 253902569276951241,
+            "system_mask": 2046,
+            "workspace_mask": 30721
+          },
+          "matching_scan_work_model_ceiling": 481636624019,
+          "retained_bytes": 1049360
+        },
+        "history_dimension": 972,
+        "history_nonzeros": 7723,
+        "history_retained_bytes": 208952,
+        "inverse": null,
+        "inverse_rejection": null,
+        "managed_peak_byte_envelope": 4357296,
+        "memory_scope": "whole live borrowed history + declared caller payload + constructor/synthesis managed envelopes; receipt formatting, allocator bookkeeping, opaque backend/RSS and preceding physical/history build peak excluded",
+        "observation_retained_bytes": 0,
+        "observation_scratch_bytes": 0,
+        "primitive_cost_scope": "portable X/H/Ry/scalar Phase with signed controls; no Clifford+T decomposition, native dispatch-work or hardware depth claim",
+        "quantum_execution": false,
+        "rhs_norm": 1.0000000000000004,
+        "rhs_preparation": {
+          "coefficients": 2047,
+          "compile_work": 28672,
+          "construction_peak_bytes": 64880,
+          "constructor_declared_gates": 5114,
+          "count": {
+            "accepted_work": 0,
+            "adjoint": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "forward": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "observed_emissions": 0,
+            "rejection": "count allowance exhausted before replay"
+          },
+          "error_bound": null,
+          "norm": 1.0,
+          "padded_dimension": 1024,
+          "qubits": 10,
+          "retained_bytes": 16560
+        },
+        "sampling": null,
+        "sampling_rejection": null,
+        "status": "constructed-resources-partial",
+        "timings": {
+          "count_seconds": 0.005692875,
+          "rhs_compilation_seconds": 0.000143651,
+          "sampling_validation_seconds": 0.0,
+          "source_construction_seconds": 1.300072292,
+          "synthesis_seconds": 0.0
+        }
+      },
+      "time_cells": 2,
+      "time_order": 1
+    },
+    {
+      "all_physical_coordinates": 5,
+      "fixed_lift_order": 2,
+      "history_build_peak_bytes": null,
+      "history_build_seconds": 0.007926779,
+      "horizon": 0.001,
+      "lift": "symmetric-carleman",
+      "lift_dimension": 20,
+      "physical_order": 1,
+      "physical_scale": 0.2,
+      "resources": {
+        "caller_external_retained_bytes": 0,
+        "count_work": 20,
+        "encoding": {
+          "construction_peak_bytes": 209408,
+          "constructor_count_pass_gates": 2093,
+          "count": {
+            "accepted_work": 20,
+            "adjoint": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "forward": {
+              "control_occurrences": 180,
+              "controlled_gates": 15,
+              "gates": 20,
+              "h": 5,
+              "maximum_controls": 13,
+              "phase": 7,
+              "ry": 8,
+              "x": 0
+            },
+            "observed_emissions": 21,
+            "rejection": "QSVT resource limit: shared resource count allowance"
+          },
+          "descriptor": {
+            "auxiliary_qubits_including_signal": 7,
+            "binary64_parameters": true,
+            "clean_workspace_mask": 7937,
+            "clean_workspace_value": 0,
+            "cols": 80,
+            "construction_identity": 6687374814449567392,
+            "data_qubits": 7,
+            "encoding_error_bound": null,
+            "encoding_qubits": 13,
+            "inverse_qubits": 14,
+            "left": {
+              "fixed_mask": 7937,
+              "fixed_value": 0,
+              "logical_end": 80,
+              "logical_start": 0
+            },
+            "normalization": 32.0,
+            "preparation_error_bound": 0.0,
+            "right": {
+              "fixed_mask": 7937,
+              "fixed_value": 0,
+              "logical_end": 80,
+              "logical_start": 0
+            },
+            "rows": 80,
+            "source_identity": 14146046548643042885,
+            "system_mask": 254,
+            "workspace_mask": 7937
+          },
+          "matching_scan_work_model_ceiling": 110741248,
+          "retained_bytes": 60528
+        },
+        "history_dimension": 80,
+        "history_nonzeros": 408,
+        "history_retained_bytes": 13712,
+        "inverse": null,
+        "inverse_rejection": null,
+        "managed_peak_byte_envelope": 233560,
+        "memory_scope": "whole live borrowed history + declared caller payload + constructor/synthesis managed envelopes; receipt formatting, allocator bookkeeping, opaque backend/RSS and preceding physical/history build peak excluded",
+        "observation_retained_bytes": 0,
+        "observation_scratch_bytes": 0,
+        "primitive_cost_scope": "portable X/H/Ry/scalar Phase with signed controls; no Clifford+T decomposition, native dispatch-work or hardware depth claim",
+        "quantum_execution": false,
+        "rhs_norm": 0.3954823004889093,
+        "rhs_preparation": {
+          "coefficients": 255,
+          "compile_work": 2816,
+          "construction_peak_bytes": 7600,
+          "constructor_declared_gates": 634,
+          "count": {
+            "accepted_work": 0,
+            "adjoint": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "forward": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "observed_emissions": 0,
+            "rejection": "count allowance exhausted before replay"
+          },
+          "error_bound": null,
+          "norm": 0.3954823004889093,
+          "padded_dimension": 128,
+          "qubits": 7,
+          "retained_bytes": 2224
+        },
+        "sampling": null,
+        "sampling_rejection": null,
+        "status": "constructed-resources-partial",
+        "timings": {
+          "count_seconds": 0.000388373,
+          "rhs_compilation_seconds": 1.85e-05,
+          "sampling_validation_seconds": 0.0,
+          "source_construction_seconds": 0.004456108,
+          "synthesis_seconds": 0.0
+        }
+      },
+      "time_cells": 2,
+      "time_order": 1,
+      "truncation_accuracy_established": false
+    },
+    {
+      "all_physical_coordinates": 5,
+      "configuration_boundary": "periodic central; bump touches boundary; not boundary-resolved",
+      "configuration_nodes": 32,
+      "configuration_order": 1,
+      "exact_zero_generator": true,
+      "generator_nonzeros": 0,
+      "history_build_peak_bytes": null,
+      "history_build_seconds": 0.004006105,
+      "horizon": 0.001,
+      "lift": "kvn",
+      "physical_order": 1,
+      "physical_response_accuracy_established": false,
+      "resources": {
+        "caller_external_retained_bytes": 368,
+        "count_work": 20,
+        "encoding": {
+          "construction_peak_bytes": 131584,
+          "constructor_count_pass_gates": 680,
+          "count": {
+            "accepted_work": 20,
+            "adjoint": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "forward": {
+              "control_occurrences": 163,
+              "controlled_gates": 18,
+              "gates": 20,
+              "h": 2,
+              "maximum_controls": 10,
+              "phase": 8,
+              "ry": 10,
+              "x": 0
+            },
+            "observed_emissions": 21,
+            "rejection": "QSVT resource limit: shared resource count allowance"
+          },
+          "descriptor": {
+            "auxiliary_qubits_including_signal": 4,
+            "binary64_parameters": true,
+            "clean_workspace_mask": 769,
+            "clean_workspace_value": 0,
+            "cols": 96,
+            "construction_identity": 8137008375847255394,
+            "data_qubits": 7,
+            "encoding_error_bound": null,
+            "encoding_qubits": 10,
+            "inverse_qubits": 11,
+            "left": {
+              "fixed_mask": 769,
+              "fixed_value": 0,
+              "logical_end": 96,
+              "logical_start": 0
+            },
+            "normalization": 2.6666666666666665,
+            "preparation_error_bound": 0.0,
+            "right": {
+              "fixed_mask": 769,
+              "fixed_value": 0,
+              "logical_end": 96,
+              "logical_start": 0
+            },
+            "rows": 96,
+            "source_identity": 11434938630745838629,
+            "system_mask": 254,
+            "workspace_mask": 769
+          },
+          "matching_scan_work_model_ceiling": 33685760,
+          "retained_bytes": 34704
+        },
+        "history_dimension": 96,
+        "history_nonzeros": 256,
+        "history_retained_bytes": 8704,
+        "inverse": null,
+        "inverse_rejection": null,
+        "managed_peak_byte_envelope": 147576,
+        "memory_scope": "whole live borrowed history + declared caller payload + constructor/synthesis managed envelopes; receipt formatting, allocator bookkeeping, opaque backend/RSS and preceding physical/history build peak excluded",
+        "observation_retained_bytes": 0,
+        "observation_scratch_bytes": 0,
+        "primitive_cost_scope": "portable X/H/Ry/scalar Phase with signed controls; no Clifford+T decomposition, native dispatch-work or hardware depth claim",
+        "quantum_execution": false,
+        "rhs_norm": 1.0,
+        "rhs_preparation": {
+          "coefficients": 255,
+          "compile_work": 2816,
+          "construction_peak_bytes": 7856,
+          "constructor_declared_gates": 634,
+          "count": {
+            "accepted_work": 0,
+            "adjoint": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "forward": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "observed_emissions": 0,
+            "rejection": "count allowance exhausted before replay"
+          },
+          "error_bound": null,
+          "norm": 1.0,
+          "padded_dimension": 128,
+          "qubits": 7,
+          "retained_bytes": 2224
+        },
+        "sampling": null,
+        "sampling_rejection": null,
+        "status": "constructed-resources-partial",
+        "timings": {
+          "count_seconds": 0.000191871,
+          "rhs_compilation_seconds": 1.744e-05,
+          "sampling_validation_seconds": 0.0,
+          "source_construction_seconds": 0.000816915,
+          "synthesis_seconds": 0.0
+        }
+      },
+      "time_cells": 1,
+      "time_order": 2
+    },
+    {
+      "all_physical_coordinates": 5,
+      "configuration_boundary": "periodic central; bump touches boundary; not boundary-resolved",
+      "configuration_nodes": 243,
+      "configuration_order": 2,
+      "exact_zero_generator": false,
+      "generator_nonzeros": 1384,
+      "history_build_peak_bytes": null,
+      "history_build_seconds": 0.043360279,
+      "horizon": 0.001,
+      "lift": "kvn",
+      "physical_order": 1,
+      "physical_response_accuracy_established": false,
+      "resources": {
+        "caller_external_retained_bytes": 520,
+        "count_work": 20,
+        "encoding": {
+          "construction_peak_bytes": 3121664,
+          "constructor_count_pass_gates": 34477,
+          "count": {
+            "accepted_work": 20,
+            "adjoint": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "forward": {
+              "control_occurrences": 221,
+              "controlled_gates": 16,
+              "gates": 20,
+              "h": 4,
+              "maximum_controls": 15,
+              "phase": 7,
+              "ry": 9,
+              "x": 0
+            },
+            "observed_emissions": 21,
+            "rejection": "QSVT resource limit: shared resource count allowance"
+          },
+          "descriptor": {
+            "auxiliary_qubits_including_signal": 6,
+            "binary64_parameters": true,
+            "clean_workspace_mask": 30721,
+            "clean_workspace_value": 0,
+            "cols": 729,
+            "construction_identity": 362627554258287211,
+            "data_qubits": 10,
+            "encoding_error_bound": null,
+            "encoding_qubits": 15,
+            "inverse_qubits": 16,
+            "left": {
+              "fixed_mask": 30721,
+              "fixed_value": 0,
+              "logical_end": 729,
+              "logical_start": 0
+            },
+            "normalization": 10.666666666666666,
+            "preparation_error_bound": 0.0,
+            "right": {
+              "fixed_mask": 30721,
+              "fixed_value": 0,
+              "logical_end": 729,
+              "logical_start": 0
+            },
+            "rows": 729,
+            "source_identity": 6719238481307864209,
+            "system_mask": 2046,
+            "workspace_mask": 30721
+          },
+          "matching_scan_work_model_ceiling": 239619812704,
+          "retained_bytes": 826432
+        },
+        "history_dimension": 729,
+        "history_nonzeros": 6096,
+        "history_retained_bytes": 164056,
+        "inverse": null,
+        "inverse_rejection": null,
+        "managed_peak_byte_envelope": 3438384,
+        "memory_scope": "whole live borrowed history + declared caller payload + constructor/synthesis managed envelopes; receipt formatting, allocator bookkeeping, opaque backend/RSS and preceding physical/history build peak excluded",
+        "observation_retained_bytes": 0,
+        "observation_scratch_bytes": 0,
+        "primitive_cost_scope": "portable X/H/Ry/scalar Phase with signed controls; no Clifford+T decomposition, native dispatch-work or hardware depth claim",
+        "quantum_execution": false,
+        "rhs_norm": 1.0000000000000004,
+        "rhs_preparation": {
+          "coefficients": 2047,
+          "compile_work": 28672,
+          "construction_peak_bytes": 60992,
+          "constructor_declared_gates": 5114,
+          "count": {
+            "accepted_work": 0,
+            "adjoint": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "forward": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "observed_emissions": 0,
+            "rejection": "count allowance exhausted before replay"
+          },
+          "error_bound": null,
+          "norm": 1.0,
+          "padded_dimension": 1024,
+          "qubits": 10,
+          "retained_bytes": 16560
+        },
+        "sampling": null,
+        "sampling_rejection": null,
+        "status": "constructed-resources-partial",
+        "timings": {
+          "count_seconds": 0.004348656,
+          "rhs_compilation_seconds": 0.000139291,
+          "sampling_validation_seconds": 0.0,
+          "source_construction_seconds": 0.780854581,
+          "synthesis_seconds": 0.0
+        }
+      },
+      "time_cells": 1,
+      "time_order": 2
+    },
+    {
+      "all_physical_coordinates": 5,
+      "fixed_lift_order": 2,
+      "history_build_peak_bytes": null,
+      "history_build_seconds": 0.008592414,
+      "horizon": 0.001,
+      "lift": "symmetric-carleman",
+      "lift_dimension": 20,
+      "physical_order": 1,
+      "physical_scale": 0.2,
+      "resources": {
+        "caller_external_retained_bytes": 0,
+        "count_work": 20,
+        "encoding": {
+          "construction_peak_bytes": 177664,
+          "constructor_count_pass_gates": 1701,
+          "count": {
+            "accepted_work": 20,
+            "adjoint": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "forward": {
+              "control_occurrences": 166,
+              "controlled_gates": 15,
+              "gates": 20,
+              "h": 5,
+              "maximum_controls": 12,
+              "phase": 7,
+              "ry": 8,
+              "x": 0
+            },
+            "observed_emissions": 21,
+            "rejection": "QSVT resource limit: shared resource count allowance"
+          },
+          "descriptor": {
+            "auxiliary_qubits_including_signal": 7,
+            "binary64_parameters": true,
+            "clean_workspace_mask": 3969,
+            "clean_workspace_value": 0,
+            "cols": 60,
+            "construction_identity": 17734891251521304581,
+            "data_qubits": 6,
+            "encoding_error_bound": null,
+            "encoding_qubits": 12,
+            "inverse_qubits": 13,
+            "left": {
+              "fixed_mask": 3969,
+              "fixed_value": 0,
+              "logical_end": 60,
+              "logical_start": 0
+            },
+            "normalization": 21.333333333333332,
+            "preparation_error_bound": 0.0,
+            "right": {
+              "fixed_mask": 3969,
+              "fixed_value": 0,
+              "logical_end": 60,
+              "logical_start": 0
+            },
+            "rows": 60,
+            "source_identity": 4751562007117157219,
+            "system_mask": 126,
+            "workspace_mask": 3969
+          },
+          "matching_scan_work_model_ceiling": 68393352,
+          "retained_bytes": 51264
+        },
+        "history_dimension": 60,
+        "history_nonzeros": 346,
+        "history_retained_bytes": 10936,
+        "inverse": null,
+        "inverse_rejection": null,
+        "managed_peak_byte_envelope": 197392,
+        "memory_scope": "whole live borrowed history + declared caller payload + constructor/synthesis managed envelopes; receipt formatting, allocator bookkeeping, opaque backend/RSS and preceding physical/history build peak excluded",
+        "observation_retained_bytes": 0,
+        "observation_scratch_bytes": 0,
+        "primitive_cost_scope": "portable X/H/Ry/scalar Phase with signed controls; no Clifford+T decomposition, native dispatch-work or hardware depth claim",
+        "quantum_execution": false,
+        "rhs_norm": 0.3954823004889093,
+        "rhs_preparation": {
+          "coefficients": 127,
+          "compile_work": 1280,
+          "construction_peak_bytes": 4208,
+          "constructor_declared_gates": 314,
+          "count": {
+            "accepted_work": 0,
+            "adjoint": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "forward": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "observed_emissions": 0,
+            "rejection": "count allowance exhausted before replay"
+          },
+          "error_bound": null,
+          "norm": 0.3954823004889093,
+          "padded_dimension": 64,
+          "qubits": 6,
+          "retained_bytes": 1200
+        },
+        "sampling": null,
+        "sampling_rejection": null,
+        "status": "constructed-resources-partial",
+        "timings": {
+          "count_seconds": 0.000317242,
+          "rhs_compilation_seconds": 1.106e-05,
+          "sampling_validation_seconds": 0.0,
+          "source_construction_seconds": 0.00316943,
+          "synthesis_seconds": 0.0
+        }
+      },
+      "time_cells": 1,
+      "time_order": 2,
+      "truncation_accuracy_established": false
+    },
+    {
+      "all_physical_coordinates": 5,
+      "configuration_boundary": "periodic central; bump touches boundary; not boundary-resolved",
+      "configuration_nodes": 32,
+      "configuration_order": 1,
+      "exact_zero_generator": true,
+      "generator_nonzeros": 0,
+      "history_build_peak_bytes": null,
+      "history_build_seconds": 0.00488301,
+      "horizon": 0.001,
+      "lift": "kvn",
+      "physical_order": 1,
+      "physical_response_accuracy_established": false,
+      "resources": {
+        "caller_external_retained_bytes": 368,
+        "count_work": 20,
+        "encoding": {
+          "construction_peak_bytes": 279040,
+          "constructor_count_pass_gates": 1576,
+          "count": {
+            "accepted_work": 20,
+            "adjoint": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "forward": {
+              "control_occurrences": 180,
+              "controlled_gates": 18,
+              "gates": 20,
+              "h": 2,
+              "maximum_controls": 11,
+              "phase": 8,
+              "ry": 10,
+              "x": 0
+            },
+            "observed_emissions": 21,
+            "rejection": "QSVT resource limit: shared resource count allowance"
+          },
+          "descriptor": {
+            "auxiliary_qubits_including_signal": 4,
+            "binary64_parameters": true,
+            "clean_workspace_mask": 1537,
+            "clean_workspace_value": 0,
+            "cols": 192,
+            "construction_identity": 6706514227610359352,
+            "data_qubits": 8,
+            "encoding_error_bound": null,
+            "encoding_qubits": 11,
+            "inverse_qubits": 12,
+            "left": {
+              "fixed_mask": 1537,
+              "fixed_value": 0,
+              "logical_end": 192,
+              "logical_start": 0
+            },
+            "normalization": 4.0,
+            "preparation_error_bound": 0.0,
+            "right": {
+              "fixed_mask": 1537,
+              "fixed_value": 0,
+              "logical_end": 192,
+              "logical_start": 0
+            },
+            "rows": 192,
+            "source_identity": 10222014799722591461,
+            "system_mask": 510,
+            "workspace_mask": 1537
+          },
+          "matching_scan_work_model_ceiling": 246532384,
+          "retained_bytes": 74224
+        },
+        "history_dimension": 192,
+        "history_nonzeros": 544,
+        "history_retained_bytes": 17968,
+        "inverse": null,
+        "inverse_rejection": null,
+        "managed_peak_byte_envelope": 311976,
+        "memory_scope": "whole live borrowed history + declared caller payload + constructor/synthesis managed envelopes; receipt formatting, allocator bookkeeping, opaque backend/RSS and preceding physical/history build peak excluded",
+        "observation_retained_bytes": 0,
+        "observation_scratch_bytes": 0,
+        "primitive_cost_scope": "portable X/H/Ry/scalar Phase with signed controls; no Clifford+T decomposition, native dispatch-work or hardware depth claim",
+        "quantum_execution": false,
+        "rhs_norm": 1.0,
+        "rhs_preparation": {
+          "coefficients": 511,
+          "compile_work": 6144,
+          "construction_peak_bytes": 15536,
+          "constructor_declared_gates": 1274,
+          "count": {
+            "accepted_work": 0,
+            "adjoint": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "forward": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "observed_emissions": 0,
+            "rejection": "count allowance exhausted before replay"
+          },
+          "error_bound": null,
+          "norm": 1.0,
+          "padded_dimension": 256,
+          "qubits": 8,
+          "retained_bytes": 4272
+        },
+        "sampling": null,
+        "sampling_rejection": null,
+        "status": "constructed-resources-partial",
+        "timings": {
+          "count_seconds": 0.000400853,
+          "rhs_compilation_seconds": 3.179e-05,
+          "sampling_validation_seconds": 0.0,
+          "source_construction_seconds": 0.003500322,
+          "synthesis_seconds": 0.0
+        }
+      },
+      "time_cells": 2,
+      "time_order": 2
+    },
+    {
+      "all_physical_coordinates": 5,
+      "configuration_boundary": "periodic central; bump touches boundary; not boundary-resolved",
+      "configuration_nodes": 243,
+      "configuration_order": 2,
+      "exact_zero_generator": false,
+      "generator_nonzeros": 1384,
+      "history_build_peak_bytes": null,
+      "history_build_seconds": 0.068172964,
+      "horizon": 0.001,
+      "lift": "kvn",
+      "physical_order": 1,
+      "physical_response_accuracy_established": false,
+      "resources": {
+        "caller_external_retained_bytes": 520,
+        "count_work": 20,
+        "encoding": {
+          "construction_peak_bytes": 6367232,
+          "constructor_count_pass_gates": 82469,
+          "count": {
+            "accepted_work": 20,
+            "adjoint": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "forward": {
+              "control_occurrences": 236,
+              "controlled_gates": 16,
+              "gates": 20,
+              "h": 4,
+              "maximum_controls": 16,
+              "phase": 7,
+              "ry": 9,
+              "x": 0
+            },
+            "observed_emissions": 21,
+            "rejection": "QSVT resource limit: shared resource count allowance"
+          },
+          "descriptor": {
+            "auxiliary_qubits_including_signal": 6,
+            "binary64_parameters": true,
+            "clean_workspace_mask": 61441,
+            "clean_workspace_value": 0,
+            "cols": 1458,
+            "construction_identity": 1695143576085644958,
+            "data_qubits": 11,
+            "encoding_error_bound": null,
+            "encoding_qubits": 16,
+            "inverse_qubits": 17,
+            "left": {
+              "fixed_mask": 61441,
+              "fixed_value": 0,
+              "logical_end": 1458,
+              "logical_start": 0
+            },
+            "normalization": 16.0,
+            "preparation_error_bound": 0.0,
+            "right": {
+              "fixed_mask": 61441,
+              "fixed_value": 0,
+              "logical_end": 1458,
+              "logical_start": 0
+            },
+            "rows": 1458,
+            "source_identity": 16132691027094412045,
+            "system_mask": 4094,
+            "workspace_mask": 61441
+          },
+          "matching_scan_work_model_ceiling": 1982201585739,
+          "retained_bytes": 1698160
+        },
+        "history_dimension": 1458,
+        "history_nonzeros": 12435,
+        "history_retained_bytes": 333736,
+        "inverse": null,
+        "inverse_rejection": null,
+        "managed_peak_byte_envelope": 7011600,
+        "memory_scope": "whole live borrowed history + declared caller payload + constructor/synthesis managed envelopes; receipt formatting, allocator bookkeeping, opaque backend/RSS and preceding physical/history build peak excluded",
+        "observation_retained_bytes": 0,
+        "observation_scratch_bytes": 0,
+        "primitive_cost_scope": "portable X/H/Ry/scalar Phase with signed controls; no Clifford+T decomposition, native dispatch-work or hardware depth claim",
+        "quantum_execution": false,
+        "rhs_norm": 1.0000000000000004,
+        "rhs_preparation": {
+          "coefficients": 4095,
+          "compile_work": 61440,
+          "construction_peak_bytes": 121808,
+          "constructor_declared_gates": 10234,
+          "count": {
+            "accepted_work": 0,
+            "adjoint": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "forward": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "observed_emissions": 0,
+            "rejection": "count allowance exhausted before replay"
+          },
+          "error_bound": null,
+          "norm": 1.0,
+          "padded_dimension": 2048,
+          "qubits": 11,
+          "retained_bytes": 32944
+        },
+        "sampling": null,
+        "sampling_rejection": null,
+        "status": "constructed-resources-partial",
+        "timings": {
+          "count_seconds": 0.009347858,
+          "rhs_compilation_seconds": 0.000275282,
+          "sampling_validation_seconds": 0.0,
+          "source_construction_seconds": 3.683009135,
+          "synthesis_seconds": 0.0
+        }
+      },
+      "time_cells": 2,
+      "time_order": 2
+    },
+    {
+      "all_physical_coordinates": 5,
+      "fixed_lift_order": 2,
+      "history_build_peak_bytes": null,
+      "history_build_seconds": 0.013695205,
+      "horizon": 0.001,
+      "lift": "symmetric-carleman",
+      "lift_dimension": 20,
+      "physical_order": 1,
+      "physical_scale": 0.2,
+      "resources": {
+        "caller_external_retained_bytes": 0,
+        "count_work": 20,
+        "encoding": {
+          "construction_peak_bytes": 365056,
+          "constructor_count_pass_gates": 3685,
+          "count": {
+            "accepted_work": 20,
+            "adjoint": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "forward": {
+              "control_occurrences": 180,
+              "controlled_gates": 15,
+              "gates": 20,
+              "h": 5,
+              "maximum_controls": 13,
+              "phase": 7,
+              "ry": 8,
+              "x": 0
+            },
+            "observed_emissions": 21,
+            "rejection": "QSVT resource limit: shared resource count allowance"
+          },
+          "descriptor": {
+            "auxiliary_qubits_including_signal": 7,
+            "binary64_parameters": true,
+            "clean_workspace_mask": 7937,
+            "clean_workspace_value": 0,
+            "cols": 120,
+            "construction_identity": 13609487507448063429,
+            "data_qubits": 7,
+            "encoding_error_bound": null,
+            "encoding_qubits": 13,
+            "inverse_qubits": 14,
+            "left": {
+              "fixed_mask": 7937,
+              "fixed_value": 0,
+              "logical_end": 120,
+              "logical_start": 0
+            },
+            "normalization": 32.0,
+            "preparation_error_bound": 0.0,
+            "right": {
+              "fixed_mask": 7937,
+              "fixed_value": 0,
+              "logical_end": 120,
+              "logical_start": 0
+            },
+            "rows": 120,
+            "source_identity": 13335850908520178857,
+            "system_mask": 254,
+            "workspace_mask": 7937
+          },
+          "matching_scan_work_model_ceiling": 491086592,
+          "retained_bytes": 103600
+        },
+        "history_dimension": 120,
+        "history_nonzeros": 712,
+        "history_retained_bytes": 22144,
+        "inverse": null,
+        "inverse_rejection": null,
+        "managed_peak_byte_envelope": 405256,
+        "memory_scope": "whole live borrowed history + declared caller payload + constructor/synthesis managed envelopes; receipt formatting, allocator bookkeeping, opaque backend/RSS and preceding physical/history build peak excluded",
+        "observation_retained_bytes": 0,
+        "observation_scratch_bytes": 0,
+        "primitive_cost_scope": "portable X/H/Ry/scalar Phase with signed controls; no Clifford+T decomposition, native dispatch-work or hardware depth claim",
+        "quantum_execution": false,
+        "rhs_norm": 0.3954823004889093,
+        "rhs_preparation": {
+          "coefficients": 255,
+          "compile_work": 2816,
+          "construction_peak_bytes": 8240,
+          "constructor_declared_gates": 634,
+          "count": {
+            "accepted_work": 0,
+            "adjoint": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "forward": {
+              "control_occurrences": 0,
+              "controlled_gates": 0,
+              "gates": 0,
+              "h": 0,
+              "maximum_controls": 0,
+              "phase": 0,
+              "ry": 0,
+              "x": 0
+            },
+            "observed_emissions": 0,
+            "rejection": "count allowance exhausted before replay"
+          },
+          "error_bound": null,
+          "norm": 0.3954823004889093,
+          "padded_dimension": 128,
+          "qubits": 7,
+          "retained_bytes": 2224
+        },
+        "sampling": null,
+        "sampling_rejection": null,
+        "status": "constructed-resources-partial",
+        "timings": {
+          "count_seconds": 0.000650694,
+          "rhs_compilation_seconds": 2.082e-05,
+          "sampling_validation_seconds": 0.0,
+          "source_construction_seconds": 0.013409253,
+          "synthesis_seconds": 0.0
+        }
+      },
+      "time_cells": 2,
+      "time_order": 2,
+      "truncation_accuracy_established": false
+    }
+  ],
+  "same_complete_physical_model": true,
+  "sampling_premises": "illustrative caller hypotheses, not simulator-derived or certified",
+  "schema": "quest-cfd-constructed-resource-curves-v1",
+  "source": "complete PeriodicBdm1 two-triangle mass-orthonormal five-coordinate chart, viscosity0.01",
+  "time_orders": [
+    1,
+    2
+  ],
+  "recorded_context": {
+    "recorded_at_utc": "2026-10-05T22:38:28.605016+00:00",
+    "base_commit": "dd9a869ebe9952cf85a6411a180ed7b688f568fb",
+    "execution": "local serial Linux x86_64 debug Cargo profile; no native quantum/MPI execution",
+    "source_hash_scope": "Listed files read after both curve runs; selected source snapshot only, not a complete dependency inventory, compiler-input identity or reproducible build attestation. Other uncommitted stages exist in this shared worktree.",
+    "source_sha256": {
+      "crates/quest-cfd/src/lib.rs": "7543febd4522502d8cace34ab7025d993fc7333a72941777917419fb65a82317",
+      "crates/quest-cfd/src/distributed_history.rs": "0751f54b9c7c274ed50b7a3342ba8651403552b91007a5a4f5bc0f3e7ceba64a",
+      "crates/quest-cfd/src/constructed_resources.rs": "d12141760e032ec95b7445bd822f88fb8996f1a5abb9eb37fadba895190cf2c8",
+      "crates/quest-cfd/src/main.rs": "d0b93e68ee7d938ef89992c573e4a43bfb4f45b5ca3959890e11e403b7fef200",
+      "crates/quest-cfd/examples/resource_curves.rs": "78045ed1ecbdee95938eba57ccb8dd2f2a0c14967a46790d6f06ca117d46093e",
+      "crates/quest-cfd/tests/constructed_resources.rs": "9bfbcf0cd4281eb2293e2acc61d6c4b3c1a879b270eef32554f00e2ba75d4d43",
+      "crates/quest-cfd/tests/resource_build.rs": "17dee4b3dcee4f762199fa26e791145da43d0f5874690f1a12efc3d2c1d71342",
+      "crates/quest-cfd/src/history.rs": "f8d77f13c8e676bd1b17ddb0419eba812eaeaa6499c925116af307ecc11fb27d",
+      "crates/quest-cfd/src/configuration.rs": "11d1a4d3d7e59209e02d67fb09f8083e2309f5eb6e084e26e02274c98ab3e8aa",
+      "crates/quest-cfd/src/carleman.rs": "59ea79465483ec75dab03662ee6c7b0bd4dc8e64a2525816d7def62634d6f9cc",
+      "crates/quest-cfd/src/probability_observation.rs": "ef700d56fef867ebedf1b270e47c2b4e093ceae068838b958754ac4504ecebca",
+      "crates/quest-qsvt/src/matching.rs": "4e9ecb941e1dbbe97dea2255436f0a9393478952618a71724d28a46581bb86e3",
+      "crates/quest-qsvt/src/owned_replay.rs": "73e39978e484f31a143d22387a9011d40a8a718c79fbc25da6df1217efaec662",
+      "crates/quest-qsvt/src/state_preparation.rs": "2a429c0543b6ffa2ce11587a954168cc2112c8b6a2eabacbc5f3b9aaceced71a",
+      "crates/quest-qsvt/src/replay_transform.rs": "ea3860cc14189db5632ad6ec2882293026cc811d76149a84cb0c5447f155c33b",
+      "crates/quest-qsvt/src/reciprocal.rs": "276db3b265a7de3ce272c37093b6ccf63fe304e90feaa0b98426a614a5dea538"
+    },
+    "binary_hash_scope": "Actual example file read after the runs; hash identifies a local tested binary, without attesting its complete compiler inputs.",
+    "example_binary_sha256": "4c323cf59b6e719c945dacacbae557ac5012f4448ea5ccbef1a7c0cdfa9e45f5",
+    "limits": {
+      "max_bytes": 268435456,
+      "max_matching_work": 10000000000000,
+      "max_count_work": 20,
+      "max_gates_per_orientation": 100000000,
+      "max_preparation_compile_work": 67108864,
+      "max_preparation_gates": 8388608
+    },
+    "inverse_limits": null,
+    "receipt_validation_scope": "Finite numeric fields; exact 12 lift/order/cell keys; source/preparation existence, positive normalization, complete/partial status, visitor accounting and managed envelope; no physical/convergence/native numerical validation.",
+    "command": "cargo run -p quest-cfd --example resource_curves -- --count-work 20",
+    "artifact_validation": {
+      "rows_checked": 12,
+      "finite_numbers": true,
+      "counted_rows": 0,
+      "retained_partial_rows": 12,
+      "failed_physical_accuracy_claims_not_promoted": true
+    }
+  }
+}

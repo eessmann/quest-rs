@@ -1,0 +1,114 @@
+{
+  "schema": "quest.workspace-verification.checkpoint.v1",
+  "base_commit": "dd9a869ebe9952cf85a6411a180ed7b688f568fb",
+  "environment": {
+    "rust": "1.101.0-nightly (db8f076d2 2026-10-03)",
+    "quest": "4.3.0 installed, native source unchanged",
+    "mpi": "MPICH 4.2.2; QuEST, MPICC and mpiexec ABI matched",
+    "hdf5": "serial",
+    "execution": "local CPU native statevector; MPI socket-dependent tests allowed loopback networking"
+  },
+  "checkpoint": "02-boundaries-observables-constructed-resources",
+  "recorded_utc": "2026-10-05T22:47:49.435352+00:00",
+  "source_sha256": "283a3c745f9b1a506f446a8f31a68d7a1e8565fb51e75e6229a7b7322f605eaa",
+  "source_file_count": 748,
+  "source_manifest": "checkpoint-02-source.json",
+  "source_unchanged_before_after": true,
+  "gates": [
+    {
+      "name": "all_features_tests",
+      "command": "cargo nextest run --workspace --all-features --test-threads 4 --no-fail-fast",
+      "exit_code": 0,
+      "log_sha256": "83afdd27ce26654b93b5add625de4d257103bc798f2d3bdcfc9c7c02fa94f7d0",
+      "seconds": 209.437,
+      "tests_run": 1484,
+      "passed": 1484,
+      "skipped": 4
+    },
+    {
+      "name": "default_tests",
+      "command": "cargo nextest run --workspace --test-threads 4 --no-fail-fast",
+      "exit_code": 0,
+      "log_sha256": "425b2fa12d62c4d92669606980d0e5b8a3f593fd416807b09ce2fe8da44f5106",
+      "seconds": 114.726,
+      "tests_run": 1328,
+      "passed": 1328,
+      "skipped": 1
+    },
+    {
+      "name": "doctests",
+      "command": "cargo test --workspace --all-features --doc",
+      "exit_code": 0,
+      "log_sha256": "0b968e18cfd49c49bd271fa7c88c5268521948e23cd4176a1625825649d93839",
+      "suites": 24,
+      "passed": 65,
+      "failed": 0,
+      "ignored": 1
+    },
+    {
+      "name": "clippy",
+      "command": "cargo clippy --workspace --all-features --all-targets -- -D warnings",
+      "exit_code": 0,
+      "log_sha256": "abb3adfe2c432fa325c562c8715ede62e5756c67de93eca9b7aaa2f24dc1120a"
+    },
+    {
+      "name": "default_all_targets",
+      "command": "cargo check --workspace --all-targets",
+      "exit_code": 0,
+      "log_sha256": "117eaa363d688126e714b6ffdebb02cc8465e3220b3308f9fecf43bfde62648f"
+    },
+    {
+      "name": "format",
+      "command": "cargo fmt --all -- --check",
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "binding_freshness",
+      "command": "cargo run -p xtask -- generate-quest-bindings --check",
+      "exit_code": 0,
+      "log_sha256": "4dc6a7d1802f90bdc3dc5155e7914eff6e8502d730304659d3072797fa55e789"
+    },
+    {
+      "name": "whitespace",
+      "command": "git diff --check",
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "historical_evidence": [
+    {
+      "name": "offline_catalog",
+      "receipt": "checkpoint-01-verification.json",
+      "status": "previous passing run; unchanged catalog; not rerun at checkpoint02"
+    }
+  ],
+  "preliminary_attempts": [
+    {
+      "name": "all_features_tests",
+      "exit_code": 0,
+      "scope": "1483 passed, four skipped before final resource-report regression and formatting correction",
+      "log_sha256": "5df4eb4abe28231c1bcd6ed0ac5e1b217e8214ca976b529ba77987f6cbc50928"
+    },
+    {
+      "name": "format",
+      "exit_code": 1,
+      "scope": "module ordering and export wrapping; corrected before frozen final checks",
+      "log_sha256": "a1f49462e4a494c0519371a427b2ea776ad5443b0c1e52122a4b8fa014763b45"
+    },
+    {
+      "name": "clippy",
+      "exit_code": 101,
+      "scope": "manual_assert in test-only injected-panic branch; corrected before frozen final checks",
+      "log_sha256": "0c320739b9aa2c3073ea82d7832488fb9e0ef8490c5e385e07b45090dae7f2fd"
+    }
+  ],
+  "limitations": [
+    "Source manifest excludes Markdown and docs/verification; static-audit-02.json records the separate audit.",
+    "Recorded logs were local; their byte hashes preserve identity but are not independent build attestations.",
+    "Intentional skipped/ignored tests are not passing execution evidence.",
+    "Compiler notices about the nightly generic-constant-expression trait solver remain distinct from the successful strict Clippy result.",
+    "New stages after this frozen checkpoint require their own affected tests and integrated gates.",
+    "No multi-host capacity, actual huge-count transfer, accelerator, hardware, speedup or physical-convergence acceptance is implied."
+  ]
+}

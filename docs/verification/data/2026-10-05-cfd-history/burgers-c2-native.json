@@ -1,0 +1,110 @@
+{
+  "construction": {
+    "all_independent_coordinates_retained": true,
+    "case": "burgers",
+    "coefficient_evidence": {
+      "autonomous_linear_quadratic": true,
+      "forcing_norm_upper": 0.0,
+      "linear_norm_upper": 184.9367459430387,
+      "logarithmic_norm_upper": 5.329070518200751e-15,
+      "quadratic_norm_lower": 3.771236166328253,
+      "quadratic_norm_upper": 17.281975195754306,
+      "theorem_status": "coefficient bounds only; complete Carleman convergence hypotheses not certified"
+    },
+    "coefficient_extraction": {
+      "status": "MathCore exact polynomial forms with recorded quadrature coefficients"
+    },
+    "exact_zero_trajectory": false,
+    "explicit_scale_override": null,
+    "history_dimension": 88,
+    "history_nonzeros": 644,
+    "horizon": 0.001,
+    "independent_coordinates": 8,
+    "lift": "carleman",
+    "lift_dimension": 44,
+    "lift_order": 2,
+    "normal_equations": false,
+    "physical_scale": 0.008886099114058446,
+    "quantum_execution": false,
+    "representation": "all normalized symmetric monomials; degree zero is external forcing",
+    "scaling_evidence": {
+      "corrected_forcing_hypothesis": true,
+      "initial_norm": 0.004443049557029223,
+      "rc_upper": null,
+      "scale": 0.008886099114058446,
+      "status": "experimental full-coordinate scale; insufficient theorem evidence is not divergence"
+    },
+    "scaling_evidence_applies_to_override": true,
+    "spectral_bound_rejection": null,
+    "spectral_bounds": {
+      "evidence": "Analytic { description: \"Temporal DG1 slab coercivity and finite causal inverse series, with outward sparse Hermitian-part Gershgorin lower bound\" }",
+      "lower": 0.48010590087393906,
+      "upper": 1.1222940990635206
+    },
+    "status": "construction-only",
+    "theorem_convergence_certified": false,
+    "time_cells": 1,
+    "time_order": 1,
+    "truncation_accuracy_established": false
+  },
+  "final_observables": {
+    "combined_inverse_degree_time_probability": 0.002881660876901234,
+    "degree_one_and_final_time_probability_given_inverse": 0.3997001563038183,
+    "energy": 9.851773024739007e-06,
+    "final_time_selection_probability_given_inverse": 0.4994380327762402,
+    "history_inverse_success_probability": 0.007209556542456889,
+    "imaginary_lift_norm": 3.114369760369956e-15,
+    "lift_chain_rule_truncation_defect": 0.003221295828148336,
+    "observable_recovery": "bounded full-state readout; sampling cost not certified",
+    "physical_coordinates": [
+      -8.942848981525585e-09,
+      0.0015583058236715013,
+      0.0015583106024944851,
+      0.00221933673243552,
+      0.0022193647637781294,
+      0.0015804815540788407,
+      0.0015804871546321393,
+      9.198527253569768e-09
+    ],
+    "physical_reconstruction_defect": 1.0161375039394816e-09,
+    "physical_scale": 0.008886099114058446,
+    "solution_norm": 0.7901215091691748,
+    "truncation_accuracy_established": false
+  },
+  "physical_convergence_established": false,
+  "solve": {
+    "alpha": 8.8192,
+    "approximation_error_bound": 1.0455738459956568e-06,
+    "backend": "QuEST CPU execution of the complete matching QSVT unitary",
+    "conversion_roundoff_estimate": 8.611026733366426e-13,
+    "history_dimension": 88,
+    "physical_rescaling": 9.305497750519018,
+    "polynomial_degree": 465,
+    "projector_response_bound": null,
+    "qubits": 13,
+    "reciprocal_scale": 0.006811710951559972,
+    "relative_residual": 4.368167669289612e-06,
+    "residual_tolerance": 0.01,
+    "retained_physical_coordinates": 8,
+    "rhs_norm": 0.5590169943749473,
+    "rhs_preparation": "coherent amplitude-tree circuit",
+    "rhs_preparation_coefficients": 255,
+    "rhs_preparation_error_bound": null,
+    "rhs_preparation_gates": 634,
+    "spectral_lower": 0.48010590087393906,
+    "spectral_upper": 1.1222940990635206,
+    "status": "quantum-circuit-reference-executed",
+    "success_probability": 0.007209556542456889,
+    "timings": {
+      "backend_preparation_seconds": 0.002543856,
+      "certification_seconds": 0.000576144,
+      "execution_seconds": 2.452603482,
+      "preprocessing_seconds": 0.026135223,
+      "readout_seconds": 0.0006170840000000001,
+      "rhs_compilation_seconds": 3.126e-05,
+      "rhs_preparation_seconds": 0.008025689999999999,
+      "synthesis_seconds": 0.036273446,
+      "transfer_seconds": 0.0
+    }
+  }
+}

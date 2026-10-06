@@ -406,12 +406,11 @@ mod tests {
 	fn mpi_admission_precedes_root_worker_spawns() -> googletest::Result<()> {
 		const NAME: &str = "distributed::tests::mpi_admission_precedes_root_worker_spawns";
 		if std::env::var("QUEST_WORKER_ORDER_TEST").as_deref() != Ok(NAME) {
-			let output = std::process::Command::new("timeout")
-				.args(["60s", "mpiexec", "-n", "2"])
-				.arg(std::env::current_exe()?)
-				.args(["--exact", NAME, "--nocapture", "--test-threads=1"])
-				.env("QUEST_WORKER_ORDER_TEST", NAME)
-				.output()?;
+			let output =
+				quest_test_support::mpi::MpiTest::new(2, std::time::Duration::from_secs(60))?
+					.args(["--exact", NAME, "--nocapture", "--test-threads=1"])
+					.env("QUEST_WORKER_ORDER_TEST", NAME)
+					.output()?;
 			expect_true!(
 				output.status.success(),
 				"{}",
@@ -421,6 +420,7 @@ mod tests {
 		}
 		let runtime = mpi!(MpiRuntime::initialize())?;
 		let mut comm = mpi!(runtime.world())?;
+		quest_test_support::mpi::assert_rank_count(mpi!(comm.size())?)?;
 		let mut spawned = 0_usize;
 		let pool = root_resources(&runtime, &mut comm, || {
 			Ok(rayon::ThreadPoolBuilder::new()

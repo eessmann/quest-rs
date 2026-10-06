@@ -8,6 +8,21 @@ and [tutorial validation guide](../book/src/validation.md) for current commands.
 
 | Record | Scope |
 | --- | --- |
+| [Portable native builds and Cirrus, 2026-10-06](2026-10-06-portable-cirrus.md) | Compiler/module discovery, ordered native links, shared MPI supervision, central HDF5, exclusive hybrid jobs and explicit capacity gates |
+| [Reviewed portable-native source, 2026-10-06](2026-10-06-portable-reviewed.md) | HDF5 fallback, fatal-drop negative control, safe Rust supervision and separate acceptance ledger for the corrected source |
+| [Explicit scaling mode, 2026-10-06](2026-10-06-scaling-only.md) | Observed process limits, managed budgets, focused local MPI checks and a separately frozen GNU/Cray release campaign; capacity remains open |
+| [Torc on Cirrus, 2026-10-06](2026-10-06-torc-cirrus.md) | Earlier standalone GNU/Cray build workflows and source-specific acceptance; the later [scaling campaign](2026-10-06-scaling-only.md) verifies a server-managed eight-node Cray runtime |
+| [Native discovery follow-up, 2026-10-06](2026-10-06-native-discovery-followup.md) | Bounded whole-archive file-kind admission, HDF5 pkg-config parity, independent regressions and downstream Linux verification |
+| [Cargo host policy on Cirrus Cray, 2026-10-06](2026-10-06-cargo-host-policy.md) | Documented host/target compiler configuration, expected linker failure, executed subnormal checks and source-specific workspace acceptance |
+| [MPI request ABI admission, 2026-10-06](2026-10-06-mpi-request-abi.md) | Independent request size/alignment witnesses, negative controls, local Linux verification and current Cirrus smoke evidence; macOS unrun |
+| [Linux native Clang and MPI, 2026-10-06](2026-10-06-native-clang.md) | Clang-built QuEST with LLVM OpenMP, default/all-feature workspace validation, independent MPI consumer and separate native installation loader outcomes |
+| [Linux native GNU, 2026-10-06](2026-10-06-native-gnu.md) | Frozen-source GCC workspace campaign, CPU/OpenMP consumers in normal and isolated loader modes, and independent local MPI at 1/2/4/8 ranks |
+| [Cirrus sparse capacity and scaling, 2026-10-06](2026-10-06-cirrus-capacity.md) | Original-input byte counts, multi-host placement, enforced process envelopes and separate execution/capacity outcomes |
+| [Real large-count MPI transport, 2026-10-06](2026-10-06-large-count-mpi.md) | GNU and Cray two-node transfers above the signed-int count boundary, full-byte verification and separate capacity limits |
+| [Sparse capacity follow-up, 2026-10-06](2026-10-06-sparse-capacity-followup.md) | Producer lifetime accounting, native array telemetry and resource-only native execution receipts |
+| [Matching communication-buffer reuse, 2026-10-06](2026-10-06-matching-buffer-reuse.md) | Reduced native array storage, whole-unitary and failure regressions, local affinity diagnosis and remaining admission limits |
+| [Cirrus node enforcement diagnostic, 2026-10-06](2026-10-06-node-enforcement.md) | Read-only compute-node cgroup observations, site memory limits, HugeTLB coverage uncertainty and remaining capacity gate |
+| [Persisted matching load phases, 2026-10-06](2026-10-06-matching-load-phases.md) | Measured collective directory costs and completed GNU/Cray comparisons separating portable admission from native loading |
 | [PennyLane and standard formats, 2026-10-03](2026-10-03-pennylane-formats.md) | Owned runtime HDF5 catalog, provenance, typed JSON, bounded output, TOML/CSV/Glaze migrations and offline distribution checks |
 | [All-feature QSP optimization, 2026-10-02](2026-10-02-qsp-optimization.md) | Installed-system and clean-devenv validation, algorithm-specific completion, root transfer pruning and shared FFT measurements |
 | [Dashu migration, 2026-10-02](2026-10-02-dashu-migration.md) | Pure-Rust arbitrary precision, canonical exact interchange, dependency cleanup and numerical/performance validation |

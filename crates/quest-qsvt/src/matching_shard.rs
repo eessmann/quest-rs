@@ -144,6 +144,14 @@ pub struct MatchingShard {
 	records: Vec<MatchingColumn>,
 }
 impl MatchingShard {
+	/// Summarize immutable local columns for collective manifest admission.
+	/// This additive fingerprint detects accidental corruption, not adversarial changes.
+	/// # Errors
+	/// Rejects column-field representation overflow.
+	pub fn summarize_records(records: &[MatchingColumn]) -> Result<(usize, u64)> {
+		Ok((records.len(), digest(records)?))
+	}
+
 	/// Snapshot this partition from an existing plan, retaining no parent storage.
 	/// This is a preprocessing convenience; distributed applications distribute
 	/// these owned shards before releasing the complete source plan.
@@ -158,7 +166,6 @@ impl MatchingShard {
 		if parts == 0 || !parts.is_power_of_two() || rank >= parts {
 			return Err(Error::Encoding("invalid matching shard ownership"));
 		}
-		let header = MatchingHeader::from_encoding(encoding)?;
 		let count = encoding
 			.matchings()
 			.iter()
@@ -170,10 +177,13 @@ impl MatchingShard {
 					.count()
 			})
 			.sum();
-		let bytes = storage_bytes(count)?;
+		let bytes = storage_bytes(count)?
+			.checked_add(crate::RECORD_FINGERPRINT_SCRATCH_BYTES)
+			.ok_or(Error::Budget("matching hash scratch"))?;
 		if bytes > policy.max_bytes {
 			return Err(Error::Budget("matching shard storage"));
 		}
+		let header = MatchingHeader::from_encoding(encoding)?;
 		let mut records = Vec::new();
 		records
 			.try_reserve_exact(count)
@@ -202,7 +212,14 @@ impl MatchingShard {
 		if parts == 0 || !parts.is_power_of_two() || rank >= parts {
 			return Err(Error::Encoding("invalid matching shard ownership"));
 		}
-		if storage_bytes(records.capacity())? > policy.max_bytes {
+		let peak = storage_bytes(records.capacity())?
+			.checked_add(if parts == 1 {
+				crate::RECORD_FINGERPRINT_SCRATCH_BYTES
+			} else {
+				0
+			})
+			.ok_or(Error::Budget("matching hash scratch"))?;
+		if peak > policy.max_bytes {
 			return Err(Error::Budget("matching shard storage"));
 		}
 		let system = header.system_dimension()?;
@@ -346,10 +363,5 @@ fn column_digest(column: MatchingColumn) -> Result<u64> {
 		column.phase.re.to_bits(),
 		column.phase.im.to_bits(),
 	];
-	Ok(words
-		.into_iter()
-		.flat_map(u64::to_le_bytes)
-		.fold(0xcbf2_9ce4_8422_2325_u64, |hash, byte| {
-			(hash ^ u64::from(byte)).wrapping_mul(0x0100_0000_01b3)
-		}))
+	Ok(crate::record_fingerprint(0x4d43_4f4c_554d_4e32, words))
 }

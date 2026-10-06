@@ -4,30 +4,13 @@
 //! phases scan native local partitions in bounded chunks, including unsuccessful
 //! flag/color sectors and arbitrary spectator qubits.
 use super::{Result, matching::PreparedMatching};
-use crate::{
-	Environment, QubitCount, Register, StateVector, environment::Reservation, error::BackendResult,
-};
+use crate::{Environment, QubitCount, Register, StateVector, environment::Reservation};
 use quest_qsvt::{
 	MatchingHeader, MatchingShard,
 	replay_transform::{MatchingSchedule, TransformStep},
 };
 
-const PHASE_CHUNK: usize = 256;
-const PHASE_BYTES: usize = PHASE_CHUNK * size_of::<quest_sys::QuestComplex>();
-// Include collective metadata comparison storage and scalar routing frames as
-// well as the phase buffer, even though their peaks do not usually coincide.
-const SCRATCH_BYTES: usize = PHASE_BYTES + 8192 + 512;
-
-struct ProjectorLayout {
-	count: QubitCount,
-	response: usize,
-	response_mask: usize,
-	zero_mask: usize,
-	system: Vec<(usize, usize)>,
-	contiguous_system: Option<(usize, usize)>,
-	rows: usize,
-	cols: usize,
-}
+struct ProjectorLayout(super::transform_execution::TransformLayout);
 impl ProjectorLayout {
 	fn new(
 		header: MatchingHeader,
@@ -35,189 +18,30 @@ impl ProjectorLayout {
 		targets: &[usize],
 		response: usize,
 	) -> crate::Result<Self> {
-		header
-			.validate()
+		let descriptor = quest_qsvt::EncodingDescriptor::from_matching_header(header)
 			.map_err(|_| crate::Error::Value("invalid matching header"))?;
-		if targets.len() != header.num_qubits().map_err(|_| crate::Error::Overflow)? {
-			return Err(crate::Error::Value("QSVT matching target count"));
-		}
-		let mut active = 0;
-		for &target in targets {
-			if target >= count.get() || active & super::matching::bit(target)? != 0 {
-				return Err(crate::Error::Value("invalid QSVT matching targets"));
-			}
-			active |= super::matching::bit(target)?;
-		}
-		if response >= count.get() || targets.contains(&response) {
-			return Err(crate::Error::Value(
-				"QSVT response overlaps matching targets or exceeds register",
-			));
-		}
-		let response_mask = super::matching::bit(response)?;
-		let mut system = Vec::new();
-		system
-			.try_reserve_exact(header.system_qubits)
-			.map_err(|_| crate::Error::Overflow)?;
-		let color_start = header
-			.system_qubits
-			.checked_add(1)
-			.ok_or(crate::Error::Overflow)?;
-		for (packed, index) in (1..color_start).enumerate() {
-			let physical = *targets
-				.get(index)
-				.ok_or(crate::Error::Value("QSVT system target"))?;
-			system.push((
-				super::matching::bit(physical)?,
-				super::matching::bit(packed)?,
-			));
-		}
-		let mut zero_mask = super::matching::bit(
-			*targets
-				.first()
-				.ok_or(crate::Error::Value("QSVT flag target"))?,
-		)?;
-		for index in color_start..targets.len() {
-			zero_mask |= super::matching::bit(
-				*targets
-					.get(index)
-					.ok_or(crate::Error::Value("QSVT color target"))?,
-			)?;
-		}
-		let system_targets = targets.get(1..color_start).ok_or(crate::Error::Overflow)?;
-		let contiguous_system = system_targets
-			.windows(2)
-			.all(|pair| {
-				pair.first()
-					.and_then(|target| target.checked_add(1))
-					.as_ref()
-					== pair.get(1)
-			})
-			.then(|| {
-				(
-					system
-						.iter()
-						.fold(0, |mask, &(physical, _)| mask | physical),
-					system_targets.first().copied().unwrap_or(0),
-				)
-			});
-		Ok(Self {
+		super::transform_execution::TransformLayout::new(
+			&descriptor,
 			count,
+			targets,
 			response,
-			response_mask,
-			zero_mask,
-			system,
-			contiguous_system,
-			rows: header.rows,
-			cols: header.cols,
-		})
-	}
-	fn logical_index(&self, basis: usize) -> usize {
-		if let Some((mask, shift)) = self.contiguous_system {
-			return (basis & mask) >> shift;
-		}
-		self.system.iter().fold(0, |index, &(physical, logical)| {
-			if basis & physical == 0 {
-				index
-			} else {
-				index | logical
-			}
-		})
+			|_| Ok(()),
+		)
+		.map(Self)
+		.map_err(|_| crate::Error::Value("QSVT matching target layout"))
 	}
 	fn bytes(&self, schedule: &MatchingSchedule) -> Result<usize> {
-		self.system
-			.capacity()
-			.checked_mul(size_of::<(usize, usize)>())
-			.and_then(|n| n.checked_add(SCRATCH_BYTES))
-			.and_then(|n| n.checked_add(size_of::<Self>()))
-			.and_then(|n| n.checked_add(schedule.retained_bytes().ok()?))
-			.ok_or_else(|| crate::Error::Overflow.into())
-	}
-	#[allow(
-		clippy::arithmetic_side_effects,
-		reason = "Unit-modulus finite phase factors multiply already admitted native amplitudes"
-	)]
-	fn phase(
-		&self,
-		register: &mut Register<'_, StateVector>,
-		left: bool,
-		angle: f64,
-		response: bool,
-	) -> crate::Result<()> {
-		let positive = crate::Complex64::from_polar(1.0, angle);
-		let negative = positive.conj();
-		let bound = if left { self.rows } else { self.cols };
-		let local = register.deployment().local_amplitudes();
-		let global_start = register
-			.deployment()
-			.rank()
-			.checked_mul(local)
-			.ok_or(crate::Error::Overflow)?;
-		let mut buffer = [quest_sys::QuestComplex { re: 0.0, im: 0.0 }; PHASE_CHUNK];
-		for start in (0..local).step_by(PHASE_CHUNK) {
-			let length = local
-				.checked_sub(start)
-				.ok_or(crate::Error::Overflow)?
-				.min(PHASE_CHUNK);
-			let chunk_start = global_start
-				.checked_add(start)
-				.ok_or(crate::Error::Overflow)?;
-			// Native state partitions and these chunks have aligned power-of-two
-			// lengths, so sufficiently high response bits are constant in a chunk.
-			if self.response_mask >= length && (chunk_start & self.response_mask != 0) != response {
-				continue;
-			}
-			let chunk = buffer.get_mut(..length).ok_or(crate::Error::Overflow)?;
-			let native_start = i64::try_from(start).map_err(|_| crate::Error::Overflow)?;
-			quest_sys::read_local_qureg_amps(&register.native, native_start, chunk)
-				.context("reading QSVT projector partition")?;
-			for (offset, value) in chunk.iter_mut().enumerate() {
-				let basis = chunk_start
-					.checked_add(offset)
-					.ok_or(crate::Error::Overflow)?;
-				if (basis & self.response_mask != 0) != response {
-					continue;
-				}
-				let factor = if basis & self.zero_mask == 0 && self.logical_index(basis) < bound {
-					positive
-				} else {
-					negative
-				};
-				let updated = crate::Complex64::new(value.re, value.im) * factor;
-				*value = quest_sys::QuestComplex {
-					re: updated.re,
-					im: updated.im,
-				};
-			}
-			quest_sys::write_local_qureg_amps(register.pin(), native_start, chunk)
-				.context("writing QSVT projector partition")?;
-		}
-		Ok(())
+		self.0
+			.bytes(schedule.general_schedule(), size_of::<MatchingHeader>())
 	}
 	fn native_step(
 		&self,
 		register: &mut Register<'_, StateVector>,
 		step: TransformStep,
 	) -> crate::Result<()> {
-		match step {
-			TransformStep::Hadamard => register.h(self.response),
-			TransformStep::ResponseRotation(angle) => quest_sys::apply_rotate_z(
-				register.pin(),
-				i32::try_from(self.response).map_err(|_| crate::Error::Overflow)?,
-				angle,
-			)
-			.context("applying QSVT response rotation"),
-			TransformStep::Projector {
-				left,
-				angle,
-				response,
-			} => self.phase(register, left, angle, response),
-			TransformStep::Oracle { .. } => {
-				Err(crate::Error::Value("oracle requires matching resource"))
-			}
-		}
+		self.0.legacy_step(register, step)
 	}
 }
-
 /// Owning QSVT schedule and matching resource tied to the allocating environment.
 pub struct PreparedMatchingTransform<'env> {
 	matching: PreparedMatching<'env>,
@@ -262,7 +86,7 @@ impl PreparedMatchingTransform<'_> {
 	/// Rejects a different environment or width before state mutation, and native failures.
 	pub fn apply(&mut self, register: &mut Register<'_, StateVector>, adjoint: bool) -> Result<()> {
 		if !std::ptr::eq(register.resources(), self.reservation.environment)
-			|| register.num_qubits() != self.layout.count
+			|| register.num_qubits() != self.layout.0.count
 		{
 			return Err(crate::Error::Value("QSVT register owner or width").into());
 		}
@@ -271,9 +95,9 @@ impl PreparedMatchingTransform<'_> {
 				self.matching.apply(
 					register,
 					adjoint,
-					self.layout.response_mask,
+					self.layout.0.response_mask,
 					if response {
-						self.layout.response_mask
+						self.layout.0.response_mask
 					} else {
 						0
 					},
@@ -424,7 +248,7 @@ pub mod collective {
 			agree(
 				&mut lane,
 				if std::ptr::eq(register.environment, self.environment)
-					&& register.num_qubits() == self.layout.count
+					&& register.num_qubits() == self.layout.0.count
 				{
 					Ok(())
 				} else {
@@ -437,9 +261,9 @@ pub mod collective {
 					self.matching.apply(
 						register,
 						adjoint,
-						self.layout.response_mask,
+						self.layout.0.response_mask,
 						if response {
-							self.layout.response_mask
+							self.layout.0.response_mask
 						} else {
 							0
 						},

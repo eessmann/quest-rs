@@ -179,11 +179,11 @@ pub fn box_reference(id: &str, reynolds: u32, subdivisions: u32) -> Result<BoxRe
 }
 
 #[allow(clippy::arithmetic_side_effects)]
-fn tgv2d_initial([x, y, _]: [f64; 3]) -> [f64; 3] {
+pub(crate) fn tgv2d_initial([x, y, _]: [f64; 3]) -> [f64; 3] {
 	[x.sin() * y.cos(), -x.cos() * y.sin(), 0.]
 }
 #[allow(clippy::arithmetic_side_effects)]
-fn tgv3d_initial([x, y, z]: [f64; 3]) -> [f64; 3] {
+pub(crate) fn tgv3d_initial([x, y, z]: [f64; 3]) -> [f64; 3] {
 	[
 		x.sin() * y.cos() * z.cos(),
 		-x.cos() * y.sin() * z.cos(),
@@ -193,7 +193,7 @@ fn tgv3d_initial([x, y, z]: [f64; 3]) -> [f64; 3] {
 
 /// Classical full-DG reference observables at a requested physical time.
 #[derive(Clone, Debug, serde::Serialize)]
-pub struct ReferenceSnapshot {
+pub struct ReferenceSnapshot<P = crate::simplex::SimplexPressureRecovery> {
 	/// Explicit execution provenance; never quantum/QSVT evidence.
 	pub method: String,
 	/// Physical case family.
@@ -209,7 +209,7 @@ pub struct ReferenceSnapshot {
 	/// Enstrophy averaged over physical volume.
 	pub mean_enstrophy: f64,
 	/// Full momentum, continuity and mean-zero pressure recovery evidence.
-	pub pressure: crate::simplex::SimplexPressureRecovery,
+	pub pressure: P,
 	/// Velocity at the geometric center, using the first-cell DG trace convention.
 	pub center_velocity: [f64; 3],
 	/// Analytic velocity error for 2D Taylor-Green only; absent for other cases.
@@ -226,6 +226,8 @@ pub struct ReferenceSnapshot {
 	pub midplane_samples: Vec<VelocityProbe>,
 	/// 2D cavity candidate from the largest absolute sampled streamfunction; coarse, not certified.
 	pub primary_vortex_candidate: Option<[f64; 3]>,
+	/// Fixed transverse-plane samples and spanwise reflection diagnostics for the 3D cavity.
+	pub cavity_3d: Option<crate::cavity_observations::Cavity3dObservations>,
 }
 
 impl BoxReference {
@@ -290,10 +292,19 @@ impl BoxReference {
 		let steady_residual_l2 = drift.iter().map(|v| v * v).sum::<f64>().sqrt();
 		let (centerline_profiles, midplane_samples, primary_vortex_candidate) =
 			if self.manifest.id.starts_with("cavity") {
-				cavity_probes(&self.model, &state)?
+				cavity_probes(self.manifest.dimension, |points| {
+					self.model.sample_velocities(&state, points)
+				})?
 			} else {
 				(Vec::new(), Vec::new(), None)
 			};
+		let cavity_3d = if self.manifest.id == "cavity3d" {
+			Some(crate::cavity_observations::cavity_3d_probes(|points| {
+				self.model.sample_velocities(&state, points)
+			})?)
+		} else {
+			None
+		};
 		Ok(ReferenceSnapshot {
 			method: "classical RK4 of the complete BDM1/P0 DG ODE".into(),
 			case: self.manifest.id.clone(),
@@ -311,6 +322,7 @@ impl BoxReference {
 			centerline_profiles,
 			midplane_samples,
 			primary_vortex_candidate,
+			cavity_3d,
 		})
 	}
 }
@@ -324,24 +336,20 @@ pub struct VelocityProbe {
 	pub velocity: [f64; 3],
 }
 
-type CavityProbes = (Vec<VelocityProbe>, Vec<VelocityProbe>, Option<[f64; 3]>);
+pub(crate) type CavityProbes = (Vec<VelocityProbe>, Vec<VelocityProbe>, Option<[f64; 3]>);
 
 #[allow(clippy::arithmetic_side_effects, clippy::indexing_slicing)]
-fn cavity_probes(
-	model: &crate::simplex::SimplexBdm,
-	state: &[f64],
+pub(crate) fn cavity_probes(
+	dimension: usize,
+	sample: impl Fn(&[[f64; 3]]) -> Result<Vec<[f64; 3]>, CfdError>,
 ) -> Result<CavityProbes, CfdError> {
-	let z = if model.physical_dimension() == 3 {
-		0.5
-	} else {
-		0.
-	};
+	let z = if dimension == 3 { 0.5 } else { 0. };
 	let mut lines = Vec::new();
 	for i in 0..=10 {
 		let t = f64::from(i) / 10.;
 		lines.extend([[0.5, t, z], [t, 0.5, z]]);
 	}
-	let line_values = model.sample_velocities(state, &lines)?;
+	let line_values = sample(&lines)?;
 	let profiles = lines
 		.iter()
 		.copied()
@@ -354,10 +362,10 @@ fn cavity_probes(
 			plane.push([f64::from(i) / 10., f64::from(j) / 10., z]);
 		}
 	}
-	let plane_values = model.sample_velocities(state, &plane)?;
+	let plane_values = sample(&plane)?;
 	let mut candidate = None;
 	let mut largest = 1e-14_f64;
-	if model.physical_dimension() == 2 {
+	if dimension == 2 {
 		for i in 1..10 {
 			let mut psi = 0.;
 			for j in 1..10 {

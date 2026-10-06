@@ -20,6 +20,7 @@ dashu-int = { workspace = true, optional = true }
 dashu-float = { workspace = true, optional = true }
 
 [dev-dependencies]
+mathcore.workspace = true
 criterion.workspace = true
 googletest.workspace = true
 

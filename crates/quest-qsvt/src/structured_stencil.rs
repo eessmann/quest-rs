@@ -41,12 +41,15 @@ pub struct StructuredStencilEncoding {
 	normalization: Normalization,
 	terms: Arc<[StructuredStencilTerm]>,
 	gate_count: usize,
+	source_identity: u64,
+	identity_work: usize,
 }
 impl StructuredStencilEncoding {
 	/// Freeze coefficients and arithmetic recipes in supplied deterministic order.
 	/// Zero coefficients are removed; empty sums have K=beta=alpha=1.
 	/// # Errors
 	/// Rejects nonfinite coefficients, mismatched widths, normalization and storage overflow.
+	/// Storage admission includes the fixed record-digest stack with live recipe owners.
 	pub fn new(
 		system_qubits: usize,
 		mut terms: Vec<(Complex64, TensorShiftEncoding)>,
@@ -87,6 +90,7 @@ impl StructuredStencilEncoding {
 				)
 			})
 			.and_then(|n| n.checked_add(size_of::<Self>()))
+			.and_then(|n| n.checked_add(crate::RECORD_FINGERPRINT_SCRATCH_BYTES))
 			.ok_or(Error::Budget("stencil construction storage"))?;
 		admit(peak, policy)?;
 		terms.retain(|(w, _)| w.re != 0.0 || w.im != 0.0);
@@ -116,6 +120,10 @@ impl StructuredStencilEncoding {
 				phase: weight.arg(),
 			});
 		}
+		let identity_work = frozen
+			.len()
+			.checked_mul(crate::record_fingerprint_work(3)?)
+			.ok_or(Error::Budget("stencil identity work"))?;
 		let mut result = Self {
 			system_qubits,
 			color_qubits,
@@ -124,7 +132,10 @@ impl StructuredStencilEncoding {
 			normalization: Normalization::new(alpha)?,
 			terms: Arc::from(frozen),
 			gate_count: 0,
+			source_identity: 0,
+			identity_work,
 		};
+		result.source_identity = crate::owned_replay::stencil_source_identity(&result)?;
 		let mut count = 0_usize;
 		result.visit_gates(false, |_| result_count(&mut count))?;
 		result.gate_count = count;
@@ -140,6 +151,16 @@ impl StructuredStencilEncoding {
 	#[must_use]
 	pub const fn color_qubits(&self) -> usize {
 		self.color_qubits
+	}
+	/// Modeled SHA record work performed once for this stencil's own records.
+	/// Previously constructed child shifts have separate source work. Clones
+	/// retain this original cost; byte-only policy does not impose a work ceiling.
+	#[must_use]
+	pub const fn source_fingerprint_work(&self) -> usize {
+		self.identity_work
+	}
+	pub(crate) const fn cached_source_identity(&self) -> u64 {
+		self.source_identity
 	}
 	/// Padded number of terms.
 	#[must_use]

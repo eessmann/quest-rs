@@ -1,0 +1,5 @@
+{
+  "quantum_solution_claimed": false,
+  "reason": "case execution is unsupported: QuEST CPU backend requires building quest-cfd with --features quantum",
+  "status": "rejected-or-failed"
+}

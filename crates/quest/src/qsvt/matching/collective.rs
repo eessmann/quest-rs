@@ -1,16 +1,20 @@
 //! Whole matching unitaries using owned coefficient shards and local native states.
 pub use super::batched::RoutingStatistics;
 use super::batched::{BatchExecution, RoutingWorkspace};
-use super::{MatchingLayout, read_local, reserve_descriptor, write_local};
+use super::{MatchingLayout, reserve_descriptor, staging::RoutingState};
 use crate::qsvt::Result;
 use crate::{
-	Complex64, QubitCount, Register, StateVector,
+	Complex64, QubitCount,
 	collective::{CollectiveEnvironment, CollectiveRegister, equal},
 	environment::Reservation,
 	error::BackendResult,
 };
 use quest_qsvt::{MatchingHeader, MatchingShard};
 use quest_sys::mpi::MpiCollectiveLane;
+#[cfg(test)]
+mod buffer_tests;
+#[cfg(test)]
+mod preparation_tests;
 
 fn agree<T>(lane: &mut MpiCollectiveLane<'_>, value: crate::Result<T>) -> crate::Result<T> {
 	if !lane
@@ -151,14 +155,76 @@ fn admit_payload(lane: &mut MpiCollectiveLane<'_>, shard: &MatchingShard) -> cra
 		},
 	)
 }
+fn admit_validation_capacity(
+	lane: &mut MpiCollectiveLane<'_>,
+	incoming_capacity: usize,
+	resources: &crate::environment::RuntimeResources,
+	validation: &mut Reservation<'_>,
+	count: QubitCount,
+	parts: usize,
+	capacity: RoutingCapacity,
+) -> crate::Result<()> {
+	agree(
+		lane,
+		(|| {
+			let bytes = incoming_capacity
+				.checked_mul(size_of::<(usize, usize)>())
+				.ok_or(crate::Error::Overflow)?;
+			validation.resize(bytes)
+		})(),
+	)?;
+	let peak = agree(
+		lane,
+		(|| {
+			let baseline = resources
+				.allocated_bytes()
+				.checked_sub(validation.bytes())
+				.ok_or(crate::Error::Overflow)?;
+			let runtime = preparation_scratch_bytes(count, parts, 0)?;
+			let peak = baseline
+				.checked_add(validation.bytes().max(runtime))
+				.ok_or(crate::Error::Overflow)?;
+			if peak > resources.memory_budget().bytes() {
+				return Err(crate::Error::Budget {
+					requested: peak,
+					available: resources.memory_budget().bytes(),
+				});
+			}
+			Ok(peak)
+		})(),
+	)?;
+	admit_node_peak(lane, peak, parts, capacity)?;
+	Ok(())
+}
 // Only counts are broadcast. Completion columns travel directly to their
 // destination owner, which checks uniqueness and exact closure against its keys.
-fn admit_permutation(lane: &mut MpiCollectiveLane<'_>, shard: &MatchingShard) -> crate::Result<()> {
+fn admit_permutation(
+	lane: &mut MpiCollectiveLane<'_>,
+	shard: &MatchingShard,
+	resources: &crate::environment::RuntimeResources,
+	validation: &mut Reservation<'_>,
+	count: QubitCount,
+	capacity: RoutingCapacity,
+) -> crate::Result<()> {
 	let rank = shard.rank();
 	let parts = shard.parts();
 	let mut incoming = agree(
 		lane,
 		crate::values::reserve_vec::<(usize, usize)>(shard.records().len()),
+	)?;
+	#[cfg(test)]
+	agree(
+		lane,
+		preparation_tests::inject_capacity(&mut incoming, rank),
+	)?;
+	admit_validation_capacity(
+		lane,
+		incoming.capacity(),
+		resources,
+		validation,
+		count,
+		parts,
+		capacity,
 	)?;
 	let mut valid = true;
 	for sender in 0..parts {
@@ -240,22 +306,142 @@ fn admit_permutation(lane: &mut MpiCollectiveLane<'_>, shard: &MatchingShard) ->
 	)
 }
 
-/// Prepared CPU/MPI unitary. Only this rank's immutable coefficient partition,
-/// scalar manifest, mapped targets and one local native scratch state are owned.
+/// Explicit conservative placement and scratch admission for prepared execution.
+#[derive(Debug, Clone, Copy)]
+pub struct RoutingCapacity {
+	/// Maximum ranks sharing one physical node. Admission uses the largest rank peak.
+	pub ranks_per_node: usize,
+	pub node_budget: crate::MemoryBudget,
+}
+
+/// Shared requested-capacity preparation formula; actual vectors are reconciled separately.
+pub(crate) fn preparation_scratch_bytes(
+	count: QubitCount,
+	parts: usize,
+	records: usize,
+) -> crate::Result<usize> {
+	let validation = records
+		.checked_mul(size_of::<(usize, usize)>())
+		.and_then(|n| n.checked_add(quest_qsvt::RECORD_FINGERPRINT_SCRATCH_BYTES))
+		.ok_or(crate::Error::Overflow)?;
+	let state = owned_scratch_bytes(count, parts)?;
+	let runtime = RoutingWorkspace::bytes()?
+		.checked_add(state)
+		.ok_or(crate::Error::Overflow)?;
+	Ok(validation.max(runtime))
+}
+
+fn owned_scratch_bytes(count: QubitCount, parts: usize) -> crate::Result<usize> {
+	if !parts.is_power_of_two() || count.dimension() < parts {
+		return Err(crate::Error::Value(
+			"matching communicator or state dimension",
+		));
+	}
+	if parts == 1 {
+		crate::values::bytes_for(count.dimension(), 4)
+	} else {
+		Ok(0)
+	}
+}
+
+fn admit_peak(
+	lane: &mut MpiCollectiveLane<'_>,
+	resources: &crate::environment::RuntimeResources,
+	shard: &MatchingShard,
+	count: QubitCount,
+	capacity: RoutingCapacity,
+) -> crate::Result<()> {
+	let peak = agree(
+		lane,
+		(|| {
+			if capacity.ranks_per_node == 0 || capacity.ranks_per_node > shard.parts() {
+				return Err(crate::Error::Value(
+					"invalid matching physical-node placement",
+				));
+			}
+			let scratch = preparation_scratch_bytes(count, shard.parts(), shard.records().len())?;
+			let peak = resources
+				.allocated_bytes()
+				.checked_add(scratch)
+				.ok_or(crate::Error::Overflow)?;
+			if peak > resources.memory_budget().bytes() {
+				return Err(crate::Error::Budget {
+					requested: peak,
+					available: resources.memory_budget().bytes(),
+				});
+			}
+			Ok(peak)
+		})(),
+	)?;
+	admit_node_peak(lane, peak, shard.parts(), capacity)
+}
+
+fn admit_node_peak(
+	lane: &mut MpiCollectiveLane<'_>,
+	peak: usize,
+	parts: usize,
+	capacity: RoutingCapacity,
+) -> crate::Result<()> {
+	if lane
+		.all_agree(capacity.node_budget.bytes() == usize::MAX)
+		.context("checking matching node admission policy")?
+	{
+		return Ok(());
+	}
+	let mut maximum_peak = peak;
+	for peer in 0..parts {
+		let mut packet = u64::try_from(peak)
+			.map_err(|_| crate::Error::Overflow)?
+			.to_le_bytes();
+		lane.broadcast_bytes(
+			i32::try_from(peer).map_err(|_| crate::Error::Overflow)?,
+			&mut packet,
+		)
+		.context("admitting matching simultaneous node scratch")?;
+		maximum_peak = maximum_peak
+			.max(usize::try_from(u64::from_le_bytes(packet)).map_err(|_| crate::Error::Overflow)?);
+	}
+	agree(
+		lane,
+		(|| {
+			let requested = maximum_peak
+				.checked_mul(capacity.ranks_per_node)
+				.ok_or(crate::Error::Overflow)?;
+			if requested > capacity.node_budget.bytes() {
+				return Err(crate::Error::Budget {
+					requested,
+					available: capacity.node_budget.bytes(),
+				});
+			}
+			Ok(())
+		})(),
+	)?;
+	Ok(())
+}
+
+/// Prepared CPU/MPI unitary with bounded routing workspace.
+///
+/// Only this rank's immutable coefficient partition,
+/// scalar manifest, mapped targets and bounded routing buffers are owned.
+/// Distributed CPU execution borrows the input register's communication array
+/// during routing. One-rank execution owns a native scratch register.
 pub struct PreparedMatching<'env, 'comm, 'runtime> {
 	environment: &'env CollectiveEnvironment<'comm, 'runtime>,
-	scratch: CollectiveRegister<'env, 'comm, 'runtime>,
+	scratch: Option<CollectiveRegister<'env, 'comm, 'runtime>>,
 	shard: MatchingShard,
 	layout: MatchingLayout,
-	_reservation: Reservation<'env>,
+	reservation: Reservation<'env>,
 	id: u64,
 	routing: RoutingWorkspace,
-	_routing_reservation: Reservation<'env>,
+	routing_reservation: Reservation<'env>,
 	statistics: RoutingStatistics,
+	capacity: RoutingCapacity,
 }
 impl<'comm, 'runtime> CollectiveEnvironment<'comm, 'runtime> {
 	/// Admit scalar identity, local shard ownership and global permutation closure
-	/// before allocating a local-accounted scratch partition. No circuit is retained.
+	/// before allocating bounded routing buffers and any one-rank scratch register.
+	///
+	/// No circuit or additional distributed state partition is retained.
 	/// # Errors
 	/// Rejects inconsistent manifests/layouts, malformed shards, GPU execution or budgets collectively.
 	pub fn prepare_matching(
@@ -263,6 +449,29 @@ impl<'comm, 'runtime> CollectiveEnvironment<'comm, 'runtime> {
 		shard: MatchingShard,
 		count: QubitCount,
 		targets: Vec<usize>,
+	) -> Result<PreparedMatching<'_, 'comm, 'runtime>> {
+		self.prepare_matching_with_capacity(
+			shard,
+			count,
+			targets,
+			RoutingCapacity {
+				ranks_per_node: usize::try_from(self.size()?)
+					.map_err(|_| crate::Error::Overflow)?,
+				node_budget: crate::MemoryBudget::new(usize::MAX),
+			},
+		)
+	}
+	/// Prepare with explicit simultaneous rank and physical-node scratch bounds.
+	/// The existing environment budget still limits each rank. Node placement is
+	/// supplied by the caller; no inference from communicator rank count is made.
+	/// # Errors
+	/// Rejects invalid placement or insufficient peak budgets collectively before allocation.
+	pub fn prepare_matching_with_capacity(
+		&self,
+		shard: MatchingShard,
+		count: QubitCount,
+		targets: Vec<usize>,
+		capacity: RoutingCapacity,
 	) -> Result<PreparedMatching<'_, 'comm, 'runtime>> {
 		let id = self.identifier();
 		let mut lane = self.begin(43, id, 0, 0)?;
@@ -288,36 +497,67 @@ impl<'comm, 'runtime> CollectiveEnvironment<'comm, 'runtime> {
 			&mut lane,
 			reserve_descriptor(&self.resources, &shard, &layout),
 		)?;
-		let validation = agree(
+		admit_peak(&mut lane, &self.resources, &shard, count, capacity)?;
+		let mut validation = agree(
 			&mut lane,
 			self.resources.reserve(
 				shard
 					.records()
 					.len()
 					.checked_mul(size_of::<(usize, usize)>())
+					.and_then(|n| n.checked_add(quest_qsvt::RECORD_FINGERPRINT_SCRATCH_BYTES))
 					.ok_or(crate::Error::Overflow)?,
 			),
 		)?;
 		admit_payload(&mut lane, &shard)?;
-		admit_permutation(&mut lane, &shard)?;
+		admit_permutation(
+			&mut lane,
+			&shard,
+			&self.resources,
+			&mut validation,
+			count,
+			capacity,
+		)?;
 		drop(validation);
-		let routing_reservation = agree(
+		let mut routingreservation = agree(
 			&mut lane,
 			self.resources.reserve(RoutingWorkspace::bytes()?),
 		)?;
 		let routing = agree(&mut lane, RoutingWorkspace::new())?;
+		agree(
+			&mut lane,
+			routing
+				.retained_bytes()
+				.and_then(|bytes| routingreservation.resize(bytes)),
+		)?;
+		let actual_peak = agree(
+			&mut lane,
+			(|| {
+				let state = owned_scratch_bytes(count, shard.parts())?;
+				self.resources
+					.allocated_bytes()
+					.checked_add(state)
+					.ok_or(crate::Error::Overflow)
+			})(),
+		)?;
+		admit_node_peak(&mut lane, actual_peak, shard.parts(), capacity)?;
 		drop(lane);
-		let scratch = self.state_vector_local(count)?;
+		let scratch = if shard.parts() == 1 {
+			Some(self.state_vector_local(count)?)
+		} else {
+			None
+		};
 		Ok(PreparedMatching {
 			environment: self,
 			scratch,
 			shard,
 			layout,
-			_reservation: reservation,
+			reservation,
 			id,
 			routing,
-			_routing_reservation: routing_reservation,
+			routing_reservation: routingreservation,
 			statistics: RoutingStatistics::default(),
+			capacity,
 		})
 	}
 }
@@ -330,7 +570,7 @@ fn remote_read(
 	parts: usize,
 	processor: usize,
 	local: usize,
-	register: &Register<'_, StateVector>,
+	state: &RoutingState<'_, '_, '_>,
 	index: Option<usize>,
 ) -> crate::Result<Complex64> {
 	let mut result = Complex64::new(0.0, 0.0);
@@ -353,10 +593,8 @@ fn remote_read(
 			if position.checked_div(local) != Some(peer) {
 				return Err(crate::Error::Value("matching read outside owner"));
 			}
-			let value = read_local(
-				register,
-				position.checked_rem(local).ok_or(crate::Error::Overflow)?,
-			)?;
+			let value =
+				state.read_local(position.checked_rem(local).ok_or(crate::Error::Overflow)?)?;
 			put(&mut response, 0, value.re.to_bits())?;
 			put(&mut response, 1, value.im.to_bits())?;
 		}
@@ -378,7 +616,7 @@ fn remote_write(
 	parts: usize,
 	processor: usize,
 	local: usize,
-	register: &mut Register<'_, StateVector>,
+	state: &mut RoutingState<'_, '_, '_>,
 	output: Option<(usize, Complex64)>,
 ) -> crate::Result<()> {
 	for peer in 0..parts {
@@ -407,8 +645,7 @@ fn remote_write(
 				f64::from_bits(get(&packet, 1)?),
 				f64::from_bits(get(&packet, 2)?),
 			);
-			write_local(
-				register,
+			state.write_local(
 				index.checked_rem(local).ok_or(crate::Error::Overflow)?,
 				value,
 			)?;
@@ -417,6 +654,12 @@ fn remote_write(
 	Ok(())
 }
 impl<'env, 'comm, 'runtime> PreparedMatching<'env, 'comm, 'runtime> {
+	pub(crate) const fn native_accounted_bytes(&self) -> usize {
+		match &self.scratch {
+			Some(scratch) => scratch.inner.accounted_bytes(),
+			None => 0,
+		}
+	}
 	/// Collective execution context used by this prepared unitary.
 	#[must_use]
 	pub const fn environment(&self) -> &'env CollectiveEnvironment<'comm, 'runtime> {
@@ -435,11 +678,21 @@ impl<'env, 'comm, 'runtime> PreparedMatching<'env, 'comm, 'runtime> {
 	pub const fn shard(&self) -> &MatchingShard {
 		&self.shard
 	}
+	/// Native deployment of an owned one-rank permutation scratch register.
+	/// `None` means routing borrows the input register's existing communication array;
+	/// its payload belongs to the input deployment and is not a second allocation.
+	#[must_use]
+	pub const fn scratch_deployment(&self) -> Option<crate::RegisterDeployment> {
+		match &self.scratch {
+			Some(scratch) => Some(scratch.deployment()),
+			None => None,
+		}
+	}
 	/// Apply the identical whole matching unitary or adjoint with outer controls.
 	/// Pair requests and replies have fixed bounded storage; coefficient records
 	/// remain on their original-source owner, even when state partitions differ.
 	/// # Errors
-	/// Rejects mismatched register/width/control/adjoint calls collectively before mutation.
+	/// Rejects mismatched calls or excessive concurrent node storage collectively before mutation.
 	pub fn apply_scalar(
 		&mut self,
 		register: &mut CollectiveRegister<'_, '_, '_>,
@@ -450,30 +703,8 @@ impl<'env, 'comm, 'runtime> PreparedMatching<'env, 'comm, 'runtime> {
 		let mut lane = self
 			.environment
 			.begin(44, self.id, register.id, u64::from(adjoint))?;
-		let (positions, outcomes) = agree(
-			&mut lane,
-			(|| {
-				if !std::ptr::eq(register.environment, self.environment)
-					|| register.num_qubits() != self.layout.count
-					|| register.deployment().nodes() != self.shard.parts()
-				{
-					return Err(crate::Error::Value("matching register owner or deployment"));
-				}
-				self.layout.controls(outer_mask, outer_value)
-			})(),
-		)?;
-		let mut controls = [0u8; 16];
-		put(
-			&mut controls,
-			0,
-			u64::try_from(outer_mask).map_err(|_| crate::Error::Overflow)?,
-		)?;
-		put(
-			&mut controls,
-			1,
-			u64::try_from(outer_value).map_err(|_| crate::Error::Overflow)?,
-		)?;
-		equal(&mut lane, &controls)?;
+		let (positions, outcomes) =
+			self.admit_entry(register, outer_mask, outer_value, &mut lane)?;
 		fatal(|| {
 			self.apply_native(
 				register,
@@ -490,10 +721,10 @@ impl<'env, 'comm, 'runtime> PreparedMatching<'env, 'comm, 'runtime> {
 	pub const fn last_statistics(&self) -> RoutingStatistics {
 		self.statistics
 	}
-	/// Apply the whole unitary using bounded global batches and indexed native
+	/// Apply the whole unitary using bounded native-owner batches and indexed native
 	/// transfers. All packet/state/coefficient storage remains local or bounded.
 	/// # Errors
-	/// Rejects inconsistent calls and invalid controls collectively before mutation.
+	/// Rejects inconsistent calls, invalid controls or excessive concurrent node storage before mutation.
 	pub fn apply(
 		&mut self,
 		register: &mut CollectiveRegister<'_, '_, '_>,
@@ -504,15 +735,87 @@ impl<'env, 'comm, 'runtime> PreparedMatching<'env, 'comm, 'runtime> {
 		let mut lane = self
 			.environment
 			.begin(45, self.id, register.id, u64::from(adjoint))?;
+		let (positions, outcomes) =
+			self.admit_entry(register, outer_mask, outer_value, &mut lane)?;
+		self.statistics = fatal(|| {
+			self.layout
+				.hadamards(&mut register.inner, &positions, &outcomes)?;
+			let state = RoutingState::stage(
+				&mut register.inner,
+				self.scratch.as_mut().map(|scratch| &mut scratch.inner),
+			)?;
+			let mut execution = BatchExecution {
+				layout: &self.layout,
+				shard: &self.shard,
+				state,
+				adjoint,
+				outer_mask,
+				outer_value,
+			};
+			let statistics = self.routing.apply(&mut lane, &mut execution)?;
+			execution.state.commit()?;
+			self.layout
+				.hadamards(&mut register.inner, &positions, &outcomes)?;
+			Ok(statistics)
+		});
+		Ok(())
+	}
+
+	/// Modeled native allocation plus actual owned sparse/target/router capacities.
+	/// # Errors
+	/// Rejects retained-byte overflow.
+	pub fn retained_bytes(&self) -> Result<usize> {
+		self.native_accounted_bytes()
+			.checked_add(self.reservation.bytes())
+			.and_then(|n| n.checked_add(self.routing_reservation.bytes()))
+			.ok_or(crate::Error::Overflow)
+			.map_err(Into::into)
+	}
+	/// MPI-free validation used before entering any child collective lane.
+	pub(crate) fn validate_apply_locally(
+		&self,
+		register: &CollectiveRegister<'_, '_, '_>,
+		mask: usize,
+		value: usize,
+	) -> crate::Result<super::MatchingExecutionCost> {
+		if !std::ptr::eq(register.environment, self.environment)
+			|| register.num_qubits() != self.layout.count
+			|| register.deployment().nodes() != self.shard.parts()
+		{
+			return Err(crate::Error::Value("matching register owner or deployment"));
+		}
+		if self.layout.header.color_qubits > 0 && register.deployment().local_amplitudes() < 2 {
+			return Err(crate::Error::Unsupported(
+				"matching color Hadamards require two local amplitudes",
+			));
+		}
+		if self.scratch.is_none() {
+			#[cfg(test)]
+			buffer_tests::inject_admission_failure(self.shard.rank())?;
+			quest_sys::validate_cpu_communication_buffer(&register.inner.native)
+				.context("admitting matching communication buffer")?;
+		}
+		self.layout.controls(mask, value)?;
+		super::MatchingExecutionCost::admit(
+			self.layout.count.dimension(),
+			self.shard.parts(),
+			self.layout.flag()?,
+			self.layout.count.get(),
+			self.layout.header.color_qubits,
+			self.layout.header.record_count,
+		)
+	}
+	fn admit_entry(
+		&self,
+		register: &CollectiveRegister<'_, '_, '_>,
+		outer_mask: usize,
+		outer_value: usize,
+		lane: &mut MpiCollectiveLane<'_>,
+	) -> crate::Result<(Vec<i32>, Vec<i32>)> {
 		let (positions, outcomes) = agree(
-			&mut lane,
+			lane,
 			(|| {
-				if !std::ptr::eq(register.environment, self.environment)
-					|| register.num_qubits() != self.layout.count
-					|| register.deployment().nodes() != self.shard.parts()
-				{
-					return Err(crate::Error::Value("matching register owner or deployment"));
-				}
+				self.validate_apply_locally(register, outer_mask, outer_value)?;
 				self.layout.controls(outer_mask, outer_value)
 			})(),
 		)?;
@@ -527,29 +830,42 @@ impl<'env, 'comm, 'runtime> PreparedMatching<'env, 'comm, 'runtime> {
 			1,
 			u64::try_from(outer_value).map_err(|_| crate::Error::Overflow)?,
 		)?;
-		equal(&mut lane, &controls)?;
-		self.statistics = fatal(|| {
-			self.layout
-				.hadamards(&mut register.inner, &positions, &outcomes)?;
-			quest_sys::set_qureg_to_clone(self.scratch.inner.pin(), &register.inner.native)
-				.context("staging batched matching permutation")?;
-			let mut execution = BatchExecution {
-				layout: &self.layout,
-				shard: &self.shard,
-				input: &register.inner,
-				output: &mut self.scratch.inner,
-				adjoint,
-				outer_mask,
-				outer_value,
-			};
-			let statistics = self.routing.apply(&mut lane, &mut execution)?;
-			quest_sys::set_qureg_to_clone(register.inner.pin(), &self.scratch.inner.native)
-				.context("installing batched matching permutation")?;
-			self.layout
-				.hadamards(&mut register.inner, &positions, &outcomes)?;
-			Ok(statistics)
-		});
-		Ok(())
+		equal(lane, &controls)?;
+		admit_node_peak(
+			lane,
+			self.environment.resources.allocated_bytes(),
+			self.shard.parts(),
+			self.capacity,
+		)?;
+		Ok((positions, outcomes))
+	}
+
+	/// Collectively admit owner, mapping and current simultaneous node storage without mutation.
+	/// Execution ceilings are for the optimized batched path in either direction.
+	/// # Errors
+	/// Rejects inconsistent calls, budgets and checked resource overflow before mutation.
+	pub fn admit_apply(
+		&self,
+		register: &CollectiveRegister<'_, '_, '_>,
+		adjoint: bool,
+		outer_mask: usize,
+		outer_value: usize,
+	) -> Result<super::MatchingExecutionCost> {
+		let mut lane = self
+			.environment
+			.begin(46, self.id, register.id, u64::from(adjoint))?;
+		self.admit_entry(register, outer_mask, outer_value, &mut lane)?;
+		Ok(agree(
+			&mut lane,
+			super::MatchingExecutionCost::admit(
+				self.layout.count.dimension(),
+				self.shard.parts(),
+				self.layout.flag()?,
+				self.layout.count.get(),
+				self.layout.header.color_qubits,
+				self.layout.header.record_count,
+			),
+		)?)
 	}
 
 	fn apply_native(
@@ -566,8 +882,10 @@ impl<'env, 'comm, 'runtime> PreparedMatching<'env, 'comm, 'runtime> {
 		let local = register.deployment().local_amplitudes();
 		self.layout
 			.hadamards(&mut register.inner, positions, outcomes)?;
-		quest_sys::set_qureg_to_clone(self.scratch.inner.pin(), &register.inner.native)
-			.context("staging distributed matching permutation")?;
+		let mut state = RoutingState::stage(
+			&mut register.inner,
+			self.scratch.as_mut().map(|scratch| &mut scratch.inner),
+		)?;
 		let flag = self.layout.flag()?;
 		for basis in 0..self.layout.count.dimension() {
 			if basis & flag != 0 || basis & outer.0 != outer.1 {
@@ -593,14 +911,14 @@ impl<'env, 'comm, 'runtime> PreparedMatching<'env, 'comm, 'runtime> {
 			} else {
 				(rank == processor).then_some(basis)
 			};
-			let first = remote_read(lane, rank, parts, processor, local, &register.inner, input)?;
+			let first = remote_read(lane, rank, parts, processor, local, &state, input)?;
 			let second = remote_read(
 				lane,
 				rank,
 				parts,
 				processor,
 				local,
-				&register.inner,
+				&state,
 				input.map(|index| index | flag),
 			)?;
 			let result = column.map(|column| column.rotate([first, second], adjoint));
@@ -615,7 +933,7 @@ impl<'env, 'comm, 'runtime> PreparedMatching<'env, 'comm, 'runtime> {
 				parts,
 				processor,
 				local,
-				&mut self.scratch.inner,
+				&mut state,
 				output.zip(result.map(|pair| pair[0])),
 			)?;
 			remote_write(
@@ -624,14 +942,13 @@ impl<'env, 'comm, 'runtime> PreparedMatching<'env, 'comm, 'runtime> {
 				parts,
 				processor,
 				local,
-				&mut self.scratch.inner,
+				&mut state,
 				output
 					.map(|index| index | flag)
 					.zip(result.map(|pair| pair[1])),
 			)?;
 		}
-		quest_sys::set_qureg_to_clone(register.inner.pin(), &self.scratch.inner.native)
-			.context("installing distributed matching permutation")?;
+		state.commit()?;
 		self.layout
 			.hadamards(&mut register.inner, positions, outcomes)
 	}

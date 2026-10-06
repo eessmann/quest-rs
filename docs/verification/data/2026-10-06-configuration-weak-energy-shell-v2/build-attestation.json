@@ -1,0 +1,50 @@
+{
+  "schema": "quest-weak-shell-v2-build-attempt-v1",
+  "command": [
+    "cargo",
+    "build",
+    "-p",
+    "quest-cfd",
+    "--example",
+    "configuration_weak_energy_shell_v2",
+    "--message-format=json"
+  ],
+  "status": "stable-pinned",
+  "before_sha256": "13f74e60158b1b8fa4f06b41702958216a8caeb006af0d3425103f87d0478197",
+  "scope": "Root Cargo/configuration and all Rust/TOML/Cargo files in the actual default local compiler-artifact package closure, including package tests. Unused quest/quest-sys, external registry source, non-Rust assets and arbitrary environment are excluded. Compiler version/binary and artifact profile are recorded separately; this is not whole-process reproducible-build attestation.",
+  "build_exit_code": 0,
+  "after_sha256": "13f74e60158b1b8fa4f06b41702958216a8caeb006af0d3425103f87d0478197",
+  "source_changes": [],
+  "before_after_equal": true,
+  "actual_local_package_manifests": [
+    "crates/quest-build/Cargo.toml",
+    "crates/quest-cfd/Cargo.toml",
+    "crates/quest-compile/Cargo.toml",
+    "crates/quest-language/Cargo.toml",
+    "crates/quest-math/Cargo.toml",
+    "crates/quest-numerics/Cargo.toml",
+    "crates/quest-polynomial/Cargo.toml",
+    "crates/quest-qasm/Cargo.toml",
+    "crates/quest-qsp/Cargo.toml",
+    "crates/quest-qsvt/Cargo.toml",
+    "crates/quest-symbolic/Cargo.toml",
+    "crates/vendor/mathcore/Cargo.toml"
+  ],
+  "source_files": 509,
+  "source_manifest_sha256": "93d4944c110624d2a83dd987499efb6770eb963257af29af0caf4c888ac3e05b",
+  "binary_sha256": "727ea4196c7c03fb20332dba5f0caa8467e5e64cf3d5ba1ece06b3152267227d",
+  "binary_path": "<private-artifacts>/quest-weak-shell-v2-binary-1",
+  "profile": {
+    "opt_level": "0",
+    "debuginfo": 1,
+    "debug_assertions": true,
+    "overflow_checks": true,
+    "test": false
+  },
+  "features": [],
+  "owned_manifest_sha256": "8265d007d88ce0252a4c938339847ba080bcee5d06b1c8c9dea16b8952e182ef",
+  "reference_sha256": "14664ebc2b353933ef9dabd3e9768f64e4ba5edfa9b4a5d6731e1fc8351d7d76",
+  "elapsed_seconds": 0.7902505289966939,
+  "compiler_artifacts_sha256": "7b68736ff77837f02d1cdcbc19b8160838dd0ced1ed9f9b722093d110b910e54",
+  "build_log_sha256": "24c452f17036b35c01807d04feae91b5b5c86dc03d4e75e3d2662a48839a55d3"
+}

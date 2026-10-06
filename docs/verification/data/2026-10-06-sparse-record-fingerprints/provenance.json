@@ -1,0 +1,296 @@
+{
+  "schema": "sparse-record-fingerprint-v2-public-candidate-provenance-v1",
+  "publication_status": "candidate only; parent owns final publication",
+  "normalization": "Absolute workspace/install/compiler and temporary paths replaced with generic placeholders in text logs/review. Original hashes retained; full source manifest copied byte-identically.",
+  "no_tests_or_campaign_rerun_during_preparation": true,
+  "files": [
+    {
+      "path": "source.json",
+      "bytes": 3492,
+      "sha256": "5ff27a818e1aa6e32e2a2f53690bccea5fdcf44036fd44c792c0186319abf41d",
+      "original_label": "sparse-record-fingerprint-v2-source-final-2.json",
+      "original_bytes": 3492,
+      "original_sha256": "5ff27a818e1aa6e32e2a2f53690bccea5fdcf44036fd44c792c0186319abf41d",
+      "transformation": "byte-identical"
+    },
+    {
+      "path": "reference.json",
+      "bytes": 1140,
+      "sha256": "c87b783e7c25ca8a7c4a051a4bf21b70db8e48c828218a3c14810141dbdf9614",
+      "original_label": "quest-sparse-fingerprint-independent-reference.json",
+      "original_bytes": 1140,
+      "original_sha256": "c87b783e7c25ca8a7c4a051a4bf21b70db8e48c828218a3c14810141dbdf9614",
+      "transformation": "byte-identical"
+    },
+    {
+      "path": "public-api-red.rs",
+      "bytes": 1406,
+      "sha256": "6e9a4fc7aa9602e67e0224e9334d042cfa261afde35645ac58ab053f037e460d",
+      "original_label": "main.rs",
+      "original_bytes": 1406,
+      "original_sha256": "6e9a4fc7aa9602e67e0224e9334d042cfa261afde35645ac58ab053f037e460d",
+      "transformation": "byte-identical"
+    },
+    {
+      "path": "public-api-red.log",
+      "bytes": 1349,
+      "sha256": "705056e7bacb14052af95a0333047ce03f5789afd71d3a395d16f30621223bcd",
+      "original_label": "quest-sparse-digest-independent-behavioral-red.log",
+      "original_bytes": 1377,
+      "original_sha256": "eef482fd29578adfd215acba91aa3e480bed2ee97240c54fec43f3ba68dd4336",
+      "transformation": "host and temporary path normalization only"
+    },
+    {
+      "path": "version-1-red.log",
+      "bytes": 1658,
+      "sha256": "a96483e0557b594e3d9bb0c2f93b6ff532938ecdd4e256de3dd00d38b5630370",
+      "original_label": "quest-sparse-version-maintained-red.log",
+      "original_bytes": 1763,
+      "original_sha256": "1096e0fece69d2bbe8fcd440788897a7b63b3cd498f915c13681ee02fa2d9f87",
+      "transformation": "host and temporary path normalization only"
+    },
+    {
+      "path": "final-hash-check.json",
+      "bytes": 3694,
+      "sha256": "d0f5a660eaefad48fb29fdc4a71fb53d0a956f4b8c1d36b649d0691daa094273",
+      "original_label": "quest-sparse-fingerprint-review-final-after.json",
+      "original_bytes": 3694,
+      "original_sha256": "d0f5a660eaefad48fb29fdc4a71fb53d0a956f4b8c1d36b649d0691daa094273",
+      "transformation": "byte-identical"
+    },
+    {
+      "path": "diagnosis.json",
+      "bytes": 2249,
+      "sha256": "25f347db70b80b28925ec9a7598a4801aa373691f7fa8f4a05a3d4deccaa71b7",
+      "original_label": "persisted-weighted-sparse-digest-diagnosis.json",
+      "original_bytes": 1343,
+      "original_sha256": "32f9e5cac629169e1a1d6302c11f055dea22ddb68acc6845fe7f0451ae8feff4",
+      "transformation": "add explicit schema/status/exact formulas; historical fields unchanged"
+    },
+    {
+      "path": "logs/quest-sparse-digest-resource-final-green.log",
+      "bytes": 1038,
+      "sha256": "d49d028f0ce11f8c10a079ec96353e8060841b877b9f9ed4c84ffdbc8ff77ba6",
+      "original_label": "quest-sparse-digest-resource-final-green.log",
+      "original_bytes": 1073,
+      "original_sha256": "3eb003e8440535772961434448043f56deb60786cc7fed58ebec3e446bd88967",
+      "transformation": "host and temporary path normalization only"
+    },
+    {
+      "path": "logs/quest-sparse-digest-maintained-red.log",
+      "bytes": 2089,
+      "sha256": "70f04774f0fbd552300fe88f71b872de23afa6a08e15d482ff39ea02b33d56a5",
+      "original_label": "quest-sparse-digest-maintained-red.log",
+      "original_bytes": 2159,
+      "original_sha256": "d9623582aef64649ed34aac8ab4ef4abcdd73082f019535b43e2b6e3c1035497",
+      "transformation": "host and temporary path normalization only"
+    },
+    {
+      "path": "logs/quest-sparse-version-maintained-red.log",
+      "bytes": 1658,
+      "sha256": "a96483e0557b594e3d9bb0c2f93b6ff532938ecdd4e256de3dd00d38b5630370",
+      "original_label": "quest-sparse-version-maintained-red.log",
+      "original_bytes": 1763,
+      "original_sha256": "1096e0fece69d2bbe8fcd440788897a7b63b3cd498f915c13681ee02fa2d9f87",
+      "transformation": "host and temporary path normalization only"
+    },
+    {
+      "path": "logs/quest-sparse-pure-matrix-final.log",
+      "bytes": 2955,
+      "sha256": "4b23bac801f44ebb415a021ac81f00e78eca94c910200da4eb37a0b8fef8b5f8",
+      "original_label": "quest-sparse-pure-matrix-final.log",
+      "original_bytes": 2990,
+      "original_sha256": "7ff3ba0854ad38ad9086dfe9b595810cba07532629776653730c67faff3e261b",
+      "transformation": "host and temporary path normalization only"
+    },
+    {
+      "path": "logs/quest-sparse-digest-final-pass.log",
+      "bytes": 1220,
+      "sha256": "52a2c878ae0fadece755633b385108fd94e375b2bb3901cc3bfd421d0fb07b02",
+      "original_label": "quest-sparse-digest-final-pass.log",
+      "original_bytes": 1255,
+      "original_sha256": "569f037e4f65b18d99fdca82ad6ff376d85847c87b6e8ac6d39354ad6ae37bd0",
+      "transformation": "host and temporary path normalization only"
+    },
+    {
+      "path": "logs/quest-sparse-source-final-pass.log",
+      "bytes": 1301,
+      "sha256": "ed72021c33b93e36ec3d987ff8e8ac4b57266a5822ebf4107af7dbd2aa3977e0",
+      "original_label": "quest-sparse-source-final-pass.log",
+      "original_bytes": 1365,
+      "original_sha256": "090872845124775a5097de31ad5e4f51046188a1c52d166468bc0e3e3224509e",
+      "transformation": "host and temporary path normalization only"
+    },
+    {
+      "path": "logs/quest-sparse-version-green.log",
+      "bytes": 1875,
+      "sha256": "39ee7e983a8d4a77094681462b3164059454d8e27d8fedcf55f91186fdb30af4",
+      "original_label": "quest-sparse-version-green.log",
+      "original_bytes": 1945,
+      "original_sha256": "e40829a1295657e7bc0536f7f57552df00cd8003a049cc1cf974d106d66b71af",
+      "transformation": "host and temporary path normalization only"
+    },
+    {
+      "path": "logs/quest-sparse-fingerprint-mpi-green.log",
+      "bytes": 11855,
+      "sha256": "ff67c3038dd1588ef2d7fc084104f0cf40e1069b78ff7980cd6ee1b141a6dcaa",
+      "original_label": "quest-sparse-fingerprint-mpi-green.log",
+      "original_bytes": 11884,
+      "original_sha256": "56e9683b646135439557912369cbbd646a33ff12452278290d17848e68454791",
+      "transformation": "host and temporary path normalization only"
+    },
+    {
+      "path": "logs/quest-sparse-fingerprint-restart-green.log",
+      "bytes": 2127,
+      "sha256": "40fe6d413b72b2f6df7b9ec09d32390192b104f7ba06ca0111405f9a6fcf6570",
+      "original_label": "quest-sparse-fingerprint-restart-green.log",
+      "original_bytes": 2296,
+      "original_sha256": "6d238135e74ea48e1392b253ffa18562e55acc8b1abedad89c0e950486ac8cde",
+      "transformation": "host and temporary path normalization only"
+    },
+    {
+      "path": "logs/quest-sparse-fingerprint-bridge-green.log",
+      "bytes": 1429,
+      "sha256": "fd77e2639355ef04a10b00d131fba4d8d3e95364c5e5013ca9e47ea842c74a97",
+      "original_label": "quest-sparse-fingerprint-bridge-green.log",
+      "original_bytes": 1563,
+      "original_sha256": "27628ee8e58fbb770e091f24bb2a30b408a2afdf37be9989bb92c1e40693e58e",
+      "transformation": "host and temporary path normalization only"
+    },
+    {
+      "path": "logs/quest-sparse-native-clippy.log",
+      "bytes": 953,
+      "sha256": "442838577cc1ab9bae16c8c2c0f6381b672dc9370d04417e2bd43ee1baccb5c0",
+      "original_label": "quest-sparse-native-clippy.log",
+      "original_bytes": 1017,
+      "original_sha256": "8b3241ea72192e5fafcc3dda24b92c47754bee5dd74d4bc4a6638bb2e27d6713",
+      "transformation": "host and temporary path normalization only"
+    },
+    {
+      "path": "logs/quest-sparse-pure-clippy-final-pass.log",
+      "bytes": 841,
+      "sha256": "21ac30d9eabf08cab97e7d3f37feb77b37d31d0fb4078c28e9425997b9541dda",
+      "original_label": "quest-sparse-pure-clippy-final-pass.log",
+      "original_bytes": 911,
+      "original_sha256": "f8b01c0bfb5d9417b9d541f091a7ab195eb99b9e1a7e8fe416f48d764bfebe92",
+      "transformation": "host and temporary path normalization only"
+    },
+    {
+      "path": "owner-focused.json",
+      "bytes": 15807,
+      "sha256": "50e7e9fd356c1ab063b772038473e845de2973e8197ab9b4e514621e294e120c",
+      "original_label": "sparse-record-fingerprint-v2-verification.json",
+      "original_bytes": 13389,
+      "original_sha256": "b387777dfcaec0f1756ba4322a9cf193557aebc4b7a75b9a50ae08797f982f89",
+      "transformation": "relative artifact labels; normalized log payload hashes with original hashes retained"
+    },
+    {
+      "path": "logs/quest-sparse-fingerprint-independent-pure.log",
+      "bytes": 2179,
+      "sha256": "a25f0c5e6908e88d8195096546ef31a1fe3ffa3943c2e6e855d2340fc19ad6d8",
+      "original_label": "quest-sparse-fingerprint-independent-pure.log",
+      "original_bytes": 2179,
+      "original_sha256": "a25f0c5e6908e88d8195096546ef31a1fe3ffa3943c2e6e855d2340fc19ad6d8",
+      "transformation": "byte-identical"
+    },
+    {
+      "path": "logs/quest-sparse-fingerprint-independent-io.log",
+      "bytes": 1875,
+      "sha256": "0750b9d9761ab7e05d6017bbfbaba81e6ee9a6d27f42ee1d9d24f2961a29c840",
+      "original_label": "quest-sparse-fingerprint-independent-io.log",
+      "original_bytes": 1945,
+      "original_sha256": "8ddc31be34dfc2e136a08a17194f95ec66cccd5ca3affcebeaa3128606e4d327",
+      "transformation": "host and temporary path normalization only"
+    },
+    {
+      "path": "logs/quest-sparse-fingerprint-independent-native.log",
+      "bytes": 13130,
+      "sha256": "c12ed06263381d07a2fcbbe1d6f1ec9b81038af8cae498187329d269e1960591",
+      "original_label": "quest-sparse-fingerprint-independent-native.log",
+      "original_bytes": 13264,
+      "original_sha256": "438d6e991895f7053af26573fceb589befa5a394a3639b0f00ce0d00e9c0dce9",
+      "transformation": "host and temporary path normalization only"
+    },
+    {
+      "path": "logs/quest-sparse-fingerprint-independent-pure-clippy.log",
+      "bytes": 5092,
+      "sha256": "04720cefd7004b4b87d18cd161325258a691b5ccc9089b2283e327359aeb50b9",
+      "original_label": "quest-sparse-fingerprint-independent-pure-clippy.log",
+      "original_bytes": 5127,
+      "original_sha256": "5b9cbddc8f4f8ef8b15b9621cb5c10200db88f36d12daa4abd4f5e11aa5f0c18",
+      "transformation": "host and temporary path normalization only"
+    },
+    {
+      "path": "logs/quest-sparse-fingerprint-independent-io-clippy.log",
+      "bytes": 841,
+      "sha256": "0f3dc93356a13fecbd2d90f9d41fa0b8478c1994f407d2e98fdb39560ad17516",
+      "original_label": "quest-sparse-fingerprint-independent-io-clippy.log",
+      "original_bytes": 911,
+      "original_sha256": "e6297ccb6f595bc8985221c9b7f8ce102948caedee8c9613c74bd1d3990659b4",
+      "transformation": "host and temporary path normalization only"
+    },
+    {
+      "path": "logs/quest-sparse-fingerprint-independent-native-clippy.log",
+      "bytes": 1085,
+      "sha256": "9e4bc6265f3cf1d364c22597d6e750d476d1897bb3662049e22c260a2b3c689e",
+      "original_label": "quest-sparse-fingerprint-independent-native-clippy.log",
+      "original_bytes": 1219,
+      "original_sha256": "95c6ab52e5c7f6c184b9720c408d54170022b3447f1715b2df39fcbe807055fd",
+      "transformation": "host and temporary path normalization only"
+    },
+    {
+      "path": "logs/quest-sparse-fingerprint-independent-digest-delta.log",
+      "bytes": 1220,
+      "sha256": "b5588381b1e8a38b35872b7338a353a767c10b2e4e3c70951a21d02e64f53c30",
+      "original_label": "quest-sparse-fingerprint-independent-digest-delta.log",
+      "original_bytes": 1255,
+      "original_sha256": "dd476ac460d2dd1fd8803a4b78c266530ac888777951dcf19294ee4e101954c1",
+      "transformation": "host and temporary path normalization only"
+    },
+    {
+      "path": "logs/quest-sparse-fingerprint-independent-source-delta.log",
+      "bytes": 1433,
+      "sha256": "65949dbd2382d55ebc7a6346ffce40b061704831f1bbe319a3c25cdb9f353bd9",
+      "original_label": "quest-sparse-fingerprint-independent-source-delta.log",
+      "original_bytes": 1567,
+      "original_sha256": "0ebc0d6fd6f05d3d2d41b530ceab217f4f0e903d4a2529b70290e23db54eb089",
+      "transformation": "host and temporary path normalization only"
+    },
+    {
+      "path": "logs/quest-sparse-fingerprint-independent-pure-clippy-final.log",
+      "bytes": 772,
+      "sha256": "b21c0ef0d0f7e6e9153049561b24ede91a00284f199700676600ca09440bd954",
+      "original_label": "quest-sparse-fingerprint-independent-pure-clippy-final.log",
+      "original_bytes": 807,
+      "original_sha256": "279e183a5d073df4c40debb777312a580494d350c55ec1e60b9027332a709ea8",
+      "transformation": "host and temporary path normalization only"
+    },
+    {
+      "path": "independent-focused.json",
+      "bytes": 11705,
+      "sha256": "ebc929ad285de1212a9e69424f8a7731b6f149c87ff8f0e69f3fb11bbd29e2d6",
+      "original_label": "sparse-record-fingerprint-v2-independent-review.json",
+      "original_bytes": 3232,
+      "original_sha256": "f027de67faa4549202b3d29dbf5756b688df3c6ac67ca63d36881b116f933596",
+      "transformation": "public scoped command classifications and relative artifact labels; original receipt/log hashes retained"
+    },
+    {
+      "path": "independent-review.md",
+      "bytes": 5723,
+      "sha256": "9263c0988ff72e0d16401bf36f36ae96a656ce76df8ae8576dbecfe133cafd5e",
+      "original_label": "sparse-record-fingerprint-v2-independent-review.md",
+      "original_bytes": 5726,
+      "original_sha256": "65f7c107ff9f320a2770d92629d58255c3f7daf95c7121b02cc80d1f2ab50bb2",
+      "transformation": "path/manifest label normalization only plus publication-preparation scope sentence"
+    },
+    {
+      "path": "diagnosis.md",
+      "bytes": 1266,
+      "sha256": "b14b0911b1b8ac945a2a7a37e39178df31036758d9b6af56015e19d07fcd594d",
+      "original_label": "diagnosis.md",
+      "original_bytes": 1266,
+      "original_sha256": "b14b0911b1b8ac945a2a7a37e39178df31036758d9b6af56015e19d07fcd594d",
+      "transformation": "byte-identical"
+    }
+  ]
+}

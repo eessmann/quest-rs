@@ -1,0 +1,4 @@
+warning: quest-sys@0.2.0: Using QuEST 4.3.0 from <quest-install> with /usr/bin/c++
+warning: quest-sys@0.2.0: Verified rsmpi MPICC /usr/lib64/mpich/bin/mpicc matches QuEST MPI ABI and loaded library
+   Compiling quest-rs v0.1.0 (<workspace>/crates/quest)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.61s

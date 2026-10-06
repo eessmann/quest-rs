@@ -1,4 +1,4 @@
-#![feature(const_trait_impl, const_ops, const_destruct, generic_const_exprs)]
+#![feature(const_trait_impl, generic_const_exprs)]
 #![allow(incomplete_features)]
 #![forbid(unsafe_code)]
 //! Typed binary64 polynomials with explicit basis, support and numerical limits.
@@ -11,7 +11,9 @@ pub use quest_numerics::Interval;
 pub mod typed;
 pub use quest_numerics::ad::{First, Gradient, Jet};
 pub use typed::{Expression, ExpressionMetadata, StaticExpression};
+mod exact_target;
 mod function;
+pub use exact_target::ExactMonomialTarget;
 pub use function::{
 	AdmittedFunction, Assumed, AssumedFunction, ConsistencyAssumption, Function, GenericFunction,
 	Structural, System, VectorExpression,
@@ -108,4 +110,10 @@ fn zeros(count: usize, limits: Limits) -> Result<Vec<Complex64>> {
 		.map_err(|_| Error::Budget("coefficient allocation"))?;
 	values.resize(count, Complex64::new(0.0, 0.0));
 	Ok(values)
+}
+
+impl From<mathcore::arithmetic::ArithmeticError> for Error {
+	fn from(error: mathcore::arithmetic::ArithmeticError) -> Self {
+		Self::Arithmetic(error.into())
+	}
 }

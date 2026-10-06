@@ -1,0 +1,68 @@
+{
+  "source_hashes": {
+    "crates/quest-qsvt/src/matching_shard.rs": "418b4192349e5e3f288b46a7d446fdd97d952735f1631cdfc101b0a615d9c209",
+    "crates/quest/src/qsvt/matching/preprocess.rs": "2016ac8f6f0e8f1228219ebf9f8f3d851dc702c383155582db06ce016505636f",
+    "crates/quest-qsvt/src/owned_replay.rs": "73e39978e484f31a143d22387a9011d40a8a718c79fbc25da6df1217efaec662",
+    "crates/quest-qsvt-io/src/sharded_matching.rs": "f158e533b22c984842bf6a822bacf0276f9b9bc46975c367dbc1e728c848f72d"
+  },
+  "formula_results": [
+    {
+      "n": 2,
+      "source_ids_I_plus_iX_I_minus_iX_minusI_plus_iX": [
+        8130999254731851411,
+        8130999254731851411,
+        468866020854723475
+      ]
+    },
+    {
+      "n": 4,
+      "source_ids_I_plus_iX_I_minus_iX_minusI_plus_iX": [
+        15807407095909784565,
+        15807407095909784565,
+        8145273862032656629
+      ]
+    },
+    {
+      "n": 8,
+      "source_ids_I_plus_iX_I_minus_iX_minusI_plus_iX": [
+        11161285836701689785,
+        11161285836701689785,
+        11161285836701689785
+      ]
+    },
+    {
+      "n": 32,
+      "source_ids_I_plus_iX_I_minus_iX_minusI_plus_iX": [
+        9565490681770765905,
+        9565490681770765905,
+        9565490681770765905
+      ]
+    }
+  ],
+  "public_api_red_log_sha256": "eef482fd29578adfd215acba91aa3e480bed2ee97240c54fec43f3ba68dd4336",
+  "schema": "sparse-record-fingerprint-historical-diagnosis-v1",
+  "status": "pre-correction historical evidence",
+  "exact_formulas": {
+    "u64_modulus": "2^64",
+    "record_fnv_seed": "0xcbf29ce484222325",
+    "record_fnv_prime": "0x100000001b3",
+    "byte_update": "h = ((h XOR byte) * prime) mod 2^64; domain-free LE-u64 field stream",
+    "old_column_fields": [
+      "color",
+      "source",
+      "destination",
+      "cosine.to_bits",
+      "sine.to_bits",
+      "phase.re.to_bits",
+      "phase.im.to_bits"
+    ],
+    "old_source_fields": [
+      "row",
+      "column",
+      "value.re.to_bits",
+      "value.im.to_bits"
+    ],
+    "old_source_identity": "(sum(record_fnv(entry)) + rotate_left(rows,17) + rotate_left(cols,31) + 0x5350524f44303031) mod 2^64",
+    "balanced_sign_increment_magnitude": "128 * 0x100000001b3 = 140737488411008; signs cancel across the documented indexed family"
+  }
+}

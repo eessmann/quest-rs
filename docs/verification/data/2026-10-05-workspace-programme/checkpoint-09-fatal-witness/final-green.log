@@ -1,0 +1,25 @@
+warning: quest-sys@0.2.0: Using QuEST 4.3.0 from <quest-install> with <cxx>
+warning: quest-sys@0.2.0: Verified rsmpi MPICC <matching-mpicc> matches QuEST MPI ABI and loaded library
+warning: `feature(generic_const_exprs)` is not supported with the next-generation trait solver
+ --> crates/quest-polynomial/src/lib.rs:1:30
+  |
+1 | #![feature(const_trait_impl, generic_const_exprs)]
+  |                              ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `-Znext-solver=globally` is currently enabled by default for testing
+  = note: reverted the setting to `-Znext-solver=coherence` for this crate
+  = note: the currently stable trait solver will be used for this crate
+  = note: see issues #160895 <https://github.com/rust-lang/rust/issues/160895> for more information
+
+warning: `quest-polynomial` (lib) generated 1 warning
+   Compiling quest-rs v0.1.0 (<workspace>/crates/quest)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.81s
+     Running unittests src/lib.rs (target/debug/build/quest-rs/742462a71950ae23/out/quest-742462a71950ae23)
+
+running 1 test
+test qsvt::matching::collective::failure_tests::native_rank_local_failure_aborts_blocked_peer ... matching fatal fixture: suppressed_stderr=false, status=exit status: 1
+matching fatal fixture: suppressed_stderr=true, status=exit status: 1
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 33 filtered out; finished in 1.02s
+

@@ -7,28 +7,33 @@ use quest_numerics::{SparseFormat, SparseLimits, SparseMatrix};
 use quest_qsvt::{MatchingEncoding, MatchingShard, NumericalPolicy, materialize_program};
 use std::ops::{Div, Mul, Sub};
 
+#[path = "matching_collective/buffer_reuse.rs"]
+mod buffer_reuse;
+
 #[gtest]
 fn collective_matching_shards_route_all_sectors_without_global_storage() -> googletest::Result<()> {
 	if std::env::var("QUEST_MATCHING_RANKS").is_err() {
 		for (count, split) in [("1", "0"), ("2", "0"), ("4", "0"), ("4", "1"), ("8", "0")] {
-			let status = std::process::Command::new("timeout")
-				.args(["90s", "mpiexec", "-n", count])
-				.arg(std::env::current_exe()?)
-				.args([
-					"--exact",
-					"collective_matching_shards_route_all_sectors_without_global_storage",
-					"--nocapture",
-					"--test-threads=1",
-				])
-				.env("QUEST_MATCHING_RANKS", count)
-				.env("QUEST_MATCHING_SPLIT", split)
-				.status()?;
+			let status = quest_test_support::mpi::MpiTest::new(
+				count.parse()?,
+				std::time::Duration::from_secs(90),
+			)?
+			.args([
+				"--exact",
+				"collective_matching_shards_route_all_sectors_without_global_storage",
+				"--nocapture",
+				"--test-threads=1",
+			])
+			.env("QUEST_MATCHING_RANKS", count)
+			.env("QUEST_MATCHING_SPLIT", split)
+			.status()?;
 			expect_true!(status.success());
 		}
 		return Ok(());
 	}
 	let runtime = MpiRuntime::initialize()?;
 	let mut world = runtime.world()?;
+	quest_test_support::mpi::assert_rank_count(world.size()?)?;
 	{
 		let split = std::env::var("QUEST_MATCHING_SPLIT").as_deref() == Ok("1");
 		let comm = if split && world.size()? >= 4 {
@@ -39,6 +44,18 @@ fn collective_matching_shards_route_all_sectors_without_global_storage() -> goog
 		let environment = CollectiveEnvironment::builder(&comm)?
 			.memory_budget(MemoryBudget::new(128 * 1024))
 			.build()?;
+		let sampled = environment.state_vector_local(QubitCount::new(4)?)?;
+		expect_eq!(sampled.deployment().is_distributed(), comm.size()? > 1);
+		expect_eq!(
+			sampled.deployment().host_array_bytes(),
+			sampled
+				.deployment()
+				.local_amplitudes()
+				.checked_mul(if comm.size()? > 1 { 32 } else { 16 })
+				.ok_or(quest::Error::Overflow)?
+		);
+		expect_eq!(sampled.deployment().device_array_bytes(), 0);
+		drop(sampled);
 		if comm.size()? > 1 {
 			expect_true!(environment.state_vector(QubitCount::new(12)?).is_err());
 			let partitioned = environment.state_vector_local(QubitCount::new(12)?)?;
@@ -51,6 +68,54 @@ fn collective_matching_shards_route_all_sectors_without_global_storage() -> goog
 			drop(partitioned);
 		}
 		let policy = NumericalPolicy::default();
+		// A balanced sign flip formerly canceled in the additive FNV digest.
+		// Reject it before any native source/state mutation, including split lanes.
+		let positive: Vec<_> = (0..4)
+			.map(|source| quest_qsvt::MatchingColumn {
+				color: 0,
+				source,
+				destination: source ^ 1,
+				cosine: 1.0,
+				sine: 0.0,
+				phase: Complex64::new(0.0, 1.0),
+			})
+			.collect();
+		let summary = MatchingShard::summarize_records(&positive)?;
+		let header = quest_qsvt::MatchingHeader {
+			rows: 4,
+			cols: 4,
+			system_qubits: 2,
+			color_qubits: 0,
+			num_colors: 1,
+			beta: 1.0,
+			alpha: 1.0,
+			source_identity: 42,
+			record_count: summary.0,
+			record_digest: summary.1,
+		};
+		let rank = usize::try_from(comm.rank()?)?;
+		let parts = usize::try_from(comm.size()?)?;
+		let changed = positive
+			.into_iter()
+			.filter(|c| c.source.checked_rem(parts) == Some(rank))
+			.map(|c| quest_qsvt::MatchingColumn {
+				phase: Complex64::new(0.0, -1.0),
+				..c
+			})
+			.collect();
+		let baseline = environment.view().allocated_bytes();
+		let changed = MatchingShard::from_parts(header, rank, parts, changed, policy);
+		if parts == 1 {
+			expect_true!(changed.is_err());
+		} else {
+			expect_true!(
+				environment
+					.prepare_matching(changed?, QubitCount::new(5)?, vec![0, 1, 2])
+					.is_err()
+			);
+		}
+		expect_eq!(environment.view().allocated_bytes(), baseline);
+
 		let matrix = SparseMatrix::from_triplets(
 			2,
 			3,
@@ -66,29 +131,132 @@ fn collective_matching_shards_route_all_sectors_without_global_storage() -> goog
 		// Complete objects below are small explicit cold references for this differential.
 		// The prepared execution receives only the owned partition and scalar header.
 		let encoding = MatchingEncoding::from_sparse(&matrix, policy)?;
-		let shard = MatchingShard::from_encoding(
-			&encoding,
-			usize::try_from(comm.rank()?)?,
-			usize::try_from(comm.size()?)?,
-			policy,
-		)?;
-		let targets = vec![2, 0, 4, 1, 5];
-		let mut builder = QuantumRegionBuilder::new(9, 0)?;
-		let mapped = targets
-			.iter()
-			.map(|&position| builder.qubit(position))
-			.collect::<quest_compile::Result<Vec<_>>>()?;
-		builder.oracle(
-			&encoding.to_oracle(policy)?,
-			&mapped,
-			&[Control::new(builder.qubit(6)?, ControlState::One)],
-		)?;
-		let unitary = materialize_program(&builder.finish()?.bind(&[])?, policy)?;
-		drop(encoding);
-		drop(matrix);
-		reject_malformed(&environment, &comm, &shard, &targets, policy)?;
-		let mut prepared = environment.prepare_matching(shard, QubitCount::new(9)?, targets)?;
-		exercise(&environment, &comm, &mut prepared, &unitary)?;
+
+		for (targets, control_state) in [
+			(vec![2, 0, 4, 1, 5], ControlState::One),
+			(vec![8, 0, 4, 1, 5], ControlState::Zero),
+			(vec![2, 0, 4, 1, 8], ControlState::One),
+		] {
+			let shard = MatchingShard::from_encoding(
+				&encoding,
+				usize::try_from(comm.rank()?)?,
+				usize::try_from(comm.size()?)?,
+				policy,
+			)?;
+			let mut builder = QuantumRegionBuilder::new(9, 0)?;
+			let mapped = targets
+				.iter()
+				.map(|&position| builder.qubit(position))
+				.collect::<quest_compile::Result<Vec<_>>>()?;
+			builder.oracle(
+				&encoding.to_oracle(policy)?,
+				&mapped,
+				&[Control::new(builder.qubit(6)?, control_state)],
+			)?;
+			let unitary = materialize_program(&builder.finish()?.bind(&[])?, policy)?;
+
+			reject_malformed(&environment, &comm, &shard, &targets, policy)?;
+			let before_rejection = environment.view().allocated_bytes();
+			let wide =
+				environment.prepare_matching(shard.clone(), QubitCount::new(16)?, targets.clone());
+			if parts == 1 {
+				expect_true!(wide.is_err());
+			} else {
+				// The prepared descriptor borrows future input scratch on distributed
+				// calls; allocation of that input still obeys the native rank budget.
+				let wide = wide?;
+				expect_true!(
+					environment
+						.state_vector_local(QubitCount::new(16)?)
+						.is_err()
+				);
+				drop(wide);
+			}
+			expect_eq!(environment.view().allocated_bytes(), before_rejection);
+
+			expect_true!(
+				environment
+					.prepare_matching_with_capacity(
+						shard.clone(),
+						QubitCount::new(9)?,
+						targets.clone(),
+						quest::qsvt::matching::collective::RoutingCapacity {
+							ranks_per_node: usize::try_from(comm.size()?)?,
+							node_budget: MemoryBudget::new(0),
+						}
+					)
+					.is_err()
+			);
+			expect_eq!(environment.view().allocated_bytes(), before_rejection);
+			reject_live_node_peak(&environment, &comm, &shard, &targets)?;
+			let setup_start = std::time::Instant::now();
+			let mut prepared = environment.prepare_matching(shard, QubitCount::new(9)?, targets)?;
+			if comm.rank()? == 0 {
+				eprintln!(
+					"matching setup_seconds={}",
+					setup_start.elapsed().as_secs_f64()
+				);
+			}
+			let outer_value = if control_state == ControlState::One {
+				1 << 6
+			} else {
+				0
+			};
+			exercise(&environment, &comm, &mut prepared, &unitary, outer_value)?;
+		}
+	}
+	Ok(())
+}
+
+fn reject_live_node_peak(
+	environment: &CollectiveEnvironment<'_, '_>,
+	comm: &quest_sys::mpi::MpiCommunicator<'_>,
+	shard: &MatchingShard,
+	targets: &[usize],
+) -> googletest::Result<()> {
+	let probe =
+		environment.prepare_matching(shard.clone(), QubitCount::new(9)?, targets.to_vec())?;
+	let local_peak = environment.view().allocated_bytes();
+	drop(probe);
+	// Permit the most heavily loaded rank's preparation, then add an input state.
+	let mut maximum_peak = local_peak;
+	let mut lane = comm.collective_lane()?;
+	for peer in 0..comm.size()? {
+		let mut bytes = u64::try_from(local_peak)?.to_le_bytes();
+		lane.broadcast_bytes(peer, &mut bytes)?;
+		maximum_peak = maximum_peak.max(usize::try_from(u64::from_le_bytes(bytes))?);
+	}
+	drop(lane);
+	let mut restricted = environment.prepare_matching_with_capacity(
+		shard.clone(),
+		QubitCount::new(9)?,
+		targets.to_vec(),
+		quest::qsvt::matching::collective::RoutingCapacity {
+			ranks_per_node: usize::try_from(comm.size()?)?,
+			node_budget: MemoryBudget::new(
+				maximum_peak
+					.checked_mul(usize::try_from(comm.size()?)?)
+					.ok_or(quest::Error::Overflow)?,
+			),
+		},
+	)?;
+	let mut input = environment.state_vector_local(QubitCount::new(9)?)?;
+	input.init_zero()?;
+	expect_true!(restricted.admit_apply(&input, false, 0, 0).is_err());
+	expect_true!(restricted.apply(&mut input, false, 0, 0).is_err());
+	expect_true!(restricted.apply_scalar(&mut input, false, 0, 0).is_err());
+	let local_count = input.deployment().local_amplitudes();
+	for (index, value) in input
+		.read_local_amplitudes(0, local_count)?
+		.iter()
+		.enumerate()
+	{
+		let expected = if comm.rank()? == 0 && index == 0 {
+			Complex64::new(1.0, 0.0)
+		} else {
+			Complex64::new(0.0, 0.0)
+		};
+		expect_true!((*value).sub(expected).norm() < 1e-12);
 	}
 	Ok(())
 }
@@ -149,6 +317,7 @@ fn exercise(
 	comm: &quest_sys::mpi::MpiCommunicator<'_>,
 	prepared: &mut quest::qsvt::matching::collective::PreparedMatching<'_, '_, '_>,
 	unitary: &faer::Mat<Complex64>,
+	outer_value: usize,
 ) -> googletest::Result<()> {
 	let mut register = environment.state_vector_local(QubitCount::new(9)?)?;
 	let local_count = register.deployment().local_amplitudes();
@@ -181,7 +350,16 @@ fn exercise(
 			.write_local_amplitudes(chunk.checked_mul(8).ok_or(quest::Error::Overflow)?, values)?;
 	}
 	let bytes = environment.view().allocated_bytes();
-	let invalid_mask = if comm.rank()? == 0 { 1 << 2 } else { 1 << 6 };
+	let flag_target = prepared
+		.targets()
+		.first()
+		.copied()
+		.ok_or(quest::Error::Overflow)?;
+	let invalid_mask = if comm.rank()? == 0 {
+		1 << flag_target
+	} else {
+		1 << 6
+	};
 	expect_true!(
 		prepared
 			.apply(&mut register, false, invalid_mask, 0)
@@ -192,20 +370,38 @@ fn exercise(
 		expect_true!(actual.sub(*expected).norm() < 1e-12);
 	}
 	let scalar_start = std::time::Instant::now();
-	prepared.apply_scalar(&mut register, false, 1 << 6, 1 << 6)?;
-	prepared.apply_scalar(&mut register, true, 1 << 6, 1 << 6)?;
+	prepared.apply_scalar(&mut register, false, 1 << 6, outer_value)?;
+	prepared.apply_scalar(&mut register, true, 1 << 6, outer_value)?;
 	let scalar_time = scalar_start.elapsed();
 	let batch_start = std::time::Instant::now();
-	prepared.apply(&mut register, false, 1 << 6, 1 << 6)?;
-	expect_eq!(prepared.last_statistics().batches, 2);
+	prepared.apply(&mut register, false, 1 << 6, outer_value)?;
+	let forward_time = batch_start.elapsed();
+	expect_gt!(prepared.last_statistics().batches, 0);
+	expect_le!(
+		prepared.last_statistics().batches,
+		usize::try_from(comm.size()?)?.max(4)
+	);
+	let flag = 1usize << flag_target;
+	let expected_candidates = if flag < local_count {
+		local_count / 2
+	} else if start & flag == 0 {
+		local_count
+	} else {
+		0
+	};
+	expect_eq!(
+		prepared.last_statistics().local_pair_candidates,
+		expected_candidates
+	);
 	expect_le!(prepared.last_statistics().maximum_batch_pairs, 64);
 	expect_le!(prepared.last_statistics().maximum_routed_amplitudes, 128);
 	let actual = register.read_local_amplitudes(0, local_count)?;
 	for (actual, expected) in actual.iter().zip(&expected) {
 		expect_true!(actual.sub(*expected).norm() < 1e-12);
 	}
-	prepared.apply(&mut register, true, 1 << 6, 1 << 6)?;
-	let batch_time = batch_start.elapsed();
+	let adjoint_start = std::time::Instant::now();
+	prepared.apply(&mut register, true, 1 << 6, outer_value)?;
+	let batch_time = forward_time.saturating_add(adjoint_start.elapsed());
 	report_times(
 		comm,
 		[scalar_time.as_secs_f64(), batch_time.as_secs_f64()],

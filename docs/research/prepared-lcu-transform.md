@@ -1,0 +1,42 @@
+# Prepared weighted matching QSVT and reciprocal replay
+
+The CPU and MPI `prepare_matching_lcu_transform` adapters consume a reviewed `PreparedMatchingLcu`, a separate physical response target, a compact `TransformSchedule`, and `TransformExecutionLimits`. They reuse the same semantic phase order and literal adjoint interpreter as portable `ReplayTransform`; no matching header is fabricated for the composite source. MPI children retain genuinely sharded coefficient owners and their original K native scratches. There is no production global matrix, circuit, coefficient list or state copy.
+
+Prepare children with the complete register width already including response and spectator qubits. Prepare the weighted source with its selector targets, obtain its actual descriptor from `source.plan().descriptor()`, and construct a schedule with `TransformSchedule::from_phase_sequence(descriptor, sequence, policy)`. The descriptor-only certified factory borrows `CertifiedProjectorPhases`, copies its exact angles/readout and retains its scalar response attestation. The full certificate and its polynomial provenance remain separate caller-owned resources. Neither factory reruns synthesis or replaces the QSP convention algorithm. Existing matching and owning replay constructors delegate to these factories while preserving their source/certificate ownership admission.
+
+The native constructor binds both source operator and whole-unitary construction identities, normalization, complete left/right projectors, numerical error options, target mapping and response bit. MPI additionally compares limits, all rounded phase metadata and every immutable forward/adjoint semantic step. Clean selector projectors, rectangular padding, color/flag failures and inactive signed controls remain coherent. Compact projector free bits are packed in source logical order, including nonzero fixed values and nonzero range starts, before mapping to physical targets. A response Z rotation uses two controlled scalar phases; this preserves relative phase under outer controls.
+
+## Complete operation admission and ownership
+
+For degree d, the shared schedule streams 4d+5 semantic steps: 2d source queries, 2(d+1) projector phases, two response Hadamards and one response rotation. `admit_apply` checks the whole operation before the first Hadamard. It validates at most four source query patterns (source/adjoint times response zero/one), every response primitive, all original child limits and current simultaneous rank/node accounting. MPI performs a caught complete local pass, agrees it, releases the parent lane, and then enters the fixed common source-admission pattern loop. No independently advancing local visitor contains child collectives.
+
+Limits separately bound constructor work, degree/step/query counts, preflight work, modeled repeated execution work, native dispatches, coordination calls and aggregate application routing payload. The latter is directional application data and excludes MPI protocol/coordinator and native internal traffic. Constructor equality broadcasts have a separate receipt. The constructor work floor includes a checked256*parts coordination allowance before its node loops. Application admission similarly agrees its parts-dependent coordinator/work floor before entering the node loop, including no-query schedules; that floor must fit preflight, control, rank and aggregate work caps. Counts of portable controlled primitives are not Clifford+T or fault-tolerant elementary gate costs. Preflight conservatively charges a complete source execution envelope for each of its local and collective-prefix validation passes; those checks do not actually route amplitudes.
+
+Each projector phase scans the full local native partition with at most 256 temporary amplitudes, charges all predicate/complex updates, and performs at most 2 ceil(L/256) local read/write API calls. Branch probability does not reduce its admission. Query receipts sum all repeated source native state-pass elements and application payload. Response state-pass elements are distinct from projector scans. The outer limits supplement rather than replace source/child limits.
+
+The managed envelope includes the input native-register accounting, K original children/scratches, LCU plan/PREP/executor, compact schedule/Arc metadata, both projector vector actual capacities, the new primitive executor and conservative stack allowances. Planned future projector storage remains reserved while each returned capacity is checked before filling. Shared phase payloads and inline scalar owners may be conservatively charged twice. Caller-retained certificates, synthesis/reference buffers and unrelated external storage require their own declarations/reservations; the adapter cannot discover arbitrary Rust owners. Managed accounting is not an allocator/RSS/native-temporary bound, physical placement proof or multihost measurement. Use OS limits separately when measuring a campaign.
+
+CPU execution errors after mutation leave unspecified quantum state and provide no rollback or retry promise. After MPI emission, every later source/lane/native error or panic is inside a job-fatal boundary; no success receipt or recoverable modified-state return is published. Common admission rejection preserves the register and releases temporary accounting.
+
+## Reciprocal orientation and scientific qualifications
+
+For A=sum(w_t A_t), prepare source children for A_t† with conjugated weights. The odd SVT block then approximates the inverse action of A on an in-range RHS. `apply(adjoint=true)` instead applies the literal full transform adjoint; it does not silently change inverse orientation. Use the implemented LCU normalization alpha from the descriptor, including PREP rounding, rather than forcing the nominal sum to equal it bit-for-bit.
+
+Existing `ReciprocalPolynomial::geometric`, synthesis and certification APIs remain unchanged. Rescale unnormalized successful amplitudes by ||b||/(alpha*c), where c is the polynomial's reciprocal scale. Preserve the failure mass. Spectral bounds concern the admitted nonzero subspace; inverse claims additionally need an in-range RHS or a suitable rank/invertibility premise. Unknown preparation/encoding errors remain `None`. A scalar phase certificate alone cannot establish a physical residual bound: uniform source, execution and RHS error premises must also be supplied. Conditional telescoping of a full-unitary source error contributes at most 2d times that error, separately from phase/native arithmetic and RHS errors. Measured success is diagnostic and does not certify sampling p_min.
+
+The independent bounded native test uses A=.625I+.125iX and the separately constructed source A†. Its singular value is sqrt(.625²+.125²). For degrees 1, 3 and 5, symmetric Wx endpoint phases π/4 with zero interior phases give U00=iT_d and hence selected imaginary response T_d; an independent scalar Chebyshev recurrence predicts the projected block T_d(sigma/alpha) A†/sigma. All-zero Wx phases would give zero in this imaginary-U00 convention. The reciprocal test compares physical rescaled amplitudes directly with (.625I-.125iX)/(.625²+.125²). These are small empirical numerical fixtures with unknown uniform encoding/native error, not a certified physical inverse campaign.
+
+## Focused reproduction
+
+With a matching native QuEST installation and MPI compiler/launcher on PATH:
+
+```sh
+export QUEST_ROOT=/path/to/installed/quest
+export MPICC=/path/to/matching/mpicc
+export PATH=/path/to/matching/mpi/bin:$PATH
+cargo test -p quest-qsvt --all-features --test transform_schedule_factories --test owned_replay --test replay_transform --test reciprocal_review
+cargo test -p quest-rs --features qsvt,mpi --test matching_lcu_transform --test matching_lcu_transform_collective --test qsvt_matching_transform
+cargo test -p quest-rs --features qsvt,mpi --lib qsvt::matching_lcu -- --test-threads=1
+```
+
+The new whole-register tests compare 512 arbitrary amplitudes in both orientations against bounded test-only portable references. MPI covers 1/2/4/8 ranks and independent split communicators, three terms with selector padding, and five input owners with zero filtering and actual nonzero-mass underflow. Rejection/fatal subprocesses have explicit deadlines. These local MPI fixtures do not establish multihost scaling. Distributed tensors, persisted loaded-child composition, global weight ingestion, physical-history decomposition and coherent measurement remain separate stages.

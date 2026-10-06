@@ -1,0 +1,27 @@
+{
+  "benchmark_convergence_established": false,
+  "quantum_execution": false,
+  "reference": {
+    "cells": 4,
+    "cole_hopf_l2_error": 0.00020677048176070422,
+    "final_energy": 8.183112967053271e-06,
+    "horizon": 0.1,
+    "initial_energy": 9.870344683108788e-06,
+    "order": 1,
+    "physical_dimension": 8,
+    "state": [
+      -1.6196619661756842e-07,
+      0.0014210012898440787,
+      0.0014210432434145666,
+      0.0020225698530248496,
+      0.0020228226979935133,
+      0.0014395966312932172,
+      0.0014396452257954954,
+      1.6616710931117257e-07
+    ],
+    "status": "executed classical full-coordinate DG reference; no quantum execution",
+    "steps": 4000,
+    "viscosity": 0.1
+  },
+  "status": "classical-reference-executed"
+}

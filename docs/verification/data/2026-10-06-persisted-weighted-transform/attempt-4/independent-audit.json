@@ -1,0 +1,2343 @@
+{
+  "schema": "quest-persisted-weighted-attempt-4-independent-audit-v1",
+  "verdict": "approved scoped saved seven-job completion and direct residual/readout evidence",
+  "native_or_scientific_reruns": 0,
+  "source_files": 975,
+  "workspace_source_aggregate_sha256": "9056b776fb8865b02112a01a20db061c0a8c7cb95e3191179972347b43569f8a",
+  "snapshot_file_sha256": "9dcf3171035b7a13bc0804ff33959175fbbe939032b771d23f4552dbe6d9c1b8",
+  "consumer_source_manifest_sha256": "dc69f1e3a848b6ebf368f6b0ac2a09e4573e5601cae0b06452ea38b352b8963c",
+  "mutable_cargo_artifact_current_sha256": "389f0827d031f278d7ebda9cf38d0092f3589fb7104cdcada465620f0f889264",
+  "mutable_cargo_artifact_note": "Cargo target is reused by later broad gates; immutable pinned binary copies are authoritative for this saved run",
+  "current_later_documentation_deltas": [
+    "crates/quest-cfd/NEXT_STEPS.md",
+    "crates/quest-cfd/README.md"
+  ],
+  "consumer_files": 16,
+  "native_install_files": 29,
+  "tool_executable_records": 5,
+  "actual_local_package_manifests": [
+    "crates/quest-build/Cargo.toml",
+    "crates/quest-compile/Cargo.toml",
+    "crates/quest-language/Cargo.toml",
+    "crates/quest-macros/Cargo.toml",
+    "crates/quest-math/Cargo.toml",
+    "crates/quest-numerics/Cargo.toml",
+    "crates/quest-polynomial/Cargo.toml",
+    "crates/quest-qasm/Cargo.toml",
+    "crates/quest-qsp/Cargo.toml",
+    "crates/quest-qsvt-io/Cargo.toml",
+    "crates/quest-qsvt/Cargo.toml",
+    "crates/quest-symbolic/Cargo.toml",
+    "crates/quest-synthesis/Cargo.toml",
+    "crates/quest-sys/Cargo.toml",
+    "crates/quest/Cargo.toml",
+    "crates/vendor/mathcore/Cargo.toml"
+  ],
+  "binary_sha256": "7acd0d38dc30a81aa299ad5704a28d7c2e0acec00f0d4a4a5f20f584759dcab9",
+  "build_attestation_sha256": "fd59fe4164397f1abccdae411e292f2cd63897ce1c62ee8fc10dc1660748b3ec",
+  "raw_receipt_sha256": "a9fb283e26c948dc2c2e5ff6871559fae968692173b54981515cc90fd19ea89f",
+  "execution_attestation_sha256": "e82ca07970d9f5e5a5d1ce365efec3a96854ba07b468875710f6036a1b99a80d",
+  "raw_rank_rows": 28,
+  "independent_replay_calls": 57,
+  "jobs": 7,
+  "publication_input_files": 27,
+  "freeze_phase_files": 2,
+  "immutable_files": 29,
+  "phase_sha256": "51753f689cdca32c68a812c20df82e0b8b83643a8d587a6a12e8ac706d3de412",
+  "degree": 33,
+  "alpha": 1.2500000000000002,
+  "nominal_sigma": 0.6373774391990981,
+  "independent_polynomial_response": 0.15313643661118861,
+  "independent_relative_polynomial_residual": 2.9622031556986173e-05,
+  "ideal_inverse_norm_squared": 2.4615384615384617,
+  "nominal_finite_success": 0.023450768217972588,
+  "ideal_reciprocal_success": 0.023452157598499068,
+  "native_failure_mass_range": [
+    0.9765492317820176,
+    0.9765492317820191
+  ],
+  "replay_calls": [
+    {
+      "mode": "replay",
+      "world_parts": 1,
+      "parts": 1,
+      "world_rank": 0,
+      "call": 0,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 0,
+          "indexed_reads": 1584,
+          "indexed_writes": 1584,
+          "local_pair_candidates": 101376,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 0,
+          "sent_bytes": 0
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 981729024,
+      "managed_rank_peak_bytes": 2514056
+    },
+    {
+      "mode": "replay",
+      "world_parts": 1,
+      "parts": 1,
+      "world_rank": 0,
+      "call": 1,
+      "adjoint": true,
+      "relative_residual": 2.962203156364751e-05,
+      "relative_vector_error": 2.9622031563689144e-05,
+      "success_probability": 0.023450768217972272,
+      "total_probability": 0.9999999999999899,
+      "failure_mass": 0.9765492317820176,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 0,
+          "indexed_reads": 1584,
+          "indexed_writes": 1584,
+          "local_pair_candidates": 101376,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 0,
+          "sent_bytes": 0
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 981729024,
+      "managed_rank_peak_bytes": 2514056
+    },
+    {
+      "mode": "replay",
+      "world_parts": 1,
+      "parts": 1,
+      "world_rank": 0,
+      "call": 2,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 0,
+          "indexed_reads": 1584,
+          "indexed_writes": 1584,
+          "local_pair_candidates": 101376,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 0,
+          "sent_bytes": 0
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 981729024,
+      "managed_rank_peak_bytes": 2514056
+    },
+    {
+      "mode": "replay",
+      "world_parts": 2,
+      "parts": 2,
+      "world_rank": 0,
+      "call": 0,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 12672,
+          "indexed_reads": 1176,
+          "indexed_writes": 1200,
+          "local_pair_candidates": 50688,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 427008,
+          "sent_bytes": 427008
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 988647424,
+      "managed_rank_peak_bytes": 2377608
+    },
+    {
+      "mode": "replay",
+      "world_parts": 2,
+      "parts": 2,
+      "world_rank": 0,
+      "call": 1,
+      "adjoint": true,
+      "relative_residual": 2.962203156364751e-05,
+      "relative_vector_error": 2.9622031563689144e-05,
+      "success_probability": 0.023450768217972272,
+      "total_probability": 0.9999999999999899,
+      "failure_mass": 0.9765492317820176,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 12672,
+          "indexed_reads": 1200,
+          "indexed_writes": 1176,
+          "local_pair_candidates": 50688,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 434688,
+          "sent_bytes": 434688
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 988647424,
+      "managed_rank_peak_bytes": 2377608
+    },
+    {
+      "mode": "replay",
+      "world_parts": 2,
+      "parts": 2,
+      "world_rank": 0,
+      "call": 2,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 12672,
+          "indexed_reads": 1176,
+          "indexed_writes": 1200,
+          "local_pair_candidates": 50688,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 427008,
+          "sent_bytes": 427008
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 988647424,
+      "managed_rank_peak_bytes": 2377608
+    },
+    {
+      "mode": "replay",
+      "world_parts": 2,
+      "parts": 2,
+      "world_rank": 1,
+      "call": 0,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 12672,
+          "indexed_reads": 1176,
+          "indexed_writes": 1200,
+          "local_pair_candidates": 50688,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 427008,
+          "sent_bytes": 427008
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 988647424,
+      "managed_rank_peak_bytes": 2377608
+    },
+    {
+      "mode": "replay",
+      "world_parts": 2,
+      "parts": 2,
+      "world_rank": 1,
+      "call": 1,
+      "adjoint": true,
+      "relative_residual": 2.962203156364751e-05,
+      "relative_vector_error": 2.9622031563689144e-05,
+      "success_probability": 0.023450768217972272,
+      "total_probability": 0.9999999999999899,
+      "failure_mass": 0.9765492317820176,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 12672,
+          "indexed_reads": 1200,
+          "indexed_writes": 1176,
+          "local_pair_candidates": 50688,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 434688,
+          "sent_bytes": 434688
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 988647424,
+      "managed_rank_peak_bytes": 2377608
+    },
+    {
+      "mode": "replay",
+      "world_parts": 2,
+      "parts": 2,
+      "world_rank": 1,
+      "call": 2,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 12672,
+          "indexed_reads": 1176,
+          "indexed_writes": 1200,
+          "local_pair_candidates": 50688,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 427008,
+          "sent_bytes": 427008
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 988647424,
+      "managed_rank_peak_bytes": 2377608
+    },
+    {
+      "mode": "replay",
+      "world_parts": 4,
+      "parts": 4,
+      "world_rank": 0,
+      "call": 0,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 38016,
+          "indexed_reads": 588,
+          "indexed_writes": 600,
+          "local_pair_candidates": 25344,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 340224,
+          "sent_bytes": 340224
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 1363161600,
+      "managed_rank_peak_bytes": 2309384
+    },
+    {
+      "mode": "replay",
+      "world_parts": 4,
+      "parts": 4,
+      "world_rank": 0,
+      "call": 1,
+      "adjoint": true,
+      "relative_residual": 2.962203156364751e-05,
+      "relative_vector_error": 2.9622031563689144e-05,
+      "success_probability": 0.023450768217972272,
+      "total_probability": 0.9999999999999899,
+      "failure_mass": 0.9765492317820176,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 38016,
+          "indexed_reads": 600,
+          "indexed_writes": 588,
+          "local_pair_candidates": 25344,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 344064,
+          "sent_bytes": 344064
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 1363161600,
+      "managed_rank_peak_bytes": 2309384
+    },
+    {
+      "mode": "replay",
+      "world_parts": 4,
+      "parts": 4,
+      "world_rank": 0,
+      "call": 2,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 38016,
+          "indexed_reads": 588,
+          "indexed_writes": 600,
+          "local_pair_candidates": 25344,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 340224,
+          "sent_bytes": 340224
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 1363161600,
+      "managed_rank_peak_bytes": 2309384
+    },
+    {
+      "mode": "replay",
+      "world_parts": 4,
+      "parts": 4,
+      "world_rank": 1,
+      "call": 0,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 38016,
+          "indexed_reads": 588,
+          "indexed_writes": 600,
+          "local_pair_candidates": 25344,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 1039104,
+          "sent_bytes": 1039104
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 1363161600,
+      "managed_rank_peak_bytes": 2309384
+    },
+    {
+      "mode": "replay",
+      "world_parts": 4,
+      "parts": 4,
+      "world_rank": 1,
+      "call": 1,
+      "adjoint": true,
+      "relative_residual": 2.962203156364751e-05,
+      "relative_vector_error": 2.9622031563689144e-05,
+      "success_probability": 0.023450768217972272,
+      "total_probability": 0.9999999999999899,
+      "failure_mass": 0.9765492317820176,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 38016,
+          "indexed_reads": 600,
+          "indexed_writes": 588,
+          "local_pair_candidates": 25344,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 1039104,
+          "sent_bytes": 1039104
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 1363161600,
+      "managed_rank_peak_bytes": 2309384
+    },
+    {
+      "mode": "replay",
+      "world_parts": 4,
+      "parts": 4,
+      "world_rank": 1,
+      "call": 2,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 38016,
+          "indexed_reads": 588,
+          "indexed_writes": 600,
+          "local_pair_candidates": 25344,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 1039104,
+          "sent_bytes": 1039104
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 1363161600,
+      "managed_rank_peak_bytes": 2309384
+    },
+    {
+      "mode": "replay",
+      "world_parts": 4,
+      "parts": 4,
+      "world_rank": 2,
+      "call": 0,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 38016,
+          "indexed_reads": 588,
+          "indexed_writes": 600,
+          "local_pair_candidates": 25344,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 1039104,
+          "sent_bytes": 1039104
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 1363161600,
+      "managed_rank_peak_bytes": 2309384
+    },
+    {
+      "mode": "replay",
+      "world_parts": 4,
+      "parts": 4,
+      "world_rank": 2,
+      "call": 1,
+      "adjoint": true,
+      "relative_residual": 2.962203156364751e-05,
+      "relative_vector_error": 2.9622031563689144e-05,
+      "success_probability": 0.023450768217972272,
+      "total_probability": 0.9999999999999899,
+      "failure_mass": 0.9765492317820176,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 38016,
+          "indexed_reads": 600,
+          "indexed_writes": 588,
+          "local_pair_candidates": 25344,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 1039104,
+          "sent_bytes": 1039104
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 1363161600,
+      "managed_rank_peak_bytes": 2309384
+    },
+    {
+      "mode": "replay",
+      "world_parts": 4,
+      "parts": 4,
+      "world_rank": 2,
+      "call": 2,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 38016,
+          "indexed_reads": 588,
+          "indexed_writes": 600,
+          "local_pair_candidates": 25344,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 1039104,
+          "sent_bytes": 1039104
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 1363161600,
+      "managed_rank_peak_bytes": 2309384
+    },
+    {
+      "mode": "replay",
+      "world_parts": 4,
+      "parts": 4,
+      "world_rank": 3,
+      "call": 0,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 38016,
+          "indexed_reads": 588,
+          "indexed_writes": 600,
+          "local_pair_candidates": 25344,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 340224,
+          "sent_bytes": 340224
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 1363161600,
+      "managed_rank_peak_bytes": 2309384
+    },
+    {
+      "mode": "replay",
+      "world_parts": 4,
+      "parts": 4,
+      "world_rank": 3,
+      "call": 1,
+      "adjoint": true,
+      "relative_residual": 2.962203156364751e-05,
+      "relative_vector_error": 2.9622031563689144e-05,
+      "success_probability": 0.023450768217972272,
+      "total_probability": 0.9999999999999899,
+      "failure_mass": 0.9765492317820176,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 38016,
+          "indexed_reads": 600,
+          "indexed_writes": 588,
+          "local_pair_candidates": 25344,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 344064,
+          "sent_bytes": 344064
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 1363161600,
+      "managed_rank_peak_bytes": 2309384
+    },
+    {
+      "mode": "replay",
+      "world_parts": 4,
+      "parts": 4,
+      "world_rank": 3,
+      "call": 2,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 38016,
+          "indexed_reads": 588,
+          "indexed_writes": 600,
+          "local_pair_candidates": 25344,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 340224,
+          "sent_bytes": 340224
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 1363161600,
+      "managed_rank_peak_bytes": 2309384
+    },
+    {
+      "mode": "replay",
+      "world_parts": 8,
+      "parts": 8,
+      "world_rank": 0,
+      "call": 0,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 88704,
+          "indexed_reads": 294,
+          "indexed_writes": 300,
+          "local_pair_candidates": 12672,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 448896,
+          "sent_bytes": 448896
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 2292528640,
+      "managed_rank_peak_bytes": 2275272
+    },
+    {
+      "mode": "replay",
+      "world_parts": 8,
+      "parts": 8,
+      "world_rank": 0,
+      "call": 1,
+      "adjoint": true,
+      "relative_residual": 2.962203156364751e-05,
+      "relative_vector_error": 2.9622031563689144e-05,
+      "success_probability": 0.023450768217972272,
+      "total_probability": 0.9999999999999899,
+      "failure_mass": 0.9765492317820176,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 88704,
+          "indexed_reads": 300,
+          "indexed_writes": 294,
+          "local_pair_candidates": 12672,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 450816,
+          "sent_bytes": 450816
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 2292528640,
+      "managed_rank_peak_bytes": 2275272
+    },
+    {
+      "mode": "replay",
+      "world_parts": 8,
+      "parts": 8,
+      "world_rank": 0,
+      "call": 2,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 88704,
+          "indexed_reads": 294,
+          "indexed_writes": 300,
+          "local_pair_candidates": 12672,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 448896,
+          "sent_bytes": 448896
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 2292528640,
+      "managed_rank_peak_bytes": 2275272
+    },
+    {
+      "mode": "replay",
+      "world_parts": 8,
+      "parts": 8,
+      "world_rank": 1,
+      "call": 0,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 88704,
+          "indexed_reads": 294,
+          "indexed_writes": 300,
+          "local_pair_candidates": 12672,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 798336,
+          "sent_bytes": 798336
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 2292528640,
+      "managed_rank_peak_bytes": 2275272
+    },
+    {
+      "mode": "replay",
+      "world_parts": 8,
+      "parts": 8,
+      "world_rank": 1,
+      "call": 1,
+      "adjoint": true,
+      "relative_residual": 2.962203156364751e-05,
+      "relative_vector_error": 2.9622031563689144e-05,
+      "success_probability": 0.023450768217972272,
+      "total_probability": 0.9999999999999899,
+      "failure_mass": 0.9765492317820176,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 88704,
+          "indexed_reads": 300,
+          "indexed_writes": 294,
+          "local_pair_candidates": 12672,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 798336,
+          "sent_bytes": 798336
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 2292528640,
+      "managed_rank_peak_bytes": 2275272
+    },
+    {
+      "mode": "replay",
+      "world_parts": 8,
+      "parts": 8,
+      "world_rank": 1,
+      "call": 2,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 88704,
+          "indexed_reads": 294,
+          "indexed_writes": 300,
+          "local_pair_candidates": 12672,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 798336,
+          "sent_bytes": 798336
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 2292528640,
+      "managed_rank_peak_bytes": 2275272
+    },
+    {
+      "mode": "replay",
+      "world_parts": 8,
+      "parts": 8,
+      "world_rank": 2,
+      "call": 0,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 88704,
+          "indexed_reads": 294,
+          "indexed_writes": 300,
+          "local_pair_candidates": 12672,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 448896,
+          "sent_bytes": 448896
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 2292528640,
+      "managed_rank_peak_bytes": 2275272
+    },
+    {
+      "mode": "replay",
+      "world_parts": 8,
+      "parts": 8,
+      "world_rank": 2,
+      "call": 1,
+      "adjoint": true,
+      "relative_residual": 2.962203156364751e-05,
+      "relative_vector_error": 2.9622031563689144e-05,
+      "success_probability": 0.023450768217972272,
+      "total_probability": 0.9999999999999899,
+      "failure_mass": 0.9765492317820176,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 88704,
+          "indexed_reads": 300,
+          "indexed_writes": 294,
+          "local_pair_candidates": 12672,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 450816,
+          "sent_bytes": 450816
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 2292528640,
+      "managed_rank_peak_bytes": 2275272
+    },
+    {
+      "mode": "replay",
+      "world_parts": 8,
+      "parts": 8,
+      "world_rank": 2,
+      "call": 2,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 88704,
+          "indexed_reads": 294,
+          "indexed_writes": 300,
+          "local_pair_candidates": 12672,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 448896,
+          "sent_bytes": 448896
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 2292528640,
+      "managed_rank_peak_bytes": 2275272
+    },
+    {
+      "mode": "replay",
+      "world_parts": 8,
+      "parts": 8,
+      "world_rank": 3,
+      "call": 0,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 88704,
+          "indexed_reads": 294,
+          "indexed_writes": 300,
+          "local_pair_candidates": 12672,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 798336,
+          "sent_bytes": 798336
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 2292528640,
+      "managed_rank_peak_bytes": 2275272
+    },
+    {
+      "mode": "replay",
+      "world_parts": 8,
+      "parts": 8,
+      "world_rank": 3,
+      "call": 1,
+      "adjoint": true,
+      "relative_residual": 2.962203156364751e-05,
+      "relative_vector_error": 2.9622031563689144e-05,
+      "success_probability": 0.023450768217972272,
+      "total_probability": 0.9999999999999899,
+      "failure_mass": 0.9765492317820176,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 88704,
+          "indexed_reads": 300,
+          "indexed_writes": 294,
+          "local_pair_candidates": 12672,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 798336,
+          "sent_bytes": 798336
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 2292528640,
+      "managed_rank_peak_bytes": 2275272
+    },
+    {
+      "mode": "replay",
+      "world_parts": 8,
+      "parts": 8,
+      "world_rank": 3,
+      "call": 2,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 88704,
+          "indexed_reads": 294,
+          "indexed_writes": 300,
+          "local_pair_candidates": 12672,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 798336,
+          "sent_bytes": 798336
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 2292528640,
+      "managed_rank_peak_bytes": 2275272
+    },
+    {
+      "mode": "replay",
+      "world_parts": 8,
+      "parts": 8,
+      "world_rank": 4,
+      "call": 0,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 88704,
+          "indexed_reads": 294,
+          "indexed_writes": 300,
+          "local_pair_candidates": 12672,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 798336,
+          "sent_bytes": 798336
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 2292528640,
+      "managed_rank_peak_bytes": 2275272
+    },
+    {
+      "mode": "replay",
+      "world_parts": 8,
+      "parts": 8,
+      "world_rank": 4,
+      "call": 1,
+      "adjoint": true,
+      "relative_residual": 2.962203156364751e-05,
+      "relative_vector_error": 2.9622031563689144e-05,
+      "success_probability": 0.023450768217972272,
+      "total_probability": 0.9999999999999899,
+      "failure_mass": 0.9765492317820176,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 88704,
+          "indexed_reads": 300,
+          "indexed_writes": 294,
+          "local_pair_candidates": 12672,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 798336,
+          "sent_bytes": 798336
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 2292528640,
+      "managed_rank_peak_bytes": 2275272
+    },
+    {
+      "mode": "replay",
+      "world_parts": 8,
+      "parts": 8,
+      "world_rank": 4,
+      "call": 2,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 88704,
+          "indexed_reads": 294,
+          "indexed_writes": 300,
+          "local_pair_candidates": 12672,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 798336,
+          "sent_bytes": 798336
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 2292528640,
+      "managed_rank_peak_bytes": 2275272
+    },
+    {
+      "mode": "replay",
+      "world_parts": 8,
+      "parts": 8,
+      "world_rank": 5,
+      "call": 0,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 88704,
+          "indexed_reads": 294,
+          "indexed_writes": 300,
+          "local_pair_candidates": 12672,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 448896,
+          "sent_bytes": 448896
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 2292528640,
+      "managed_rank_peak_bytes": 2275272
+    },
+    {
+      "mode": "replay",
+      "world_parts": 8,
+      "parts": 8,
+      "world_rank": 5,
+      "call": 1,
+      "adjoint": true,
+      "relative_residual": 2.962203156364751e-05,
+      "relative_vector_error": 2.9622031563689144e-05,
+      "success_probability": 0.023450768217972272,
+      "total_probability": 0.9999999999999899,
+      "failure_mass": 0.9765492317820176,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 88704,
+          "indexed_reads": 300,
+          "indexed_writes": 294,
+          "local_pair_candidates": 12672,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 450816,
+          "sent_bytes": 450816
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 2292528640,
+      "managed_rank_peak_bytes": 2275272
+    },
+    {
+      "mode": "replay",
+      "world_parts": 8,
+      "parts": 8,
+      "world_rank": 5,
+      "call": 2,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 88704,
+          "indexed_reads": 294,
+          "indexed_writes": 300,
+          "local_pair_candidates": 12672,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 448896,
+          "sent_bytes": 448896
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 2292528640,
+      "managed_rank_peak_bytes": 2275272
+    },
+    {
+      "mode": "replay",
+      "world_parts": 8,
+      "parts": 8,
+      "world_rank": 6,
+      "call": 0,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 88704,
+          "indexed_reads": 294,
+          "indexed_writes": 300,
+          "local_pair_candidates": 12672,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 798336,
+          "sent_bytes": 798336
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 2292528640,
+      "managed_rank_peak_bytes": 2275272
+    },
+    {
+      "mode": "replay",
+      "world_parts": 8,
+      "parts": 8,
+      "world_rank": 6,
+      "call": 1,
+      "adjoint": true,
+      "relative_residual": 2.962203156364751e-05,
+      "relative_vector_error": 2.9622031563689144e-05,
+      "success_probability": 0.023450768217972272,
+      "total_probability": 0.9999999999999899,
+      "failure_mass": 0.9765492317820176,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 88704,
+          "indexed_reads": 300,
+          "indexed_writes": 294,
+          "local_pair_candidates": 12672,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 798336,
+          "sent_bytes": 798336
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 2292528640,
+      "managed_rank_peak_bytes": 2275272
+    },
+    {
+      "mode": "replay",
+      "world_parts": 8,
+      "parts": 8,
+      "world_rank": 6,
+      "call": 2,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 88704,
+          "indexed_reads": 294,
+          "indexed_writes": 300,
+          "local_pair_candidates": 12672,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 798336,
+          "sent_bytes": 798336
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 2292528640,
+      "managed_rank_peak_bytes": 2275272
+    },
+    {
+      "mode": "replay",
+      "world_parts": 8,
+      "parts": 8,
+      "world_rank": 7,
+      "call": 0,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 88704,
+          "indexed_reads": 294,
+          "indexed_writes": 300,
+          "local_pair_candidates": 12672,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 448896,
+          "sent_bytes": 448896
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 2292528640,
+      "managed_rank_peak_bytes": 2275272
+    },
+    {
+      "mode": "replay",
+      "world_parts": 8,
+      "parts": 8,
+      "world_rank": 7,
+      "call": 1,
+      "adjoint": true,
+      "relative_residual": 2.962203156364751e-05,
+      "relative_vector_error": 2.9622031563689144e-05,
+      "success_probability": 0.023450768217972272,
+      "total_probability": 0.9999999999999899,
+      "failure_mass": 0.9765492317820176,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 88704,
+          "indexed_reads": 300,
+          "indexed_writes": 294,
+          "local_pair_candidates": 12672,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 450816,
+          "sent_bytes": 450816
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 2292528640,
+      "managed_rank_peak_bytes": 2275272
+    },
+    {
+      "mode": "replay",
+      "world_parts": 8,
+      "parts": 8,
+      "world_rank": 7,
+      "call": 2,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 88704,
+          "indexed_reads": 294,
+          "indexed_writes": 300,
+          "local_pair_candidates": 12672,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 448896,
+          "sent_bytes": 448896
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 2292528640,
+      "managed_rank_peak_bytes": 2275272
+    },
+    {
+      "mode": "split",
+      "world_parts": 4,
+      "parts": 2,
+      "world_rank": 0,
+      "call": 0,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 12672,
+          "indexed_reads": 1176,
+          "indexed_writes": 1200,
+          "local_pair_candidates": 50688,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 427008,
+          "sent_bytes": 427008
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 988647424,
+      "managed_rank_peak_bytes": 2377608
+    },
+    {
+      "mode": "split",
+      "world_parts": 4,
+      "parts": 2,
+      "world_rank": 0,
+      "call": 1,
+      "adjoint": true,
+      "relative_residual": 2.962203156364751e-05,
+      "relative_vector_error": 2.9622031563689144e-05,
+      "success_probability": 0.023450768217972272,
+      "total_probability": 0.9999999999999899,
+      "failure_mass": 0.9765492317820176,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 12672,
+          "indexed_reads": 1200,
+          "indexed_writes": 1176,
+          "local_pair_candidates": 50688,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 434688,
+          "sent_bytes": 434688
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 988647424,
+      "managed_rank_peak_bytes": 2377608
+    },
+    {
+      "mode": "split",
+      "world_parts": 4,
+      "parts": 2,
+      "world_rank": 0,
+      "call": 2,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 12672,
+          "indexed_reads": 1176,
+          "indexed_writes": 1200,
+          "local_pair_candidates": 50688,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 427008,
+          "sent_bytes": 427008
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 988647424,
+      "managed_rank_peak_bytes": 2377608
+    },
+    {
+      "mode": "split",
+      "world_parts": 4,
+      "parts": 2,
+      "world_rank": 1,
+      "call": 0,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 12672,
+          "indexed_reads": 1176,
+          "indexed_writes": 1200,
+          "local_pair_candidates": 50688,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 427008,
+          "sent_bytes": 427008
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 988647424,
+      "managed_rank_peak_bytes": 2377608
+    },
+    {
+      "mode": "split",
+      "world_parts": 4,
+      "parts": 2,
+      "world_rank": 1,
+      "call": 1,
+      "adjoint": true,
+      "relative_residual": 2.962203156364751e-05,
+      "relative_vector_error": 2.9622031563689144e-05,
+      "success_probability": 0.023450768217972272,
+      "total_probability": 0.9999999999999899,
+      "failure_mass": 0.9765492317820176,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 12672,
+          "indexed_reads": 1200,
+          "indexed_writes": 1176,
+          "local_pair_candidates": 50688,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 434688,
+          "sent_bytes": 434688
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 988647424,
+      "managed_rank_peak_bytes": 2377608
+    },
+    {
+      "mode": "split",
+      "world_parts": 4,
+      "parts": 2,
+      "world_rank": 1,
+      "call": 2,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 12672,
+          "indexed_reads": 1176,
+          "indexed_writes": 1200,
+          "local_pair_candidates": 50688,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 427008,
+          "sent_bytes": 427008
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 988647424,
+      "managed_rank_peak_bytes": 2377608
+    },
+    {
+      "mode": "split",
+      "world_parts": 4,
+      "parts": 2,
+      "world_rank": 2,
+      "call": 0,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 12672,
+          "indexed_reads": 1176,
+          "indexed_writes": 1200,
+          "local_pair_candidates": 50688,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 427008,
+          "sent_bytes": 427008
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 988647424,
+      "managed_rank_peak_bytes": 2377608
+    },
+    {
+      "mode": "split",
+      "world_parts": 4,
+      "parts": 2,
+      "world_rank": 2,
+      "call": 1,
+      "adjoint": true,
+      "relative_residual": 2.962203156364751e-05,
+      "relative_vector_error": 2.9622031563689144e-05,
+      "success_probability": 0.023450768217972272,
+      "total_probability": 0.9999999999999899,
+      "failure_mass": 0.9765492317820176,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 12672,
+          "indexed_reads": 1200,
+          "indexed_writes": 1176,
+          "local_pair_candidates": 50688,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 434688,
+          "sent_bytes": 434688
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 988647424,
+      "managed_rank_peak_bytes": 2377608
+    },
+    {
+      "mode": "split",
+      "world_parts": 4,
+      "parts": 2,
+      "world_rank": 2,
+      "call": 2,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 12672,
+          "indexed_reads": 1176,
+          "indexed_writes": 1200,
+          "local_pair_candidates": 50688,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 427008,
+          "sent_bytes": 427008
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 988647424,
+      "managed_rank_peak_bytes": 2377608
+    },
+    {
+      "mode": "split",
+      "world_parts": 4,
+      "parts": 2,
+      "world_rank": 3,
+      "call": 0,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 12672,
+          "indexed_reads": 1176,
+          "indexed_writes": 1200,
+          "local_pair_candidates": 50688,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 427008,
+          "sent_bytes": 427008
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 988647424,
+      "managed_rank_peak_bytes": 2377608
+    },
+    {
+      "mode": "split",
+      "world_parts": 4,
+      "parts": 2,
+      "world_rank": 3,
+      "call": 1,
+      "adjoint": true,
+      "relative_residual": 2.962203156364751e-05,
+      "relative_vector_error": 2.9622031563689144e-05,
+      "success_probability": 0.023450768217972272,
+      "total_probability": 0.9999999999999899,
+      "failure_mass": 0.9765492317820176,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 12672,
+          "indexed_reads": 1200,
+          "indexed_writes": 1176,
+          "local_pair_candidates": 50688,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 434688,
+          "sent_bytes": 434688
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 988647424,
+      "managed_rank_peak_bytes": 2377608
+    },
+    {
+      "mode": "split",
+      "world_parts": 4,
+      "parts": 2,
+      "world_rank": 3,
+      "call": 2,
+      "adjoint": false,
+      "relative_residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "success_probability": 0.02345076821797234,
+      "total_probability": 0.9999999999999915,
+      "failure_mass": 0.9765492317820191,
+      "routing": {
+        "child_events": 198,
+        "exact": true,
+        "excludes": [
+          "PREP",
+          "response/projectors",
+          "constructor/coordinator",
+          "native internal MPI",
+          "MPI protocol"
+        ],
+        "routing": {
+          "batches": 1584,
+          "coordination_calls": 12672,
+          "indexed_reads": 1176,
+          "indexed_writes": 1200,
+          "local_pair_candidates": 50688,
+          "maximum_batch_pairs": 8,
+          "maximum_routed_amplitudes": 16,
+          "received_bytes": 427008,
+          "sent_bytes": 427008
+        },
+        "source_queries": 66
+      },
+      "admitted_rank_work": 988647424,
+      "managed_rank_peak_bytes": 2377608
+    }
+  ],
+  "cross_rank_layout_readout_comparisons": [
+    {
+      "mode": "replay",
+      "world_parts": 1,
+      "call": 0,
+      "maximum_readout_delta_from_p1": 0.0
+    },
+    {
+      "mode": "replay",
+      "world_parts": 1,
+      "call": 1,
+      "maximum_readout_delta_from_p1": 0.0
+    },
+    {
+      "mode": "replay",
+      "world_parts": 1,
+      "call": 2,
+      "maximum_readout_delta_from_p1": 0.0
+    },
+    {
+      "mode": "replay",
+      "world_parts": 2,
+      "call": 0,
+      "maximum_readout_delta_from_p1": 0.0
+    },
+    {
+      "mode": "replay",
+      "world_parts": 2,
+      "call": 1,
+      "maximum_readout_delta_from_p1": 0.0
+    },
+    {
+      "mode": "replay",
+      "world_parts": 2,
+      "call": 2,
+      "maximum_readout_delta_from_p1": 0.0
+    },
+    {
+      "mode": "replay",
+      "world_parts": 4,
+      "call": 0,
+      "maximum_readout_delta_from_p1": 0.0
+    },
+    {
+      "mode": "replay",
+      "world_parts": 4,
+      "call": 1,
+      "maximum_readout_delta_from_p1": 0.0
+    },
+    {
+      "mode": "replay",
+      "world_parts": 4,
+      "call": 2,
+      "maximum_readout_delta_from_p1": 0.0
+    },
+    {
+      "mode": "replay",
+      "world_parts": 8,
+      "call": 0,
+      "maximum_readout_delta_from_p1": 0.0
+    },
+    {
+      "mode": "replay",
+      "world_parts": 8,
+      "call": 1,
+      "maximum_readout_delta_from_p1": 0.0
+    },
+    {
+      "mode": "replay",
+      "world_parts": 8,
+      "call": 2,
+      "maximum_readout_delta_from_p1": 0.0
+    },
+    {
+      "mode": "split",
+      "world_parts": 4,
+      "call": 0,
+      "maximum_readout_delta_from_p1": 0.0
+    },
+    {
+      "mode": "split",
+      "world_parts": 4,
+      "call": 1,
+      "maximum_readout_delta_from_p1": 0.0
+    },
+    {
+      "mode": "split",
+      "world_parts": 4,
+      "call": 2,
+      "maximum_readout_delta_from_p1": 0.0
+    }
+  ],
+  "caps": {
+    "address_space_bytes": 2147483648,
+    "stdout_bytes": 4194304,
+    "stderr_bytes": 4194304,
+    "read_chunk_bytes": 65536,
+    "process_file_size_limit": null,
+    "seconds": 180
+  },
+  "elapsed_seconds": {
+    "campaign_driver": 6.299383257995942,
+    "outer_execution": 6.537869480001973,
+    "build": 1.00806791800278
+  },
+  "qualifications": [
+    "975-file workspace superset distinct from actual16-local-package compiler closure; neither hashes external registry/dependent library closure",
+    "rustc/cargo hashes identify rustup launcher; actual reported versions/profile preserved separately",
+    "three calls each use fresh computational basis RHS; not an accumulated U-U\u2020 round-trip or general dense input preparation",
+    "full32-coordinate scalar residuals validated; no saved global quantum-state vector available to independently recompute native amplitude coordinates",
+    "source H=.625I-.125iX encodes A\u2020; forward solves A=.625I+.125iX, standalone adjoint solves A\u2020",
+    "nominal analytic sigma/polynomial diagnostics not uniform source/native/phase error certificate; certificate and native-overhead remain null",
+    "telemetry exact only for named router counters, excludes PREP/projectors/coordinator/native/MPI protocol",
+    "managed cap not RSS quota;2GiB process AS and recorded RSS separate; local MPI not multihost evidence",
+    "historical attempts1/2/3 preserved; no change to caps/tolerances or old bytes"
+  ]
+}

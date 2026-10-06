@@ -7,7 +7,9 @@ license.workspace = true
 repository.workspace = true
 
 [dependencies]
-cmake.workspace = true
+build-probe-mpi.workspace = true
+cc.workspace = true
+pkg-config.workspace = true
 cmake-file-api = { workspace = true }
 shlex = { workspace = true }
 thiserror.workspace = true

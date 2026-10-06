@@ -12,10 +12,10 @@ pub type DynError = Box<dyn std::error::Error + Send + Sync>;
 
 pub fn run(check: bool) -> Result<(), DynError> {
 	let workspace = find_workspace_root()?;
-	let package = quest_build::discover_for_tooling(
-		workspace.join("target/xtask-binding-native-discovery"),
-		None,
-	)?;
+	let work =
+		crate::tooling::native_work_directory(&workspace, "xtask-binding-native-discovery-")?;
+	let context = quest_build::NativeBuildContext::for_tooling(work.path(), None)?;
+	let package = context.discover()?;
 	let quest_root = clang::QuestRoot::from_package(&package);
 	let registry = emit::load_adapter_registry(&workspace)?;
 

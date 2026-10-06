@@ -1,0 +1,344 @@
+{
+  "schema": "saved-weak-shell-v2-independent-arithmetic-v1",
+  "scope": "Only saved JSON, independent one-dimensional separable density quadrature and scalar G/P/E arithmetic. No physical drift, generator, example, or runner execution; not validated continuum integration.",
+  "inputs": [
+    {
+      "path": "docs/verification/data/2026-10-06-configuration-weak-campaign/p1-c4-e1-w1_2.json",
+      "sha256": "14664ebc2b353933ef9dabd3e9768f64e4ba5edfa9b4a5d6731e1fc8351d7d76"
+    },
+    {
+      "path": "<private-artifacts>/quest-weak-shell-v2-execution-1/p2-c2-e1-w1_2.json",
+      "sha256": "b8e4ca7603f15bb3e93f418d0209a7f25e743d7ec4ab5c09b119e089090f8387"
+    },
+    {
+      "path": "<private-artifacts>/quest-weak-shell-v2-execution-1/receipt.json",
+      "sha256": "b969804f27e37ca8e6d8e973e45940996fe21a1e2f541478d5b9a6a059134f19"
+    }
+  ],
+  "sampling_old": {
+    "row_id": "p1-c4-e1-w1_2",
+    "axes": [
+      {
+        "probabilities_per_retained_axis_coefficient": [
+          0.0,
+          0.0,
+          0.0,
+          0.42430667020244783,
+          0.42430667020244783,
+          0.0756933297975522,
+          0.0756933297975522,
+          0.0
+        ],
+        "distinct_support": [
+          0.0,
+          0.5
+        ],
+        "mean": 0.0756933297975522,
+        "second_moment": 0.0378466648987761,
+        "variance": 0.032117184722935094,
+        "mean_minus_continuum_center": -0.0743066702024478,
+        "effective_axis_coefficients": 2.6915635497724977
+      },
+      {
+        "probabilities_per_retained_axis_coefficient": [
+          0.0,
+          0.01505650548259732,
+          0.01505650548259732,
+          0.48494349451740265,
+          0.48494349451740265,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "distinct_support": [
+          -0.5,
+          0.0
+        ],
+        "mean": -0.01505650548259732,
+        "second_moment": 0.00752825274129866,
+        "variance": 0.007301554383951177,
+        "mean_minus_continuum_center": 0.08494349451740268,
+        "effective_axis_coefficients": 2.1240722312981095
+      },
+      {
+        "probabilities_per_retained_axis_coefficient": [
+          0.0,
+          0.0,
+          0.0,
+          0.4982307504869011,
+          0.4982307504869011,
+          0.0017692495130989879,
+          0.0017692495130989879,
+          0.0
+        ],
+        "distinct_support": [
+          0.0,
+          0.5
+        ],
+        "mean": 0.0017692495130989879,
+        "second_moment": 0.0008846247565494939,
+        "variance": 0.000881494512709893,
+        "mean_minus_continuum_center": -0.06823075048690101,
+        "effective_axis_coefficients": 2.014204078743119
+      },
+      {
+        "probabilities_per_retained_axis_coefficient": [
+          0.0,
+          0.0,
+          0.0,
+          0.47641163965504774,
+          0.47641163965504774,
+          0.02358836034495223,
+          0.02358836034495223,
+          0.0
+        ],
+        "distinct_support": [
+          0.0,
+          0.5
+        ],
+        "mean": 0.02358836034495223,
+        "second_moment": 0.011794180172476115,
+        "variance": 0.0112377694287128,
+        "mean_minus_continuum_center": -0.08641163965504778,
+        "effective_axis_coefficients": 2.197565912206176
+      },
+      {
+        "probabilities_per_retained_axis_coefficient": [
+          0.0,
+          8.284579725541256e-06,
+          8.284579725541256e-06,
+          0.4999917154202745,
+          0.4999917154202745,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "distinct_support": [
+          -0.5,
+          0.0
+        ],
+        "mean": -8.284579725541256e-06,
+        "second_moment": 4.142289862770628e-06,
+        "variance": 4.1422212285094e-06,
+        "mean_minus_continuum_center": 0.03999171542027446,
+        "effective_axis_coefficients": 2.0000662777359524
+      }
+    ],
+    "supported_coefficients": 1024,
+    "effective_coefficients": 50.61318737700831,
+    "mass_normalized_coordinate_energy": 0.02902893242948157,
+    "checks": {
+      "maximum_mean_difference": 8.326672684688674e-17,
+      "maximum_variance_difference": 6.938893903907228e-17,
+      "effective_coefficient_difference": -1.9895196601282805e-13,
+      "mass_chart_energy_vs_independent_axis_second_moments": -6.245004513516506e-17
+    }
+  },
+  "sampling_new": {
+    "row_id": "p2-c2-e1-w1_2",
+    "axes": [
+      {
+        "probabilities_per_retained_axis_coefficient": [
+          0.0,
+          0.0,
+          0.36851796628567773,
+          0.36851796628567773,
+          0.2629640674286445,
+          0.0
+        ],
+        "distinct_support": [
+          0.0,
+          0.5
+        ],
+        "mean": 0.13148203371432224,
+        "second_moment": 0.06574101685716112,
+        "variance": 0.04845349166750695,
+        "mean_minus_continuum_center": -0.018517966285677756,
+        "effective_axis_coefficients": 2.934607406205891
+      },
+      {
+        "probabilities_per_retained_axis_coefficient": [
+          0.0,
+          0.058465451158566314,
+          0.47076727442071686,
+          0.47076727442071686,
+          0.0,
+          0.0
+        ],
+        "distinct_support": [
+          -0.5,
+          0.0
+        ],
+        "mean": -0.029232725579283157,
+        "second_moment": 0.014616362789641579,
+        "variance": 0.013761810544847904,
+        "mean_minus_continuum_center": 0.07076727442071684,
+        "effective_axis_coefficients": 2.238830051054425
+      },
+      {
+        "probabilities_per_retained_axis_coefficient": [
+          0.0,
+          0.0,
+          0.49647397779992336,
+          0.49647397779992336,
+          0.007052044400153305,
+          0.0
+        ],
+        "distinct_support": [
+          0.0,
+          0.5
+        ],
+        "mean": 0.0035260222000766525,
+        "second_moment": 0.0017630111000383262,
+        "variance": 0.0017505782674828929,
+        "mean_minus_continuum_center": -0.06647397779992335,
+        "effective_axis_coefficients": 2.0283047798446248
+      },
+      {
+        "probabilities_per_retained_axis_coefficient": [
+          0.0,
+          0.0,
+          0.45494865407357094,
+          0.45494865407357094,
+          0.0901026918528581,
+          0.0
+        ],
+        "distinct_support": [
+          0.0,
+          0.5
+        ],
+        "mean": 0.04505134592642905,
+        "second_moment": 0.022525672963214526,
+        "variance": 0.02049604919343175,
+        "mean_minus_continuum_center": -0.06494865407357095,
+        "effective_axis_coefficients": 2.3692468867457093
+      },
+      {
+        "probabilities_per_retained_axis_coefficient": [
+          0.0,
+          3.313776983717273e-05,
+          0.49998343111508137,
+          0.49998343111508137,
+          0.0,
+          0.0
+        ],
+        "distinct_support": [
+          -0.5,
+          0.0
+        ],
+        "mean": -1.6568884918586367e-05,
+        "second_moment": 8.284442459293183e-06,
+        "variance": 8.284167931345739e-06,
+        "mean_minus_continuum_center": 0.039983431115081416,
+        "effective_axis_coefficients": 2.0001325532752814
+      }
+    ],
+    "supported_coefficients": 243,
+    "effective_coefficients": 63.15001352861202,
+    "mass_normalized_coordinate_energy": 0.05232717407625742,
+    "checks": {
+      "maximum_mean_difference": 1.942890293094024e-16,
+      "maximum_variance_difference": 1.249000902703301e-16,
+      "effective_coefficient_difference": -7.105427357601002e-15,
+      "mass_chart_energy_vs_independent_axis_second_moments": 1.1102230246251565e-16
+    }
+  },
+  "metrics": [
+    {
+      "index": 0,
+      "G_old": 9.683926446622717e-18,
+      "G_new": -2.0365096637022057e-17,
+      "P_old": 0.0,
+      "P_new": 0.0,
+      "E_old": 9.683926446622717e-18,
+      "E_new": -2.0365096637022057e-17,
+      "delta_G": -3.0049023083644774e-17,
+      "delta_P": 0.0,
+      "delta_E": -3.0049023083644774e-17,
+      "decomposition_roundoff": 0.0,
+      "absolute_defect_ratio": null,
+      "relative_to_physical_new": null
+    },
+    {
+      "index": 1,
+      "G_old": 0.09741181003522373,
+      "G_new": 0.1891277135555971,
+      "P_old": 0.03432765085198875,
+      "P_new": 0.06664737998125468,
+      "E_old": 0.06308415918323498,
+      "E_new": 0.12248033357434242,
+      "delta_G": 0.09171590352037337,
+      "delta_P": 0.03231972912926593,
+      "delta_E": 0.059396174391107434,
+      "decomposition_roundoff": 0.0,
+      "absolute_defect_ratio": 1.9415386550304112,
+      "relative_to_physical_new": 1.8377366613479986
+    },
+    {
+      "index": 2,
+      "G_old": 2.832880784695811e-19,
+      "G_new": -5.804755834732123e-19,
+      "P_old": 0.0,
+      "P_new": 0.0,
+      "E_old": 2.832880784695811e-19,
+      "E_new": -5.804755834732123e-19,
+      "delta_G": -8.637636619427934e-19,
+      "delta_P": 0.0,
+      "delta_E": -8.637636619427934e-19,
+      "decomposition_roundoff": 0.0,
+      "absolute_defect_ratio": null,
+      "relative_to_physical_new": null
+    },
+    {
+      "index": 3,
+      "G_old": -0.12084943021650382,
+      "G_new": -0.23081007351130464,
+      "P_old": -0.05378106415815204,
+      "P_new": -0.10271684921508915,
+      "E_old": -0.06706836605835179,
+      "E_new": -0.1280932242962155,
+      "delta_G": -0.10996064329480082,
+      "delta_P": -0.04893578505693712,
+      "delta_E": -0.061024858237863716,
+      "decomposition_roundoff": 1.3877787807814457e-17,
+      "absolute_defect_ratio": 1.9098903376409975,
+      "relative_to_physical_new": 1.2470517278814521
+    },
+    {
+      "index": 4,
+      "G_old": 0.0046270104038335265,
+      "G_new": 0.009229248858868692,
+      "P_old": -0.0032413479186160278,
+      "P_new": -0.006227658368271422,
+      "E_old": 0.007868358322449554,
+      "E_new": 0.015456907227140115,
+      "delta_G": 0.004602238455035166,
+      "delta_P": -0.002986310449655394,
+      "delta_E": 0.007588548904690561,
+      "decomposition_roundoff": -1.734723475976807e-18,
+      "absolute_defect_ratio": 1.9644386533642404,
+      "relative_to_physical_new": 2.4819773842909765
+    },
+    {
+      "index": 5,
+      "G_old": -0.0557220626638904,
+      "G_new": -0.10729175898144278,
+      "P_old": -0.044073981552825985,
+      "P_new": -0.08472140969972207,
+      "E_old": -0.011648081111064412,
+      "E_new": -0.022570349281720706,
+      "delta_G": -0.05156969631755238,
+      "delta_P": -0.040647428146896085,
+      "delta_E": -0.010922268170656294,
+      "decomposition_roundoff": 0.0,
+      "absolute_defect_ratio": 1.9376881965804071,
+      "relative_to_physical_new": 0.26640667762395304
+    }
+  ],
+  "density_convention": "Mass-weighted amplitudes z_i proportional sqrt(W_i)*exp(-sum_j 1/(1-r_j^2)); independent axis probabilities proportional w_i*exp(-2/(1-r_i^2)), zero outside strict support.",
+  "continuous_mean": "Each continuous compact separable symmetric density has mean equal to its prescribed center because support is wholly inside the box. No continuum energy or variance integral is asserted.",
+  "maximum_decomposition_roundoff": 1.3877787807814457e-17,
+  "nonlinear_rms_new": 0.0013587517610267473,
+  "physical_coordinate_rate_norm_new": 0.12260264311911473,
+  "convergence_certified": false
+}

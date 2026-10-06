@@ -1,0 +1,87 @@
+{
+  "schema": "quest-checkpoint08-cmake-diagnosis-v1",
+  "conclusion": "unresolved intermittent CMake own-module open failure; no justified source fix",
+  "source_changes": false,
+  "native_or_scientific_runs": 0,
+  "minimal_projects": {
+    "traced_escalated": 1,
+    "concurrent_sandbox": 4,
+    "passed": 5,
+    "initial_ptrace_denied_before_CMake": true
+  },
+  "focused_default_tests": {
+    "passed": 5,
+    "failed": 0,
+    "runtime_seconds": 0.97,
+    "command_elapsed_seconds": 6.872270077001303,
+    "quest_build_unchanged": true,
+    "environment_exact": false,
+    "difference": "MPICH prepended to inherited PATH; original08 fixed PATH learned after invocation",
+    "original08_PATH": "/usr/lib64/mpich/bin:/usr/bin:/bin:<home>/.cargo/bin",
+    "parallelism": "nextest default, no thread override; five selected tests instead of full workspace scheduling"
+  },
+  "current_RPM_exact_sizes_digests": true,
+  "original_failure_errno_known": false,
+  "artifacts": [
+    {
+      "path": "<private-artifacts>/quest-checkpoint-08-cmake-diagnosis/host.json",
+      "bytes": 3911,
+      "sha256": "c3ececb96a0534ef8dec4f2cad8e8b50ad3fc079aa895faf2c70fc46e08a0dc8"
+    },
+    {
+      "path": "<private-artifacts>/quest-checkpoint-08-cmake-diagnosis/minimal.log",
+      "bytes": 147,
+      "sha256": "bf77ee2a0c153f78b0914b4dfd529285f257ba31ffc6e5ebd04a032deed512e0"
+    },
+    {
+      "path": "<private-artifacts>/quest-checkpoint-08-cmake-diagnosis/minimal-escalated.log",
+      "bytes": 406,
+      "sha256": "bda72f871fc2729178ad88927864024f07ba27e9d0b3a3ccffcfcd3e0dee898e"
+    },
+    {
+      "path": "<private-artifacts>/quest-checkpoint-08-cmake-diagnosis/minimal-escalated.strace",
+      "bytes": 398741,
+      "sha256": "cd4c1d25724737450c8aecf071908f5dab2d761a2d6356754bb8653bf18906a5"
+    },
+    {
+      "path": "<private-artifacts>/quest-checkpoint-08-cmake-diagnosis/module-syscalls.log",
+      "bytes": 690,
+      "sha256": "1599a130acf36c9e80bcd5559e994afa892821391ed2c7806a1f88ba818b0105"
+    },
+    {
+      "path": "<private-artifacts>/quest-checkpoint-08-cmake-diagnosis/concurrent-results.json",
+      "bytes": 1364,
+      "sha256": "eb8adf64f969fd61492438a2e84e89fbb6027051f565f4d53e91804347bfcb57"
+    },
+    {
+      "path": "<private-artifacts>/quest-checkpoint-08-cmake-diagnosis/focused-before.json",
+      "bytes": 3200,
+      "sha256": "fe60b9b0e945f4d404a337a872cc1969bd84095cc602adbef03e104eda147ac3"
+    },
+    {
+      "path": "<private-artifacts>/quest-checkpoint-08-cmake-diagnosis/focused-result.json",
+      "bytes": 3382,
+      "sha256": "611fb0211666a48469e5cb66deee78dbde8a5d57d85b989101b8d95a869b3c3e"
+    },
+    {
+      "path": "<private-artifacts>/quest-checkpoint-08-cmake-diagnosis/focused-default-five.log",
+      "bytes": 3426,
+      "sha256": "e6a8f5de1604d7f63656236e60015f80b7668f1f63cd726e70312237cb098de3"
+    },
+    {
+      "path": "<private-artifacts>/quest-checkpoint-08-cmake-diagnosis/path-resolution-comparison.json",
+      "bytes": 832,
+      "sha256": "962a67e7a306c16246b92ca7856a976a5e4551516e91d9261c810a48e74cbddd"
+    },
+    {
+      "path": "<private-artifacts>/quest-programme-checkpoint-08-default.log",
+      "bytes": 207569,
+      "sha256": "2791f9c1d12abaa87847934256b2cdf16057c067cdcc8d25f11fdfe2175d23e3"
+    },
+    {
+      "path": "<private-artifacts>/quest-programme-checkpoint-08-allfeatures.log",
+      "bytes": 215180,
+      "sha256": "f127b9be2658ec48bc5dd22213e97091de0fe52fe56074b1c7fa12def1783a2a"
+    }
+  ]
+}

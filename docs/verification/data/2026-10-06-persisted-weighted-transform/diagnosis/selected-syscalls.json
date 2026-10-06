@@ -1,0 +1,265 @@
+{
+  "schema": "quest-mpi-init-selected-syscalls-v1",
+  "scope": "Derived redacted minimal MPI initialization diagnosis only; not direct tracing of the production attempt or proof of inverse feasibility",
+  "redaction": "Only host/user/PID/PSM3 transport IDs normalized; exact original SHA and line indices retained",
+  "trace_files": [
+    {
+      "trace": "trace-process-01",
+      "bytes": 26388,
+      "original_sha256": "42615b5e4fc998855deb417bf5aacddfe50d649ee85648d1711de9d806993b1e",
+      "included_full_trace": false
+    },
+    {
+      "trace": "trace-process-02",
+      "bytes": 170056,
+      "original_sha256": "1e59c41ae1d5fca82979e327e7a5b7aee1f8877f9c38ec9a46a49ad07733fb52",
+      "included_full_trace": false
+    },
+    {
+      "trace": "trace-process-03",
+      "bytes": 40322,
+      "original_sha256": "c7df08d5c29cca18b4d3f2ebf35614edde7291a11452480c8d61ff0fd98cfdbe",
+      "included_full_trace": false
+    },
+    {
+      "trace": "trace-process-04",
+      "bytes": 40325,
+      "original_sha256": "0c985d42bac68d4b142e144290ce15fdd2b5b3ab18f30777e4786e3f836acd17",
+      "included_full_trace": false
+    },
+    {
+      "trace": "trace-process-05",
+      "bytes": 40325,
+      "original_sha256": "bfc280fa1699ef2ae83f18b0397d3f6eb8e58a23e5fd4338f225353a3919d3e0",
+      "included_full_trace": false
+    },
+    {
+      "trace": "trace-process-06",
+      "bytes": 40325,
+      "original_sha256": "6850e9b2f063e550bb403585212d969d35d4c737032899ac1073e0f86196b48e",
+      "included_full_trace": false
+    },
+    {
+      "trace": "trace-process-07",
+      "bytes": 40325,
+      "original_sha256": "c7bb1a0239a24b9e414f938f1ab129018c1d622f5b990e646d5bc8f869efb669",
+      "included_full_trace": false
+    },
+    {
+      "trace": "trace-process-08",
+      "bytes": 40325,
+      "original_sha256": "673b05b391648ca3b43644aad0823e08618f142e65e4bcbb37dbc380dc6afdb5",
+      "included_full_trace": false
+    },
+    {
+      "trace": "trace-process-09",
+      "bytes": 40339,
+      "original_sha256": "01991f5895610be9a9a92489a3cc3df4f414ffd0eb24b167ee561b5fd739213b",
+      "included_full_trace": false
+    },
+    {
+      "trace": "trace-process-10",
+      "bytes": 40339,
+      "original_sha256": "2f1161dce11bda9d07a62a173f072283e087dccfa08f6cc1c829332f4f75f9e1",
+      "included_full_trace": false
+    },
+    {
+      "trace": "trace-process-11",
+      "bytes": 40,
+      "original_sha256": "7d75aa2d34976a4763ac0e96e8e1662ce6057275682e12b31d1162cbf2a12280",
+      "included_full_trace": false
+    },
+    {
+      "trace": "trace-process-12",
+      "bytes": 40,
+      "original_sha256": "7d75aa2d34976a4763ac0e96e8e1662ce6057275682e12b31d1162cbf2a12280",
+      "included_full_trace": false
+    },
+    {
+      "trace": "trace-process-13",
+      "bytes": 26,
+      "original_sha256": "fa7e833212ad4b18b1586b15d305c12ce4d36186f4cc9be3db476f6e3a08a219",
+      "included_full_trace": false
+    },
+    {
+      "trace": "trace-process-14",
+      "bytes": 26,
+      "original_sha256": "fa7e833212ad4b18b1586b15d305c12ce4d36186f4cc9be3db476f6e3a08a219",
+      "included_full_trace": false
+    },
+    {
+      "trace": "trace-process-15",
+      "bytes": 26,
+      "original_sha256": "fa7e833212ad4b18b1586b15d305c12ce4d36186f4cc9be3db476f6e3a08a219",
+      "included_full_trace": false
+    },
+    {
+      "trace": "trace-process-16",
+      "bytes": 26,
+      "original_sha256": "fa7e833212ad4b18b1586b15d305c12ce4d36186f4cc9be3db476f6e3a08a219",
+      "included_full_trace": false
+    },
+    {
+      "trace": "trace-process-17",
+      "bytes": 26,
+      "original_sha256": "fa7e833212ad4b18b1586b15d305c12ce4d36186f4cc9be3db476f6e3a08a219",
+      "included_full_trace": false
+    },
+    {
+      "trace": "trace-process-18",
+      "bytes": 26,
+      "original_sha256": "fa7e833212ad4b18b1586b15d305c12ce4d36186f4cc9be3db476f6e3a08a219",
+      "included_full_trace": false
+    }
+  ],
+  "selected_failure_syscalls": [
+    {
+      "trace": "trace-process-03",
+      "original_sha256": "c7df08d5c29cca18b4d3f2ebf35614edde7291a11452480c8d61ff0fd98cfdbe",
+      "lines": [
+        {
+          "original_line": 513,
+          "syscall": "openat(AT_FDCWD, \"/dev/shm/psm3_shm.<transport-id>\", O_RDWR|O_CREAT|O_NOFOLLOW|O_CLOEXEC, 0600) = 20"
+        },
+        {
+          "original_line": 514,
+          "syscall": "ftruncate(20, 4337664)                  = -1 EFBIG (File too large)"
+        },
+        {
+          "original_line": 515,
+          "syscall": "--- SIGXFSZ {si_signo=SIGXFSZ, si_code=SI_USER, si_pid=<process-id>, si_uid=<user-id>} ---"
+        }
+      ]
+    },
+    {
+      "trace": "trace-process-04",
+      "original_sha256": "0c985d42bac68d4b142e144290ce15fdd2b5b3ab18f30777e4786e3f836acd17",
+      "lines": [
+        {
+          "original_line": 513,
+          "syscall": "openat(AT_FDCWD, \"/dev/shm/psm3_shm.<transport-id>\", O_RDWR|O_CREAT|O_NOFOLLOW|O_CLOEXEC, 0600) = 22"
+        },
+        {
+          "original_line": 514,
+          "syscall": "ftruncate(22, 4337664)                  = -1 EFBIG (File too large)"
+        },
+        {
+          "original_line": 515,
+          "syscall": "--- SIGXFSZ {si_signo=SIGXFSZ, si_code=SI_USER, si_pid=<process-id>, si_uid=<user-id>} ---"
+        }
+      ]
+    },
+    {
+      "trace": "trace-process-05",
+      "original_sha256": "bfc280fa1699ef2ae83f18b0397d3f6eb8e58a23e5fd4338f225353a3919d3e0",
+      "lines": [
+        {
+          "original_line": 513,
+          "syscall": "openat(AT_FDCWD, \"/dev/shm/psm3_shm.<transport-id>\", O_RDWR|O_CREAT|O_NOFOLLOW|O_CLOEXEC, 0600) = 22"
+        },
+        {
+          "original_line": 514,
+          "syscall": "ftruncate(22, 4337664)                  = -1 EFBIG (File too large)"
+        },
+        {
+          "original_line": 515,
+          "syscall": "--- SIGXFSZ {si_signo=SIGXFSZ, si_code=SI_USER, si_pid=<process-id>, si_uid=<user-id>} ---"
+        }
+      ]
+    },
+    {
+      "trace": "trace-process-06",
+      "original_sha256": "6850e9b2f063e550bb403585212d969d35d4c737032899ac1073e0f86196b48e",
+      "lines": [
+        {
+          "original_line": 513,
+          "syscall": "openat(AT_FDCWD, \"/dev/shm/psm3_shm.<transport-id>\", O_RDWR|O_CREAT|O_NOFOLLOW|O_CLOEXEC, 0600) = 21"
+        },
+        {
+          "original_line": 514,
+          "syscall": "ftruncate(21, 4337664)                  = -1 EFBIG (File too large)"
+        },
+        {
+          "original_line": 515,
+          "syscall": "--- SIGXFSZ {si_signo=SIGXFSZ, si_code=SI_USER, si_pid=<process-id>, si_uid=<user-id>} ---"
+        }
+      ]
+    },
+    {
+      "trace": "trace-process-07",
+      "original_sha256": "c7bb1a0239a24b9e414f938f1ab129018c1d622f5b990e646d5bc8f869efb669",
+      "lines": [
+        {
+          "original_line": 513,
+          "syscall": "openat(AT_FDCWD, \"/dev/shm/psm3_shm.<transport-id>\", O_RDWR|O_CREAT|O_NOFOLLOW|O_CLOEXEC, 0600) = 19"
+        },
+        {
+          "original_line": 514,
+          "syscall": "ftruncate(19, 4337664)                  = -1 EFBIG (File too large)"
+        },
+        {
+          "original_line": 515,
+          "syscall": "--- SIGXFSZ {si_signo=SIGXFSZ, si_code=SI_USER, si_pid=<process-id>, si_uid=<user-id>} ---"
+        }
+      ]
+    },
+    {
+      "trace": "trace-process-08",
+      "original_sha256": "673b05b391648ca3b43644aad0823e08618f142e65e4bcbb37dbc380dc6afdb5",
+      "lines": [
+        {
+          "original_line": 513,
+          "syscall": "openat(AT_FDCWD, \"/dev/shm/psm3_shm.<transport-id>\", O_RDWR|O_CREAT|O_NOFOLLOW|O_CLOEXEC, 0600) = 19"
+        },
+        {
+          "original_line": 514,
+          "syscall": "ftruncate(19, 4337664)                  = -1 EFBIG (File too large)"
+        },
+        {
+          "original_line": 515,
+          "syscall": "--- SIGXFSZ {si_signo=SIGXFSZ, si_code=SI_USER, si_pid=<process-id>, si_uid=<user-id>} ---"
+        }
+      ]
+    },
+    {
+      "trace": "trace-process-09",
+      "original_sha256": "01991f5895610be9a9a92489a3cc3df4f414ffd0eb24b167ee561b5fd739213b",
+      "lines": [
+        {
+          "original_line": 513,
+          "syscall": "openat(AT_FDCWD, \"/dev/shm/psm3_shm.<transport-id>\", O_RDWR|O_CREAT|O_NOFOLLOW|O_CLOEXEC, 0600) = 19"
+        },
+        {
+          "original_line": 514,
+          "syscall": "ftruncate(19, 4337664)                  = -1 EFBIG (File too large)"
+        },
+        {
+          "original_line": 515,
+          "syscall": "--- SIGXFSZ {si_signo=SIGXFSZ, si_code=SI_USER, si_pid=<process-id>, si_uid=<user-id>} ---"
+        }
+      ]
+    },
+    {
+      "trace": "trace-process-10",
+      "original_sha256": "2f1161dce11bda9d07a62a173f072283e087dccfa08f6cc1c829332f4f75f9e1",
+      "lines": [
+        {
+          "original_line": 513,
+          "syscall": "openat(AT_FDCWD, \"/dev/shm/psm3_shm.<transport-id>\", O_RDWR|O_CREAT|O_NOFOLLOW|O_CLOEXEC, 0600) = 19"
+        },
+        {
+          "original_line": 514,
+          "syscall": "ftruncate(19, 4337664)                  = -1 EFBIG (File too large)"
+        },
+        {
+          "original_line": 515,
+          "syscall": "--- SIGXFSZ {si_signo=SIGXFSZ, si_code=SI_USER, si_pid=<process-id>, si_uid=<user-id>} ---"
+        }
+      ]
+    }
+  ],
+  "failing_bytes": 4337664,
+  "file_limit_bytes": 4194304,
+  "excess_bytes": 143360,
+  "no_campaign_rerun": true
+}

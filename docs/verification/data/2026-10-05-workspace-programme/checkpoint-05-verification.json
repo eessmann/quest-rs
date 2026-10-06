@@ -1,0 +1,160 @@
+{
+  "schema": "quest.workspace-verification.checkpoint.v1",
+  "base_commit": "dd9a869ebe9952cf85a6411a180ed7b688f568fb",
+  "environment": {
+    "rust": "1.101.0-nightly (db8f076d2 2026-10-03)",
+    "quest": "4.3.0 installed, native source unchanged",
+    "mpi": "MPICH 4.2.2; QuEST, MPICC and mpiexec ABI matched",
+    "hdf5": "serial",
+    "execution": "local CPU native statevector; MPI socket-dependent tests allowed loopback networking"
+  },
+  "checkpoint": "05-shared-exact-geometry-and-closed-affine-meshes",
+  "recorded_utc": "2026-10-06T01:15:09.668575+00:00",
+  "source_sha256": "d78439456a0b961462f433c76054c809caa523a04d85a2bd59721013f7a739ec",
+  "source_file_count": 770,
+  "source_manifest": "checkpoint-05-source.json",
+  "source_unchanged_before_after": true,
+  "gates": [
+    {
+      "name": "allfeatures",
+      "command": "cargo nextest run --workspace --all-features",
+      "exit_code": 0,
+      "log_sha256": "5c570983313e10225656174a038decd52105936ca666611b5f961d796152dc70",
+      "seconds": 180.55,
+      "tests_run": 1548,
+      "passed": 1548,
+      "skipped": 6
+    },
+    {
+      "name": "default",
+      "command": "cargo nextest run --workspace",
+      "exit_code": 0,
+      "log_sha256": "455060c8811cfa5ab29be6257089af7fa4e69a101dac8dff15d217ca7c6c7866",
+      "seconds": 106.633,
+      "tests_run": 1388,
+      "passed": 1388,
+      "skipped": 1,
+      "instrumentation": "strace -f -qq -e trace=openat,openat2 -e status=failed; no source/environment change other than observation",
+      "trace_sha256": "69d0ff70f960dabd202750998a0797f49e3eaaaa82d6e1338399fb268a12a9a0"
+    },
+    {
+      "name": "doctests",
+      "command": "cargo test --workspace --all-features --doc",
+      "exit_code": 0,
+      "log_sha256": "450ca77839706f4d552d3d8d4ecfd327555901faad2d413b48ebc8fdcf267eb5",
+      "wrapper_elapsed_seconds": 8.783785154002544,
+      "suites": 24,
+      "passed": 65,
+      "failed": 0,
+      "ignored": 1
+    },
+    {
+      "name": "default-check",
+      "command": "cargo check --workspace --all-targets",
+      "exit_code": 0,
+      "log_sha256": "e4de0d7b847bdff0c59f8b1c23dc3ef140bd5da7a9c10a53ed47b08b00c0ed66",
+      "wrapper_elapsed_seconds": 8.343639974002144
+    },
+    {
+      "name": "clippy",
+      "command": "cargo clippy --workspace --all-features --all-targets -- -D warnings",
+      "exit_code": 0,
+      "log_sha256": "e4cbffb30ae2c6f168ba55753ec729bc2f46c95681ea33c5a6f940bab8e195d7",
+      "wrapper_elapsed_seconds": 12.905889385001501
+    },
+    {
+      "name": "bindings",
+      "command": "cargo run -p xtask -- generate-quest-bindings --check",
+      "exit_code": 0,
+      "log_sha256": "c79c002bf4c3183676dee07ddb8f55074311523994e42355e3ef684781299ccf",
+      "wrapper_elapsed_seconds": 9.935254050004005
+    },
+    {
+      "name": "format",
+      "command": "cargo fmt --all -- --check",
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "whitespace",
+      "command": "git diff --check",
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "historical_evidence": [
+    {
+      "name": "offline_catalog",
+      "receipt": "checkpoint-01-verification.json",
+      "status": "previous passing run; unchanged catalog; not rerun at checkpoint05"
+    }
+  ],
+  "preliminary_attempts": [
+    {
+      "command": "cargo nextest run --workspace --all-features",
+      "exit_code": 100,
+      "log_sha256": "f22e99b14c52f4ef8f229b8fa46889d053ea6063150c77bdf509977346c49a17",
+      "seconds": 50.462,
+      "tests_run": 77,
+      "passed": 72,
+      "failed": 5,
+      "skipped": 6,
+      "not_run": 1471,
+      "failures": [
+        "quest-build probe::tests::cargo_profiles_and_explicit_cxx_remain_coherent_in_child_processes",
+        "quest-build probe::tests::cargo_watches_external_inputs_without_watching_its_own_outputs",
+        "quest-build probe::tests::cmake_build_evaluates_target_requirements_and_paths_with_spaces",
+        "quest-build probe::tests::imported_header_identity_survives_compiler_implicit_include_suppression",
+        "quest-build probe::tests::reconfiguration_uses_current_prefix_after_explicit_selection_is_removed"
+      ],
+      "evidence": "CMake module open failures were not reproduced. Named module bytes/sizes match RPM; isolated test and all42 quest-build tests under the workspace feature closure passed. Metadata-only strace saw385 named module calls with no failures. The original failure has no errno trace; its transient mechanism remains unproven. No source, system or native patch was made.",
+      "focused_reproduction": {
+        "passed": 42,
+        "log_sha256": "28c1513ac3b474708c28a5e0c66c81f9e771cf5fcc6fb8f3dd3728154bff51cd"
+      }
+    },
+    {
+      "command": "cargo nextest run --workspace",
+      "exit_code": 100,
+      "log_sha256": "a954fdbd3a9a064fec42ad3e67a1d47e7657cca93e3cf1e36ab85b85edd2f561",
+      "seconds": 6.292,
+      "tests_run": 155,
+      "passed": 154,
+      "failed": 1,
+      "skipped": 1,
+      "not_run": 1233,
+      "failures": [
+        "quest-build probe::tests::imported_header_identity_survives_compiler_implicit_include_suppression"
+      ],
+      "evidence": "Recurring CMake module-open failure, this time GNU-CXX-DetermineCompiler.cmake. Current module bytes match RPM and are readable. Harness inspection found no per-child limits or shared temporary cleanup, and failure precedes the fixture package load. Cause remains unknown; no code or installation patch made. Default full-suite tracing is a separate follow-up."
+    }
+  ],
+  "additional_scoped_evidence": [
+    {
+      "name": "mathcore_geometry_root_review",
+      "passed": 11,
+      "log_sha256": "c87f89c000e2b8ae7a55f62ba9ae31534d96be2a1c0dd312a0c3cbe36183fe08"
+    },
+    {
+      "name": "affine_and_existing_physical_root_regressions",
+      "passed": 31,
+      "log_sha256": "8fdae1830c5a21e36c6bfb83f6a91261600cc54d3d37af0d53eb1230f7574c88"
+    },
+    {
+      "name": "affine_pinched_topology_root_review",
+      "passed": 1,
+      "log_sha256": "bd13e5aa18586d4aeb04ac8c96b1d6e8b75869544c801f9fd6788572faa76ec8"
+    }
+  ],
+  "limitations": [
+    "Source manifest excludes Markdown and docs/verification; separate static audit inventories publication snapshots.",
+    "Source/log hashes record identity, not independent build attestation.",
+    "Initial all-feature/default runs had intermittent CMake module-open failures. Successful follow-ups do not establish their cause or a fix; default follow-up used failed-open syscall tracing.",
+    "Skipped tests remain distinct from passing tests. Explicit native nonlinear experiments retain their dated separate receipts.",
+    "Nightly generic-constant-expression compiler notices remain distinct from strict Clippy results.",
+    "The exact geometry arithmetic model excludes host environment discovery; oversized malformed settings can allocate before rejection. Actual process caps remain separate.",
+    "Closed affine construction is a bounded dense reference; arbitrary generated distributed geometry, mixed/natural closure and zero-dimensional reference charts remain unsupported.",
+    "No multi-host capacity, huge-count transfer, accelerator/hardware, quantum advantage or physical convergence acceptance is implied.",
+    "New stages after this frozen checkpoint require affected tests and further integrated checks."
+  ]
+}

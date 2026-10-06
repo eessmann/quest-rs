@@ -1,0 +1,50 @@
+{
+  "schema": "quest-cfd-capped-cylinder-window-v1",
+  "binary_sha256": "d52146b3f649120021098682e275a4e7e450251098a60711a565c787e0156af8",
+  "source_sha256": {
+    "crates/quest-cfd/examples/cylinder_window.rs": "3c97d0c32db74ed5fb3cde2bed8158ed083f0f436a9ed3d96e39516b84a5fee9",
+    "crates/quest-cfd/src/cylinder.rs": "8423695f08761900e1460c8ec7284101480618b83211920335c5bad440e6fe37",
+    "crates/quest-cfd/src/observations.rs": "b88a34d4efe24a68b24b42726ca22eefdabb9b2ae0af519606f4e2f3e32c2520",
+    "crates/quest-cfd/src/simplex.rs": "22867922da51dc5a0500f02501d8903af94d07a862cb2178531632be4af7fb19",
+    "crates/quest-cfd/src/bdm.rs": "0480e7c7cf4e393c4a5819ba5e4296957e6374ed85f0df1ff020a967805f2b85",
+    "crates/quest-cfd/src/cases.rs": "68858f2d8c758576b7fa0837c2d13def9533802c0e48538a02011d79a88f2030",
+    "crates/quest-cfd/src/lib.rs": "eeefff8a4b5a30ea6d4e877707ce7dd4086213ba0eb22da0607023fe0190e557",
+    "crates/quest-cfd/Cargo.toml": "19440f106f95312c40c74aa111dbfdb1f44f75dea1de130b1a8a9461e2863e46",
+    "Cargo.toml": "69aa4b537e7c5cda9a92a13f81e4d745cd0e05355df42f2e6a1f1cec973a8ca0",
+    "crates/quest-cfd/cases/shedding2d.json": "26db584dfddc74994347198475e8743f2a06bc28c00794971e7a4a7a8249049e",
+    "Cargo.lock": "fefe6a70afb1e37ca18587b76c8ad2df392ca16bef9e5d595d5f6457a514222f"
+  },
+  "build_profile": "caller-selected prebuilt binary; recorded build command required",
+  "parameters": [
+    "--max-work",
+    "1000000000000"
+  ],
+  "timeout_seconds": 1,
+  "process_address_space_cap_bytes": 536870912,
+  "cap_kind": "Linux RLIMIT_AS hard/soft; not RSS/node enforcement",
+  "completed": false,
+  "benchmark_converged": false,
+  "source_identity_claim": "source and prebuilt binary hashed independently",
+  "status": "timeout",
+  "exit_code": -9,
+  "elapsed_seconds": 1.0003735570026038,
+  "output_limits": {
+    "stdout_bytes": 67108864,
+    "stderr_bytes": 4194304,
+    "stderr_retained_tail_bytes": 65536,
+    "json_depth": 16
+  },
+  "output_bytes": {
+    "stdout": 0,
+    "stderr": 674
+  },
+  "stderr_tail_truncated": false,
+  "last_reported_progress": {
+    "completed_steps": 900,
+    "time": 0.09000000000000001,
+    "observations_completed": 0
+  },
+  "receipt_error": "Expecting value: line 1 column 1 (char 0)",
+  "sources_changed_during_run": false,
+  "diagnostics": ""
+}

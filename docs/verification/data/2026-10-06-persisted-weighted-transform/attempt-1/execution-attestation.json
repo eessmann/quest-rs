@@ -1,0 +1,82 @@
+{
+  "schema": "quest-persisted-weighted-execution-attestation-v1",
+  "status": "one-campaign-outcome-retained",
+  "command": [
+    "timeout",
+    "--kill-after=10s",
+    "1500s",
+    "python3",
+    "-B",
+    "<workspace>/docs/verification/fixtures/persisted-weighted-transform/run.py",
+    "--binary",
+    "<private-artifacts>/quest-persisted-weighted-final-binary-1",
+    "--binary-sha256",
+    "2bdc5ca75c018f9f5fe40b33d08050bb313f5b41b14901252ecaa4774426cf87",
+    "--source-manifest",
+    ".superpowers/sdd/2026-10-05-sparse-mathcore-cfd/persisted-weighted-transform-consumer-source-final-fix-1.json",
+    "--repository",
+    "<workspace>",
+    "--output-directory",
+    "<private-artifacts>/quest-persisted-weighted-campaign-1",
+    "--build-attestation",
+    "<private-artifacts>/quest-persisted-weighted-final-build-1-attestation.json"
+  ],
+  "consumer_source_manifest_sha256": "a1a1a1edc4700731aa83249450a2257a6a839b4a8827c74a70ef00a7157f9e58",
+  "binary_sha256": "2bdc5ca75c018f9f5fe40b33d08050bb313f5b41b14901252ecaa4774426cf87",
+  "build_attestation_sha256": "c2e27731293e8d8b1589235edfc24ac3ee9a44a37a63d4ecfe4c10749639825c",
+  "before_sha256": "f961a3adcf3006e3f7ab30bfe8f7b410505ee3fbb8734a985265bbbbf041a629",
+  "scope": "Exactly one invocation of reviewed seven-job local campaign under GNU timeout1500s plus10s forced cleanup grace, with coordinated active child-group cleanup; no retries or cap/tolerance/source substitutions. Typed rejected and accuracy-failed outcomes remain outcomes, not successful solves.",
+  "runner_exit_code": 0,
+  "elapsed_seconds": 2.5020424850008567,
+  "runner_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "receipt_sha256": "5426cd73301c5489b87543d09e629d1da2920b0a45ad0608ce589046013f592b",
+  "campaign_status": "incomplete-or-accuracy-failure",
+  "outcomes": [
+    {
+      "index": 0,
+      "mode": "publish",
+      "world_parts": 8,
+      "status": "process-failure"
+    },
+    {
+      "index": 1,
+      "mode": "compile",
+      "world_parts": 1,
+      "status": "not-run"
+    },
+    {
+      "index": 2,
+      "mode": "replay",
+      "world_parts": 1,
+      "status": "not-run"
+    },
+    {
+      "index": 3,
+      "mode": "replay",
+      "world_parts": 2,
+      "status": "not-run"
+    },
+    {
+      "index": 4,
+      "mode": "replay",
+      "world_parts": 4,
+      "status": "not-run"
+    },
+    {
+      "index": 5,
+      "mode": "replay",
+      "world_parts": 8,
+      "status": "not-run"
+    },
+    {
+      "index": 6,
+      "mode": "split",
+      "world_parts": 4,
+      "status": "not-run"
+    }
+  ],
+  "after_sha256": "f961a3adcf3006e3f7ab30bfe8f7b410505ee3fbb8734a985265bbbbf041a629",
+  "before_after_equal": true,
+  "binary_unchanged": true,
+  "build_attestation_unchanged": true
+}

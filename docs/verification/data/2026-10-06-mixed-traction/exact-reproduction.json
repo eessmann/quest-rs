@@ -1,0 +1,21 @@
+{
+  "schema": "quest-mixed-traction-exact-reproduction-v1",
+  "status": "completed",
+  "scope": "four fixed ideal-rational rank fixtures and exact natural convection energy flux; no runtime DG, quantum, continuum or multi-host claim",
+  "command": "timeout 30s python3 docs/verification/fixtures/quest-cfd/mixed_traction_exact.py",
+  "timeout_seconds": 30,
+  "os_memory_cap_bytes": null,
+  "exit_status": 0,
+  "maximum_resident_set_kib": 17184,
+  "measured_elapsed_seconds": 0.00446907700097654,
+  "script": "docs/verification/fixtures/quest-cfd/mixed_traction_exact.py",
+  "script_sha256": "dad6120430a6ecb4be505c4cd9a8d52fd4b7be097923ddee3fd1851c43b5487a",
+  "helper": "docs/verification/fixtures/quest-cfd/affine_exact.py",
+  "helper_sha256": "80db36fa9e2759f32b3934fe0ba57e73f7373947add980ad974362fab60598bd",
+  "output_sha256": "ccd9d24536b9c379a2a84dbfbeb94f0f480b76f3db77232d4d03c82c390f3ccf",
+  "measurement_log_sha256": "30485caa923828c943f9bd869f494b215346e0a04ef639c13f5139b1374d3ccb",
+  "ordinary_and_optimized_non_timing_fields_identical": true,
+  "independent_reviewer_rerun_non_timing_fields_identical": true,
+  "review_scope": "rational full-row minor proof, basis equivalence, outward traction/convection signs and finite fixture limitations",
+  "recorded_utc": "2026-10-06T01:42:09.780396+00:00"
+}

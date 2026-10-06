@@ -1,0 +1,170 @@
+{
+  "schema": "quest-persisted-matching-loading-focused-v1",
+  "recorded_date": "2026-10-06",
+  "status": "independently-approved-focused-stage",
+  "source_manifest": "source.json",
+  "source_manifest_sha256": "bf8191b4217472da04972b32566ed236783546c226dbd85bb7f7e43b8119043c",
+  "source_aggregate_sha256": "a0e5437a9f67decf6d33418aded51a26a390d2c0f0a94900dbe89ca4e7f4d401",
+  "method_path": "docs/research/persisted-matching-loading.md",
+  "method_sha256": "d90434b531065b31da4468a5822762074dfca0986fdb3651364a3f1bc9054a4b",
+  "scoped_source_unchanged_through_independent_checks": true,
+  "independent_checks": {
+    "runtime_capacity_tests": 2,
+    "runtime_capacity_seconds": 4.86,
+    "bounded_fault_mpi_jobs": 9,
+    "fault_ranks": [
+      1,
+      2
+    ],
+    "io_unit_integration_tests": 51,
+    "io_doctests": 2,
+    "restart_parent_tests": 1,
+    "restart_parent_seconds": 8.33,
+    "bridge_parent_tests": 1,
+    "bridge_parent_seconds": 3.0,
+    "whole_unitary_ranks": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "split": "world4 into two independent2-rank groups",
+    "restart": "same resources4producer to2/8reload;3ranks reject",
+    "strict_selected_runtime_clippy": true,
+    "strict_io_lib_tests_clippy": true,
+    "owned_format": true
+  },
+  "preserved_failed_check": "First independent both-package lib/tests Clippy exits101 on concurrently added unfinished consumer test; selected loader/IO checks pass. Not broad workspace closure.",
+  "owner_checks": "Frozen loader both-package lib/tests Clippy,51IO+2docs,9MPI faults and unchanged restart/bridge matrices pass before concurrent consumer test target. Historical behavioral RED and setup failures separately indexed.",
+  "fault_scope": "Real bounded capacity inflation, not OS allocator exhaustion. Historical IO RED used32768 typed/disk elements; final1024-element typed/disk injections remain below1MiB with unchanged runtime limits.",
+  "model_scope": "Declared manifest/buffer envelopes plus actual records/reverse capacity and fixed scalar/control allowances; returned excess allocation may temporarily exceed cap before rejection. HDF5 metadata/cache/returned header/owner metadata, filesystem/native/MPI internals,caller owners,allocator overhead and RSS remain separate.",
+  "remaining_gates": [
+    "Current full workspace acceptance after checkpoint07",
+    "Integrated persisted weighted inverse consumer/campaign",
+    "Actual multi-host capacity beyond per-node cap",
+    "Actual huge-count transport",
+    "Scientific inverse/physical accuracy"
+  ],
+  "logs": [
+    {
+      "scope": "owner",
+      "kind": "behavioral_runtime_records_red",
+      "private_log": "quest-loader-capacity-red.log",
+      "sha256": "353b770037f0c41cc2128ed74ee1abc39ff01a023005080b4dfd12aa2ce7c9ba"
+    },
+    {
+      "scope": "owner",
+      "kind": "behavioral_runtime_reverse_red",
+      "private_log": "quest-loader-reverse-capacity-red.log",
+      "sha256": "aae0bfd62e3ca3b1273255d0fefca4f070957f869efe763f79204ecd162174cc"
+    },
+    {
+      "scope": "owner",
+      "kind": "behavioral_io_manifest_red",
+      "private_log": "quest-loader-io-capacity-red.log",
+      "sha256": "ade4f4508af7a85e80c9d567f494f560d5a455300f628352310f9f6e37de1ae7"
+    },
+    {
+      "scope": "owner",
+      "kind": "behavioral_io_other_red",
+      "private_log": "quest-loader-io-other-capacity-red.log",
+      "sha256": "59d90adeb68a7c400443c6ff5bbb2b5b61c03f02ae14fe5cb3502f34581c6317"
+    },
+    {
+      "scope": "owner",
+      "kind": "fixture_publication_setup_rejection",
+      "private_log": "quest-loader-capacity-publication-setup-rejection.log",
+      "sha256": "5151616efefa5ff32d98f4098b437131b157d4dbfdda90cbfac4eb12f40a2ce8"
+    },
+    {
+      "scope": "owner",
+      "kind": "runtime_test_build_rejection",
+      "private_log": "quest-loader-capacity-test-build-rejection.log",
+      "sha256": "01197fab580382d9ea9647f3d1b859d3efec6caffbff7ebc9ddbf57107a4c989"
+    },
+    {
+      "scope": "owner",
+      "kind": "io_test_build_rejection",
+      "private_log": "quest-loader-io-capacity-test-build-rejection.log",
+      "sha256": "96185af5d1018f9f975e5dc82cf1c12cad050db0cce1390da7893c41583864d9"
+    },
+    {
+      "scope": "owner",
+      "kind": "initial_clippy_diagnostic",
+      "private_log": "quest-loader-capacity-clippy.log",
+      "sha256": "dad73ee5c40fa71d6d4800f2924c240bb5afe0d1ca953b24bb3e39292c8adff7"
+    },
+    {
+      "scope": "owner",
+      "kind": "runtime_final_green",
+      "private_log": "quest-loader-capacity-final-plus.log",
+      "sha256": "da0e88532206ad73412cf00f8d6cc3b9efc103f0bc96753466760ff8e4a53658"
+    },
+    {
+      "scope": "owner",
+      "kind": "io_final_green",
+      "private_log": "quest-loader-io-freeze.log",
+      "sha256": "87c681d5ce4b5f482f179e541323bb60a8ca548ac17bc0ce9c934ccadff87b98"
+    },
+    {
+      "scope": "owner",
+      "kind": "persisted_restart_bridge_final_green",
+      "private_log": "quest-loader-restart-bridge-freeze.log",
+      "sha256": "b5f93e5d3f77dac927809d82c742576b58b30f4a8b3bf52018da6b1d4bc00c2b"
+    },
+    {
+      "scope": "owner",
+      "kind": "clippy_final_green",
+      "private_log": "quest-loader-capacity-clippy-freeze-final.log",
+      "sha256": "b1ee47b21209c762b917455dfb2dae3f967b625ebcf9adcc76499f6f7094f23d"
+    },
+    {
+      "scope": "owner",
+      "kind": "format_final_green",
+      "private_log": "quest-loader-capacity-fmt-freeze-final.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "scope": "independent",
+      "kind": "capacity_green",
+      "private_log": "quest-loader-capacity-root.log",
+      "sha256": "ded2bd20c33ceffd2ece89421e08f4cd2393d6c478d90bd8732a5b82c5321e89"
+    },
+    {
+      "scope": "independent",
+      "kind": "io_green",
+      "private_log": "quest-loader-io-root.log",
+      "sha256": "00858c10210d17b097a0b1214b774336272827dba4916d7b89abe4ba0278c2b1"
+    },
+    {
+      "scope": "independent",
+      "kind": "restart_bridge_green",
+      "private_log": "quest-loader-restart-bridge-root.log",
+      "sha256": "820a87a5a429315aaef55f52dbb6546d0ab2fbc15a3ca30396a4cbd8e728acf8"
+    },
+    {
+      "scope": "independent",
+      "kind": "concurrent_consumer_wip_failure",
+      "private_log": "quest-loader-capacity-root-clippy.log",
+      "sha256": "0be09790b9d1a03f579fb87655591cb52eb3344096b48c29aec48bdfd76c7798"
+    },
+    {
+      "scope": "independent",
+      "kind": "selected_runtime_clippy_green",
+      "private_log": "quest-loader-runtime-root-clippy-selected.log",
+      "sha256": "c2ff156f27ee9b5b3b106075e71e83731f53d97d6e1392fa22daebba5ca3aef2"
+    },
+    {
+      "scope": "independent",
+      "kind": "io_clippy_green",
+      "private_log": "quest-loader-io-root-clippy.log",
+      "sha256": "d4bd6e41f7cefb40fb1e22f1cefc2c93ff406d120ddf22831791581ac7d5a259"
+    },
+    {
+      "scope": "independent",
+      "kind": "owned_format_green",
+      "private_log": "quest-loader-capacity-root-fmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

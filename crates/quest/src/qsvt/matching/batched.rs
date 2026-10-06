@@ -1,8 +1,8 @@
-//! Bounded ownership routing. Every global batch contains at most B flag pairs,
+//! Bounded ownership routing. Each native owner contributes at most B flag pairs,
 //! so all per-rank sends/receives contain at most 2B amplitude records even when
 //! coefficient or permutation ownership is maximally imbalanced.
-use super::{MatchingLayout, collective::get};
-use crate::{Complex64, Register, StateVector, error::BackendResult, values::reserve_vec};
+use super::{MatchingLayout, collective::get, staging::RoutingState};
+use crate::{Complex64, error::BackendResult, values::reserve_vec};
 use quest_qsvt::MatchingShard;
 use quest_sys::mpi::MpiCollectiveLane;
 
@@ -11,6 +11,8 @@ const PACKET_BYTES: usize = 40;
 #[derive(Debug, Clone, Copy, Default)]
 pub struct RoutingStatistics {
 	pub batches: usize,
+	/// Flag-zero basis candidates visited by this native state owner only.
+	pub local_pair_candidates: usize,
 	pub maximum_batch_pairs: usize,
 	pub maximum_routed_amplitudes: usize,
 	pub coordination_calls: usize,
@@ -42,6 +44,33 @@ struct Route {
 	local: usize,
 }
 
+fn local_pairs(route: Route, owner: usize, flag: usize) -> crate::Result<usize> {
+	let start = owner
+		.checked_mul(route.local)
+		.ok_or(crate::Error::Overflow)?;
+	if flag < route.local {
+		route.local.checked_div(2).ok_or(crate::Error::Overflow)
+	} else {
+		Ok(if start & flag == 0 { route.local } else { 0 })
+	}
+}
+fn local_pair_basis(route: Route, owner: usize, flag: usize, index: usize) -> crate::Result<usize> {
+	let start = owner
+		.checked_mul(route.local)
+		.ok_or(crate::Error::Overflow)?;
+	let offset = if flag < route.local {
+		// Insert the omitted zero flag bit into the packed local pair index.
+		let low = index & flag.saturating_sub(1);
+		let high = (index & !flag.saturating_sub(1))
+			.checked_mul(2)
+			.ok_or(crate::Error::Overflow)?;
+		low | high
+	} else {
+		index
+	};
+	start.checked_add(offset).ok_or(crate::Error::Overflow)
+}
+
 pub(super) struct RoutingWorkspace {
 	bases: Vec<usize>,
 	input: Vec<Packet>,
@@ -68,7 +97,27 @@ impl RoutingWorkspace {
 					PAIR_LIMIT.checked_mul(size_of::<usize>().saturating_add(size_of::<Pair>()))?,
 				)
 			})
+			.and_then(|n| n.checked_add(size_of::<Self>()))
 			.ok_or(crate::Error::Overflow)
+	}
+	pub(super) fn retained_bytes(&self) -> crate::Result<usize> {
+		[
+			(self.bases.capacity(), size_of::<usize>()),
+			(self.input.capacity(), size_of::<Packet>()),
+			(self.received.capacity(), size_of::<Packet>()),
+			(self.send_bytes.capacity(), 1),
+			(self.receive_bytes.capacity(), 1),
+			(self.indices.capacity(), size_of::<i64>()),
+			(self.values.capacity(), size_of::<quest_sys::QuestComplex>()),
+			(self.pairs.capacity(), size_of::<Pair>()),
+		]
+		.into_iter()
+		.try_fold(size_of::<Self>(), |sum, (count, width)| {
+			count
+				.checked_mul(width)
+				.and_then(|n| sum.checked_add(n))
+				.ok_or(crate::Error::Overflow)
+		})
 	}
 	pub(super) fn new() -> crate::Result<Self> {
 		let amplitudes = PAIR_LIMIT.checked_mul(2).ok_or(crate::Error::Overflow)?;
@@ -148,14 +197,8 @@ impl RoutingWorkspace {
 			let bytes = count
 				.checked_mul(PACKET_BYTES)
 				.ok_or(crate::Error::Overflow)?;
-			i32::try_from(bytes).map_err(|_| crate::Error::Overflow)?;
 			self.receive_bytes.resize(bytes, 0);
-			let received = lane
-				.send_receive_bytes(&self.send_bytes, peer, 3021, &mut self.receive_bytes)
-				.context("exchanging matching amplitude batch")?;
-			if received != bytes {
-				return Err(crate::Error::Value("matching batch amplitude payload"));
-			}
+			self.exchange_frames(lane, peer)?;
 			for bytes in self.receive_bytes.as_chunks::<PACKET_BYTES>().0 {
 				self.received.push(Packet {
 					destination: route.rank,
@@ -184,9 +227,40 @@ impl RoutingWorkspace {
 			.max(self.input.len());
 		Ok(())
 	}
+	fn exchange_frames(
+		&mut self,
+		lane: &mut MpiCollectiveLane<'_>,
+		peer: i32,
+	) -> crate::Result<()> {
+		// The immutable workspace bound currently makes this one frame. Keep
+		// native-count chunking explicit if the admitted batch bound grows.
+		for frame in crate::native_admission::CountChunks::new(
+			self.send_bytes.len().max(self.receive_bytes.len()),
+			1,
+		)? {
+			let send = self
+				.send_bytes
+				.get(frame.start.min(self.send_bytes.len())..frame.end.min(self.send_bytes.len()))
+				.ok_or(crate::Error::Overflow)?;
+			let receive_len = self.receive_bytes.len();
+			let receive = self
+				.receive_bytes
+				.get_mut(frame.start.min(receive_len)..frame.end.min(receive_len))
+				.ok_or(crate::Error::Overflow)?;
+			let expected = receive.len();
+			let received = lane
+				.send_receive_bytes(send, peer, 3021, receive)
+				.context("exchanging matching amplitude batch")?;
+			if received != expected {
+				return Err(crate::Error::Value("matching batch amplitude payload"));
+			}
+		}
+		Ok(())
+	}
+
 	fn read_indices(
 		&mut self,
-		register: &Register<'_, StateVector>,
+		state: &RoutingState<'_, '_, '_>,
 		route: Route,
 	) -> crate::Result<()> {
 		self.indices.clear();
@@ -208,18 +282,13 @@ impl RoutingWorkspace {
 				.push(quest_sys::QuestComplex { re: 0.0, im: 0.0 });
 		}
 		if !self.indices.is_empty() {
-			quest_sys::read_local_indexed_qureg_amps(
-				&register.native,
-				&self.indices,
-				&mut self.values,
-			)
-			.context("reading matching indexed batch")?;
+			state.read_indexed(&self.indices, &mut self.values)?;
 		}
 		Ok(())
 	}
 	fn write_indices(
 		&mut self,
-		register: &mut Register<'_, StateVector>,
+		state: &mut RoutingState<'_, '_, '_>,
 		route: Route,
 	) -> crate::Result<()> {
 		self.indices.clear();
@@ -243,8 +312,7 @@ impl RoutingWorkspace {
 			});
 		}
 		if !self.indices.is_empty() {
-			quest_sys::write_local_indexed_qureg_amps(register.pin(), &self.indices, &self.values)
-				.context("writing matching indexed batch")?;
+			state.write_indexed(&self.indices, &self.values)?;
 		}
 		Ok(())
 	}
@@ -253,8 +321,7 @@ impl RoutingWorkspace {
 pub(super) struct BatchExecution<'a, 'input, 'output> {
 	pub(super) layout: &'a MatchingLayout,
 	pub(super) shard: &'a MatchingShard,
-	pub(super) input: &'a Register<'input, StateVector>,
-	pub(super) output: &'a mut Register<'output, StateVector>,
+	pub(super) state: RoutingState<'a, 'input, 'output>,
 	pub(super) adjoint: bool,
 	pub(super) outer_mask: usize,
 	pub(super) outer_value: usize,
@@ -267,22 +334,74 @@ impl RoutingWorkspace {
 	) -> crate::Result<RoutingStatistics> {
 		let mut statistics = RoutingStatistics::default();
 		let flag = execution.layout.flag()?;
-		self.bases.clear();
-		for basis in 0..execution.layout.count.dimension() {
-			if basis & flag != 0 || basis & execution.outer_mask != execution.outer_value {
-				continue;
-			}
-			self.bases.push(basis);
-			if self.bases.len() == PAIR_LIMIT {
-				self.apply_batch(lane, execution, &mut statistics)?;
+		let route = Route {
+			rank: execution.shard.rank(),
+			parts: execution.shard.parts(),
+			local: execution.state.local_amplitudes(),
+		};
+		// Only the active native state owner traverses its partition. Other ranks
+		// run bounded transport rounds without reconstructing another owner's bases.
+		for owner in 0..route.parts {
+			let count = local_pairs(route, owner, flag)?;
+			for start in (0..count).step_by(PAIR_LIMIT) {
 				self.bases.clear();
+				if owner == route.rank {
+					let end = start.saturating_add(PAIR_LIMIT).min(count);
+					for index in start..end {
+						let basis = local_pair_basis(route, owner, flag, index)?;
+						statistics.local_pair_candidates =
+							statistics.local_pair_candidates.saturating_add(1);
+						if basis & execution.outer_mask == execution.outer_value {
+							self.bases.push(basis);
+						}
+					}
+				}
+				if lane
+					.all_agree(self.bases.is_empty())
+					.context("checking matching owner batch")?
+				{
+					continue;
+				}
+				self.coefficient_requests(execution, route)?;
+				self.exchange(lane, route, &mut statistics)?;
+				// Retain only this coefficient owner's keys for the bounded round.
+				if self.received.len() > PAIR_LIMIT {
+					return Err(crate::Error::Value(
+						"matching coefficient key batch exceeds bound",
+					));
+				}
+				self.bases.clear();
+				self.bases
+					.extend(self.received.iter().map(|packet| packet.key));
+				self.bases.sort_unstable();
+				self.apply_batch(lane, execution, &mut statistics)?;
 			}
-		}
-		if !self.bases.is_empty() {
-			self.apply_batch(lane, execution, &mut statistics)?;
 		}
 		Ok(statistics)
 	}
+	fn coefficient_requests(
+		&mut self,
+		execution: &BatchExecution<'_, '_, '_>,
+		route: Route,
+	) -> crate::Result<()> {
+		self.input.clear();
+		for &basis in &self.bases {
+			let source = execution
+				.layout
+				.extract(basis, execution.layout.system_range())?;
+			self.input.push(Packet {
+				destination: source
+					.checked_rem(route.parts)
+					.ok_or(crate::Error::Overflow)?,
+				key: basis,
+				index: basis,
+				flag: 0,
+				value: Complex64::new(0.0, 0.0),
+			});
+		}
+		Ok(())
+	}
+
 	fn requests(
 		&mut self,
 		execution: &BatchExecution<'_, '_, '_>,
@@ -432,11 +551,11 @@ impl RoutingWorkspace {
 		let route = Route {
 			rank: execution.shard.rank(),
 			parts: execution.shard.parts(),
-			local: execution.input.deployment().local_amplitudes(),
+			local: execution.state.local_amplitudes(),
 		};
 		self.requests(execution, route)?;
 		self.exchange(lane, route, statistics)?;
-		self.read_indices(execution.input, route)?;
+		self.read_indices(&execution.state, route)?;
 		statistics.indexed_reads = statistics
 			.indexed_reads
 			.saturating_add(usize::from(!self.indices.is_empty()));
@@ -445,12 +564,42 @@ impl RoutingWorkspace {
 		self.pairs(execution, route)?;
 		self.outputs(execution, route)?;
 		self.exchange(lane, route, statistics)?;
-		self.write_indices(execution.output, route)?;
+		self.write_indices(&mut execution.state, route)?;
 		statistics.indexed_writes = statistics
 			.indexed_writes
 			.saturating_add(usize::from(!self.indices.is_empty()));
 		statistics.maximum_batch_pairs = statistics.maximum_batch_pairs.max(self.bases.len());
 		statistics.batches = statistics.batches.saturating_add(1);
 		Ok(())
+	}
+}
+
+#[cfg(test)]
+mod partition_tests {
+	use super::*;
+	#[test]
+	fn local_pair_iteration_is_disjoint_complete_with_high_and_low_flags() {
+		for parts in [1usize, 2, 4, 8] {
+			for flag in [1usize, 4, 32, 64] {
+				let local = 128 / parts;
+				let mut all = Vec::new();
+				for rank in 0..parts {
+					let route = Route { rank, parts, local };
+					let pairs = local_pairs(route, rank, flag).unwrap();
+					let indices: Vec<_> = (0..pairs)
+						.map(|index| local_pair_basis(route, rank, flag, index).unwrap())
+						.collect();
+					assert!(indices.iter().all(|&basis| basis / local == rank));
+					assert!(indices.windows(2).all(|pair| pair[0] < pair[1]));
+					all.extend(indices);
+				}
+				assert_eq!(
+					all,
+					(0..128)
+						.filter(|basis| basis & flag == 0)
+						.collect::<Vec<_>>()
+				);
+			}
+		}
 	}
 }

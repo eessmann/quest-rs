@@ -1,0 +1,40 @@
+warning: `feature(generic_const_exprs)` is not supported with the next-generation trait solver
+ --> crates/quest-polynomial/src/lib.rs:1:30
+  |
+1 | #![feature(const_trait_impl, generic_const_exprs)]
+  |                              ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `-Znext-solver=globally` is currently enabled by default for testing
+  = note: reverted the setting to `-Znext-solver=coherence` for this crate
+  = note: the currently stable trait solver will be used for this crate
+  = note: see issues #160895 <https://github.com/rust-lang/rust/issues/160895> for more information
+
+warning: `quest-polynomial` (lib) generated 1 warning
+   Compiling quest-qsp v0.1.0 (<workspace>/crates/quest-qsp)
+   Compiling quest-qsvt v0.1.0 (<workspace>/crates/quest-qsvt)
+   Compiling quest-qsvt-io v0.1.0 (<workspace>/crates/quest-qsvt-io)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.26s
+     Running tests/sharded_matching.rs (target/debug/build/quest-qsvt-io/d998af4c6edc65da/out/sharded_matching-d998af4c6edc65da)
+
+running 1 test
+test obsolete_additive_fnv_manifest_version_is_rejected ... FAILED
+
+failures:
+
+---- obsolete_additive_fnv_manifest_version_is_rejected stdout ----
+Value of: MatchingManifest::open(&path,limits).is_err()
+Expected: is equal to true
+Actual: false,
+  which isn't equal to true
+  at crates/quest-qsvt-io/tests/sharded_matching.rs:433:2
+
+Error: See failure output above
+
+
+
+failures:
+    obsolete_additive_fnv_manifest_version_is_rejected
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `-p quest-qsvt-io --test sharded_matching`

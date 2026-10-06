@@ -8,13 +8,21 @@
 //! cannot authorize conditioning after the register has been released.
 use crate::execution::PreparedRegion;
 #[cfg(all(feature = "mpi", quest_native_mpi))]
+pub mod amplitude_preparation;
+#[cfg(all(feature = "mpi", quest_native_mpi))]
 pub mod collective;
 mod continuation;
 mod hadamard;
 pub mod matching;
+pub mod matching_lcu;
+pub mod matching_lcu_transform;
 pub mod matching_transform;
+#[cfg(all(feature = "qsvt-io", feature = "mpi", quest_native_mpi))]
+pub mod persisted_matching;
 mod projection;
+pub mod replay_native;
 mod reporting;
+mod transform_execution;
 use crate::{Complex64, Environment, Register, StateVector};
 use crate::{environment::Reservation, error::BackendResult, values::bytes_for};
 use continuation::{AdmittedContinuation, PreparedContinuation};

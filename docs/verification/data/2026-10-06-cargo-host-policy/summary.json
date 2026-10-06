@@ -1,0 +1,665 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-06",
+  "scope": "Documented nightly Cargo host/target compiler configuration on Cirrus Cray; full workspace acceptance remains pending",
+  "source": {
+    "manifest": {
+      "path": "target/cargo-host-policy-20261006/deploy.sha256",
+      "bytes": 460,
+      "sha256": "7713442ce58a9b4ed6d9d21f9f4b012e2a4d1b7099f53e3daf6688485bc735a2"
+    },
+    "archive": {
+      "path": "target/cargo-host-policy-20261006/deploy.tar.gz",
+      "bytes": 2792,
+      "sha256": "91cb82690ddb057e91ddcde9c35377b2ae7310577470cf747dd25b620b683463"
+    },
+    "files": {
+      "Cargo.toml": "3ec70a581121e4c6ee98ff109ebfd53560f53bcaadb307c2dddebacdd7c1836e",
+      "Cargo.lock": "eb810c58fffd8157188b0c80524e18ea016049b26ef45b44befbce6cf524e76f",
+      "build.rs": "9b21ee2819f63f0b7a4be116f6a0f368edc9ed4ac6cdd509abff2235e81d2d5c",
+      "README.md": "a35bf0a4df7ed897ab1ad721ea9d1d8943eae0759d3d0cfe7d516674c34fdc63",
+      "src/main.rs": "c918336a4370aad3bf2388a26cb9b88d9e9158965fce3885c31a9cc8eb8bf733",
+      "run.sbatch": "57c471ffa3a839b790f60d5a1c48a07c02d4f368f6b5714a8e787ee901213184"
+    },
+    "file_count": 6,
+    "archive_contents_match_manifest": true,
+    "current_public_fixture_matches_deployment": true
+  },
+  "probe": {
+    "slurm_job_id": 538200,
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed_seconds": 10,
+    "exclusive_nodes": 1,
+    "requested_cpus_per_task": 8,
+    "accounting_allocated_cpus": 288,
+    "qos": "lowpriority",
+    "time_limit_seconds": 1200,
+    "cargo_locked": true,
+    "cargo_offline": true,
+    "fresh_target_per_case": true,
+    "source_checks_before_after": "passed",
+    "completed_status": 0,
+    "job_exit_status": 0,
+    "cases": [
+      {
+        "name": "control",
+        "cargo_exit_code": 101,
+        "explicit_native_target": true,
+        "host_linker_policy_enabled": false,
+        "outcome": "expected_host_link_failure",
+        "runtime_subnormal_assertions": {
+          "host": "unrun",
+          "target": "unrun"
+        },
+        "actual_rustc_argv": {
+          "host": [
+            "$RUST_TOOLCHAIN/bin/rustc",
+            "--crate-name",
+            "build_script_build",
+            "--edition=2024",
+            "build.rs",
+            "--error-format=json",
+            "--json=diagnostic-rendered-ansi,artifacts,future-incompat,unused-externs-silent",
+            "--crate-type",
+            "bin",
+            "--emit=dep-info,link",
+            "-C",
+            "embed-bitcode=no",
+            "--forbid=unsafe_code",
+            "--deny=unexpected_cfgs",
+            "--check-cfg",
+            "cfg(quest_host_policy)",
+            "--check-cfg",
+            "cfg(quest_target_policy)",
+            "--check-cfg",
+            "cfg(docsrs,test)",
+            "--check-cfg",
+            "cfg(feature, values())",
+            "-C",
+            "metadata=737c6bc58a6c2d9a",
+            "--out-dir",
+            "$PROBE_TARGET_ROOT/538200/control/debug/build/quest-cargo-host-policy-probe/428928c0c4380b15/out",
+            "-C",
+            "linker=cc",
+            "-C",
+            "strip=debuginfo",
+            "--cfg",
+            "quest_host_policy",
+            "--force-warn=unused_crate_dependencies"
+          ],
+          "target": null
+        },
+        "log": {
+          "path": "target/cargo-host-policy-20261006/cluster-receipts/receipts/538200/control.log",
+          "bytes": 5763,
+          "sha256": "5d9f2b42b4297698cb3f98b8da6558974b2f58cf0170628fb73201d9f4f0b35e"
+        },
+        "status": {
+          "path": "target/cargo-host-policy-20261006/cluster-receipts/receipts/538200/control.status",
+          "bytes": 4,
+          "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c"
+        }
+      },
+      {
+        "name": "implicit",
+        "cargo_exit_code": 0,
+        "explicit_native_target": false,
+        "host_linker_policy_enabled": true,
+        "outcome": "passed",
+        "runtime_subnormal_assertions": {
+          "host": "passed",
+          "target": "passed"
+        },
+        "actual_rustc_argv": {
+          "host": [
+            "$RUST_TOOLCHAIN/bin/rustc",
+            "--crate-name",
+            "build_script_build",
+            "--edition=2024",
+            "build.rs",
+            "--error-format=json",
+            "--json=diagnostic-rendered-ansi,artifacts,future-incompat,unused-externs-silent",
+            "--crate-type",
+            "bin",
+            "--emit=dep-info,link",
+            "-C",
+            "embed-bitcode=no",
+            "--forbid=unsafe_code",
+            "--deny=unexpected_cfgs",
+            "--check-cfg",
+            "cfg(quest_host_policy)",
+            "--check-cfg",
+            "cfg(quest_target_policy)",
+            "--check-cfg",
+            "cfg(docsrs,test)",
+            "--check-cfg",
+            "cfg(feature, values())",
+            "-C",
+            "metadata=737c6bc58a6c2d9a",
+            "--out-dir",
+            "$PROBE_TARGET_ROOT/538200/implicit/debug/build/quest-cargo-host-policy-probe/b2db9f13dd6a7ae6/out",
+            "-C",
+            "linker=cc",
+            "-C",
+            "strip=debuginfo",
+            "--cfg",
+            "quest_host_policy",
+            "-C",
+            "linker-features=-lld",
+            "-C",
+            "link-arg=-mno-daz-ftz",
+            "--force-warn=unused_crate_dependencies"
+          ],
+          "target": [
+            "$RUST_TOOLCHAIN/bin/rustc",
+            "--crate-name",
+            "quest_cargo_host_policy_probe",
+            "--edition=2024",
+            "src/main.rs",
+            "--error-format=json",
+            "--json=diagnostic-rendered-ansi,artifacts,future-incompat,unused-externs-silent",
+            "--crate-type",
+            "bin",
+            "--emit=dep-info,link",
+            "-C",
+            "embed-bitcode=no",
+            "--forbid=unsafe_code",
+            "--deny=unexpected_cfgs",
+            "--check-cfg",
+            "cfg(quest_host_policy)",
+            "--check-cfg",
+            "cfg(quest_target_policy)",
+            "--check-cfg",
+            "cfg(docsrs,test)",
+            "--check-cfg",
+            "cfg(feature, values())",
+            "-C",
+            "metadata=4cbbea3fc2a58dc4",
+            "--out-dir",
+            "$PROBE_TARGET_ROOT/538200/implicit/debug/build/quest-cargo-host-policy-probe/5d8e4a2eab0b9f3e/out",
+            "-C",
+            "linker=cc",
+            "-C",
+            "strip=debuginfo",
+            "-C",
+            "linker-features=-lld",
+            "-C",
+            "link-arg=-mno-daz-ftz",
+            "--cfg",
+            "quest_target_policy",
+            "--force-warn=unused_crate_dependencies"
+          ]
+        },
+        "log": {
+          "path": "target/cargo-host-policy-20261006/cluster-receipts/receipts/538200/implicit.log",
+          "bytes": 8594,
+          "sha256": "b6ffde1b257d558e3daed4eeac6f705e0c05af0efb8e71f762fd6a4c2ff7c082"
+        },
+        "status": {
+          "path": "target/cargo-host-policy-20261006/cluster-receipts/receipts/538200/implicit.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      },
+      {
+        "name": "explicit",
+        "cargo_exit_code": 0,
+        "explicit_native_target": true,
+        "host_linker_policy_enabled": true,
+        "outcome": "passed",
+        "runtime_subnormal_assertions": {
+          "host": "passed",
+          "target": "passed"
+        },
+        "actual_rustc_argv": {
+          "host": [
+            "$RUST_TOOLCHAIN/bin/rustc",
+            "--crate-name",
+            "build_script_build",
+            "--edition=2024",
+            "build.rs",
+            "--error-format=json",
+            "--json=diagnostic-rendered-ansi,artifacts,future-incompat,unused-externs-silent",
+            "--crate-type",
+            "bin",
+            "--emit=dep-info,link",
+            "-C",
+            "embed-bitcode=no",
+            "--forbid=unsafe_code",
+            "--deny=unexpected_cfgs",
+            "--check-cfg",
+            "cfg(quest_host_policy)",
+            "--check-cfg",
+            "cfg(quest_target_policy)",
+            "--check-cfg",
+            "cfg(docsrs,test)",
+            "--check-cfg",
+            "cfg(feature, values())",
+            "-C",
+            "metadata=737c6bc58a6c2d9a",
+            "--out-dir",
+            "$PROBE_TARGET_ROOT/538200/explicit/debug/build/quest-cargo-host-policy-probe/b2db9f13dd6a7ae6/out",
+            "-C",
+            "linker=cc",
+            "-C",
+            "strip=debuginfo",
+            "--cfg",
+            "quest_host_policy",
+            "-C",
+            "linker-features=-lld",
+            "-C",
+            "link-arg=-mno-daz-ftz",
+            "--force-warn=unused_crate_dependencies"
+          ],
+          "target": [
+            "$RUST_TOOLCHAIN/bin/rustc",
+            "--crate-name",
+            "quest_cargo_host_policy_probe",
+            "--edition=2024",
+            "src/main.rs",
+            "--error-format=json",
+            "--json=diagnostic-rendered-ansi,artifacts,future-incompat,unused-externs-silent",
+            "--crate-type",
+            "bin",
+            "--emit=dep-info,link",
+            "-C",
+            "embed-bitcode=no",
+            "--forbid=unsafe_code",
+            "--deny=unexpected_cfgs",
+            "--check-cfg",
+            "cfg(quest_host_policy)",
+            "--check-cfg",
+            "cfg(quest_target_policy)",
+            "--check-cfg",
+            "cfg(docsrs,test)",
+            "--check-cfg",
+            "cfg(feature, values())",
+            "-C",
+            "metadata=4abb9cfa9d9de295",
+            "--out-dir",
+            "$PROBE_TARGET_ROOT/538200/explicit/x86_64-unknown-linux-gnu/debug/build/quest-cargo-host-policy-probe/7ee3eeed82446b7c/out",
+            "--target",
+            "x86_64-unknown-linux-gnu",
+            "-C",
+            "linker=cc",
+            "-C",
+            "strip=debuginfo",
+            "-L",
+            "dependency=$PROBE_TARGET_ROOT/538200/explicit/debug/build/quest-cargo-host-policy-probe/7ee3eeed82446b7c/out",
+            "-C",
+            "linker-features=-lld",
+            "-C",
+            "link-arg=-mno-daz-ftz",
+            "--cfg",
+            "quest_target_policy",
+            "--force-warn=unused_crate_dependencies"
+          ]
+        },
+        "log": {
+          "path": "target/cargo-host-policy-20261006/cluster-receipts/receipts/538200/explicit.log",
+          "bytes": 8930,
+          "sha256": "e9aad9c0071424c6e1f4f250e006947fe904c452bbabc5f60f31208818c7e2bf"
+        },
+        "status": {
+          "path": "target/cargo-host-policy-20261006/cluster-receipts/receipts/538200/explicit.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      }
+    ]
+  },
+  "toolchain": {
+    "rustc": "1.101.0-nightly (282215592 2026-10-04)",
+    "rustc_commit": "28221559263a3976766cf305940e80e30cf9ba8a",
+    "llvm": "23.1.3",
+    "host": "x86_64-unknown-linux-gnu",
+    "compiler": "Cray clang 19.0.0",
+    "modules": [
+      "craype-x86-turin",
+      "libfabric/2.3.1",
+      "craype-network-ofi",
+      "perftools-base/25.03.0",
+      "xpmem/1.0.1-1.5_1_gfb6998056825",
+      "cce/19.0.0",
+      "cse_env/0.2",
+      "craype/2.7.34",
+      "cray-dsmml/0.3.1",
+      "cray-mpich/8.1.32",
+      "PrgEnv-cray/8.6.0",
+      "epcc-setup-env",
+      "load-epcc-module",
+      "cmake/4.1.2",
+      "cray-hdf5/1.14.3.5"
+    ]
+  },
+  "configuration": {
+    "environment": {
+      "CARGO_UNSTABLE_HOST_CONFIG": "true",
+      "CARGO_UNSTABLE_TARGET_APPLIES_TO_HOST": "true",
+      "CARGO_TARGET_APPLIES_TO_HOST": "false",
+      "CARGO_HOST_LINKER": "cc",
+      "CARGO_HOST_RUSTFLAGS": "--cfg quest_host_policy -C linker-features=-lld -C link-arg=-mno-daz-ftz",
+      "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER": "cc",
+      "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS": "-C linker-features=-lld -C link-arg=-mno-daz-ftz"
+    },
+    "control_host_rustflags": "--cfg quest_host_policy",
+    "cargo_config_arrays": {
+      "build.rustflags": [
+        "--cfg",
+        "quest_target_policy"
+      ],
+      "target.x86_64-unknown-linux-gnu.rustflags": [
+        "--cfg",
+        "quest_target_policy"
+      ]
+    },
+    "removed_caller_variables": [
+      "RUSTFLAGS",
+      "CARGO_ENCODED_RUSTFLAGS"
+    ],
+    "architecture_host_environment_leaf_creates_table": false,
+    "generic_host_ignored_when_architecture_table_exists": true,
+    "actual_trybuild_execution": "not_exercised_by_probe",
+    "custom_test_routing": false
+  },
+  "local_exploratory_logs": [
+    {
+      "name": "without-host-config",
+      "exit_code": 101,
+      "log": {
+        "path": "target/cargo-host-policy-20261006/without-host-config.log",
+        "bytes": 4064,
+        "sha256": "11fdfe024e662b4b463e8b272372d23322d0ff0ceb7dd6e3863be227264898a8"
+      }
+    },
+    {
+      "name": "with-host-config",
+      "exit_code": 101,
+      "log": {
+        "path": "target/cargo-host-policy-20261006/with-host-config.log",
+        "bytes": 4006,
+        "sha256": "174d010ed89a49823362a70ed91cdc46690bd796b8c03f7f839c6b5cfea695fc"
+      }
+    },
+    {
+      "name": "generic-host-config",
+      "exit_code": 0,
+      "log": {
+        "path": "target/cargo-host-policy-20261006/generic-host-config.log",
+        "bytes": 8459,
+        "sha256": "e6f61f88186d9432368e814287062e74f72d0485ac56fa70096c2725974fdaad"
+      }
+    },
+    {
+      "name": "standard-implicit",
+      "exit_code": 0,
+      "log": {
+        "path": "target/cargo-host-policy-20261006/standard-implicit.log",
+        "bytes": 8146,
+        "sha256": "a1764e8853f61d22d6c6528997aadc4e71d625e8e3e4aba98c86a86deae3bfbb"
+      }
+    },
+    {
+      "name": "standard-explicit",
+      "exit_code": 0,
+      "log": {
+        "path": "target/cargo-host-policy-20261006/standard-explicit.log",
+        "bytes": 8854,
+        "sha256": "436ee3fc789b62258565454d6bd84becda4a39087e25fdab9a80dae6fb65d546"
+      }
+    }
+  ],
+  "raw_evidence": [
+    {
+      "path": "target/cargo-host-policy-20261006/receipts-538200.tar.gz",
+      "bytes": 3911,
+      "sha256": "6d62db9f5c888bbd25e77f402abd0b546fec6dcc447bceb762d324c8136a5af9"
+    },
+    {
+      "path": "target/cargo-host-policy-20261006/cluster-receipts/accounting-538200.txt",
+      "bytes": 171,
+      "sha256": "ccd491769c5f6b1e98559e21ddbbbc5a9aa9a2eaf182ce9d8bb9676d85982ad6"
+    },
+    {
+      "path": "target/cargo-host-policy-20261006/cluster-receipts/receipts/538200/compiler.txt",
+      "bytes": 208,
+      "sha256": "ad0e02a3148b3be0eaea1590bc0e46721cee9769d6501a5482425d4a36c1309d"
+    },
+    {
+      "path": "target/cargo-host-policy-20261006/cluster-receipts/receipts/538200/modules.txt",
+      "bytes": 260,
+      "sha256": "f5d648c8bf61cb94f937cffc0969166adc8b1bda5a27658b370d5a134ac88fee"
+    },
+    {
+      "path": "target/cargo-host-policy-20261006/cluster-receipts/receipts/538200/rustc.txt",
+      "bytes": 214,
+      "sha256": "ba405b896c6b4a26674e9d3e7fc4956ed4b1c632ac70c6b7880c76157d124b25"
+    },
+    {
+      "path": "target/cargo-host-policy-20261006/cluster-receipts/receipts/538200/source-before.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "target/cargo-host-policy-20261006/cluster-receipts/receipts/538200/source-after.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "target/cargo-host-policy-20261006/cluster-receipts/receipts/538200/completed.status",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "target/cargo-host-policy-20261006/cluster-receipts/receipts/538200/job-exit.status",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    }
+  ],
+  "full_campaign": {
+    "source_manifest": {
+      "path": "target/cargo-host-full-cirrus-20261006/source.sha256",
+      "bytes": 347787,
+      "sha256": "e68d5468b006d0dd3c5bbb6420d9a5c5db5a5a0727aafd1b8bd93540055e32d0"
+    },
+    "source_archive": {
+      "path": "target/cargo-host-full-cirrus-20261006/source.tar.gz",
+      "bytes": 11853273,
+      "sha256": "16bccef38794b94547d3b0d383be4d7f126d0cb72154a198eb984fc2eb0e344d"
+    },
+    "source_file_count": 2592,
+    "submission_receipt": {
+      "path": "target/cargo-host-full-cirrus-20261006/submitted-jobs.txt",
+      "bytes": 4750,
+      "sha256": "35cb0cf03ff16b5d86f5d4ecbc8a891e4a469aee765fffa77134bc2531d44e82"
+    },
+    "status_scope": "Retained submission observation and final archived Slurm accounting/build receipts; not a live scheduler query",
+    "full_workspace_acceptance": "pending",
+    "runtime_acceptance": "not_established_cancelled_by_owner",
+    "submission_observation_jobs": [
+      {
+        "job_id": 538206,
+        "lane": "cray",
+        "stage": "torc_build",
+        "nodes": 1,
+        "observed_state": "RUNNING"
+      },
+      {
+        "job_id": 538207,
+        "lane": "gnu",
+        "stage": "verify",
+        "nodes": 8,
+        "observed_state": "PENDING",
+        "dependency": "afterany:538206",
+        "source_manifest_sha256": "565f59ccd796712da5277c57a4203d0869f0ad67a26fdec47e99709b83dc2602"
+      },
+      {
+        "job_id": 538208,
+        "lane": "cray",
+        "stage": "verify",
+        "nodes": 8,
+        "observed_state": "PENDING",
+        "dependency": "afterok:538206,afterany:538207",
+        "source_manifest_sha256": "e68d5468b006d0dd3c5bbb6420d9a5c5db5a5a0727aafd1b8bd93540055e32d0"
+      }
+    ],
+    "jobs": [
+      {
+        "job_id": 538206,
+        "lane": "cray",
+        "stage": "torc_build",
+        "nodes": 1,
+        "observed_state": "COMPLETED",
+        "slurm_exit_code": "0:0",
+        "elapsed_seconds": 229
+      },
+      {
+        "job_id": 538207,
+        "lane": "gnu",
+        "stage": "verify",
+        "nodes": 8,
+        "observed_state": "CANCELLED",
+        "cancelled_by": "owner",
+        "elapsed_running_seconds": 23,
+        "source_manifest_sha256": "565f59ccd796712da5277c57a4203d0869f0ad67a26fdec47e99709b83dc2602",
+        "runtime_acceptance": "not_established"
+      },
+      {
+        "job_id": 538208,
+        "lane": "cray",
+        "stage": "verify",
+        "nodes": 8,
+        "observed_state": "CANCELLED",
+        "cancelled_by": "owner",
+        "started": false,
+        "source_manifest_sha256": "e68d5468b006d0dd3c5bbb6420d9a5c5db5a5a0727aafd1b8bd93540055e32d0",
+        "runtime_acceptance": "unrun"
+      }
+    ],
+    "cancellation_reason": "Review identified an HDF5 empty-library-path fallback gap and a possible false positive in the fatal-drop fixture; corrected source and focused verification required before further runtime acceptance",
+    "completion_accounting_receipt": {
+      "path": "target/cargo-host-full-cirrus-20261006/stopped-runtime-accounting.txt",
+      "bytes": 662,
+      "sha256": "246833b213e78d1dfa0ad29f52290ef67a8eb1b6fed1120d6a75e2ac6cb5046b"
+    },
+    "build_receipts_archive": {
+      "path": "target/cargo-host-full-cirrus-20261006/build-receipts.tar.gz",
+      "bytes": 109765,
+      "sha256": "8f410013f26b13a2b9b9f52d2d6d8840b3e2912b9fa6a48f278790cf2218ce02"
+    },
+    "terminal_accounting": {
+      "path": "target/cargo-host-full-cirrus-20261006/build-receipts/accounting.txt",
+      "bytes": 348,
+      "sha256": "785fb2ff58070f371c9e170e44aa86d6abe6f5edd4bb93ebe3d9e3e176066763"
+    },
+    "build_acceptance": {
+      "status": "passed",
+      "native_stage_statuses": {
+        "all-feature-build.status": 0,
+        "bindings.status": 0,
+        "completed.status": 0,
+        "default-build.status": 0,
+        "doctor.status": 0,
+        "job-exit.status": 0,
+        "mpi-consumer-build.status": 0,
+        "source-after.status": 0
+      },
+      "torc": {
+        "workflow_id": 1,
+        "job_id": 1,
+        "run_id": 1,
+        "attempt_id": 1,
+        "job_status": "completed",
+        "result_status": "completed",
+        "return_code": 0,
+        "identities_match": true
+      },
+      "compiler_environment": {
+        "CARGO_UNSTABLE_HOST_CONFIG": "true",
+        "CARGO_UNSTABLE_TARGET_APPLIES_TO_HOST": "true",
+        "CARGO_TARGET_APPLIES_TO_HOST": "false",
+        "CARGO_HOST_LINKER": "cc",
+        "CARGO_HOST_RUSTFLAGS": "-C linker-features=-lld -C link-arg=-mno-daz-ftz",
+        "CARGO_HOST_X86_64_UNKNOWN_LINUX_GNU_LINKER": "cc",
+        "CARGO_HOST_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS": "-C linker-features=-lld -C link-arg=-mno-daz-ftz",
+        "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS": "-C linker-features=-lld -C link-arg=-mno-daz-ftz",
+        "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER": "cc"
+      },
+      "scope": "Doctor, binding freshness, default/all-feature compilation, independent MPI consumer compilation and source integrity; no compile-fail fixture or MPI runtime acceptance",
+      "evidence": [
+        {
+          "path": "target/cargo-host-full-cirrus-20261006/build-receipts/torc/cray/538206/workflow-export.json",
+          "bytes": 5164,
+          "sha256": "e99c9e7b5c77fc6ee9442daf4343bf3d78dfad28b3963362ee82756ffd949db5"
+        },
+        {
+          "path": "target/cargo-host-full-cirrus-20261006/build-receipts/torc/cray/538206/acceptance.json",
+          "bytes": 5,
+          "sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74"
+        },
+        {
+          "path": "target/cargo-host-full-cirrus-20261006/build-receipts/receipts/cray/538206/compiler-inputs.txt",
+          "bytes": 1824,
+          "sha256": "187baa0252193e40bd041003b7e321175bc7a9cdd6c77110ed22d634ada18f00"
+        },
+        {
+          "path": "target/cargo-host-full-cirrus-20261006/build-receipts/receipts/cray/538206/source-digest",
+          "bytes": 65,
+          "sha256": "1dda915d20bfefbdab38aed8b623ed5f9f7e3cfaf2caa66d74a840c9092addeb"
+        },
+        {
+          "path": "target/cargo-host-full-cirrus-20261006/build-receipts/receipts/cray/538206/all-feature-build.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        },
+        {
+          "path": "target/cargo-host-full-cirrus-20261006/build-receipts/receipts/cray/538206/bindings.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        },
+        {
+          "path": "target/cargo-host-full-cirrus-20261006/build-receipts/receipts/cray/538206/completed.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        },
+        {
+          "path": "target/cargo-host-full-cirrus-20261006/build-receipts/receipts/cray/538206/default-build.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        },
+        {
+          "path": "target/cargo-host-full-cirrus-20261006/build-receipts/receipts/cray/538206/doctor.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        },
+        {
+          "path": "target/cargo-host-full-cirrus-20261006/build-receipts/receipts/cray/538206/job-exit.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        },
+        {
+          "path": "target/cargo-host-full-cirrus-20261006/build-receipts/receipts/cray/538206/mpi-consumer-build.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        },
+        {
+          "path": "target/cargo-host-full-cirrus-20261006/build-receipts/receipts/cray/538206/source-after.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      ]
+    }
+  },
+  "primary_sources": {
+    "cargo_host_config": "https://doc.rust-lang.org/cargo/reference/unstable.html#host-config",
+    "cargo_environment": "https://doc.rust-lang.org/cargo/reference/config.html#environment-variables",
+    "cargo_host_selection": "https://doc.rust-lang.org/nightly/nightly-rustc/src/cargo/context/target.rs.html#100-108",
+    "cargo_config_lookup": "https://doc.rust-lang.org/nightly/nightly-rustc/src/cargo/context/mod.rs.html#837-848",
+    "locked_trybuild": "https://github.com/dtolnay/trybuild/blob/1.0.121/src/cargo.rs"
+  },
+  "privacy": {
+    "published_rustc_arguments": "Actual argument arrays with toolchain and probe target prefixes replaced by generic placeholders; command environment omitted",
+    "original_log_hashes_retained": true
+  }
+}

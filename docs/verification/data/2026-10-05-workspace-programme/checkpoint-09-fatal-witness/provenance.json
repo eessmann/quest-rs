@@ -1,0 +1,83 @@
+{
+  "schema": "quest-matching-fatal-witness-public-provenance-v1",
+  "publication_status": "private candidates only; root owns publication",
+  "future_namespace": "docs/verification/data/2026-10-05-workspace-programme/checkpoint-09-fatal-witness",
+  "original_numeric_status_fields_unchanged": true,
+  "source_manifest_byte_identical": true,
+  "new_test_build_or_scientific_jobs_during_staging": 0,
+  "normalization": "Host workspace/install/compiler and temporary paths use generic labels; original hashes remain distinct from normalized publication hashes. Historical full checkpoint logs are separately published.",
+  "files": [
+    {
+      "path": "source.json",
+      "bytes": 813,
+      "sha256": "5ed623268e3399c5cc526deed76d31ab780ac48d1e81921caf08c2b38cee27e3",
+      "original_label": "matching-fatal-witness-source.json",
+      "original_bytes": 813,
+      "original_sha256": "5ed623268e3399c5cc526deed76d31ab780ac48d1e81921caf08c2b38cee27e3",
+      "transformation": "byte-identical"
+    },
+    {
+      "path": "historical-red.log",
+      "bytes": 983,
+      "sha256": "e943581696cbe76bdae27cd7f170d422da188de0de2eae65878f9939a0104167",
+      "original_label": "matching-fatal-witness-historical-red.log",
+      "original_bytes": 983,
+      "original_sha256": "e943581696cbe76bdae27cd7f170d422da188de0de2eae65878f9939a0104167",
+      "transformation": "byte-identical"
+    },
+    {
+      "path": "final-green.log",
+      "bytes": 1410,
+      "sha256": "2d129b9c76603a091510b6ca8cf8702c8b6406f1610ceac7a258db4a55866b40",
+      "original_label": "quest-matching-fatal-witness-final-green.log",
+      "original_bytes": 1481,
+      "original_sha256": "ae9d2a985d9328dd995de5a2613ec3c6ab4dc2fa94ac6b4528120d4e8c664c52",
+      "transformation": "generic path normalization only"
+    },
+    {
+      "path": "final-clippy.log",
+      "bytes": 946,
+      "sha256": "a87026c2e11f8c5e4ca86cdaaea5027310e990f26cc505027af3e9a233cfaf4b",
+      "original_label": "quest-matching-fatal-witness-tests-clippy-final.log",
+      "original_bytes": 1017,
+      "original_sha256": "29709832fdb10e213052ab384f84b9be367ded3a530b91338f2d1d3563b3b386",
+      "transformation": "generic path normalization only"
+    },
+    {
+      "path": "diagnosis.md",
+      "bytes": 4530,
+      "sha256": "88c045d6e2a09d8161b89be843d1c014aca87fa867aa708c13a4093f0659dbcd",
+      "original_label": "checkpoint-08-matching-fatal-diagnostic-readonly-review.md",
+      "original_bytes": 4523,
+      "original_sha256": "d313f0979b8faf8ff92fd7cfd2c13473a340c62c8c9335a01617d37be1c9ee8c",
+      "transformation": "generic path normalization only"
+    },
+    {
+      "path": "focused.json",
+      "bytes": 4679,
+      "sha256": "40b56a51cddbbafa08980f81d666a2bc9987a82e3fcaefab28bcffe81c49878d",
+      "original_label": "matching-fatal-witness-focused.json",
+      "original_bytes": 2913,
+      "original_sha256": "f14069c5d40a25e668a0ca8d7c5cd6909b684cb263179552a8b7817a1aeb74ea",
+      "transformation": "Relative/generic artifact labels, explicit published hashes; original numeric/status fields unchanged"
+    },
+    {
+      "path": "report.md",
+      "bytes": 2871,
+      "sha256": "8d776daf574cbb075b09da151d79103a943c8feb9cb311e0a046e42833b43d7f",
+      "original_label": "matching-fatal-witness-report.md",
+      "original_bytes": 3014,
+      "original_sha256": "856daf316b657d725a8e5429077bea72fc5c5789308b01485554450a51d11189",
+      "transformation": "Generic paths and public artifact label normalization only"
+    },
+    {
+      "path": "README.md",
+      "bytes": 1693,
+      "sha256": "3336eb41ca0b52d74a7167cb13100105064fe6188ff0ba61dcb2e34a7144ffb7",
+      "original_label": null,
+      "original_bytes": 1693,
+      "original_sha256": "3336eb41ca0b52d74a7167cb13100105064fe6188ff0ba61dcb2e34a7144ffb7",
+      "transformation": "New publication-neutral scope guide"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "schema": "quest-cmake-historical-context-v1",
+  "reference_path": "docs/verification/data/2026-10-05-workspace-programme/checkpoint-06-verification.json",
+  "reference_bytes": 7072,
+  "reference_sha256": "2aa885d9541f1b545dec6a8dfcdcb994ef0d14fed68e7dd8e099dd4073bf66d8",
+  "checkpoint": "06-mixed-traction-cylinder-and-native-weighted-matching",
+  "workspace_test_source_sha256": "f12c59455b05b563ec996dcc16c60a75a3553488e4481dd396864ad492c4d163",
+  "gates": [
+    {
+      "name": "allfeatures",
+      "command": "cargo nextest run --workspace --all-features --no-fail-fast",
+      "exit_code": 0,
+      "elapsed_seconds": 282.2361863689948,
+      "log_sha256": "7692716429383e557cd45d9458e116107c1c97fb6f032d80c45f48d2ad266230",
+      "seconds": 261.666,
+      "tests_run": 1581,
+      "passed": 1581,
+      "skipped": 6
+    },
+    {
+      "name": "default",
+      "command": "cargo nextest run --workspace --no-fail-fast",
+      "exit_code": 0,
+      "elapsed_seconds": 102.67816966900136,
+      "log_sha256": "25ddee9a5d8914399dd7d45504ec87f6163bee54b346b20258843dbe904af1f4",
+      "seconds": 89.019,
+      "tests_run": 1418,
+      "passed": 1418,
+      "skipped": 1
+    }
+  ],
+  "existing_overview_path": "docs/verification/2026-10-05-workspace-programme.md",
+  "existing_overview_statement": "No CMake module-open failure occurred in these two full test runs. The earlier intermittent cause remains unresolved; this successful checkpoint does not establish a native installation fix.",
+  "context": "Checkpoint05 retained initial all-feature5/default1 CMake module-open failures, later successful reruns without source/install repair. Checkpoint06 full runs succeeded without claiming mechanism fixed. Checkpoint08 recurrence remains unresolved; this package performs no new gate."
+}

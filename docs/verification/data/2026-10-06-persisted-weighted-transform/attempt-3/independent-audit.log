@@ -1,0 +1,148 @@
+{
+  "schema": "persisted-weighted-attempt3-independent-audit-v1",
+  "verdict": "Approved saved-artifact integrity and bounded P1 numerical evidence; overall campaign remains incomplete due to four timeouts.",
+  "read_only_saved_artifacts": true,
+  "physical_or_native_runs": 0,
+  "source_builds": 0,
+  "current_tree_not_used_as_historical_identity": true,
+  "build_source_files": 975,
+  "actual_compiler_local_packages": 16,
+  "historical_consumer_files": 16,
+  "consumer_paths_outside_compiler_source_scope": [
+    "docs/research/persisted-weighted-transform.md"
+  ],
+  "immutable_dataset_files": 29,
+  "rank_receipts": 10,
+  "raw_streams": 14,
+  "before_after_snapshot_sha256": "525bcb4c3c8e3bee35ada4415f4a1764029c180dd723a8810508b8d68f452621",
+  "binary_sha256": "b0be8c8f588370348b8ec45e61da09c6b53b6de9186ff1ed60b52a1d67712b24",
+  "elapsed_wrapper_seconds": 722.8618813700014,
+  "elapsed_driver_seconds": 722.6245635080049,
+  "outcomes": [
+    {
+      "index": 0,
+      "mode": "publish",
+      "world_parts": 8,
+      "status": "completed",
+      "elapsed_seconds": 0.5891056570035289,
+      "stdout_bytes": 2376,
+      "stderr_bytes": 0,
+      "job_stage_known": true
+    },
+    {
+      "index": 1,
+      "mode": "compile",
+      "world_parts": 1,
+      "status": "completed",
+      "elapsed_seconds": 0.5505607180020888,
+      "stdout_bytes": 297,
+      "stderr_bytes": 0,
+      "job_stage_known": true
+    },
+    {
+      "index": 2,
+      "mode": "replay",
+      "world_parts": 1,
+      "status": "completed",
+      "elapsed_seconds": 0.7355873619962949,
+      "stdout_bytes": 295,
+      "stderr_bytes": 0,
+      "job_stage_known": true
+    },
+    {
+      "index": 3,
+      "mode": "replay",
+      "world_parts": 2,
+      "status": "timeout",
+      "elapsed_seconds": 180.00220031999925,
+      "stdout_bytes": 0,
+      "stderr_bytes": 0,
+      "job_stage_known": false
+    },
+    {
+      "index": 4,
+      "mode": "replay",
+      "world_parts": 4,
+      "status": "timeout",
+      "elapsed_seconds": 180.0010509240019,
+      "stdout_bytes": 0,
+      "stderr_bytes": 0,
+      "job_stage_known": false
+    },
+    {
+      "index": 5,
+      "mode": "replay",
+      "world_parts": 8,
+      "status": "timeout",
+      "elapsed_seconds": 180.00073789300222,
+      "stdout_bytes": 0,
+      "stderr_bytes": 0,
+      "job_stage_known": false
+    },
+    {
+      "index": 6,
+      "mode": "split",
+      "world_parts": 4,
+      "status": "timeout",
+      "elapsed_seconds": 180.0015368259992,
+      "stdout_bytes": 0,
+      "stderr_bytes": 0,
+      "job_stage_known": false
+    }
+  ],
+  "p1_calls": [
+    {
+      "index": 0,
+      "adjoint": false,
+      "residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "total_probability": 0.9999999999999915,
+      "success_probability": 0.02345076821797234,
+      "recovered_norm_squared": 2.4613926321583763,
+      "application_seconds": 0.062235935
+    },
+    {
+      "index": 1,
+      "adjoint": true,
+      "residual": 2.962203156364751e-05,
+      "relative_vector_error": 2.9622031563689144e-05,
+      "total_probability": 0.9999999999999899,
+      "success_probability": 0.023450768217972272,
+      "recovered_norm_squared": 2.4613926321583692,
+      "application_seconds": 0.062583747
+    },
+    {
+      "index": 2,
+      "adjoint": false,
+      "residual": 2.962203156220422e-05,
+      "relative_vector_error": 2.9622031562252793e-05,
+      "total_probability": 0.9999999999999915,
+      "success_probability": 0.02345076821797234,
+      "recovered_norm_squared": 2.4613926321583763,
+      "application_seconds": 0.062200654
+    }
+  ],
+  "phase_scalar_reconstruction": {
+    "x": 0.5099019513592784,
+    "polynomial": 0.15313643661118856,
+    "wx_symmetric_imaginary_response": 0.1531364366111887,
+    "absolute_response_difference": 1.3877787807814457e-16,
+    "predicted_relative_error": 2.9622031557208217e-05
+  },
+  "source_identities": [
+    1017135645874412409,
+    4137702323942760639,
+    9519297731046934094
+  ],
+  "record_digests": [
+    6706022727555010557,
+    10627784019892735802,
+    14474623951579437146
+  ],
+  "timed_out_job_stage_unknown": true,
+  "tag_mismatch_is_separate_source_diagnosis": true,
+  "uniform_native_inverse_error_certificate": false,
+  "multihost_capacity_acceptance": false,
+  "cumulative_p1_work": 2945187072
+}
+AUDIT_SHA256 4c17b2c1586a67aa9bf4311254ee9c1177a17a61bb6edea6ad4ae47b6811e876

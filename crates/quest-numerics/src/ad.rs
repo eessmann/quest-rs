@@ -78,7 +78,7 @@ impl<B: Backend> Backend for JetBackend<'_, B> {
 		for value in [&x.value, &x.first, &x.second] {
 			n = n
 				.checked_add(self.0.storage_bytes(value)?)
-				.ok_or(crate::arithmetic::ArithmeticError::Budget("jet storage"))?;
+				.ok_or(mathcore::arithmetic::ArithmeticError::Budget("jet storage"))?;
 		}
 		Ok(n)
 	}
@@ -206,7 +206,7 @@ impl<B: Backend, const N: usize> GradientBackend<'_, B, N> {
 		let zero = self.0.point(0.0)?;
 		let mut data = Vec::new();
 		data.try_reserve_exact(N)
-			.map_err(|_| crate::arithmetic::ArithmeticError::Budget("gradient allocation"))?;
+			.map_err(|_| mathcore::arithmetic::ArithmeticError::Budget("gradient allocation"))?;
 		data.resize(N, zero);
 		Ok(crate::shapes::Matrix::from_vec(data)?)
 	}
@@ -218,7 +218,7 @@ impl<B: Backend, const N: usize> GradientBackend<'_, B, N> {
 		index: usize,
 	) -> Result<Gradient<B::Scalar, N>, B::Error> {
 		if index >= N {
-			return Err(crate::arithmetic::ArithmeticError::Domain("gradient index").into());
+			return Err(mathcore::arithmetic::ArithmeticError::Domain("gradient index").into());
 		}
 		self.0.validate(&value)?;
 		let mut gradient = self.zeros()?;
@@ -254,12 +254,12 @@ impl<B: Backend, const N: usize> Backend for GradientBackend<'_, B, N> {
 			.0
 			.storage_bytes(&x.value)?
 			.checked_add(std::mem::size_of::<Vec<B::Scalar>>())
-			.ok_or(crate::arithmetic::ArithmeticError::Budget(
+			.ok_or(mathcore::arithmetic::ArithmeticError::Budget(
 				"gradient storage",
 			))?;
 		for value in x.gradient.as_slice() {
 			n = n.checked_add(self.0.storage_bytes(value)?).ok_or(
-				crate::arithmetic::ArithmeticError::Budget("gradient storage"),
+				mathcore::arithmetic::ArithmeticError::Budget("gradient storage"),
 			)?;
 		}
 		Ok(n)
@@ -394,7 +394,7 @@ impl<B: Backend> Backend for FirstBackend<'_, B> {
 			.storage_bytes(&x.value)?
 			.checked_add(self.0.storage_bytes(&x.first)?)
 			.ok_or_else(|| {
-				crate::arithmetic::ArithmeticError::Budget("first derivative storage").into()
+				mathcore::arithmetic::ArithmeticError::Budget("first derivative storage").into()
 			})
 	}
 	fn working_scalar_bytes(&self) -> usize {
@@ -520,7 +520,7 @@ where
 {
 	const { assert!(N > 0 && M > 0, "zero Jacobian dimension") };
 	if N > limits.max_inputs || M > limits.max_outputs {
-		return Err(crate::arithmetic::ArithmeticError::Budget("Jacobian dimension").into());
+		return Err(mathcore::arithmetic::ArithmeticError::Budget("Jacobian dimension").into());
 	}
 	let mut scalar_bytes = backend.working_scalar_bytes();
 	for value in &input {
@@ -529,12 +529,16 @@ where
 	}
 	let count = N
 		.checked_mul(M)
-		.ok_or(crate::arithmetic::ArithmeticError::Budget("Jacobian shape"))?;
+		.ok_or(mathcore::arithmetic::ArithmeticError::Budget(
+			"Jacobian shape",
+		))?;
 	let cells = N
 		.checked_mul(N)
 		.and_then(|n| n.checked_add(count.checked_mul(2)?))
 		.and_then(|n| n.checked_add(N.checked_add(M)?.checked_mul(3)?))
-		.ok_or(crate::arithmetic::ArithmeticError::Budget("Jacobian shape"))?;
+		.ok_or(mathcore::arithmetic::ArithmeticError::Budget(
+			"Jacobian shape",
+		))?;
 	let bytes = cells
 		.checked_mul(scalar_bytes)
 		.and_then(|n| {
@@ -543,49 +547,51 @@ where
 					.checked_mul(std::mem::size_of::<Vec<B::Scalar>>())?,
 			)
 		})
-		.ok_or(crate::arithmetic::ArithmeticError::Budget(
+		.ok_or(mathcore::arithmetic::ArithmeticError::Budget(
 			"Jacobian storage",
 		))?;
 	if bytes > limits.max_bytes {
-		return Err(crate::arithmetic::ArithmeticError::Budget("Jacobian storage").into());
+		return Err(mathcore::arithmetic::ArithmeticError::Budget("Jacobian storage").into());
 	}
 	let mut seeds = Vec::new();
 	seeds
 		.try_reserve_exact(N)
-		.map_err(|_| crate::arithmetic::ArithmeticError::Budget("Jacobian seeds"))?;
+		.map_err(|_| mathcore::arithmetic::ArithmeticError::Budget("Jacobian seeds"))?;
 	let mut ad = GradientBackend(backend);
 	for (index, value) in input.into_iter().enumerate() {
 		seeds.push(ad.variable(value, index)?);
 	}
 	let outputs = function(&mut ad, &seeds)?;
 	if outputs.len() != M {
-		return Err(crate::arithmetic::ArithmeticError::Domain("Jacobian output shape").into());
+		return Err(mathcore::arithmetic::ArithmeticError::Domain("Jacobian output shape").into());
 	}
 	let mut actual = 0_usize;
 	for output in &outputs {
 		ad.validate(output)?;
 		actual = actual.checked_add(ad.storage_bytes(output)?).ok_or(
-			crate::arithmetic::ArithmeticError::Budget("Jacobian output storage"),
+			mathcore::arithmetic::ArithmeticError::Budget("Jacobian output storage"),
 		)?;
 	}
 	// Higher-precision values returned by an open callback must also be admitted.
 	if actual.saturating_mul(2).saturating_add(bytes) > limits.max_bytes {
-		return Err(crate::arithmetic::ArithmeticError::Budget("Jacobian output storage").into());
+		return Err(
+			mathcore::arithmetic::ArithmeticError::Budget("Jacobian output storage").into(),
+		);
 	}
 	let mut data = Vec::new();
 	data.try_reserve_exact(count)
-		.map_err(|_| crate::arithmetic::ArithmeticError::Budget("Jacobian allocation"))?;
+		.map_err(|_| mathcore::arithmetic::ArithmeticError::Budget("Jacobian allocation"))?;
 	let mut values = Vec::new();
 	values
 		.try_reserve_exact(M)
-		.map_err(|_| crate::arithmetic::ArithmeticError::Budget("Jacobian values"))?;
+		.map_err(|_| mathcore::arithmetic::ArithmeticError::Budget("Jacobian values"))?;
 	for output in outputs {
 		data.extend(output.gradient.into_vec());
 		values.push(output.value);
 	}
 	let value = values
 		.try_into()
-		.map_err(|_| crate::arithmetic::ArithmeticError::Domain("Jacobian output shape"))?;
+		.map_err(|_| mathcore::arithmetic::ArithmeticError::Domain("Jacobian output shape"))?;
 	Ok(Jacobian {
 		value,
 		derivative: crate::shapes::Matrix::from_vec(data)?,

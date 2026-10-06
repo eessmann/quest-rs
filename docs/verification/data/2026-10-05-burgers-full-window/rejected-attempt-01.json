@@ -1,0 +1,5 @@
+{
+  "quantum_solution_claimed": false,
+  "reason": "case execution is unsupported: QSP certification admission: certification resource budget: modeled verification memory",
+  "status": "rejected-or-failed"
+}

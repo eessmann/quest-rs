@@ -1,0 +1,191 @@
+{
+  "schema": "quest-sparse-capacity-followup-v1",
+  "source_digest": "8e02c49a7acf70a84f0c55aa40caba647024090a8cd72ffd3267bb72d8d3925b",
+  "source_files": {
+    "crates/quest-sys/src/cxx_bindings/quest_bindings.cpp": "03fd91b5f7cc2bd0468a25c085a45fce87a84e33ce4b93a3e471fc9100cb666a",
+    "crates/quest-sys/src/lib.rs": "d95ccbf5d6c6c63dd997f44a51d5e5af987b31c6a9ecc1e8f6f6efc049070d6a",
+    "crates/quest/examples/sparse_capacity.rs": "d7bbfb3c669babbe86c309f7f63dc460fab5ddaa476c490ffe72e738b18ba3bf",
+    "crates/quest/examples/sparse_capacity/support.rs": "61e2e1e2039b58ac0c394b8a34320a87af2a8f6a4d69b828b42fee7e1ab0b4a9",
+    "crates/quest/src/qsvt/matching/collective.rs": "8112063683d9e6e2be350334b9c4a8e6211d6a895d60ef5b302fbf901405d743",
+    "crates/quest/src/qsvt/matching/preprocess.rs": "22285fc6bec2fee4379888173ff617f40a5b099f8dac1b25de812a2754ba5b63",
+    "crates/quest/src/qsvt/matching/preprocess/color.rs": "5cc351e9be346ffd3ccc7ba697f8a0e44c238e6a40d854e560004b3419eb9e69",
+    "crates/quest/src/qsvt/matching/preprocess/completion.rs": "410513c2e1f5c29d8f0dff31b8e20e6cc96ea63b54d12b61bd4735b45a1f747c",
+    "crates/quest/src/qsvt/matching/preprocess/transport.rs": "22ecf73ed3370a5618b1e816a5267270532ea43a8cb4f22073b3d1661aa215e7",
+    "crates/quest/src/qsvt/persisted_matching.rs": "8e3b89fda7614f41e3731189f9ccdc460af531dad360348c97d2ea08ddf90aaf",
+    "crates/quest/src/qsvt/persisted_matching/directory.rs": "3b9ee3e36dbf5817295c57ad1139b1ae606cae37b699fa7754c76fb27ccefe9c",
+    "crates/quest/src/qsvt/persisted_matching/loading.rs": "39e23d5df463513ec5fb31a0c15fb1d8de948fdebb2be073d6a692ea1870d5e7",
+    "crates/quest/src/qsvt/persisted_matching/preparation.rs": "20e91bdfb051913cb387bc050f74321256f3a2ba88efe59cdd346936295076d4",
+    "crates/quest/src/register.rs": "98b2004b97989e2734b25aa73a2643b8e35a31241d990317e2d67aa714b725cb",
+    "docs/verification/fixtures/cirrus/capacity.py": "8e45dc775d42cbc37d00b24f30518236b481231a64d7c7538f20d01c9609ff66",
+    "docs/verification/fixtures/cirrus/capacity_resource_test.py": "a0be2c72b2f92cb456fbe7e756dfcd534d05e6c5b0055a77d366bfafd8cde7ea"
+  },
+  "local_checks": {
+    "all-features": {
+      "exit_status": 100,
+      "log_sha256": "58f9318dd2ebf2d8d60a0a20519eb03c9e69e607ea7d18487fa4031cd3cca93c"
+    },
+    "doctests": {
+      "exit_status": 0,
+      "log_sha256": "8befcb6dd313d7e52005dd25851bb05ed2b59171c70c9e614d2098b684cae17c"
+    },
+    "default-check": {
+      "exit_status": 0,
+      "log_sha256": "bd6e3f9cf7048e966c48cddefaa68561e8c163cb3ddd540b83db9ea009b281ba"
+    },
+    "clippy": {
+      "exit_status": 0,
+      "log_sha256": "e12fada239b5e0a29bd2063e42e234ffb63a8ea619e1ef964175bf4b0928c7c1"
+    },
+    "bindings": {
+      "exit_status": 0,
+      "log_sha256": "31b3762676adb6d199d764c4844c1d43adfa5279235d126cfb2ea46840eab520"
+    },
+    "fmt": {
+      "exit_status": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "whitespace": {
+      "exit_status": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "python": {
+      "exit_status": 0,
+      "log_sha256": "fcfac626448b4ba0692f791a27807725daf141c5006ff2feff0119e234a9c2eb"
+    },
+    "default-tests": {
+      "exit_status": 0,
+      "log_sha256": "e1f3f6323ca0a3675b336e3abd3eaa456ed47beabb1109bd72e88d832f4c9ccc"
+    },
+    "default-doctests": {
+      "exit_status": 0,
+      "log_sha256": "4aad383406f520ff6691c9fb2a9cb05a61d17ea3bf6fca008fccd6478941b022"
+    }
+  },
+  "all_feature_nextest": {
+    "passed": 1698,
+    "failed": 1,
+    "skipped": 6,
+    "seconds": 352.985,
+    "failure": "quest-build probe::tests::cmake_build_evaluates_target_requirements_and_paths_with_spaces",
+    "cause": "CMake could not open an installed system module; cause unresolved; nine unchanged traced runs passed"
+  },
+  "all_feature_doctests": {
+    "passed": 65,
+    "failed": 0,
+    "ignored": 1
+  },
+  "cirrus_python_tests": 58,
+  "acceptance": {
+    "strict_capacity": "open",
+    "controlled_profile_dimension_growth_sufficient": false,
+    "macos_execution": "unavailable",
+    "current_multihost_followup": "queued"
+  },
+  "default_nextest": {
+    "passed": 1512,
+    "failed": 0,
+    "skipped": 1,
+    "seconds": 108.571
+  },
+  "local_capacity": {
+    "p1": {
+      "receipt_sha256": "6a33c37eb697568d77db213ca24bec8a85b16f73d9ffc254f1c57d85052b9f57",
+      "schema_version": 4,
+      "complete": true,
+      "capacity_closed": false,
+      "dimension": 64,
+      "ranks": 1,
+      "physical_hosts": 1,
+      "requested_openmp_threads": 2,
+      "repetitions": 3,
+      "stage_max_seconds": {
+        "preprocessing": 0.002597225,
+        "persistence": 0.011910121,
+        "load": 0.004718769,
+        "prepare": 0.000728884,
+        "execution": 0.002158623
+      },
+      "rank_host_array_bytes": [
+        16384
+      ]
+    },
+    "p2": {
+      "receipt_sha256": "fa39da104c2532cf556270ee22ca98baa4949bb16e05d4b803b605460a711342",
+      "schema_version": 4,
+      "complete": true,
+      "capacity_closed": false,
+      "dimension": 64,
+      "ranks": 2,
+      "physical_hosts": 1,
+      "requested_openmp_threads": 2,
+      "repetitions": 3,
+      "stage_max_seconds": {
+        "preprocessing": 0.002748516,
+        "persistence": 0.014287965,
+        "load": 0.004813998,
+        "prepare": 0.000907335,
+        "execution": 0.004170295
+      },
+      "rank_host_array_bytes": [
+        16384,
+        16384
+      ]
+    }
+  },
+  "source_identity_scope": "All recorded source files match the immutable deployed snapshot; later documentation receipts are a separate documentation-only delta.",
+  "default_doctests": {
+    "passed": 55,
+    "failed": 0,
+    "ignored": 1
+  },
+  "queued_cluster_followup": {
+    "status": "pending",
+    "execution_evidence": false,
+    "baseline_dependency": "537317",
+    "compiler_lanes": {
+      "cray": {
+        "build": "537399",
+        "paired": {
+          "2": "537400",
+          "4": "537401",
+          "8": "537402"
+        },
+        "capacity": {
+          "2": "537405",
+          "4": "537406",
+          "8": "537407"
+        }
+      },
+      "gnu": {
+        "build": "537408",
+        "paired": {
+          "2": "537409"
+        },
+        "capacity": {
+          "2": "537410",
+          "4": "537411",
+          "8": "537412"
+        }
+      }
+    },
+    "capacity_configuration": {
+      "dimension": 65536,
+      "repetitions": 3,
+      "original_input_bytes": 4194304,
+      "ranks_per_node": 1,
+      "requested_openmp_threads": 288,
+      "exclusive_nodes": true,
+      "rank_process_address_space_cap_bytes": 8589934592,
+      "managed_rank_budget_bytes": 4294967296,
+      "walltime_minutes": 15,
+      "case_deadline_seconds": 600
+    },
+    "binary_identities": "pending completed compiler-specific builds"
+  },
+  "next_execution_stage": {
+    "status": "design-only",
+    "description": "Exclusively reuse native distributed CPU communication array during matching routing; no second full Qureg; retain conservative generic reservations initially",
+    "implemented_in_snapshot": false,
+    "design_document": "../../../research/distributed-capacity-memory.md"
+  }
+}

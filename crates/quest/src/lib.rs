@@ -20,6 +20,7 @@ mod collective_payload;
 mod environment;
 mod error;
 mod execution;
+pub mod native_admission;
 mod oracle_execution;
 mod output_storage;
 mod payload_execution;
@@ -40,3 +41,6 @@ pub use num_complex::Complex64;
 pub use quest_compile::*;
 pub use register::{DensityMatrix, Register, RegisterDeployment, RegisterKind, StateVector};
 pub use values::{MemoryBudget, Outcome, Probability, QubitCount, Shots};
+
+#[cfg(all(feature = "mpi", quest_native_mpi))]
+pub mod distributed_constraints;

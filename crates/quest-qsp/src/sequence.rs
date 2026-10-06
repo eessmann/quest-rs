@@ -83,6 +83,19 @@ impl<C: PhaseConvention> PhaseSequence<C> {
 	pub fn values(&self) -> &[f64] {
 		&self.values
 	}
+	/// Full retained phase capacity and sequence/Vec/Arc metadata, excluding
+	/// allocator bookkeeping. Clones report the shared allocation in full.
+	/// # Errors
+	/// Rejects integer overflow in retained-storage accounting.
+	pub fn retained_bytes(&self) -> Result<usize> {
+		self.values
+			.capacity()
+			.checked_mul(size_of::<f64>())
+			.and_then(|n| n.checked_add(size_of::<Self>()))
+			.and_then(|n| n.checked_add(size_of::<Vec<f64>>()))
+			.and_then(|n| n.checked_add(2_usize.checked_mul(size_of::<usize>())?))
+			.ok_or(Error::Budget("phase sequence retained storage"))
+	}
 	/// Accumulated numerical convention-conversion diagnostic, not a certificate.
 	#[must_use]
 	pub const fn conversion_roundoff_estimate(&self) -> f64 {
@@ -150,6 +163,17 @@ pub struct ConvertedProjectorPhases {
 	roundoff_estimate: f64,
 }
 impl ConvertedProjectorPhases {
+	/// Actual converted Vec capacity and scalar owner, excluding allocator overhead.
+	/// # Errors
+	/// Rejects checked retained-storage overflow.
+	pub fn retained_bytes(&self) -> Result<usize> {
+		self.values
+			.capacity()
+			.checked_mul(size_of::<f64>())
+			.and_then(|n| n.checked_add(size_of::<Self>()))
+			.ok_or(Error::Budget("converted phase retained storage"))
+	}
+
 	/// Converted projector-rotation angles in radians, in product order.
 	#[must_use]
 	pub fn values(&self) -> &[f64] {
@@ -381,5 +405,29 @@ impl FrozenCandidate<UnitCircleResponse> {
 		ControlSequence {
 			matrices: Arc::clone(&self.controls),
 		}
+	}
+}
+
+#[cfg(test)]
+mod retained_tests {
+	#[test]
+	#[allow(
+		clippy::panic_in_result_fn,
+		reason = "Capacity regression asserts independently computed accessible Vec capacity bytes"
+	)]
+	fn converted_phase_bytes_use_capacity_including_excess() -> super::Result<()> {
+		let mut values = Vec::with_capacity(1024);
+		values.extend([0.1, 0.2]);
+		let actual = values
+			.capacity()
+			.checked_mul(size_of::<f64>())
+			.and_then(|n| n.checked_add(size_of::<super::ConvertedProjectorPhases>()))
+			.ok_or(super::Error::Budget("test bytes"))?;
+		let converted = super::ConvertedProjectorPhases {
+			values,
+			roundoff_estimate: 0.,
+		};
+		assert_eq!(converted.retained_bytes()?, actual);
+		Ok(())
 	}
 }

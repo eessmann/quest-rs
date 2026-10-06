@@ -1,0 +1,17 @@
+{
+  "passed": [
+    "finite norm drift retained as accuracy-failure",
+    "contradictory accuracy label rejected",
+    "later non-object call rejected before aggregate any",
+    "underflow scale is ValueError not uncaught division",
+    "cumulative work must equal three actual admissions",
+    "unequal-rank counters sum and peaks max",
+    "aggregate overflow saturates and invalidates exactness",
+    "receipt byte/hash/decoder use one captured snapshot",
+    "hash-consistent non-object receipt rejected",
+    "terminal provenance preserves partial scientific failure"
+  ],
+  "count": 10,
+  "frozen_five_files_match": true,
+  "physical_or_subprocess_jobs": 0
+}

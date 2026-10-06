@@ -7,6 +7,7 @@ repository.workspace = true
 publish = false
 
 [dependencies]
+mathcore.workspace = true
 dashu-int.workspace = true
 serde = { workspace = true, features = ["derive"] }
 serde_json.workspace = true
@@ -16,6 +17,9 @@ quest-qsvt = { workspace = true, features = ["certification"] }
 quest-qsp = { workspace = true, features = ["certification"] }
 clap = { workspace = true, features = ["derive"] }
 
+sha2 = { workspace = true, optional = true }
+quest-qsvt-io = { workspace = true, optional = true }
+
 quest = { workspace = true, optional = true, features = ["qsvt"] }
 
 [lints]
@@ -23,6 +27,15 @@ workspace = true
 
 [features]
 quantum = ["dep:quest"]
+distributed = ["quantum", "quest/mpi", "dep:quest-qsvt-io", "dep:sha2"]
 
 [build-dependencies]
 quest-build.workspace = true
+
+[[example]]
+name = "distributed_history"
+required-features = ["distributed"]
+
+[dev-dependencies]
+quest-test-support.workspace = true
+sha2.workspace = true

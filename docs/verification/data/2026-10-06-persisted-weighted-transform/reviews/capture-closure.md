@@ -1,0 +1,5 @@
+# Capture correction independent closure
+
+The frozen parent-owned pipe correction is independently approved in persisted-weighted-transform-pipe-capture-independent-review.md. Reviewer reran25 groups in4.563s and the minimal eight-rank MPI_Init/Finalize smoke in0.501s (296stdout bytes/0stderr; no truncation or timeout), then verified all five Python and14 combined snapshot hashes unchanged. Runner SHA0313e0ba2ab937873d08012b6214ab442cc2a342bf1f786e547aa61fdb635e26; Python manifest407fe4fc823887bec31912a0076a75547a3c18c7dd35b9c77e9102775df02b0e; combined manifestfac76f206b3d7aca6e0b9c89e1b021c864084ed6c9724f617a35320d896ccdb1.
+
+Original implementation report, evidence and attempt1 remain preserved. Correction scope is only output capture/global-file-policy semantics, not scientific or native implementation. No source edits or campaign execution were performed by this worker. Parent separately completed a stable attempt2 build and released exactly one fixed campaign; all source remains frozen while that execution proceeds. No inference about its outcome is made here.

@@ -1,0 +1,89 @@
+{
+  "scope": "Read-only source diagnosis while campaign3 was running. No native execution, debugger attachment, build, source edit or live-job instrumentation.",
+  "files": [
+    {
+      "path": "crates/quest/examples/persisted_weighted_transform/execution.rs",
+      "sha256": "bf0caa2f11c0c3aa8a7e82bc3b89f1850d1f767811f958a5c61887e31d12d813"
+    },
+    {
+      "path": "crates/quest/examples/persisted_weighted_transform/runtime.rs",
+      "sha256": "1a3d7bd04c8f6d91ab834b298e7cbc1dd8872578d4c98123d0b8fb47def0bce9"
+    },
+    {
+      "path": "crates/quest/examples/persisted_weighted_transform/phases.rs",
+      "sha256": "5624d1c42f8b0bb4bd7754f9987982c516cf2958243c864f46f4cd1c1e6717eb"
+    },
+    {
+      "path": "crates/quest-sys/src/mpi.rs",
+      "sha256": "838489993e2cbb9f70d90fe64eaeb01c7ad9f976249eae73973bafcc302c154e"
+    },
+    {
+      "path": "crates/quest/tests/persisted_weighted_transform.rs",
+      "sha256": "cc81cc88da634463a4fc809b53a31a4d7f64b3c10fd4f3853dabd9220224a0d4"
+    },
+    {
+      "path": "crates/quest/src/collective.rs",
+      "sha256": "85def10fb6217b7fd9dadf0c926426be8d4e3c73ae073747d5d6cabe004f5eed"
+    }
+  ],
+  "pair_matching": [
+    {
+      "parts": 2,
+      "rank": 0,
+      "peer": 1,
+      "rank_tag": 1,
+      "peer_tag": 0,
+      "tags_match": false
+    },
+    {
+      "parts": 4,
+      "rank": 0,
+      "peer": 2,
+      "rank_tag": 2,
+      "peer_tag": 0,
+      "tags_match": false
+    },
+    {
+      "parts": 4,
+      "rank": 1,
+      "peer": 3,
+      "rank_tag": 3,
+      "peer_tag": 1,
+      "tags_match": false
+    },
+    {
+      "parts": 8,
+      "rank": 0,
+      "peer": 4,
+      "rank_tag": 4,
+      "peer_tag": 0,
+      "tags_match": false
+    },
+    {
+      "parts": 8,
+      "rank": 1,
+      "peer": 5,
+      "rank_tag": 5,
+      "peer_tag": 1,
+      "tags_match": false
+    },
+    {
+      "parts": 8,
+      "rank": 2,
+      "peer": 6,
+      "rank_tag": 6,
+      "peer_tag": 2,
+      "tags_match": false
+    },
+    {
+      "parts": 8,
+      "rank": 3,
+      "peer": 7,
+      "rank_tag": 7,
+      "peer_tag": 3,
+      "tags_match": false
+    }
+  ],
+  "observed_job_stage_unknown": true,
+  "tests_gap": "Existing consumer cold differential invokes execution::readout_floor only; actual execution::readout is called only from production replay."
+}

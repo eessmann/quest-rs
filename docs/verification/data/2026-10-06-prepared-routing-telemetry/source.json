@@ -1,0 +1,36 @@
+{
+  "schema": "quest-prepared-routing-telemetry-source-v1",
+  "scope": "Six scoped Rust runtime/helper/test files and one method document; excludes dependencies/native QuEST/build closure/historical checkpoint identities. Native router unchanged.",
+  "aggregate_algorithm": "SHA-256 of sorted relative path UTF8 + NUL + lowercase content SHA256 hex + LF",
+  "aggregate_sha256": "814ecdea1f18c5b4e11bb68466cd1152fedc6a0f912b5f45c39d729b8fc44fe4",
+  "files": [
+    {
+      "path": "crates/quest/src/qsvt/matching_lcu.rs",
+      "sha256": "f60cfaf45f8f91c38a259e792ba7c12a1642a090d4fc424edf83d0fb0e8328f4"
+    },
+    {
+      "path": "crates/quest/src/qsvt/matching_lcu/collective.rs",
+      "sha256": "daa1234792213a93b4749b3baba5e9833f928343f60dd65e210861b7b7b8c11d"
+    },
+    {
+      "path": "crates/quest/src/qsvt/matching_lcu/telemetry.rs",
+      "sha256": "45411ddb17b0a76196a7e5797edd1d2e894381c2668b3b354778476b88de706c"
+    },
+    {
+      "path": "crates/quest/src/qsvt/matching_lcu_transform.rs",
+      "sha256": "5f586a0d65a56c454b02b75b46c96d2c0693153bb857abfe28d5154d6e6825e9"
+    },
+    {
+      "path": "crates/quest/src/qsvt/matching_lcu_transform/collective.rs",
+      "sha256": "aad5152da59ff3b9db50d5306394d385e6d87c9eb99b7aec3d8a6ff606bbcd4c"
+    },
+    {
+      "path": "crates/quest/tests/routing_telemetry.rs",
+      "sha256": "71bfdf3dad03364389d591eab67fc78653fe76273aeff85eed6bb0bda18e1321"
+    },
+    {
+      "path": "docs/research/prepared-routing-telemetry.md",
+      "sha256": "15a606d56fe37cb03013363cbffac997e65aaeef67afc9939860371fa5efe8e7"
+    }
+  ]
+}

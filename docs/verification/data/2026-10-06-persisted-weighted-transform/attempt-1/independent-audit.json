@@ -1,0 +1,105 @@
+{
+  "schema": "quest-persisted-weighted-attempt-1-independent-audit-v1",
+  "verdict": "approved-retained-failure-evidence-only",
+  "reruns": 0,
+  "source_files": 970,
+  "source_aggregate_sha256": "b0d6dbe054576507fdbaa2b9777a1695fcf660ca565052a41402a923d38b39f5",
+  "source_manifest_file_sha256": "21587e89a90d3281f22f3f633ac7bf5201aeb760574401cc182c08b11b2b7519",
+  "consumer_manifest_files": 14,
+  "consumer_manifest_sha256": "a1a1a1edc4700731aa83249450a2257a6a839b4a8827c74a70ef00a7157f9e58",
+  "actual_local_packages": [
+    "crates/quest-build/Cargo.toml",
+    "crates/quest-compile/Cargo.toml",
+    "crates/quest-language/Cargo.toml",
+    "crates/quest-macros/Cargo.toml",
+    "crates/quest-math/Cargo.toml",
+    "crates/quest-numerics/Cargo.toml",
+    "crates/quest-polynomial/Cargo.toml",
+    "crates/quest-qasm/Cargo.toml",
+    "crates/quest-qsp/Cargo.toml",
+    "crates/quest-qsvt-io/Cargo.toml",
+    "crates/quest-qsvt/Cargo.toml",
+    "crates/quest-symbolic/Cargo.toml",
+    "crates/quest-synthesis/Cargo.toml",
+    "crates/quest-sys/Cargo.toml",
+    "crates/quest/Cargo.toml",
+    "crates/vendor/mathcore/Cargo.toml"
+  ],
+  "compiler_records": 373,
+  "all_compiler_packages": 230,
+  "native_files": 29,
+  "tool_executable_records": 5,
+  "snapshots_verified": 4,
+  "native_execution_binary_sha256": "2bdc5ca75c018f9f5fe40b33d08050bb313f5b41b14901252ecaa4774426cf87",
+  "receipt_sha256": "5426cd73301c5489b87543d09e629d1da2920b0a45ad0608ce589046013f592b",
+  "outcomes": {
+    "publication_process_failure": 1,
+    "dependent_not_run": 6,
+    "inverse_requests_executed": 0
+  },
+  "returncode": 153,
+  "signal_from_launcher": 25,
+  "stdout_bytes": 555,
+  "stderr_bytes": 0,
+  "dataset_entries": 0,
+  "limits": {
+    "address_space_bytes": 2147483648,
+    "file_bytes": 4194304,
+    "seconds": 180
+  },
+  "elapsed_seconds": {
+    "publication_child": 2.168690227001207,
+    "campaign_driver": 2.2717797120058094,
+    "outer_execution": 2.5020424850008567
+  },
+  "scope_qualifications": [
+    "970-file source identity is an audited workspace superset, not exact16-package compiler input closure",
+    "rustc/cargo executable hashes identify rustup launcher; version output recorded separately",
+    "external registry source and dependent shared libraries/arbitrary environment not hashed; no hermetic claim",
+    "launcher reports SIGXFSZ but saved artifacts do not identify offending file or establish MPI-internal cause",
+    "child file cap applies all inherited regular-file writes, not only captured stdout/stderr; not an output-volume limit alone",
+    "empty dataset/no dependent jobs means no N32 inverse accuracy or distributed replay evidence"
+  ],
+  "evidence": [
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-attempt-1-independent-audit.py",
+      "bytes": 7785,
+      "sha256": "5f44b80a4beb709cef8d9ffaa27fa2e79b234b721ee7e54115fc7059178125ec"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-attempt-1-independent-audit.log",
+      "bytes": 2670,
+      "sha256": "9e592838e717e1011d929e9a63927634c64dc27797932161bfe2420812f1da01"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-attempt-1-independent-audit-results.json",
+      "bytes": 2670,
+      "sha256": "9e592838e717e1011d929e9a63927634c64dc27797932161bfe2420812f1da01"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-final-build-1-attestation.json",
+      "bytes": 2535,
+      "sha256": "c2e27731293e8d8b1589235edfc24ac3ee9a44a37a63d4ecfe4c10749639825c"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-final-execution-1.json",
+      "bytes": 2804,
+      "sha256": "bcb40281f025d3898988c3dcc8bcb0c673f642811c034f9c92d58804c89a2856"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-1/receipt.json",
+      "bytes": 1999,
+      "sha256": "5426cd73301c5489b87543d09e629d1da2920b0a45ad0608ce589046013f592b"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-1/job-0.stdout",
+      "bytes": 555,
+      "sha256": "395f87919c57f29ace9a205bbcea70e123a80def08586fb63da9f79bdb1e0049"
+    },
+    {
+      "path": "<private-artifacts>/quest-persisted-weighted-campaign-1/job-0.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

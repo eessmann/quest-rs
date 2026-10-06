@@ -1,0 +1,102 @@
+{
+  "files": [
+    {
+      "file": "cylinder-p2-evolution-fix-2-source-manifest.json",
+      "sha256": "c40cc89a2b33e94a0e60f30b5c4e0075a9631368a10a4f4c310b32f32d84cdad"
+    },
+    {
+      "file": "quest-cylinder-evolution-attempt-3-before.json",
+      "sha256": "e45b8e9a64ee01698413e70c9a457a35775974280388dcf5a3df6e0da41a2da3"
+    },
+    {
+      "file": "quest-cylinder-evolution-attempt-3-after.json",
+      "sha256": "e45b8e9a64ee01698413e70c9a457a35775974280388dcf5a3df6e0da41a2da3"
+    },
+    {
+      "file": "quest-cylinder-evolution-campaign-source-after.json",
+      "sha256": "e45b8e9a64ee01698413e70c9a457a35775974280388dcf5a3df6e0da41a2da3"
+    },
+    {
+      "file": "quest-cylinder-evolution-attempt-3-build.jsonl",
+      "sha256": "2498d26e87b5054edf090a03f01e0c9864f6e0d4f8c067d08c787291783c85f9"
+    },
+    {
+      "file": "quest-cylinder-evolution-attempt-3-build.log",
+      "sha256": "92e78b40debadcd7940065b593d0baed9ce293a1d8a5605c0870a606250cf336"
+    },
+    {
+      "file": "quest-cylinder-evolution-build-attestation.json",
+      "sha256": "d744fdd0873a3ef2b00463725d7e71968153a7ead40e4bbe89a34931298086f5"
+    },
+    {
+      "file": "receipt.json",
+      "sha256": "2ebf2a2e00331ab30d1c20282fdba02e7f2011a76112d0ed4c51e8e4220c89f1"
+    },
+    {
+      "file": "cylinder_p2_evolution.py",
+      "sha256": "e125bb3ffc4782c16b7ef289975e375c9d7978155ea7f8f809f59afc40cc33ae"
+    },
+    {
+      "file": "test_cylinder_evolution_runner.py",
+      "sha256": "fd18f3999972832939f143d65f37f1617824a528f275f11c9815cd95d118b1b0"
+    },
+    {
+      "file": "quest-cylinder-evolution-build.jsonl",
+      "sha256": "a1be99c63376dd9ae19dcaa32ca1fc5b1d6a5cff5de3156ae0a1e7b8aa8e4125"
+    },
+    {
+      "file": "quest-cylinder-evolution-build.log",
+      "sha256": "045a3c9ed44025bffde24d9f6ab8f0ccd4bba2b8ca3e5a93bff40f59356e035e"
+    },
+    {
+      "file": "quest-cylinder-evolution-relevant-build.jsonl",
+      "sha256": "33af10e4574122d219d4f6e2dab30992f1c4a35817a88c763084bd1ed2ef3569"
+    },
+    {
+      "file": "quest-cylinder-evolution-relevant-build.log",
+      "sha256": "4cea4639552ac07702e3e73156cc19690bd69a476e3440045a4eb0dfdceda280"
+    }
+  ],
+  "rejected_build_attempts": [
+    {
+      "scope": "whole",
+      "before_manifest": "quest-cylinder-evolution-build-before.json",
+      "before_manifest_sha256": "fa17283530ae4f1660241600e27be9c2c238f60a101de0cdad8f1973364b08cc",
+      "after_manifest": "quest-cylinder-evolution-build-after.json",
+      "after_manifest_sha256": "f3446d0916c25494525ed52e533dd9ad4b41e0f1f644e747c3114a0ef1792586",
+      "changes": [
+        {
+          "path": "crates/quest/src/qsvt/matching_lcu_transform.rs",
+          "before_sha256": "3b03c769882a840f7b5c1c9a97e2f1c3a9f31cfc895629e7367f6186994547d5",
+          "after_sha256": "630b1b25c7b2082afc1f072c3a4130c3874dcaf90cc5e19bdfded9593baf4e5b"
+        },
+        {
+          "path": "crates/quest/src/qsvt/matching_lcu_transform/collective.rs",
+          "before_sha256": "79b87338483ad58e14ef0e90dae6b15cae19a71da8256cc168de48d442b51577",
+          "after_sha256": "28266e0815097c999937fd4b2731ca8d5d5c30b242bd0c357c47b47af42defdf"
+        }
+      ]
+    },
+    {
+      "scope": "default-packages",
+      "before_manifest": "quest-cylinder-evolution-relevant-build-before.json",
+      "before_manifest_sha256": "ca5aa595f7621e31955ca6b0022308c2d1959c535f309c57a22bd2affad562b2",
+      "after_manifest": "quest-cylinder-evolution-relevant-build-after.json",
+      "after_manifest_sha256": "a11896505fb05b3e3bfee6e46910fa29ef9d1fa838b229964f3d7acbcb74ecd8",
+      "changes": [
+        {
+          "path": "crates/quest-qsp/src/sequence.rs",
+          "before_sha256": "b98f4a33d390af98749d922ad2f972a3be3358f3b009c6dff304a7170ef42e8b",
+          "after_sha256": "05ab18fa8c15442d8ed8561ebba57ada8ffb56c1ea2fb23fbe4345fb6ade696e"
+        },
+        {
+          "path": "crates/quest-qsvt/src/replay_transform.rs",
+          "before_sha256": "8c349d0b8d302178fd7286276d03efc2c791373abf00af3e76a2b1ecf96e6c6e",
+          "after_sha256": "bb797fb7abff1ff0a08ca2c84603e50412fed3d99a264da20bd6fa0b2e1f57d2"
+        }
+      ]
+    }
+  ],
+  "rss_measured": false,
+  "rss_note": "No RSS measurement was made. RLIMIT_AS=512MiB constrains address space; it is not observed RSS or measured peak allocation. No additional physical child run was performed."
+}

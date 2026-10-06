@@ -1,0 +1,2 @@
+# Receipt hashes cover archived log bytes, including whitespace and line endings.
+docs/verification/data/**/*.log -text -whitespace

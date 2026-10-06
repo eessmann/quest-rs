@@ -8,6 +8,8 @@ disabled. The full workspace also needs serial HDF5. See the
 [build instructions](README.md#build) for installed packages and the optional Nix
 shell, or the [Grace Hopper guide](docs/grace-hopper.md) for manual/Spack
 dependencies and CUDA.
+See [native tooling](docs/native-tooling.md) for module-based builds, diagnostic
+receipts, Cargo target isolation and local/Slurm MPI test supervision.
 
 Run commands from the repository root in a configured native environment or
 the optional `devenv shell`. Record `rustc -Vv` and the native configuration with
@@ -105,9 +107,11 @@ cargo nextest run -p quest-sys --features mpi --test mpi --locked
 ```
 
 Replace the placeholder with the wrapper and launcher directory from the MPI
-installation used by QuEST. rsmpi rejects an ambiguous or mismatched selection;
-unset `MPI_PKG_CONFIG`, `CRAY_MPICH_DIR`, `CFLAGS`, `CPPFLAGS` and
-`BINDGEN_EXTRA_CLANG_ARGS` when selecting MPI through `MPICC`. The clean Linux
+installation used by QuEST. Discovery follows the locked rsmpi dependency:
+`MPI_PKG_CONFIG`, then `CRAY_MPICH_DIR`, then `MPICC`, then fallback probes.
+Keep module-provided compiler and header settings; when explicitly selecting a
+different MPI through `MPICC`, remove higher-priority MPI selectors first.
+Native and generated-Rust ABI witnesses reject incompatible selections. The clean Linux
 devenv supplies the absolute development-output wrapper and matching binary-output
 launcher itself. System serial HDF5 can be autodetected with `HDF5_DIR` unset;
 devenv selects its pinned serial package explicitly. QuEST's installed runtime

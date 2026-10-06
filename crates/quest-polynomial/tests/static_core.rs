@@ -77,3 +77,71 @@ fn identity_and_constant_targets_admit_input_before_shortcuts() {
 			.is_err()
 	);
 }
+
+#[test]
+fn shared_mathcore_expression_lowers_dynamic_and_exact_polynomial_once()
+-> Result<(), Box<dyn std::error::Error>> {
+	use mathcore::{
+		dynamic::ExpressionLimits,
+		exact::{Owner, Symbol},
+		multivariate::PolynomialLimits,
+		typed,
+	};
+	let symbol = Symbol::new(Owner::new(48), 0);
+	let x = typed::variable::<0>();
+	let f = Function::new(x * x + typed::exact(ExactConstant::Rational(1, 3)));
+	let dynamic = f.dynamic(&[symbol], ExpressionLimits::default())?;
+	let formal = dynamic.simplify(&[symbol], PolynomialLimits::default())?;
+	let derivative = formal.polynomial.differentiate(symbol)?;
+	let mut backend = MpBackend::new(Precision::default())?;
+	let value = backend.point(2.0)?;
+	let lowered = dynamic.lower(&mut backend, &[symbol])?;
+	assert_eq!(
+		lowered.evaluate(&mut backend, std::slice::from_ref(&value))?,
+		f.evaluate(&mut backend, value.clone())?
+	);
+	let kernel = derivative.lower(&mut backend)?;
+	assert_eq!(
+		kernel.evaluate(&mut backend, &[value])?,
+		backend.point(4.0)?
+	);
+	assert_eq!(
+		backend.constant(&ExactConstant::Pi)?,
+		quest_numerics::arithmetic::PointBackend::pi(&mut backend)?
+	);
+	Ok(())
+}
+
+#[test]
+fn dynamic_constant_function_preserves_input_admission() -> Result<(), Box<dyn std::error::Error>> {
+	let f = function!(|x| 0.5);
+	let symbol = mathcore::exact::Symbol::new(mathcore::exact::Owner::new(49), 0);
+	let expression = f.dynamic(&[symbol], mathcore::dynamic::ExpressionLimits::default())?;
+	let kernel = expression.lower(&mut F64Backend, &[symbol])?;
+	assert!(kernel.evaluate(&mut F64Backend, &[f64::NAN]).is_err());
+	Ok(())
+}
+
+#[test]
+fn exact_target_keeps_source_and_bounds_non_dyadic_rounding()
+-> Result<(), Box<dyn std::error::Error>> {
+	let symbol = mathcore::exact::Symbol::new(mathcore::exact::Owner::new(51), 0);
+	let x = mathcore::typed::variable::<0>();
+	let f = Function::new(x * x + mathcore::typed::exact(ExactConstant::Rational(1, 3)));
+	let source = f.dynamic(&[symbol], mathcore::dynamic::ExpressionLimits::default())?;
+	let target = quest_polynomial::ExactMonomialTarget::from_expression(
+		source,
+		symbol,
+		mathcore::multivariate::PolynomialLimits::default(),
+		quest_polynomial::Limits::default(),
+	)?;
+	assert!(target.rounding_bound() > 0.0);
+	assert_eq!(target.exact().terms().count(), 2);
+	assert_eq!(target.polynomial().evaluate_real(0.5)?, 0.25 + 1.0 / 3.0);
+	let kernel = target.source().lower(&mut F64Backend, &[symbol])?;
+	assert_eq!(
+		kernel.evaluate(&mut F64Backend, &[0.5])?,
+		f.evaluate(&mut F64Backend, 0.5)?
+	);
+	Ok(())
+}

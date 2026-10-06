@@ -1,0 +1,131 @@
+{
+  "schema": "quest-cfd-certification-admission-diagnostic-v1",
+  "status": "read_only_fixed_cap_diagnostic",
+  "native_inverse_executed": false,
+  "higher_budget_attempt_executed": false,
+  "actual_polynomial_degree": 449,
+  "actual_phase_count": 450,
+  "observed_context_admissions": [
+    {
+      "count": 450,
+      "precision": 256,
+      "context_bytes": 39762944,
+      "working_cap_bytes": 67108864
+    },
+    {
+      "count": 450,
+      "precision": 256,
+      "context_bytes": 39762944,
+      "working_cap_bytes": 67108864
+    },
+    {
+      "count": 899,
+      "precision": 256,
+      "context_bytes": 85436416,
+      "working_cap_bytes": 67047664
+    }
+  ],
+  "formula": "support=2count-1; fft=next_power_of_two(support); levels=ilog2(fft)+1; slots=64*(count*levels+fft); float_bytes=8*ceil((precision+1)/64)+64; context_bytes=slots*float_bytes",
+  "formula_rows": [
+    {
+      "coefficient_support_count": 450,
+      "precision_bits": 256,
+      "fft_support": 1024,
+      "levels": 11,
+      "coefficient_slots": 382336,
+      "float_storage_bytes": 104,
+      "context_bytes": 39762944,
+      "projector_retained_conversion_bytes": null,
+      "projector_context_plus_retained_bytes": null
+    },
+    {
+      "coefficient_support_count": 450,
+      "precision_bits": 512,
+      "fft_support": 1024,
+      "levels": 11,
+      "coefficient_slots": 382336,
+      "float_storage_bytes": 136,
+      "context_bytes": 51997696,
+      "projector_retained_conversion_bytes": null,
+      "projector_context_plus_retained_bytes": null
+    },
+    {
+      "coefficient_support_count": 450,
+      "precision_bits": 1024,
+      "fft_support": 1024,
+      "levels": 11,
+      "coefficient_slots": 382336,
+      "float_storage_bytes": 200,
+      "context_bytes": 76467200,
+      "projector_retained_conversion_bytes": null,
+      "projector_context_plus_retained_bytes": null
+    },
+    {
+      "coefficient_support_count": 899,
+      "precision_bits": 256,
+      "fft_support": 2048,
+      "levels": 12,
+      "coefficient_slots": 821504,
+      "float_storage_bytes": 104,
+      "context_bytes": 85436416,
+      "projector_retained_conversion_bytes": 61200,
+      "projector_context_plus_retained_bytes": 85497616
+    },
+    {
+      "coefficient_support_count": 899,
+      "precision_bits": 512,
+      "fft_support": 2048,
+      "levels": 12,
+      "coefficient_slots": 821504,
+      "float_storage_bytes": 136,
+      "context_bytes": 111724544,
+      "projector_retained_conversion_bytes": 61200,
+      "projector_context_plus_retained_bytes": 111785744
+    },
+    {
+      "coefficient_support_count": 899,
+      "precision_bits": 1024,
+      "fft_support": 2048,
+      "levels": 12,
+      "coefficient_slots": 821504,
+      "float_storage_bytes": 200,
+      "context_bytes": 164300800,
+      "projector_retained_conversion_bytes": 61200,
+      "projector_context_plus_retained_bytes": 164362000
+    }
+  ],
+  "projector_retained_bytes_derived_from_observed_caps": 61200,
+  "higher_precision_rows": "calculated admission envelopes, not completed verification attempts",
+  "diagnostic_scope": "same immutable failed-trial binary; x86_64 stack/argument offsets verified against its disassembly because debug level1 omits local variables; breakpoint at Context::new memory comparison, never alters counters/limits",
+  "binary_sha256": "132f37b6d8a95121a985c0f921fb102c12f1d9a2d8fc6d54330ed179f5f21869",
+  "diagnostic_log_sha256": "cf63ed4371d4fb2a580e466b9ad00f1adf0da6b77f9f4b3ecb4b2bb241a22ef5",
+  "first_debugger_probe": "omitted local-variable names prevented extraction; no admission limits changed, preserved privately",
+  "proposed_budget_requires_review": {
+    "certification_bytes_per_owner": 268435456,
+    "synthesis_bytes": 67108864,
+    "history_managed_bytes_per_rank": 1073741824,
+    "history_managed_bytes_per_node_for_two_local_ranks": 2147483648,
+    "native_managed_bytes_per_rank": 67108864,
+    "source_managed_bytes_per_rank_unchanged": 536870912,
+    "source_managed_bytes_per_node_unchanged": 1073741824,
+    "os_address_space_bytes_per_rank": 3221225472,
+    "os_address_space_sum_for_two_local_ranks": 6442450944,
+    "certification_pass_guaranteed": false,
+    "physical_accuracy_pass_guaranteed": false
+  },
+  "source_candidate_retained_bytes_derived": 54000,
+  "projector_binary64_conversion_bytes": 7200,
+  "concurrent_owner_admission": {
+    "native_environment_full_budget_bytes": 67108864,
+    "synthesis_full_cap_bytes": 67108864,
+    "certification_owners": 2,
+    "candidate_and_projector_caps_charged_simultaneously": true,
+    "old_fixed_scalar_plus_native_envelopes_bytes": 268435456,
+    "old_source_and_polynomial_retained_upper_from_successful_pre_certification_admission_bytes": 268435456,
+    "proposed_scalar_plus_native_envelopes_bytes": 671088640,
+    "projector_output_phase_payload_bytes": 3600,
+    "proposed_one_rank_peak_upper_from_prior_admission_bytes": 939527696,
+    "two_rank_source_retention_not_measured": true,
+    "full_managed_capacity_rechecked_collectively_for_each_future_attempt": true
+  }
+}

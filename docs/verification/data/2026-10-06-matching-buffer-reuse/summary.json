@@ -1,0 +1,347 @@
+{
+  "schema_version": 1,
+  "status": "local and GNU/Cray focused multi-host validation passed; strict capacity open",
+  "native_source_revision": "503552065045eaf89baba85e6cd6aad728525554",
+  "native_source_changed": false,
+  "source_sha256": {
+    "crates/quest/src/qsvt/matching.rs": "083cc3df3b863c0395444c4881f1721b8a9c15a2a747571a48342643eb46151d",
+    "crates/quest/src/qsvt/matching/staging.rs": "7f77b72de55795be792f4404fea3ecb8931149671349a813b59c924e668ad566",
+    "crates/quest/src/qsvt/matching/collective.rs": "e223d6184b5f7d2778bb6fd43a0e7e5bf5660af3f9a216abafb08bbbec7c2335",
+    "crates/quest/src/qsvt/matching/batched.rs": "10cb58b042b90d52b4d76a859753c75e1a264af38098aa95e96da92cf90c1007",
+    "crates/quest-sys/src/lib.rs": "5b33146aadc12ee2f61733fb8264ce18cdc670197b92eefe87946db054e10a7f",
+    "crates/quest-sys/src/cxx_bindings/quest_bindings.cpp": "ec29c66769350b43821846fd3a507465b76b2fea22ab0fc3092b9205088b8662",
+    "crates/quest-sys/src/cxx_bindings/include/quest_bindings.hpp": "d84aa37ca85c397febaf4b39d7ad7c2b7239bf48063820b880038a403c9c6ab7",
+    "crates/quest-sys/tests/communication_buffer.rs": "dca38b154cb4d9503d6b05605396c686b6ce0c7514a8253b30411f6111d39166",
+    "crates/quest/src/collective.rs": "a892e2941f2628770a371bc76ba5d4c26be65a93b7dcbf6f4a50d4394d839671",
+    "crates/quest/tests/collective_initialization_budget.rs": "832ea951115704053ce9be72dff8caf564745bc066e18dc0c9b86de5c31f9033",
+    "crates/quest/tests/matching_collective.rs": "8806cac7de1b5dcd8d5e57e7a21319f0039d39e9e091c3146d8108821fae31bb",
+    "crates/quest/tests/matching_collective/buffer_reuse.rs": "37844cdbb3f232baae85710373ef23ad2aba6ddaffaa1eb80b5de0530976ee94",
+    "crates/quest/src/qsvt/matching/collective/buffer_tests.rs": "ba03f77d7d3028c36af13e609d8c66731ff1547ec37c95c325d3c80e0ac49468",
+    "crates/quest/src/qsvt/matching/collective/failure_tests.rs": "e297fd71093e0f0794fa2c9be09f0420d6fd9f15f4caba7c90331430e8948231",
+    "crates/quest/examples/sparse_capacity.rs": "a78d11efa9930fd1b9d785c38c13f5da069baf257b621238017d10d3c634c4d4",
+    "crates/quest/examples/sparse_capacity/support.rs": "58e87d0889adbdb4a8771e5350dae78cea2bf0ebc13f9b0a654ab88019e77dca",
+    "docs/verification/fixtures/cirrus/capacity.py": "63fa66067952ee00a13fd70305ed1c655f35b2818854d8297f92c72398a8c6b7",
+    "docs/verification/fixtures/cirrus/capacity_resource_test.py": "cf12666650badf10cb9f14a7c5a3c850e14351dd99094b5ffb95de86c3fdd491"
+  },
+  "focused_evidence": {
+    "failures": {
+      "schema_version": 1,
+      "scope": "local MPI collective buffer admission and staged mutation failure fixtures",
+      "red": {
+        "ranks": 2,
+        "status": 101,
+        "reason": "rank 1 buffer admission must reject on every rank",
+        "hook_wired": false
+      },
+      "green": {
+        "tests_passed": 4,
+        "mpi_launches": 8,
+        "admission_ranks": [
+          2,
+          4
+        ],
+        "staged_fatal_ranks": 2,
+        "staged_fatal_stderr_modes": [
+          "captured",
+          "suppressed"
+        ],
+        "staged_fatal_statuses": [
+          1,
+          1
+        ],
+        "staged_fatal_seconds": [
+          0.573143733,
+          0.537494851
+        ],
+        "timed_out": false,
+        "all_durable_witnesses_checked": true,
+        "after_return_witnesses_absent": true
+      },
+      "strict_scoped_clippy_status": 0,
+      "formatting_status": 0,
+      "source_sha256": {
+        "crates/quest/src/qsvt/matching/collective/buffer_tests.rs": "ba03f77d7d3028c36af13e609d8c66731ff1547ec37c95c325d3c80e0ac49468",
+        "crates/quest/src/qsvt/matching/collective/failure_tests.rs": "e297fd71093e0f0794fa2c9be09f0420d6fd9f15f4caba7c90331430e8948231",
+        "crates/quest/src/qsvt/matching/collective.rs": "e223d6184b5f7d2778bb6fd43a0e7e5bf5660af3f9a216abafb08bbbec7c2335",
+        "crates/quest/src/qsvt/matching/staging.rs": "7f77b72de55795be792f4404fea3ecb8931149671349a813b59c924e668ad566"
+      },
+      "log_sha256": {
+        "admission-red.log": "91fd16c514807aeb0f23a4e6b8a00ed0114776bd32f75e891b4eef4e3386e46b",
+        "collective-green.log": "66e5d96bac22a5f218665414dd6bcdbcfdc6ecd2ffd3ff33e77678eb1145f7b5",
+        "clippy.log": "d3de56c1d500adc80db6d6e276c50098681ab60157f96aaf4ebfcebcb32ccddc",
+        "initial-package-setup-error.log": "47d2ce59090da3910df8a70b22c68532918cdc66f40ea09d99ca8c89e1480236"
+      }
+    },
+    "root_initializer": {
+      "schema_version": 1,
+      "scope": "collective root initializer live payload accounting; no memory peak or scalable-path claim",
+      "ranks": 4,
+      "qubits": 20,
+      "global_amplitudes": 1048576,
+      "global_complex_payload_bytes": 16777216,
+      "per_rank_register_ledger_bytes": 16777216,
+      "per_rank_budget_bytes": 67108864,
+      "corrected_initializer_scratch_bytes": 50331648,
+      "external_lease_rank": 1,
+      "external_lease_bytes": 16777216,
+      "red": {
+        "old_multiplier": 2,
+        "status": 101,
+        "reason": "a third live global buffer must cause collective budget rejection"
+      },
+      "green": {
+        "new_regression_passed": true,
+        "existing_collective_runtime_tests_passed": 7,
+        "mpi_launches": 8,
+        "regression_seconds": 0.785573722,
+        "status": 0,
+        "all_local_amplitudes_checked": true,
+        "accounting_checked_after_rejection_and_success": true
+      },
+      "strict_scoped_clippy_status": 0,
+      "formatting_status": 0,
+      "native_source_revision": "503552065045eaf89baba85e6cd6aad728525554",
+      "native_cpu_copy_path": [
+        "quest/src/api/initialisations.cpp:100",
+        "quest/src/core/localiser.cpp:680",
+        "quest/src/core/localiser.cpp:577",
+        "quest/src/core/accelerator.cpp:183",
+        "quest/src/cpu/cpu_config.cpp:420"
+      ],
+      "source_sha256": {
+        "crates/quest/src/collective.rs": "a892e2941f2628770a371bc76ba5d4c26be65a93b7dcbf6f4a50d4394d839671",
+        "crates/quest/tests/collective_initialization_budget.rs": "832ea951115704053ce9be72dff8caf564745bc066e18dc0c9b86de5c31f9033"
+      },
+      "log_sha256": {
+        "red.log": "bf286c7c6110e0af5464dd6313c43614dcf59199a5c15375c21af77be57cb18f",
+        "green.log": "061eaccccbac34bb6dbd9e72da6f3c63677e17483724a83bc6d0448e3c9bc04d",
+        "clippy.log": "d2c749fe9d93c281360e58a1f3527b35a586fd93d296e55fd2a07584a1ac3810"
+      }
+    }
+  },
+  "workspace": {
+    "status": "passed",
+    "runner": "Cargo Nextest",
+    "all_feature_skipped": 6,
+    "all_feature_passed": 1704,
+    "all_feature_duration_seconds": 367.306,
+    "all_feature_doc_passed": 65,
+    "all_feature_doc_ignored": 1,
+    "default_passed": 1512,
+    "default_skipped": 1,
+    "default_duration_seconds": 107.759,
+    "default_doc_passed": 55,
+    "default_doc_ignored": 1,
+    "check_statuses": {
+      "all-features": 0,
+      "doctests": 0,
+      "default-tests": 0,
+      "default-doctests": 0,
+      "default-check": 0,
+      "clippy": 0,
+      "bindings": 0,
+      "fmt": 0,
+      "whitespace": 0
+    },
+    "log_sha256": {
+      "all-features.log": "d003cb6409b451a6e77dbbd64a1be958e34de218f6c0fe5456306ceee70a2ac3",
+      "bindings.log": "1878aa873dbae982088e74ea03d81cce9e94c0a95e004a31362b4729f9dc7f7b",
+      "clippy.log": "f346a8063536de79f092ddae257f6d42ba2519a8322de569df56694f21a43828",
+      "default-check.log": "e4569357d9c54e0bbb4a431bc59ee3840796841360ced0b881ff538b67b193c2",
+      "default-doctests.log": "a80f1ae4371dd99ba300921c6afbd95d3f47c7b363695498bbbe1c5a9fb4e7c2",
+      "default-tests.log": "eca15f037fc51b3fba43897e4daacc471e579725336ad7a17cc9bfdb32974aea",
+      "doctests.log": "3ecefc7bb83934a57b62023ffd82a7e96ec45d2d4cd297a084018a3ecfe48a0f",
+      "fmt.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "whitespace.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "historical_cmake_failure": "Previous-source broad run failed to read an installed CMake module; unexplained. This unchanged fixture passed in the current all-feature run; no causal fix claimed.",
+    "all_feature_tests_run": 1704
+  },
+  "capacity_evidence": "capacity.json",
+  "open_acceptance": [
+    "stored original input larger than every enforced node cap with completed execution",
+    "Apple Silicon execution",
+    "loader-isolated Cirrus installed consumers"
+  ],
+  "previous_snapshot_results_included": false,
+  "source_snapshot": {
+    "digest": "9adbef476110e8425bacee15882c006464a6d95b6a54ccb2269621e29af68233",
+    "files": 2559,
+    "archive_sha256": "5965a49b185e1ca056c5153c5f814613d7eeb39ddc7ff8e28575d0bf8bb03cf7",
+    "deployment": "Cirrus campaign snapshots/<digest>/source",
+    "verified_before_and_after_readonly": true,
+    "all_recorded_source_files_match": true,
+    "status": "deployed; both compiler builds, focused tests and all six scaling cases passed",
+    "later_changes": "Later reporting and separately recorded post-snapshot acceptance corrections do not alter the immutable tested source."
+  },
+  "cluster_campaign": {
+    "status": "completed successfully; see cluster.json for exact identities and receipts",
+    "source_digest": "9adbef476110e8425bacee15882c006464a6d95b6a54ccb2269621e29af68233",
+    "compiler_profiles": "matching GNU and Cray native installations; central serial cray-hdf5 modules",
+    "max_concurrent_nodes": 8,
+    "runtime_ranks_per_node": 1,
+    "runtime_requested_openmp_threads": 288,
+    "exclusive_nodes": true,
+    "build_cpus": 8,
+    "root_dependency": "537412",
+    "jobs": [
+      {
+        "job": "537488",
+        "compiler": "gnu",
+        "mode": "build",
+        "nodes": 1,
+        "cpus_per_task": 8,
+        "qos": "lowpriority",
+        "scheduler_state": "COMPLETED",
+        "scheduler_exit_code": "0:0"
+      },
+      {
+        "job": "537489",
+        "compiler": "gnu",
+        "mode": "focused",
+        "nodes": 8,
+        "cpus_per_task": 288,
+        "qos": "lowpriority",
+        "scheduler_state": "COMPLETED",
+        "scheduler_exit_code": "0:0"
+      },
+      {
+        "job": "537490",
+        "compiler": "gnu",
+        "mode": "capacity",
+        "nodes": 2,
+        "cpus_per_task": 288,
+        "qos": "short",
+        "scheduler_state": "COMPLETED",
+        "scheduler_exit_code": "0:0"
+      },
+      {
+        "job": "537491",
+        "compiler": "gnu",
+        "mode": "capacity",
+        "nodes": 4,
+        "cpus_per_task": 288,
+        "qos": "lowpriority",
+        "scheduler_state": "COMPLETED",
+        "scheduler_exit_code": "0:0"
+      },
+      {
+        "job": "537492",
+        "compiler": "gnu",
+        "mode": "capacity",
+        "nodes": 8,
+        "cpus_per_task": 288,
+        "qos": "lowpriority",
+        "scheduler_state": "COMPLETED",
+        "scheduler_exit_code": "0:0"
+      },
+      {
+        "job": "537493",
+        "compiler": "cray",
+        "mode": "build",
+        "nodes": 1,
+        "cpus_per_task": 8,
+        "qos": "lowpriority",
+        "scheduler_state": "COMPLETED",
+        "scheduler_exit_code": "0:0"
+      },
+      {
+        "job": "537494",
+        "compiler": "cray",
+        "mode": "focused",
+        "nodes": 8,
+        "cpus_per_task": 288,
+        "qos": "lowpriority",
+        "scheduler_state": "COMPLETED",
+        "scheduler_exit_code": "0:0"
+      },
+      {
+        "job": "537615",
+        "compiler": "cray",
+        "mode": "capacity",
+        "nodes": 2,
+        "cpus_per_task": 288,
+        "qos": "lowpriority",
+        "scheduler_state": "COMPLETED",
+        "scheduler_exit_code": "0:0"
+      },
+      {
+        "job": "537616",
+        "compiler": "cray",
+        "mode": "capacity",
+        "nodes": 4,
+        "cpus_per_task": 288,
+        "qos": "lowpriority",
+        "scheduler_state": "COMPLETED",
+        "scheduler_exit_code": "0:0"
+      },
+      {
+        "job": "537617",
+        "compiler": "cray",
+        "mode": "capacity",
+        "nodes": 8,
+        "cpus_per_task": 288,
+        "qos": "lowpriority",
+        "scheduler_state": "COMPLETED",
+        "scheduler_exit_code": "0:0"
+      }
+    ],
+    "payload_manifest_sha256": "8c2314adc2b87758e4d84f557d7866ec6aa562865558ba2a0933cd75f1ae2ebb",
+    "payload_archive_sha256": "f363a04b63d16b59befd025a7a0e0abb154213b286cd40f37375cd447a80c337",
+    "adapter_checks": {
+      "offline_tests": 10,
+      "local_real_archived_parent_tests": 1,
+      "local_mpi_ranks": [
+        1,
+        2
+      ],
+      "scope": "archive/list/extract/run with child reexecution; not Cirrus validation"
+    },
+    "submission_failure": {
+      "action": "Cray two-node short submission",
+      "accepted_job_id": null,
+      "original_stderr_retained": false,
+      "observed_short_qos_max_submit_jobs_per_user": 2,
+      "observed_short_jobs": [
+        "537409",
+        "537490"
+      ],
+      "resolution": "submitted remaining Cray capacity jobs using lowpriority"
+    },
+    "capacity_profile": {
+      "dimension": 65536,
+      "roundtrips": 3,
+      "original_input_bytes": 4194304,
+      "rank_process_address_space_cap_bytes": 8589934592,
+      "managed_rank_budget_bytes": 4294967296,
+      "whole_node_cap_verified": false,
+      "capacity_acceptance": "open; rank process caps are not a whole-node enforcement proof"
+    },
+    "results": "cluster.json",
+    "focused_parent_tests_passed": 32,
+    "mpi_test_launches": 126,
+    "scaling_cases_passed": 6
+  },
+  "post_snapshot_corrections": [
+    {
+      "scope": "Strict capacity requires verified whole-node enforcement rather than the sum of MPI rank address-space limits",
+      "record": "../2026-10-06-sparse-capacity-followup/node-enforcement-correction.json",
+      "included_in_this_snapshot": false
+    }
+  ],
+  "additional_local_lanes": {
+    "linux_clang_bridge": "clang-bridge.json"
+  },
+  "additional_diagnostics": {
+    "node_enforcement": {
+      "record": "../2026-10-06-node-enforcement/summary.json",
+      "job": "537644",
+      "nodes": 2,
+      "status": "completed read-only observation",
+      "site_job_memory_max_bytes_per_node": 780945850368,
+      "writable_slurm_delegation_observed": false,
+      "whole_node_enforcement_verified": false,
+      "configured_smaller_cap": false
+    }
+  }
+}

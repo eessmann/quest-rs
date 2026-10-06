@@ -1,0 +1,24 @@
+# Persisted consumer readout tag/count correction
+
+Implemented and frozen within the two authorized files: consumer execution.rs and existing persisted_weighted_transform.rs integration test. Source manifest `source.json` SHA256 `82be7c38a1cef657236bf428da0c791a93b4812d858e0139a86743837057517f`; both source hashes matched after final checks. Parent independently approved the minimal change after3 integration plus9 example tests (12.67s), and owns the later16-file consumer/source/build pin. Root's method paragraph is outside this two-file owner manifest. All code/method/config is frozen for the separately released future campaign; this owner ran no scientific retry.
+
+## Reproduction and cause
+
+The old readout passed `rank XOR(P/2)` as both peer and third argument. quest-sys::MpiCollectiveLane::send_receive_bytes accepts(send,peer,tag,receive) and uses that tag for send and receive. AtP2 the two sides used tags1/0; atP4 pairs0/2 used2/0 and1/3 used3/1; P8 likewise mismatched. Every cross-rank pair would block after reaching this exchange. P1 skipped it. The existing N4 whole-register oracle tests covered transform action but only readout_floor, not this actual readout. Saved campaign3 timeouts are consistent with this defect, though the uninstrumented scientific run provides no stack trace locating its exact stopped instruction. Its source and receipts remain untouched.
+
+A new test calls the actual production readout on a directly initialized10-qubit state. Old code passesP1, then bothP2 ranks print test-only READOUT_ENTER at adjoint=false and hit the10s child timeout124. Parent test returns101 after10.54s: `<temporary>/quest-persisted-readout-tag-behavior-red.log`. This is genuine behavior RED. The earlier `<temporary>/quest-persisted-readout-tag-red.log` is only a fixture compile failure (missing mutable communicator binding), explicitly not the behavioral proof.
+
+## Minimal correction
+
+Both ends now use constant portable tag31040 on the already separately duplicated readout communicator. Blocking ordered chunks permit tag reuse; no new communicator, native API, state/router algorithm or scientific cap was introduced. The returned received byte count must equal1024. The extracted private-module decode helper rejects malformed count before its own allocation/decoding; its result enters the existing runtime::local agreement before subsequent readout arithmetic. Valid ranks can decode before that agreement, so this is not a promise that all ranks skip decoding when one count is malformed. Readout performs no state mutation.
+
+The helper remains inside private consumer binary/test modules, not a public quest runtime API. Checking count adds one bounded comparison within the existing256-units-per-amplitude/4096P modeled floor and16KiB staging envelope. Packet size, payload counters, query loops, native owners and managed caps remain unchanged. The first Clippy run rejected redundant pub(crate) in the private module; using pub inside that inaccessible module fixed the visibility-only lint without a new library export.
+
+## Focused checks and limits
+
+- Fixed integration target:3 top-level tests passed6.95s on final source. They comprise pure packet status validation, actual readout MPI1/2/4/8 and split4→2, and the existing N4 seven-job whole-U/standaloneU† parent. Initial fixed run also passed3 in7.00s.
+- Readout fixture scale2: physical0=10/13,physical512=minus/plus2i/13,physical1=sqrt(5/13),others0. It includes success mass8/13 and failure mass5/13; recovered norm32/13 and exact nominal forward/adjoint residualzero. Every rank initializes only its local amplitude vector. Independent bounded whole-register scalar accumulation decodes physical9..5 explicitly without production mapping/residual helpers and visits all32 success coordinates; total/success/vector/residual/norm/coordinate results and per-rank payloads agree. Both literal adjoint options pass.
+- Synthetic status tests pass counts0/1/1023/1025/usizeMAX to the production decoder and verify complete1024-byte decoding. One rank supplies a synthetic short status while others supply valid counts; all returnErr through common agreement before downstream arithmetic. This is explicitly not an actual1023-byte wire injection.
+- Strict selected example/test Clippy passes0.45s and scoped rustfmt --check returns0. Earlier lint failure is retained. Upstream nightly generic-const trait-solver warning remains separate.
+
+Commands use the configured installed QuEST with matching MPICC/mpiexec. No matching source production atN32, inverse polynomial/phase synthesis, production quantum inverse apply, whole-workspace gate, debugger attachment or campaign retry was performed. Direct simulator initialization is bounded test evidence, not coherent RHS preparation. Source/log hashes and statuses are retained in `focused.json`; historical manifests and failed campaign receipts are not rewritten.

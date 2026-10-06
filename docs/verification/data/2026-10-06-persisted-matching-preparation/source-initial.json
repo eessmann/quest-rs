@@ -1,0 +1,32 @@
+{
+  "schema": "quest-persisted-matching-preparation-source-v1",
+  "scope": "Six phase1 Rust implementation/test files; excludes dependencies, native QuEST, documentation, ledger and historical checkpoint07. No whole-workspace build identity claim.",
+  "aggregate_algorithm": "SHA-256 of sorted relative path UTF8 + NUL + lowercase content SHA256 hex + LF",
+  "aggregate_sha256": "ff53437baf2688a960ed6baec6e7b7f12f4aeed099910a81b279cf374c2166ff",
+  "files": [
+    {
+      "path": "crates/quest/src/qsvt/matching/collective.rs",
+      "sha256": "6b7c073ab2a3ea9db23b750d317416634cebe550bcbdf1f76be70ad9391ed3a1"
+    },
+    {
+      "path": "crates/quest/src/qsvt/matching/collective/preparation_tests.rs",
+      "sha256": "968845f2de096c8db89913fa15469057620d64cfbeb9b481e601b6dc3400ede4"
+    },
+    {
+      "path": "crates/quest/src/qsvt/persisted_matching.rs",
+      "sha256": "14a0683a6de98dfb40f644006b0dbbc6c0676d24431f34c2efe92ef2924bbd95"
+    },
+    {
+      "path": "crates/quest/src/qsvt/persisted_matching/preparation.rs",
+      "sha256": "b4c8ca6e22ad9a1f12c22c1e2d8150d4e8bc49977aa2fb592c024c3e7acdf3d3"
+    },
+    {
+      "path": "crates/quest/src/qsvt/persisted_matching/preparation/failure_tests.rs",
+      "sha256": "7a87aab7b40d69ac3809d64123ba745af833384f732909735b297b8afd84860f"
+    },
+    {
+      "path": "crates/quest/tests/matching_persisted_preparation.rs",
+      "sha256": "28c801e7cdd87527c3707e886634c7a96d92689e8c7c7a6e6c307922f8ccedd9"
+    }
+  ]
+}

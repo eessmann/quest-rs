@@ -1,0 +1,181 @@
+{
+  "schema": "quest-sparse-record-fingerprint-publication-v1",
+  "status": "published after independent source and focused review",
+  "candidate_index_sha256": "2ffe85e1f9a9eb2c10d1d2c29c31c361a57c2230ccddd916e780d2ad3d84e135",
+  "source_manifest_sha256": "5ff27a818e1aa6e32e2a2f53690bccea5fdcf44036fd44c792c0186319abf41d",
+  "files": [
+    {
+      "path": "docs/verification/2026-10-06-sparse-record-fingerprints.md",
+      "bytes": 5002,
+      "sha256": "01cf52481ad1b936b2783314011ad968486781993e535ddb91999388fa17420d"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/diagnosis.json",
+      "bytes": 2249,
+      "sha256": "25f347db70b80b28925ec9a7598a4801aa373691f7fa8f4a05a3d4deccaa71b7"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/diagnosis.md",
+      "bytes": 1266,
+      "sha256": "b14b0911b1b8ac945a2a7a37e39178df31036758d9b6af56015e19d07fcd594d"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/final-hash-check.json",
+      "bytes": 3694,
+      "sha256": "d0f5a660eaefad48fb29fdc4a71fb53d0a956f4b8c1d36b649d0691daa094273"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/independent-focused.json",
+      "bytes": 11705,
+      "sha256": "ebc929ad285de1212a9e69424f8a7731b6f149c87ff8f0e69f3fb11bbd29e2d6"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/independent-review.md",
+      "bytes": 5723,
+      "sha256": "9263c0988ff72e0d16401bf36f36ae96a656ce76df8ae8576dbecfe133cafd5e"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/logs/quest-sparse-digest-final-pass.log",
+      "bytes": 1220,
+      "sha256": "52a2c878ae0fadece755633b385108fd94e375b2bb3901cc3bfd421d0fb07b02"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/logs/quest-sparse-digest-maintained-red.log",
+      "bytes": 2089,
+      "sha256": "70f04774f0fbd552300fe88f71b872de23afa6a08e15d482ff39ea02b33d56a5"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/logs/quest-sparse-digest-resource-final-green.log",
+      "bytes": 1038,
+      "sha256": "d49d028f0ce11f8c10a079ec96353e8060841b877b9f9ed4c84ffdbc8ff77ba6"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/logs/quest-sparse-fingerprint-bridge-green.log",
+      "bytes": 1429,
+      "sha256": "fd77e2639355ef04a10b00d131fba4d8d3e95364c5e5013ca9e47ea842c74a97"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/logs/quest-sparse-fingerprint-independent-digest-delta.log",
+      "bytes": 1220,
+      "sha256": "b5588381b1e8a38b35872b7338a353a767c10b2e4e3c70951a21d02e64f53c30"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/logs/quest-sparse-fingerprint-independent-io-clippy.log",
+      "bytes": 841,
+      "sha256": "0f3dc93356a13fecbd2d90f9d41fa0b8478c1994f407d2e98fdb39560ad17516"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/logs/quest-sparse-fingerprint-independent-io.log",
+      "bytes": 1875,
+      "sha256": "0750b9d9761ab7e05d6017bbfbaba81e6ee9a6d27f42ee1d9d24f2961a29c840"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/logs/quest-sparse-fingerprint-independent-native-clippy.log",
+      "bytes": 1085,
+      "sha256": "9e4bc6265f3cf1d364c22597d6e750d476d1897bb3662049e22c260a2b3c689e"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/logs/quest-sparse-fingerprint-independent-native.log",
+      "bytes": 13130,
+      "sha256": "c12ed06263381d07a2fcbbe1d6f1ec9b81038af8cae498187329d269e1960591"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/logs/quest-sparse-fingerprint-independent-pure-clippy-final.log",
+      "bytes": 772,
+      "sha256": "b21c0ef0d0f7e6e9153049561b24ede91a00284f199700676600ca09440bd954"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/logs/quest-sparse-fingerprint-independent-pure-clippy.log",
+      "bytes": 5092,
+      "sha256": "04720cefd7004b4b87d18cd161325258a691b5ccc9089b2283e327359aeb50b9"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/logs/quest-sparse-fingerprint-independent-pure.log",
+      "bytes": 2179,
+      "sha256": "a25f0c5e6908e88d8195096546ef31a1fe3ffa3943c2e6e855d2340fc19ad6d8"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/logs/quest-sparse-fingerprint-independent-source-delta.log",
+      "bytes": 1433,
+      "sha256": "65949dbd2382d55ebc7a6346ffce40b061704831f1bbe319a3c25cdb9f353bd9"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/logs/quest-sparse-fingerprint-mpi-green.log",
+      "bytes": 11855,
+      "sha256": "ff67c3038dd1588ef2d7fc084104f0cf40e1069b78ff7980cd6ee1b141a6dcaa"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/logs/quest-sparse-fingerprint-restart-green.log",
+      "bytes": 2127,
+      "sha256": "40fe6d413b72b2f6df7b9ec09d32390192b104f7ba06ca0111405f9a6fcf6570"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/logs/quest-sparse-native-clippy.log",
+      "bytes": 953,
+      "sha256": "442838577cc1ab9bae16c8c2c0f6381b672dc9370d04417e2bd43ee1baccb5c0"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/logs/quest-sparse-pure-clippy-final-pass.log",
+      "bytes": 841,
+      "sha256": "21ac30d9eabf08cab97e7d3f37feb77b37d31d0fb4078c28e9425997b9541dda"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/logs/quest-sparse-pure-matrix-final.log",
+      "bytes": 2955,
+      "sha256": "4b23bac801f44ebb415a021ac81f00e78eca94c910200da4eb37a0b8fef8b5f8"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/logs/quest-sparse-source-final-pass.log",
+      "bytes": 1301,
+      "sha256": "ed72021c33b93e36ec3d987ff8e8ac4b57266a5822ebf4107af7dbd2aa3977e0"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/logs/quest-sparse-version-green.log",
+      "bytes": 1875,
+      "sha256": "39ee7e983a8d4a77094681462b3164059454d8e27d8fedcf55f91186fdb30af4"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/logs/quest-sparse-version-maintained-red.log",
+      "bytes": 1658,
+      "sha256": "a96483e0557b594e3d9bb0c2f93b6ff532938ecdd4e256de3dd00d38b5630370"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/owner-focused.json",
+      "bytes": 15807,
+      "sha256": "50e7e9fd356c1ab063b772038473e845de2973e8197ab9b4e514621e294e120c"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/provenance.json",
+      "bytes": 14366,
+      "sha256": "7ce4c2e74815bb6df5085fccf9b7a6b00ed061d26fc165b06edf70703e6e466e"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/public-api-red.log",
+      "bytes": 1349,
+      "sha256": "705056e7bacb14052af95a0333047ce03f5789afd71d3a395d16f30621223bcd"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/public-api-red.rs",
+      "bytes": 1406,
+      "sha256": "6e9a4fc7aa9602e67e0224e9334d042cfa261afde35645ac58ab053f037e460d"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/reference.json",
+      "bytes": 1140,
+      "sha256": "c87b783e7c25ca8a7c4a051a4bf21b70db8e48c828218a3c14810141dbdf9614"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/source.json",
+      "bytes": 3492,
+      "sha256": "5ff27a818e1aa6e32e2a2f53690bccea5fdcf44036fd44c792c0186319abf41d"
+    },
+    {
+      "path": "docs/verification/data/2026-10-06-sparse-record-fingerprints/version-1-red.log",
+      "bytes": 1658,
+      "sha256": "a96483e0557b594e3d9bb0c2f93b6ff532938ecdd4e256de3dd00d38b5630370"
+    }
+  ],
+  "scope": "Matching/shared helper/IOv2 and stage admission only; portfolio/source consumer/campaign and current workspace gates separate",
+  "native_quest_changed": false,
+  "production_inverse_execution": false
+}

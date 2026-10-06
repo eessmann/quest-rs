@@ -32,25 +32,25 @@ pub enum BoxBoundary {
 }
 
 #[derive(Clone, Debug)]
-struct Cell {
-	vertices: Vec<Point>,
-	grid: Vec<GridPoint>,
-	gradients: Vec<Point>,
-	volume: f64,
+pub(crate) struct Cell {
+	pub(crate) vertices: Vec<Point>,
+	pub(crate) grid: Vec<GridPoint>,
+	pub(crate) gradients: Vec<Point>,
+	pub(crate) volume: f64,
 }
 
 #[derive(Clone, Debug)]
-struct Face {
-	left: usize,
-	right: Option<usize>,
-	left_nodes: Vec<usize>,
-	right_nodes: Vec<usize>,
-	normal: Point,
-	measure: f64,
-	lid: bool,
-	prescribed: Option<Vec<Point>>,
-	outflow: bool,
-	label: String,
+pub(crate) struct Face {
+	pub(crate) left: usize,
+	pub(crate) right: Option<usize>,
+	pub(crate) left_nodes: Vec<usize>,
+	pub(crate) right_nodes: Vec<usize>,
+	pub(crate) normal: Point,
+	pub(crate) measure: f64,
+	pub(crate) lid: bool,
+	pub(crate) prescribed: Option<Vec<Point>>,
+	pub(crate) outflow: bool,
+	pub(crate) label: String,
 }
 
 /// Full BDM1/P0 ODE with all independent modes retained on a small box mesh.
@@ -69,6 +69,53 @@ pub struct SimplexBdm {
 	boundary_force: Vec<f64>,
 	lifting: Vec<f64>,
 	diagnostics: AssemblyDiagnostics,
+}
+
+impl SimplexBdm {
+	/// Actual retained Vec/String capacities of the complete bounded physical source.
+	/// Includes geometry, chart, dense viscosity, lifting and boundary payloads;
+	/// excludes allocator/operating-system metadata and transient query storage.
+	/// # Errors
+	/// Rejects checked capacity-byte overflow.
+	pub fn retained_bytes(&self) -> Result<usize, CfdError> {
+		fn payload<T>(values: &Vec<T>) -> Result<usize, CfdError> {
+			values
+				.capacity()
+				.checked_mul(size_of::<T>())
+				.ok_or(CfdError::InvalidInput("simplex retained capacity overflow"))
+		}
+		let mut bytes = size_of::<Self>();
+		let mut charge = |n: usize| -> Result<(), CfdError> {
+			bytes = bytes
+				.checked_add(n)
+				.ok_or(CfdError::InvalidInput("simplex retained capacity overflow"))?;
+			Ok(())
+		};
+		for rows in [&self.chart, &self.sip] {
+			charge(payload(rows)?)?;
+			for row in rows {
+				charge(payload(row)?)?;
+			}
+		}
+		charge(payload(&self.boundary_force)?)?;
+		charge(payload(&self.lifting)?)?;
+		charge(payload(&self.cells)?)?;
+		for cell in &self.cells {
+			charge(payload(&cell.vertices)?)?;
+			charge(payload(&cell.grid)?)?;
+			charge(payload(&cell.gradients)?)?;
+		}
+		charge(payload(&self.faces)?)?;
+		for face in &self.faces {
+			charge(payload(&face.left_nodes)?)?;
+			charge(payload(&face.right_nodes)?)?;
+			charge(face.label.capacity())?;
+			if let Some(values) = &face.prescribed {
+				charge(payload(values)?)?;
+			}
+		}
+		Ok(bytes)
+	}
 }
 
 fn dot(a: &[f64], b: &[f64]) -> f64 {
@@ -102,7 +149,7 @@ fn cell(grid: Vec<GridPoint>, scale: f64, dimension: usize) -> Result<Cell, CfdE
 	physical_cell(vertices, grid, dimension)
 }
 
-fn physical_cell(
+pub(crate) fn physical_cell(
 	vertices: Vec<Point>,
 	grid: Vec<GridPoint>,
 	dimension: usize,
@@ -136,7 +183,7 @@ fn physical_cell(
 	})
 }
 
-fn mesh(
+pub(crate) fn mesh(
 	dimension: usize,
 	n: u32,
 	extent: f64,
@@ -221,7 +268,7 @@ fn mesh(
 	Ok((cells, faces))
 }
 
-fn make_face(
+pub(crate) fn make_face(
 	cells: &[Cell],
 	left: &(usize, Vec<usize>),
 	right: Option<&(usize, Vec<usize>)>,
@@ -638,7 +685,22 @@ impl SimplexBdm {
 	/// # Errors
 	/// Rejects malformed/nonfinite states or numerical overflow.
 	pub fn coefficients(&self, state: &[f64]) -> Result<Vec<f64>, CfdError> {
-		if state.len() != self.dimension() || state.iter().any(|v| !v.is_finite()) {
+		self.coefficients_with_boundary_scale(state, 1.)
+	}
+
+	/// Reconstruct `u = Q a + g l` for a scalar time-dependent prescribed trace.
+	/// Every homogeneous coordinate and the original minimum-mass lifting is retained.
+	/// # Errors
+	/// Rejects invalid states, nonfinite scale or numerical overflow.
+	pub fn coefficients_with_boundary_scale(
+		&self,
+		state: &[f64],
+		scale: f64,
+	) -> Result<Vec<f64>, CfdError> {
+		if state.len() != self.dimension()
+			|| state.iter().any(|v| !v.is_finite())
+			|| !scale.is_finite()
+		{
 			return Err(CfdError::InvalidInput("invalid full simplex state"));
 		}
 		let c: Vec<_> = (0..self.diagnostics.local_velocity_dimension)
@@ -648,7 +710,7 @@ impl SimplexBdm {
 					.zip(state)
 					.map(|(q, s)| q[i] * s)
 					.sum::<f64>()
-					+ self.lifting[i]
+					+ scale * self.lifting[i]
 			})
 			.collect();
 		if c.iter().any(|v| !v.is_finite()) {
@@ -695,8 +757,31 @@ impl SimplexBdm {
 	/// # Errors
 	/// Rejects malformed states or nonfinite drift values.
 	pub fn drift(&self, state: &[f64]) -> Result<Vec<f64>, CfdError> {
-		let c = self.coefficients(state)?;
-		let force = self.force(&c);
+		self.drift_with_boundary_scale(state, 1., 0.)
+	}
+
+	/// Evaluate `a' = Q^T (r(Qa+g l,g) - M l g')`.
+	///
+	/// The scalar multiplies every prescribed trace, including tangential SIP
+	/// data. The lifting derivative is retained explicitly even when its mass
+	/// projection is zero to roundoff. Geometry and constraint rank are fixed.
+	/// # Errors
+	/// Rejects invalid state/scale/rate or nonfinite drift.
+	pub fn drift_with_boundary_scale(
+		&self,
+		state: &[f64],
+		scale: f64,
+		rate: f64,
+	) -> Result<Vec<f64>, CfdError> {
+		if !rate.is_finite() {
+			return Err(CfdError::InvalidInput("nonfinite boundary derivative"));
+		}
+		let c = self.coefficients_with_boundary_scale(state, scale)?;
+		let mut force = self.force(&c, scale);
+		let mass_lifting = mass_apply(&self.cells, self.dimension, &self.lifting);
+		for (f, l) in force.iter_mut().zip(mass_lifting) {
+			*f -= rate * l;
+		}
 		let result: Vec<_> = self.chart.iter().map(|q| dot(q, &force)).collect();
 		if result.iter().any(|v| !v.is_finite()) {
 			return Err(CfdError::InvalidInput("simplex drift overflow"));
@@ -704,14 +789,14 @@ impl SimplexBdm {
 		Ok(result)
 	}
 
-	fn force(&self, c: &[f64]) -> Vec<f64> {
+	fn force(&self, c: &[f64], boundary_scale: f64) -> Vec<f64> {
 		let nodes = self.dimension + 1;
 		let local = self.dimension * nodes;
 		let mut force: Vec<_> = self
 			.sip
 			.iter()
 			.zip(&self.boundary_force)
-			.map(|(row, b)| self.viscosity * (b - dot(row, c)))
+			.map(|(row, b)| self.viscosity * (boundary_scale * b - dot(row, c)))
 			.collect();
 		for (ci, cell) in self.cells.iter().enumerate() {
 			for (bary, weight) in volume_quadrature(self.dimension) {
@@ -788,7 +873,8 @@ impl SimplexBdm {
 					let exterior = face.prescribed.as_ref().map_or(u, |values| {
 						std::array::from_fn(|k| {
 							0.5 * (u[k]
-								+ values.iter().zip(&bary).map(|(v, l)| v[k] * l).sum::<f64>())
+								+ boundary_scale
+									* values.iter().zip(&bary).map(|(v, l)| v[k] * l).sum::<f64>())
 						})
 					});
 					for (i, k, trace, _) in face_basis(face, &bary, self.dimension) {
@@ -1056,12 +1142,24 @@ impl SimplexBdm {
 	/// # Errors
 	/// Rejects malformed states or a singular pressure recovery system.
 	pub fn reconstruct_pressure(&self, state: &[f64]) -> Result<SimplexPressureRecovery, CfdError> {
-		let c = self.coefficients(state)?;
-		let mut a = self.coefficients(&self.drift(state)?)?;
-		for (v, l) in a.iter_mut().zip(&self.lifting) {
-			*v -= l;
-		}
-		let force = self.force(&c);
+		self.reconstruct_pressure_with_boundary_scale(state, 1., 0.)
+	}
+
+	/// Reconstruct pressure from full momentum including the physical lifting acceleration.
+	/// # Errors
+	/// Rejects malformed state/boundary data or singular recovery.
+	pub fn reconstruct_pressure_with_boundary_scale(
+		&self,
+		state: &[f64],
+		scale: f64,
+		rate: f64,
+	) -> Result<SimplexPressureRecovery, CfdError> {
+		let c = self.coefficients_with_boundary_scale(state, scale)?;
+		let a = self.coefficients_with_boundary_scale(
+			&self.drift_with_boundary_scale(state, scale, rate)?,
+			rate,
+		)?;
+		let force = self.force(&c, scale);
 		let ma = mass_apply(&self.cells, self.dimension, &a);
 		let residual: Vec<_> = force.iter().zip(&ma).map(|(f, m)| f - m).collect();
 		let mut rows = constraints(&self.cells, &self.faces, self.dimension);
@@ -1322,13 +1420,20 @@ impl SimplexBdm {
 	/// # Errors
 	/// Rejects malformed states.
 	pub fn boundary_residual(&self, state: &[f64]) -> Result<f64, CfdError> {
-		let c = self.coefficients(state)?;
+		self.boundary_residual_with_scale(state, 1.)
+	}
+
+	/// Maximum constraint residual for the prescribed trace multiplied by `scale`.
+	/// # Errors
+	/// Rejects malformed state or nonfinite scale.
+	pub fn boundary_residual_with_scale(&self, state: &[f64], scale: f64) -> Result<f64, CfdError> {
+		let c = self.coefficients_with_boundary_scale(state, scale)?;
 		let rows = constraints(&self.cells, &self.faces, self.dimension);
 		let values = boundary_values(&self.cells, &self.faces, self.dimension);
 		Ok(rows
 			.iter()
 			.zip(values)
-			.map(|(r, b)| (dot(r, &c) - b).abs())
+			.map(|(r, b)| (dot(r, &c) - scale * b).abs())
 			.fold(0., f64::max))
 	}
 
@@ -1388,6 +1493,27 @@ impl SimplexBdm {
 	}
 }
 
+/// Admission limits for cellwise pressure probes, independent of caller allocation capacity.
+#[derive(Clone, Copy, Debug)]
+pub struct PressureProbeLimits {
+	/// Number of requested points.
+	pub max_points: usize,
+	/// Conservative scalar work: pressure validation plus 64 units per point/cell pair.
+	pub max_work: usize,
+	/// Accessible pressure/point slices, output values and 256 bytes of scalar scratch.
+	/// The already prepared mesh and unused capacity in caller buffers are separate.
+	pub max_bytes: usize,
+}
+impl Default for PressureProbeLimits {
+	fn default() -> Self {
+		Self {
+			max_points: 65_536,
+			max_work: 100_000_000,
+			max_bytes: 8 * 1024 * 1024,
+		}
+	}
+}
+
 impl SimplexBdm {
 	/// Batch physical velocity probes while reconstructing the full coefficient vector once.
 	///
@@ -1403,6 +1529,86 @@ impl SimplexBdm {
 			.iter()
 			.map(|&p| self.sample_coefficients(&c, p))
 			.collect()
+	}
+
+	/// Sample cellwise P0 pressure, averaging incident fluid-cell traces at facets/vertices.
+	///
+	/// The trace convention is explicit because discontinuous pressure has no unique
+	/// point value at interfaces. This bounded physical probe does not perform global
+	/// pressure interpolation or claim a continuum boundary-trace error bound.
+	/// # Errors
+	/// Rejects malformed pressure, nonfinite points and points outside the physical mesh.
+	pub fn sample_pressures(
+		&self,
+		pressure: &[f64],
+		points: &[[f64; 3]],
+	) -> Result<Vec<f64>, CfdError> {
+		self.sample_pressures_with_limits(pressure, points, PressureProbeLimits::default())
+	}
+
+	/// Pressure probes with checked work/storage admission before scanning points or allocating.
+	///
+	/// Uses the same incident-cell trace convention as [`Self::sample_pressures`].
+	/// # Errors
+	/// Rejects exceeded limits, allocation failure, invalid inputs and arithmetic overflow.
+	pub fn sample_pressures_with_limits(
+		&self,
+		pressure: &[f64],
+		points: &[[f64; 3]],
+		limits: PressureProbeLimits,
+	) -> Result<Vec<f64>, CfdError> {
+		let work = points
+			.len()
+			.checked_mul(self.cells.len())
+			.and_then(|n| n.checked_mul(64))
+			.and_then(|n| n.checked_add(pressure.len()));
+		let bytes = points
+			.len()
+			.checked_mul(32)
+			.and_then(|n| pressure.len().checked_mul(8).and_then(|p| n.checked_add(p)))
+			.and_then(|n| n.checked_add(256));
+		if points.len() > limits.max_points
+			|| work.is_none_or(|n| n > limits.max_work)
+			|| bytes.is_none_or(|n| n > limits.max_bytes)
+		{
+			return Err(CfdError::InvalidInput(
+				"pressure probe work or storage budget",
+			));
+		}
+		if pressure.len() != self.cells.len() || pressure.iter().any(|p| !p.is_finite()) {
+			return Err(CfdError::InvalidInput("invalid P0 pressure probes"));
+		}
+		let mut output = Vec::new();
+		output
+			.try_reserve_exact(points.len())
+			.map_err(|_| CfdError::InvalidInput("pressure probe allocation"))?;
+		for &point in points {
+			if point.iter().any(|v| !v.is_finite())
+				|| (self.dimension == 2 && point[2].abs() >= 1e-10)
+			{
+				return Err(CfdError::InvalidInput("invalid pressure probe location"));
+			}
+			let mut sum = 0.;
+			let mut count = 0_u32;
+			for (cell, &p) in self.cells.iter().zip(pressure) {
+				let delta = sub(point, cell.vertices[0]);
+				if cell.gradients.iter().enumerate().all(|(i, g)| {
+					(-1e-10..=1. + 1e-10).contains(&(dot(g, &delta) + f64::from(i == 0)))
+				}) {
+					sum += p;
+					count = count
+						.checked_add(1)
+						.ok_or(CfdError::InvalidInput("pressure probe cell count"))?;
+				}
+			}
+			if count == 0 || !sum.is_finite() {
+				return Err(CfdError::InvalidInput(
+					"pressure probe outside mesh or trace overflow",
+				));
+			}
+			output.push(sum / f64::from(count));
+		}
+		Ok(output)
 	}
 
 	/// L2 error of the recovered cellwise P0 pressure against a prescribed analytic gauge.
@@ -1549,4 +1755,50 @@ fn assign_boundaries(
 		faces.push(face);
 	}
 	Ok(())
+}
+
+#[cfg(test)]
+mod retained_source_tests {
+	use super::*;
+	use crate::physical_observation::{
+		PhysicalObservableKind, PhysicalObservableLimits, PreparedPhysicalObservable,
+	};
+	#[test]
+	#[allow(
+		clippy::panic_in_result_fn,
+		reason = "Assertions verify bounded source-capacity admission"
+	)]
+	fn excess_simplex_chart_capacity_is_rejected_by_capture_admission() -> Result<(), CfdError> {
+		let mut model = SimplexBdm::box_mesh(2, 1, 1., 0.02, BoxBoundary::Periodic)?;
+		let base = PreparedPhysicalObservable::simplex(
+			&model,
+			PhysicalObservableKind::Enstrophy,
+			PhysicalObservableLimits::default(),
+		)?;
+		assert_eq!(
+			base.resources().borrowed_source_bytes,
+			model.retained_bytes()?
+		);
+		let previous_bytes = model.retained_bytes()?;
+		let previous_capacity = model.chart[0].capacity();
+		model.chart[0]
+			.try_reserve_exact(100_000)
+			.map_err(|_| CfdError::InvalidInput("test capacity allocation"))?;
+		assert_eq!(
+			model.retained_bytes()? - previous_bytes,
+			8 * (model.chart[0].capacity() - previous_capacity)
+		);
+		assert!(
+			PreparedPhysicalObservable::simplex(
+				&model,
+				PhysicalObservableKind::Enstrophy,
+				PhysicalObservableLimits {
+					max_prepare_bytes: base.resources().prepare_peak_bytes + 1024,
+					..Default::default()
+				}
+			)
+			.is_err()
+		);
+		Ok(())
+	}
 }

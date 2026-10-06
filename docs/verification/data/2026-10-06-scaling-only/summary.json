@@ -1,0 +1,3545 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-06",
+  "scope": "Explicit scaling mode: focused local checks, completed GNU/Cray release builds and both compiler scientific scaling cases, including verified regular-server Torc lifecycle for Cray. Source freeze precedes this report.",
+  "capacity_closed": false,
+  "cluster_scaling_verified": true,
+  "full_portable_native_acceptance": "open",
+  "source": {
+    "manifest": {
+      "path": "target/scaling-cirrus-20261006/source.sha256",
+      "bytes": 353830,
+      "sha256": "ff4d5ce8215176f16e243e5dc7c733f46a6c2931ada4a3592a9a75d169cb797f"
+    },
+    "archive": {
+      "path": "target/scaling-cirrus-20261006/source.tar.gz",
+      "bytes": 11879128,
+      "sha256": "e205959bc8d8f1c8a948538579c944a0dbc54e9e99e3e0a601bd0789ec29a155"
+    },
+    "files": 2599,
+    "frozen_manifest_mismatches": 0,
+    "archive_files": 2599,
+    "archive_manifest_mismatches": 0,
+    "archive_extra_files": 0,
+    "parent_manifest": {
+      "path": "target/portable-locked-cirrus-20261006/source.sha256",
+      "bytes": 348034,
+      "sha256": "452a49852c4e23f018b82795c19a3fd183c781234f2914df2c0ab516d696918f"
+    },
+    "overlay_list": {
+      "path": "target/scaling-cirrus-20261006/overlay-files.txt",
+      "bytes": 547,
+      "sha256": "ca26c03f0e3b90acfb2753b587041d337a7cb3e570f52434430af0d00a7b1889"
+    },
+    "parent_delta": {
+      "path": "target/scaling-cirrus-20261006/parent-delta.txt",
+      "bytes": 2466,
+      "sha256": "aecd4e2422d073b5a5104c2484e349f1e4d4d3d84c696216b7992e5850d3f760"
+    },
+    "overlay": [
+      {
+        "path": "crates/quest/README.md",
+        "sha256": "f0e49c7d8e2c75f32deb4e8900261f4ec6568e70b69a281519b9e338f59c02fc",
+        "parent_sha256": "83c04de610605c027c947c6f31b5eb33defa2fcb1d89200aeb54e4bf17cc95bf",
+        "change": "modified"
+      },
+      {
+        "path": "crates/quest/examples/sparse_capacity.rs",
+        "sha256": "04d2ce730de9e2ed7b05f7a1085bd6550a2f6b97bae69157ec1468aeb11771ac",
+        "parent_sha256": "a78d11efa9930fd1b9d785c38c13f5da069baf257b621238017d10d3c634c4d4",
+        "change": "modified"
+      },
+      {
+        "path": "crates/quest/examples/sparse_capacity/README.md",
+        "sha256": "fcb087339b52d03269830bfdf1dea8043e5b429c8ecaf306c579480cd0b4066e",
+        "parent_sha256": null,
+        "change": "added"
+      },
+      {
+        "path": "crates/quest/examples/sparse_capacity/admission.rs",
+        "sha256": "414cfd1d6052e2959d5fa72c35c1993643878ff0359a215a9c4ae3e6f7175682",
+        "parent_sha256": null,
+        "change": "added"
+      },
+      {
+        "path": "docs/superpowers/plans/2026-10-06-portable-cirrus.md",
+        "sha256": "0bb71af524c9b57d81ca056041abd4241e757866cf654f7c923bc1535b4fb0a0",
+        "parent_sha256": "02931f6f0453f5b86db3eeff205c9129fe7fca651f920e3595f48eb15175c335",
+        "change": "modified"
+      },
+      {
+        "path": "docs/verification/fixtures/cirrus/README.md",
+        "sha256": "909fcf65b203b80c54bfc359a47a473ac45bfdcc09cbd3221af15d01face8d15",
+        "parent_sha256": "8c7dda143f8a0de303f3b5eca73408eace641cb6e372002f62cdcd0fc1566019",
+        "change": "modified"
+      },
+      {
+        "path": "docs/verification/fixtures/cirrus/native-scaling.sh",
+        "sha256": "68629930f890a6a9825a29b691eb11bd7c2ad6b09d65189d7d5b2510842c2e9f",
+        "parent_sha256": null,
+        "change": "added"
+      },
+      {
+        "path": "docs/verification/fixtures/cirrus/native-validation.sbatch",
+        "sha256": "07c119f706c7de9e7e17eb9d520501696de537df80a39082aea25d776bae0752",
+        "parent_sha256": "19e2769808886ac897010dd3c3563bf94bae61f4ecfa58f4fe92832d4d0ac7a9",
+        "change": "modified"
+      },
+      {
+        "path": "docs/verification/fixtures/cirrus/scaling-report.jq",
+        "sha256": "3d79a5bb7507a53c87c761da7eb861ab79f8448de447fcdb0589747ff0ec39ed",
+        "parent_sha256": null,
+        "change": "added"
+      },
+      {
+        "path": "docs/verification/fixtures/cirrus/torc-native-build.sbatch",
+        "sha256": "e1c3fd08d8a0ca59dfb162c829c9a4f6aaf08f7e6bfae1c4b2e048d418cb1ff6",
+        "parent_sha256": "8af6160c8bb675a4ffb7fd2356face3cedf3fbe0d60da692a32baa4e5775823e",
+        "change": "modified"
+      },
+      {
+        "path": "docs/verification/fixtures/cirrus/torc-native-scaling-build.yaml",
+        "sha256": "9b21c9d1988d154a48faae1da8f397fb6e00e9f733081e8fcfacd0e75e4a52e5",
+        "parent_sha256": null,
+        "change": "added"
+      }
+    ],
+    "removed_paths": [],
+    "library_source_workspace_manifests_and_locks_unchanged_from_parent": true,
+    "overlay_working_files_matched_frozen_before_post_freeze_documentation": true,
+    "post_freeze_documentation": "Later maintained Torc server guide/template promotion and acceptance-ledger updates changed only working documentation; ff4 source and archive bytes were not changed.",
+    "current_overlay_mismatches": [
+      "docs/superpowers/plans/2026-10-06-portable-cirrus.md",
+      "docs/verification/fixtures/cirrus/README.md"
+    ]
+  },
+  "mode_contract": {
+    "cli": "sparse_capacity --scaling OUTPUT N REPETITIONS MANAGED_RANK_BYTES MANAGED_NODE_BYTES NODES RANKS_PER_NODE THREADS STACK_BYTES",
+    "receipt_schema_version": 6,
+    "evidence_kind": "scaling-only",
+    "capacity_closed": false,
+    "changes_process_limits": false,
+    "accepts_observed_unlimited_limits": true,
+    "finite_soft_limit_must_admit_modeled_rank_envelope": true,
+    "managed_application_budget_enforcement_retained": true,
+    "input_construction": "Direct rank-owned COO shards",
+    "modeled_rank_envelope": "measured baseline address space + managed rank bytes + (requested threads - 1) * stack bytes per worker",
+    "modeled_node_rank_envelope": "Sum of actual co-located rank envelopes; not an enforced node cap or observed node peak",
+    "legacy_mode_requires_equal_finite_soft_and_hard_limits": true
+  },
+  "native_installations": {
+    "modified_by_this_change": false,
+    "quest_version": "4.3.0",
+    "quest_revision": "503552065045eaf89baba85e6cd6aad728525554",
+    "existing_library_sha256": {
+      "local_gnu": "2128fd71d6effd5ae463f9f92ff467032f09089a07cdb9ba7a5d565719b95396",
+      "cirrus_gnu": "afdf97834ae301ce6029fd85c3e66b86c6b7934c1bc97c5c98d05d2ef3df3ee3",
+      "cirrus_cray": "f1eba6a43b2f9b0b0ed043adeb66840bdae977aa1920efa6e767e4e3ec14af89"
+    },
+    "configuration_reports": [
+      "docs/verification/2026-10-06-native-gnu.md",
+      "docs/verification/2026-10-06-torc-cirrus.md"
+    ]
+  },
+  "local_checks": {
+    "scope": "Focused example checks and two MPI ranks on one host; no multi-host or performance claim",
+    "build_profile": "dev/test, debug=0, incremental=0, reused GNU Cargo target",
+    "cpu_execution": true,
+    "gpu_execution_tested": false,
+    "commands": [
+      "cargo test --locked --offline -p quest-rs --all-features --example sparse_capacity",
+      "cargo clippy --locked --offline -p quest-rs --all-features --example sparse_capacity -- -D warnings",
+      "cargo build --locked --offline -p quest-rs --all-features --example sparse_capacity"
+    ],
+    "unit_tests": {
+      "passed": 6,
+      "failed": 0,
+      "exit_code": 0
+    },
+    "statuses": {
+      "build": 0,
+      "clippy-final": 0,
+      "clippy": 101,
+      "legacy-unlimited-after": 1,
+      "legacy-unlimited-before": 1,
+      "n16-receipts": 0,
+      "n16": 0,
+      "n64-receipts": 0,
+      "n64": 0,
+      "red-build": 0,
+      "red": 1,
+      "unit": 0
+    },
+    "runtime_settings": {
+      "nodes": 1,
+      "ranks": 2,
+      "threads_per_rank": 2,
+      "repetitions": 3,
+      "managed_rank_bytes": 134217728,
+      "managed_node_bytes": 268435456,
+      "stack_bytes_per_worker": 8388608,
+      "observed_soft_limit": "unlimited",
+      "observed_hard_limit": "unlimited",
+      "observed_limits_unchanged": true
+    },
+    "runtime_deadline": "Local manual GNU timeout: TERM after 120 seconds, KILL grace 5 seconds. This is not the maintained Cirrus launcher.",
+    "runs": [
+      {
+        "dimension": 16,
+        "exit_code": 0,
+        "receipt_check_exit_code": 0,
+        "ranks": 2,
+        "physical_hosts": 1,
+        "limits_before_and_after": [
+          {
+            "rank": 0,
+            "before": {
+              "hard": {
+                "kind": "unlimited"
+              },
+              "soft": {
+                "kind": "unlimited"
+              },
+              "source": "/proc/self/limits: Max address space"
+            },
+            "after": {
+              "hard": {
+                "kind": "unlimited"
+              },
+              "soft": {
+                "kind": "unlimited"
+              },
+              "source": "/proc/self/limits: Max address space"
+            }
+          },
+          {
+            "rank": 1,
+            "before": {
+              "hard": {
+                "kind": "unlimited"
+              },
+              "soft": {
+                "kind": "unlimited"
+              },
+              "source": "/proc/self/limits: Max address space"
+            },
+            "after": {
+              "hard": {
+                "kind": "unlimited"
+              },
+              "soft": {
+                "kind": "unlimited"
+              },
+              "source": "/proc/self/limits: Max address space"
+            }
+          }
+        ],
+        "maximum_norm_error": 4.440892098500626e-16,
+        "maximum_sample_error": 5.551115123125783e-17,
+        "input_shard_hashes_verified": true,
+        "receipts": [
+          {
+            "path": "target/scaling-only-20261006/n16/rank-0.json",
+            "bytes": 5981,
+            "sha256": "64594e60836320a3edcb13d924136f18e3aa71268bcbabc57f6359e156822fa7"
+          },
+          {
+            "path": "target/scaling-only-20261006/n16/rank-1.json",
+            "bytes": 5777,
+            "sha256": "9015a8e7d1143080d49dc707bb63dd7b37855c49df9e8b0937b9984214401ead"
+          }
+        ],
+        "inputs": [
+          {
+            "path": "target/scaling-only-20261006/n16/input-rank-0.coo32",
+            "bytes": 512,
+            "sha256": "28a037648a3894280c8970c8e7955c55cc6f5890b4b70e1417c3ae8bebf03932"
+          },
+          {
+            "path": "target/scaling-only-20261006/n16/input-rank-1.coo32",
+            "bytes": 512,
+            "sha256": "66cec7b6e89aaa643e9a9fc6c2670a54bb07cb725a8574e6baf65950840640e6"
+          }
+        ]
+      },
+      {
+        "dimension": 64,
+        "exit_code": 0,
+        "receipt_check_exit_code": 0,
+        "ranks": 2,
+        "physical_hosts": 1,
+        "limits_before_and_after": [
+          {
+            "rank": 0,
+            "before": {
+              "hard": {
+                "kind": "unlimited"
+              },
+              "soft": {
+                "kind": "unlimited"
+              },
+              "source": "/proc/self/limits: Max address space"
+            },
+            "after": {
+              "hard": {
+                "kind": "unlimited"
+              },
+              "soft": {
+                "kind": "unlimited"
+              },
+              "source": "/proc/self/limits: Max address space"
+            }
+          },
+          {
+            "rank": 1,
+            "before": {
+              "hard": {
+                "kind": "unlimited"
+              },
+              "soft": {
+                "kind": "unlimited"
+              },
+              "source": "/proc/self/limits: Max address space"
+            },
+            "after": {
+              "hard": {
+                "kind": "unlimited"
+              },
+              "soft": {
+                "kind": "unlimited"
+              },
+              "source": "/proc/self/limits: Max address space"
+            }
+          }
+        ],
+        "maximum_norm_error": 2.220446049250313e-16,
+        "maximum_sample_error": 2.7755575615628914e-17,
+        "input_shard_hashes_verified": true,
+        "receipts": [
+          {
+            "path": "target/scaling-only-20261006/n64/rank-0.json",
+            "bytes": 5987,
+            "sha256": "d807c2cad26b15ee4e370dffb6d265ac8a9767d3c7bd27253ffdf341243b5511"
+          },
+          {
+            "path": "target/scaling-only-20261006/n64/rank-1.json",
+            "bytes": 5782,
+            "sha256": "1f3b48477daec81e8d9bee4a3150945acc697c1ab69804cdd2f8a26eabfce2f2"
+          }
+        ],
+        "inputs": [
+          {
+            "path": "target/scaling-only-20261006/n64/input-rank-0.coo32",
+            "bytes": 2048,
+            "sha256": "6dbbecf50ef4726ce48d06921a4361a98abc1a5b6fe0bdbecdfd3c36d96a6ea7"
+          },
+          {
+            "path": "target/scaling-only-20261006/n64/input-rank-1.coo32",
+            "bytes": 2048,
+            "sha256": "b9ff44af72966e5a48be7e109547d4d62ec9cc67b9af8302ac4685915897135a"
+          }
+        ]
+      }
+    ],
+    "retained_diagnostics": [
+      {
+        "name": "old positional parser given --scaling",
+        "exit_code": 1,
+        "reason": "ParseIntError InvalidDigit on both MPI ranks"
+      },
+      {
+        "name": "legacy positional mode on unlimited limits before and after",
+        "exit_codes": [
+          1,
+          1
+        ],
+        "reason": "Requires matching finite hard and soft address-space limits"
+      },
+      {
+        "name": "initial strict Clippy",
+        "exit_code": 101,
+        "reason": "Missing const qualifier and three redundant borrows; final strict check exit 0"
+      },
+      {
+        "name": "initial independent jq validator",
+        "result": "false for both unchanged runtime receipt sets",
+        "reason": "Boolean-binding precedence error; corrected validator accepts unchanged receipts without rerunning MPI"
+      }
+    ],
+    "source_manifest": {
+      "path": "target/scaling-only-20261006/source.sha256",
+      "bytes": 339,
+      "sha256": "9db0dbe50adecfe2c9327aebfce29e0ea689e87e706ecabf4186a82d1260d62a"
+    },
+    "source_manifest_matches_frozen": true,
+    "evidence_manifest": {
+      "path": "target/scaling-only-20261006/evidence.sha256",
+      "bytes": 3917,
+      "sha256": "178084685bbde0dc25a3aa52fbb09daed3a278bef0bdd64fb62c0489cf25c506"
+    },
+    "evidence_manifest_entries": 35,
+    "evidence_manifest_mismatches": 0,
+    "commands_record": {
+      "path": "target/scaling-only-20261006/commands.md",
+      "bytes": 2071,
+      "sha256": "84967e2b7ea1c74ca080016239b398548ad41bd9246a36ae82033d73b85ff006"
+    },
+    "summary_record": {
+      "path": "target/scaling-only-20261006/summary.json",
+      "bytes": 12261,
+      "sha256": "f0468b84be242106e829a664db594d9c7f9e9d41696a839882ff90f78116e390"
+    },
+    "artifacts": [
+      {
+        "path": "target/scaling-only-20261006/build.log",
+        "bytes": 1018,
+        "sha256": "29c5c69a9195af6c68e778fe8e51d381e3b31c7ca44cc61804e78ab0b8abade4"
+      },
+      {
+        "path": "target/scaling-only-20261006/build.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/scaling-only-20261006/clippy-final.log",
+        "bytes": 1018,
+        "sha256": "8f2f26b84990c19c14b495ac54b986d280c491013500b59ae0db478e22b48de3"
+      },
+      {
+        "path": "target/scaling-only-20261006/clippy-final.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/scaling-only-20261006/clippy.log",
+        "bytes": 5806,
+        "sha256": "b170de54c2197a24db67c57283f09f441a2f1a26bc02aba763afe34f5f6f9a17"
+      },
+      {
+        "path": "target/scaling-only-20261006/clippy.status",
+        "bytes": 4,
+        "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c"
+      },
+      {
+        "path": "target/scaling-only-20261006/commands.md",
+        "bytes": 2071,
+        "sha256": "84967e2b7ea1c74ca080016239b398548ad41bd9246a36ae82033d73b85ff006"
+      },
+      {
+        "path": "target/scaling-only-20261006/legacy-unlimited-after.log",
+        "bytes": 74,
+        "sha256": "c980caec0c06cfc426f4cf1578622986a6f8d9d29e61d96ce27abc75e6f2a946"
+      },
+      {
+        "path": "target/scaling-only-20261006/legacy-unlimited-after.status",
+        "bytes": 2,
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+      },
+      {
+        "path": "target/scaling-only-20261006/legacy-unlimited-before.log",
+        "bytes": 44,
+        "sha256": "833a767a632adcc6e31826317380464406a93cda0da686308c93905af218506d"
+      },
+      {
+        "path": "target/scaling-only-20261006/legacy-unlimited-before.status",
+        "bytes": 2,
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+      },
+      {
+        "path": "target/scaling-only-20261006/n16-receipts-initial.log",
+        "bytes": 6,
+        "sha256": "2ed27c1421e6928dbe13dbfdb5c59e1045b30341fe7ebe05700006bc5ac572c0"
+      },
+      {
+        "path": "target/scaling-only-20261006/n16-receipts.log",
+        "bytes": 5,
+        "sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74"
+      },
+      {
+        "path": "target/scaling-only-20261006/n16-receipts.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/scaling-only-20261006/n16.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "target/scaling-only-20261006/n16.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/scaling-only-20261006/n16/rank-0.json",
+        "bytes": 5981,
+        "sha256": "64594e60836320a3edcb13d924136f18e3aa71268bcbabc57f6359e156822fa7"
+      },
+      {
+        "path": "target/scaling-only-20261006/n16/rank-1.json",
+        "bytes": 5777,
+        "sha256": "9015a8e7d1143080d49dc707bb63dd7b37855c49df9e8b0937b9984214401ead"
+      },
+      {
+        "path": "target/scaling-only-20261006/n64-receipts-initial.log",
+        "bytes": 6,
+        "sha256": "2ed27c1421e6928dbe13dbfdb5c59e1045b30341fe7ebe05700006bc5ac572c0"
+      },
+      {
+        "path": "target/scaling-only-20261006/n64-receipts.log",
+        "bytes": 5,
+        "sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74"
+      },
+      {
+        "path": "target/scaling-only-20261006/n64-receipts.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/scaling-only-20261006/n64.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "target/scaling-only-20261006/n64.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/scaling-only-20261006/n64/rank-0.json",
+        "bytes": 5987,
+        "sha256": "d807c2cad26b15ee4e370dffb6d265ac8a9767d3c7bd27253ffdf341243b5511"
+      },
+      {
+        "path": "target/scaling-only-20261006/n64/rank-1.json",
+        "bytes": 5782,
+        "sha256": "1f3b48477daec81e8d9bee4a3150945acc697c1ab69804cdd2f8a26eabfce2f2"
+      },
+      {
+        "path": "target/scaling-only-20261006/receipts-summary.json",
+        "bytes": 10314,
+        "sha256": "9cdece65b93404e3228fb1a47ef7b66fdedb4e82984c27f93d7f172fff5372b1"
+      },
+      {
+        "path": "target/scaling-only-20261006/red-build.log",
+        "bytes": 3156,
+        "sha256": "275c75a5ddc4222947f44ad0847ffe07af8e7419d93ccf2a2b09411f3aa94463"
+      },
+      {
+        "path": "target/scaling-only-20261006/red-build.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/scaling-only-20261006/red.log",
+        "bytes": 88,
+        "sha256": "8e7db7a8cbca6eba999c166b030943a03eae145250c49344636562ea6bd9fd20"
+      },
+      {
+        "path": "target/scaling-only-20261006/red.status",
+        "bytes": 2,
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+      },
+      {
+        "path": "target/scaling-only-20261006/source.sha256",
+        "bytes": 339,
+        "sha256": "9db0dbe50adecfe2c9327aebfce29e0ea689e87e706ecabf4186a82d1260d62a"
+      },
+      {
+        "path": "target/scaling-only-20261006/unit.log",
+        "bytes": 1844,
+        "sha256": "a86015f76d2b95aed41c09916bc02bb31ec3e1666ef12132a4d1b5d4aedfe1a2"
+      },
+      {
+        "path": "target/scaling-only-20261006/unit.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/scaling-only-20261006/verify-receipts-initial.jq",
+        "bytes": 1342,
+        "sha256": "b1d43394c1cf9f35ab26dd624b7bbad5bd9e77b8871b75fd800278700a6bd864"
+      },
+      {
+        "path": "target/scaling-only-20261006/verify-receipts.jq",
+        "bytes": 1342,
+        "sha256": "466ccbf8666c362e1bca3b7d130cb61a58ab41b31de2eab34f72c10a18554ed1"
+      },
+      {
+        "path": "target/scaling-only-20261006/build.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/scaling-only-20261006/clippy-final.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/scaling-only-20261006/clippy.status",
+        "bytes": 4,
+        "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c"
+      },
+      {
+        "path": "target/scaling-only-20261006/legacy-unlimited-after.status",
+        "bytes": 2,
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+      },
+      {
+        "path": "target/scaling-only-20261006/legacy-unlimited-before.status",
+        "bytes": 2,
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+      },
+      {
+        "path": "target/scaling-only-20261006/n16-receipts.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/scaling-only-20261006/n16.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/scaling-only-20261006/n64-receipts.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/scaling-only-20261006/n64.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/scaling-only-20261006/red-build.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      {
+        "path": "target/scaling-only-20261006/red.status",
+        "bytes": 2,
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+      },
+      {
+        "path": "target/scaling-only-20261006/unit.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      }
+    ]
+  },
+  "fixtures": {
+    "source_manifest": {
+      "path": "target/scaling-fixtures-20261006/source.sha256",
+      "bytes": 727,
+      "sha256": "b2f65c534395ee415c9724f0db04cb5cd10e38b44dcb8d406c0c6e105dc71667"
+    },
+    "static_checks": {
+      "bash_syntax": "passed during preparation",
+      "shellcheck_warning_severity": "passed during preparation",
+      "diff_whitespace": "passed during preparation"
+    },
+    "independent_review": "No remaining concrete blocker after limit/envelope/metric completeness and allocation-host checks",
+    "synthetic_validator_checks": {
+      "scope": "Synthetic JSON validator contract checks only; no scientific, MPI, cluster or timing evidence",
+      "valid_sets_accepted": 6,
+      "invalid_sets_rejected": 7,
+      "summary": {
+        "path": "target/scaling-fixtures-20261006/summary.json",
+        "bytes": 1489,
+        "sha256": "1fe9132c75599dc6665bd9f8ff27cd839ef5cfa406df64795db05a0c76e63325"
+      },
+      "results": [
+        {
+          "case": "strong-2",
+          "expected_acceptance": true,
+          "exit_code": 0
+        },
+        {
+          "case": "weak-2",
+          "expected_acceptance": true,
+          "exit_code": 0
+        },
+        {
+          "case": "strong-4",
+          "expected_acceptance": true,
+          "exit_code": 0
+        },
+        {
+          "case": "weak-4",
+          "expected_acceptance": true,
+          "exit_code": 0
+        },
+        {
+          "case": "strong-8",
+          "expected_acceptance": true,
+          "exit_code": 0
+        },
+        {
+          "case": "weak-8",
+          "expected_acceptance": true,
+          "exit_code": 0
+        },
+        {
+          "case": "null-norm",
+          "expected_acceptance": false,
+          "exit_code": 1
+        },
+        {
+          "case": "null-limits",
+          "expected_acceptance": false,
+          "exit_code": 1
+        },
+        {
+          "case": "duplicate-host",
+          "expected_acceptance": false,
+          "exit_code": 1
+        },
+        {
+          "case": "wrong-envelope",
+          "expected_acceptance": false,
+          "exit_code": 1
+        },
+        {
+          "case": "missing-stage",
+          "expected_acceptance": false,
+          "exit_code": 1
+        },
+        {
+          "case": "incomplete-ranks",
+          "expected_acceptance": false,
+          "exit_code": 1
+        },
+        {
+          "case": "wrong-source",
+          "expected_acceptance": false,
+          "exit_code": 1
+        }
+      ]
+    },
+    "build": {
+      "stage": "scaling-build",
+      "target_namespace": "targets/scaling/<compiler>/<source-manifest-sha256>",
+      "profile": "release",
+      "command": "cargo build --release --locked --offline -p quest-rs --features mpi,qsvt-io --example sparse_capacity",
+      "torc_version": "0.41.0",
+      "torc_mode": "standalone",
+      "execution_mode": "direct",
+      "limit_resources": false,
+      "retry_or_recovery": false,
+      "resource_declaration": {
+        "num_cpus": 8,
+        "num_nodes": 1,
+        "memory": "32g",
+        "memory_is_enforced_cap": false
+      },
+      "database_and_worker_output": "Fresh node-local TMPDIR; exit archive retained on EPCCFS",
+      "acceptance": "Structured exported workflow/job/result match, completed status and zero result return code, plus native stage receipt"
+    },
+    "runtime": {
+      "launcher": "ordinary direct srun",
+      "allocated_nodes": 8,
+      "active_nodes": [
+        2,
+        4,
+        8
+      ],
+      "ranks_per_active_node": 1,
+      "cpus_and_requested_threads_per_rank": 288,
+      "series": {
+        "strong_dimensions": [
+          65536,
+          65536,
+          65536
+        ],
+        "weak_dimensions": [
+          16384,
+          32768,
+          65536
+        ]
+      },
+      "repetitions": 3,
+      "managed_rank_bytes": 4294967296,
+      "managed_node_bytes": 4294967296,
+      "stack_bytes_per_worker": 8388608,
+      "case_deadline_seconds": 480,
+      "srun_options": [
+        "--ntasks-per-node=1",
+        "--cpus-per-task=288",
+        "--hint=nomultithread",
+        "--distribution=block:block",
+        "--cpu-bind=cores",
+        "--kill-on-bad-exit=1",
+        "--time=00:08:00"
+      ],
+      "process_or_scheduler_memory_caps_added": false,
+      "acceptance": [
+        "matching completed scaling-build receipt and release profile",
+        "module/compiler/source/native/executable identity before and after",
+        "independent eight-host allocation observation",
+        "all rank receipts with unique active hosts within allocation",
+        "schema 6, scaling-only, capacity_closed false",
+        "typed unchanged observed limits and exact managed/stack/envelope settings",
+        "finite norm/sample errors and nonnegative stage/communication metrics",
+        "retained local source shard hash matches rank receipt"
+      ]
+    }
+  },
+  "cluster_submission": {
+    "observation_before_submission_utc": "2026-10-06T20:27:36Z",
+    "state_scope": "Historical pending states from retained per-ID scontrol records and the later Cray build submission log; not terminal accounting",
+    "generic_campaign": "$WORK/quest-validation/2026-10-06-scaling-only",
+    "source_deployed_read_only": true,
+    "epccfs_available_before_submission_human": "22G",
+    "account": "d458",
+    "partition": "standard",
+    "gnu_jobs": [
+      {
+        "job_id": 538274,
+        "stage": "scaling-build",
+        "state": "PENDING",
+        "dependency": "afterany:538261",
+        "exclusive": true,
+        "nodes": 1,
+        "tasks": 1,
+        "cpus_per_task": 8,
+        "qos": "lowpriority",
+        "time_limit_seconds": 7200,
+        "terminal_exit_code": null
+      },
+      {
+        "job_id": 538275,
+        "stage": "scaling",
+        "state": "PENDING",
+        "dependency": "afterok:538274",
+        "exclusive": true,
+        "nodes": 8,
+        "tasks": 8,
+        "tasks_per_node": 1,
+        "cpus_per_task": 288,
+        "qos": "lowpriority",
+        "time_limit_seconds": 3600,
+        "terminal_exit_code": null
+      }
+    ],
+    "aggregate_node_limit": 8,
+    "dependency_explanation": "538261 follows the earlier eight-node GNU validation job; 538274 follows 538261 and 538275 requires successful 538274. Cray build 538288 follows GNU scaling 538275.",
+    "partial_script_failure": {
+      "exit_code": 1,
+      "operation": "Combined scontrol show query after both GNU submissions",
+      "message": "too many arguments for keyword:show",
+      "gnu_submissions_succeeded": true,
+      "cray_submission_reached": false,
+      "followup": "Separate per-ID scontrol queries confirmed both accepted jobs and their dependencies",
+      "jobs_resubmitted": false,
+      "corrected_script_retained_for_provenance_not_rerun": true,
+      "log": {
+        "path": "target/scaling-cirrus-20261006/submission.log",
+        "bytes": 103,
+        "sha256": "fd505e4f75199ed2a62ae946f6fb8901165e9daf2ba25e4b1b361e8aaffa54e6"
+      },
+      "status": {
+        "path": "target/scaling-cirrus-20261006/submission.status",
+        "bytes": 2,
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+      }
+    },
+    "archive": {
+      "path": "target/scaling-cirrus-20261006/gnu-submission-receipts.tar.gz",
+      "bytes": 2764,
+      "sha256": "dc2b33bf0b7c2fba630e0f0a4ee31d2d027fc3045e85b5d16de9875544d38e87"
+    },
+    "archive_gzip_verified": true,
+    "archive_members": [
+      "submissions/538274.txt",
+      "submissions/538275.txt",
+      "submissions/deploy-and-submit.initial.sh",
+      "submissions/deploy-and-submit.sh",
+      "submissions/gnu-build.job",
+      "submissions/gnu-jobs.txt",
+      "submissions/gnu-runtime.job",
+      "submissions/observed-before.txt",
+      "submissions/torc-binaries.sha256"
+    ],
+    "private_raw_fields_published": false,
+    "cray_build_jobs": [
+      {
+        "job_id": 538288,
+        "stage": "scaling-build",
+        "state": "PENDING",
+        "dependency": "afterany:538275",
+        "exclusive": true,
+        "nodes": 1,
+        "tasks": 1,
+        "cpus_per_task": 8,
+        "qos": "lowpriority",
+        "time_limit_seconds": 7200,
+        "terminal_exit_code": null
+      }
+    ],
+    "cray_runtime_submitted": true,
+    "cray_build_submission": {
+      "observed_utc": "2026-10-06T20:42:16Z",
+      "exit_code": 0,
+      "script": {
+        "path": "target/scaling-cirrus-20261006/submit-cray-build.sh",
+        "bytes": 2131,
+        "sha256": "be7d34fa5c9abe32cdcbcf3ae4c397d2fc999a13a29e871b7c2b97529a99fd2d"
+      },
+      "log": {
+        "path": "target/scaling-cirrus-20261006/cray-build-submission.log",
+        "bytes": 393,
+        "sha256": "017d882e1d7b2feb1e6d3fafd94f85aaad1dbb8552320f8d48dd2ffc71c7f708"
+      },
+      "status": {
+        "path": "target/scaling-cirrus-20261006/cray-build-submission.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "runtime_route": "Later submitted as regular-server Torc workflow1, Slurm538318, after matching build and connectivity success.",
+      "archive": {
+        "path": "target/scaling-cirrus-20261006/cray-build-submission-receipts.tar.gz",
+        "bytes": 1134,
+        "sha256": "7dbab49670ee235275513abf2c48662ebbca8f6ea06c5caf671ba0cac0a76be1"
+      },
+      "archive_members": [
+        "submissions/cray-build.job",
+        "submissions/538288.txt",
+        "submissions/observed-after-cray-build.txt"
+      ],
+      "archive_gzip_verified": true
+    }
+  },
+  "open_acceptance": [
+    "Whole-node small aggregate memory enforcement unsupported in this documented Cirrus workflow",
+    "Whole-node peak memory and HugeTLB coverage unmeasured",
+    "Persistence/load wire-byte accounting unmeasured",
+    "NFS server/worker-WAL durability and reliability unvalidated",
+    "Requested OpenMP thread count does not measure each kernel team",
+    "Known-rank process sampling excludes other node residents",
+    "No speedup claim; fixed-work execution and load times increased with nodes",
+    "No overall portable-native acceptance or capacity closure"
+  ],
+  "related_reports": [
+    "docs/verification/2026-10-06-portable-reviewed.md",
+    "docs/verification/2026-10-06-node-enforcement.md",
+    "docs/verification/2026-10-06-cargo-host-policy.md"
+  ],
+  "server_read_only_followup": {
+    "observed_utc": "2026-10-06T20:58:25Z",
+    "matched_user_server_process_and_listener": true,
+    "login_api_ping_succeeded": true,
+    "login_workflow_list_items": 0,
+    "inspection_exit_code": 0,
+    "server_changed": false,
+    "workflow_created": true,
+    "server_backed_allocation_submitted": true,
+    "endpoint_guessed": false,
+    "compute_node_reachability": "passed on one allocated compute node",
+    "server_working_directory": "$WORK/torc",
+    "reported_database_name": "torc-quest.db",
+    "observed_directory_filesystem": {
+      "type": "NFS",
+      "version": 3,
+      "local_lock": "none",
+      "local_lock_interpretation": "Locks are not assumed client-local; normal remote locking is not disabled",
+      "interpretation_source": "Installed primary nfs(5), /usr/share/man/man5/nfs.5.gz, local_lock section"
+    },
+    "database_storage_support": "NFS is discouraged by upstream; reliability unvalidated, with no categorical implementation rejection or demonstrated corruption",
+    "worker_wal_storage_support": "Reliability unvalidated for any enabled time-series or used offline journal",
+    "server_backed_scaling_verified": true,
+    "log": {
+      "path": "target/torc-server-20261006/live/login-inspection.log",
+      "bytes": 813,
+      "sha256": "ada6aa5d7037d93dbd258f55ff4620acd115d09ecc5491810fb08fc55c8592a9"
+    },
+    "status": {
+      "path": "target/torc-server-20261006/live/login-inspection.status",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "private_hostname_process_and_path_fields_published": false,
+    "guide": "docs/verification/fixtures/cirrus/torc-server.md",
+    "database_location_evidence": [
+      "user-provided sqlite:torc-quest.db setting",
+      "working directory of matched server process",
+      "matching relative-path file exists",
+      "findmnt identifies the directory filesystem"
+    ],
+    "open_database_file_descriptor_observed": false,
+    "workflow_attempt_policy": "Ordinary documented workflow may proceed after successful compute-node connectivity and matching build, retaining NFS reliability limitation without a new durability proof or approval gate",
+    "connectivity_probe": {
+      "job_id": 538300,
+      "submitted_utc": "2026-10-06T21:00:58Z",
+      "state_at_submission": "PENDING",
+      "dependency": "afterany:538288",
+      "nodes": 1,
+      "tasks": 1,
+      "cpus_per_task": 1,
+      "exclusive": true,
+      "qos": "short",
+      "partition": "standard",
+      "time_limit_seconds": 120,
+      "requeue": false,
+      "submission_exit_code": 0,
+      "terminal_exit_code": "0:0",
+      "future_runtime_must_follow_probe": true,
+      "script": {
+        "path": "target/torc-server-20261006/live/submit-connectivity.sh",
+        "bytes": 1358,
+        "sha256": "00b480515717a2aebafb2d052ea794738814727ba3a48637ce07c4a925dff974"
+      },
+      "log": {
+        "path": "target/torc-server-20261006/live/connectivity-submission.log",
+        "bytes": 1630,
+        "sha256": "d37509f212d226f4f732752e2b678c7d6bc15d24f0acbec71ec0338f07f05fb0"
+      },
+      "status": {
+        "path": "target/torc-server-20261006/live/connectivity-submission.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "terminal_state": "COMPLETED",
+      "started_utc": "2026-10-06T21:06:31Z",
+      "ended_utc": "2026-10-06T21:06:34Z",
+      "elapsed_seconds": 3,
+      "ping_exit_code": 0,
+      "archive": {
+        "path": "target/torc-server-20261006/live/connectivity-receipts.tar.gz",
+        "bytes": 1766,
+        "sha256": "deafa6ea4009ece4e481554424120ba3e8dadd9eeb03de31c153c789e01043bd"
+      },
+      "terminal_log": {
+        "path": "target/torc-server-20261006/live/connectivity-terminal.log",
+        "bytes": 2515,
+        "sha256": "3bbd10ab2e9c0be1e15d07c567b248472d5789ca16d27714948219b2fe17df78"
+      },
+      "terminal_status": {
+        "path": "target/torc-server-20261006/live/connectivity-terminal.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "archive_probe_matches_maintained_bytes": true
+    },
+    "server_hostname_identified_from_matched_process": true,
+    "populated_workflow": {
+      "yaml": {
+        "path": "target/torc-server-20261006/live/scaling-server.yaml",
+        "bytes": 1952,
+        "sha256": "213e81f8395b791aeae1f95520216f85fc2c75c14bcef9feb49a9822821d7dbf"
+      },
+      "schema_result": {
+        "path": "target/torc-server-20261006/live/concrete-schema.json",
+        "bytes": 618,
+        "sha256": "aa5ef02f05fabfe649d6a0f6b8edcf9e35c7cdda34fc36917f76b3ca3dc7391b"
+      },
+      "schema_status": {
+        "path": "target/torc-server-20261006/live/concrete-schema.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "schema_exit_code": 0,
+      "valid": true,
+      "dependency": "afterok:538288:538300",
+      "no_requeue": true,
+      "created": true,
+      "workflow_id": 1,
+      "submitted": true,
+      "slurm_job_id": 538318
+    },
+    "historical_populated_workflow_without_no_requeue": {
+      "yaml": {
+        "path": "target/torc-server-20261006/live/scaling-server.initial.yaml",
+        "bytes": 1939,
+        "sha256": "cb93d64b2d91b298c8d0d0cbb050833f230373ced70a8b7262f152661f9306b6"
+      },
+      "schema_result": {
+        "path": "target/torc-server-20261006/live/concrete-schema.initial.json",
+        "bytes": 618,
+        "sha256": "aa5ef02f05fabfe649d6a0f6b8edcf9e35c7cdda34fc36917f76b3ca3dc7391b"
+      },
+      "schema_status": {
+        "path": "target/torc-server-20261006/live/concrete-schema.initial.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "created": false,
+      "submitted": false
+    },
+    "current_template_validation": {
+      "yaml": {
+        "path": "docs/verification/fixtures/cirrus/torc-server-scaling.template.yaml",
+        "bytes": 1739,
+        "sha256": "01b65583fa1cb89a48d4b93e955f17f68217724600fb22ef3fcd114a911b26fd"
+      },
+      "schema_result": {
+        "path": "target/torc-server-20261006/template-no-requeue-schema.json",
+        "bytes": 600,
+        "sha256": "b8e83bac230af865187af0361bbb2bed48c437e3557caad1d0e6baa7630f32b5"
+      },
+      "schema_status": {
+        "path": "target/torc-server-20261006/template-no-requeue-schema.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "schema_stderr": {
+        "path": "target/torc-server-20261006/template-no-requeue-schema.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "exit_code": 0,
+      "command": "torc --skip-version-check -f json create --dry-run -",
+      "offline": true,
+      "change": "Added documented --no-requeue to scheduler.extra; previous validated packet remains historical"
+    },
+    "server_lifecycle_acceptance": "passed: exactly one completed native-scaling job/result with matching workflow/run/attempt and inactive eight-node coordinator",
+    "actual_submission": {
+      "workflow_id": 1,
+      "slurm_job_id": 538318,
+      "submitted_utc": "2026-10-06T21:10:54Z",
+      "script": {
+        "path": "target/torc-server-20261006/live/create-and-submit.sh",
+        "bytes": 2810,
+        "sha256": "d83caba93ac2f7a4a8fe36e6889b1a253be1755fba2a880be500ef1640cf5a13"
+      },
+      "log": {
+        "path": "target/torc-server-20261006/live/create-and-submit.log",
+        "bytes": 1074,
+        "sha256": "c5619aa8b5bc165c82f9d70fc51aaa517ec4867b967632b9da1bf96413226646"
+      },
+      "status": {
+        "path": "target/torc-server-20261006/live/create-and-submit.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "exit_code": 0,
+      "generated_script": {
+        "path": "target/torc-server-20261006/live/generated-538318.sh",
+        "bytes": 888,
+        "sha256": "bea911f70e326ae508827bc1ba8eed698213f34a100fbeedbfa9ee2bd10b4a4f"
+      },
+      "allocation_log": {
+        "path": "target/torc-server-20261006/live/submitted-allocation.log",
+        "bytes": 1980,
+        "sha256": "e0bc302b6e11ef908c353b891193f1f2c8211b1796360f61ebe88136564bd48f"
+      },
+      "one_coordinator": true,
+      "outer_srun": false,
+      "memory_request_flags": false,
+      "nodes": 8,
+      "tasks": 8,
+      "tasks_per_node": 1,
+      "cpus_per_task": 288,
+      "exclusive": true,
+      "no_requeue": true,
+      "qos": "lowpriority",
+      "partition": "standard",
+      "dependency": "afterok:538288:538300"
+    },
+    "lifecycle": {
+      "workflow_id": 1,
+      "job_id": 1,
+      "job_name": "native-scaling",
+      "run_id": 1,
+      "attempt_id": 1,
+      "result_id": 1,
+      "job_status": "completed",
+      "result_status": "completed",
+      "return_code": 0,
+      "result_count": 1,
+      "compute_record_count": 1,
+      "compute_record_active": false,
+      "compute_record_nodes": 8,
+      "compute_record_cpus": 2304,
+      "slurm_job_id": 538318,
+      "execution_mode": {
+        "limit_resources": false,
+        "mode": "direct"
+      },
+      "resource_monitor_configuration": {
+        "compute_node": null,
+        "enabled": true,
+        "flush_interval_seconds": 300,
+        "generate_plots": false,
+        "granularity": "summary",
+        "jobs": {
+          "enabled": true,
+          "granularity": "summary"
+        },
+        "sample_interval_seconds": 10
+      },
+      "export": {
+        "path": "target/torc-server-20261006/live/workflow-export.json",
+        "bytes": 7426,
+        "sha256": "ae63cfc2dfb8b937e2293b71a15cb70bb8c182e6bfc562d0ae691df6f047ea29"
+      },
+      "get": {
+        "path": "target/torc-server-20261006/live/workflow-get.json",
+        "bytes": 1185,
+        "sha256": "ab5cd3bb989d3a44c9236586c93ea421f373cd9a99d45affce73ce198a5d1300"
+      },
+      "results_with_logs": {
+        "path": "target/torc-server-20261006/live/results-with-logs.json",
+        "bytes": 1301,
+        "sha256": "ce5915ce721993d25077714a470a3acd9a7902f0b5d0437577eca717476410e4"
+      },
+      "query_statuses": [
+        {
+          "path": "target/torc-server-20261006/live/workflow-export.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        },
+        {
+          "path": "target/torc-server-20261006/live/workflow-get.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        },
+        {
+          "path": "target/torc-server-20261006/live/results-with-logs.status",
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      ],
+      "output_archive": {
+        "path": "target/torc-server-20261006/live/server-output-538318.tar.gz",
+        "bytes": 4606,
+        "sha256": "76330a387ad76bac38f1e16e8af186e1079684181c6fbec13e6c7191fa1022f7"
+      },
+      "archive_gzip_hash_and_actual_generated_script_verified": true,
+      "actual_stdout_stderr_and_runner_logs_archived": true,
+      "server_database_archived": false,
+      "terminal_accounting": {
+        "path": "target/torc-server-20261006/live/terminal-accounting-538318.txt",
+        "bytes": 2873,
+        "sha256": "172b2b68c620aae0cf8e1cd5e0a5f21632208cfb4c97caaf47fcd46f239a8065"
+      },
+      "initial_read_only_query_diagnostics": {
+        "artifact": {
+          "path": "target/torc-server-20261006/live/initial-query-diagnostics.txt",
+          "bytes": 854,
+          "sha256": "3ea4f22daa92312dcbf7d7dd1a8f5fbedac4c79c206893d83ba593045666fbc5"
+        },
+        "kind": "Retained transcription of original tool output",
+        "errors": [
+          "unsupported workflows status subcommand",
+          "results --include-logs defaulted to missing torc_output directory"
+        ],
+        "individual_exit_codes_recorded": false,
+        "combined_initial_shell_exit_code": 0,
+        "combined_exit_explanation": "Final file inventory succeeded; this does not establish either failed query succeeded",
+        "correction": "workflows get; results list --include-logs --output-dir with actual deployment output",
+        "scientific_or_workflow_retries": false
+      },
+      "independent_summary": {
+        "path": "target/torc-server-20261006/live/lifecycle-summary.json",
+        "bytes": 4629,
+        "sha256": "fca2fda822a1a5d452b6418c6a00469e6408308cbc37c49d43e856378da53b13"
+      },
+      "independent_artifact_index": {
+        "path": "target/torc-server-20261006/live/lifecycle-artifacts.sha256",
+        "bytes": 6228,
+        "sha256": "d803466137fd3abed6a368ec6f48a7c6935010107ee98db95d5cbf3f2bc9d950"
+      },
+      "independent_index_files": 56,
+      "independent_index_mismatches": 0,
+      "scheduled_compute_nodes": {
+        "path": "target/torc-server-20261006/live/scheduled-compute-nodes.json",
+        "bytes": 194,
+        "sha256": "fedbc8098c093c7704e957825bea592a03883b45da845bfa9884038e219b2034"
+      },
+      "scheduled_compute_record_count": 1,
+      "scheduled_compute_status": "complete",
+      "all_five_results_referenced_logs_present_and_hashed": true,
+      "runner_had_failures": false,
+      "runner_had_terminations": false,
+      "compute_record_end_time_scope": "Planned allocation deadline, not actual completion; actual completion uses Slurm accounting and result completion_time",
+      "actual_result_completion_utc": "2026-10-06T21:11:42.503Z",
+      "no_workflow_or_scientific_retry": true
+    }
+  },
+  "cluster_compilers_with_scientific_acceptance": [
+    "gnu",
+    "cray"
+  ],
+  "cluster_execution": {
+    "source_manifest_sha256": "ff4d5ce8215176f16e243e5dc7c733f46a6c2931ada4a3592a9a75d169cb797f",
+    "release_builds": [
+      {
+        "compiler": "gnu",
+        "job_id": 538274,
+        "state": "COMPLETED",
+        "exit_code": "0:0",
+        "started_utc": "2026-10-06T21:02:36Z",
+        "ended_utc": "2026-10-06T21:04:11Z",
+        "elapsed_seconds": 95,
+        "allocated_nodes": 1,
+        "requested_cpus_per_task": 8,
+        "accounting_allocated_cpus": 288,
+        "exclusive": true,
+        "build_profile": "release",
+        "executable_sha256": "4388c94671c829d39e4d7811b220f3a343dd27f17032d73f6d32d7923189eb18",
+        "source_manifest_sha256": "ff4d5ce8215176f16e243e5dc7c733f46a6c2931ada4a3592a9a75d169cb797f",
+        "all_stage_statuses": {
+          "completed.status": 0,
+          "executable-after.status": 0,
+          "job-exit.status": 0,
+          "native-after.status": 0,
+          "scaling-build.status": 0,
+          "source-after.status": 0
+        },
+        "torc": {
+          "mode": "standalone",
+          "version": "0.41.0",
+          "workflow_id": 1,
+          "job_id": 1,
+          "job_name": "native-scaling-build",
+          "job_status": "completed",
+          "result": {
+            "id": 1,
+            "job_id": 1,
+            "workflow_id": 1,
+            "run_id": 1,
+            "attempt_id": 1,
+            "status": "completed",
+            "return_code": 0
+          },
+          "acceptance": true,
+          "run_exit_code": 0,
+          "wrapper_exit_code": 0,
+          "export": {
+            "path": "target/scaling-cirrus-20261006/retrieved/torc/gnu/538274/workflow-export.json",
+            "bytes": 5220,
+            "sha256": "1a2a298055b1460c4d134f0b583fa7f4cff2882c5409be64982dd3bce358c794"
+          },
+          "local_artifacts_archive": {
+            "path": "target/scaling-cirrus-20261006/retrieved/torc/gnu/538274/local-artifacts.tar.gz",
+            "bytes": 80703,
+            "sha256": "fb8b90594b084cd8eccf6b63e9aac3f18b4848865e93d74cd3e91270d11a66c1"
+          }
+        },
+        "identity_records": [
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538274/source-digest",
+            "bytes": 65,
+            "sha256": "b3d822c64c2970e39ecef7a7d80f5c7d5f7e2a7ec21387cbde2d1dc55f45a409"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538274/executable.sha256",
+            "bytes": 253,
+            "sha256": "36fd132d236f852719f0fe55c77cb450a7ced1718f38a37cbad226a6ad75cec0"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538274/native.sha256",
+            "bytes": 181,
+            "sha256": "041d518409f77b388a49ebe15ad1d0f8881dedb82810256cf1ddbc5bd3684451"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538274/modules.txt",
+            "bytes": 308,
+            "sha256": "8623b74f7226ee04c83cc4c021763741102179df3832d59bd93f3d505f641690"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538274/compiler-inputs.txt",
+            "bytes": 1275,
+            "sha256": "b23c93c1b0d6fa77d660156c8f4b8c59b4647a5fc33af9ecc17aaf3d8e052a60"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538274/build-profile",
+            "bytes": 8,
+            "sha256": "3933e3274b63dc01fd286d6d939a626867c83a4603fc4347e0f8b8856f1b98fd"
+          }
+        ],
+        "build_log": {
+          "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538274/scaling-build.log",
+          "bytes": 11339,
+          "sha256": "9293019ddc3c563d5b79ac234c7929931c5542937dfec739d35a2bb261de1e2d"
+        }
+      },
+      {
+        "compiler": "cray",
+        "job_id": 538288,
+        "state": "COMPLETED",
+        "exit_code": "0:0",
+        "started_utc": "2026-10-06T21:04:57Z",
+        "ended_utc": "2026-10-06T21:06:31Z",
+        "elapsed_seconds": 94,
+        "allocated_nodes": 1,
+        "requested_cpus_per_task": 8,
+        "accounting_allocated_cpus": 288,
+        "exclusive": true,
+        "build_profile": "release",
+        "executable_sha256": "efb772532f397ff447a6d6dfc97d95fcc8e7b96d536c5b84da16b5c23a4275c6",
+        "source_manifest_sha256": "ff4d5ce8215176f16e243e5dc7c733f46a6c2931ada4a3592a9a75d169cb797f",
+        "all_stage_statuses": {
+          "completed.status": 0,
+          "executable-after.status": 0,
+          "job-exit.status": 0,
+          "native-after.status": 0,
+          "scaling-build.status": 0,
+          "source-after.status": 0
+        },
+        "torc": {
+          "mode": "standalone",
+          "version": "0.41.0",
+          "workflow_id": 1,
+          "job_id": 1,
+          "job_name": "native-scaling-build",
+          "job_status": "completed",
+          "result": {
+            "id": 1,
+            "job_id": 1,
+            "workflow_id": 1,
+            "run_id": 1,
+            "attempt_id": 1,
+            "status": "completed",
+            "return_code": 0
+          },
+          "acceptance": true,
+          "run_exit_code": 0,
+          "wrapper_exit_code": 0,
+          "export": {
+            "path": "target/scaling-cirrus-20261006/retrieved/torc/cray/538288/workflow-export.json",
+            "bytes": 5209,
+            "sha256": "66abb4a5c4bf44fda174ccf67e3dff09d8db4fb9c9cd3fbf6af9bc4099e81505"
+          },
+          "local_artifacts_archive": {
+            "path": "target/scaling-cirrus-20261006/retrieved/torc/cray/538288/local-artifacts.tar.gz",
+            "bytes": 80588,
+            "sha256": "427ffeb2a37be09a625b5b4f9a785e2ec4a52843b52cfd6f05fb3899f2f483aa"
+          }
+        },
+        "identity_records": [
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538288/source-digest",
+            "bytes": 65,
+            "sha256": "b3d822c64c2970e39ecef7a7d80f5c7d5f7e2a7ec21387cbde2d1dc55f45a409"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538288/executable.sha256",
+            "bytes": 254,
+            "sha256": "5b56e06514270bdde66c504657f0ada8b11ca646d8d163f43dc32226a57fee5b"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538288/native.sha256",
+            "bytes": 182,
+            "sha256": "f0062b6b6b6cec41d7786a5012fe0904874f998eb0157a39dd1c001574a3232a"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538288/modules.txt",
+            "bytes": 260,
+            "sha256": "f5d648c8bf61cb94f937cffc0969166adc8b1bda5a27658b370d5a134ac88fee"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538288/compiler-inputs.txt",
+            "bytes": 1867,
+            "sha256": "072ed26e0f8d52b7da1661355b6fdeb85d043f88dce06ddcf5e0c3bf40f6b183"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538288/build-profile",
+            "bytes": 8,
+            "sha256": "3933e3274b63dc01fd286d6d939a626867c83a4603fc4347e0f8b8856f1b98fd"
+          }
+        ],
+        "build_log": {
+          "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538288/scaling-build.log",
+          "bytes": 11346,
+          "sha256": "b88f3c98bd06fb7a114caade98bc90556cef67c94838e25d03ddd9f8ea1514eb"
+        }
+      }
+    ],
+    "gnu_and_build_archive": {
+      "path": "target/scaling-cirrus-20261006/retrieved/completed-gnu-and-builds.tar.gz",
+      "bytes": 5326147,
+      "sha256": "2bc5a2d26c31db4130a347b86c4ab16dc6e3fd3df184a75f72e13c9e4f240fe3"
+    },
+    "gnu_and_build_raw_index": {
+      "artifact": {
+        "path": "target/scaling-cirrus-20261006/analysis/retrieved.sha256",
+        "bytes": 43426,
+        "sha256": "fdd4867aa9ee2db54d34a9da57769cec10e4de547974494837edf565fa78f951"
+      },
+      "files": 286,
+      "mismatches": 0
+    },
+    "gnu_and_build_status_files": 42,
+    "gnu_and_build_all_statuses_zero": true,
+    "gnu_and_build_validation": {
+      "script": {
+        "path": "target/scaling-cirrus-20261006/analysis/check-and-aggregate.sh",
+        "bytes": 2281,
+        "sha256": "61275ba3a146ce09a980b5f51979074172b4c17550ba0af4a4d89b39ee94ca6c"
+      },
+      "log": {
+        "path": "target/scaling-cirrus-20261006/analysis/check-and-aggregate.log",
+        "bytes": 572,
+        "sha256": "3620096b7356c0295b98897b615c40457d27c2e4bce2742585962482c4410e2e"
+      },
+      "status": {
+        "path": "target/scaling-cirrus-20261006/analysis/check-and-aggregate.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "exit_code": 0
+    },
+    "gnu_and_build_accounting": {
+      "path": "target/scaling-cirrus-20261006/analysis/accounting-gnu-and-builds.txt",
+      "bytes": 2199,
+      "sha256": "506eb34104f5276f51cdf0a5172b28fc961b1cd1ac138565607ea9747c49f2ba"
+    },
+    "runtimes": [
+      {
+        "compiler": "gnu",
+        "job_id": 538275,
+        "route": "ordinary direct sbatch/srun",
+        "state": "COMPLETED",
+        "exit_code": "0:0",
+        "started_utc": "2026-10-06T21:04:13Z",
+        "ended_utc": "2026-10-06T21:04:57Z",
+        "elapsed_seconds": 44,
+        "allocated_nodes": 8,
+        "allocated_cpus": 2304,
+        "active_case_nodes": [
+          2,
+          4,
+          8
+        ],
+        "ranks_per_active_node": 1,
+        "omp_requested_threads": 288,
+        "capacity_closed": false,
+        "source_manifest_sha256": "ff4d5ce8215176f16e243e5dc7c733f46a6c2931ada4a3592a9a75d169cb797f",
+        "executable_sha256": "4388c94671c829d39e4d7811b220f3a343dd27f17032d73f6d32d7923189eb18",
+        "native_library_sha256": "afdf97834ae301ce6029fd85c3e66b86c6b7934c1bc97c5c98d05d2ef3df3ee3",
+        "all_stage_statuses": {
+          "completed.status": 0,
+          "executable-after.status": 0,
+          "executable-before.status": 0,
+          "job-exit.status": 0,
+          "native-after.status": 0,
+          "scaling-placement-check.status": 0,
+          "scaling-placement.status": 0,
+          "scaling-strong-2-inputs.status": 0,
+          "scaling-strong-2-reports.status": 0,
+          "scaling-strong-2.status": 0,
+          "scaling-strong-4-inputs.status": 0,
+          "scaling-strong-4-reports.status": 0,
+          "scaling-strong-4.status": 0,
+          "scaling-strong-8-inputs.status": 0,
+          "scaling-strong-8-reports.status": 0,
+          "scaling-strong-8.status": 0,
+          "scaling-weak-2-inputs.status": 0,
+          "scaling-weak-2-reports.status": 0,
+          "scaling-weak-2.status": 0,
+          "scaling-weak-4-inputs.status": 0,
+          "scaling-weak-4-reports.status": 0,
+          "scaling-weak-4.status": 0,
+          "scaling-weak-8-inputs.status": 0,
+          "scaling-weak-8-reports.status": 0,
+          "scaling-weak-8.status": 0,
+          "source-after.status": 0
+        },
+        "input_shards_hash_verified": 28,
+        "rank_receipts": [
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538275/scaling/strong-2/rank-0.json",
+            "bytes": 6075,
+            "sha256": "fca04a6b204976e2c0e639a1ad2a6381a878244b93cbcb57b1646ed6d3cb62e9"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538275/scaling/strong-2/rank-1.json",
+            "bytes": 6080,
+            "sha256": "6a7c8e7d8d63fe27840a41e0f7dc57e9216a9657b71d3b761ae3a6a382f5ce62"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538275/scaling/strong-4/rank-0.json",
+            "bytes": 6072,
+            "sha256": "a4cfcd5b6b2304fa549abef2be3ed5b6406983afe8334d883279ae24580cbfd0"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538275/scaling/strong-4/rank-1.json",
+            "bytes": 6081,
+            "sha256": "c73b8c03885ecfe258d227c653573deb50eaad480b7650e8fbeb10dc35934d54"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538275/scaling/strong-4/rank-2.json",
+            "bytes": 6067,
+            "sha256": "8107360cc391223c5ebbda21851b6f2360d52bd042548f126936eead23507e16"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538275/scaling/strong-4/rank-3.json",
+            "bytes": 6065,
+            "sha256": "c4de20d7abceee60c389c33a1718362803026067a44e152d46f8d243b3e624d9"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538275/scaling/strong-8/rank-0.json",
+            "bytes": 6071,
+            "sha256": "4fb1e8fc53f61aac9b667439ad9cc63845a07195692161892080499f8168e2b1"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538275/scaling/strong-8/rank-1.json",
+            "bytes": 6061,
+            "sha256": "42b6e50c10de054f22c45ab83fb7520abf7bc37908cea8d2f94b48877791acbe"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538275/scaling/strong-8/rank-2.json",
+            "bytes": 6064,
+            "sha256": "6513a3fdf04319d4aed7805002c2873179b8666140181e7b4209ab2c66a8e75c"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538275/scaling/strong-8/rank-3.json",
+            "bytes": 6064,
+            "sha256": "1a23d5ff54f55c5e1ac704ae929c2efb55bd5337ca1e53d24707e8ba1b73d420"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538275/scaling/strong-8/rank-4.json",
+            "bytes": 6063,
+            "sha256": "8c61c4b0c81bafe64692461a80e827375fa5282548cc2a4c8c464ff7597e429f"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538275/scaling/strong-8/rank-5.json",
+            "bytes": 6064,
+            "sha256": "8f1406c2009e8e79146203de62f028d6007b0285a6c9b4bf15b6de688fbf5ec9"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538275/scaling/strong-8/rank-6.json",
+            "bytes": 6071,
+            "sha256": "59c276469265eacbe32baa43ae6442c03a2473441b37667a8706fd2a64f685de"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538275/scaling/strong-8/rank-7.json",
+            "bytes": 6063,
+            "sha256": "8532f0bccabae892877dc499eca448f31df6768e18dc9aa2cccaec28f454e14e"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538275/scaling/weak-2/rank-0.json",
+            "bytes": 6064,
+            "sha256": "4161d01f169136e6f28c0f8c133155187a92147bf2b89ae7b28020c5ef9814e1"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538275/scaling/weak-2/rank-1.json",
+            "bytes": 6058,
+            "sha256": "fc00b25396e3aaf4be3c1eee633cc1dc2ab82bf3cf954e8535e611711dd19873"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538275/scaling/weak-4/rank-0.json",
+            "bytes": 6068,
+            "sha256": "898d2bcb3821799e9c440e6cefbed4f434539549f9cfe2ebdd58e8ecf64b42ac"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538275/scaling/weak-4/rank-1.json",
+            "bytes": 6069,
+            "sha256": "b5993c65aa097e9adee4bba950b91984da078fd46b84313aeb8571f34d19c23b"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538275/scaling/weak-4/rank-2.json",
+            "bytes": 6067,
+            "sha256": "7799ecdb4dbaaa9dd0d6e32c11a37192c20cbec1c3c691f6f30664ce2ec2ac96"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538275/scaling/weak-4/rank-3.json",
+            "bytes": 6060,
+            "sha256": "a4a92a2d3a0edd6247561e5aecadbc9e794a02eeeca7ad6ce672016ef335cb4a"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538275/scaling/weak-8/rank-0.json",
+            "bytes": 6070,
+            "sha256": "651c76018ef871ed98342a8416c02da889666d3548495b54e39fbce954ab39d5"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538275/scaling/weak-8/rank-1.json",
+            "bytes": 6062,
+            "sha256": "b78cb187c64f32630cb31701f6085af52ac47cc1df786581ebadc021a7a0b05a"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538275/scaling/weak-8/rank-2.json",
+            "bytes": 6063,
+            "sha256": "cf03dbddd2850ab795c0f1e37843d3cfef4641c5cb4d97cd401f9713e722a5e9"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538275/scaling/weak-8/rank-3.json",
+            "bytes": 6069,
+            "sha256": "b90edfa4e470465cefe3860bd2cdf56adf4f3ec5d13f3612f247de629ed25999"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538275/scaling/weak-8/rank-4.json",
+            "bytes": 6065,
+            "sha256": "dfb5fa4cda6d037ba16744f1840d9ee45fc774e1c67b3ceed34bafc3e37e3774"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538275/scaling/weak-8/rank-5.json",
+            "bytes": 6064,
+            "sha256": "9537b6833f8985d8eb9af60379ceeb2171dc18b73fa001a6379471aa7616fd2c"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538275/scaling/weak-8/rank-6.json",
+            "bytes": 6065,
+            "sha256": "e0ffc10e8bfd78d1a8bd19a509e7ed7a6d884de65730937f44f7e504ce928378"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/gnu/538275/scaling/weak-8/rank-7.json",
+            "bytes": 6065,
+            "sha256": "22371cd23eb44c44a705161cc4bbea81e143997e678bf4deefbb2706a4c124d4"
+          }
+        ],
+        "observed_limits_unlimited_and_unchanged": true,
+        "six_frozen_receipt_predicates_passed": true,
+        "metrics": [
+          {
+            "evidence_kind": "scaling-only",
+            "capacity_closed": false,
+            "rank_receipts": 2,
+            "dimension": 65536,
+            "ranks": 2,
+            "repetitions": 3,
+            "distinct_hosts": 2,
+            "canonical_input_bytes": 4194304,
+            "measured_local_input_sum_bytes": 4194304,
+            "maximum_rank_input_storage_seconds": 0.011641255,
+            "maximum_rank_phase_seconds": {
+              "preprocessing": 0.606738897,
+              "persistence": 0.103653034,
+              "load": 1.449643241,
+              "prepare": 0.227615989,
+              "execution": 1.060180659
+            },
+            "maximum_rank_roundtrip_seconds": [
+              0.354623001,
+              0.355104064,
+              0.351287836
+            ],
+            "communication": {
+              "producer_sum_sent_payload_bytes": 104857600,
+              "execution_sum_sent_payload_bytes": 110886912,
+              "execution_sum_received_payload_bytes": 110886912,
+              "execution_maximum_rank_sent_payload_bytes": 58064896,
+              "execution_maximum_rank_received_payload_bytes": 58064896,
+              "execution_sum_coordination_calls": 196608,
+              "persistence_load_wire_bytes": null,
+              "scope": "Application-reported payload counts and coordination calls; MPI-internal traffic and persistence/load wire bytes are unmeasured. Send and receive totals are separate, not added as unique payload."
+            },
+            "memory": {
+              "maximum_rank_rss_high_water_bytes": 239222784,
+              "maximum_rank_address_space_high_water_bytes": 2787737600,
+              "maximum_sampled_rank_group_rss_bytes": 239222784,
+              "maximum_sampled_rank_group_address_space_bytes": 2787737600,
+              "per_rank": [
+                {
+                  "rank": 0,
+                  "rss_high_water_bytes": 239222784,
+                  "address_space_high_water_bytes": 2787737600,
+                  "baseline_address_space_bytes": 276156416,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6978654208,
+                  "modeled_node_rank_envelope_bytes": 6978654208,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 5.5999e-05,
+                    "maximum_sum_address_space_bytes": 2787737600,
+                    "maximum_sum_rss_bytes": 239222784,
+                    "pids": 1,
+                    "samples": 174
+                  }
+                },
+                {
+                  "rank": 1,
+                  "rss_high_water_bytes": 234303488,
+                  "address_space_high_water_bytes": 2787061760,
+                  "baseline_address_space_bytes": 276156416,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6978654208,
+                  "modeled_node_rank_envelope_bytes": 6978654208,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 3.199e-05,
+                    "maximum_sum_address_space_bytes": 2787061760,
+                    "maximum_sum_rss_bytes": 234303488,
+                    "pids": 1,
+                    "samples": 174
+                  }
+                }
+              ],
+              "scope": "Rank-process high-water counters and sampled simultaneous sums of known MPI rank PIDs only. Samples may miss instantaneous peaks; launcher, coordinator, filesystem cache, unrelated node residents and HugeTLB coverage are not measured.",
+              "whole_node_enforced_cap_bytes": null,
+              "whole_node_peak_bytes": null
+            },
+            "minimum_norm": 0.9999999999999999,
+            "maximum_norm": 0.9999999999999999,
+            "maximum_sample_error": 8.673617379884035e-19,
+            "timing_scope": "Maximum of rank-local elapsed stage times; stage barriers are included where the fixture measures them. Independent node-local samples are not summed into a simultaneous multi-node peak.",
+            "series": "strong"
+          },
+          {
+            "evidence_kind": "scaling-only",
+            "capacity_closed": false,
+            "rank_receipts": 4,
+            "dimension": 65536,
+            "ranks": 4,
+            "repetitions": 3,
+            "distinct_hosts": 4,
+            "canonical_input_bytes": 4194304,
+            "measured_local_input_sum_bytes": 4194304,
+            "maximum_rank_input_storage_seconds": 0.010493097,
+            "maximum_rank_phase_seconds": {
+              "preprocessing": 0.60258783,
+              "persistence": 0.086449876,
+              "load": 2.009482109,
+              "prepare": 0.300512965,
+              "execution": 1.465392973
+            },
+            "maximum_rank_roundtrip_seconds": [
+              0.493145487,
+              0.489600132,
+              0.483653366
+            ],
+            "communication": {
+              "producer_sum_sent_payload_bytes": 104857600,
+              "execution_sum_sent_payload_bytes": 169869312,
+              "execution_sum_received_payload_bytes": 169869312,
+              "execution_maximum_rank_sent_payload_bytes": 45744128,
+              "execution_maximum_rank_received_payload_bytes": 48365568,
+              "execution_sum_coordination_calls": 1179648,
+              "persistence_load_wire_bytes": null,
+              "scope": "Application-reported payload counts and coordination calls; MPI-internal traffic and persistence/load wire bytes are unmeasured. Send and receive totals are separate, not added as unique payload."
+            },
+            "memory": {
+              "maximum_rank_rss_high_water_bytes": 226828288,
+              "maximum_rank_address_space_high_water_bytes": 2775363584,
+              "maximum_sampled_rank_group_rss_bytes": 226828288,
+              "maximum_sampled_rank_group_address_space_bytes": 2775363584,
+              "per_rank": [
+                {
+                  "rank": 0,
+                  "rss_high_water_bytes": 226828288,
+                  "address_space_high_water_bytes": 2775363584,
+                  "baseline_address_space_bytes": 343289856,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 7045787648,
+                  "modeled_node_rank_envelope_bytes": 7045787648,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 3.5496e-05,
+                    "maximum_sum_address_space_bytes": 2775363584,
+                    "maximum_sum_rss_bytes": 226828288,
+                    "pids": 1,
+                    "samples": 225
+                  }
+                },
+                {
+                  "rank": 1,
+                  "rss_high_water_bytes": 226603008,
+                  "address_space_high_water_bytes": 2775298048,
+                  "baseline_address_space_bytes": 343289856,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 7045787648,
+                  "modeled_node_rank_envelope_bytes": 7045787648,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 3.2831e-05,
+                    "maximum_sum_address_space_bytes": 2775298048,
+                    "maximum_sum_rss_bytes": 226603008,
+                    "pids": 1,
+                    "samples": 225
+                  }
+                },
+                {
+                  "rank": 2,
+                  "rss_high_water_bytes": 226623488,
+                  "address_space_high_water_bytes": 2775228416,
+                  "baseline_address_space_bytes": 343277568,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 7045775360,
+                  "modeled_node_rank_envelope_bytes": 7045775360,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 3.5396e-05,
+                    "maximum_sum_address_space_bytes": 2775228416,
+                    "maximum_sum_rss_bytes": 226623488,
+                    "pids": 1,
+                    "samples": 225
+                  }
+                },
+                {
+                  "rank": 3,
+                  "rss_high_water_bytes": 226717696,
+                  "address_space_high_water_bytes": 2775228416,
+                  "baseline_address_space_bytes": 343277568,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 7045775360,
+                  "modeled_node_rank_envelope_bytes": 7045775360,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 3.2211e-05,
+                    "maximum_sum_address_space_bytes": 2775228416,
+                    "maximum_sum_rss_bytes": 226717696,
+                    "pids": 1,
+                    "samples": 225
+                  }
+                }
+              ],
+              "scope": "Rank-process high-water counters and sampled simultaneous sums of known MPI rank PIDs only. Samples may miss instantaneous peaks; launcher, coordinator, filesystem cache, unrelated node residents and HugeTLB coverage are not measured.",
+              "whole_node_enforced_cap_bytes": null,
+              "whole_node_peak_bytes": null
+            },
+            "minimum_norm": 0.9999999999999999,
+            "maximum_norm": 0.9999999999999999,
+            "maximum_sample_error": 8.673617379884035e-19,
+            "timing_scope": "Maximum of rank-local elapsed stage times; stage barriers are included where the fixture measures them. Independent node-local samples are not summed into a simultaneous multi-node peak.",
+            "series": "strong"
+          },
+          {
+            "evidence_kind": "scaling-only",
+            "capacity_closed": false,
+            "rank_receipts": 8,
+            "dimension": 65536,
+            "ranks": 8,
+            "repetitions": 3,
+            "distinct_hosts": 8,
+            "canonical_input_bytes": 4194304,
+            "measured_local_input_sum_bytes": 4194304,
+            "maximum_rank_input_storage_seconds": 0.010078599,
+            "maximum_rank_phase_seconds": {
+              "preprocessing": 0.663180132,
+              "persistence": 0.047448895,
+              "load": 3.210671683,
+              "prepare": 0.317217734,
+              "execution": 2.983073838
+            },
+            "maximum_rank_roundtrip_seconds": [
+              1.006293759,
+              0.971006577,
+              1.006624055
+            ],
+            "communication": {
+              "producer_sum_sent_payload_bytes": 104857600,
+              "execution_sum_sent_payload_bytes": 214695936,
+              "execution_sum_received_payload_bytes": 214695936,
+              "execution_maximum_rank_sent_payload_bytes": 29622272,
+              "execution_maximum_rank_received_payload_bytes": 30932992,
+              "execution_sum_coordination_calls": 5505024,
+              "persistence_load_wire_bytes": null,
+              "scope": "Application-reported payload counts and coordination calls; MPI-internal traffic and persistence/load wire bytes are unmeasured. Send and receive totals are separate, not added as unique payload."
+            },
+            "memory": {
+              "maximum_rank_rss_high_water_bytes": 213053440,
+              "maximum_rank_address_space_high_water_bytes": 2758201344,
+              "maximum_sampled_rank_group_rss_bytes": 213053440,
+              "maximum_sampled_rank_group_address_space_bytes": 2758201344,
+              "per_rank": [
+                {
+                  "rank": 0,
+                  "rss_high_water_bytes": 211660800,
+                  "address_space_high_water_bytes": 2758197248,
+                  "baseline_address_space_bytes": 276185088,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6978682880,
+                  "modeled_node_rank_envelope_bytes": 6978682880,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 3.8301e-05,
+                    "maximum_sum_address_space_bytes": 2758197248,
+                    "maximum_sum_rss_bytes": 211660800,
+                    "pids": 1,
+                    "samples": 362
+                  }
+                },
+                {
+                  "rank": 1,
+                  "rss_high_water_bytes": 212918272,
+                  "address_space_high_water_bytes": 2758201344,
+                  "baseline_address_space_bytes": 276185088,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6978682880,
+                  "modeled_node_rank_envelope_bytes": 6978682880,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 3.129e-05,
+                    "maximum_sum_address_space_bytes": 2758201344,
+                    "maximum_sum_rss_bytes": 212918272,
+                    "pids": 1,
+                    "samples": 362
+                  }
+                },
+                {
+                  "rank": 2,
+                  "rss_high_water_bytes": 213053440,
+                  "address_space_high_water_bytes": 2758197248,
+                  "baseline_address_space_bytes": 276185088,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6978682880,
+                  "modeled_node_rank_envelope_bytes": 6978682880,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 3.5936e-05,
+                    "maximum_sum_address_space_bytes": 2758197248,
+                    "maximum_sum_rss_bytes": 213053440,
+                    "pids": 1,
+                    "samples": 362
+                  }
+                },
+                {
+                  "rank": 3,
+                  "rss_high_water_bytes": 212914176,
+                  "address_space_high_water_bytes": 2758201344,
+                  "baseline_address_space_bytes": 276185088,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6978682880,
+                  "modeled_node_rank_envelope_bytes": 6978682880,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 4.2026e-05,
+                    "maximum_sum_address_space_bytes": 2758201344,
+                    "maximum_sum_rss_bytes": 212914176,
+                    "pids": 1,
+                    "samples": 362
+                  }
+                },
+                {
+                  "rank": 4,
+                  "rss_high_water_bytes": 212918272,
+                  "address_space_high_water_bytes": 2758201344,
+                  "baseline_address_space_bytes": 276185088,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6978682880,
+                  "modeled_node_rank_envelope_bytes": 6978682880,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 3.3884e-05,
+                    "maximum_sum_address_space_bytes": 2758201344,
+                    "maximum_sum_rss_bytes": 212918272,
+                    "pids": 1,
+                    "samples": 362
+                  }
+                },
+                {
+                  "rank": 5,
+                  "rss_high_water_bytes": 212918272,
+                  "address_space_high_water_bytes": 2758201344,
+                  "baseline_address_space_bytes": 276185088,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6978682880,
+                  "modeled_node_rank_envelope_bytes": 6978682880,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 5.8442e-05,
+                    "maximum_sum_address_space_bytes": 2758201344,
+                    "maximum_sum_rss_bytes": 212918272,
+                    "pids": 1,
+                    "samples": 362
+                  }
+                },
+                {
+                  "rank": 6,
+                  "rss_high_water_bytes": 209346560,
+                  "address_space_high_water_bytes": 2758201344,
+                  "baseline_address_space_bytes": 410402816,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 7112900608,
+                  "modeled_node_rank_envelope_bytes": 7112900608,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 3.0979e-05,
+                    "maximum_sum_address_space_bytes": 2758201344,
+                    "maximum_sum_rss_bytes": 209346560,
+                    "pids": 1,
+                    "samples": 362
+                  }
+                },
+                {
+                  "rank": 7,
+                  "rss_high_water_bytes": 212942848,
+                  "address_space_high_water_bytes": 2758201344,
+                  "baseline_address_space_bytes": 276185088,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6978682880,
+                  "modeled_node_rank_envelope_bytes": 6978682880,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 3.9182e-05,
+                    "maximum_sum_address_space_bytes": 2758201344,
+                    "maximum_sum_rss_bytes": 212942848,
+                    "pids": 1,
+                    "samples": 362
+                  }
+                }
+              ],
+              "scope": "Rank-process high-water counters and sampled simultaneous sums of known MPI rank PIDs only. Samples may miss instantaneous peaks; launcher, coordinator, filesystem cache, unrelated node residents and HugeTLB coverage are not measured.",
+              "whole_node_enforced_cap_bytes": null,
+              "whole_node_peak_bytes": null
+            },
+            "minimum_norm": 0.9999999999999999,
+            "maximum_norm": 0.9999999999999999,
+            "maximum_sample_error": 8.673617379884035e-19,
+            "timing_scope": "Maximum of rank-local elapsed stage times; stage barriers are included where the fixture measures them. Independent node-local samples are not summed into a simultaneous multi-node peak.",
+            "series": "strong"
+          },
+          {
+            "evidence_kind": "scaling-only",
+            "capacity_closed": false,
+            "rank_receipts": 2,
+            "dimension": 16384,
+            "ranks": 2,
+            "repetitions": 3,
+            "distinct_hosts": 2,
+            "canonical_input_bytes": 1048576,
+            "measured_local_input_sum_bytes": 1048576,
+            "maximum_rank_input_storage_seconds": 0.008558435,
+            "maximum_rank_phase_seconds": {
+              "preprocessing": 0.14850457,
+              "persistence": 0.070357388,
+              "load": 0.324409893,
+              "prepare": 0.104435764,
+              "execution": 0.249359076
+            },
+            "maximum_rank_roundtrip_seconds": [
+              0.08276487,
+              0.085077675,
+              0.082221109
+            ],
+            "communication": {
+              "producer_sum_sent_payload_bytes": 26214400,
+              "execution_sum_sent_payload_bytes": 27721728,
+              "execution_sum_received_payload_bytes": 27721728,
+              "execution_maximum_rank_sent_payload_bytes": 14516224,
+              "execution_maximum_rank_received_payload_bytes": 14516224,
+              "execution_sum_coordination_calls": 49152,
+              "persistence_load_wire_bytes": null,
+              "scope": "Application-reported payload counts and coordination calls; MPI-internal traffic and persistence/load wire bytes are unmeasured. Send and receive totals are separate, not added as unique payload."
+            },
+            "memory": {
+              "maximum_rank_rss_high_water_bytes": 214171648,
+              "maximum_rank_address_space_high_water_bytes": 2758893568,
+              "maximum_sampled_rank_group_rss_bytes": 214171648,
+              "maximum_sampled_rank_group_address_space_bytes": 2758893568,
+              "per_rank": [
+                {
+                  "rank": 0,
+                  "rss_high_water_bytes": 214171648,
+                  "address_space_high_water_bytes": 2758893568,
+                  "baseline_address_space_bytes": 343277568,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 7045775360,
+                  "modeled_node_rank_envelope_bytes": 7045775360,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 3.5976e-05,
+                    "maximum_sum_address_space_bytes": 2758893568,
+                    "maximum_sum_rss_bytes": 214171648,
+                    "pids": 1,
+                    "samples": 47
+                  }
+                },
+                {
+                  "rank": 1,
+                  "rss_high_water_bytes": 210112512,
+                  "address_space_high_water_bytes": 2758209536,
+                  "baseline_address_space_bytes": 343277568,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 7045775360,
+                  "modeled_node_rank_envelope_bytes": 7045775360,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 3.8952e-05,
+                    "maximum_sum_address_space_bytes": 2758209536,
+                    "maximum_sum_rss_bytes": 210112512,
+                    "pids": 1,
+                    "samples": 47
+                  }
+                }
+              ],
+              "scope": "Rank-process high-water counters and sampled simultaneous sums of known MPI rank PIDs only. Samples may miss instantaneous peaks; launcher, coordinator, filesystem cache, unrelated node residents and HugeTLB coverage are not measured.",
+              "whole_node_enforced_cap_bytes": null,
+              "whole_node_peak_bytes": null
+            },
+            "minimum_norm": 0.9999999999999999,
+            "maximum_norm": 0.9999999999999999,
+            "maximum_sample_error": 1.734723475976807e-18,
+            "timing_scope": "Maximum of rank-local elapsed stage times; stage barriers are included where the fixture measures them. Independent node-local samples are not summed into a simultaneous multi-node peak.",
+            "series": "weak"
+          },
+          {
+            "evidence_kind": "scaling-only",
+            "capacity_closed": false,
+            "rank_receipts": 4,
+            "dimension": 32768,
+            "ranks": 4,
+            "repetitions": 3,
+            "distinct_hosts": 4,
+            "canonical_input_bytes": 2097152,
+            "measured_local_input_sum_bytes": 2097152,
+            "maximum_rank_input_storage_seconds": 0.008523561,
+            "maximum_rank_phase_seconds": {
+              "preprocessing": 0.316704812,
+              "persistence": 0.027344174,
+              "load": 1.156431081,
+              "prepare": 0.140034765,
+              "execution": 0.851897179
+            },
+            "maximum_rank_roundtrip_seconds": [
+              0.289376763,
+              0.277585205,
+              0.285849546
+            ],
+            "communication": {
+              "producer_sum_sent_payload_bytes": 52428800,
+              "execution_sum_sent_payload_bytes": 84934656,
+              "execution_sum_received_payload_bytes": 84934656,
+              "execution_maximum_rank_sent_payload_bytes": 22872064,
+              "execution_maximum_rank_received_payload_bytes": 24182784,
+              "execution_sum_coordination_calls": 589824,
+              "persistence_load_wire_bytes": null,
+              "scope": "Application-reported payload counts and coordination calls; MPI-internal traffic and persistence/load wire bytes are unmeasured. Send and receive totals are separate, not added as unique payload."
+            },
+            "memory": {
+              "maximum_rank_rss_high_water_bytes": 213151744,
+              "maximum_rank_address_space_high_water_bytes": 2758184960,
+              "maximum_sampled_rank_group_rss_bytes": 213151744,
+              "maximum_sampled_rank_group_address_space_bytes": 2758184960,
+              "per_rank": [
+                {
+                  "rank": 0,
+                  "rss_high_water_bytes": 210505728,
+                  "address_space_high_water_bytes": 2758180864,
+                  "baseline_address_space_bytes": 276168704,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6978666496,
+                  "modeled_node_rank_envelope_bytes": 6978666496,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 3.6247e-05,
+                    "maximum_sum_address_space_bytes": 2758180864,
+                    "maximum_sum_rss_bytes": 210505728,
+                    "pids": 1,
+                    "samples": 126
+                  }
+                },
+                {
+                  "rank": 1,
+                  "rss_high_water_bytes": 211468288,
+                  "address_space_high_water_bytes": 2758184960,
+                  "baseline_address_space_bytes": 410386432,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 7112884224,
+                  "modeled_node_rank_envelope_bytes": 7112884224,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 2.9065e-05,
+                    "maximum_sum_address_space_bytes": 2758184960,
+                    "maximum_sum_rss_bytes": 211468288,
+                    "pids": 1,
+                    "samples": 126
+                  }
+                },
+                {
+                  "rank": 2,
+                  "rss_high_water_bytes": 201814016,
+                  "address_space_high_water_bytes": 2758180864,
+                  "baseline_address_space_bytes": 410386432,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 7112884224,
+                  "modeled_node_rank_envelope_bytes": 7112884224,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 7.2023e-05,
+                    "maximum_sum_address_space_bytes": 2758180864,
+                    "maximum_sum_rss_bytes": 201814016,
+                    "pids": 1,
+                    "samples": 126
+                  }
+                },
+                {
+                  "rank": 3,
+                  "rss_high_water_bytes": 213151744,
+                  "address_space_high_water_bytes": 2758184960,
+                  "baseline_address_space_bytes": 276168704,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6978666496,
+                  "modeled_node_rank_envelope_bytes": 6978666496,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 4.7444e-05,
+                    "maximum_sum_address_space_bytes": 2758184960,
+                    "maximum_sum_rss_bytes": 213151744,
+                    "pids": 1,
+                    "samples": 126
+                  }
+                }
+              ],
+              "scope": "Rank-process high-water counters and sampled simultaneous sums of known MPI rank PIDs only. Samples may miss instantaneous peaks; launcher, coordinator, filesystem cache, unrelated node residents and HugeTLB coverage are not measured.",
+              "whole_node_enforced_cap_bytes": null,
+              "whole_node_peak_bytes": null
+            },
+            "minimum_norm": 0.9999999999999999,
+            "maximum_norm": 0.9999999999999999,
+            "maximum_sample_error": 1.3016071731219915e-18,
+            "timing_scope": "Maximum of rank-local elapsed stage times; stage barriers are included where the fixture measures them. Independent node-local samples are not summed into a simultaneous multi-node peak.",
+            "series": "weak"
+          },
+          {
+            "evidence_kind": "scaling-only",
+            "capacity_closed": false,
+            "rank_receipts": 8,
+            "dimension": 65536,
+            "ranks": 8,
+            "repetitions": 3,
+            "distinct_hosts": 8,
+            "canonical_input_bytes": 4194304,
+            "measured_local_input_sum_bytes": 4194304,
+            "maximum_rank_input_storage_seconds": 0.009926244,
+            "maximum_rank_phase_seconds": {
+              "preprocessing": 0.661337635,
+              "persistence": 0.034454496,
+              "load": 3.208595165,
+              "prepare": 0.314751235,
+              "execution": 2.979263565
+            },
+            "maximum_rank_roundtrip_seconds": [
+              1.004832858,
+              0.971830354,
+              1.003540492
+            ],
+            "communication": {
+              "producer_sum_sent_payload_bytes": 104857600,
+              "execution_sum_sent_payload_bytes": 214695936,
+              "execution_sum_received_payload_bytes": 214695936,
+              "execution_maximum_rank_sent_payload_bytes": 29622272,
+              "execution_maximum_rank_received_payload_bytes": 30932992,
+              "execution_sum_coordination_calls": 5505024,
+              "persistence_load_wire_bytes": null,
+              "scope": "Application-reported payload counts and coordination calls; MPI-internal traffic and persistence/load wire bytes are unmeasured. Send and receive totals are separate, not added as unique payload."
+            },
+            "memory": {
+              "maximum_rank_rss_high_water_bytes": 213438464,
+              "maximum_rank_address_space_high_water_bytes": 2758201344,
+              "maximum_sampled_rank_group_rss_bytes": 213438464,
+              "maximum_sampled_rank_group_address_space_bytes": 2758201344,
+              "per_rank": [
+                {
+                  "rank": 0,
+                  "rss_high_water_bytes": 212918272,
+                  "address_space_high_water_bytes": 2758197248,
+                  "baseline_address_space_bytes": 276185088,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6978682880,
+                  "modeled_node_rank_envelope_bytes": 6978682880,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 3.4274e-05,
+                    "maximum_sum_address_space_bytes": 2758197248,
+                    "maximum_sum_rss_bytes": 212918272,
+                    "pids": 1,
+                    "samples": 361
+                  }
+                },
+                {
+                  "rank": 1,
+                  "rss_high_water_bytes": 213438464,
+                  "address_space_high_water_bytes": 2758197248,
+                  "baseline_address_space_bytes": 276185088,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6978682880,
+                  "modeled_node_rank_envelope_bytes": 6978682880,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 3.0288e-05,
+                    "maximum_sum_address_space_bytes": 2758197248,
+                    "maximum_sum_rss_bytes": 213438464,
+                    "pids": 1,
+                    "samples": 361
+                  }
+                },
+                {
+                  "rank": 2,
+                  "rss_high_water_bytes": 203317248,
+                  "address_space_high_water_bytes": 2758201344,
+                  "baseline_address_space_bytes": 410402816,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 7112900608,
+                  "modeled_node_rank_envelope_bytes": 7112900608,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 3.3002e-05,
+                    "maximum_sum_address_space_bytes": 2758201344,
+                    "maximum_sum_rss_bytes": 203317248,
+                    "pids": 1,
+                    "samples": 361
+                  }
+                },
+                {
+                  "rank": 3,
+                  "rss_high_water_bytes": 212918272,
+                  "address_space_high_water_bytes": 2758197248,
+                  "baseline_address_space_bytes": 276185088,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6978682880,
+                  "modeled_node_rank_envelope_bytes": 6978682880,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 3.179e-05,
+                    "maximum_sum_address_space_bytes": 2758197248,
+                    "maximum_sum_rss_bytes": 212918272,
+                    "pids": 1,
+                    "samples": 361
+                  }
+                },
+                {
+                  "rank": 4,
+                  "rss_high_water_bytes": 212484096,
+                  "address_space_high_water_bytes": 2758201344,
+                  "baseline_address_space_bytes": 410402816,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 7112900608,
+                  "modeled_node_rank_envelope_bytes": 7112900608,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 3.7168e-05,
+                    "maximum_sum_address_space_bytes": 2758201344,
+                    "maximum_sum_rss_bytes": 212484096,
+                    "pids": 1,
+                    "samples": 361
+                  }
+                },
+                {
+                  "rank": 5,
+                  "rss_high_water_bytes": 212918272,
+                  "address_space_high_water_bytes": 2758201344,
+                  "baseline_address_space_bytes": 410402816,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 7112900608,
+                  "modeled_node_rank_envelope_bytes": 7112900608,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 0.000575166,
+                    "maximum_sum_address_space_bytes": 2758201344,
+                    "maximum_sum_rss_bytes": 212918272,
+                    "pids": 1,
+                    "samples": 361
+                  }
+                },
+                {
+                  "rank": 6,
+                  "rss_high_water_bytes": 207433728,
+                  "address_space_high_water_bytes": 2758197248,
+                  "baseline_address_space_bytes": 410402816,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 7112900608,
+                  "modeled_node_rank_envelope_bytes": 7112900608,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 5.5527e-05,
+                    "maximum_sum_address_space_bytes": 2758197248,
+                    "maximum_sum_rss_bytes": 207433728,
+                    "pids": 1,
+                    "samples": 361
+                  }
+                },
+                {
+                  "rank": 7,
+                  "rss_high_water_bytes": 212914176,
+                  "address_space_high_water_bytes": 2758197248,
+                  "baseline_address_space_bytes": 276185088,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6978682880,
+                  "modeled_node_rank_envelope_bytes": 6978682880,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 3.2472e-05,
+                    "maximum_sum_address_space_bytes": 2758197248,
+                    "maximum_sum_rss_bytes": 212914176,
+                    "pids": 1,
+                    "samples": 361
+                  }
+                }
+              ],
+              "scope": "Rank-process high-water counters and sampled simultaneous sums of known MPI rank PIDs only. Samples may miss instantaneous peaks; launcher, coordinator, filesystem cache, unrelated node residents and HugeTLB coverage are not measured.",
+              "whole_node_enforced_cap_bytes": null,
+              "whole_node_peak_bytes": null
+            },
+            "minimum_norm": 0.9999999999999999,
+            "maximum_norm": 0.9999999999999999,
+            "maximum_sample_error": 8.673617379884035e-19,
+            "timing_scope": "Maximum of rank-local elapsed stage times; stage barriers are included where the fixture measures them. Independent node-local samples are not summed into a simultaneous multi-node peak.",
+            "series": "weak"
+          }
+        ],
+        "metrics_artifact": {
+          "path": "target/scaling-cirrus-20261006/analysis/gnu-cases.json",
+          "bytes": 33158,
+          "sha256": "1fa3db76769f46aefcd6d06b39513b062b1673b56b26c8807375c04747f47f5f"
+        },
+        "metric_scope": "Maximum rank-local phase and round-trip seconds, application-reported communication, per-rank process high-water counters and known-rank-group samples. No whole-node peak, MPI-internal/persistence wire-byte, HugeTLB or speedup claim."
+      },
+      {
+        "compiler": "cray",
+        "job_id": 538318,
+        "route": "regular Torc server with one Slurm coordinator and authored srun steps",
+        "state": "COMPLETED",
+        "exit_code": "0:0",
+        "started_utc": "2026-10-06T21:10:55Z",
+        "ended_utc": "2026-10-06T21:11:42Z",
+        "elapsed_seconds": 47,
+        "allocated_nodes": 8,
+        "allocated_cpus": 2304,
+        "active_case_nodes": [
+          2,
+          4,
+          8
+        ],
+        "ranks_per_active_node": 1,
+        "omp_requested_threads": 288,
+        "capacity_closed": false,
+        "source_manifest_sha256": "ff4d5ce8215176f16e243e5dc7c733f46a6c2931ada4a3592a9a75d169cb797f",
+        "executable_sha256": "efb772532f397ff447a6d6dfc97d95fcc8e7b96d536c5b84da16b5c23a4275c6",
+        "native_library_sha256": "f1eba6a43b2f9b0b0ed043adeb66840bdae977aa1920efa6e767e4e3ec14af89",
+        "all_stage_statuses": {
+          "completed.status": 0,
+          "executable-after.status": 0,
+          "executable-before.status": 0,
+          "job-exit.status": 0,
+          "native-after.status": 0,
+          "scaling-placement-check.status": 0,
+          "scaling-placement.status": 0,
+          "scaling-strong-2-inputs.status": 0,
+          "scaling-strong-2-reports.status": 0,
+          "scaling-strong-2.status": 0,
+          "scaling-strong-4-inputs.status": 0,
+          "scaling-strong-4-reports.status": 0,
+          "scaling-strong-4.status": 0,
+          "scaling-strong-8-inputs.status": 0,
+          "scaling-strong-8-reports.status": 0,
+          "scaling-strong-8.status": 0,
+          "scaling-weak-2-inputs.status": 0,
+          "scaling-weak-2-reports.status": 0,
+          "scaling-weak-2.status": 0,
+          "scaling-weak-4-inputs.status": 0,
+          "scaling-weak-4-reports.status": 0,
+          "scaling-weak-4.status": 0,
+          "scaling-weak-8-inputs.status": 0,
+          "scaling-weak-8-reports.status": 0,
+          "scaling-weak-8.status": 0,
+          "source-after.status": 0
+        },
+        "input_shards_hash_verified": 28,
+        "rank_receipts": [
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538318/scaling/strong-2/rank-0.json",
+            "bytes": 6074,
+            "sha256": "87ea3e3088391b363d24eaaad02eef7780befb5ed542441dde8d17d066e245bb"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538318/scaling/strong-2/rank-1.json",
+            "bytes": 6075,
+            "sha256": "9dbe73ae7b2269738380779bc02dabf2052b391f889aa3ac38fe2e797e8ce850"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538318/scaling/strong-4/rank-0.json",
+            "bytes": 6081,
+            "sha256": "829458a0fe0b58eb0c46e0655fb7122cd3f71d0a2458f45b6364d6c3bc9fe2c4"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538318/scaling/strong-4/rank-1.json",
+            "bytes": 6067,
+            "sha256": "5826e4beb950f00935c87b0a1c4ee67a2c5f012b9411bd76df05124a6dd28c0e"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538318/scaling/strong-4/rank-2.json",
+            "bytes": 6072,
+            "sha256": "32c0f098162e0e3d6a6768709772832207f1a86a0d0c7c74258b499a0add97b8"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538318/scaling/strong-4/rank-3.json",
+            "bytes": 6068,
+            "sha256": "deefb0a196169d98c5b29a09f3ff627ad8353d0e7d04f4fcbec1d8ce398aafb2"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538318/scaling/strong-8/rank-0.json",
+            "bytes": 6070,
+            "sha256": "f465d6cf0acd2f3a498846efb9b9f27cb7740054f1245c3124a0683a9c7787fe"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538318/scaling/strong-8/rank-1.json",
+            "bytes": 6063,
+            "sha256": "4526627e56a94bbc970c5c3c4fe99c8fb9f6d4ebfa1282e2656c0645100816b0"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538318/scaling/strong-8/rank-2.json",
+            "bytes": 6063,
+            "sha256": "a307259498441903f6a4b5e236025ace911c47b1ca0aaa016164608fd2d411da"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538318/scaling/strong-8/rank-3.json",
+            "bytes": 6065,
+            "sha256": "baba2cbc0c6073408910ea66e8b06e152187140941c274164a54cf735488d76a"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538318/scaling/strong-8/rank-4.json",
+            "bytes": 6064,
+            "sha256": "9a45a24d554f089964d65e886dfd88d42a2a172804a4486014ca2ae6a42a6508"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538318/scaling/strong-8/rank-5.json",
+            "bytes": 6079,
+            "sha256": "a6d668694c457edea6321e8e6fdc904a53dfa46373fa094d0465b8d6c039bf92"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538318/scaling/strong-8/rank-6.json",
+            "bytes": 6070,
+            "sha256": "f16d62d8cec6290623d291aae9e32ab4248f09fee61f39ff2fdd7355a5bb7fa9"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538318/scaling/strong-8/rank-7.json",
+            "bytes": 6064,
+            "sha256": "1246f7b6da1fca873b23987fac564810fbcf0b558d146f8761dc9c764f13aadd"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538318/scaling/weak-2/rank-0.json",
+            "bytes": 6065,
+            "sha256": "a10a718b2a09dc494fd0acb2259dc4b7b535d94c61644f4a3ede38e25983c0a1"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538318/scaling/weak-2/rank-1.json",
+            "bytes": 6059,
+            "sha256": "80ef761aecdfe3f6990b89235f13c16c2cdc31d266940e9cc15f137947479852"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538318/scaling/weak-4/rank-0.json",
+            "bytes": 6066,
+            "sha256": "7c1f2fada0c80f7bfd3bbc1a2a5b49257d6418a45728fdebf2f6236096ebf639"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538318/scaling/weak-4/rank-1.json",
+            "bytes": 6058,
+            "sha256": "f9169037ec1f2b90d623e4dcdf7f7618b46e38b3d90a391b383b6eff05ca06cb"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538318/scaling/weak-4/rank-2.json",
+            "bytes": 6061,
+            "sha256": "9d0d75329d06dfc46dfd34a87e24ce2d17fd405e70584bb9fe4a7b81e0674846"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538318/scaling/weak-4/rank-3.json",
+            "bytes": 6059,
+            "sha256": "d61f36eb894d343c1070af205e9c52ab4185218b11bdf7bc658b4999263f1c75"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538318/scaling/weak-8/rank-0.json",
+            "bytes": 6072,
+            "sha256": "6d925c71f02696a9e9c3e5016842da5a78442fe42a30862b16b2ef40e0048be7"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538318/scaling/weak-8/rank-1.json",
+            "bytes": 6065,
+            "sha256": "7a902e8da2b5db3b428c25dc6b261219a3920b9a0eb978927489111d040671d7"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538318/scaling/weak-8/rank-2.json",
+            "bytes": 6064,
+            "sha256": "ae0b37113d32ca1ec4cec928b99793dffe52928cc57d6003ff714d4be0ca70aa"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538318/scaling/weak-8/rank-3.json",
+            "bytes": 6065,
+            "sha256": "230b467d5bc88f86b07e3af1fad3a78bf9816ff8392771ce7e2633c827738edf"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538318/scaling/weak-8/rank-4.json",
+            "bytes": 6063,
+            "sha256": "cfd408754d2771002a4f885f940ba65cce4be0fc7dd10b5beb0849696e814151"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538318/scaling/weak-8/rank-5.json",
+            "bytes": 6061,
+            "sha256": "45f95dc3630ae3eb932cf063e0b8242dc51f30e151dbe60a3d92674fc92207cb"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538318/scaling/weak-8/rank-6.json",
+            "bytes": 6075,
+            "sha256": "81af07a4caa797de80a25e34d7dcb6efcc0b2f75850bbeabb7e0b4ab37a45b21"
+          },
+          {
+            "path": "target/scaling-cirrus-20261006/retrieved/receipts/cray/538318/scaling/weak-8/rank-7.json",
+            "bytes": 6062,
+            "sha256": "fa63a3402bb5ef510f49002e4e8bb0db4225e325004bf8dede25be555d2a0691"
+          }
+        ],
+        "observed_limits_unlimited_and_unchanged": true,
+        "six_frozen_receipt_predicates_passed": true,
+        "metrics": [
+          {
+            "evidence_kind": "scaling-only",
+            "capacity_closed": false,
+            "rank_receipts": 2,
+            "dimension": 65536,
+            "ranks": 2,
+            "repetitions": 3,
+            "distinct_hosts": 2,
+            "canonical_input_bytes": 4194304,
+            "measured_local_input_sum_bytes": 4194304,
+            "maximum_rank_input_storage_seconds": 0.012595519,
+            "maximum_rank_phase_seconds": {
+              "preprocessing": 0.619339763,
+              "persistence": 0.095783977,
+              "load": 1.500726079,
+              "prepare": 0.240998043,
+              "execution": 1.093993076
+            },
+            "maximum_rank_roundtrip_seconds": [
+              0.371290846,
+              0.362894747,
+              0.360130519
+            ],
+            "communication": {
+              "producer_sum_sent_payload_bytes": 104857600,
+              "execution_sum_sent_payload_bytes": 110886912,
+              "execution_sum_received_payload_bytes": 110886912,
+              "execution_maximum_rank_sent_payload_bytes": 58064896,
+              "execution_maximum_rank_received_payload_bytes": 58064896,
+              "execution_sum_coordination_calls": 196608,
+              "persistence_load_wire_bytes": null,
+              "scope": "Application-reported payload counts and coordination calls; MPI-internal traffic and persistence/load wire bytes are unmeasured. Send and receive totals are separate, not added as unique payload."
+            },
+            "memory": {
+              "maximum_rank_rss_high_water_bytes": 182427648,
+              "maximum_rank_address_space_high_water_bytes": 2742149120,
+              "maximum_sampled_rank_group_rss_bytes": 182427648,
+              "maximum_sampled_rank_group_address_space_bytes": 2742149120,
+              "per_rank": [
+                {
+                  "rank": 0,
+                  "rss_high_water_bytes": 182427648,
+                  "address_space_high_water_bytes": 2742149120,
+                  "baseline_address_space_bytes": 235388928,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6937886720,
+                  "modeled_node_rank_envelope_bytes": 6937886720,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 5.044e-05,
+                    "maximum_sum_address_space_bytes": 2742149120,
+                    "maximum_sum_rss_bytes": 182427648,
+                    "pids": 1,
+                    "samples": 179
+                  }
+                },
+                {
+                  "rank": 1,
+                  "rss_high_water_bytes": 180846592,
+                  "address_space_high_water_bytes": 2742149120,
+                  "baseline_address_space_bytes": 369606656,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 7072104448,
+                  "modeled_node_rank_envelope_bytes": 7072104448,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 4.2978e-05,
+                    "maximum_sum_address_space_bytes": 2742149120,
+                    "maximum_sum_rss_bytes": 180846592,
+                    "pids": 1,
+                    "samples": 179
+                  }
+                }
+              ],
+              "scope": "Rank-process high-water counters and sampled simultaneous sums of known MPI rank PIDs only. Samples may miss instantaneous peaks; launcher, coordinator, filesystem cache, unrelated node residents and HugeTLB coverage are not measured.",
+              "whole_node_enforced_cap_bytes": null,
+              "whole_node_peak_bytes": null
+            },
+            "minimum_norm": 0.9999999999999999,
+            "maximum_norm": 0.9999999999999999,
+            "maximum_sample_error": 8.673617379884035e-19,
+            "timing_scope": "Maximum of rank-local elapsed stage times; stage barriers are included where the fixture measures them. Independent node-local samples are not summed into a simultaneous multi-node peak.",
+            "series": "strong",
+            "compiler": "cray"
+          },
+          {
+            "evidence_kind": "scaling-only",
+            "capacity_closed": false,
+            "rank_receipts": 4,
+            "dimension": 65536,
+            "ranks": 4,
+            "repetitions": 3,
+            "distinct_hosts": 4,
+            "canonical_input_bytes": 4194304,
+            "measured_local_input_sum_bytes": 4194304,
+            "maximum_rank_input_storage_seconds": 0.010917885,
+            "maximum_rank_phase_seconds": {
+              "preprocessing": 0.60762535,
+              "persistence": 0.077531536,
+              "load": 2.104248866,
+              "prepare": 0.306008966,
+              "execution": 1.5484918840000002
+            },
+            "maximum_rank_roundtrip_seconds": [
+              0.525439099,
+              0.51433892,
+              0.509147414
+            ],
+            "communication": {
+              "producer_sum_sent_payload_bytes": 104857600,
+              "execution_sum_sent_payload_bytes": 169869312,
+              "execution_sum_received_payload_bytes": 169869312,
+              "execution_maximum_rank_sent_payload_bytes": 45744128,
+              "execution_maximum_rank_received_payload_bytes": 48365568,
+              "execution_sum_coordination_calls": 1179648,
+              "persistence_load_wire_bytes": null,
+              "scope": "Application-reported payload counts and coordination calls; MPI-internal traffic and persistence/load wire bytes are unmeasured. Send and receive totals are separate, not added as unique payload."
+            },
+            "memory": {
+              "maximum_rank_rss_high_water_bytes": 179044352,
+              "maximum_rank_address_space_high_water_bytes": 2733314048,
+              "maximum_sampled_rank_group_rss_bytes": 179044352,
+              "maximum_sampled_rank_group_address_space_bytes": 2733314048,
+              "per_rank": [
+                {
+                  "rank": 0,
+                  "rss_high_water_bytes": 179044352,
+                  "address_space_high_water_bytes": 2732843008,
+                  "baseline_address_space_bytes": 369618944,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 7072116736,
+                  "modeled_node_rank_envelope_bytes": 7072116736,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 4.425e-05,
+                    "maximum_sum_address_space_bytes": 2732843008,
+                    "maximum_sum_rss_bytes": 179044352,
+                    "pids": 1,
+                    "samples": 234
+                  }
+                },
+                {
+                  "rank": 1,
+                  "rss_high_water_bytes": 177872896,
+                  "address_space_high_water_bytes": 2733314048,
+                  "baseline_address_space_bytes": 369618944,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 7072116736,
+                  "modeled_node_rank_envelope_bytes": 7072116736,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 4.9137e-05,
+                    "maximum_sum_address_space_bytes": 2733314048,
+                    "maximum_sum_rss_bytes": 177872896,
+                    "pids": 1,
+                    "samples": 234
+                  }
+                },
+                {
+                  "rank": 2,
+                  "rss_high_water_bytes": 175108096,
+                  "address_space_high_water_bytes": 2732843008,
+                  "baseline_address_space_bytes": 369618944,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 7072116736,
+                  "modeled_node_rank_envelope_bytes": 7072116736,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 4.0874e-05,
+                    "maximum_sum_address_space_bytes": 2732843008,
+                    "maximum_sum_rss_bytes": 175108096,
+                    "pids": 1,
+                    "samples": 234
+                  }
+                },
+                {
+                  "rank": 3,
+                  "rss_high_water_bytes": 172126208,
+                  "address_space_high_water_bytes": 2733314048,
+                  "baseline_address_space_bytes": 333967360,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 7036465152,
+                  "modeled_node_rank_envelope_bytes": 7036465152,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 4.8337e-05,
+                    "maximum_sum_address_space_bytes": 2733314048,
+                    "maximum_sum_rss_bytes": 172126208,
+                    "pids": 1,
+                    "samples": 233
+                  }
+                }
+              ],
+              "scope": "Rank-process high-water counters and sampled simultaneous sums of known MPI rank PIDs only. Samples may miss instantaneous peaks; launcher, coordinator, filesystem cache, unrelated node residents and HugeTLB coverage are not measured.",
+              "whole_node_enforced_cap_bytes": null,
+              "whole_node_peak_bytes": null
+            },
+            "minimum_norm": 0.9999999999999999,
+            "maximum_norm": 0.9999999999999999,
+            "maximum_sample_error": 8.673617379884035e-19,
+            "timing_scope": "Maximum of rank-local elapsed stage times; stage barriers are included where the fixture measures them. Independent node-local samples are not summed into a simultaneous multi-node peak.",
+            "series": "strong",
+            "compiler": "cray"
+          },
+          {
+            "evidence_kind": "scaling-only",
+            "capacity_closed": false,
+            "rank_receipts": 8,
+            "dimension": 65536,
+            "ranks": 8,
+            "repetitions": 3,
+            "distinct_hosts": 8,
+            "canonical_input_bytes": 4194304,
+            "measured_local_input_sum_bytes": 4194304,
+            "maximum_rank_input_storage_seconds": 0.010096492,
+            "maximum_rank_phase_seconds": {
+              "preprocessing": 0.706470411,
+              "persistence": 0.051366921,
+              "load": 3.43462869,
+              "prepare": 0.324461354,
+              "execution": 3.272625359
+            },
+            "maximum_rank_roundtrip_seconds": [
+              1.109956173,
+              1.054605608,
+              1.108362721
+            ],
+            "communication": {
+              "producer_sum_sent_payload_bytes": 104857600,
+              "execution_sum_sent_payload_bytes": 214695936,
+              "execution_sum_received_payload_bytes": 214695936,
+              "execution_maximum_rank_sent_payload_bytes": 29622272,
+              "execution_maximum_rank_received_payload_bytes": 30932992,
+              "execution_sum_coordination_calls": 5505024,
+              "persistence_load_wire_bytes": null,
+              "scope": "Application-reported payload counts and coordination calls; MPI-internal traffic and persistence/load wire bytes are unmeasured. Send and receive totals are separate, not added as unique payload."
+            },
+            "memory": {
+              "maximum_rank_rss_high_water_bytes": 162918400,
+              "maximum_rank_address_space_high_water_bytes": 2717151232,
+              "maximum_sampled_rank_group_rss_bytes": 162918400,
+              "maximum_sampled_rank_group_address_space_bytes": 2717151232,
+              "per_rank": [
+                {
+                  "rank": 0,
+                  "rss_high_water_bytes": 152199168,
+                  "address_space_high_water_bytes": 2717151232,
+                  "baseline_address_space_bytes": 235417600,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6937915392,
+                  "modeled_node_rank_envelope_bytes": 6937915392,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 4.9388e-05,
+                    "maximum_sum_address_space_bytes": 2717151232,
+                    "maximum_sum_rss_bytes": 152199168,
+                    "pids": 1,
+                    "samples": 390
+                  }
+                },
+                {
+                  "rank": 1,
+                  "rss_high_water_bytes": 152854528,
+                  "address_space_high_water_bytes": 2717151232,
+                  "baseline_address_space_bytes": 235417600,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6937915392,
+                  "modeled_node_rank_envelope_bytes": 6937915392,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 6.7827e-05,
+                    "maximum_sum_address_space_bytes": 2717151232,
+                    "maximum_sum_rss_bytes": 152854528,
+                    "pids": 1,
+                    "samples": 390
+                  }
+                },
+                {
+                  "rank": 2,
+                  "rss_high_water_bytes": 162918400,
+                  "address_space_high_water_bytes": 2717151232,
+                  "baseline_address_space_bytes": 235417600,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6937915392,
+                  "modeled_node_rank_envelope_bytes": 6937915392,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 5.067e-05,
+                    "maximum_sum_address_space_bytes": 2717151232,
+                    "maximum_sum_rss_bytes": 162918400,
+                    "pids": 1,
+                    "samples": 390
+                  }
+                },
+                {
+                  "rank": 3,
+                  "rss_high_water_bytes": 157732864,
+                  "address_space_high_water_bytes": 2717151232,
+                  "baseline_address_space_bytes": 235417600,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6937915392,
+                  "modeled_node_rank_envelope_bytes": 6937915392,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 5.0139e-05,
+                    "maximum_sum_address_space_bytes": 2717151232,
+                    "maximum_sum_rss_bytes": 157732864,
+                    "pids": 1,
+                    "samples": 390
+                  }
+                },
+                {
+                  "rank": 4,
+                  "rss_high_water_bytes": 153743360,
+                  "address_space_high_water_bytes": 2717151232,
+                  "baseline_address_space_bytes": 235417600,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6937915392,
+                  "modeled_node_rank_envelope_bytes": 6937915392,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 4.0955e-05,
+                    "maximum_sum_address_space_bytes": 2717151232,
+                    "maximum_sum_rss_bytes": 153743360,
+                    "pids": 1,
+                    "samples": 390
+                  }
+                },
+                {
+                  "rank": 5,
+                  "rss_high_water_bytes": 157761536,
+                  "address_space_high_water_bytes": 2717151232,
+                  "baseline_address_space_bytes": 235417600,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6937915392,
+                  "modeled_node_rank_envelope_bytes": 6937915392,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 3.6347e-05,
+                    "maximum_sum_address_space_bytes": 2717151232,
+                    "maximum_sum_rss_bytes": 157761536,
+                    "pids": 1,
+                    "samples": 390
+                  }
+                },
+                {
+                  "rank": 6,
+                  "rss_high_water_bytes": 153321472,
+                  "address_space_high_water_bytes": 2717151232,
+                  "baseline_address_space_bytes": 235417600,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6937915392,
+                  "modeled_node_rank_envelope_bytes": 6937915392,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 7.3306e-05,
+                    "maximum_sum_address_space_bytes": 2717151232,
+                    "maximum_sum_rss_bytes": 153321472,
+                    "pids": 1,
+                    "samples": 390
+                  }
+                },
+                {
+                  "rank": 7,
+                  "rss_high_water_bytes": 160313344,
+                  "address_space_high_water_bytes": 2717151232,
+                  "baseline_address_space_bytes": 235417600,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6937915392,
+                  "modeled_node_rank_envelope_bytes": 6937915392,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 5.5447e-05,
+                    "maximum_sum_address_space_bytes": 2717151232,
+                    "maximum_sum_rss_bytes": 160313344,
+                    "pids": 1,
+                    "samples": 390
+                  }
+                }
+              ],
+              "scope": "Rank-process high-water counters and sampled simultaneous sums of known MPI rank PIDs only. Samples may miss instantaneous peaks; launcher, coordinator, filesystem cache, unrelated node residents and HugeTLB coverage are not measured.",
+              "whole_node_enforced_cap_bytes": null,
+              "whole_node_peak_bytes": null
+            },
+            "minimum_norm": 0.9999999999999999,
+            "maximum_norm": 0.9999999999999999,
+            "maximum_sample_error": 8.673617379884035e-19,
+            "timing_scope": "Maximum of rank-local elapsed stage times; stage barriers are included where the fixture measures them. Independent node-local samples are not summed into a simultaneous multi-node peak.",
+            "series": "strong",
+            "compiler": "cray"
+          },
+          {
+            "evidence_kind": "scaling-only",
+            "capacity_closed": false,
+            "rank_receipts": 2,
+            "dimension": 16384,
+            "ranks": 2,
+            "repetitions": 3,
+            "distinct_hosts": 2,
+            "canonical_input_bytes": 1048576,
+            "measured_local_input_sum_bytes": 1048576,
+            "maximum_rank_input_storage_seconds": 0.009185226,
+            "maximum_rank_phase_seconds": {
+              "preprocessing": 0.145130575,
+              "persistence": 0.056060265,
+              "load": 0.335567064,
+              "prepare": 0.106964125,
+              "execution": 0.246941329
+            },
+            "maximum_rank_roundtrip_seconds": [
+              0.085247941,
+              0.080658124,
+              0.081204317
+            ],
+            "communication": {
+              "producer_sum_sent_payload_bytes": 26214400,
+              "execution_sum_sent_payload_bytes": 27721728,
+              "execution_sum_received_payload_bytes": 27721728,
+              "execution_maximum_rank_sent_payload_bytes": 14516224,
+              "execution_maximum_rank_received_payload_bytes": 14516224,
+              "execution_sum_coordination_calls": 49152,
+              "persistence_load_wire_bytes": null,
+              "scope": "Application-reported payload counts and coordination calls; MPI-internal traffic and persistence/load wire bytes are unmeasured. Send and receive totals are separate, not added as unique payload."
+            },
+            "memory": {
+              "maximum_rank_rss_high_water_bytes": 160436224,
+              "maximum_rank_address_space_high_water_bytes": 2718744576,
+              "maximum_sampled_rank_group_rss_bytes": 160436224,
+              "maximum_sampled_rank_group_address_space_bytes": 2718744576,
+              "per_rank": [
+                {
+                  "rank": 0,
+                  "rss_high_water_bytes": 160436224,
+                  "address_space_high_water_bytes": 2718744576,
+                  "baseline_address_space_bytes": 329760768,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 7032258560,
+                  "modeled_node_rank_envelope_bytes": 7032258560,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 5.0469e-05,
+                    "maximum_sum_address_space_bytes": 2718744576,
+                    "maximum_sum_rss_bytes": 160436224,
+                    "pids": 1,
+                    "samples": 46
+                  }
+                },
+                {
+                  "rank": 1,
+                  "rss_high_water_bytes": 157888512,
+                  "address_space_high_water_bytes": 2717933568,
+                  "baseline_address_space_bytes": 369606656,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 7072104448,
+                  "modeled_node_rank_envelope_bytes": 7072104448,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 4.7726e-05,
+                    "maximum_sum_address_space_bytes": 2717933568,
+                    "maximum_sum_rss_bytes": 157888512,
+                    "pids": 1,
+                    "samples": 46
+                  }
+                }
+              ],
+              "scope": "Rank-process high-water counters and sampled simultaneous sums of known MPI rank PIDs only. Samples may miss instantaneous peaks; launcher, coordinator, filesystem cache, unrelated node residents and HugeTLB coverage are not measured.",
+              "whole_node_enforced_cap_bytes": null,
+              "whole_node_peak_bytes": null
+            },
+            "minimum_norm": 0.9999999999999999,
+            "maximum_norm": 0.9999999999999999,
+            "maximum_sample_error": 1.734723475976807e-18,
+            "timing_scope": "Maximum of rank-local elapsed stage times; stage barriers are included where the fixture measures them. Independent node-local samples are not summed into a simultaneous multi-node peak.",
+            "series": "weak",
+            "compiler": "cray"
+          },
+          {
+            "evidence_kind": "scaling-only",
+            "capacity_closed": false,
+            "rank_receipts": 4,
+            "dimension": 32768,
+            "ranks": 4,
+            "repetitions": 3,
+            "distinct_hosts": 4,
+            "canonical_input_bytes": 2097152,
+            "measured_local_input_sum_bytes": 2097152,
+            "maximum_rank_input_storage_seconds": 0.009367507,
+            "maximum_rank_phase_seconds": {
+              "preprocessing": 0.340228048,
+              "persistence": 0.0577354,
+              "load": 1.247640794,
+              "prepare": 0.168081875,
+              "execution": 0.947052234
+            },
+            "maximum_rank_roundtrip_seconds": [
+              0.321940403,
+              0.308690643,
+              0.316716649
+            ],
+            "communication": {
+              "producer_sum_sent_payload_bytes": 52428800,
+              "execution_sum_sent_payload_bytes": 84934656,
+              "execution_sum_received_payload_bytes": 84934656,
+              "execution_maximum_rank_sent_payload_bytes": 22872064,
+              "execution_maximum_rank_received_payload_bytes": 24182784,
+              "execution_sum_coordination_calls": 589824,
+              "persistence_load_wire_bytes": null,
+              "scope": "Application-reported payload counts and coordination calls; MPI-internal traffic and persistence/load wire bytes are unmeasured. Send and receive totals are separate, not added as unique payload."
+            },
+            "memory": {
+              "maximum_rank_rss_high_water_bytes": 159059968,
+              "maximum_rank_address_space_high_water_bytes": 2718081024,
+              "maximum_sampled_rank_group_rss_bytes": 159059968,
+              "maximum_sampled_rank_group_address_space_bytes": 2718081024,
+              "per_rank": [
+                {
+                  "rank": 0,
+                  "rss_high_water_bytes": 156504064,
+                  "address_space_high_water_bytes": 2718081024,
+                  "baseline_address_space_bytes": 235401216,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6937899008,
+                  "modeled_node_rank_envelope_bytes": 6937899008,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 4.9519e-05,
+                    "maximum_sum_address_space_bytes": 2718081024,
+                    "maximum_sum_rss_bytes": 156504064,
+                    "pids": 1,
+                    "samples": 140
+                  }
+                },
+                {
+                  "rank": 1,
+                  "rss_high_water_bytes": 157249536,
+                  "address_space_high_water_bytes": 2718081024,
+                  "baseline_address_space_bytes": 235401216,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6937899008,
+                  "modeled_node_rank_envelope_bytes": 6937899008,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 4.5792e-05,
+                    "maximum_sum_address_space_bytes": 2718081024,
+                    "maximum_sum_rss_bytes": 157249536,
+                    "pids": 1,
+                    "samples": 140
+                  }
+                },
+                {
+                  "rank": 2,
+                  "rss_high_water_bytes": 159059968,
+                  "address_space_high_water_bytes": 2718081024,
+                  "baseline_address_space_bytes": 235401216,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6937899008,
+                  "modeled_node_rank_envelope_bytes": 6937899008,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 5.0719e-05,
+                    "maximum_sum_address_space_bytes": 2718081024,
+                    "maximum_sum_rss_bytes": 159059968,
+                    "pids": 1,
+                    "samples": 140
+                  }
+                },
+                {
+                  "rank": 3,
+                  "rss_high_water_bytes": 151818240,
+                  "address_space_high_water_bytes": 2717270016,
+                  "baseline_address_space_bytes": 235401216,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6937899008,
+                  "modeled_node_rank_envelope_bytes": 6937899008,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 4.7365e-05,
+                    "maximum_sum_address_space_bytes": 2717270016,
+                    "maximum_sum_rss_bytes": 151818240,
+                    "pids": 1,
+                    "samples": 140
+                  }
+                }
+              ],
+              "scope": "Rank-process high-water counters and sampled simultaneous sums of known MPI rank PIDs only. Samples may miss instantaneous peaks; launcher, coordinator, filesystem cache, unrelated node residents and HugeTLB coverage are not measured.",
+              "whole_node_enforced_cap_bytes": null,
+              "whole_node_peak_bytes": null
+            },
+            "minimum_norm": 0.9999999999999999,
+            "maximum_norm": 0.9999999999999999,
+            "maximum_sample_error": 1.3016071731219915e-18,
+            "timing_scope": "Maximum of rank-local elapsed stage times; stage barriers are included where the fixture measures them. Independent node-local samples are not summed into a simultaneous multi-node peak.",
+            "series": "weak",
+            "compiler": "cray"
+          },
+          {
+            "evidence_kind": "scaling-only",
+            "capacity_closed": false,
+            "rank_receipts": 8,
+            "dimension": 65536,
+            "ranks": 8,
+            "repetitions": 3,
+            "distinct_hosts": 8,
+            "canonical_input_bytes": 4194304,
+            "measured_local_input_sum_bytes": 4194304,
+            "maximum_rank_input_storage_seconds": 0.010302716,
+            "maximum_rank_phase_seconds": {
+              "preprocessing": 0.700985672,
+              "persistence": 0.062998257,
+              "load": 3.433694223,
+              "prepare": 0.323556134,
+              "execution": 3.304441678
+            },
+            "maximum_rank_roundtrip_seconds": [
+              1.115747301,
+              1.077592137,
+              1.111380404
+            ],
+            "communication": {
+              "producer_sum_sent_payload_bytes": 104857600,
+              "execution_sum_sent_payload_bytes": 214695936,
+              "execution_sum_received_payload_bytes": 214695936,
+              "execution_maximum_rank_sent_payload_bytes": 29622272,
+              "execution_maximum_rank_received_payload_bytes": 30932992,
+              "execution_sum_coordination_calls": 5505024,
+              "persistence_load_wire_bytes": null,
+              "scope": "Application-reported payload counts and coordination calls; MPI-internal traffic and persistence/load wire bytes are unmeasured. Send and receive totals are separate, not added as unique payload."
+            },
+            "memory": {
+              "maximum_rank_rss_high_water_bytes": 160194560,
+              "maximum_rank_address_space_high_water_bytes": 2717151232,
+              "maximum_sampled_rank_group_rss_bytes": 160194560,
+              "maximum_sampled_rank_group_address_space_bytes": 2717151232,
+              "per_rank": [
+                {
+                  "rank": 0,
+                  "rss_high_water_bytes": 152555520,
+                  "address_space_high_water_bytes": 2717151232,
+                  "baseline_address_space_bytes": 235417600,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6937915392,
+                  "modeled_node_rank_envelope_bytes": 6937915392,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 4.6004e-05,
+                    "maximum_sum_address_space_bytes": 2717151232,
+                    "maximum_sum_rss_bytes": 152555520,
+                    "pids": 1,
+                    "samples": 392
+                  }
+                },
+                {
+                  "rank": 1,
+                  "rss_high_water_bytes": 155418624,
+                  "address_space_high_water_bytes": 2717151232,
+                  "baseline_address_space_bytes": 235417600,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6937915392,
+                  "modeled_node_rank_envelope_bytes": 6937915392,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 5.7801e-05,
+                    "maximum_sum_address_space_bytes": 2717151232,
+                    "maximum_sum_rss_bytes": 155418624,
+                    "pids": 1,
+                    "samples": 392
+                  }
+                },
+                {
+                  "rank": 2,
+                  "rss_high_water_bytes": 157487104,
+                  "address_space_high_water_bytes": 2717151232,
+                  "baseline_address_space_bytes": 235417600,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6937915392,
+                  "modeled_node_rank_envelope_bytes": 6937915392,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 4.7876e-05,
+                    "maximum_sum_address_space_bytes": 2717151232,
+                    "maximum_sum_rss_bytes": 157487104,
+                    "pids": 1,
+                    "samples": 392
+                  }
+                },
+                {
+                  "rank": 3,
+                  "rss_high_water_bytes": 153841664,
+                  "address_space_high_water_bytes": 2717151232,
+                  "baseline_address_space_bytes": 235417600,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6937915392,
+                  "modeled_node_rank_envelope_bytes": 6937915392,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 4.1025e-05,
+                    "maximum_sum_address_space_bytes": 2717151232,
+                    "maximum_sum_rss_bytes": 153841664,
+                    "pids": 1,
+                    "samples": 392
+                  }
+                },
+                {
+                  "rank": 4,
+                  "rss_high_water_bytes": 157827072,
+                  "address_space_high_water_bytes": 2717151232,
+                  "baseline_address_space_bytes": 235417600,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6937915392,
+                  "modeled_node_rank_envelope_bytes": 6937915392,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 3.6428e-05,
+                    "maximum_sum_address_space_bytes": 2717151232,
+                    "maximum_sum_rss_bytes": 157827072,
+                    "pids": 1,
+                    "samples": 392
+                  }
+                },
+                {
+                  "rank": 5,
+                  "rss_high_water_bytes": 157929472,
+                  "address_space_high_water_bytes": 2717151232,
+                  "baseline_address_space_bytes": 235417600,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6937915392,
+                  "modeled_node_rank_envelope_bytes": 6937915392,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 5.6649e-05,
+                    "maximum_sum_address_space_bytes": 2717151232,
+                    "maximum_sum_rss_bytes": 157929472,
+                    "pids": 1,
+                    "samples": 392
+                  }
+                },
+                {
+                  "rank": 6,
+                  "rss_high_water_bytes": 160194560,
+                  "address_space_high_water_bytes": 2717151232,
+                  "baseline_address_space_bytes": 235417600,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6937915392,
+                  "modeled_node_rank_envelope_bytes": 6937915392,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 4.1355e-05,
+                    "maximum_sum_address_space_bytes": 2717151232,
+                    "maximum_sum_rss_bytes": 160194560,
+                    "pids": 1,
+                    "samples": 392
+                  }
+                },
+                {
+                  "rank": 7,
+                  "rss_high_water_bytes": 153817088,
+                  "address_space_high_water_bytes": 2717151232,
+                  "baseline_address_space_bytes": 235417600,
+                  "model_rank_budget_bytes": 4294967296,
+                  "model_node_budget_bytes": 4294967296,
+                  "modeled_rank_envelope_bytes": 6937915392,
+                  "modeled_node_rank_envelope_bytes": 6937915392,
+                  "node_memory_sampling": {
+                    "interval_milliseconds": 20,
+                    "max_sample_span_seconds": 5.4116e-05,
+                    "maximum_sum_address_space_bytes": 2717151232,
+                    "maximum_sum_rss_bytes": 153817088,
+                    "pids": 1,
+                    "samples": 392
+                  }
+                }
+              ],
+              "scope": "Rank-process high-water counters and sampled simultaneous sums of known MPI rank PIDs only. Samples may miss instantaneous peaks; launcher, coordinator, filesystem cache, unrelated node residents and HugeTLB coverage are not measured.",
+              "whole_node_enforced_cap_bytes": null,
+              "whole_node_peak_bytes": null
+            },
+            "minimum_norm": 0.9999999999999999,
+            "maximum_norm": 0.9999999999999999,
+            "maximum_sample_error": 8.673617379884035e-19,
+            "timing_scope": "Maximum of rank-local elapsed stage times; stage barriers are included where the fixture measures them. Independent node-local samples are not summed into a simultaneous multi-node peak.",
+            "series": "weak",
+            "compiler": "cray"
+          }
+        ],
+        "metrics_artifact": {
+          "path": "target/scaling-cirrus-20261006/analysis/cray-cases.json",
+          "bytes": 33307,
+          "sha256": "e6bbbc1aeabbf4d9ce8c49e33477315ceb0bbeb7b75ce3b039945a116f0bd7ff"
+        },
+        "metric_scope": "Maximum rank-local phase and round-trip seconds, application-reported communication, per-rank process high-water counters and known-rank-group samples. No whole-node peak, MPI-internal/persistence wire-byte, HugeTLB or speedup claim."
+      }
+    ],
+    "cray_runtime_archive": {
+      "path": "target/scaling-cirrus-20261006/retrieved/completed-cray-server-runtime.tar.gz",
+      "bytes": 5151060,
+      "sha256": "d34c150c53d841d4c1d44dc52d9a054390a91821df4c636a84f9b25a6d76fed5"
+    },
+    "cray_runtime_raw_index": {
+      "artifact": {
+        "path": "target/scaling-cirrus-20261006/analysis/retrieved-cray-runtime.sha256",
+        "bytes": 29861,
+        "sha256": "16a3829d90b9d995533b4b049e49bccc532bbcc2dcdfaf15f96488780b0db85f"
+      },
+      "files": 189,
+      "mismatches": 0
+    },
+    "cray_runtime_validation": {
+      "log": {
+        "path": "target/scaling-cirrus-20261006/analysis/check-and-aggregate-cray.log",
+        "bytes": 458,
+        "sha256": "a510e6270129c3d70cc0a70294744248e5a392b3181a0fa3cfe2a6958f94f6aa"
+      },
+      "status": {
+        "path": "target/scaling-cirrus-20261006/analysis/check-and-aggregate-cray.status",
+        "bytes": 2,
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "exit_code": 0
+    },
+    "cray_runtime_accounting": {
+      "path": "target/scaling-cirrus-20261006/analysis/accounting-cray-server-runtime.txt",
+      "bytes": 1469,
+      "sha256": "613babb9a25336be5daf513e8f4c6cd2958fde9b8e73cb6e971b41f6347936df"
+    }
+  }
+}

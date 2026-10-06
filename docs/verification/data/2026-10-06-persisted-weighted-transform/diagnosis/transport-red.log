@@ -1,0 +1,14 @@
+F
+======================================================================
+FAIL: test_capture_limits_do_not_apply_to_child_transport_files (__main__.Contract.test_capture_limits_do_not_apply_to_child_transport_files)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<workspace>/docs/verification/fixtures/persisted-weighted-transform/test_run.py", line 136, in test_capture_limits_do_not_apply_to_child_transport_files
+    self.assertEqual(job['returncode'],0)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0
+
+----------------------------------------------------------------------
+Ran 1 test in 0.034s
+
+FAILED (failures=1)

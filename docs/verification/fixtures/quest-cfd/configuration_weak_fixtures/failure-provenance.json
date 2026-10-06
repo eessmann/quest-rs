@@ -1,0 +1,17 @@
+{
+  "scope": "One cfg(test)-only injected grid failure using real example run/error wrapper/fixed serializer; no grid or physical source construction. Not a campaign row.",
+  "command": [
+    "cargo",
+    "test",
+    "-p",
+    "quest-cfd",
+    "--example",
+    "configuration_weak"
+  ],
+  "example_sha256": "8c776b6aa61a5ab8e549e609f67ddec69879e20484eeac486d1c803125cf7819",
+  "test_binary_sha256": "e8433dee0594dc27b65cbd92ff9526f7f600aad3bd1ce1cedbcef816e885c7ff",
+  "final_test_log_sha256": "862324c05fa6d22cb5850b279269c90bdab67a1eed8e9a46842da8673e45a601",
+  "fixture_sha256": "150479dd94eae36cabfb847878af05091aea81f2d4fb8bea6e185b445872a305",
+  "managed_campaign_limits_applied": false,
+  "unit_test_passed": true
+}
