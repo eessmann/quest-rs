@@ -104,8 +104,11 @@ fn policy(tolerance: f64, algorithm: SynthesisAlgorithm) -> Result<Policy> {
 		return Err(Error::Input("positive finite tolerance required"));
 	}
 	Ok(Policy {
+		accuracy: quest_qsp::AccuracyPolicy {
+			response_tolerance: tolerance,
+			..(Policy::default()).accuracy
+		},
 		algorithm,
-		response_tolerance: tolerance,
 		..Policy::default()
 	})
 }

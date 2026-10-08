@@ -1,0 +1,77 @@
+{
+  "additional_reconstruction_status": "ok",
+  "after_workspace_release": {
+    "last_rejection": null,
+    "live_buffer_bytes": 0,
+    "live_bytes": 0,
+    "live_planner_bytes_estimate": 0,
+    "peak_bytes": 33072,
+    "requested_peak_bytes": 33072,
+    "requested_work_units": 54550,
+    "reservations": 342,
+    "work_units": 54550
+  },
+  "backend": "rustfft-simd-sequential",
+  "cached_after_result_release": {
+    "last_rejection": null,
+    "live_buffer_bytes": 944,
+    "live_bytes": 30640,
+    "live_planner_bytes_estimate": 29696,
+    "peak_bytes": 33072,
+    "requested_peak_bytes": 33072,
+    "requested_work_units": 54550,
+    "reservations": 342,
+    "work_units": 54550
+  },
+  "cached_forward_plans": 4,
+  "cached_forward_scratch_bytes": 944,
+  "coefficient_backward_linf": 1.4655215321055763e-16,
+  "degree": 10,
+  "live_result_and_workspaces": {
+    "last_rejection": null,
+    "live_buffer_bytes": 1296,
+    "live_bytes": 30992,
+    "live_planner_bytes_estimate": 29696,
+    "peak_bytes": 33072,
+    "requested_peak_bytes": 33072,
+    "requested_work_units": 27275,
+    "reservations": 177,
+    "work_units": 27275
+  },
+  "main_backward_tolerance": 1e-10,
+  "memory_kind": "modeled live allocations plus retained opaque planner estimate; not process RSS",
+  "operation": "forward",
+  "profile": "million-degree-inverse-forward-v1",
+  "reconstructed_a_constant": [
+    0.9994791358195656,
+    -9.566390106290068e-17
+  ],
+  "reuse": {
+    "coefficient_linf": 1.4655215321055763e-16,
+    "plans_after": 4,
+    "plans_before": 4,
+    "resources_after_reuse": {
+      "last_rejection": null,
+      "live_buffer_bytes": 1296,
+      "live_bytes": 30992,
+      "live_planner_bytes_estimate": 29696,
+      "peak_bytes": 33072,
+      "requested_peak_bytes": 33072,
+      "requested_work_units": 54550,
+      "reservations": 342,
+      "work_units": 54550
+    },
+    "scratch_bytes_after": 944,
+    "scratch_bytes_before": 944,
+    "status": "ok"
+  },
+  "source_a_constant": [
+    0.9994791358195657,
+    -0.0
+  ],
+  "source_inverse_check": null,
+  "source_inverse_contract": "finite, size-preserving, max complex reflection error",
+  "source_reflection_linf": null,
+  "status": "ok",
+  "tolerance": 1e-10
+}

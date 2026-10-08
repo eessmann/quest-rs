@@ -189,33 +189,57 @@ macro_rules! registry {
         }
     };
 }
-registry! {
-	Id, "id", "Id", 1, 0, 0, Adjoint::SelfInverse, Decomposition::Primitive(Primitive::Identity);
-	X, "x", "X", 1, 0, 0, Adjoint::SelfInverse, Decomposition::Primitive(Primitive::Pauli(Axis::X));
-	Y, "y", "Y", 1, 0, 0, Adjoint::SelfInverse, Decomposition::Primitive(Primitive::Pauli(Axis::Y));
-	Z, "z", "Z", 1, 0, 0, Adjoint::SelfInverse, Decomposition::Primitive(Primitive::Pauli(Axis::Z));
-	H, "h", "H", 1, 0, 0, Adjoint::SelfInverse, Decomposition::Primitive(Primitive::Hadamard);
-	S, "s", "S", 1, 0, 0, Adjoint::Gate(GateKind::Sdg), Decomposition::Sequence(&[GateStep { gate: GateKind::Phase, parameters: &[AngleExpression::pi(1, 2)] }]);
-	Sdg, "sdg", "Sdg", 1, 0, 0, Adjoint::Gate(GateKind::S), Decomposition::Sequence(&[GateStep { gate: GateKind::Phase, parameters: &[AngleExpression::pi(-1, 2)] }]);
-	T, "t", "T", 1, 0, 0, Adjoint::Gate(GateKind::Tdg), Decomposition::Sequence(&[GateStep { gate: GateKind::Phase, parameters: &[AngleExpression::pi(1, 4)] }]);
-	Tdg, "tdg", "Tdg", 1, 0, 0, Adjoint::Gate(GateKind::T), Decomposition::Sequence(&[GateStep { gate: GateKind::Phase, parameters: &[AngleExpression::pi(-1, 4)] }]);
-	Sx, "sx", "Sx", 1, 0, 0, Adjoint::Gate(GateKind::Sxdg), Decomposition::Sequence(&[
-		GateStep { gate: GateKind::GlobalPhase, parameters: &[AngleExpression::pi(1, 4)] },
-		GateStep { gate: GateKind::Rx, parameters: &[AngleExpression::pi(1, 2)] },
-	]);
-	Sxdg, "sxdg", "Sxdg", 1, 0, 0, Adjoint::Gate(GateKind::Sx), Decomposition::Sequence(&[
-		GateStep { gate: GateKind::GlobalPhase, parameters: &[AngleExpression::pi(-1, 4)] },
-		GateStep { gate: GateKind::Rx, parameters: &[AngleExpression::pi(-1, 2)] },
-	]);
-	Swap, "swap", "Swap", 2, 0, 0, Adjoint::SelfInverse, Decomposition::Primitive(Primitive::Swap);
-	Rx, "rx", "Rx", 1, 1, 0, Adjoint::Parameters(NEGATE), Decomposition::Primitive(Primitive::Rotation(Axis::X));
-	Ry, "ry", "Ry", 1, 1, 0, Adjoint::Parameters(NEGATE), Decomposition::Primitive(Primitive::Rotation(Axis::Y));
-	Rz, "rz", "Rz", 1, 1, 0, Adjoint::Parameters(NEGATE), Decomposition::Primitive(Primitive::Rotation(Axis::Z));
-	Phase, "p", "Phase", 1, 1, 0, Adjoint::Parameters(NEGATE), Decomposition::Primitive(Primitive::Phase);
-	U, "U", "U", 1, 3, 0, Adjoint::Parameters(U_ADJOINT), Decomposition::Sequence(U_STEPS);
-	Cx, "cx", "X", 1, 0, 1, Adjoint::SelfInverse, Decomposition::Controlled { base: GateKind::X, controls: 1 };
-	Cy, "cy", "Y", 1, 0, 1, Adjoint::SelfInverse, Decomposition::Controlled { base: GateKind::Y, controls: 1 };
-	Cz, "cz", "Z", 1, 0, 1, Adjoint::SelfInverse, Decomposition::Controlled { base: GateKind::Z, controls: 1 };
-	Ccx, "ccx", "X", 1, 0, 2, Adjoint::SelfInverse, Decomposition::Controlled { base: GateKind::X, controls: 2 };
-	GlobalPhase, "gphase", "GlobalPhase", 0, 1, 0, Adjoint::Parameters(NEGATE), Decomposition::Primitive(Primitive::GlobalPhase);
+// This table also generates the mechanical circuit adapters. Numerical
+// formulas and independent verification remain outside this callback registry.
+macro_rules! circuit_registry {
+    ($callback:ident) => { $callback! {
+        fixed {
+            Id => ("id", "Id", 1, 0, 0, Adjoint::SelfInverse, Decomposition::Primitive(Primitive::Identity));
+            X => ("x", "X", 1, 0, 0, Adjoint::SelfInverse, Decomposition::Primitive(Primitive::Pauli(Axis::X)));
+            Y => ("y", "Y", 1, 0, 0, Adjoint::SelfInverse, Decomposition::Primitive(Primitive::Pauli(Axis::Y)));
+            Z => ("z", "Z", 1, 0, 0, Adjoint::SelfInverse, Decomposition::Primitive(Primitive::Pauli(Axis::Z)));
+            H => ("h", "H", 1, 0, 0, Adjoint::SelfInverse, Decomposition::Primitive(Primitive::Hadamard));
+            S => ("s", "S", 1, 0, 0, Adjoint::Gate(GateKind::Sdg), Decomposition::Sequence(&[GateStep { gate: GateKind::Phase, parameters: &[AngleExpression::pi(1, 2)] }]));
+            Sdg => ("sdg", "Sdg", 1, 0, 0, Adjoint::Gate(GateKind::S), Decomposition::Sequence(&[GateStep { gate: GateKind::Phase, parameters: &[AngleExpression::pi(-1, 2)] }]));
+            T => ("t", "T", 1, 0, 0, Adjoint::Gate(GateKind::Tdg), Decomposition::Sequence(&[GateStep { gate: GateKind::Phase, parameters: &[AngleExpression::pi(1, 4)] }]));
+            Tdg => ("tdg", "Tdg", 1, 0, 0, Adjoint::Gate(GateKind::T), Decomposition::Sequence(&[GateStep { gate: GateKind::Phase, parameters: &[AngleExpression::pi(-1, 4)] }]));
+            Sx => ("sx", "Sx", 1, 0, 0, Adjoint::Gate(GateKind::Sxdg), Decomposition::Sequence(&[
+                GateStep { gate: GateKind::GlobalPhase, parameters: &[AngleExpression::pi(1, 4)] },
+                GateStep { gate: GateKind::Rx, parameters: &[AngleExpression::pi(1, 2)] },
+            ]));
+            Sxdg => ("sxdg", "Sxdg", 1, 0, 0, Adjoint::Gate(GateKind::Sx), Decomposition::Sequence(&[
+                GateStep { gate: GateKind::GlobalPhase, parameters: &[AngleExpression::pi(-1, 4)] },
+                GateStep { gate: GateKind::Rx, parameters: &[AngleExpression::pi(-1, 2)] },
+            ]));
+            Swap => ("swap", "Swap", 2, 0, 0, Adjoint::SelfInverse, Decomposition::Primitive(Primitive::Swap));
+        }
+        angle {
+            Rx => ("rx", "Rx", 1, 1, 0, Adjoint::Parameters(NEGATE), Decomposition::Primitive(Primitive::Rotation(Axis::X)));
+            Ry => ("ry", "Ry", 1, 1, 0, Adjoint::Parameters(NEGATE), Decomposition::Primitive(Primitive::Rotation(Axis::Y)));
+            Rz => ("rz", "Rz", 1, 1, 0, Adjoint::Parameters(NEGATE), Decomposition::Primitive(Primitive::Rotation(Axis::Z)));
+            Phase => ("p", "Phase", 1, 1, 0, Adjoint::Parameters(NEGATE), Decomposition::Primitive(Primitive::Phase));
+        }
+        euler {
+            U => ("U", "U", 1, 3, 0, Adjoint::Parameters(U_ADJOINT), Decomposition::Sequence(U_STEPS));
+        }
+    }};
+        }
+pub(crate) use circuit_registry;
+macro_rules! define_registry {
+    (fixed { $($fixed:ident => ($($fm:tt)*);)* }
+     angle { $($angle:ident => ($($am:tt)*);)* }
+     euler { $euler:ident => ($($em:tt)*); }) => {
+        registry! {
+            $($fixed, $($fm)*;)*
+            $($angle, $($am)*;)*
+            $euler, $($em)*;
+
+            Cx, "cx", "X", 1, 0, 1, Adjoint::SelfInverse, Decomposition::Controlled { base: GateKind::X, controls: 1 };
+            Cy, "cy", "Y", 1, 0, 1, Adjoint::SelfInverse, Decomposition::Controlled { base: GateKind::Y, controls: 1 };
+            Cz, "cz", "Z", 1, 0, 1, Adjoint::SelfInverse, Decomposition::Controlled { base: GateKind::Z, controls: 1 };
+            Ccx, "ccx", "X", 1, 0, 2, Adjoint::SelfInverse, Decomposition::Controlled { base: GateKind::X, controls: 2 };
+            GlobalPhase, "gphase", "GlobalPhase", 0, 1, 0, Adjoint::Parameters(NEGATE), Decomposition::Primitive(Primitive::GlobalPhase);
+        }
+    };
 }
+circuit_registry!(define_registry);

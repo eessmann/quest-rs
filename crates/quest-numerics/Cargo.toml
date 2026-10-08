@@ -19,6 +19,8 @@ serde_json = { workspace = true, optional = true }
 rayon = { workspace = true, optional = true }
 
 [dev-dependencies]
+allocation-counter.workspace = true
+stats_alloc.workspace = true
 serde_json.workspace = true
 dashu-ratio.workspace = true
 googletest.workspace = true

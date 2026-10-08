@@ -3,11 +3,13 @@
 //! Maintained exact algebra and backend-neutral ordered mathematical expressions.
 pub use dashu_ratio::RBig;
 pub mod arithmetic;
-mod dyadic;
+pub mod dyadic;
 pub mod dynamic;
 pub mod exact;
 pub mod geometry;
+pub mod identity;
 pub mod multivariate;
+pub mod resources;
 pub mod scalar;
 mod scope;
 pub mod typed;

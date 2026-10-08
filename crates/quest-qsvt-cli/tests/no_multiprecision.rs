@@ -38,7 +38,10 @@ fn production_failure_and_native_execution_are_independent_of_cold_verification(
 	)?;
 	let failed = SynthesisBuilder::new()
 		.policy(Policy {
-			response_tolerance: 1e-18,
+			accuracy: quest_qsp::AccuracyPolicy {
+				response_tolerance: 1e-18,
+				..(Policy::default()).accuracy
+			},
 			..Policy::default()
 		})
 		.real_parity_wx(&difficult)?

@@ -88,3 +88,32 @@ bounds. The oracle shares exact integer storage with production but none of the
 rounded or transcendental floating-point algorithms. Zero extraction returns
 before reading or shifting its special exponent. Rug, GMP, MPFR, Malachite and
 backend-selection machinery are absent from this crate.
+
+## Shared operation resources
+
+`OperationLimits` replaces the former flat limits. `ShapeLimits` separates
+`max_coefficients`, `max_fft_len`, and `max_completion_grid`; `ResourceLimits`
+contains `max_peak_bytes` and `max_work_units`. The transitional `Limits` name is
+an alias of this same configuration. The defaults remain conservative.
+On 64-bit targets, `OperationLimits::million_degree()` explicitly selects
+1,000,001 coefficient slots, a padded FFT limit of 2^21, 8 GiB of modeled peak
+storage, and 2^37 cumulative work units. Its completion grid gate is 2^22;
+admission of that grid does not establish successful completion or accuracy.
+
+`OperationResources` is a cloneable shared ledger. Pass the same ledger to
+`FftWorkspace::new_with_resources`, `ConvolutionWorkspace::new_with_resources`,
+or `SharedConvolutionWorkspace::new_with_resources` to account for successive
+kernels together. Constructors reserve owned buffers and conservative opaque
+RustFFT plan estimates before allocation. Cached plans and scratch remain charged
+until their owning workspace drops; output reservations follow output ownership.
+An `Accounted<T>` owns both its result and reservation tokens. Keep these together
+when using `into_parts`; `map` transfers the same ownership through an in-place
+representation change.
+
+Work charges cover complete kernel batches, accumulate across calls, and remain
+spent after an execution failure. Parallel allocations are admitted as an ordered
+atomic batch before dispatch. Reports separate live owned buffers from planner
+estimates and include configured limits, requested peaks/work, admitted peaks/work,
+and the last structured rejection. A modeled byte limit is neither a process RSS
+quota nor an allocator guarantee; allocator metadata, scheduler state, and opaque
+backend allocation details are outside the model.

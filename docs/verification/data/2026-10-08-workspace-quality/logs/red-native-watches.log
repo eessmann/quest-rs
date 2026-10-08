@@ -1,0 +1,161 @@
+ Nextest run ID fd8bd772-10a5-4885-97e8-93fb4c2f48c9 with nextest profile: default
+    Starting 2 tests across 1 binary (64 tests skipped)
+        FAIL [   0.049s] (1/2) quest-build hdf5::tests::linux_pkg_config_empty_link_paths_use_selected_header_root
+  stdout ───
+
+    running 1 test
+    Value of: String::from_utf8_lossy(&output.stdout).contains(&format!("rerun-if-env-changed={key}"))
+    Expected: is equal to true
+    Actual: false,
+      which isn't equal to true
+    missing input watch for PKG_CONFIG_x86_64-unknown-linux-gnu
+      at crates/quest-build/src/hdf5.rs:552:17
+
+    Value of: String::from_utf8_lossy(&output.stdout).contains(&format!("rerun-if-env-changed={key}"))
+    Expected: is equal to true
+    Actual: false,
+      which isn't equal to true
+    missing input watch for PKG_CONFIG_x86_64_unknown_linux_gnu
+      at crates/quest-build/src/hdf5.rs:552:17
+
+    Value of: String::from_utf8_lossy(&output.stdout).contains(&format!("rerun-if-env-changed={key}"))
+    Expected: is equal to true
+    Actual: false,
+      which isn't equal to true
+    missing input watch for HOST_PKG_CONFIG
+      at crates/quest-build/src/hdf5.rs:552:17
+
+    Value of: String::from_utf8_lossy(&output.stdout).contains(&format!("rerun-if-env-changed={key}"))
+    Expected: is equal to true
+    Actual: false,
+      which isn't equal to true
+    missing input watch for PKG_CONFIG_PATH_x86_64-unknown-linux-gnu
+      at crates/quest-build/src/hdf5.rs:552:17
+
+    Value of: String::from_utf8_lossy(&output.stdout).contains(&format!("rerun-if-env-changed={key}"))
+    Expected: is equal to true
+    Actual: false,
+      which isn't equal to true
+    missing input watch for PKG_CONFIG_PATH_x86_64_unknown_linux_gnu
+      at crates/quest-build/src/hdf5.rs:552:17
+
+    Value of: String::from_utf8_lossy(&output.stdout).contains(&format!("rerun-if-env-changed={key}"))
+    Expected: is equal to true
+    Actual: false,
+      which isn't equal to true
+    missing input watch for HOST_PKG_CONFIG_PATH
+      at crates/quest-build/src/hdf5.rs:552:17
+
+    Value of: String::from_utf8_lossy(&output.stdout).contains(&format!("rerun-if-env-changed={key}"))
+    Expected: is equal to true
+    Actual: false,
+      which isn't equal to true
+    missing input watch for PKG_CONFIG_LIBDIR_x86_64-unknown-linux-gnu
+      at crates/quest-build/src/hdf5.rs:552:17
+
+    Value of: String::from_utf8_lossy(&output.stdout).contains(&format!("rerun-if-env-changed={key}"))
+    Expected: is equal to true
+    Actual: false,
+      which isn't equal to true
+    missing input watch for PKG_CONFIG_LIBDIR_x86_64_unknown_linux_gnu
+      at crates/quest-build/src/hdf5.rs:552:17
+
+    Value of: String::from_utf8_lossy(&output.stdout).contains(&format!("rerun-if-env-changed={key}"))
+    Expected: is equal to true
+    Actual: false,
+      which isn't equal to true
+    missing input watch for HOST_PKG_CONFIG_LIBDIR
+      at crates/quest-build/src/hdf5.rs:552:17
+
+    Value of: String::from_utf8_lossy(&output.stdout).contains(&format!("rerun-if-env-changed={key}"))
+    Expected: is equal to true
+    Actual: false,
+      which isn't equal to true
+    missing input watch for PKG_CONFIG_SYSROOT_DIR_x86_64-unknown-linux-gnu
+      at crates/quest-build/src/hdf5.rs:552:17
+
+    Value of: String::from_utf8_lossy(&output.stdout).contains(&format!("rerun-if-env-changed={key}"))
+    Expected: is equal to true
+    Actual: false,
+      which isn't equal to true
+    missing input watch for PKG_CONFIG_SYSROOT_DIR_x86_64_unknown_linux_gnu
+      at crates/quest-build/src/hdf5.rs:552:17
+
+    Value of: String::from_utf8_lossy(&output.stdout).contains(&format!("rerun-if-env-changed={key}"))
+    Expected: is equal to true
+    Actual: false,
+      which isn't equal to true
+    missing input watch for HOST_PKG_CONFIG_SYSROOT_DIR
+      at crates/quest-build/src/hdf5.rs:552:17
+
+    Value of: String::from_utf8_lossy(&output.stdout).contains(&format!("rerun-if-env-changed={key}"))
+    Expected: is equal to true
+    Actual: false,
+      which isn't equal to true
+    missing input watch for PKG_CONFIG_SYSROOT_DIR
+      at crates/quest-build/src/hdf5.rs:552:17
+
+    test hdf5::tests::linux_pkg_config_empty_link_paths_use_selected_header_root ... FAILED
+
+    failures:
+
+    failures:
+        hdf5::tests::linux_pkg_config_empty_link_paths_use_selected_header_root
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 65 filtered out; finished in 0.05s
+
+  stderr ───
+    Error: See failure output above
+
+
+        FAIL [   0.324s] (2/2) quest-build probe::tests::tooling_preserves_toolchain_wrapper_arguments_and_normal_environment
+  stdout ───
+
+    running 1 test
+    <workspace>/target/debug/build/quest-build/12b0307ccfc109de/out/quest_build-12b0307ccfc109de failed (exit status: 101):
+
+    running 1 test
+    Value of: native.watched_inputs.contains(&native.library)
+    Expected: is equal to true
+    Actual: false,
+      which isn't equal to true
+      at crates/quest-build/src/probe.rs:847:13
+
+    Value of: native.watched_inputs.contains(&root.join("package/include/quest.h"))
+    Expected: is equal to true
+    Actual: false,
+      which isn't equal to true
+      at crates/quest-build/src/probe.rs:848:13
+
+    test probe::tests::tooling_preserves_toolchain_wrapper_arguments_and_normal_environment ... FAILED
+
+    failures:
+
+    failures:
+        probe::tests::tooling_preserves_toolchain_wrapper_arguments_and_normal_environment
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 65 filtered out; finished in 0.32s
+
+    Error: See failure output above
+
+
+      at crates/quest-build/src/probe.rs:911:22
+
+    test probe::tests::tooling_preserves_toolchain_wrapper_arguments_and_normal_environment ... FAILED
+
+    failures:
+
+    failures:
+        probe::tests::tooling_preserves_toolchain_wrapper_arguments_and_normal_environment
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 65 filtered out; finished in 0.32s
+
+  stderr ───
+    Error: See failure output above
+
+
+────────────
+     Summary [   0.324s] 2 tests run: 0 passed, 2 failed, 64 skipped
+        FAIL [   0.049s] (1/2) quest-build hdf5::tests::linux_pkg_config_empty_link_paths_use_selected_header_root
+        FAIL [   0.324s] (2/2) quest-build probe::tests::tooling_preserves_toolchain_wrapper_arguments_and_normal_environment
+error: test run failed

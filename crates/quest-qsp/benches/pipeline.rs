@@ -134,6 +134,26 @@ fn parallel_pipeline(criterion: &mut Criterion) -> Result<(), Box<dyn std::error
 	Ok(())
 }
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+	if std::env::args().any(|arg| arg == "--list") {
+		if std::env::args().any(|arg| arg == "--ignored") {
+			return Ok(());
+		}
+		for name in ["binary64/synthesis_degree1", "frozen/response_degree1"] {
+			println!("{name}: benchmark");
+		}
+		#[cfg(feature = "certification")]
+		println!("cold/certification_degree1: benchmark");
+		#[cfg(feature = "offline-synthesis")]
+		println!("cold/offline_including_certification_degree1: benchmark");
+		#[cfg(feature = "rayon")]
+		{
+			println!("binary64/complete_synthesize_degree256/sequential: benchmark");
+			for workers in [1, 2, 4] {
+				println!("binary64/complete_synthesize_degree256/workers{workers}: benchmark");
+			}
+		}
+		return Ok(());
+	}
 	let mut criterion = Criterion::default().configure_from_args();
 	pipeline(&mut criterion)?;
 	criterion.final_summary();

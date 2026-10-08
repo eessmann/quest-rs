@@ -1,4 +1,5 @@
-use std::env;
+use clap::{CommandFactory, Parser};
+#[cfg(test)]
 use std::ffi::OsString;
 use std::path::PathBuf;
 
@@ -17,7 +18,7 @@ fn main() -> Result<()> {
 }
 
 fn run() -> Result<(), generate::DynError> {
-	match parse_command(env::args_os().skip(1))? {
+	match command_kind(Cli::parse())? {
 		CommandKind::GenerateQuestBindings { check } => generate::run(check),
 		CommandKind::CheckNativeConsumers {
 			work_dir,
@@ -28,13 +29,47 @@ fn run() -> Result<(), generate::DynError> {
 		CommandKind::NativeDoctorProbe { kind } => native_doctor::probe_worker(&kind),
 		CommandKind::QsvtCatalog { fetch } => qsvt_catalog::run(fetch),
 		CommandKind::Help => {
-			eprintln!("{USAGE}");
+			Cli::command().print_help()?;
 			Ok(())
 		}
 	}
 }
 
-const USAGE: &str = "usage: cargo run -p xtask -- generate-quest-bindings [--check]\n       cargo run -p xtask -- check-native-consumers [--work-dir PATH] [--backends cpu,omp,gpu] [--loader-isolated]\n       cargo run -p xtask -- native-doctor [--json]\n       cargo run -p xtask -- fetch-qsvt-catalog\n       cargo run -p xtask -- check-qsvt-catalog";
+#[derive(clap::Parser)]
+#[command(
+	name = "xtask",
+	about = "Maintain QuEST bindings, native consumers, and the bundled QSVT catalog"
+)]
+struct Cli {
+	#[command(subcommand)]
+	command: Option<CliCommand>,
+}
+
+#[derive(clap::Subcommand)]
+enum CliCommand {
+	GenerateQuestBindings {
+		#[arg(long)]
+		check: bool,
+	},
+	CheckNativeConsumers {
+		#[arg(long)]
+		work_dir: Option<PathBuf>,
+		#[arg(long, default_value = "cpu")]
+		backends: String,
+		#[arg(long)]
+		loader_isolated: bool,
+	},
+	NativeDoctor {
+		#[arg(long)]
+		json: bool,
+	},
+	#[command(name = "__native-doctor-probe", hide = true)]
+	NativeDoctorProbe {
+		kind: String,
+	},
+	FetchQsvtCatalog,
+	CheckQsvtCatalog,
+}
 
 #[derive(Debug, Eq, PartialEq)]
 enum CommandKind {
@@ -58,100 +93,69 @@ enum CommandKind {
 	Help,
 }
 
+fn command_kind(cli: Cli) -> Result<CommandKind, generate::DynError> {
+	Ok(match cli.command {
+		None => CommandKind::Help,
+		Some(CliCommand::GenerateQuestBindings { check }) => {
+			CommandKind::GenerateQuestBindings { check }
+		}
+		Some(CliCommand::CheckNativeConsumers {
+			work_dir,
+			backends,
+			loader_isolated,
+		}) => CommandKind::CheckNativeConsumers {
+			work_dir,
+			backends: native_consumers::parse_backends(&backends)?,
+			loader_isolated,
+		},
+		Some(CliCommand::NativeDoctor { json }) => CommandKind::NativeDoctor { json },
+		Some(CliCommand::NativeDoctorProbe { kind }) => CommandKind::NativeDoctorProbe { kind },
+		Some(CliCommand::FetchQsvtCatalog) => CommandKind::QsvtCatalog { fetch: true },
+		Some(CliCommand::CheckQsvtCatalog) => CommandKind::QsvtCatalog { fetch: false },
+	})
+}
+
+#[cfg(test)]
 fn parse_command(
 	arguments: impl IntoIterator<Item = OsString>,
 ) -> Result<CommandKind, generate::DynError> {
-	let mut arguments = arguments.into_iter();
-	let Some(command) = arguments.next() else {
-		return Ok(CommandKind::Help);
-	};
-	match command.to_str() {
-		Some(command @ ("fetch-qsvt-catalog" | "check-qsvt-catalog")) => {
-			if arguments.next().is_some() {
-				return Err("catalog maintenance commands take no arguments".into());
-			}
-			Ok(CommandKind::QsvtCatalog {
-				fetch: command == "fetch-qsvt-catalog",
-			})
-		}
-		Some("generate-quest-bindings") => match arguments.next().as_deref() {
-			None => Ok(CommandKind::GenerateQuestBindings { check: false }),
-			Some(argument) if argument == "--check" && arguments.next().is_none() => {
-				Ok(CommandKind::GenerateQuestBindings { check: true })
-			}
-			Some(argument) => Err(format!(
-				"unexpected generate-quest-bindings argument: {}\n{USAGE}",
-				argument.to_string_lossy()
-			)
-			.into()),
-		},
-		Some("__native-doctor-probe") => {
-			let kind = arguments
-				.next()
-				.ok_or("missing doctor probe name")?
-				.into_string()
-				.map_err(|_| "doctor probe name is not UTF-8")?;
-			if arguments.next().is_some() {
-				return Err("unexpected doctor probe argument".into());
-			}
-			Ok(CommandKind::NativeDoctorProbe { kind })
-		}
-		Some("native-doctor") => match arguments.next().as_deref() {
-			None => Ok(CommandKind::NativeDoctor { json: false }),
-			Some(argument) if argument == "--json" && arguments.next().is_none() => {
-				Ok(CommandKind::NativeDoctor { json: true })
-			}
-			_ => Err(format!("unexpected native-doctor argument\n{USAGE}").into()),
-		},
-		Some("check-native-consumers") => {
-			let mut work_dir = None;
-			let mut backends = None;
-			let mut loader_isolated = false;
-			while let Some(argument) = arguments.next() {
-				if argument == "--loader-isolated" {
-					if loader_isolated {
-						return Err("duplicate --loader-isolated option".into());
-					}
-					loader_isolated = true;
-				} else if argument == "--work-dir" {
-					if work_dir.is_some() {
-						return Err("duplicate --work-dir option".into());
-					}
-					work_dir = Some(PathBuf::from(
-						arguments.next().ok_or("--work-dir requires a path")?,
-					));
-				} else if argument == "--backends" {
-					if backends.is_some() {
-						return Err("duplicate --backends option".into());
-					}
-					let value = arguments.next().ok_or("--backends requires a list")?;
-					let value = value.to_str().ok_or("backend list is not valid UTF-8")?;
-					backends = Some(native_consumers::parse_backends(value)?);
-				} else {
-					return Err(format!(
-						"unexpected check-native-consumers argument: {}\n{USAGE}",
-						argument.to_string_lossy()
-					)
-					.into());
-				}
-			}
-			Ok(CommandKind::CheckNativeConsumers {
-				work_dir,
-				backends: backends.unwrap_or_else(|| vec![native_consumers::Backend::Cpu]),
-				loader_isolated,
-			})
-		}
-		Some(command) => Err(format!("unknown xtask command: {command}\n{USAGE}").into()),
-		None => Err(format!("xtask command is not valid UTF-8\n{USAGE}").into()),
-	}
+	command_kind(Cli::try_parse_from(
+		std::iter::once(OsString::from("xtask")).chain(arguments),
+	)?)
 }
 
 #[cfg(test)]
 mod tests {
 	use super::*;
 	use googletest::prelude::*;
+	#[cfg(test)]
 	use std::ffi::OsString;
 	use std::path::PathBuf;
+
+	#[gtest]
+	fn consumer_options_accept_equals_syntax_without_splitting_paths() -> googletest::Result<()> {
+		let parsed = parse_command(
+			[
+				"check-native-consumers",
+				"--work-dir=/tmp/fixture with spaces",
+				"--backends=cpu,omp",
+			]
+			.map(OsString::from),
+		)
+		.or_fail()?;
+		expect_eq!(
+			parsed,
+			CommandKind::CheckNativeConsumers {
+				work_dir: Some(PathBuf::from("/tmp/fixture with spaces")),
+				backends: vec![
+					native_consumers::Backend::Cpu,
+					native_consumers::Backend::Omp
+				],
+				loader_isolated: false
+			}
+		);
+		Ok(())
+	}
 
 	#[gtest]
 	fn native_doctor_accepts_json_and_consumers_accept_loader_isolation() {

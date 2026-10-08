@@ -44,6 +44,11 @@ fn analytic(degree: usize) -> CertificationResult<FrozenCandidate<UnitCircleResp
 		.ok_or(CertificationError::Export("fixture"))? =
 		[[zero, crate::Complex64::new(-1.0, 0.0)], [one, zero]];
 	let admitted = crate::AdmittedTarget {
+		resources: quest_numerics::OperationResources::from_limits(
+			(crate::Policy::default()).limits,
+		),
+		ownership: Vec::new(),
+
 		source_offset: 0,
 		source_length: target.len(),
 		source: Arc::new(target.clone()),
@@ -53,6 +58,8 @@ fn analytic(degree: usize) -> CertificationResult<FrozenCandidate<UnitCircleResp
 		_mode: std::marker::PhantomData,
 	};
 	Ok(FrozenCandidate {
+		ownership: Vec::new(),
+
 		synthesis_precision: crate::SynthesisPrecision::Binary64,
 		admitted,
 		controls: Arc::new(controls),
@@ -191,8 +198,15 @@ fn tiny_phase() -> FrozenCandidate<RealParityWx> {
 	let value = crate::Complex64::new(tiny, 0.0);
 	let zero = crate::Complex64::new(0.0, 0.0);
 	FrozenCandidate {
+		ownership: Vec::new(),
+
 		synthesis_precision: crate::SynthesisPrecision::Binary64,
 		admitted: crate::AdmittedTarget {
+			resources: quest_numerics::OperationResources::from_limits(
+				(crate::Policy::default()).limits,
+			),
+			ownership: Vec::new(),
+
 			source_offset: 0,
 			source_length: 1,
 			target: Arc::new(vec![value]),

@@ -124,9 +124,9 @@ impl<V: ResponseArgument> RouteTarget<V> {
 			.checked_add(source.coefficients().len())
 			.and_then(|n| n.checked_mul(size_of::<quest_polynomial::Complex64>()))
 			.ok_or(Error::Encoding("unit-circle route storage overflow"))?;
-		if count > limits.max_coefficients
-			|| count > limits.max_work
-			|| bytes > limits.max_bytes
+		if count > limits.shapes.max_coefficients
+			|| count > limits.resources.max_work_units
+			|| bytes > limits.resources.max_peak_bytes
 			|| isize::try_from(bytes).is_err()
 			|| i32::try_from(count).is_err()
 		{

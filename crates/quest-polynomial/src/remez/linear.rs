@@ -96,7 +96,7 @@ fn admit<P: PointBackend<Error = ArithmeticError>>(
 	if n == 0 {
 		return Err(Error::NotEstablished("empty linear system"));
 	}
-	if n > limits.max_coefficients || i32::try_from(n).is_err() {
+	if n > limits.shapes.max_coefficients || i32::try_from(n).is_err() {
 		return Err(Error::Budget("QR dimension"));
 	}
 	let mut scalar_bytes = backend.working_scalar_bytes().max(size_of::<P::Scalar>());
@@ -110,7 +110,7 @@ fn admit<P: PointBackend<Error = ArithmeticError>>(
 		.and_then(|x| x.checked_mul(16))
 		.and_then(|x| x.checked_mul(scalar_bytes.max(size_of::<usize>())))
 		.ok_or(Error::Budget("QR storage overflow"))?;
-	if bytes > limits.max_bytes || isize::try_from(bytes).is_err() {
+	if bytes > limits.resources.max_peak_bytes || isize::try_from(bytes).is_err() {
 		return Err(Error::Budget("QR storage"));
 	}
 	let zero = backend.point(0.0)?;
@@ -197,7 +197,7 @@ fn faer_workspace(
 		.checked_add(permutations)
 		.and_then(|value| value.checked_add(bytes(factor).ok()?.max(bytes(solve).ok()?)))
 		.ok_or(Error::Budget("faer scratch storage"))?;
-	if total > limits.max_bytes || isize::try_from(total).is_err() {
+	if total > limits.resources.max_peak_bytes || isize::try_from(total).is_err() {
 		return Err(Error::Budget("faer storage"));
 	}
 	Ok((factor, solve))
@@ -339,7 +339,7 @@ impl<P: PointBackend<Scalar = f64, Error = ArithmeticError>> LinearSolver<P> for
 			dyn_stack::{MemBuffer, MemStack},
 			linalg::qr::col_pivoting::{factor, solve},
 		};
-		let budget = Budget::new(limits.max_work);
+		let budget = Budget::new(limits.resources.max_work_units);
 		let backend = &mut BudgetedBackend::new(backend, &budget);
 		let system = admit(backend, input, rhs, n, limits)?;
 		let (factor_scratch, solve_scratch) = faer_workspace(n, system.workspace_bytes, limits)?;
@@ -350,7 +350,7 @@ impl<P: PointBackend<Scalar = f64, Error = ArithmeticError>> LinearSolver<P> for
 			.and_then(|x| x.checked_mul(n))
 			.and_then(|x| x.checked_mul(16))
 			.ok_or(Error::Budget("QR work overflow"))?;
-		if work > limits.max_work {
+		if work > limits.resources.max_work_units {
 			return Err(Error::Budget("QR work"));
 		}
 		backend.charge(work)?;
@@ -404,7 +404,7 @@ impl<P: PointBackend<Error = ArithmeticError>> LinearSolver<P> for MpHouseholder
 		n: usize,
 		limits: Limits,
 	) -> Result<LinearSolution<P::Scalar>> {
-		let budget = Budget::new(limits.max_work);
+		let budget = Budget::new(limits.resources.max_work_units);
 		let backend = &mut BudgetedBackend::new(backend, &budget);
 		let system = admit(backend, input, rhs, n, limits)?;
 		let zero = backend.point(0.0)?;

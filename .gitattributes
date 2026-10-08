@@ -1,2 +1,5 @@
 # Receipt hashes cover archived log bytes, including whitespace and line endings.
 docs/verification/data/**/*.log -text -whitespace
+# These hashed CSV receipts use CRLF; preserve their bytes and line endings.
+docs/verification/data/2026-10-08-workspace-quality/native-devenv/named-inverse-comparison.csv -text whitespace=cr-at-eol
+docs/verification/data/2026-10-08-workspace-quality/native-devenv/native-observations.csv -text whitespace=cr-at-eol

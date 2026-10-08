@@ -1,0 +1,5 @@
+ Nextest run ID ab2f3c68-76be-4ab1-9933-4cbf99533219 with nextest profile: default
+    Starting 2 tests across 38 binaries (146 tests skipped)
+        PASS [   1.332s] (1/2) quest-rs qsvt::matching::collective::failure_tests::native_rank_local_failure_aborts_blocked_peer
+        PASS [   2.616s] (2/2) quest-rs::matching_collective buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch
+     Summary [   3.948s] 2 tests run: 2 passed, 146 skipped

@@ -45,7 +45,27 @@ impl ComplexInterval {
 	}
 }
 
+#[cfg(test)]
 pub fn contractivity(target: &[Complex64], policy: Policy) -> Result<f64> {
+	contractivity_with_resources(
+		target,
+		policy,
+		&quest_numerics::OperationResources::from_limits(policy.limits),
+	)
+}
+pub fn contractivity_with_resources(
+	target: &[Complex64],
+	policy: Policy,
+	resources: &quest_numerics::OperationResources,
+) -> Result<f64> {
+	resources
+		.charge_work(
+			target
+				.len()
+				.checked_mul(32)
+				.ok_or(Error::Budget("contractivity work"))?,
+		)
+		.map_err(quest_numerics::Error::from)?;
 	let mut norm = Interval::point(0.0)?;
 	let mut derivative = norm;
 	for (index, &coefficient) in target.iter().enumerate() {
@@ -55,8 +75,8 @@ pub fn contractivity(target: &[Complex64], policy: Policy) -> Result<f64> {
 			f64::from(u32::try_from(index).map_err(|_| Error::Budget("contractivity degree"))?);
 		derivative = derivative.checked_add(magnitude.checked_mul(Interval::point(index)?)?)?;
 	}
-	let threshold_interval =
-		Interval::point(1.0)?.checked_sub(Interval::point(policy.contractivity_margin)?)?;
+	let threshold_interval = Interval::point(1.0)?
+		.checked_sub(Interval::point(policy.accuracy.contractivity_margin)?)?;
 	let threshold = threshold_interval.lower();
 	if norm.upper() < threshold {
 		return Ok(norm.upper());
@@ -68,16 +88,22 @@ pub fn contractivity(target: &[Complex64], policy: Policy) -> Result<f64> {
 		.ok_or(Error::Budget("contractivity FFT"))?
 		.max(32);
 	let mut last_bound = norm.upper();
-	let mut charged = 0_usize;
-	while count <= policy.max_completion_grid && count <= policy.limits.max_len {
+
+	while count <= policy.limits.shapes.max_completion_grid {
 		let work = count
 			.checked_mul(usize::try_from(count.ilog2()).map_err(|_| Error::Budget("FFT work"))?)
 			.and_then(|n| n.checked_mul(256))
 			.ok_or(Error::Budget("FFT work"))?;
-		charged = charged.checked_add(work).ok_or(Error::Budget("FFT work"))?;
-		if charged > policy.limits.max_work {
-			return Err(Error::Budget("contractivity FFT work"));
-		}
+		resources
+			.charge_work(work)
+			.map_err(quest_numerics::Error::from)?;
+		let bytes = count
+			.checked_mul(size_of::<ComplexInterval>())
+			.and_then(|n| n.checked_mul(2))
+			.ok_or(Error::Budget("interval FFT storage"))?;
+		let _samples = resources
+			.reserve(bytes, 0)
+			.map_err(quest_numerics::Error::from)?;
 		let values = sample_enclosures(target, count, policy)?;
 		let mut max_sample = 0.0_f64;
 		for value in values {
@@ -118,7 +144,7 @@ fn sample_enclosures(
 		.checked_mul(size_of::<ComplexInterval>())
 		.and_then(|n| n.checked_mul(2))
 		.ok_or(Error::Budget("interval FFT storage"))?;
-	if bytes > policy.limits.max_bytes {
+	if bytes > policy.limits.resources.max_peak_bytes {
 		return Err(Error::Budget("interval FFT storage"));
 	}
 	let zero = ComplexInterval::point(Complex64::new(0.0, 0.0))?;

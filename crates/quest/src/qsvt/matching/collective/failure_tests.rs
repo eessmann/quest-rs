@@ -179,7 +179,7 @@ fn native_rank_local_failure_aborts_blocked_peer() -> googletest::Result<()> {
 	))?
 }
 
-const BUFFER_RANGE_ERROR: &str = "communication buffer index exceeds local partition";
+const BUFFER_RANGE_ERROR: &str = "indexed amplitude exceeds local partition";
 
 fn assert_staged_fatal_job(suppress_stderr: bool) -> googletest::Result<()> {
 	let directory = WitnessDirectory::create()?;
@@ -243,6 +243,7 @@ fn staged_write_failure_aborts_blocked_peer() -> googletest::Result<()> {
 	quest_test_support::mpi::assert_rank_count(comm.size()?)?;
 	let environment = CollectiveEnvironment::builder(&comm)?.build()?;
 	let mut register = environment.state_vector_local(QubitCount::new(2)?)?;
+	let mut scratch = environment.state_vector_local(QubitCount::new(2)?)?;
 	let mut lane = comm.collective_lane()?;
 	let rank = comm.rank()?;
 	fatal(|| {
@@ -254,7 +255,7 @@ fn staged_write_failure_aborts_blocked_peer() -> googletest::Result<()> {
 		// At P2 the high color bit uses native MPI communication scratch. The
 		// exclusive routing state begins only after that native operation returns.
 		register.inner.h(1)?;
-		let mut state = super::RoutingState::stage(&mut register.inner, None)?;
+		let mut state = super::RoutingState::stage(&mut register.inner, &mut scratch.inner)?;
 		state.write_local(0, crate::Complex64::new(0.25, -0.5))?;
 		witness(
 			&directory,

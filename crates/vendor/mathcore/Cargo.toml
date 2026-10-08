@@ -16,6 +16,7 @@ dashu-ratio.workspace = true
 thiserror.workspace = true
 
 [dev-dependencies]
+allocation-counter.workspace = true
 googletest.workspace = true
 
 [lints]

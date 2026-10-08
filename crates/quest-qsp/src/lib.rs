@@ -4,6 +4,8 @@
 mod admission;
 #[cfg(feature = "artifact")]
 pub mod artifact;
+#[cfg(feature = "benchmark-support")]
+pub mod benchmark_support;
 #[cfg(feature = "certification")]
 pub mod certification;
 #[cfg(feature = "offline-synthesis")]
@@ -12,6 +14,7 @@ pub mod offline;
 pub mod precision;
 
 mod kernel;
+pub use kernel::{ForwardNlftWorkspace, InverseNlftWorkspace, ScatteringPair};
 mod sequence;
 mod stages;
 pub use sequence::{
@@ -93,7 +96,7 @@ fn zeros(count: usize, limits: quest_numerics::Limits) -> Result<Vec<Complex64>>
 	let bytes = count
 		.checked_mul(size_of::<Complex64>())
 		.ok_or(Error::Budget("size overflow"))?;
-	if count > limits.max_len || bytes > limits.max_bytes {
+	if bytes > limits.resources.max_peak_bytes {
 		return Err(Error::Budget("coefficient allocation"));
 	}
 	let mut output = Vec::new();
@@ -113,14 +116,31 @@ const fn finite(value: Complex64, stage: &'static str) -> Result<Complex64> {
 }
 
 // Reserve concurrently retained scalar storage before admitting workspaces.
+#[cfg(test)]
 fn workspace_policy(mut policy: Policy, scalars: usize) -> Result<Policy> {
 	let bytes = scalars
 		.checked_mul(size_of::<Complex64>())
 		.ok_or(Error::Budget("stage storage"))?;
-	policy.limits.max_bytes = policy
+	policy.limits.resources.max_peak_bytes = policy
 		.limits
-		.max_bytes
+		.resources
+		.max_peak_bytes
 		.checked_sub(bytes)
 		.ok_or(Error::Budget("stage storage"))?;
 	Ok(policy)
+}
+
+/// Numerical acceptance gates, independent of shapes and resource capacity.
+#[derive(Clone, Copy, Debug)]
+pub struct AccuracyPolicy {
+	pub response_tolerance: f64,
+	pub contractivity_margin: f64,
+}
+impl Default for AccuracyPolicy {
+	fn default() -> Self {
+		Self {
+			response_tolerance: 1e-11,
+			contractivity_margin: 1e-12,
+		}
+	}
 }

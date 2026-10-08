@@ -1,5 +1,13 @@
 # Memory boundary of the matching capacity experiment
 
+As of the [2026-10-08 consolidation](../plans/2026-10-08-workspace-quality.md),
+matching execution owns and admits a scratch register on every deployment.
+The communication-array reuse described below is historical: QuEST does not
+document that array as application-owned scratch. The current implementation
+uses documented register cloning and amplitude access. Its two-register memory
+bound applies again; earlier reduced-storage measurements do not describe the
+current implementation.
+
 The [Cirrus campaign](../verification/2026-10-06-cirrus-capacity.md) completed
 distributed sparse execution but did not exceed any participating rank's memory
 cap with its original stored input. Increasing that experiment's dimensions
@@ -100,8 +108,8 @@ The audit is against native QuEST revision
 `quest/src/comm/comm_routines.cpp`. In this workspace, the relevant interval is
 in `crates/quest/src/qsvt/matching/collective.rs` and `matching/batched.rs`;
 checked indexed adapters are in
-`crates/quest-sys/src/cxx_bindings/quest_bindings.cpp`. These references establish
-the native storage contract. Local and GNU/Cray multi-host evidence is recorded in the
+`crates/quest-sys/src/cxx_bindings/quest_bindings.cpp`. These references describe
+the audited implementation, not a public scratch-ownership contract. Local and GNU/Cray multi-host evidence is recorded in the
 [buffer-reuse validation](../verification/2026-10-06-matching-buffer-reuse.md).
 
 For distributed execution this reduces native array payload from

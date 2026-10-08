@@ -1,11 +1,14 @@
 //! Checked native binary arithmetic and exact binary64 interchange for cold stages.
 use dashu_base::Abs;
+#[cfg(any(feature = "offline-synthesis", test))]
+use dashu_float::round::mode::HalfEven;
 use dashu_float::{
-	ConstCache, Context, FBig, FpError,
-	round::mode::{Down, HalfEven, Up},
+	ConstCache, Context, FpError,
+	round::mode::{Down, Up},
 };
 /// Native binary value; endpoints remain exact represented dyadics.
-pub type Binary = FBig<HalfEven, 2>;
+pub use quest_numerics::arithmetic::Binary;
+use quest_numerics::arithmetic::directed;
 /// Maximum admitted interchange precision.
 pub const MAX_PRECISION: u32 = 1_048_576;
 /// Checked arithmetic and interchange failure.
@@ -85,12 +88,11 @@ pub(crate) fn abs(value: &Binary) -> Binary {
 macro_rules! binary_op {
 	($name:ident, $op:ident, $round:ty) => {
 		pub(crate) fn $name(p: u32, a: &Binary, b: &Binary) -> Result<Binary> {
-			checked(
-				Context::<$round>::new(native_precision(p))
-					.$op(a.repr(), b.repr())?
-					.value()
-					.with_rounding::<HalfEven>(),
-			)
+			checked(directed::$op(
+				Context::<$round>::new(native_precision(p)),
+				a,
+				b,
+			)?)
 		}
 	};
 }
@@ -113,12 +115,10 @@ binary_op!(up_div, div, Up);
 macro_rules! root_op {
 	($name:ident, $round:ty) => {
 		pub(crate) fn $name(p: u32, a: &Binary) -> Result<Binary> {
-			checked(
-				Context::<$round>::new(native_precision(p))
-					.sqrt(a.repr())?
-					.value()
-					.with_rounding::<HalfEven>(),
-			)
+			checked(directed::sqrt(
+				Context::<$round>::new(native_precision(p)),
+				a,
+			)?)
 		}
 	};
 }
@@ -129,12 +129,11 @@ root_op!(up_sqrt, Up);
 macro_rules! transcendental {
 	($name:ident, $op:ident, $round:ty) => {
 		pub(crate) fn $name(p: u32, a: &Binary, cache: &mut ConstCache) -> Result<Binary> {
-			checked(
-				Context::<$round>::new(native_precision(p))
-					.$op(a.repr(), Some(cache))?
-					.value()
-					.with_rounding::<HalfEven>(),
-			)
+			checked(directed::$op(
+				Context::<$round>::new(native_precision(p)),
+				a,
+				cache,
+			)?)
 		}
 	};
 }
@@ -161,11 +160,8 @@ macro_rules! trigonometric_pair {
 			cache: &mut ConstCache,
 		) -> Result<(Binary, Binary)> {
 			let (sin, cos) =
-				Context::<$round>::new(native_precision(p)).sin_cos(a.repr(), Some(cache));
-			Ok((
-				checked(sin?.value().with_rounding::<HalfEven>())?,
-				checked(cos?.value().with_rounding::<HalfEven>())?,
-			))
+				directed::sin_cos(Context::<$round>::new(native_precision(p)), a, cache)?;
+			Ok((checked(sin)?, checked(cos)?))
 		}
 	};
 }
@@ -176,12 +172,10 @@ trigonometric_pair!(up_sin_cos, Up);
 macro_rules! constant {
 	($name:ident, $round:ty) => {
 		pub(crate) fn $name(p: u32, cache: &mut ConstCache) -> Result<Binary> {
-			checked(
-				Context::<$round>::new(native_precision(p))
-					.pi::<2>(Some(cache))
-					.value()
-					.with_rounding::<HalfEven>(),
-			)
+			checked(directed::pi(
+				Context::<$round>::new(native_precision(p)),
+				cache,
+			))
 		}
 	};
 }

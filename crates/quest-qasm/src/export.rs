@@ -246,9 +246,9 @@ impl Writer {
 				expected,
 				operation,
 			} => {
-				self.push("if (")?;
+				self.push(if *expected { "if (bool(" } else { "if (!bool(" })?;
 				self.expression(bit(*b)?)?;
-				self.push(if *expected { " == 1) { " } else { " == 0) { " })?;
+				self.push(")) { ")?;
 				self.finite_operation(operation, qubits, bits)?;
 				self.push(" }")?;
 			}

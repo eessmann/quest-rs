@@ -31,10 +31,14 @@ where
 const fn callback_error(error: Error) -> ArithmeticError {
 	match error {
 		Error::Arithmetic(error) => error,
-		Error::Budget(reason) => ArithmeticError::Budget(reason),
-		Error::NonFinite => ArithmeticError::Nonfinite,
+		Error::Budget(reason) => {
+			ArithmeticError::Core(mathcore::arithmetic::ArithmeticError::Budget(reason))
+		}
+		Error::NonFinite => ArithmeticError::Core(mathcore::arithmetic::ArithmeticError::Nonfinite),
 		Error::Interval(error) => ArithmeticError::Interval(error),
-		_ => ArithmeticError::Domain("polynomial derivative enclosure"),
+		_ => ArithmeticError::Core(mathcore::arithmetic::ArithmeticError::Domain(
+			"polynomial derivative enclosure",
+		)),
 	}
 }
 pub(super) fn residual<F, I, D>(
@@ -116,7 +120,7 @@ where
 		CoverLimits {
 			max_iterations: options.max_subdivisions,
 			max_boxes: options.max_subdivisions,
-			max_bytes: options.limits.max_bytes,
+			max_bytes: options.limits.resources.max_peak_bytes,
 		},
 		width,
 		roots::Premise::EnclosesContinuouslyDifferentiableFunction,

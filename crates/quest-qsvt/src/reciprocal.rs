@@ -271,9 +271,14 @@ impl ReciprocalPolynomial {
 			.map_or(0, |i| i + 1);
 		coefficients.truncate(retained);
 		let limits = Limits {
-			max_coefficients: count,
-			max_bytes: policy.max_bytes,
-			..Limits::default()
+			shapes: quest_numerics::ShapeLimits {
+				max_coefficients: count,
+				..(Limits::default()).shapes
+			},
+			resources: quest_numerics::ResourceLimits {
+				max_peak_bytes: policy.max_bytes,
+				..(Limits::default()).resources
+			},
 		};
 		let coefficient_capacity_bytes = coefficients
 			.capacity()

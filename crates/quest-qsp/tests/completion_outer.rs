@@ -82,18 +82,21 @@ fn completion_charges_four_nlft_transforms_and_five_rhw_transforms() -> Result<(
 		vec![Complex64::new(0.3, 0.2)],
 		Limits::default(),
 	)?;
-	// Grid 32 costs 1280 units per transform; two length-one residual
+	// Admission costs 32 units. Grid 32 costs 1280 units per transform; two length-one residual
 	// convolutions cost 25 units each, including their pointwise product.
 	for (algorithm, budget) in [
-		(SynthesisAlgorithm::InverseNlftDivideConquer, 5_170),
-		(SynthesisAlgorithm::RhwHalfCholesky, 6_450),
+		(SynthesisAlgorithm::InverseNlftDivideConquer, 5_202),
+		(SynthesisAlgorithm::RhwHalfCholesky, 6_482),
 	] {
 		let complete = |max_work| {
 			SynthesisBuilder::new()
 				.policy(Policy {
 					algorithm,
 					limits: quest_numerics::Limits {
-						max_work,
+						resources: quest_numerics::ResourceLimits {
+							max_work_units: max_work,
+							..quest_numerics::ResourceLimits::default()
+						},
 						..quest_numerics::Limits::default()
 					},
 					..Policy::default()
@@ -128,7 +131,10 @@ fn completion_refinement_charges_all_attempts_and_residuals() -> Result<()> {
 				.policy(Policy {
 					algorithm,
 					limits: quest_numerics::Limits {
-						max_work,
+						resources: quest_numerics::ResourceLimits {
+							max_work_units: max_work,
+							..quest_numerics::ResourceLimits::default()
+						},
 						..quest_numerics::Limits::default()
 					},
 					..Policy::default()
@@ -137,9 +143,9 @@ fn completion_refinement_charges_all_attempts_and_residuals() -> Result<()> {
 				.admit()?
 				.complete()
 		};
-		let completed = complete(quest_numerics::Limits::default().max_work)?;
+		let completed = complete(quest_numerics::Limits::default().resources.max_work_units)?;
 		expect_that!(completed.completion_grid(), gt(32));
-		let mut budget = 0;
+		let mut budget = 64;
 		let mut grid: usize = 32;
 		while grid <= completed.completion_grid() {
 			// A length-two pair uses a size-four convolution plan twice.

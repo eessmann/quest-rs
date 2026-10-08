@@ -28,32 +28,17 @@ use dashu_float::{
 	},
 };
 use dashu_int::IBig;
+use mathcore::arithmetic::ArithmeticError as CoreError;
 use std::cmp::Ordering;
+pub mod directed;
 mod interchange;
 pub use interchange::{BinaryRounding, exact_from_f64, to_f64};
 #[derive(Debug, thiserror::Error)]
 pub enum ArithmeticError {
-	#[error("nonfinite arithmetic")]
-	Nonfinite,
-	#[error("invalid arithmetic input: {0}")]
-	Interchange(&'static str),
-	#[error("outside domain of {0}")]
-	Domain(&'static str),
-	#[error("arithmetic resource limit: {0}")]
-	Budget(&'static str),
+	#[error("arithmetic: {0}")]
+	Core(#[from] CoreError),
 	#[error("binary64 enclosure: {0}")]
 	Interval(#[from] crate::Error),
-}
-impl From<mathcore::arithmetic::ArithmeticError> for ArithmeticError {
-	fn from(error: mathcore::arithmetic::ArithmeticError) -> Self {
-		use mathcore::arithmetic::ArithmeticError as Core;
-		match error {
-			Core::Nonfinite => Self::Nonfinite,
-			Core::Interchange(s) => Self::Interchange(s),
-			Core::Domain(s) => Self::Domain(s),
-			Core::Budget(s) => Self::Budget(s),
-		}
-	}
 }
 pub type ArithmeticResult<T> = Result<T, ArithmeticError>;
 /// Exponent and work limits apply before mathematical shortcuts.
@@ -77,7 +62,9 @@ impl Default for Precision {
 		}
 	}
 }
-pub use mathcore::arithmetic::{Backend, EnclosureBackend, ExactConstant, PointBackend};
+pub use mathcore::arithmetic::{
+	ArithmeticProfile, Backend, EnclosureBackend, ExactConstant, PointBackend,
+};
 use mathcore::arithmetic::{valid_decimal, valid_integer, valid_positive_integer};
 mod sealed {
 	pub trait Sealed {}
@@ -113,13 +100,20 @@ fn round_exact_f64(c: &ExactConstant) -> ArithmeticResult<f64> {
 		}
 		bits = bits
 			.checked_mul(2)
-			.ok_or(ArithmeticError::Budget("constant rounding"))?;
+			.ok_or(ArithmeticError::Core(CoreError::Budget(
+				"constant rounding",
+			)))?;
 		if bits > 1_048_576 {
-			return Err(ArithmeticError::Budget("constant rounding"));
+			return Err(ArithmeticError::Core(CoreError::Budget(
+				"constant rounding",
+			)));
 		}
 	}
 }
 impl Backend for F64Backend {
+	fn profile(&self) -> ArithmeticProfile {
+		ArithmeticProfile::new("F64Backend", 53, "nearest-even")
+	}
 	fn charge(&mut self, _work: usize) -> Result<(), Self::Error> {
 		Ok(())
 	}
@@ -254,6 +248,9 @@ fn enclose_exact_f64(c: &ExactConstant) -> ArithmeticResult<Interval> {
 	)?)
 }
 impl Backend for Interval64Backend {
+	fn profile(&self) -> ArithmeticProfile {
+		ArithmeticProfile::new("Interval64Backend", 53, "outward")
+	}
 	fn charge(&mut self, _work: usize) -> Result<(), Self::Error> {
 		Ok(())
 	}
@@ -326,7 +323,9 @@ impl EnclosureBackend for Interval64Backend {
 	fn width_le(&mut self, a: &Interval, t: &f64) -> ArithmeticResult<bool> {
 		finite(*t)?;
 		if *t < 0.0 {
-			return Err(ArithmeticError::Domain("negative tolerance"));
+			return Err(ArithmeticError::Core(CoreError::Domain(
+				"negative tolerance",
+			)));
 		}
 		let width = Interval::point(a.upper())?.checked_sub(Interval::point(a.lower())?)?;
 		Ok(width.upper() <= *t)
@@ -435,11 +434,15 @@ enum Operation {
 const fn fp_error(error: dashu_float::FpError) -> ArithmeticError {
 	use dashu_float::FpError;
 	match error {
-		FpError::InfiniteInput => ArithmeticError::Nonfinite,
-		FpError::OutOfDomain | FpError::Indeterminate => ArithmeticError::Domain("Dashu operation"),
-		FpError::Overflow(_) => ArithmeticError::Budget("overflow"),
-		FpError::Underflow(_) => ArithmeticError::Budget("underflow"),
-		FpError::ZivRetryLimitExceeded => ArithmeticError::Budget("transcendental certification"),
+		FpError::InfiniteInput => ArithmeticError::Core(CoreError::Nonfinite),
+		FpError::OutOfDomain | FpError::Indeterminate => {
+			ArithmeticError::Core(CoreError::Domain("Dashu operation"))
+		}
+		FpError::Overflow(_) => ArithmeticError::Core(CoreError::Budget("overflow")),
+		FpError::Underflow(_) => ArithmeticError::Core(CoreError::Budget("underflow")),
+		FpError::ZivRetryLimitExceeded => {
+			ArithmeticError::Core(CoreError::Budget("transcendental certification"))
+		}
 	}
 }
 fn binary_operation<R: Round>(
@@ -449,18 +452,17 @@ fn binary_operation<R: Round>(
 	b: &Binary,
 ) -> ArithmeticResult<Binary> {
 	let result = match operation {
-		Operation::Add => context.add(a.repr(), b.repr()),
-		Operation::Sub => context.sub(a.repr(), b.repr()),
-		Operation::Mul => context.mul(a.repr(), b.repr()),
-		Operation::Div => context.div(a.repr(), b.repr()),
-		_ => return Err(ArithmeticError::Domain("binary operation")),
+		Operation::Add => directed::add(context, a, b),
+		Operation::Sub => directed::sub(context, a, b),
+		Operation::Mul => directed::mul(context, a, b),
+		Operation::Div => directed::div(context, a, b),
+		_ => {
+			return Err(ArithmeticError::Core(CoreError::Domain("binary operation")));
+		}
 	};
 	// Changing the type-level rounding mode preserves the exact result, including
 	// Dashu's allowed guard digit. A second with_precision would double-round it.
-	Ok(result
-		.map_err(fp_error)?
-		.value()
-		.with_rounding::<HalfEven>())
+	result.map_err(fp_error)
 }
 fn unary_operation<R: Round + ErrorBounds>(
 	context: Context<R>,
@@ -469,17 +471,16 @@ fn unary_operation<R: Round + ErrorBounds>(
 	cache: &mut ConstCache,
 ) -> ArithmeticResult<Binary> {
 	let result = match operation {
-		Operation::Exp => context.exp(a.repr(), Some(cache)),
-		Operation::Ln => context.ln(a.repr(), Some(cache)),
-		Operation::Sqrt => context.sqrt(a.repr()),
-		Operation::Sin => context.sin(a.repr(), Some(cache)),
-		Operation::Cos => context.cos(a.repr(), Some(cache)),
-		_ => return Err(ArithmeticError::Domain("unary operation")),
+		Operation::Exp => directed::exp(context, a, cache),
+		Operation::Ln => directed::ln(context, a, cache),
+		Operation::Sqrt => directed::sqrt(context, a),
+		Operation::Sin => directed::sin(context, a, cache),
+		Operation::Cos => directed::cos(context, a, cache),
+		_ => {
+			return Err(ArithmeticError::Core(CoreError::Domain("unary operation")));
+		}
 	};
-	Ok(result
-		.map_err(fp_error)?
-		.value()
-		.with_rounding::<HalfEven>())
+	result.map_err(fp_error)
 }
 pub struct MpBackend {
 	precision: Precision,
@@ -496,7 +497,9 @@ impl MpBackend {
 		if !(64..=1_048_576).contains(&precision.bits)
 			|| !(1..=i32::MAX / 4).contains(&precision.max_abs_exponent)
 		{
-			return Err(ArithmeticError::Budget("precision/exponent"));
+			return Err(ArithmeticError::Core(CoreError::Budget(
+				"precision/exponent",
+			)));
 		}
 		Ok(Self {
 			precision,
@@ -517,28 +520,28 @@ impl MpBackend {
 	}
 	const fn tick(&mut self) -> ArithmeticResult<()> {
 		if self.operations >= self.precision.max_operations {
-			return Err(ArithmeticError::Budget("operations"));
+			return Err(ArithmeticError::Core(CoreError::Budget("operations")));
 		}
 		self.operations = self.operations.saturating_add(1);
 		Ok(())
 	}
 	fn validate_value(&self, value: &Binary) -> ArithmeticResult<()> {
 		if !value.repr().is_finite() {
-			return Err(ArithmeticError::Nonfinite);
+			return Err(ArithmeticError::Core(CoreError::Nonfinite));
 		}
 		if !value.repr().significand().is_zero() {
 			let bits = isize::try_from(value.repr().significand().bit_len())
-				.map_err(|_| ArithmeticError::Budget("exponent"))?;
+				.map_err(|_| ArithmeticError::Core(CoreError::Budget("exponent")))?;
 			let top = value
 				.repr()
 				.exponent()
 				.checked_add(bits)
-				.ok_or(ArithmeticError::Budget("exponent"))?;
+				.ok_or(ArithmeticError::Core(CoreError::Budget("exponent")))?;
 			if top.unsigned_abs()
 				> usize::try_from(self.precision.max_abs_exponent)
-					.map_err(|_| ArithmeticError::Budget("exponent"))?
+					.map_err(|_| ArithmeticError::Core(CoreError::Budget("exponent")))?
 			{
-				return Err(ArithmeticError::Budget("exponent"));
+				return Err(ArithmeticError::Core(CoreError::Budget("exponent")));
 			}
 		}
 		Ok(())
@@ -557,7 +560,7 @@ impl MpBackend {
 		self.validate_value(a)?;
 		self.validate_value(b)?;
 		if matches!(operation, Operation::Div) && b.repr().significand().is_zero() {
-			return Err(ArithmeticError::Domain("division"));
+			return Err(ArithmeticError::Core(CoreError::Domain("division")));
 		}
 		self.checked(match direction {
 			BinaryRounding::Nearest => binary_operation(self.nearest, operation, a, b)?,
@@ -573,10 +576,10 @@ impl MpBackend {
 	) -> ArithmeticResult<Binary> {
 		self.validate_value(a)?;
 		if matches!(operation, Operation::Ln) && a <= &Binary::ZERO {
-			return Err(ArithmeticError::Domain("ln"));
+			return Err(ArithmeticError::Core(CoreError::Domain("ln")));
 		}
 		if matches!(operation, Operation::Sqrt) && a < &Binary::ZERO {
-			return Err(ArithmeticError::Domain("sqrt"));
+			return Err(ArithmeticError::Core(CoreError::Domain("sqrt")));
 		}
 		let value = match direction {
 			BinaryRounding::Nearest => {
@@ -589,17 +592,9 @@ impl MpBackend {
 	}
 	fn pi_value(&mut self, direction: BinaryRounding) -> ArithmeticResult<Binary> {
 		let value = match direction {
-			BinaryRounding::Nearest => self.nearest.pi::<2>(Some(&mut self.cache)).value(),
-			BinaryRounding::Down => self
-				.down
-				.pi::<2>(Some(&mut self.cache))
-				.value()
-				.with_rounding::<HalfEven>(),
-			BinaryRounding::Up => self
-				.up
-				.pi::<2>(Some(&mut self.cache))
-				.value()
-				.with_rounding::<HalfEven>(),
+			BinaryRounding::Nearest => directed::pi(self.nearest, &mut self.cache),
+			BinaryRounding::Down => directed::pi(self.down, &mut self.cache),
+			BinaryRounding::Up => directed::pi(self.up, &mut self.cache),
 		};
 		self.checked(value)
 	}
@@ -613,7 +608,9 @@ impl MpBackend {
 		direction: BinaryRounding,
 	) -> ArithmeticResult<Binary> {
 		if denominator.is_zero() {
-			return Err(ArithmeticError::Domain("rational denominator"));
+			return Err(ArithmeticError::Core(CoreError::Domain(
+				"rational denominator",
+			)));
 		}
 		// Exact operands are admitted before cancellation can hide their size.
 		let numerator = self.integer_value(numerator)?;
@@ -626,10 +623,12 @@ impl MpBackend {
 	)]
 	fn parse(&self, text: &str, direction: BinaryRounding) -> ArithmeticResult<Binary> {
 		if text.len() > self.precision.bits.saturating_mul(8) {
-			return Err(ArithmeticError::Budget("constant digits"));
+			return Err(ArithmeticError::Core(CoreError::Budget("constant digits")));
 		}
 		if !valid_decimal(text) {
-			return Err(ArithmeticError::Interchange("decimal syntax"));
+			return Err(ArithmeticError::Core(CoreError::Interchange(
+				"decimal syntax",
+			)));
 		}
 		let mut parts = text.split(['e', 'E']);
 		let mantissa = parts.next().unwrap_or("");
@@ -637,25 +636,25 @@ impl MpBackend {
 			.next()
 			.map(str::parse::<isize>)
 			.transpose()
-			.map_err(|_| ArithmeticError::Budget("decimal exponent"))?
+			.map_err(|_| ArithmeticError::Core(CoreError::Budget("decimal exponent")))?
 			.unwrap_or(0);
 		if exponent.unsigned_abs()
 			> usize::try_from(self.precision.max_abs_exponent)
 				.unwrap_or(0)
 				.saturating_add(text.len())
 		{
-			return Err(ArithmeticError::Budget("decimal exponent"));
+			return Err(ArithmeticError::Core(CoreError::Budget("decimal exponent")));
 		}
 		let fractional = mantissa.split('.').nth(1).map_or(0, str::len);
 		let scale = exponent
 			.checked_sub(
 				isize::try_from(fractional)
-					.map_err(|_| ArithmeticError::Budget("decimal exponent"))?,
+					.map_err(|_| ArithmeticError::Core(CoreError::Budget("decimal exponent")))?,
 			)
-			.ok_or(ArithmeticError::Budget("decimal exponent"))?;
+			.ok_or(ArithmeticError::Core(CoreError::Budget("decimal exponent")))?;
 		let digits = mantissa.replace('.', "");
 		let mut numerator = IBig::from_str_radix(&digits, 10)
-			.map_err(|_| ArithmeticError::Interchange("decimal syntax"))?;
+			.map_err(|_| ArithmeticError::Core(CoreError::Interchange("decimal syntax")))?;
 		let mut denominator = IBig::ONE;
 		if scale >= 0 {
 			numerator *= IBig::from(10).pow(scale.unsigned_abs());
@@ -666,13 +665,13 @@ impl MpBackend {
 	}
 	fn import(&self, value: &ExactConstant, direction: BinaryRounding) -> ArithmeticResult<Binary> {
 		match value {
-			ExactConstant::Pi => Err(ArithmeticError::Domain(
+			ExactConstant::Pi => Err(ArithmeticError::Core(CoreError::Domain(
 				"pi requires precision-aware backend lowering",
-			)),
+			))),
 			ExactConstant::Binary64(value) => self.checked(exact_from_f64(
 				*value,
 				u32::try_from(self.precision.bits)
-					.map_err(|_| ArithmeticError::Budget("precision"))?,
+					.map_err(|_| ArithmeticError::Core(CoreError::Budget("precision")))?,
 			)?),
 			ExactConstant::Integer(value) => self.checked(
 				Binary::from(*value)
@@ -688,17 +687,19 @@ impl MpBackend {
 				denominator,
 			} => {
 				if !valid_integer(numerator) || !valid_positive_integer(denominator) {
-					return Err(ArithmeticError::Interchange("integer ratio"));
+					return Err(ArithmeticError::Core(CoreError::Interchange(
+						"integer ratio",
+					)));
 				}
 				if numerator.len().max(denominator.len()).saturating_mul(4)
 					> self.precision.bits.saturating_mul(32)
 				{
-					return Err(ArithmeticError::Budget("constant digits"));
+					return Err(ArithmeticError::Core(CoreError::Budget("constant digits")));
 				}
 				let n = IBig::from_str_radix(numerator, 10)
-					.map_err(|_| ArithmeticError::Interchange("integer ratio"))?;
+					.map_err(|_| ArithmeticError::Core(CoreError::Interchange("integer ratio")))?;
 				let d = IBig::from_str_radix(denominator, 10)
-					.map_err(|_| ArithmeticError::Interchange("integer ratio"))?;
+					.map_err(|_| ArithmeticError::Core(CoreError::Interchange("integer ratio")))?;
 				self.ratio(n, d, direction)
 			}
 		}
@@ -710,9 +711,12 @@ fn float_storage_bytes(words: usize) -> ArithmeticResult<usize> {
 	(if words > 2 { words } else { 0 })
 		.checked_mul(std::mem::size_of::<dashu_int::Word>())
 		.and_then(|bytes| bytes.checked_add(std::mem::size_of::<Binary>()))
-		.ok_or(ArithmeticError::Budget("scalar storage"))
+		.ok_or(ArithmeticError::Core(CoreError::Budget("scalar storage")))
 }
 impl Backend for MpBackend {
+	fn profile(&self) -> ArithmeticProfile {
+		ArithmeticProfile::new("MpBackend", self.precision.bits, "nearest-even")
+	}
 	type Scalar = Binary;
 	type Error = ArithmeticError;
 	fn validate(&self, value: &Binary) -> ArithmeticResult<()> {
@@ -807,9 +811,9 @@ impl PointBackend for MpBackend {
 			Binary::from_parts(
 				IBig::ONE,
 				isize::try_from(self.precision.bits.saturating_sub(1))
-					.map_err(|_| ArithmeticError::Budget("precision"))?
+					.map_err(|_| ArithmeticError::Core(CoreError::Budget("precision")))?
 					.checked_neg()
-					.ok_or(ArithmeticError::Budget("precision"))?,
+					.ok_or(ArithmeticError::Core(CoreError::Budget("precision")))?,
 			)
 			.with_precision(self.precision.bits)
 			.value(),
@@ -838,7 +842,7 @@ impl MpIntervalBackend {
 		self.point.validate_value(&value.lower)?;
 		self.point.validate_value(&value.upper)?;
 		if value.lower > value.upper {
-			return Err(ArithmeticError::Domain("interval order"));
+			return Err(ArithmeticError::Core(CoreError::Domain("interval order")));
 		}
 		Ok(())
 	}
@@ -856,6 +860,9 @@ impl MpIntervalBackend {
 	}
 }
 impl Backend for MpIntervalBackend {
+	fn profile(&self) -> ArithmeticProfile {
+		ArithmeticProfile::new("MpIntervalBackend", self.point.precision.bits, "outward")
+	}
 	type Scalar = MpInterval;
 	type Error = ArithmeticError;
 	fn validate(&self, value: &MpInterval) -> ArithmeticResult<()> {
@@ -866,7 +873,7 @@ impl Backend for MpIntervalBackend {
 		self.point
 			.storage_bytes(&value.lower)?
 			.checked_add(self.point.storage_bytes(&value.upper)?)
-			.ok_or(ArithmeticError::Budget("interval storage"))
+			.ok_or(ArithmeticError::Core(CoreError::Budget("interval storage")))
 	}
 	fn working_scalar_bytes(&self) -> usize {
 		self.point.working_scalar_bytes().saturating_mul(2)
@@ -954,7 +961,7 @@ impl MpIntervalBackend {
 		self.validate_value(&a)?;
 		self.validate_value(&b)?;
 		if divide && self.contains_zero(&b)? {
-			return Err(ArithmeticError::Domain("division"));
+			return Err(ArithmeticError::Core(CoreError::Domain("division")));
 		}
 		let op = if divide {
 			Operation::Div
@@ -978,14 +985,14 @@ impl MpIntervalBackend {
 			}
 		}
 		self.interval(
-			lower.ok_or(ArithmeticError::Domain("product"))?,
-			upper.ok_or(ArithmeticError::Domain("product"))?,
+			lower.ok_or(ArithmeticError::Core(CoreError::Domain("product")))?,
+			upper.ok_or(ArithmeticError::Core(CoreError::Domain("product")))?,
 		)
 	}
 	fn integer_possible(&self, q: &MpInterval) -> ArithmeticResult<bool> {
 		self.validate_value(q)?;
 		let integer_bits = isize::try_from(self.point.precision.bits.saturating_sub(2))
-			.map_err(|_| ArithmeticError::Budget("integer bits"))?;
+			.map_err(|_| ArithmeticError::Core(CoreError::Budget("integer bits")))?;
 		for x in [&q.lower, &q.upper] {
 			if !x.repr().significand().is_zero()
 				&& x.repr().exponent().saturating_add(
@@ -1040,7 +1047,9 @@ impl EnclosureBackend for MpIntervalBackend {
 		self.validate_value(a)?;
 		self.point.validate_value(tolerance)?;
 		if tolerance < &Binary::ZERO {
-			return Err(ArithmeticError::Domain("negative tolerance"));
+			return Err(ArithmeticError::Core(CoreError::Domain(
+				"negative tolerance",
+			)));
 		}
 		let width = self
 			.point
@@ -1114,7 +1123,7 @@ impl EnclosureBackend for MpIntervalBackend {
 				.repr()
 				.exponent()
 				.checked_sub(1)
-				.ok_or(ArithmeticError::Budget("exponent"))?,
+				.ok_or(ArithmeticError::Core(CoreError::Budget("exponent")))?,
 		);
 		let hi = Binary::from_parts(
 			a.upper.repr().significand().clone(),
@@ -1122,7 +1131,7 @@ impl EnclosureBackend for MpIntervalBackend {
 				.repr()
 				.exponent()
 				.checked_sub(1)
-				.ok_or(ArithmeticError::Budget("exponent"))?,
+				.ok_or(ArithmeticError::Core(CoreError::Budget("exponent")))?,
 		);
 		let middle = self
 			.point

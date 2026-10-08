@@ -1,0 +1,77 @@
+{
+  "additional_reconstruction_status": "ok",
+  "after_workspace_release": {
+    "last_rejection": null,
+    "live_buffer_bytes": 0,
+    "live_bytes": 0,
+    "live_planner_bytes_estimate": 0,
+    "peak_bytes": 74730608,
+    "requested_peak_bytes": 74730608,
+    "requested_work_units": 1490702530,
+    "reservations": 640055,
+    "work_units": 1490702530
+  },
+  "backend": "rustfft-simd-sequential",
+  "cached_after_result_release": {
+    "last_rejection": null,
+    "live_buffer_bytes": 3144624,
+    "live_bytes": 70250416,
+    "live_planner_bytes_estimate": 67105792,
+    "peak_bytes": 74730608,
+    "requested_peak_bytes": 74730608,
+    "requested_work_units": 1490702530,
+    "reservations": 640055,
+    "work_units": 1490702530
+  },
+  "cached_forward_plans": 15,
+  "cached_forward_scratch_bytes": 3144624,
+  "coefficient_backward_linf": 8.839028285896426e-14,
+  "degree": 20000,
+  "live_result_and_workspaces": {
+    "last_rejection": null,
+    "live_buffer_bytes": 3784656,
+    "live_bytes": 70890448,
+    "live_planner_bytes_estimate": 67105792,
+    "peak_bytes": 74730608,
+    "requested_peak_bytes": 74730608,
+    "requested_work_units": 745351265,
+    "reservations": 320050,
+    "work_units": 745351265
+  },
+  "main_backward_tolerance": 1e-10,
+  "memory_kind": "modeled live allocations plus retained opaque planner estimate; not process RSS",
+  "operation": "forward",
+  "profile": "million-degree-inverse-forward-v1",
+  "reconstructed_a_constant": [
+    0.9999996669788154,
+    -2.853955262004687e-14
+  ],
+  "reuse": {
+    "coefficient_linf": 8.839028285896426e-14,
+    "plans_after": 15,
+    "plans_before": 15,
+    "resources_after_reuse": {
+      "last_rejection": null,
+      "live_buffer_bytes": 3784656,
+      "live_bytes": 70890448,
+      "live_planner_bytes_estimate": 67105792,
+      "peak_bytes": 74730608,
+      "requested_peak_bytes": 74730608,
+      "requested_work_units": 1490702530,
+      "reservations": 640055,
+      "work_units": 1490702530
+    },
+    "scratch_bytes_after": 3144624,
+    "scratch_bytes_before": 3144624,
+    "status": "ok"
+  },
+  "source_a_constant": [
+    0.9999996669787757,
+    2.0277467570837675e-15
+  ],
+  "source_inverse_check": null,
+  "source_inverse_contract": "finite, size-preserving, max complex reflection error",
+  "source_reflection_linf": null,
+  "status": "ok",
+  "tolerance": 1e-10
+}

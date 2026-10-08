@@ -444,8 +444,8 @@ fn complete_generated_history_has_no_independent_collective_readers()
 					synthesis: {
 						let mut policy = quest_qsp::Policy::default();
 						if resolved {
-							policy.limits.max_work = 8_589_934_592;
-							policy.limits.max_bytes = 64 * 1024 * 1024;
+							policy.limits.resources.max_work_units = 8_589_934_592;
+							policy.limits.resources.max_peak_bytes = 64 * 1024 * 1024;
 						}
 						policy
 					},

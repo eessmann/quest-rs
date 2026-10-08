@@ -1,0 +1,11 @@
+{
+  "binary_sha256": "6e435fcba2d7ba09becc52c4e3c45df1501be98aaa43a76fd5227581502819a1",
+  "manifest_sha256": "b7b9842066ced783599a21bba61169629f1e232115dfde52256bbe3833f343a6",
+  "native_index_sha256": "bb9a94a52ff5e09832c4b2cafd72408945253b04afed44f5cefc2962eff84202",
+  "profile": "million-degree-inverse-forward-v1",
+  "purpose": "numerical regression and capacity; not performance comparison",
+  "cases": 37,
+  "complete": true,
+  "all_passed": true,
+  "summary_sha256": "5728c8391f4f16a7d8e4015b1fe203be2e724d61cef081557d60f0f339939162"
+}

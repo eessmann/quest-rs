@@ -1,0 +1,44 @@
+{
+  "after_workspace_release": {
+    "last_rejection": null,
+    "live_buffer_bytes": 0,
+    "live_bytes": 0,
+    "live_planner_bytes_estimate": 0,
+    "peak_bytes": 7051541504,
+    "requested_peak_bytes": 7051541504,
+    "requested_work_units": 97027214126,
+    "reservations": 28000127,
+    "work_units": 97027214126
+  },
+  "backend": "rustfft-simd-sequential",
+  "cached_after_result_release": {
+    "last_rejection": null,
+    "live_buffer_bytes": 369096496,
+    "live_bytes": 6811541296,
+    "live_planner_bytes_estimate": 6442444800,
+    "peak_bytes": 7051541504,
+    "requested_peak_bytes": 7051541504,
+    "requested_work_units": 97027214126,
+    "reservations": 28000127,
+    "work_units": 97027214126
+  },
+  "coefficient_backward_linf": 5.409406757634787e-11,
+  "degree": 1000000,
+  "live_result_and_workspaces": {
+    "last_rejection": null,
+    "live_buffer_bytes": 417096544,
+    "live_bytes": 6859541344,
+    "live_planner_bytes_estimate": 6442444800,
+    "peak_bytes": 7051541504,
+    "requested_peak_bytes": 7051541504,
+    "requested_work_units": 97027214126,
+    "reservations": 28000127,
+    "work_units": 97027214126
+  },
+  "memory_kind": "modeled live allocations plus retained opaque planner estimate; not process RSS",
+  "operation": "inverse",
+  "profile": "million-degree-inverse-forward-v1",
+  "source_reflection_linf": 2.543718508157025e-18,
+  "status": "accuracy_failure",
+  "tolerance": 1.9037152025719928e-11
+}

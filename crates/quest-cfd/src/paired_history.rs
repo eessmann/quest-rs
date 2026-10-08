@@ -41,13 +41,12 @@ const fn finite(x: f64) -> Result<f64, CfdError> {
 	if x.is_finite() { Ok(x) } else { Err(invalid()) }
 }
 fn buffer<T: Clone>(n: usize, value: T) -> Result<Vec<T>, CfdError> {
-	let mut v = Vec::new();
-	v.try_reserve_exact(n).map_err(|_| invalid())?;
+	let mut v = crate::storage::reserved(n, invalid)?;
 	v.resize(n, value);
 	Ok(v)
 }
 fn payload<T>(v: &Vec<T>) -> Result<usize, CfdError> {
-	mul(v.capacity(), size_of::<T>())
+	crate::storage::bytes::<T>(v.capacity()).ok_or_else(invalid)
 }
 /// Fixed scientific comparison route; every physical coordinate remains present.
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
@@ -211,13 +210,7 @@ impl Ensemble {
 		}
 		let grid = ConfigurationGrid::uniform(5, -0.2, 0.2, 1, 2, 243)?;
 		let mut amplitudes = grid.initial_bump(&CENTER, 0.55)?;
-		let norm = finite(amplitudes.iter().map(Complex64::norm_sqr).sum::<f64>())?.sqrt();
-		if norm == 0. {
-			return Err(invalid());
-		}
-		for a in &mut amplitudes {
-			*a /= norm;
-		}
+		crate::storage::normalize(&mut amplitudes, invalid)?;
 		let mut probabilities = buffer(243, 0.)?;
 		let mut mean = [0.; 5];
 		let mut energy = 0.;

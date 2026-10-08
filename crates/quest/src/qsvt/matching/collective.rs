@@ -337,11 +337,13 @@ fn owned_scratch_bytes(count: QubitCount, parts: usize) -> crate::Result<usize> 
 			"matching communicator or state dimension",
 		));
 	}
-	if parts == 1 {
-		crate::values::bytes_for(count.dimension(), 4)
-	} else {
-		Ok(0)
-	}
+	crate::values::bytes_for(
+		count
+			.dimension()
+			.checked_div(parts)
+			.ok_or(crate::Error::Overflow)?,
+		4,
+	)
 }
 
 fn admit_peak(
@@ -423,11 +425,10 @@ fn admit_node_peak(
 ///
 /// Only this rank's immutable coefficient partition,
 /// scalar manifest, mapped targets and bounded routing buffers are owned.
-/// Distributed CPU execution borrows the input register's communication array
-/// during routing. One-rank execution owns a native scratch register.
+/// Every deployment owns an admitted scratch register for permutation output.
 pub struct PreparedMatching<'env, 'comm, 'runtime> {
 	environment: &'env CollectiveEnvironment<'comm, 'runtime>,
-	scratch: Option<CollectiveRegister<'env, 'comm, 'runtime>>,
+	scratch: CollectiveRegister<'env, 'comm, 'runtime>,
 	shard: MatchingShard,
 	layout: MatchingLayout,
 	reservation: Reservation<'env>,
@@ -439,9 +440,9 @@ pub struct PreparedMatching<'env, 'comm, 'runtime> {
 }
 impl<'comm, 'runtime> CollectiveEnvironment<'comm, 'runtime> {
 	/// Admit scalar identity, local shard ownership and global permutation closure
-	/// before allocating bounded routing buffers and any one-rank scratch register.
+	/// before allocating bounded routing buffers and the independently owned scratch register.
 	///
-	/// No circuit or additional distributed state partition is retained.
+	/// No circuit is retained. Scratch owns one additional native state partition.
 	/// # Errors
 	/// Rejects inconsistent manifests/layouts, malformed shards, GPU execution or budgets collectively.
 	pub fn prepare_matching(
@@ -542,11 +543,7 @@ impl<'comm, 'runtime> CollectiveEnvironment<'comm, 'runtime> {
 		)?;
 		admit_node_peak(&mut lane, actual_peak, shard.parts(), capacity)?;
 		drop(lane);
-		let scratch = if shard.parts() == 1 {
-			Some(self.state_vector_local(count)?)
-		} else {
-			None
-		};
+		let scratch = self.state_vector_local(count)?;
 		Ok(PreparedMatching {
 			environment: self,
 			scratch,
@@ -655,10 +652,7 @@ fn remote_write(
 }
 impl<'env, 'comm, 'runtime> PreparedMatching<'env, 'comm, 'runtime> {
 	pub(crate) const fn native_accounted_bytes(&self) -> usize {
-		match &self.scratch {
-			Some(scratch) => scratch.inner.accounted_bytes(),
-			None => 0,
-		}
+		self.scratch.inner.accounted_bytes()
 	}
 	/// Collective execution context used by this prepared unitary.
 	#[must_use]
@@ -678,16 +672,12 @@ impl<'env, 'comm, 'runtime> PreparedMatching<'env, 'comm, 'runtime> {
 	pub const fn shard(&self) -> &MatchingShard {
 		&self.shard
 	}
-	/// Native deployment of an owned one-rank permutation scratch register.
-	/// `None` means routing borrows the input register's existing communication array;
-	/// its payload belongs to the input deployment and is not a second allocation.
+	/// Native deployment of the independently owned permutation scratch register.
 	#[must_use]
-	pub const fn scratch_deployment(&self) -> Option<crate::RegisterDeployment> {
-		match &self.scratch {
-			Some(scratch) => Some(scratch.deployment()),
-			None => None,
-		}
+	pub const fn scratch_deployment(&self) -> crate::RegisterDeployment {
+		self.scratch.deployment()
 	}
+
 	/// Apply the identical whole matching unitary or adjoint with outer controls.
 	/// Pair requests and replies have fixed bounded storage; coefficient records
 	/// remain on their original-source owner, even when state partitions differ.
@@ -740,10 +730,7 @@ impl<'env, 'comm, 'runtime> PreparedMatching<'env, 'comm, 'runtime> {
 		self.statistics = fatal(|| {
 			self.layout
 				.hadamards(&mut register.inner, &positions, &outcomes)?;
-			let state = RoutingState::stage(
-				&mut register.inner,
-				self.scratch.as_mut().map(|scratch| &mut scratch.inner),
-			)?;
+			let state = RoutingState::stage(&mut register.inner, &mut self.scratch.inner)?;
 			let mut execution = BatchExecution {
 				layout: &self.layout,
 				shard: &self.shard,
@@ -789,11 +776,11 @@ impl<'env, 'comm, 'runtime> PreparedMatching<'env, 'comm, 'runtime> {
 				"matching color Hadamards require two local amplitudes",
 			));
 		}
-		if self.scratch.is_none() {
-			#[cfg(test)]
-			buffer_tests::inject_admission_failure(self.shard.rank())?;
-			quest_sys::validate_cpu_communication_buffer(&register.inner.native)
-				.context("admitting matching communication buffer")?;
+		#[cfg(test)]
+		buffer_tests::inject_admission_failure(self.shard.rank())?;
+		if self.scratch.deployment().local_amplitudes() != register.deployment().local_amplitudes()
+		{
+			return Err(crate::Error::Value("matching staging partition length"));
 		}
 		self.layout.controls(mask, value)?;
 		super::MatchingExecutionCost::admit(
@@ -882,10 +869,7 @@ impl<'env, 'comm, 'runtime> PreparedMatching<'env, 'comm, 'runtime> {
 		let local = register.deployment().local_amplitudes();
 		self.layout
 			.hadamards(&mut register.inner, positions, outcomes)?;
-		let mut state = RoutingState::stage(
-			&mut register.inner,
-			self.scratch.as_mut().map(|scratch| &mut scratch.inner),
-		)?;
+		let mut state = RoutingState::stage(&mut register.inner, &mut self.scratch.inner)?;
 		let flag = self.layout.flag()?;
 		for basis in 0..self.layout.count.dimension() {
 			if basis & flag != 0 || basis & outer.0 != outer.1 {

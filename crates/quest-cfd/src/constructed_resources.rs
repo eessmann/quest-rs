@@ -570,9 +570,9 @@ fn inverse_cost(
 	)?;
 	let synthesis_bytes = available(l, polynomial_live)?;
 	let mut policy = quest_qsp::Policy::default();
-	policy.limits.max_bytes = synthesis_bytes;
-	policy.limits.max_work = request.max_synthesis_work;
-	policy.max_completion_grid = request.max_completion_grid;
+	policy.limits.resources.max_peak_bytes = synthesis_bytes;
+	policy.limits.resources.max_work_units = request.max_synthesis_work;
+	policy.limits.shapes.max_completion_grid = request.max_completion_grid;
 	// QSP exposes its admitted workspace envelope, not allocator peak telemetry.
 	charge_peak(r, l, add(polynomial_live, synthesis_bytes)?)?;
 	let frozen = polynomial.synthesize(policy)?;

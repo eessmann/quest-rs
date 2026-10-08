@@ -1,0 +1,9 @@
+     Running `target/debug/xtask check-native-consumers --backends cpu,omp --loader-isolated --work-dir target/quality-native-consumers`
+Error: 
+   0: consumer dependency locking failed (exit status: 101); inspect <workspace>/target/quality-native-consumers/lock.log
+
+Location:
+   crates/xtask/src/main.rs:17
+
+Backtrace omitted. Run with RUST_BACKTRACE=1 environment variable to display it.
+Run with RUST_BACKTRACE=full to include source snippets.

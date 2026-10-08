@@ -144,7 +144,10 @@ fn evaluations_and_exchange_respect_work_budget() -> Result<()> {
 		let options = RemezOptions {
 			max_iterations: 1,
 			limits: Limits {
-				max_work,
+				resources: quest_numerics::ResourceLimits {
+					max_work_units: max_work,
+					..quest_numerics::ResourceLimits::default()
+				},
 				..Limits::default()
 			},
 			..RemezOptions::default()
@@ -160,7 +163,9 @@ fn evaluations_and_exchange_respect_work_budget() -> Result<()> {
 			failure.error(),
 			quest_polynomial::Error::Budget(_)
 				| quest_polynomial::Error::Arithmetic(
-					quest_numerics::arithmetic::ArithmeticError::Budget(_)
+					quest_numerics::arithmetic::ArithmeticError::Core(
+						mathcore::arithmetic::ArithmeticError::Budget(_)
+					)
 				)
 		));
 	}
@@ -174,8 +179,11 @@ fn failures_retain_original_request_constants_shape_and_premise() -> Result<()> 
 	let metadata = target.metadata();
 	let options = RemezOptions {
 		limits: Limits {
-			max_work: 0,
-			..Limits::default()
+			shapes: (Limits::default()).shapes,
+			resources: quest_numerics::ResourceLimits {
+				max_work_units: 0,
+				..(Limits::default()).resources
+			},
 		},
 		..RemezOptions::default()
 	};

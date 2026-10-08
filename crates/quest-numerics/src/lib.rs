@@ -32,3 +32,8 @@ pub mod roots;
 pub mod shapes;
 
 pub mod constraint_chart;
+
+pub use mathcore::resources::{
+	Accounted, MemoryReservation, OperationLimits, OperationResources, ResourceError,
+	ResourceLimits, ResourceReport, ShapeLimits,
+};

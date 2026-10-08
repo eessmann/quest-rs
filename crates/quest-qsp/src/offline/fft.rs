@@ -381,7 +381,7 @@ mod tests {
 				}
 				assert!(matches!(
 					limited.product(&left1, 0, &mut short),
-					Err(Error::Budget("offline work"))
+					Err(Error::Resource(_))
 				));
 				assert_eq!(limited.ready, [None, None]);
 				let short_storage = OfflinePolicy {

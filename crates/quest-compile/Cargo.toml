@@ -49,3 +49,7 @@ workers = ["dep:quest-optimizer-client", "dep:quest-optimizer-protocol"]
 name = "compiler"
 harness = false
 required-features = ["macros"]
+
+[[bench]]
+name = "source_unitary"
+harness = false

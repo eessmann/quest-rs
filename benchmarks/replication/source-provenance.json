@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "quest_qsvt_revision": "4fc35983138d07a990862a4d83ad16f2b737c98f",
+  "source_files": {
+    "test/qsp_tools/nlft/benchmark_fixture_tests.cpp": "899b99d6b129f7d8e16a91fd4063d063a342bcca2f804ca6d3533d47ba8d06b9",
+    "test/qsp_tools/nlft_inverse_benchmark_fixture.hpp": "0cf7c1029de0ffe22cd646a907f0715a7c145258f8d534b2607e5a599647e084",
+    "test/qsp_tools/nlft_bench_contract.hpp": "d814ec9e71fb6bc8f7505afc3b0efe4f0399b2b85931988771a8922fb5c3ae1a",
+    "test/qsp_tools/nlft_bench_models.hpp": "23960b2a3b6fd1dae431fb7311536284f5243de9484e5e5ec11a2714e281f02a",
+    "test/qsp_tools/critical_root_isolation_benchmarks.cpp": "06dd562c6e98421f97a988022884fdf3e5d61d43b6d40d3f084a10359d5e11d4",
+    "test/qsp_tools/unit_tests_poly.cpp": "936d021430bdfcedf7362bef47e6ee73d32ad8396d0966b14b26aed768b2d122",
+    "test/qsvt_tools/benchmarks/circuit_benchmarks.cpp": "9f3e4754ab2056a012d1b27386dcbcf03c7dcc2f3235d22619de41e3e59e6c24"
+  },
+  "softwarex_revision": "245938a575deac7f232797efdade97ba442a366d",
+  "frozen_corpus_sha256": "806b1557498debe5d409b214609ad30a74a86d529ae36045a2b3c428b9546e6d",
+  "rust_original_revision": "0f95954e7951dca9a8d88a10c1a9764ecb58d91f",
+  "softwarex_case_inventory_sha256": "66b7773cba0cdc4dceca173cbd40590be3941749c7bd0e5e9bf86665d2410ad3",
+  "softwarex_case_inventory_derivation": "case_id, source degree, and source/canonical little-endian IEEE754 hashes extracted from the checksum-verified frozen 62-case corpus"
+}

@@ -1,0 +1,144 @@
+{
+  "schema_version": "1.0",
+  "purpose": "Original exact native inverse regression inputs and original reflection-recovery gates; independent of matched paper acceptance",
+  "source_revision": "4fc35983138d07a990862a4d83ad16f2b737c98f",
+  "encoding": "gzip of unchanged IEEE754-bit JSON; mtime zero",
+  "fixtures": [
+    {
+      "degree": 5,
+      "file": "order5.json.gz",
+      "source_sha256": "1bbde14d8ff036f8e6156e8ba926c9aa4e54a9ad647e57fba3985554543eb994",
+      "archive_sha256": "80a2c04245b0c6cf2589c707842750659f7dd3c9faebb90a9c145b2098a00de1",
+      "source_bytes": 592,
+      "archive_bytes": 352
+    },
+    {
+      "degree": 10,
+      "file": "order10.json.gz",
+      "source_sha256": "9bd57de21dcd54dc578cd5e9575cc3456bd8e37b0591d1ff793dae820c078384",
+      "archive_sha256": "ee9815cb41d84373724076fb12ec5401128d2965cb600c46a3377362159d304a",
+      "source_bytes": 1018,
+      "archive_bytes": 538
+    },
+    {
+      "degree": 20,
+      "file": "order20.json.gz",
+      "source_sha256": "a8f3658e9f508f81ffa43452d25acaa448ad74d951681b4d49dc5f6a2093b296",
+      "archive_sha256": "4c08ce12456b3c6ac755a4062c5007266939669022b0b2fb121bae165a08dce6",
+      "source_bytes": 1881,
+      "archive_bytes": 910
+    },
+    {
+      "degree": 50,
+      "file": "order50.json.gz",
+      "source_sha256": "ecfe4896fa41bfa771e4ab1a5764bc279d8391b79a93e2405f2c0857ee27f7c4",
+      "archive_sha256": "bd579bc0abd024b9d3f7fd7708f091d318dd3379d4d896b716cffc4fc1c63122",
+      "source_bytes": 4460,
+      "archive_bytes": 2021
+    },
+    {
+      "degree": 100,
+      "file": "order100.json.gz",
+      "source_sha256": "a8a6b2621472f70224edfcf55be06268bc837aa487c674c8df08369fb4ce309b",
+      "archive_sha256": "d80cbff2708e051f36b7ff9159cb3d9de2495f54096925d634db819cff9b95a3",
+      "source_bytes": 8786,
+      "archive_bytes": 3934
+    },
+    {
+      "degree": 200,
+      "file": "order200.json.gz",
+      "source_sha256": "11e6913baaccd3a8a6481228187a301b4b157fff1faf5ec6f67c8edeaa5315c3",
+      "archive_sha256": "eb953c47288c3ce92eb65cae2d1e605086daab2ee98b16df6d10ff4e2136e28b",
+      "source_bytes": 17361,
+      "archive_bytes": 7761
+    },
+    {
+      "degree": 500,
+      "file": "order500.json.gz",
+      "source_sha256": "f374de04bba1eba96b03a9f99ce209602dfac07e3234433c7fb58f8002ac3bcf",
+      "archive_sha256": "790cd1e1ab17ba9f20b054dfcca1c8d6fcdf9822929519890ed766fe22a40990",
+      "source_bytes": 43200,
+      "archive_bytes": 19329
+    },
+    {
+      "degree": 1000,
+      "file": "order1000.json.gz",
+      "source_sha256": "82cd2a41241665a9e40f4ed1f7929086443562081aef47202b1ff2d14a3f9830",
+      "archive_sha256": "3b16e8862d3f9b09c480ec7a60771cda9d64b5bce0ccb12a3f1e3a5fbe42fea5",
+      "source_bytes": 86167,
+      "archive_bytes": 38088
+    },
+    {
+      "degree": 2000,
+      "file": "order2000.json.gz",
+      "source_sha256": "ee0bce22cf6b1a4eae91aeac8eca6add56733dab3cff66efd3e2fd71f7a1d238",
+      "archive_sha256": "11e4cc29a3e14195aded8214782ec05307603d063fdb735eeafd23c62ab3145f",
+      "source_bytes": 258150,
+      "archive_bytes": 101839
+    },
+    {
+      "degree": 5000,
+      "file": "order5000.json.gz",
+      "source_sha256": "d674048afa1af5d35078fbbf6133b2db5ec3113a395fb5983036abad66fd7673",
+      "archive_sha256": "5ba6f19b2d89e4b743ab481d7c440fc2f71d8bda5a910e72ab539a0d3c10f082",
+      "source_bytes": 644939,
+      "archive_bytes": 261372
+    },
+    {
+      "degree": 10000,
+      "file": "order10000.json.gz",
+      "source_sha256": "645ba779c84f0c911c33c06909bd0f19547dffbfd09faf50e434b521196139d8",
+      "archive_sha256": "7b28ddc8e1b5c5f9c04c1b848d82e6250adbb5ed63ffa4752bbddafb2b4ae895",
+      "source_bytes": 1289589,
+      "archive_bytes": 527766
+    },
+    {
+      "degree": 20000,
+      "file": "order20000.json.gz",
+      "source_sha256": "0177b03dca5d2aa9814451b7eaa7a35855f33ef3bfe5019a32dd297e00a8884d",
+      "archive_sha256": "68b69add30778e9ec8af1ecca45840040e2158e168140538ef48c3bf3503d764",
+      "source_bytes": 2578902,
+      "archive_bytes": 1036701
+    },
+    {
+      "degree": 50000,
+      "file": "order50000.json.gz",
+      "source_sha256": "4db83c0a9269d60e76c82e08bf13beb63ce8da091ef7c6aa5065c23296e2c073",
+      "archive_sha256": "fac68579e923243bace4aaabd5750121022dea847651d1a2d2de18feb097ef70",
+      "source_bytes": 6446824,
+      "archive_bytes": 2543426
+    },
+    {
+      "degree": 100000,
+      "file": "order100000.json.gz",
+      "source_sha256": "0727af05f6a049b054efb5a9d5f060476750f58a7dca58808be9784da46a9696",
+      "archive_sha256": "47301b4fa5f462603616978cb70a8e401b4f64e207de10ba7a5b91c23b2e027a",
+      "source_bytes": 12893374,
+      "archive_bytes": 5021255
+    },
+    {
+      "degree": 200000,
+      "file": "order200000.json.gz",
+      "source_sha256": "9f2e048fc6d43988eebb3dab2ed2f493e7f2a70567a7fe490c0d341553474249",
+      "archive_sha256": "8d59e86557694cc8a1e81e07ec4c86e47da383e4779eebfa3ece568009a761a9",
+      "source_bytes": 25786522,
+      "archive_bytes": 9863986
+    },
+    {
+      "degree": 500000,
+      "file": "order500000.json.gz",
+      "source_sha256": "f9e2729291b7150513d4c7c60f541db1a7515f030ba4ee673402a3ae9992471e",
+      "archive_sha256": "18e957e529ffbd04d54e1967eb607065a69d2a1f3fb788d75a2c7c1fe651e86c",
+      "source_bytes": 64466292,
+      "archive_bytes": 24170105
+    },
+    {
+      "degree": 1000000,
+      "file": "order1000000.json.gz",
+      "source_sha256": "123c74db5f2618e712c955d3673e80e6a5055ce77ebc852816f123ffd1456cb9",
+      "archive_sha256": "11aa046c4e36fd30ae71647a88f35449d07b18ca4d8e2283a1929359f27ffb88",
+      "source_bytes": 128933634,
+      "archive_bytes": 47578469
+    }
+  ]
+}

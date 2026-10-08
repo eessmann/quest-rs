@@ -1,0 +1,162 @@
+{
+  "source_revisions": {
+    "rust_original": "0f95954e7951dca9a8d88a10c1a9764ecb58d91f",
+    "quest_qsvt": "4fc35983138d07a990862a4d83ad16f2b737c98f",
+    "softwarex": "245938a575deac7f232797efdade97ba442a366d"
+  },
+  "raw_artifact_root": "target/quality-campaign",
+  "native_combined_lane": "native-devenv-combined",
+  "native_lanes": [
+    {
+      "role": "named",
+      "lane": "native-devenv-named-v1",
+      "rows": 26,
+      "files": {
+        "manifest.json": "bf4fb3ed44f938883274c6712fbb2d0daabc7d8162b1d0d1720d21a0fdbe1f38",
+        "results.jsonl": "a516c178763947e7b88e93054a39a49995cb944f259739cfdde29d541453ee37",
+        "completion.json": "d71ae653057b5303aacd06e855feb82576c66190df0603037afe1d31059d92ec",
+        "identity.json": "4284b7d932dc65f8bd18d3ffc6cd5b5f8d72562d1b3c0a30fc353c34c796e93a",
+        "processes.json": "db22766081254159046a3e01e87a879a5a8e0bedaef3d78068f18c03c4824139"
+      }
+    },
+    {
+      "role": "source",
+      "lane": "native-devenv-source-v1",
+      "rows": 33,
+      "files": {
+        "manifest.json": "76189da1889cc0f767d812ce9d1739eeb068621990d84f329aecbea53b89f36a",
+        "results.jsonl": "ac0a439c607546ff0a1f19df747fa0b30a591f119153c0c0de06fcd1b1f96f64",
+        "completion.json": "6e2604013aa65584a0b597fc71824af196db110746eb14bdf573c997ce53c410",
+        "identity.json": "4f0bc29be32efe3bb666f69b19cffcfeba9580df58c91bcb54ab3819782b95ab",
+        "processes.json": "984219d2d03c6b7b55be00ffa3f3b8dcf4dffba54e1ddf59285409a122877842"
+      }
+    },
+    {
+      "role": "softwarex",
+      "lane": "native-devenv-softwarex-unavailable",
+      "rows": 124,
+      "files": {
+        "manifest.json": "c423777aed3c2562ac754cfe495970ef6511ebc345034ca7d426fe586a000cc2",
+        "results.jsonl": "d3007f4be7d27b050c027b887e7f25ff100604d3f089cd35ba55e38f897af57b",
+        "completion.json": "ee385af6dd8f6196086ee9e1997ff9125cafd61e0a2c86ff8299e16f8cd9a153"
+      }
+    }
+  ],
+  "input_bundle": "named-inverse-inputs",
+  "input_bundle_manifest_sha256": "5b9eb5cd19a23c662814cf6047d2b1567bcf77f5a8b312f0a6ac189061072b59",
+  "export_provenance": {
+    "exporter_sha256": "27da818e134a1cf1e8c80730954b6b0e8f538c8d7980f79f0fee36fee8ab1bed",
+    "log_sha256": "0c0363823cb13b4247a844e0dc1ef1ce6e99ec3835237bd4db5357cf03ded93a",
+    "source": "4fc35983138d07a990862a4d83ad16f2b737c98f",
+    "adapter_sha256": "7525d61a94647c850e86e2d802e8af78c61e068c21bd42ccfaa38e75a3acb9db",
+    "cmake_sha256": "d8ae8b1e0eb9c7d8b8fd314c396471729c0ebd6e12aa8afda62cc8cfb2ff6861"
+  },
+  "lanes": {
+    "named-inverse-original": {
+      "completion": {
+        "accounting_complete": true,
+        "performance_coverage_complete": false,
+        "expected_rows": 17,
+        "outcomes": {
+          "ok": 13,
+          "resource_limit": 4
+        }
+      },
+      "controllers": {
+        "run_named_inverse.py": "155051578a2e7b6b737f1051b4e6d7fb32aed8af8177614e84d892b24955420b",
+        "campaign.py": "48be5153610b522546a263d0156836600c221dc5575164ae91c8b8a20edc5b07"
+      },
+      "source_identity_sha256": "e263635ea9536046410388255968c3dde80e53d68a6057393f8485ab9ed42977",
+      "files": {
+        "manifest.json": "cc39eea244a5febf72fcdc2137347b1072ed17f5ba3e6bcf19b3397816923067",
+        "results.jsonl": "8b6848bf1efe20a20e9bbe79790c8f8f05399b86a84c9fa6901e06a98c44a4e3",
+        "completion.json": "858d6560845619cc7c476a797dffc2cace23d247972d48ee407a8992f9b81cde",
+        "toolchain.json": "508638e0c9b726a72b5e6dc6fa1573a807d3fab7484893f0f4cb0f9fd4eb1c31",
+        "source-identity.json": "e263635ea9536046410388255968c3dde80e53d68a6057393f8485ab9ed42977"
+      }
+    },
+    "named-inverse-current": {
+      "completion": {
+        "accounting_complete": true,
+        "performance_coverage_complete": false,
+        "expected_rows": 17,
+        "outcomes": {
+          "ok": 13,
+          "resource_limit": 4
+        }
+      },
+      "controllers": {
+        "run_named_inverse.py": "155051578a2e7b6b737f1051b4e6d7fb32aed8af8177614e84d892b24955420b",
+        "campaign.py": "48be5153610b522546a263d0156836600c221dc5575164ae91c8b8a20edc5b07"
+      },
+      "source_identity_sha256": "7ef4669d85e2065fd45630df46279f069027ea9307edd3d559d18dbbdea01fb7",
+      "files": {
+        "manifest.json": "760e677c4aaf3fab7b3a173f5807c3197096de4eac1d8da9480eb485c2c3ad87",
+        "results.jsonl": "b8b13ea5e3f2a5cc0b1763bbfbca766077fc5fbded678baba0d11c29cb21f698",
+        "completion.json": "858d6560845619cc7c476a797dffc2cace23d247972d48ee407a8992f9b81cde",
+        "toolchain.json": "508638e0c9b726a72b5e6dc6fa1573a807d3fab7484893f0f4cb0f9fd4eb1c31",
+        "source-identity.json": "7ef4669d85e2065fd45630df46279f069027ea9307edd3d559d18dbbdea01fb7"
+      }
+    },
+    "native-devenv-named-v1": {
+      "controllers": {
+        "controllers/campaign.py": "48be5153610b522546a263d0156836600c221dc5575164ae91c8b8a20edc5b07",
+        "controllers/run_named.py": "f305cdd43d0e0a0f6b8286c8702d811775d7a10d02af96136ff96cb4132cc9fe",
+        "controllers/run_source_suites.py": "5910f6bf7c188bbc213f27de7476af369242663151be1b0ef5399b619f6e9eb1"
+      },
+      "compiler": "g++ (GCC) 15.3.0",
+      "binaries": {
+        "unit_tests_nlft": "1a664c2b039e02c292e09c072ffc466a3bb7c0d149da382c0b9536c4426e3590"
+      },
+      "files": {
+        "manifest.json": "bf4fb3ed44f938883274c6712fbb2d0daabc7d8162b1d0d1720d21a0fdbe1f38",
+        "results.jsonl": "a516c178763947e7b88e93054a39a49995cb944f259739cfdde29d541453ee37",
+        "completion.json": "d71ae653057b5303aacd06e855feb82576c66190df0603037afe1d31059d92ec",
+        "identity.json": "4284b7d932dc65f8bd18d3ffc6cd5b5f8d72562d1b3c0a30fc353c34c796e93a",
+        "processes.json": "db22766081254159046a3e01e87a879a5a8e0bedaef3d78068f18c03c4824139"
+      }
+    },
+    "native-devenv-source-v1": {
+      "controllers": {
+        "controllers/campaign.py": "48be5153610b522546a263d0156836600c221dc5575164ae91c8b8a20edc5b07",
+        "controllers/run_source_suites.py": "5910f6bf7c188bbc213f27de7476af369242663151be1b0ef5399b619f6e9eb1"
+      },
+      "compiler": "g++ (GCC) 15.3.0",
+      "binaries": {
+        "critical_point_benchmarks": "780ca920d047763133afc91f139d37cf922af85c37dc81fc91fd1e121d4bb1cd",
+        "unit_tests_poly": "92ee265e5988d76642de35088d79a0ed2d61936554bccae77ed081cd3ee36255",
+        "circuit_benchmarks": "e1791ca798596ab3edcd76b90afaab03e4d49690faf62349a33f75c41710c267"
+      },
+      "files": {
+        "manifest.json": "76189da1889cc0f767d812ce9d1739eeb068621990d84f329aecbea53b89f36a",
+        "results.jsonl": "ac0a439c607546ff0a1f19df747fa0b30a591f119153c0c0de06fcd1b1f96f64",
+        "completion.json": "6e2604013aa65584a0b597fc71824af196db110746eb14bdf573c997ce53c410",
+        "identity.json": "4f0bc29be32efe3bb666f69b19cffcfeba9580df58c91bcb54ab3819782b95ab",
+        "processes.json": "984219d2d03c6b7b55be00ffa3f3b8dcf4dffba54e1ddf59285409a122877842"
+      }
+    }
+  },
+  "comparison_raw_sha256": "66baa41160c7a142ca2b8e45f3c23c7e7f17e00fadae043876bcd7c973981a40",
+  "report_generator_path": "target/quality-native-devenv/publish-followup.py",
+  "report_generator_sha256": "5486eae473eb0adf8a9eb8e65ea7c074eb2d088c996093126356ed4689bb74b7",
+  "reviewed_reporting_code": {
+    "report.py": "736f7fcabbd625018d104e30d6b391d4cdca633e14c5409eaf46e8480f561355",
+    "native/reconcile.py": "f768f64219eb00b45d1f5a7837048e6af6edd068233c025fdce5ab8eeecfeb06"
+  },
+  "notes": [
+    "Catch means and confidence intervals are source reporter summaries; individual Catch sample arrays are unavailable.",
+    "Five earlier random-solver summaries are invalidated by their enclosing test case assertion gate. They are not five independently established numerical accuracy failures.",
+    "The Laurent solver preflight failed before its timing started; the source did not print the underlying numerical error.",
+    "The hardcoded coordinate result has exactly three actual source chrono samples.",
+    "124 SoftwareX legacy executable contracts and the extra ten-sample coordinate protocol remain unsupported.",
+    "Rust medians use only hash-verified Criterion new/sample.json arrays, with exact paired inputs and matching scope.",
+    "Native process RSS belongs to a whole selectable group; Rust RSS includes build/discovery/preflight/measurement. Neither is a cgroup peak or kernel allocation claim."
+  ],
+  "published_artifacts": {
+    "build-export-receipt.json": "060b0b09ff1d25c141778ca11514b535a32deeb4b17b5eb607f5f130314058c0",
+    "named-inverse-comparison.csv": "01c0d33e33cd1c11d07b27e2360f99723e5ebbdbddacd5e574589211f7ae8440",
+    "named-inverse-completion.json": "c8682f7d2a52a74c327aea36d560a7a7a07e51d86479dbae3d4cb550faa14043",
+    "native-completion.json": "6371469f060c7d95d785ba59bd8465af907e168b30b8582aaf9e88a418bf6d33",
+    "native-observations.csv": "81b0afe1cc0a1fb4b09cf8b23d3f2e4d9a65d945566e45d6b52cc3179b269aca"
+  }
+}

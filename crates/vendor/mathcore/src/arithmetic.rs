@@ -25,7 +25,49 @@ pub enum ExactConstant {
 		denominator: String,
 	},
 }
+/// Immutable interpretation of stored scalars.
+///
+/// Resource limits and accumulated
+/// spend are deliberately excluded. A precision or rounding change requires
+/// lowering again from the original exact/ordered source.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct ArithmeticProfile {
+	semantics: &'static str,
+	representation: &'static str,
+	precision_bits: usize,
+	rounding: &'static str,
+}
+impl ArithmeticProfile {
+	#[must_use]
+	pub const fn new(
+		semantics: &'static str,
+		precision_bits: usize,
+		rounding: &'static str,
+	) -> Self {
+		Self {
+			semantics,
+			representation: semantics,
+			precision_bits,
+			rounding,
+		}
+	}
+	/// Preserve the underlying arithmetic policy when adding an AD scalar shape.
+	#[must_use]
+	pub const fn with_representation(mut self, representation: &'static str) -> Self {
+		self.representation = representation;
+		self
+	}
+	#[must_use]
+	pub const fn precision_bits(self) -> usize {
+		self.precision_bits
+	}
+}
 pub trait Backend {
+	/// Declare scalar semantics, precision and rounding explicitly. Implementations
+	/// with runtime arithmetic policy must reflect it here; counters and resource
+	/// ceilings must not affect the profile. Wrappers preserve the inner policy.
+	fn profile(&self) -> ArithmeticProfile;
+
 	/// Admit a stored scalar without rounding or changing its value. Custom
 	/// backends whose scalar type does not enforce validity must override this
 	/// hook; the default trusts their scalar admission contract.

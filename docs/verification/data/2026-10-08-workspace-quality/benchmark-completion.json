@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "accounting_complete": true,
+  "performance_coverage_complete": false,
+  "expected_rows": 811,
+  "recorded_statuses": {
+    "native_error": 187,
+    "ok": 560,
+    "accuracy_failure": 14,
+    "preparation_failure": 30,
+    "resource_limit": 20
+  },
+  "diagnostic_categories": {
+    "native_dependency_failure": 183,
+    "ok": 560,
+    "accuracy_failure": 14,
+    "numerical_admission_not_established": 4,
+    "resource_limit": 50
+  },
+  "successful_matched_comparisons": 280,
+  "comparison_rows": 314,
+  "source_contract_diagnostic_rows": 33,
+  "source_contract_diagnostics_included_in_workload_count": false,
+  "historical_1488_campaign_included": false,
+  "combined_raw_path": "target/quality-campaign/combined-final",
+  "combined_artifacts_sha256": {
+    "manifest.json": "1d864d89baf420a43443e5fb0b8a7aedc1077cd2534b88c5fb8affecafa4e69e",
+    "results.jsonl": "0d73e7de31b97d22648e38537852c60ff57dcc87b87c999e8661be0535eff5e1",
+    "completion.json": "49034f5716ea998747aac8534bc5f529838ad7e936c8b56ad943cec828da8482"
+  },
+  "lanes": [
+    {
+      "lane": "native-source",
+      "raw_path": "target/quality-campaign/native-source",
+      "implementation": "quest_qsvt_cpp",
+      "rows": 183,
+      "recorded_statuses": {
+        "native_error": 183
+      },
+      "diagnostic_categories": {
+        "native_dependency_failure": 183
+      },
+      "artifacts_sha256": {
+        "completion.json": "751ad5129cd446f6904255532511c3426560e81c87ad66c42adc2c1b317141ca",
+        "manifest.json": "5b024279fa8d23d808104432bed034b868e01f83ccd50462e5e7f74b579ad921",
+        "results.jsonl": "5aaa79a736743c1cffce4d3ddef038e233e792f5c65a893e268608f788bb2d8a"
+      }
+    },
+    {
+      "lane": "original-final-v2",
+      "raw_path": "target/quality-campaign/original-final-v2",
+      "implementation": "original_0f95954",
+      "rows": 310,
+      "recorded_statuses": {
+        "ok": 276,
+        "accuracy_failure": 7,
+        "native_error": 2,
+        "preparation_failure": 15,
+        "resource_limit": 10
+      },
+      "diagnostic_categories": {
+        "ok": 276,
+        "accuracy_failure": 7,
+        "numerical_admission_not_established": 2,
+        "resource_limit": 25
+      },
+      "artifacts_sha256": {
+        "completion.json": "3a13b135cd2d9087abe5dc1277671d3f1a1b7d9b1391ad0a1d8e7ab110a3d6fe",
+        "manifest.json": "90859c8692988156e11bc70f7b761dd27e85adabbd1a44053cca2ecb9accc9a1",
+        "results.jsonl": "3afce29bf98f09eb229bab925048c4624542de77d820bc4d9d1f49801ff01165",
+        "source-identity.json": "e263635ea9536046410388255968c3dde80e53d68a6057393f8485ab9ed42977",
+        "toolchain.json": "cac5bb9362b3d43dd76d56a4e92628251f7107660db00cf79048301d8aecca96"
+      }
+    },
+    {
+      "lane": "current-final",
+      "raw_path": "target/quality-campaign/current-final",
+      "implementation": "current",
+      "rows": 310,
+      "recorded_statuses": {
+        "ok": 276,
+        "accuracy_failure": 7,
+        "native_error": 2,
+        "preparation_failure": 15,
+        "resource_limit": 10
+      },
+      "diagnostic_categories": {
+        "ok": 276,
+        "accuracy_failure": 7,
+        "numerical_admission_not_established": 2,
+        "resource_limit": 25
+      },
+      "artifacts_sha256": {
+        "completion.json": "3a13b135cd2d9087abe5dc1277671d3f1a1b7d9b1391ad0a1d8e7ab110a3d6fe",
+        "manifest.json": "1cdd9d810c913024fdae3722b3c8ba916629c5bafcfd95fcb14d6ea7827bc35c",
+        "results.jsonl": "176b1d27d051a93c98f1507156ffb64fd3aecc2255881adf36700d0e55421bb8",
+        "source-identity.json": "7ef4669d85e2065fd45630df46279f069027ea9307edd3d559d18dbbdea01fb7",
+        "toolchain.json": "cac5bb9362b3d43dd76d56a4e92628251f7107660db00cf79048301d8aecca96"
+      }
+    },
+    {
+      "lane": "source-unitary-original-pinned",
+      "raw_path": "target/quality-campaign/source-unitary-original-pinned",
+      "implementation": "rust_original",
+      "rows": 4,
+      "recorded_statuses": {
+        "ok": 4
+      },
+      "diagnostic_categories": {
+        "ok": 4
+      },
+      "artifacts_sha256": {
+        "completion.json": "2be6ef5a40f591a0641d037d2896ea8890f922e120c1907e68bb9021d3fc5ad5",
+        "controller-identity.json": "df00bd380458af9c503f24c3464f62556a5f47ff878688d43fd8483e8fcd1226",
+        "environment.json": "a6b3e2529b0a210f983ba72af1b1b4c5cd463420a49657f88336a2e6ddfcd0ce",
+        "manifest.json": "37eec01c2f06a3512aa56271b970c49f8fb274e2a1f03dfca7aea45405abe750",
+        "results.jsonl": "4ab4adcd8393a8590a4f6b417876327c9ad47223cb88ad94c476a9ce91c3fd4f",
+        "source-identity.json": "e411e7165825587a5a42357d8bdafd7ec6c81a3d3b6e343f1954495b6ea5d22a"
+      }
+    },
+    {
+      "lane": "source-unitary-current-pinned",
+      "raw_path": "target/quality-campaign/source-unitary-current-pinned",
+      "implementation": "rust_current",
+      "rows": 4,
+      "recorded_statuses": {
+        "ok": 4
+      },
+      "diagnostic_categories": {
+        "ok": 4
+      },
+      "artifacts_sha256": {
+        "completion.json": "2be6ef5a40f591a0641d037d2896ea8890f922e120c1907e68bb9021d3fc5ad5",
+        "controller-identity.json": "df00bd380458af9c503f24c3464f62556a5f47ff878688d43fd8483e8fcd1226",
+        "environment.json": "361675a8084cd9d703452c79c6b0a7828a0db482af20bc25349c64cb0286d7a4",
+        "manifest.json": "23f7313b0faed55a2da145147edefa73a1e6a706ea5191c2e293d4d9fa450be3",
+        "results.jsonl": "6fa20dd180de8fe6b2e35b6968185348929b1446c660c2fb2e7250780f65f04b",
+        "source-identity.json": "728674a6deddb5910b0434ac54631d7920c0fafcd8932d80f498187a174cdf8c"
+      }
+    }
+  ],
+  "capability_diagnostics": {
+    "name": "source-suites-native",
+    "manifest_sha256": "4e0c77ab115196629cffc3932335f5b2755cdc203fb1fbe58ca0c075324e2d0d",
+    "results_sha256": "702ed121bb8ac41b1588e160bc9088176c7827668eaf27a67294c97ab55a0594",
+    "included_in_workload_count": false
+  },
+  "comparison_csv_sha256": "1c025694f2d014530d021f4d3fd1f8f190ad649972314cba35a9fc5d95cf30f4",
+  "provenance_sha256": "99a3883e1e6725e5c0ccba57f8baeb438757c47d4fc0ae071af629892c2f693a"
+}

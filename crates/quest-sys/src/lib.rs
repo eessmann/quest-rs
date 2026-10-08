@@ -1,4 +1,8 @@
 #![allow(
+	unsafe_code,
+	reason = "Audited CXX and MPI FFI is confined to this crate"
+)]
+#![allow(
 	clippy::missing_errors_doc,
 	reason = "one-to-one safe CXX wrappers uniformly forward lifecycle and native validation errors"
 )]
@@ -186,14 +190,6 @@ mod ffi {
 			indices: &[i64],
 			values: &[QuestComplex],
 		) -> Result<()>;
-		fn validate_cpu_communication_buffer(qureg: &Qureg) -> Result<()>;
-		fn stage_cpu_communication_buffer(qureg: Pin<&mut Qureg>) -> Result<()>;
-		fn set_cpu_communication_buffer_indexed(
-			qureg: Pin<&mut Qureg>,
-			indices: &[i64],
-			values: &[QuestComplex],
-		) -> Result<()>;
-		fn commit_cpu_communication_buffer(qureg: Pin<&mut Qureg>) -> Result<()>;
 		fn set_density_qureg_amps(
 			qureg: Pin<&mut Qureg>,
 			start_row: i64,
@@ -495,63 +491,6 @@ pub fn write_local_indexed_qureg_amps(
 	values: &[QuestComplex],
 ) -> QuestResult<()> {
 	map_quest_result(ffi::write_local_indexed_qureg_amps(qureg, indices, values))
-}
-
-/// Check that a distributed CPU statevector owns a usable local communication buffer.
-///
-/// This local admission does not mutate either array or perform MPI communication.
-/// The native allocation contract gives the buffer the same length as the local
-/// amplitude partition. Distributed callers must agree admission on every rank
-/// before entering a mutation interval.
-/// # Errors
-/// Rejects inactive runtimes, incompatible thread ownership, GPU/density/local
-/// registers, missing or overlapping arrays, and unrepresentable array sizes.
-pub fn validate_cpu_communication_buffer(qureg: &Qureg) -> QuestResult<()> {
-	map_quest_result(ffi::validate_cpu_communication_buffer(qureg))
-}
-
-/// Copy all local amplitudes into their existing native communication buffer.
-///
-/// This leaves the amplitudes intact and allocates no additional state storage.
-/// Repeating it discards prior staged writes. The caller must exclusively own
-/// the register through staging, indexed writes and commit, and must invoke no
-/// native operation that uses the communication buffer during that interval.
-/// # Errors
-/// Rejects the same deployments and lifecycle states as
-/// [`validate_cpu_communication_buffer`], before copying.
-pub fn stage_cpu_communication_buffer(qureg: Pin<&mut Qureg>) -> QuestResult<()> {
-	map_quest_result(ffi::stage_cpu_communication_buffer(qureg))
-}
-
-/// Write local indices into the communication buffer without changing amplitudes.
-///
-/// Stage the buffer first with [`stage_cpu_communication_buffer`]. All indices
-/// and values are checked before any write; repeated indices are written in
-/// supplied order, so the last value wins. No MPI communication occurs.
-/// # Errors
-/// Rejects invalid buffer admission, differing lengths, out-of-range indices,
-/// or nonfinite values before mutation.
-pub fn set_cpu_communication_buffer_indexed(
-	qureg: Pin<&mut Qureg>,
-	indices: &[i64],
-	values: &[QuestComplex],
-) -> QuestResult<()> {
-	map_quest_result(ffi::set_cpu_communication_buffer_indexed(
-		qureg, indices, values,
-	))
-}
-
-/// Copy the entire staged communication buffer back into local amplitudes.
-///
-/// Call this only after staging and writing while exclusively owning the register
-/// without intervening native use of its communication buffer. Neither native
-/// pointer nor allocation ownership changes. This operation is local; distributed
-/// callers own collective failure handling once any rank has begun mutation.
-/// # Errors
-/// Rejects the same deployments and lifecycle states as
-/// [`validate_cpu_communication_buffer`], before copying.
-pub fn commit_cpu_communication_buffer(qureg: Pin<&mut Qureg>) -> QuestResult<()> {
-	map_quest_result(ffi::commit_cpu_communication_buffer(qureg))
 }
 
 /// Copy a rectangular row-major buffer into a density register.

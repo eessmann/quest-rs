@@ -25,6 +25,13 @@ pub struct HeaderContext {
 }
 
 /// An installed package and its evaluated consumer requirements.
+///
+/// Evaluated results cannot be edited into an unvalidated configuration.
+/// ```compile_fail
+/// fn alter(package: &mut quest_build::NativePackage) {
+///     package.version = "4.3.99".into();
+/// }
+/// ```
 #[derive(Clone, Debug)]
 #[expect(
 	clippy::struct_excessive_bools,
@@ -32,33 +39,35 @@ pub struct HeaderContext {
 )]
 pub struct NativePackage {
 	/// Validated native Cargo target triple.
-	pub target: String,
+	pub(crate) target: String,
 	/// Evaluated `CMake` configuration used by the bridge and executable witnesses.
-	pub profile: String,
-	pub prefix: PathBuf,
-	pub version: String,
-	pub mpi_enabled: bool,
-	pub subcommunicators_enabled: bool,
+	pub(crate) profile: String,
+	pub(crate) prefix: PathBuf,
+	pub(crate) version: String,
+	pub(crate) mpi_enabled: bool,
+	pub(crate) subcommunicators_enabled: bool,
 	/// Canonical compiler identity; never invoke a symlink target in place of its wrapper.
-	pub compiler: PathBuf,
+	pub(crate) compiler: PathBuf,
 	/// The executable path selected by `CMake`, preserving wrapper invocation identity.
-	pub compiler_invocation: PathBuf,
-	pub compiler_arguments: Vec<String>,
-	pub implicit_link_dirs: Vec<PathBuf>,
-	pub cmake: PathBuf,
-	pub dynamic_loader_libraries: Vec<String>,
-	pub openmp_enabled: bool,
-	pub gpu_enabled: bool,
-	pub cuquantum_enabled: bool,
-	pub compiler_id: String,
-	pub compiler_version: String,
-	pub headers: HeaderContext,
-	pub library: PathBuf,
-	pub link_search_dirs: Vec<PathBuf>,
-	pub framework_search_dirs: Vec<PathBuf>,
-	pub link_libraries: Vec<String>,
-	pub link_options: Vec<String>,
-	pub runtime_library_dirs: Vec<PathBuf>,
+	pub(crate) compiler_invocation: PathBuf,
+	pub(crate) compiler_arguments: Vec<String>,
+	pub(crate) implicit_link_dirs: Vec<PathBuf>,
+	pub(crate) cmake: PathBuf,
+	pub(crate) dynamic_loader_libraries: Vec<String>,
+	pub(crate) openmp_enabled: bool,
+	pub(crate) gpu_enabled: bool,
+	pub(crate) cuquantum_enabled: bool,
+	pub(crate) compiler_id: String,
+	pub(crate) compiler_version: String,
+	pub(crate) headers: HeaderContext,
+	pub(crate) library: PathBuf,
+	pub(crate) link_search_dirs: Vec<PathBuf>,
+	pub(crate) framework_search_dirs: Vec<PathBuf>,
+	pub(crate) link_libraries: Vec<String>,
+	pub(crate) link_options: Vec<String>,
+	pub(crate) runtime_library_dirs: Vec<PathBuf>,
+	pub(crate) context: crate::NativeBuildContext,
+	pub(crate) watched_inputs: BTreeSet<PathBuf>,
 	pub(crate) bridge_archive: Option<PathBuf>,
 	pub(crate) build_directory: PathBuf,
 	pub(crate) mpi_probe: PathBuf,
@@ -66,6 +75,138 @@ pub struct NativePackage {
 }
 
 impl NativePackage {
+	/// Emit Cargo invalidation directives separately from discovery.
+	/// # Errors
+	/// Reports inaccessible output directories.
+	pub fn emit_cargo_input_metadata(&self) -> Result<()> {
+		self.context.emit_environment_watches();
+		crate::probe::emit_input_watches_in(
+			self.watched_inputs.clone(),
+			self.context.value("OUT_DIR"),
+		)
+	}
+
+	/// Read the evaluated `target`.
+	#[must_use]
+	pub fn target(&self) -> &str {
+		&self.target
+	}
+	/// Read the evaluated `profile`.
+	#[must_use]
+	pub fn profile(&self) -> &str {
+		&self.profile
+	}
+	/// Read the evaluated `prefix`.
+	#[must_use]
+	pub fn prefix(&self) -> &std::path::Path {
+		&self.prefix
+	}
+	/// Read the evaluated `version`.
+	#[must_use]
+	pub fn version(&self) -> &str {
+		&self.version
+	}
+	/// Read the evaluated `mpi_enabled`.
+	#[must_use]
+	pub const fn mpi_enabled(&self) -> bool {
+		self.mpi_enabled
+	}
+	/// Read the evaluated `subcommunicators_enabled`.
+	#[must_use]
+	pub const fn subcommunicators_enabled(&self) -> bool {
+		self.subcommunicators_enabled
+	}
+	/// Read the evaluated `compiler`.
+	#[must_use]
+	pub fn compiler(&self) -> &std::path::Path {
+		&self.compiler
+	}
+	/// Read the evaluated `compiler_invocation`.
+	#[must_use]
+	pub fn compiler_invocation(&self) -> &std::path::Path {
+		&self.compiler_invocation
+	}
+	/// Read the evaluated `compiler_arguments`.
+	#[must_use]
+	pub fn compiler_arguments(&self) -> &[String] {
+		&self.compiler_arguments
+	}
+	/// Read the evaluated `implicit_link_dirs`.
+	#[must_use]
+	pub fn implicit_link_dirs(&self) -> &[PathBuf] {
+		&self.implicit_link_dirs
+	}
+	/// Read the evaluated `cmake`.
+	#[must_use]
+	pub fn cmake(&self) -> &std::path::Path {
+		&self.cmake
+	}
+	/// Read the evaluated `dynamic_loader_libraries`.
+	#[must_use]
+	pub fn dynamic_loader_libraries(&self) -> &[String] {
+		&self.dynamic_loader_libraries
+	}
+	/// Read the evaluated `openmp_enabled`.
+	#[must_use]
+	pub const fn openmp_enabled(&self) -> bool {
+		self.openmp_enabled
+	}
+	/// Read the evaluated `gpu_enabled`.
+	#[must_use]
+	pub const fn gpu_enabled(&self) -> bool {
+		self.gpu_enabled
+	}
+	/// Read the evaluated `cuquantum_enabled`.
+	#[must_use]
+	pub const fn cuquantum_enabled(&self) -> bool {
+		self.cuquantum_enabled
+	}
+	/// Read the evaluated `compiler_id`.
+	#[must_use]
+	pub fn compiler_id(&self) -> &str {
+		&self.compiler_id
+	}
+	/// Read the evaluated `compiler_version`.
+	#[must_use]
+	pub fn compiler_version(&self) -> &str {
+		&self.compiler_version
+	}
+	/// Read the evaluated `headers`.
+	#[must_use]
+	pub const fn headers(&self) -> &HeaderContext {
+		&self.headers
+	}
+	/// Read the evaluated `library`.
+	#[must_use]
+	pub fn library(&self) -> &std::path::Path {
+		&self.library
+	}
+	/// Read the evaluated `link_search_dirs`.
+	#[must_use]
+	pub fn link_search_dirs(&self) -> &[PathBuf] {
+		&self.link_search_dirs
+	}
+	/// Read the evaluated `framework_search_dirs`.
+	#[must_use]
+	pub fn framework_search_dirs(&self) -> &[PathBuf] {
+		&self.framework_search_dirs
+	}
+	/// Read the evaluated `link_libraries`.
+	#[must_use]
+	pub fn link_libraries(&self) -> &[String] {
+		&self.link_libraries
+	}
+	/// Read the evaluated `link_options`.
+	#[must_use]
+	pub fn link_options(&self) -> &[String] {
+		&self.link_options
+	}
+	/// Read the evaluated `runtime_library_dirs`.
+	#[must_use]
+	pub fn runtime_library_dirs(&self) -> &[PathBuf] {
+		&self.runtime_library_dirs
+	}
+
 	/// Whether the evaluated installed package supports the public MPI adapter.
 	#[must_use]
 	pub const fn supports_mpi_subcommunicators(&self) -> bool {
@@ -92,6 +233,7 @@ impl NativePackage {
 	/// # Errors
 	/// Returns an error for paths or options that Cargo cannot represent.
 	pub fn emit_cargo_link_metadata(&self) -> Result<()> {
+		self.emit_cargo_input_metadata()?;
 		self.validate_link_search()?;
 		if let Some(archive) = &self.bridge_archive {
 			let parent = archive
@@ -129,6 +271,7 @@ impl NativePackage {
 	/// # Errors
 	/// Returns an error when a runtime directory cannot be safely represented.
 	pub fn emit_runtime_paths(&self) -> Result<()> {
+		self.emit_cargo_input_metadata()?;
 		for option in runtime_options(&self.target, &self.link_options, &self.runtime_library_dirs)?
 		{
 			println!("cargo:rustc-link-arg={option}");
@@ -213,6 +356,13 @@ mod tests {
 		let library = native.join("libsame.so");
 		fs::write(&library, "selected").or_fail()?;
 		let mut package = NativePackage {
+			watched_inputs: BTreeSet::new(),
+			context: crate::NativeBuildContext::capture(
+				fixture.path(),
+				"x86_64-unknown-linux-gnu",
+				"x86_64-unknown-linux-gnu",
+				false,
+			)?,
 			target: "x86_64-unknown-linux-gnu".into(),
 			profile: "Release".into(),
 			prefix: fixture.path().to_owned(),

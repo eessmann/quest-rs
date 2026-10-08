@@ -498,7 +498,12 @@ where
 	let cert_cap = l.certification.map_or(0, |p| p.max_bytes);
 	let scalar_envelope = agree(env, (|| plus(l.max_synthesis_bytes, times(cert_cap, 2)?))())?;
 	peak = peak.max(capacity(env, plus(retained, scalar_envelope), &l)?);
-	l.synthesis.limits.max_bytes = l.synthesis.limits.max_bytes.min(l.max_synthesis_bytes);
+	l.synthesis.limits.resources.max_peak_bytes = l
+		.synthesis
+		.limits
+		.resources
+		.max_peak_bytes
+		.min(l.max_synthesis_bytes);
 	let started = std::time::Instant::now();
 	let candidate = agree(
 		env,

@@ -85,14 +85,16 @@ fn canonical_pool_scope_ends_before_frozen_phase_payload_is_used() -> Result<()>
 fn caller_pools_do_not_retry_failed_work_budgets_with_another_backend() -> Result<()> {
 	let target = Polynomial::new(Chebyshev, vec![Complex64::new(0.1, 0.0)], Limits::default())?;
 	let mut policy = quest_qsp::Policy::default();
-	policy.limits.max_work = 1280;
+	policy.limits.resources.max_work_units = 1280;
 	let admitted = SynthesisBuilder::new()
 		.policy(policy)
 		.real_parity_wx(&target)?
 		.admit()?;
 	expect_true!(matches!(
 		admitted.clone().complete(),
-		Err(quest_qsp::Error::Budget("Weiss work"))
+		Err(quest_qsp::Error::Numerics(quest_numerics::Error::Resource(
+			_
+		)))
 	));
 	for workers in [1, 2, 4] {
 		let pool = rayon::ThreadPoolBuilder::new()
@@ -102,7 +104,9 @@ fn caller_pools_do_not_retry_failed_work_budgets_with_another_backend() -> Resul
 			admitted
 				.clone()
 				.complete_with(ExecutionPolicy::Rayon(&pool)),
-			Err(quest_qsp::Error::Budget("Weiss work"))
+			Err(quest_qsp::Error::Numerics(quest_numerics::Error::Resource(
+				_
+			)))
 		));
 	}
 	Ok(())

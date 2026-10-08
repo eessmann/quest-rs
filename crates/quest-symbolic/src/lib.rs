@@ -17,8 +17,9 @@ use std::collections::BTreeMap;
 use std::fmt;
 use std::sync::Arc;
 
-use affine::{Affine, Context, Limits, Owner as CoreOwner, Symbol as CoreSymbol};
+use affine::{Affine, Context, Limits};
 use dashu_int::IBig;
+use mathcore::identity::{Owner as CoreOwner, Symbol as CoreSymbol};
 use source::{Kind, Linear, MAX_INPUT_BINDINGS, Source, rational_bytes};
 
 pub use affine::ExactError;
@@ -26,39 +27,36 @@ pub use mathcore::RBig;
 
 /// Quest's parameter namespace, independent of the algebra engine's type.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct Owner(u64);
+pub struct Owner(CoreOwner);
 impl Owner {
 	pub const fn new(id: u64) -> Self {
-		Self(id)
+		Self(CoreOwner::new(id))
 	}
 	pub const fn id(self) -> u64 {
-		self.0
+		self.0.id()
 	}
 	const fn core(self) -> CoreOwner {
-		CoreOwner::new(self.0)
+		self.0
 	}
 }
 /// Quest's owned parameter identity.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct Symbol {
-	owner: Owner,
-	index: u64,
-}
+pub struct Symbol(CoreSymbol);
 impl Symbol {
 	pub const fn new(owner: Owner, index: u64) -> Self {
-		Self { owner, index }
+		Self(CoreSymbol::new(owner.core(), index))
 	}
 	pub const fn owner(self) -> Owner {
-		self.owner
+		Owner(self.0.owner())
 	}
 	pub const fn index(self) -> u64 {
-		self.index
+		self.0.index()
 	}
 	const fn core(self) -> CoreSymbol {
-		CoreSymbol::new(self.owner.core(), self.index)
+		self.0
 	}
 	const fn from_core(value: CoreSymbol) -> Self {
-		Self::new(Owner::new(value.owner().id()), value.index())
+		Self(value)
 	}
 }
 

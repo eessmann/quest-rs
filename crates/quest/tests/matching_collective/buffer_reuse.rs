@@ -1,15 +1,14 @@
 use super::*;
 
 #[gtest]
-fn distributed_matching_reuses_native_buffer_without_width_scaled_scratch() -> googletest::Result<()>
-{
+fn distributed_matching_owns_and_accounts_partition_scratch() -> googletest::Result<()> {
 	if std::env::var("QUEST_MATCHING_REUSE_RANKS").is_err() {
 		for count in [1, 2, 4, 8] {
 			let status =
 				quest_test_support::mpi::MpiTest::new(count, std::time::Duration::from_secs(90))?
 					.args([
 						"--exact",
-						"buffer_reuse::distributed_matching_reuses_native_buffer_without_width_scaled_scratch",
+						"buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch",
 						"--nocapture",
 						"--test-threads=1",
 					])
@@ -47,30 +46,21 @@ fn distributed_matching_reuses_native_buffer_without_width_scaled_scratch() -> g
 	)?;
 	let baseline = environment.view().allocated_bytes();
 	let small = environment.prepare_matching(shard.clone(), QubitCount::new(9)?, vec![0, 1, 5])?;
-	if comm.size()? > 1 {
-		expect_true!(small.scratch_deployment().is_none());
-	} else {
-		let deployment = small
-			.scratch_deployment()
-			.ok_or(quest::Error::Value("missing local scratch fallback"))?;
-		expect_false!(deployment.is_distributed());
-		expect_eq!(deployment.local_amplitudes(), 512);
-		expect_eq!(deployment.host_array_bytes(), 8192);
-	}
+	let deployment = small.scratch_deployment();
+	expect_eq!(deployment.is_distributed(), comm.size()? > 1);
+	expect_eq!(
+		deployment.local_amplitudes(),
+		512_usize
+			.checked_div(usize::try_from(comm.size()?)?)
+			.ok_or_else(|| std::io::Error::other("MPI communicator has no ranks"))?
+	);
+
 	let small_bytes = environment.view().allocated_bytes();
 	drop(small);
 	expect_eq!(environment.view().allocated_bytes(), baseline);
 	let large = environment.prepare_matching(shard.clone(), QubitCount::new(13)?, vec![0, 1, 5])?;
 	let large_bytes = environment.view().allocated_bytes();
-	if comm.size()? > 1 {
-		// Only the caller's eventual state width changes: preparation owns the same
-		// shard and fixed-size routing payload, with no second native Qureg.
-		expect_eq!(large_bytes, small_bytes);
-	} else {
-		// Native QuEST disables MPI deployment at P=1, so no communication buffer
-		// is available and the local scratch-register fallback remains necessary.
-		expect_gt!(large_bytes, small_bytes);
-	}
+	expect_gt!(large_bytes, small_bytes);
 	drop(large);
 	expect_eq!(environment.view().allocated_bytes(), baseline);
 	for control in [ControlState::Zero, ControlState::One] {
@@ -133,7 +123,7 @@ fn exercise_distributed_color(
 		0
 	};
 	// Native Hadamards on the distributed color use MPI scratch themselves.
-	// Alternating scalar/batched calls also catches stale borrowed-buffer state.
+	// Alternating scalar/batched calls also checks owned scratch reuse.
 	for scalar_first in [false, true] {
 		if scalar_first {
 			prepared.apply_scalar(&mut register, false, 1 << 3, value)?;

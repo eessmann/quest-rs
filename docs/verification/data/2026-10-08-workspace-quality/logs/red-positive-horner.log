@@ -1,0 +1,27 @@
+ Nextest run ID 64fd8a25-ac53-4a68-9363-34dd0ce9e1dc with nextest profile: default
+    Starting 1 test across 1 binary (3 tests skipped)
+        FAIL [   0.003s] (1/1) quest-polynomial::extreme_laurent positive_powers_preserve_representable_horner_scaling
+  stdout ───
+
+    running 1 test
+    polynomial value or arithmetic result is not finite
+      at crates/quest-polynomial/tests/extreme_laurent.rs:66:20
+
+    test positive_powers_preserve_representable_horner_scaling ... FAILED
+
+    failures:
+
+    failures:
+        positive_powers_preserve_representable_horner_scaling
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+  stderr ───
+    Error: See failure output above
+
+
+  Cancelling due to test failure: 
+────────────
+     Summary [   0.004s] 1 test run: 0 passed, 1 failed, 3 skipped
+        FAIL [   0.003s] (1/1) quest-polynomial::extreme_laurent positive_powers_preserve_representable_horner_scaling
+error: test run failed

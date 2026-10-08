@@ -36,6 +36,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "allocation-counter"
+version = "0.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "beb9e990c0a33699f1984d85a6abead615ccc72dd8130bf3e15dcabe2ca149c9"
+
+[[package]]
 name = "anes"
 version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -274,6 +280,39 @@ name = "bytes"
 version = "1.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fc652a48c352aef3ea3aed32080501cf3ef6ed5da78602a020c991775b0aff04"
+
+[[package]]
+name = "camino"
+version = "1.2.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bb1307f12aa967b5a58416e87b3653360e0fd614a016b6e970db08fecbb1b80d"
+dependencies = [
+ "serde_core",
+]
+
+[[package]]
+name = "cargo-platform"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "87a0c0e6148f11f01f32650a2ea02d532b2ad4e81d8bd41e6e565b5adc5e6082"
+dependencies = [
+ "serde",
+ "serde_core",
+]
+
+[[package]]
+name = "cargo_metadata"
+version = "0.23.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ef987d17b0a113becdd19d3d0022d04d7ef41f9efe4f3fb63ac44ba61df3ade9"
+dependencies = [
+ "camino",
+ "cargo-platform",
+ "semver",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+]
 
 [[package]]
 name = "cast"
@@ -2403,6 +2442,7 @@ dependencies = [
  "cmake-file-api",
  "googletest",
  "pkg-config",
+ "rustc_version",
  "shlex 2.0.1",
  "tempfile",
  "thiserror 2.0.21",
@@ -2509,6 +2549,7 @@ dependencies = [
 name = "quest-mathcore"
 version = "0.3.1-quest.2"
 dependencies = [
+ "allocation-counter",
  "dashu-base",
  "dashu-int",
  "dashu-ratio",
@@ -2520,6 +2561,7 @@ dependencies = [
 name = "quest-numerics"
 version = "0.1.0"
 dependencies = [
+ "allocation-counter",
  "dashu-base",
  "dashu-float",
  "dashu-int",
@@ -2531,6 +2573,7 @@ dependencies = [
  "rayon",
  "rustfft",
  "serde_json",
+ "stats_alloc",
  "thiserror 2.0.21",
 ]
 
@@ -2579,6 +2622,7 @@ dependencies = [
 name = "quest-polynomial"
 version = "0.1.0"
 dependencies = [
+ "allocation-counter",
  "csv",
  "faer",
  "googletest",
@@ -2607,6 +2651,7 @@ dependencies = [
  "dashu-float",
  "dashu-int",
  "googletest",
+ "hdf5-metno",
  "num-complex",
  "quest-mathcore",
  "quest-numerics",
@@ -2733,10 +2778,10 @@ dependencies = [
  "cxx",
  "cxx-build",
  "googletest",
- "libc",
  "mpi",
  "quest-build",
  "quest-test-support",
+ "rustix",
  "serde_json",
  "thiserror 2.0.21",
 ]
@@ -3173,6 +3218,10 @@ name = "semver"
 version = "1.0.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8a7852d02fc848982e0c167ef163aaff9cd91dc640ba85e263cb1ce46fae51cd"
+dependencies = [
+ "serde",
+ "serde_core",
+]
 
 [[package]]
 name = "seq-macro"
@@ -3306,6 +3355,12 @@ name = "static_assertions"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
+
+[[package]]
+name = "stats_alloc"
+version = "0.1.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5c0e04424e733e69714ca1bbb9204c1a57f09f5493439520f9f68c132ad25eec"
 
 [[package]]
 name = "strength_reduce"
@@ -4052,7 +4107,9 @@ checksum = "1ebf944e87a7c253233ad6766e082e3cd714b5d03812acc24c318f549614536e"
 name = "xtask"
 version = "0.1.0"
 dependencies = [
+ "cargo_metadata",
  "clang",
+ "clap",
  "color-eyre",
  "googletest",
  "quest-build",

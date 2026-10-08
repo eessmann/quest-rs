@@ -1,7 +1,7 @@
 use super::{
 	Complex64, Error, ExecutionPolicy, FftBackend, FftDirection, FftWorkspace, Limits,
-	Normalization, ResourceUsage, Result, admit, bytes, checked_len, finite, multiply,
-	plan_allowance, support_len, work, zeros,
+	MemoryReservation, Normalization, OperationResources, ResourceUsage, Result, bytes,
+	checked_len, finite, multiply, plan_allowance, support_len, work, zeros,
 };
 
 /// Reusable linear convolutions sharing two immutable right-hand inputs.
@@ -21,6 +21,7 @@ pub struct SharedConvolutionWorkspace {
 	#[cfg(feature = "rayon")]
 	second_scratch: Option<Vec<Complex64>>,
 	usage: ResourceUsage,
+	_reservation: MemoryReservation,
 }
 
 impl SharedConvolutionWorkspace {
@@ -61,26 +62,43 @@ impl SharedConvolutionWorkspace {
 		limits: Limits,
 		execution: ExecutionPolicy<'_>,
 	) -> Result<Self> {
+		Self::new_with_resources(
+			max_left,
+			max_right,
+			backend,
+			&OperationResources::from_limits(limits),
+			execution,
+		)
+	}
+	/// Construct shared spectra against the operation ledger.
+	/// # Errors
+	/// Rejects malformed shapes, overflow and shared resource exhaustion.
+	pub fn new_with_resources(
+		max_left: usize,
+		max_right: usize,
+		backend: FftBackend,
+		resources: &OperationResources,
+		execution: ExecutionPolicy<'_>,
+	) -> Result<Self> {
+		let limits = resources.limits();
+		resources.coefficients(max_left)?;
 		checked_len(max_left, limits)?;
+		resources.coefficients(max_right)?;
 		checked_len(max_right, limits)?;
 		let support = support_len(max_left, max_right)?;
 		let len = support.checked_next_power_of_two().ok_or(Error::Overflow)?;
-		checked_len(len, limits)?;
+		resources.fft(len)?;
 		let data_bytes = bytes(len.checked_mul(3).ok_or(Error::Overflow)?)?;
 		let mut usage = ResourceUsage {
 			buffer_bytes: data_bytes,
 			planner_bytes_estimate: plan_allowance(len)?,
 			work_units: work(len, 3)?.checked_add(len).ok_or(Error::Overflow)?,
 		};
-		admit(usage, limits)?;
-		let fft_limits = Limits {
-			max_bytes: limits
-				.max_bytes
-				.checked_sub(data_bytes)
-				.ok_or(Error::Overflow)?,
-			..limits
-		};
-		let fft = FftWorkspace::new(len, backend, fft_limits)?;
+		resources.admit_work(usage.work_units)?;
+		resources.admit_peak(usage.buffer_bytes, usage.planner_bytes_estimate)?;
+		#[allow(unused_mut)]
+		let mut reservation = resources.reserve(data_bytes, 0)?;
+		let fft = FftWorkspace::new_with_resources(len, backend, resources.clone())?;
 		usage.buffer_bytes = data_bytes
 			.checked_add(fft.resource_usage().buffer_bytes)
 			.ok_or(Error::Overflow)?;
@@ -95,7 +113,14 @@ impl SharedConvolutionWorkspace {
 				.checked_add(bytes(fft.scratch.len())?)
 				.ok_or(Error::Overflow)?;
 		}
-		admit(usage, limits)?;
+
+		#[cfg(feature = "rayon")]
+		if parallel {
+			let extra = bytes(fft.scratch.len())?;
+			drop(reservation);
+			reservation =
+				resources.reserve(data_bytes.checked_add(extra).ok_or(Error::Overflow)?, 0)?;
+		}
 		#[cfg(feature = "rayon")]
 		let second_scratch = if parallel {
 			Some(zeros(fft.scratch.len())?)
@@ -104,13 +129,17 @@ impl SharedConvolutionWorkspace {
 		};
 		Ok(Self {
 			fft,
-			left: zeros(len)?,
-			right: [zeros(len)?, zeros(len)?],
+			left: zeros(len).inspect_err(|_| resources.allocation_failed())?,
+			right: [
+				zeros(len).inspect_err(|_| resources.allocation_failed())?,
+				zeros(len).inspect_err(|_| resources.allocation_failed())?,
+			],
 			max_left,
 			max_right,
 			#[cfg(feature = "rayon")]
 			second_scratch,
 			usage,
+			_reservation: reservation,
 		})
 	}
 
@@ -184,7 +213,11 @@ impl SharedConvolutionSession<'_, '_, '_> {
 	/// Rejects an invalid RHS index, empty/oversized inputs, or the first
 	/// nonfinite input/intermediate/output in the ordinary convolution order.
 	pub fn product(&mut self, left: &[Complex64], right_index: usize) -> Result<&[Complex64]> {
-		match self.product_inner(left, right_index) {
+		let result = self.work_for(right_index).and_then(|units| {
+			self.workspace.fft.resources.charge_work(units)?;
+			self.product_inner(left, right_index)
+		});
+		match result {
 			Ok(support) => self
 				.workspace
 				.left
@@ -230,7 +263,7 @@ impl SharedConvolutionSession<'_, '_, '_> {
 				"shared convolution right index must be 0 or 1",
 			))?;
 		if *ready {
-			self.workspace.fft.transform(
+			self.workspace.fft.transform_inner(
 				&mut self.workspace.left,
 				FftDirection::Forward,
 				Normalization::None,
@@ -252,7 +285,7 @@ impl SharedConvolutionSession<'_, '_, '_> {
 			*ready = true;
 		}
 		multiply(&mut self.workspace.left, spectrum, self.execution);
-		self.workspace.fft.transform(
+		self.workspace.fft.transform_inner(
 			&mut self.workspace.left,
 			FftDirection::Inverse,
 			Normalization::ByLength,
@@ -283,6 +316,6 @@ fn forward_pair(
 	}
 	#[cfg(not(feature = "rayon"))]
 	let _ = execution;
-	fft.transform(left, FftDirection::Forward, Normalization::None)?;
-	fft.transform(right, FftDirection::Forward, Normalization::None)
+	fft.transform_inner(left, FftDirection::Forward, Normalization::None)?;
+	fft.transform_inner(right, FftDirection::Forward, Normalization::None)
 }

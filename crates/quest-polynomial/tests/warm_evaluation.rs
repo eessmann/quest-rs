@@ -3,29 +3,6 @@ use quest_numerics::arithmetic::{F64Backend, Interval64Backend};
 use quest_polynomial::{
 	Chebyshev, Complex64, GenericFunction, Interval, Limits, Polynomial, function,
 };
-use std::{
-	alloc::{GlobalAlloc, Layout, System},
-	sync::atomic::{AtomicBool, AtomicUsize, Ordering},
-};
-struct CountingAllocator;
-static TRACK: AtomicBool = AtomicBool::new(false);
-static ALLOCATIONS: AtomicUsize = AtomicUsize::new(0);
-#[global_allocator]
-static ALLOCATOR: CountingAllocator = CountingAllocator;
-// SAFETY: Every allocation and deallocation is delegated unchanged to System.
-unsafe impl GlobalAlloc for CountingAllocator {
-	unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-		if TRACK.load(Ordering::Relaxed) {
-			ALLOCATIONS.fetch_add(1, Ordering::Relaxed);
-		}
-		// SAFETY: The caller supplied the allocator contract's valid layout.
-		unsafe { System.alloc(layout) }
-	}
-	unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
-		// SAFETY: The caller supplies the pointer and matching original layout.
-		unsafe { System.dealloc(ptr, layout) }
-	}
-}
 #[gtest]
 #[expect(
 	clippy::arithmetic_side_effects,
@@ -51,11 +28,11 @@ fn warmed_scalar_interval_and_derivative_evaluation_allocate_nothing() -> Result
 		Ok(())
 	};
 	execute()?;
-	ALLOCATIONS.store(0, Ordering::SeqCst);
-	TRACK.store(true, Ordering::SeqCst);
-	let result = execute();
-	TRACK.store(false, Ordering::SeqCst);
+	let mut result = Ok(());
+	let stats = allocation_counter::measure(|| {
+		result = execute();
+	});
 	result?;
-	expect_that!(ALLOCATIONS.load(Ordering::SeqCst), eq(0));
+	expect_that!(stats.count_total, eq(0));
 	Ok(())
 }

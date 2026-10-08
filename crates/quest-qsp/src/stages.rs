@@ -1,6 +1,5 @@
-use crate::admission::contractivity;
 use crate::{Complex64, Control, Error, FftBackend, Result, finite, kernel, zeros};
-use quest_numerics::{ExecutionPolicy, Limits};
+use quest_numerics::{ExecutionPolicy, Limits, MemoryReservation, OperationResources};
 use quest_polynomial::{Basis, Chebyshev, Laurent, Polynomial};
 use std::{
 	marker::PhantomData,
@@ -33,33 +32,25 @@ pub enum SynthesisPrecision {
 /// Production numerical policy, independent of certification precision.
 ///
 /// Memory admission includes retained data and concurrent workspace estimates.
-/// Work is charged across FFT/convolution calls within each consuming stage,
+/// Work is charged across all FFT/convolution calls in one shared operation,
 /// including completion retries and inverse plus response reconstruction. Opaque
 /// `RustFFT` planner memory remains an estimate rather than an allocator quota.
 #[derive(Debug, Clone, Copy)]
 pub struct Policy {
 	/// Requested numerical factorization. No automatic fallback occurs.
 	pub algorithm: SynthesisAlgorithm,
-	/// Maximum binary64 response-reconstruction diagnostic (default `1e-11`).
-	/// Completion uses one eighth of this tolerance; neither check is an
-	/// independent certificate of the exported sequence.
-	pub response_tolerance: f64,
-	/// Required positive gap from unit-circle magnitude one (default `1e-12`).
-	pub contractivity_margin: f64,
-	/// Largest grid allowed for contractivity refinement and Weiss completion.
-	pub max_completion_grid: usize,
+	/// Independent numerical accuracy and margin policy.
+	pub accuracy: crate::AccuracyPolicy,
 	/// Explicit scalar or available compiled SIMD FFT implementation.
 	pub backend: FftBackend,
-	/// Coefficient, modeled-byte and work budgets, charged per consuming stage.
+	/// Independent shape gates and shared modeled-byte/cumulative-work limits.
 	pub limits: Limits,
 }
 impl Default for Policy {
 	fn default() -> Self {
 		Self {
 			algorithm: SynthesisAlgorithm::default(),
-			response_tolerance: 1e-11,
-			contractivity_margin: 1e-12,
-			max_completion_grid: 1_048_576,
+			accuracy: crate::AccuracyPolicy::default(),
 			backend: FftBackend::Scalar,
 			limits: Limits::default(),
 		}
@@ -67,12 +58,12 @@ impl Default for Policy {
 }
 impl Policy {
 	pub(crate) fn validate(self) -> Result<()> {
-		if !(self.response_tolerance.is_finite()
-			&& self.response_tolerance > 0.0
-			&& self.contractivity_margin.is_finite()
-			&& self.contractivity_margin > 0.0
-			&& self.contractivity_margin < 1.0
-			&& self.max_completion_grid > 0)
+		if !(self.accuracy.response_tolerance.is_finite()
+			&& self.accuracy.response_tolerance > 0.0
+			&& self.accuracy.contractivity_margin.is_finite()
+			&& self.accuracy.contractivity_margin > 0.0
+			&& self.accuracy.contractivity_margin < 1.0
+			&& self.limits.shapes.max_completion_grid > 0)
 		{
 			return Err(Error::Policy(
 				"positive finite tolerances and nonzero grid required",
@@ -83,19 +74,51 @@ impl Policy {
 }
 
 fn admit_target_storage(target: usize, source: usize, policy: Policy) -> Result<()> {
-	if target > policy.limits.max_len || source > policy.limits.max_len {
+	if target > policy.limits.shapes.max_coefficients
+		|| source > policy.limits.shapes.max_coefficients
+	{
 		return Err(Error::Budget("retained target support"));
 	}
 	let bytes = target
 		.checked_add(source)
 		.and_then(|count| count.checked_mul(size_of::<Complex64>()))
 		.ok_or(Error::Budget("retained target storage"))?;
-	if bytes > policy.limits.max_bytes {
+	if bytes > policy.limits.resources.max_peak_bytes {
 		return Err(Error::Budget("retained target storage"));
 	}
 	Ok(())
 }
 
+fn copied_target_ownership(
+	resources: Option<&OperationResources>,
+	target: usize,
+	source: usize,
+) -> Result<Vec<MemoryReservation>> {
+	let Some(resources) = resources else {
+		return Ok(Vec::new());
+	};
+	resources
+		.coefficients(target)
+		.map_err(quest_numerics::Error::from)?;
+	resources
+		.coefficients(source)
+		.map_err(quest_numerics::Error::from)?;
+	resources
+		.charge_work(
+			target
+				.checked_add(source)
+				.ok_or(Error::Budget("target preparation work"))?,
+		)
+		.map_err(quest_numerics::Error::from)?;
+	let bytes = |count: usize| {
+		count
+			.checked_mul(size_of::<Complex64>())
+			.ok_or(Error::Budget("target copy storage"))
+	};
+	Ok(resources
+		.reserve_many(&[(bytes(target)?, 0), (bytes(source)?, 0)])
+		.map_err(quest_numerics::Error::from)?)
+}
 /// `UnitCircleResponse` upper-left polynomial response with the final K factor retained.
 ///
 /// The signal product is `C0 diag(z,1) C1 ... diag(z,1) Cd`; its domain for
@@ -115,6 +138,7 @@ pub struct MissingTarget;
 /// Strict contractivity is established only by [`SynthesisBuilder::admit`].
 #[derive(Debug)]
 pub struct ReadyTarget<M> {
+	ownership: Vec<MemoryReservation>,
 	source_offset: i32,
 	source_length: usize,
 	target: Vec<Complex64>,
@@ -134,6 +158,7 @@ pub struct ReadyTarget<M> {
 /// ```
 #[derive(Debug)]
 pub struct SynthesisBuilder<S = MissingTarget> {
+	resources: Option<OperationResources>,
 	state: S,
 	policy: Policy,
 }
@@ -148,8 +173,17 @@ impl SynthesisBuilder<MissingTarget> {
 	pub fn new() -> Self {
 		Self {
 			state: MissingTarget,
+			resources: None,
 			policy: Policy::default(),
 		}
+	}
+
+	/// Share an existing operation ledger across source construction and synthesis.
+	#[must_use]
+	pub fn resources(mut self, resources: OperationResources) -> Self {
+		self.policy.limits = resources.limits();
+		self.resources = Some(resources);
+		self
 	}
 
 	/// Supply a nonnegative-support Laurent target, padding its offset explicitly.
@@ -172,6 +206,7 @@ impl SynthesisBuilder<MissingTarget> {
 			.ok()
 			.and_then(|n| n.checked_add(1))
 			.ok_or(Error::Budget("support"))?;
+		let ownership = copied_target_ownership(self.resources.as_ref(), count, count)?;
 		admit_target_storage(count, count, self.policy)?;
 		let mut values = zeros(count, self.policy.limits)?;
 		let start = usize::try_from(first).map_err(|_| Error::Budget("support"))?;
@@ -185,6 +220,7 @@ impl SynthesisBuilder<MissingTarget> {
 		let source = Arc::new(values.clone());
 		Ok(SynthesisBuilder {
 			state: ReadyTarget {
+				ownership,
 				source_offset: first,
 				source_length: target.coefficients().len(),
 				target: values,
@@ -192,6 +228,7 @@ impl SynthesisBuilder<MissingTarget> {
 				_mode: PhantomData,
 			},
 			policy: self.policy,
+			resources: self.resources,
 		})
 	}
 
@@ -220,6 +257,7 @@ impl SynthesisBuilder<MissingTarget> {
 			));
 		}
 		let count = degree.checked_add(1).ok_or(Error::Budget("degree"))?;
+		let ownership = copied_target_ownership(self.resources.as_ref(), count, source.len())?;
 		admit_target_storage(count, source.len(), self.policy)?;
 		let mut values = zeros(count, self.policy.limits)?;
 		for (index, coefficient) in source.iter().enumerate().take(values.len()) {
@@ -241,6 +279,7 @@ impl SynthesisBuilder<MissingTarget> {
 		}
 		Ok(SynthesisBuilder {
 			state: ReadyTarget {
+				ownership,
 				source_offset: 0,
 				source_length: source.len(),
 				target: values,
@@ -248,6 +287,7 @@ impl SynthesisBuilder<MissingTarget> {
 				_mode: PhantomData,
 			},
 			policy: self.policy,
+			resources: self.resources,
 		})
 	}
 }
@@ -258,8 +298,11 @@ impl<S> SynthesisBuilder<S> {
 	/// cannot fit the previous policy; an earlier allocation failure cannot be
 	/// undone by this method. Policy values are validated by `admit`.
 	#[must_use]
-	pub const fn policy(mut self, policy: Policy) -> Self {
+	pub fn policy(mut self, policy: Policy) -> Self {
 		self.policy = policy;
+		if let Some(resources) = &self.resources {
+			self.policy.limits = resources.limits();
+		}
 		self
 	}
 }
@@ -271,20 +314,44 @@ impl<M> SynthesisBuilder<ReadyTarget<M>> {
 	/// Rejects invalid policy or an unestablished positive contractivity margin.
 	pub fn admit(self) -> Result<AdmittedTarget<M>> {
 		self.policy.validate()?;
-		admit_target_storage(
-			self.state.target.len(),
-			self.state.source.len(),
+		let resources = self
+			.resources
+			.unwrap_or_else(|| OperationResources::from_limits(self.policy.limits));
+		resources
+			.coefficients(self.state.target.len())
+			.map_err(quest_numerics::Error::from)?;
+		resources
+			.coefficients(self.state.source.len())
+			.map_err(quest_numerics::Error::from)?;
+		let ownership = if self.state.ownership.is_empty() {
+			resources
+				.reserve_many(&[
+					(
+						self.state
+							.target
+							.capacity()
+							.checked_mul(size_of::<Complex64>())
+							.ok_or(Error::Budget("retained target storage"))?,
+						0,
+					),
+					(
+						self.state
+							.source
+							.capacity()
+							.checked_mul(size_of::<Complex64>())
+							.ok_or(Error::Budget("retained source storage"))?,
+						0,
+					),
+				])
+				.map_err(quest_numerics::Error::from)?
+		} else {
+			self.state.ownership
+		};
+		let norm_upper = crate::admission::contractivity_with_resources(
+			&self.state.target,
 			self.policy,
+			&resources,
 		)?;
-		let working = crate::workspace_policy(
-			self.policy,
-			self.state
-				.target
-				.len()
-				.checked_add(self.state.source.len())
-				.ok_or(Error::Budget("admission storage"))?,
-		)?;
-		let norm_upper = contractivity(&self.state.target, working)?;
 		Ok(AdmittedTarget {
 			source_offset: self.state.source_offset,
 			source_length: self.state.source_length,
@@ -292,6 +359,8 @@ impl<M> SynthesisBuilder<ReadyTarget<M>> {
 			source: self.state.source,
 			norm_upper,
 			policy: self.policy,
+			resources,
+			ownership,
 			_mode: PhantomData,
 		})
 	}
@@ -309,9 +378,23 @@ pub struct AdmittedTarget<M> {
 	pub(crate) source: Arc<Vec<Complex64>>,
 	pub(crate) norm_upper: f64,
 	pub(crate) policy: Policy,
+	pub(crate) resources: OperationResources,
+	#[cfg_attr(
+		not(feature = "offline-synthesis"),
+		expect(
+			dead_code,
+			reason = "RAII source/target guards are retained throughout synthesis; offline snapshots also clone them"
+		)
+	)]
+	pub(crate) ownership: Vec<MemoryReservation>,
 	pub(crate) _mode: PhantomData<M>,
 }
 impl<M> AdmittedTarget<M> {
+	/// Shared cumulative operation report, including live owned results.
+	#[must_use]
+	pub fn resource_report(&self) -> quest_numerics::ResourceReport {
+		self.resources.report()
+	}
 	/// Complete the target through binary64 FFT Weiss factorization, retaining
 	/// the ratio only for the algorithm selected by [`Policy::algorithm`].
 	///
@@ -324,17 +407,19 @@ impl<M> AdmittedTarget<M> {
 	/// # Errors
 	/// Same numerical failures as [`Self::complete`], with parallel scratch admitted separately.
 	pub fn complete_with(self, execution: ExecutionPolicy<'_>) -> Result<CompletedPolynomial<M>> {
-		let working = crate::workspace_policy(
-			self.policy,
-			self.target
-				.len()
-				.checked_add(self.source.len())
-				.ok_or(Error::Budget("completion retained storage"))?,
-		)?;
-		let (a_star, ratio, residual, grid) = kernel::complete(&self.target, working, execution)?;
+		let (result, ownership) =
+			kernel::complete_with_resources(&self.target, self.policy, execution, &self.resources)?
+				.into_parts();
+		let (a_star, ratio, residual, grid) = result;
+		let mut ownership = ownership.into_iter();
+		let complement_ownership = ownership
+			.next()
+			.ok_or(Error::Budget("missing complement ownership"))?;
+		let ratio_ownership: Vec<_> = ownership.collect();
 		let payload = match ratio {
 			kernel::CompletionData::InverseNlft => CompletionPayload::InverseNlft,
 			kernel::CompletionData::Rhw(coefficients) => CompletionPayload::Rhw(WeissRatio {
+				_ownership: ratio_ownership,
 				coefficients,
 				target: Arc::clone(&self.target),
 				norm_upper: self.norm_upper,
@@ -345,6 +430,7 @@ impl<M> AdmittedTarget<M> {
 		Ok(CompletedPolynomial {
 			admitted: self,
 			a_star,
+			ownership: vec![complement_ownership],
 			payload,
 			residual,
 			grid,
@@ -378,6 +464,7 @@ pub enum OuterGauge {
 /// This is candidate-generation evidence, not a certificate for the final export.
 #[derive(Debug)]
 pub struct WeissRatio<M> {
+	_ownership: Vec<MemoryReservation>,
 	coefficients: Vec<Complex64>,
 	target: Arc<Vec<Complex64>>,
 	norm_upper: f64,
@@ -424,11 +511,17 @@ enum CompletionPayload<M> {
 pub struct CompletedPolynomial<M> {
 	admitted: AdmittedTarget<M>,
 	a_star: Vec<Complex64>,
+	ownership: Vec<MemoryReservation>,
 	payload: CompletionPayload<M>,
 	residual: f64,
 	grid: usize,
 }
 impl<M> CompletedPolynomial<M> {
+	/// Shared cumulative operation report, including live owned results.
+	#[must_use]
+	pub fn resource_report(&self) -> quest_numerics::ResourceReport {
+		self.admitted.resources.report()
+	}
 	/// RHW ratio retaining target, grid, gauge and contractivity provenance.
 	/// Inverse NLFT completion does not compute or retain a ratio.
 	#[must_use]
@@ -448,26 +541,6 @@ impl<M> CompletedPolynomial<M> {
 		}
 	}
 
-	fn working_policy(&self) -> Result<Policy> {
-		// Retained target/source/complement and the selected ratio, plus the
-		// overlapping reflection, phase, control and convention-conversion
-		// vectors while freezing.
-		let retained = self
-			.admitted
-			.target
-			.len()
-			.checked_mul(10)
-			.and_then(|n| n.checked_add(self.admitted.source.len()))
-			.and_then(|n| n.checked_add(self.a_star.len()))
-			.and_then(|n| {
-				n.checked_add(
-					self.weiss_ratio()
-						.map_or(0, |ratio| ratio.coefficients.len()),
-				)
-			})
-			.ok_or(Error::Budget("synthesis retained storage"))?;
-		crate::workspace_policy(self.admitted.policy, retained)
-	}
 	/// Conjugated complement coefficients, in increasing nonnegative exponents.
 	#[must_use]
 	pub fn conjugate_complement_coefficients(&self) -> &[Complex64] {
@@ -504,6 +577,7 @@ pub struct FrozenCandidate<M> {
 	pub(crate) completion_residual: f64,
 	pub(crate) reconstruction_residual: Option<f64>,
 	pub(crate) completion_grid: usize,
+	pub(crate) ownership: Vec<MemoryReservation>,
 }
 impl CompletedPolynomial<UnitCircleResponse> {
 	/// Freeze unit-circle matrices with the explicitly selected numerical solver.
@@ -521,18 +595,30 @@ impl CompletedPolynomial<UnitCircleResponse> {
 		self,
 		execution: ExecutionPolicy<'_>,
 	) -> Result<FrozenCandidate<UnitCircleResponse>> {
-		let mut working = self.working_policy()?;
+		let working = self.admitted.policy;
+		let resources = self.admitted.resources.clone();
 		let (gamma, work_used) = match &self.payload {
-			CompletionPayload::Rhw(ratio) => kernel::half_cholesky(ratio.coefficients(), working)?,
-			CompletionPayload::InverseNlft => {
-				kernel::inverse(&self.a_star, &self.admitted.target, working, execution)?
+			CompletionPayload::Rhw(ratio) => {
+				kernel::half_cholesky_with_resources(ratio.coefficients(), working, &resources)?
 			}
+			CompletionPayload::InverseNlft => kernel::inverse_with_resources(
+				&self.a_star,
+				&self.admitted.target,
+				working,
+				execution,
+				&resources,
+			)?,
 		};
-		working.limits.max_work = working
-			.limits
-			.max_work
-			.checked_sub(work_used)
-			.ok_or(Error::Budget("synthesis work"))?;
+		let _ = work_used;
+		let controls_ownership = resources
+			.reserve(
+				gamma
+					.len()
+					.checked_mul(size_of::<Control>())
+					.ok_or(Error::Budget("controls storage"))?,
+				0,
+			)
+			.map_err(quest_numerics::Error::from)?;
 		let mut controls = kernel::controls(&gamma)?;
 		let last = controls
 			.last_mut()
@@ -540,8 +626,15 @@ impl CompletedPolynomial<UnitCircleResponse> {
 		// Right multiply by K = [[0,-1],[1,0]], preserving every scalar phase.
 		let [[a, b], [c, d]] = *last;
 		*last = [[b, a.neg()], [d, c.neg()]];
-		let residual =
-			kernel::response_residual(&controls, &self.admitted.target, working, execution)?;
+		let residual = kernel::response_residual_with_resources(
+			&controls,
+			&self.admitted.target,
+			working,
+			execution,
+			resources,
+		)?;
+		let mut ownership = self.ownership;
+		ownership.extend(vec![controls_ownership]);
 		Ok(FrozenCandidate {
 			synthesis_precision: SynthesisPrecision::Binary64,
 			admitted: self.admitted,
@@ -551,6 +644,7 @@ impl CompletedPolynomial<UnitCircleResponse> {
 			completion_residual: self.residual,
 			reconstruction_residual: Some(residual),
 			completion_grid: self.grid,
+			ownership,
 		})
 	}
 }
@@ -570,18 +664,30 @@ impl CompletedPolynomial<RealParityWx> {
 		self,
 		execution: ExecutionPolicy<'_>,
 	) -> Result<FrozenCandidate<RealParityWx>> {
-		let mut working = self.working_policy()?;
+		let working = self.admitted.policy;
+		let resources = self.admitted.resources.clone();
 		let (gamma, work_used) = match &self.payload {
-			CompletionPayload::Rhw(ratio) => kernel::half_cholesky(ratio.coefficients(), working)?,
-			CompletionPayload::InverseNlft => {
-				kernel::inverse(&self.a_star, &self.admitted.target, working, execution)?
+			CompletionPayload::Rhw(ratio) => {
+				kernel::half_cholesky_with_resources(ratio.coefficients(), working, &resources)?
 			}
+			CompletionPayload::InverseNlft => kernel::inverse_with_resources(
+				&self.a_star,
+				&self.admitted.target,
+				working,
+				execution,
+				&resources,
+			)?,
 		};
-		working.limits.max_work = working
-			.limits
-			.max_work
-			.checked_sub(work_used)
-			.ok_or(Error::Budget("synthesis work"))?;
+		let _ = work_used;
+		let phases_ownership = resources
+			.reserve(
+				gamma
+					.len()
+					.checked_mul(size_of::<f64>())
+					.ok_or(Error::Budget("phase storage"))?,
+				0,
+			)
+			.map_err(quest_numerics::Error::from)?;
 		let mut phases: Vec<f64> = gamma.iter().map(|value| value.re.atan()).collect();
 		let count = phases.len();
 		for index in 0..count / 2 {
@@ -599,14 +705,30 @@ impl CompletedPolynomial<RealParityWx> {
 				.get_mut(mirror)
 				.ok_or(Error::Budget("phase support"))? = middle;
 		}
+		let controls_ownership = resources
+			.reserve(
+				phases
+					.len()
+					.checked_mul(size_of::<Control>())
+					.ok_or(Error::Budget("controls storage"))?,
+				0,
+			)
+			.map_err(quest_numerics::Error::from)?;
 		let mut controls = kernel::phase_controls(&phases)?;
 		let last = controls
 			.last_mut()
 			.ok_or(Error::Target("empty phase sequence"))?;
 		let [[a, b], [c, d]] = *last;
 		*last = [[b, a.neg()], [d, c.neg()]];
-		let residual =
-			kernel::response_residual(&controls, &self.admitted.target, working, execution)?;
+		let residual = kernel::response_residual_with_resources(
+			&controls,
+			&self.admitted.target,
+			working,
+			execution,
+			resources,
+		)?;
+		let mut ownership = self.ownership;
+		ownership.extend(vec![controls_ownership, phases_ownership]);
 		Ok(FrozenCandidate {
 			synthesis_precision: SynthesisPrecision::Binary64,
 			admitted: self.admitted,
@@ -616,10 +738,16 @@ impl CompletedPolynomial<RealParityWx> {
 			completion_residual: self.residual,
 			reconstruction_residual: Some(residual),
 			completion_grid: self.grid,
+			ownership,
 		})
 	}
 }
 impl<M> FrozenCandidate<M> {
+	/// Shared cumulative operation report, including live owned results.
+	#[must_use]
+	pub fn resource_report(&self) -> quest_numerics::ResourceReport {
+		self.admitted.resources.report()
+	}
 	/// Exact original source storage offset and coefficient count, before Laurent padding.
 	#[must_use]
 	pub const fn source_storage(&self) -> (i32, usize) {

@@ -1,0 +1,77 @@
+{
+  "additional_reconstruction_status": "ok",
+  "after_workspace_release": {
+    "last_rejection": null,
+    "live_buffer_bytes": 0,
+    "live_bytes": 0,
+    "live_planner_bytes_estimate": 0,
+    "peak_bytes": 15056,
+    "requested_peak_bytes": 15056,
+    "requested_work_units": 16428,
+    "reservations": 179,
+    "work_units": 16428
+  },
+  "backend": "rustfft-simd-sequential",
+  "cached_after_result_release": {
+    "last_rejection": null,
+    "live_buffer_bytes": 432,
+    "live_bytes": 13744,
+    "live_planner_bytes_estimate": 13312,
+    "peak_bytes": 15056,
+    "requested_peak_bytes": 15056,
+    "requested_work_units": 16428,
+    "reservations": 179,
+    "work_units": 16428
+  },
+  "cached_forward_plans": 3,
+  "cached_forward_scratch_bytes": 432,
+  "coefficient_backward_linf": 4.482895808851493e-16,
+  "degree": 5,
+  "live_result_and_workspaces": {
+    "last_rejection": null,
+    "live_buffer_bytes": 624,
+    "live_bytes": 13936,
+    "live_planner_bytes_estimate": 13312,
+    "peak_bytes": 15056,
+    "requested_peak_bytes": 15056,
+    "requested_work_units": 8214,
+    "reservations": 94,
+    "work_units": 8214
+  },
+  "main_backward_tolerance": 1e-10,
+  "memory_kind": "modeled live allocations plus retained opaque planner estimate; not process RSS",
+  "operation": "forward",
+  "profile": "million-degree-inverse-forward-v1",
+  "reconstructed_a_constant": [
+    0.999028681836951,
+    -6.122354142754083e-17
+  ],
+  "reuse": {
+    "coefficient_linf": 4.482895808851493e-16,
+    "plans_after": 3,
+    "plans_before": 3,
+    "resources_after_reuse": {
+      "last_rejection": null,
+      "live_buffer_bytes": 624,
+      "live_bytes": 13936,
+      "live_planner_bytes_estimate": 13312,
+      "peak_bytes": 15056,
+      "requested_peak_bytes": 15056,
+      "requested_work_units": 16428,
+      "reservations": 179,
+      "work_units": 16428
+    },
+    "scratch_bytes_after": 432,
+    "scratch_bytes_before": 432,
+    "status": "ok"
+  },
+  "source_a_constant": [
+    0.9990286818369515,
+    -0.0
+  ],
+  "source_inverse_check": null,
+  "source_inverse_contract": "finite, size-preserving, max complex reflection error",
+  "source_reflection_linf": null,
+  "status": "ok",
+  "tolerance": 1e-10
+}

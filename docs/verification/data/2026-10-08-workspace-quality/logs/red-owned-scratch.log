@@ -1,0 +1,276 @@
+ Nextest run ID 75da73ad-e5fc-42f5-b00a-1592456c6a0a with nextest profile: default
+    Starting 1 test across 1 binary (1 test skipped)
+        FAIL [   2.537s] (1/1) quest-rs::matching_collective buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch
+  stdout ───
+
+    running 1 test
+
+    running 1 test
+    test buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch ... ok
+
+    test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.32s
+
+
+    running 1 test
+    test buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch ... 
+    running 1 test
+    test buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch ... invalid value: missing owned scratch
+      at crates/quest/tests/matching_collective/buffer_reuse.rs:50:22
+
+    FAILED
+
+    failures:
+
+    failures:
+        buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.26s
+
+    invalid value: missing owned scratch
+      at crates/quest/tests/matching_collective/buffer_reuse.rs:50:22
+
+    FAILED
+
+    failures:
+
+    failures:
+        buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.26s
+
+    Value of: status.success()
+    Expected: is equal to true
+    Actual: false,
+      which isn't equal to true
+      at crates/quest/tests/matching_collective/buffer_reuse.rs:18:13
+
+
+    running 1 test
+    test buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch ... 
+    running 1 test
+    test buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch ... 
+    running 1 test
+    test buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch ... 
+    running 1 test
+    test buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch ... invalid value: missing owned scratch
+      at crates/quest/tests/matching_collective/buffer_reuse.rs:50:22
+
+    FAILED
+
+    failures:
+
+    failures:
+        buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.27s
+
+    invalid value: missing owned scratch
+      at crates/quest/tests/matching_collective/buffer_reuse.rs:50:22
+
+    FAILED
+
+    failures:
+
+    failures:
+        buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.27s
+
+    invalid value: missing owned scratch
+      at crates/quest/tests/matching_collective/buffer_reuse.rs:50:22
+
+    FAILED
+
+    failures:
+
+    failures:
+        buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.27s
+
+    invalid value: missing owned scratch
+      at crates/quest/tests/matching_collective/buffer_reuse.rs:50:22
+
+    FAILED
+
+    failures:
+
+    failures:
+        buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.27s
+
+    Value of: status.success()
+    Expected: is equal to true
+    Actual: false,
+      which isn't equal to true
+      at crates/quest/tests/matching_collective/buffer_reuse.rs:18:13
+
+
+    running 1 test
+    test buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch ... 
+    running 1 test
+    test buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch ... 
+    running 1 test
+    test buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch ... 
+    running 1 test
+    test buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch ... 
+    running 1 test
+    test buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch ... 
+    running 1 test
+    test buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch ... 
+    running 1 test
+    test buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch ... 
+    running 1 test
+    test buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch ... invalid value: missing owned scratch
+      at crates/quest/tests/matching_collective/buffer_reuse.rs:50:22
+
+    FAILED
+
+    failures:
+
+    failures:
+        buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.31s
+
+    invalid value: missing owned scratch
+      at crates/quest/tests/matching_collective/buffer_reuse.rs:50:22
+
+    FAILED
+
+    failures:
+
+    failures:
+        buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.30s
+
+    invalid value: missing owned scratch
+      at crates/quest/tests/matching_collective/buffer_reuse.rs:50:22
+
+    FAILED
+
+    failures:
+
+    failures:
+        buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.30s
+
+    invalid value: missing owned scratch
+      at crates/quest/tests/matching_collective/buffer_reuse.rs:50:22
+
+    invalid value: missing owned scratch
+      at crates/quest/tests/matching_collective/buffer_reuse.rs:50:22
+
+    FAILED
+
+    failures:
+
+    failures:
+        buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.31s
+
+    invalid value: missing owned scratch
+      at crates/quest/tests/matching_collective/buffer_reuse.rs:50:22
+
+    invalid value: missing owned scratch
+      at crates/quest/tests/matching_collective/buffer_reuse.rs:50:22
+    FAILED
+
+    failures:
+
+    failures:
+        buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out
+    ; finished in 0.31s
+
+    FAILED
+    FAILED
+
+    failures:
+
+    failures:
+
+    failures:
+        buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.31s
+
+
+    failures:
+        buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.31s
+
+    invalid value: missing owned scratch
+      at crates/quest/tests/matching_collective/buffer_reuse.rs:50:22
+
+    FAILED
+
+    failures:
+
+    failures:
+        buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.30s
+
+    Value of: status.success()
+    Expected: is equal to true
+    Actual: false,
+      which isn't equal to true
+      at crates/quest/tests/matching_collective/buffer_reuse.rs:18:13
+
+    test buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch ... FAILED
+
+    failures:
+
+    failures:
+        buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 2.27s
+
+  stderr ───
+    MPI supervisor: launcher=Local { program: "mpiexec", args: [] }, ranks=1, elapsed=593.507245ms, status=exit status: 0, timed_out=false, stdout_truncated=false, stderr_truncated=false, slurm_step=None, cancellation=None
+    MPI supervisor: launcher=Local { program: "mpiexec", args: [] }, ranks=2, elapsed=531.825571ms, status=exit status: 101, timed_out=false, stdout_truncated=false, stderr_truncated=false, slurm_step=None, cancellation=None
+    Error: See failure output above
+
+    Error: See failure output above
+
+    MPI supervisor: launcher=Local { program: "mpiexec", args: [] }, ranks=4, elapsed=541.802217ms, status=exit status: 101, timed_out=false, stdout_truncated=false, stderr_truncated=false, slurm_step=None, cancellation=None
+    Error: See failure output above
+
+    Error: See failure output above
+
+    Error: See failure output above
+
+    Error: See failure output above
+
+    MPI supervisor: launcher=Local { program: "mpiexec", args: [] }, ranks=8, elapsed=598.11129ms, status=exit status: 101, timed_out=false, stdout_truncated=false, stderr_truncated=false, slurm_step=None, cancellation=None
+    Error: See failure output above
+
+    Error: See failure output above
+
+    Error: See failure output above
+
+    Error: See failure output above
+
+    Error: See failure output above
+
+    Error: See failure output above
+
+    Error: See failure output above
+
+    Error: See failure output above
+
+    Error: See failure output above
+
+
+  Cancelling due to test failure: 
+────────────
+     Summary [   2.537s] 1 test run: 0 passed, 1 failed, 1 skipped
+        FAIL [   2.537s] (1/1) quest-rs::matching_collective buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch
+error: test run failed

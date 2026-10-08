@@ -1,0 +1,1516 @@
+{
+  "cases": [
+    {
+      "array_sha256": {
+        "a": "b3193ef9ff35b1040c10087d4e609e4abdcdaf48dd311a732d888d0663a59a5f",
+        "b": "f8e1afc7e2e89521e693a26c78f1438deec00d75dd4887f164af286cfbca5022",
+        "gamma": "c52ce1093fc71770440449c4fcfd5123bab3a8927ea3b8a6550c89c6736df87f"
+      },
+      "coefficient_count": 1,
+      "degree": 0,
+      "family": "independent_reflections",
+      "fixture": "fixtures/independent_d0.h5",
+      "fixture_sha256": "61c1ff52de1dd22727a729c2ab38c69aa52e3d23a7dfcaacbf589ab20f74095a",
+      "id": "independent_d0",
+      "input_fingerprint": "a9beb091bb3b2aa73e254b3b2fb5083300bb5180838e0d2bd4668a42fc9d08d2",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "forward",
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": 2427099340,
+      "source": {
+        "application_approximation_error": null,
+        "generator": "PCG64 uniform complex",
+        "normalisation": "each transfer/sqrt(1+abs(gamma)^2)",
+        "pair_preparation": "independent balanced transfer product; no implementation inverse",
+        "phase": "a constant positive; physical a[-d,0], b[0,d]",
+        "scaling": ".2/(sqrt(2)*(degree+1))",
+        "source_degree": 0
+      },
+      "supports": {
+        "a": [
+          0,
+          0
+        ],
+        "b": [
+          0,
+          0
+        ],
+        "gamma": [
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "26b63805ba837e18c7cfd3927745daafcb62e7e15f89631183c6f5ce23203356",
+        "b": "cf24e54357fd9904f3225e86206f2619c24ba63bf74f65abe49940c9d4b81657",
+        "gamma": "e55e533decf985fdbf11047214a608f3ea82899465c29e89396444aaf00148e2"
+      },
+      "coefficient_count": 2,
+      "degree": 1,
+      "family": "independent_reflections",
+      "fixture": "fixtures/independent_d1.h5",
+      "fixture_sha256": "4f78b8bae5435aa880c32b5fecadfb63e1bb63b8a73e5786f415e7e6d762bb5f",
+      "id": "independent_d1",
+      "input_fingerprint": "6d5c440b4c226d8bbd4a8ff6fd35c8882fd4da72dfed48f7babd0c6c81f64804",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "forward",
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": 2381473671,
+      "source": {
+        "application_approximation_error": null,
+        "generator": "PCG64 uniform complex",
+        "normalisation": "each transfer/sqrt(1+abs(gamma)^2)",
+        "pair_preparation": "independent balanced transfer product; no implementation inverse",
+        "phase": "a constant positive; physical a[-d,0], b[0,d]",
+        "scaling": ".2/(sqrt(2)*(degree+1))",
+        "source_degree": 1
+      },
+      "supports": {
+        "a": [
+          -1,
+          0
+        ],
+        "b": [
+          0,
+          1
+        ],
+        "gamma": [
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "501035318717bdd6ee5d34c35b4a3cfce69f838818e1df8c6f47c915390e1a29",
+        "b": "8b22010d3b57afbc65659a260c9d5eb6cf31e5f81f1a412362b93ba1788137c0",
+        "gamma": "36ad6447ae405777d379602eb4cd33a00f1d7a83e964a24e7686d5f63db9a099"
+      },
+      "coefficient_count": 6,
+      "degree": 5,
+      "family": "independent_reflections",
+      "fixture": "fixtures/independent_d5.h5",
+      "fixture_sha256": "b9235827244c7eac65abe8a19b299a84454a85761daf388078e198014cd3622c",
+      "id": "independent_d5",
+      "input_fingerprint": "3bc1f653438508d3f484520418c578a3500456f274cbfd06fea2b3b2b616bb3c",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "forward",
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": 1105578762,
+      "source": {
+        "application_approximation_error": null,
+        "generator": "PCG64 uniform complex",
+        "normalisation": "each transfer/sqrt(1+abs(gamma)^2)",
+        "pair_preparation": "independent balanced transfer product; no implementation inverse",
+        "phase": "a constant positive; physical a[-d,0], b[0,d]",
+        "scaling": ".2/(sqrt(2)*(degree+1))",
+        "source_degree": 5
+      },
+      "supports": {
+        "a": [
+          -5,
+          0
+        ],
+        "b": [
+          0,
+          5
+        ],
+        "gamma": [
+          0,
+          5
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "96063605ab69ad8a9648baf4430c913d36506830c8a88225d599d1283b56f243",
+        "b": "636cf5045a924be8659b1fde63d37c7da338e5ad5ac9f8072a2002a53e2cc45a",
+        "gamma": "ab93ebd352999d09e8e92f2e1128683e0af66ab00b2987329999affadceafc55"
+      },
+      "coefficient_count": 11,
+      "degree": 10,
+      "family": "independent_reflections",
+      "fixture": "fixtures/independent_d10.h5",
+      "fixture_sha256": "ea5f19c8c5fc245bea62f78bbcc8a6118fc9db978c41095edcd29e7dccc75cdb",
+      "id": "independent_d10",
+      "input_fingerprint": "db3bfb631ab117a597e2f01fbf42b97e8f6751ab942aa938d0709934a279b1cb",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "forward",
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": 113437684,
+      "source": {
+        "application_approximation_error": null,
+        "generator": "PCG64 uniform complex",
+        "normalisation": "each transfer/sqrt(1+abs(gamma)^2)",
+        "pair_preparation": "independent balanced transfer product; no implementation inverse",
+        "phase": "a constant positive; physical a[-d,0], b[0,d]",
+        "scaling": ".2/(sqrt(2)*(degree+1))",
+        "source_degree": 10
+      },
+      "supports": {
+        "a": [
+          -10,
+          0
+        ],
+        "b": [
+          0,
+          10
+        ],
+        "gamma": [
+          0,
+          10
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "070fc23f8557f9a9f3efb7c98558551e066ecbd175d48a428fafd9c1a6293176",
+        "b": "daa5a462b5bd0a47bfeb8402688a522419c07c6bdac15d6d9d8f8a6db744e645",
+        "gamma": "c74cfe7bcbd7956b64015a477c6eea9aa4270181d1722fe5be6d1ee1384b7e63"
+      },
+      "coefficient_count": 21,
+      "degree": 20,
+      "family": "independent_reflections",
+      "fixture": "fixtures/independent_d20.h5",
+      "fixture_sha256": "d3dcc578c36fce6c3a98d744056b7dfd825b55b2e6b9cbc7eb78acdef64ea80f",
+      "id": "independent_d20",
+      "input_fingerprint": "2bb69e337c4301aae24aca074036fb9772f874b68cefb019529b9345c55a45fd",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "forward",
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": 987751510,
+      "source": {
+        "application_approximation_error": null,
+        "generator": "PCG64 uniform complex",
+        "normalisation": "each transfer/sqrt(1+abs(gamma)^2)",
+        "pair_preparation": "independent balanced transfer product; no implementation inverse",
+        "phase": "a constant positive; physical a[-d,0], b[0,d]",
+        "scaling": ".2/(sqrt(2)*(degree+1))",
+        "source_degree": 20
+      },
+      "supports": {
+        "a": [
+          -20,
+          0
+        ],
+        "b": [
+          0,
+          20
+        ],
+        "gamma": [
+          0,
+          20
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "b77141f90c9481693f534616b8299046a4c231aaa6357d2e8eb09fa81c5e3824",
+        "b": "a95f6012291696f15037dc16a642498d3ca680e33fc65731a0b946c8c30226d6",
+        "gamma": "7c89582d86338f9508be932cd2b70acd0caf6dd6e932368abf62556d3cc51b90"
+      },
+      "coefficient_count": 51,
+      "degree": 50,
+      "family": "independent_reflections",
+      "fixture": "fixtures/independent_d50.h5",
+      "fixture_sha256": "9de2b73283c2903ded2a7187a34a5999d104f57044b8b734b7f49e9a3bdfb227",
+      "id": "independent_d50",
+      "input_fingerprint": "8d0eb309b6549f11f91c068bbe8fe70dfa3a76d29882ed35635c5194057f9cc6",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "forward",
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": 462361735,
+      "source": {
+        "application_approximation_error": null,
+        "generator": "PCG64 uniform complex",
+        "normalisation": "each transfer/sqrt(1+abs(gamma)^2)",
+        "pair_preparation": "independent balanced transfer product; no implementation inverse",
+        "phase": "a constant positive; physical a[-d,0], b[0,d]",
+        "scaling": ".2/(sqrt(2)*(degree+1))",
+        "source_degree": 50
+      },
+      "supports": {
+        "a": [
+          -50,
+          0
+        ],
+        "b": [
+          0,
+          50
+        ],
+        "gamma": [
+          0,
+          50
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "952225ce5ee000b7edc4e25609bb529ed1be8a9e0c3e531e9eb3e835bc2cfcf1",
+        "b": "879a15c97c864355e9b16d8b1be67057f5dbfe36ab16a653695cca549d39581f",
+        "gamma": "37dba1eaee9c6b216e0c18cb7c54f4b9ca9002b8ebb411566d96e38bed258692"
+      },
+      "coefficient_count": 65,
+      "degree": 64,
+      "family": "independent_reflections",
+      "fixture": "fixtures/independent_d64.h5",
+      "fixture_sha256": "be867222cedf86adf361eb1b6d203e7db73affe4add443a04b55b8acba57e418",
+      "id": "independent_d64",
+      "input_fingerprint": "d0136cb34d926c1ea108002a90074cc43119754cd572138f61f78ebc4a35b82c",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "forward",
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": 2886394065,
+      "source": {
+        "application_approximation_error": null,
+        "generator": "PCG64 uniform complex",
+        "normalisation": "each transfer/sqrt(1+abs(gamma)^2)",
+        "pair_preparation": "independent balanced transfer product; no implementation inverse",
+        "phase": "a constant positive; physical a[-d,0], b[0,d]",
+        "scaling": ".2/(sqrt(2)*(degree+1))",
+        "source_degree": 64
+      },
+      "supports": {
+        "a": [
+          -64,
+          0
+        ],
+        "b": [
+          0,
+          64
+        ],
+        "gamma": [
+          0,
+          64
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "8d9ab90451961f20d4d2af47ba7209d9fffe05491fdf6dc92b48a9db2633c038",
+        "b": "276d21c4b5ab862fc3b6ae3123b12c3e048d7055d5ebec3c5f847733cbfcc032",
+        "gamma": "5aa9ce6dc9bf5a9f05049ee4c237b93f272d881300c4c7c6ee878da3bb5bd0ce"
+      },
+      "coefficient_count": 101,
+      "degree": 100,
+      "family": "independent_reflections",
+      "fixture": "fixtures/independent_d100.h5",
+      "fixture_sha256": "511d647261404f7bb48a39ecca8e818ced3f172c8286f4a2bec21e681db1f1fa",
+      "id": "independent_d100",
+      "input_fingerprint": "d9c17b2d12238bcd1b1f1ebf2082ccbfa181f81fb620817aff1b2d8809e23122",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "forward",
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": 3625952214,
+      "source": {
+        "application_approximation_error": null,
+        "generator": "PCG64 uniform complex",
+        "normalisation": "each transfer/sqrt(1+abs(gamma)^2)",
+        "pair_preparation": "independent balanced transfer product; no implementation inverse",
+        "phase": "a constant positive; physical a[-d,0], b[0,d]",
+        "scaling": ".2/(sqrt(2)*(degree+1))",
+        "source_degree": 100
+      },
+      "supports": {
+        "a": [
+          -100,
+          0
+        ],
+        "b": [
+          0,
+          100
+        ],
+        "gamma": [
+          0,
+          100
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "2feeba301e01e0f2436f3d372a006a9d4a98725035e64143659dd87c7c89a33d",
+        "b": "a51b52975ba032ff7a80a70b5afc0193372ba5a681d03eee3f845cab81731c63",
+        "gamma": "30fb51938c36e1685e4f58390ab628fcb5247154011c4053b0ceadb179171fdd"
+      },
+      "coefficient_count": 201,
+      "degree": 200,
+      "family": "independent_reflections",
+      "fixture": "fixtures/independent_d200.h5",
+      "fixture_sha256": "c875fe0f459480b18e0ee0a4de98a0490d34c1c89082e266bbb713dd2b9b6480",
+      "id": "independent_d200",
+      "input_fingerprint": "dfe047fc7d5782b140604b2bdef4a3bb5ae132b5f7a69186d81fefa10089f242",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "forward",
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": 1133823624,
+      "source": {
+        "application_approximation_error": null,
+        "generator": "PCG64 uniform complex",
+        "normalisation": "each transfer/sqrt(1+abs(gamma)^2)",
+        "pair_preparation": "independent balanced transfer product; no implementation inverse",
+        "phase": "a constant positive; physical a[-d,0], b[0,d]",
+        "scaling": ".2/(sqrt(2)*(degree+1))",
+        "source_degree": 200
+      },
+      "supports": {
+        "a": [
+          -200,
+          0
+        ],
+        "b": [
+          0,
+          200
+        ],
+        "gamma": [
+          0,
+          200
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "dbc35397a1b152d409bf207d1f6988d4a8cb275da2b687964e39f1c1a559b17f",
+        "b": "d28f6b9dce9c98656113d30c71046037812e6d7b6069b736f5a92c6cda69145d",
+        "gamma": "db687a3180c84096cdb81497f9300d6a993a2c6e8730a6509e34d8bb808ff62d"
+      },
+      "coefficient_count": 501,
+      "degree": 500,
+      "family": "independent_reflections",
+      "fixture": "fixtures/independent_d500.h5",
+      "fixture_sha256": "46288edded09df3c57946c8a794ee20da677d160c39a618824f52d4858d0bdd7",
+      "id": "independent_d500",
+      "input_fingerprint": "0323d3e6f8e7d07d2c62dc9fc306719d2d55702df5c4955b0df1c25689a6bc5b",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "forward",
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": 3548692651,
+      "source": {
+        "application_approximation_error": null,
+        "generator": "PCG64 uniform complex",
+        "normalisation": "each transfer/sqrt(1+abs(gamma)^2)",
+        "pair_preparation": "independent balanced transfer product; no implementation inverse",
+        "phase": "a constant positive; physical a[-d,0], b[0,d]",
+        "scaling": ".2/(sqrt(2)*(degree+1))",
+        "source_degree": 500
+      },
+      "supports": {
+        "a": [
+          -500,
+          0
+        ],
+        "b": [
+          0,
+          500
+        ],
+        "gamma": [
+          0,
+          500
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "756b14bc72eaffd205c26eb2ccde5cb89576e6891346aed11afe98bb0c52b4fa",
+        "b": "13561c5839b037b5523b9457928bf1e7ba21906759ed3abc2f92c200c95ce295",
+        "gamma": "ef4e6d0d5d829455fbf890cec7b1861fe7b2cd8e7643ccdbe87ba3ef32b1f397"
+      },
+      "coefficient_count": 1001,
+      "degree": 1000,
+      "family": "independent_reflections",
+      "fixture": "fixtures/independent_d1000.h5",
+      "fixture_sha256": "c3f6d9149f8b65b553551c56a20ae06e8ffe0a8be3681824676964f4938dd65c",
+      "id": "independent_d1000",
+      "input_fingerprint": "c24762bacdf196e4a4325431a14a6754d974c31c27fea4b85fa3afbc8f1969af",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "forward",
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": 1116758004,
+      "source": {
+        "application_approximation_error": null,
+        "generator": "PCG64 uniform complex",
+        "normalisation": "each transfer/sqrt(1+abs(gamma)^2)",
+        "pair_preparation": "independent balanced transfer product; no implementation inverse",
+        "phase": "a constant positive; physical a[-d,0], b[0,d]",
+        "scaling": ".2/(sqrt(2)*(degree+1))",
+        "source_degree": 1000
+      },
+      "supports": {
+        "a": [
+          -1000,
+          0
+        ],
+        "b": [
+          0,
+          1000
+        ],
+        "gamma": [
+          0,
+          1000
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "9cca617f250dcfab3fede4a79296ffff5d0038ea90061d6eca5e7b68391dcefc",
+        "b": "738d25d801fbfddc490b114232a2ae1f7fe25029f8fc0f6850c3e56c7970aea1",
+        "gamma": "315599ef06de0aac62a37a3273f2db69129894519a056269713b9a2ac036395d"
+      },
+      "coefficient_count": 2001,
+      "degree": 2000,
+      "family": "independent_reflections",
+      "fixture": "fixtures/independent_d2000.h5",
+      "fixture_sha256": "cfa348b3678d46f9100999215b1a0d15852a1dc6455121eafe3cfea13934efa5",
+      "id": "independent_d2000",
+      "input_fingerprint": "2a6a4c41f72e0c390776e74ca7a1f3c3aeda969bdaf3b6bf4d9b4faf1c6c9603",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "forward",
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": 2264728061,
+      "source": {
+        "application_approximation_error": null,
+        "generator": "PCG64 uniform complex",
+        "normalisation": "each transfer/sqrt(1+abs(gamma)^2)",
+        "pair_preparation": "independent balanced transfer product; no implementation inverse",
+        "phase": "a constant positive; physical a[-d,0], b[0,d]",
+        "scaling": ".2/(sqrt(2)*(degree+1))",
+        "source_degree": 2000
+      },
+      "supports": {
+        "a": [
+          -2000,
+          0
+        ],
+        "b": [
+          0,
+          2000
+        ],
+        "gamma": [
+          0,
+          2000
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "e98c27d933609b46d44120b6686dca21850ec2d1e3d351409864f240a4e98870",
+        "b": "f107029682ca3c478ca9a46f4132cd3d21bbc9f2e2ac89e2fdae7c525a627a3c",
+        "gamma": "47a9e0e163436fa1fb40aeb4bc5c4c865e1534650d4f6c2a72911206c3df569e"
+      },
+      "coefficient_count": 5001,
+      "degree": 5000,
+      "family": "independent_reflections",
+      "fixture": "fixtures/independent_d5000.h5",
+      "fixture_sha256": "96b0af25c7ffa1b8eca42dfd44d82db576ffa1b06d0acd02b32cf9aa4bbc1dfd",
+      "id": "independent_d5000",
+      "input_fingerprint": "6c8f7a2d697b261af34cc12d12a2c798c9a58102d74f3c04b0dd80bb759dca23",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "forward",
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": 882412219,
+      "source": {
+        "application_approximation_error": null,
+        "generator": "PCG64 uniform complex",
+        "normalisation": "each transfer/sqrt(1+abs(gamma)^2)",
+        "pair_preparation": "independent balanced transfer product; no implementation inverse",
+        "phase": "a constant positive; physical a[-d,0], b[0,d]",
+        "scaling": ".2/(sqrt(2)*(degree+1))",
+        "source_degree": 5000
+      },
+      "supports": {
+        "a": [
+          -5000,
+          0
+        ],
+        "b": [
+          0,
+          5000
+        ],
+        "gamma": [
+          0,
+          5000
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "faaa90b26d38fa4a057ee4f711accd5dfb6ae0a6fa2122fe9b48f07a39dcb803",
+        "b": "c538053b53b2d7409e394fd33f27321dfb19de3c1d5e036c6e0d2f527212c6c0",
+        "gamma": "02e108c5e56ff7f465e92bda067f9771334196e0d8d0f9aed0fa7cf09ccf51cb"
+      },
+      "coefficient_count": 10001,
+      "degree": 10000,
+      "family": "independent_reflections",
+      "fixture": "fixtures/independent_d10000.h5",
+      "fixture_sha256": "d1137ca9b0ffb82f27b6f0d1d527432d4699052933fe584d23ddbf0cc7b419db",
+      "id": "independent_d10000",
+      "input_fingerprint": "e039f9cf3b542e22d199b949a60b00028a0c187fc3d24176cddb94065b41c987",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "forward",
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": 2668679663,
+      "source": {
+        "application_approximation_error": null,
+        "generator": "PCG64 uniform complex",
+        "normalisation": "each transfer/sqrt(1+abs(gamma)^2)",
+        "pair_preparation": "independent balanced transfer product; no implementation inverse",
+        "phase": "a constant positive; physical a[-d,0], b[0,d]",
+        "scaling": ".2/(sqrt(2)*(degree+1))",
+        "source_degree": 10000
+      },
+      "supports": {
+        "a": [
+          -10000,
+          0
+        ],
+        "b": [
+          0,
+          10000
+        ],
+        "gamma": [
+          0,
+          10000
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "ae90bc16aeb2d2623abf039bfb02e26699ecc875430b6456f16a9f78766b724a",
+        "b": "f4341ca8f020c6ae49601636720d3db8fe33442bf1e26e632439d43d39798133",
+        "gamma": "bddc29389fdbc12c5042eda5a1c74300727f97f64c11f585eed8b89cc15e6e2b"
+      },
+      "coefficient_count": 20001,
+      "degree": 20000,
+      "family": "independent_reflections",
+      "fixture": "fixtures/independent_d20000.h5",
+      "fixture_sha256": "e563f37a0afb2c7ceac87fb60192a5d313a7b27782b21ebf4fbfc87b0d06d333",
+      "id": "independent_d20000",
+      "input_fingerprint": "5c051c10a75ea353b1a5120ac1b392f5616e7b9c27d4778a67e4935002171a43",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "forward",
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": 286590586,
+      "source": {
+        "application_approximation_error": null,
+        "generator": "PCG64 uniform complex",
+        "normalisation": "each transfer/sqrt(1+abs(gamma)^2)",
+        "pair_preparation": "independent balanced transfer product; no implementation inverse",
+        "phase": "a constant positive; physical a[-d,0], b[0,d]",
+        "scaling": ".2/(sqrt(2)*(degree+1))",
+        "source_degree": 20000
+      },
+      "supports": {
+        "a": [
+          -20000,
+          0
+        ],
+        "b": [
+          0,
+          20000
+        ],
+        "gamma": [
+          0,
+          20000
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "00a949e9e189167437f6e46cfda5345a18fe27e08884cbc52aa1aedf7b1a373a",
+        "b": "6c5a8d13ff4e130f2be57fab9eafab31d3c5d40fd23c73c1e177a51d29c2d5f8",
+        "gamma": "caadb98cbe1d8f5f2603ba826068d4fc67193ba49545f959dccaa274c3f6b276"
+      },
+      "coefficient_count": 50001,
+      "degree": 50000,
+      "family": "independent_reflections",
+      "fixture": "fixtures/independent_d50000.h5",
+      "fixture_sha256": "28d8d5b31b79ef8f3a1357fe422ba44c3d27bee511bba1d3afb212f17dd691be",
+      "id": "independent_d50000",
+      "input_fingerprint": "d01bbae572dbccaa453ffbe412053e67d7e9109eec6d57899191b0ea7f06b203",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "forward",
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": 794731276,
+      "source": {
+        "application_approximation_error": null,
+        "generator": "PCG64 uniform complex",
+        "normalisation": "each transfer/sqrt(1+abs(gamma)^2)",
+        "pair_preparation": "independent balanced transfer product; no implementation inverse",
+        "phase": "a constant positive; physical a[-d,0], b[0,d]",
+        "scaling": ".2/(sqrt(2)*(degree+1))",
+        "source_degree": 50000
+      },
+      "supports": {
+        "a": [
+          -50000,
+          0
+        ],
+        "b": [
+          0,
+          50000
+        ],
+        "gamma": [
+          0,
+          50000
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "cab6fe5dff0ae50925e1b31d94a120991818641dda74fa30bc335095a8243173",
+        "b": "229581b88b2bf65ab4d36aed869eddb1a16b4aab1677e804b11b58fc914504e2",
+        "gamma": "c880328e6efe9b10ee7cbc627475b6116f0380ae7f4c1a71e2ee8b67f1e401cc"
+      },
+      "coefficient_count": 100001,
+      "degree": 100000,
+      "family": "independent_reflections",
+      "fixture": "fixtures/independent_d100000.h5",
+      "fixture_sha256": "8c2aee6e33edf424b8da8342a2132b697670d26249d2ff952286e7013dffd8f7",
+      "id": "independent_d100000",
+      "input_fingerprint": "06f2378bf00a0f93c96aacf33f22d7ddb1fea54be64d1386b52c363bc49a1f9f",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "forward",
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": 2295150604,
+      "source": {
+        "application_approximation_error": null,
+        "generator": "PCG64 uniform complex",
+        "normalisation": "each transfer/sqrt(1+abs(gamma)^2)",
+        "pair_preparation": "independent balanced transfer product; no implementation inverse",
+        "phase": "a constant positive; physical a[-d,0], b[0,d]",
+        "scaling": ".2/(sqrt(2)*(degree+1))",
+        "source_degree": 100000
+      },
+      "supports": {
+        "a": [
+          -100000,
+          0
+        ],
+        "b": [
+          0,
+          100000
+        ],
+        "gamma": [
+          0,
+          100000
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "6615c5e30aa545dffa60d38c5c2816596a49dc9c97846f2cd3969e0a2c3c538f",
+        "b": "37c4265d6aca72e4d6590994b170e189ef228ed8cfce1f077ac40ab0c744b612",
+        "gamma": "c8c7af437517a5d475c02b7c5b317306a1af900b81b8cb5f3e7d6f38ba237d04"
+      },
+      "coefficient_count": 200001,
+      "degree": 200000,
+      "family": "independent_reflections",
+      "fixture": "fixtures/independent_d200000.h5",
+      "fixture_sha256": "74996ece0d4ef6ce432f100cb2dc18eaa03c5c1fd9dbe0eeba79745c7c59feea",
+      "id": "independent_d200000",
+      "input_fingerprint": "c825ef6a6c52ea9d5e741fc8831fd59664b01b2deba2c7ea68cc0c428f0fc488",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "forward",
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": 987974761,
+      "source": {
+        "application_approximation_error": null,
+        "generator": "PCG64 uniform complex",
+        "normalisation": "each transfer/sqrt(1+abs(gamma)^2)",
+        "pair_preparation": "independent balanced transfer product; no implementation inverse",
+        "phase": "a constant positive; physical a[-d,0], b[0,d]",
+        "scaling": ".2/(sqrt(2)*(degree+1))",
+        "source_degree": 200000
+      },
+      "supports": {
+        "a": [
+          -200000,
+          0
+        ],
+        "b": [
+          0,
+          200000
+        ],
+        "gamma": [
+          0,
+          200000
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "9db2c373a729697ebadd790ca9ab28f21c6b7194239d8de42b49523641164655",
+        "b": "eaea25370c426112ddbaf6544c6c8e589e8b9eed3ce85daccd169194da7e62d7",
+        "gamma": "d46e042df77ceffd1d599fcb0b1a7d69ab84ac95fb1ef6001f20bb0695420126"
+      },
+      "coefficient_count": 500001,
+      "degree": 500000,
+      "family": "independent_reflections",
+      "fixture": "fixtures/independent_d500000.h5",
+      "fixture_sha256": "2febdf6907f64e8997547e8b203451bffa7b954820829b5b0b81cbeb3847d584",
+      "id": "independent_d500000",
+      "input_fingerprint": "84c0d21a292941f871c01615338f6346dd4b747d393e409952f30cf5296fafa7",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "forward",
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": 3604044612,
+      "source": {
+        "application_approximation_error": null,
+        "generator": "PCG64 uniform complex",
+        "normalisation": "each transfer/sqrt(1+abs(gamma)^2)",
+        "pair_preparation": "independent balanced transfer product; no implementation inverse",
+        "phase": "a constant positive; physical a[-d,0], b[0,d]",
+        "scaling": ".2/(sqrt(2)*(degree+1))",
+        "source_degree": 500000
+      },
+      "supports": {
+        "a": [
+          -500000,
+          0
+        ],
+        "b": [
+          0,
+          500000
+        ],
+        "gamma": [
+          0,
+          500000
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "023c32bc894998204c12e5be174b89e3da81a50d0fbd80100249349010dec418",
+        "b": "6c2e2396dd125b48bb799471828e619b2f8ba14ce700637947e533a2616c26fc",
+        "gamma": "bb83eb5a6d87d49f879d7b59d08fc1736b6777f703d8a6cb9b3afc03fd518a1f"
+      },
+      "coefficient_count": 1000001,
+      "degree": 1000000,
+      "family": "independent_reflections",
+      "fixture": "fixtures/independent_d1000000.h5",
+      "fixture_sha256": "e3d1c32cb63ef39b3ce62b38eec0ef9bf170b8739387a43fb6015af2f3e28bd7",
+      "id": "independent_d1000000",
+      "input_fingerprint": "016fdbaff8a6df9cbb1f4662abb76f1bf53b68c0e42798a1f9f4e606e13d2ddd",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "forward",
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": 2276830693,
+      "source": {
+        "application_approximation_error": null,
+        "generator": "PCG64 uniform complex",
+        "normalisation": "each transfer/sqrt(1+abs(gamma)^2)",
+        "pair_preparation": "independent balanced transfer product; no implementation inverse",
+        "phase": "a constant positive; physical a[-d,0], b[0,d]",
+        "scaling": ".2/(sqrt(2)*(degree+1))",
+        "source_degree": 1000000
+      },
+      "supports": {
+        "a": [
+          -1000000,
+          0
+        ],
+        "b": [
+          0,
+          1000000
+        ],
+        "gamma": [
+          0,
+          1000000
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "6de669b3600dea595dc424997aaa61e8a31fbe1ed424875e2b12388d193e7c3b",
+        "b": "7cc1a9d8958509032bda129da141e7a969f4af9f27090262338962c1f1fb8ae9"
+      },
+      "coefficient_count": 6,
+      "degree": 5,
+      "family": "native_exact_pair",
+      "fixture": "fixtures/native_order5.h5",
+      "fixture_sha256": "ddfffaf98c17b81c75021a4d30b9de51865df2daf125c230a0991456b28e76b8",
+      "id": "native_order5",
+      "input_fingerprint": "28d6b39ec3df589c5181bc96b38ee86482ec3086f7a69cf1d8e893131e6f5835",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": null,
+      "source": {
+        "fixture": "order5.json",
+        "fixture_sha256": "1bbde14d8ff036f8e6156e8ba926c9aa4e54a9ad647e57fba3985554543eb994",
+        "native_source": "supported exact named solver export",
+        "phase": "preserve source phase; no scaling or trimming",
+        "source_degree": 5,
+        "transformation": "a=conjugate(reverse(conjugate_complement)); b=canonical_coefficients"
+      },
+      "supports": {
+        "a": [
+          -5,
+          0
+        ],
+        "b": [
+          0,
+          5
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "16f07cdc56395b19a0fdadb6cff7bbb14eb648ffe724ef00053b0cb390981966",
+        "b": "e152bdd5dd04473583f683b1135fa9e47e2805dfc77e7a9f788cfee30cddf7d7"
+      },
+      "coefficient_count": 11,
+      "degree": 10,
+      "family": "native_exact_pair",
+      "fixture": "fixtures/native_order10.h5",
+      "fixture_sha256": "8d797da69c7454dfa042cd442787a214cd9774d01d65e03bdbd1f58daf184a7c",
+      "id": "native_order10",
+      "input_fingerprint": "b58b46a29c8f76f0bf02d6ef1b82d029cb0da24ea5277166379cc8e898c2f720",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": null,
+      "source": {
+        "fixture": "order10.json",
+        "fixture_sha256": "9bd57de21dcd54dc578cd5e9575cc3456bd8e37b0591d1ff793dae820c078384",
+        "native_source": "supported exact named solver export",
+        "phase": "preserve source phase; no scaling or trimming",
+        "source_degree": 10,
+        "transformation": "a=conjugate(reverse(conjugate_complement)); b=canonical_coefficients"
+      },
+      "supports": {
+        "a": [
+          -10,
+          0
+        ],
+        "b": [
+          0,
+          10
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "b8aef1b9b3caeba2079c2d0e83e56dc2e371761bfd55651d95d0960af1191c3e",
+        "b": "f46863cc32b07bb1197418b503b7008c230d02a81b0d93da603000cf17a0a2bb"
+      },
+      "coefficient_count": 21,
+      "degree": 20,
+      "family": "native_exact_pair",
+      "fixture": "fixtures/native_order20.h5",
+      "fixture_sha256": "52bc9d3e2fbcafc0b5fe16f072aa8875b53a1d148f45441fa4c94efcfce5da45",
+      "id": "native_order20",
+      "input_fingerprint": "fc503a07c637cee6ca9a459417cd8609735058f9409480cf601798f0e9ec8eff",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": null,
+      "source": {
+        "fixture": "order20.json",
+        "fixture_sha256": "a8f3658e9f508f81ffa43452d25acaa448ad74d951681b4d49dc5f6a2093b296",
+        "native_source": "supported exact named solver export",
+        "phase": "preserve source phase; no scaling or trimming",
+        "source_degree": 20,
+        "transformation": "a=conjugate(reverse(conjugate_complement)); b=canonical_coefficients"
+      },
+      "supports": {
+        "a": [
+          -20,
+          0
+        ],
+        "b": [
+          0,
+          20
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "98299ddd11ebc2782235724725972da3b1dbcc3231195612915e2fb2cc7006ce",
+        "b": "a72a4262d7391d76ac42267e3daa40594dd572c978e0ce2b5ebe3fd0f6929200"
+      },
+      "coefficient_count": 51,
+      "degree": 50,
+      "family": "native_exact_pair",
+      "fixture": "fixtures/native_order50.h5",
+      "fixture_sha256": "7974ff53e616c684792e91665f2a342af465b749889f82af682404e09b3857d6",
+      "id": "native_order50",
+      "input_fingerprint": "d3f8faf62eac0644ea97e8bdf8e732c254e2795234ee263567428164479def94",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": null,
+      "source": {
+        "fixture": "order50.json",
+        "fixture_sha256": "ecfe4896fa41bfa771e4ab1a5764bc279d8391b79a93e2405f2c0857ee27f7c4",
+        "native_source": "supported exact named solver export",
+        "phase": "preserve source phase; no scaling or trimming",
+        "source_degree": 50,
+        "transformation": "a=conjugate(reverse(conjugate_complement)); b=canonical_coefficients"
+      },
+      "supports": {
+        "a": [
+          -50,
+          0
+        ],
+        "b": [
+          0,
+          50
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "0a5cec943bcd31bb137c62c88750def751c56752f0058eaba73a27668cee189e",
+        "b": "5f80f108fb60c7ff385b07ee4246053ac98dce92150bb9e40d37c19cdfbf0036"
+      },
+      "coefficient_count": 101,
+      "degree": 100,
+      "family": "native_exact_pair",
+      "fixture": "fixtures/native_order100.h5",
+      "fixture_sha256": "59ae8d1666ed3c51551219456509387267fd13b4d5c96240a85cbc6cd9cfe0d3",
+      "id": "native_order100",
+      "input_fingerprint": "ea6147577a048a8952e482e3385f10e4021bc707220fb89e0f0fae18fbd6f224",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": null,
+      "source": {
+        "fixture": "order100.json",
+        "fixture_sha256": "a8a6b2621472f70224edfcf55be06268bc837aa487c674c8df08369fb4ce309b",
+        "native_source": "supported exact named solver export",
+        "phase": "preserve source phase; no scaling or trimming",
+        "source_degree": 100,
+        "transformation": "a=conjugate(reverse(conjugate_complement)); b=canonical_coefficients"
+      },
+      "supports": {
+        "a": [
+          -100,
+          0
+        ],
+        "b": [
+          0,
+          100
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "d7c7586053fa063694ef9279ba6d48525a9d0370e0afee84e851e508093185c9",
+        "b": "30a6867b95e7cc7fc7025576370c84232ef4444d6de38d5711d5a8e12f346e0b"
+      },
+      "coefficient_count": 201,
+      "degree": 200,
+      "family": "native_exact_pair",
+      "fixture": "fixtures/native_order200.h5",
+      "fixture_sha256": "fc0f0d343b3d791ef15a4b57da2c727b31f14a757c12a0b24330590a9473d0e2",
+      "id": "native_order200",
+      "input_fingerprint": "292f844af8c7ac2f2c9be4bee1d5b387f55cc285ce6aafa4b5e2c9dc64354901",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": null,
+      "source": {
+        "fixture": "order200.json",
+        "fixture_sha256": "11e6913baaccd3a8a6481228187a301b4b157fff1faf5ec6f67c8edeaa5315c3",
+        "native_source": "supported exact named solver export",
+        "phase": "preserve source phase; no scaling or trimming",
+        "source_degree": 200,
+        "transformation": "a=conjugate(reverse(conjugate_complement)); b=canonical_coefficients"
+      },
+      "supports": {
+        "a": [
+          -200,
+          0
+        ],
+        "b": [
+          0,
+          200
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "f86700e46bd894f584da1af6596b036b749ef9187fc43507f688fc806a8fac4d",
+        "b": "d14107aa9d9294a0637d14e886f1c3260d580c17d2bf5b62ab1077575060f9a4"
+      },
+      "coefficient_count": 501,
+      "degree": 500,
+      "family": "native_exact_pair",
+      "fixture": "fixtures/native_order500.h5",
+      "fixture_sha256": "e3671e9a38c4cfa635abd727884cd9b7e59cfb21a1dcd0dd70d04c6dcc82941f",
+      "id": "native_order500",
+      "input_fingerprint": "dca78b7adb8e6d245f1cbc5c24d18b06a86059294301f8f9a2725d2405f06d6c",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": null,
+      "source": {
+        "fixture": "order500.json",
+        "fixture_sha256": "f374de04bba1eba96b03a9f99ce209602dfac07e3234433c7fb58f8002ac3bcf",
+        "native_source": "supported exact named solver export",
+        "phase": "preserve source phase; no scaling or trimming",
+        "source_degree": 500,
+        "transformation": "a=conjugate(reverse(conjugate_complement)); b=canonical_coefficients"
+      },
+      "supports": {
+        "a": [
+          -500,
+          0
+        ],
+        "b": [
+          0,
+          500
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "efd4ced131441a262c19456f6a7e4f9fe5295008c9480ad108f866ac489a74ed",
+        "b": "9afe0e110e23c8aef8d6df37da740315fa4e771d1c3b74925b70381ebfb1814b"
+      },
+      "coefficient_count": 1001,
+      "degree": 1000,
+      "family": "native_exact_pair",
+      "fixture": "fixtures/native_order1000.h5",
+      "fixture_sha256": "7ce92dc8820ba62ed4ca8d8ecdc9d0058b742664b0c587fd485066a43533b3a6",
+      "id": "native_order1000",
+      "input_fingerprint": "593c1d294ba7ba0ee7c33f5390683734ac3f6e6dab785c876f8dafe9aa27b597",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": null,
+      "source": {
+        "fixture": "order1000.json",
+        "fixture_sha256": "82cd2a41241665a9e40f4ed1f7929086443562081aef47202b1ff2d14a3f9830",
+        "native_source": "supported exact named solver export",
+        "phase": "preserve source phase; no scaling or trimming",
+        "source_degree": 1000,
+        "transformation": "a=conjugate(reverse(conjugate_complement)); b=canonical_coefficients"
+      },
+      "supports": {
+        "a": [
+          -1000,
+          0
+        ],
+        "b": [
+          0,
+          1000
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "dea15f8c0f3183c4e9a22b3ead2a0e80e893e656b10682b7285d63afd6c1412b",
+        "b": "4192f70e6590c2a5ef93d07a4740ab278b2d78a9d6f251ae8795e4186498a621"
+      },
+      "coefficient_count": 2001,
+      "degree": 2000,
+      "family": "native_exact_pair",
+      "fixture": "fixtures/native_order2000.h5",
+      "fixture_sha256": "39853d91dac17fe4d312027c0e66f917d3406023665bbff320882de7e9efe0d8",
+      "id": "native_order2000",
+      "input_fingerprint": "ce19081ba8530fadeee58fb3a84f934fd56452ab0f98431109505b96dfc9eb40",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": null,
+      "source": {
+        "fixture": "order2000.json",
+        "fixture_sha256": "ee0bce22cf6b1a4eae91aeac8eca6add56733dab3cff66efd3e2fd71f7a1d238",
+        "native_source": "supported exact named solver export",
+        "phase": "preserve source phase; no scaling or trimming",
+        "source_degree": 2000,
+        "transformation": "a=conjugate(reverse(conjugate_complement)); b=canonical_coefficients"
+      },
+      "supports": {
+        "a": [
+          -2000,
+          0
+        ],
+        "b": [
+          0,
+          2000
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "74fb9da396e9a5d3fcb1e26921579e67c312dfef86ed7a4f338506722becf082",
+        "b": "696e5f3fe5eeb2ddce119adaa019a1a7ddc7f876f98fc35f2006f07300fe6c50"
+      },
+      "coefficient_count": 5001,
+      "degree": 5000,
+      "family": "native_exact_pair",
+      "fixture": "fixtures/native_order5000.h5",
+      "fixture_sha256": "cf28d4faa81537aba7157251c64073234a61040703bf153e680db6804f9cbae9",
+      "id": "native_order5000",
+      "input_fingerprint": "cadec22003ba122e40ab4f619080052a86a64c5290275463e97eb5cb4ec3c4d4",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": null,
+      "source": {
+        "fixture": "order5000.json",
+        "fixture_sha256": "d674048afa1af5d35078fbbf6133b2db5ec3113a395fb5983036abad66fd7673",
+        "native_source": "supported exact named solver export",
+        "phase": "preserve source phase; no scaling or trimming",
+        "source_degree": 5000,
+        "transformation": "a=conjugate(reverse(conjugate_complement)); b=canonical_coefficients"
+      },
+      "supports": {
+        "a": [
+          -5000,
+          0
+        ],
+        "b": [
+          0,
+          5000
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "aac20b2e911dff8f194fa8d894a8f0ff188aa03fd694c6ef5d73d47aaa05b50e",
+        "b": "b8ebe78804ab1d045fff9f56783d0380e7f04e08f4363a87a5d3610a071a0ed9"
+      },
+      "coefficient_count": 10001,
+      "degree": 10000,
+      "family": "native_exact_pair",
+      "fixture": "fixtures/native_order10000.h5",
+      "fixture_sha256": "d10e0919a6030b3dd128382d349a6e679a9d86e92f714f74db1e272d4ec4684a",
+      "id": "native_order10000",
+      "input_fingerprint": "bb3503b137d88961d2c90696e00ae84e099f67813edacfe00d6fad850dfa2be3",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": null,
+      "source": {
+        "fixture": "order10000.json",
+        "fixture_sha256": "645ba779c84f0c911c33c06909bd0f19547dffbfd09faf50e434b521196139d8",
+        "native_source": "supported exact named solver export",
+        "phase": "preserve source phase; no scaling or trimming",
+        "source_degree": 10000,
+        "transformation": "a=conjugate(reverse(conjugate_complement)); b=canonical_coefficients"
+      },
+      "supports": {
+        "a": [
+          -10000,
+          0
+        ],
+        "b": [
+          0,
+          10000
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "de099ae1a0e52ebf361e89dd7fad4dd8976bf53e1786a719eb2aa148e8f8c93e",
+        "b": "126d1a00a4b7022aca0e88a29bf992e4ad3ea966ef1d2a475bb64e90332f5211"
+      },
+      "coefficient_count": 20001,
+      "degree": 20000,
+      "family": "native_exact_pair",
+      "fixture": "fixtures/native_order20000.h5",
+      "fixture_sha256": "98407bf09c7c68d350fad13ae2df2d0065165a3035980683973db946157cc5b2",
+      "id": "native_order20000",
+      "input_fingerprint": "c7bf6c3edbd923a234ec11ec1a49ec282b0eb48a042a8d7157da9200f987bb5f",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": null,
+      "source": {
+        "fixture": "order20000.json",
+        "fixture_sha256": "0177b03dca5d2aa9814451b7eaa7a35855f33ef3bfe5019a32dd297e00a8884d",
+        "native_source": "supported exact named solver export",
+        "phase": "preserve source phase; no scaling or trimming",
+        "source_degree": 20000,
+        "transformation": "a=conjugate(reverse(conjugate_complement)); b=canonical_coefficients"
+      },
+      "supports": {
+        "a": [
+          -20000,
+          0
+        ],
+        "b": [
+          0,
+          20000
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "c6bb154cde6e199dc085a7f8ae1c35f5d684966e55ef9b1f0ae43b4c220016de",
+        "b": "660250743fdead3d62a91503559ca8795e105a41649ef6eacbf8970874be6d1d"
+      },
+      "coefficient_count": 50001,
+      "degree": 50000,
+      "family": "native_exact_pair",
+      "fixture": "fixtures/native_order50000.h5",
+      "fixture_sha256": "795c2ab6f6808ca1ea582bdfd51ac5159ce3990cb31e5ee067bc51547ff8c30e",
+      "id": "native_order50000",
+      "input_fingerprint": "04bb1343216ce078af6929747643c44e1bea812f8eb0eb7ee1362b903a54b7ad",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": null,
+      "source": {
+        "fixture": "order50000.json",
+        "fixture_sha256": "4db83c0a9269d60e76c82e08bf13beb63ce8da091ef7c6aa5065c23296e2c073",
+        "native_source": "supported exact named solver export",
+        "phase": "preserve source phase; no scaling or trimming",
+        "source_degree": 50000,
+        "transformation": "a=conjugate(reverse(conjugate_complement)); b=canonical_coefficients"
+      },
+      "supports": {
+        "a": [
+          -50000,
+          0
+        ],
+        "b": [
+          0,
+          50000
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "ab1c157dc87498ac3b864a23a6d7524982d51d3ea7d3307412d433f4c82b657b",
+        "b": "158238c2b4050a034de30b6074bba559df8b2ccc8bc3ceefea350bb57b929434"
+      },
+      "coefficient_count": 100001,
+      "degree": 100000,
+      "family": "native_exact_pair",
+      "fixture": "fixtures/native_order100000.h5",
+      "fixture_sha256": "0b00e49096b15a18512a176167ba3910285977af7a574365400cdebce1d7c371",
+      "id": "native_order100000",
+      "input_fingerprint": "55f4ac3ef42f78c0d2f9723dc99b4279486e3a9d71ae4356e31d9a6d63e8c3ce",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": null,
+      "source": {
+        "fixture": "order100000.json",
+        "fixture_sha256": "0727af05f6a049b054efb5a9d5f060476750f58a7dca58808be9784da46a9696",
+        "native_source": "supported exact named solver export",
+        "phase": "preserve source phase; no scaling or trimming",
+        "source_degree": 100000,
+        "transformation": "a=conjugate(reverse(conjugate_complement)); b=canonical_coefficients"
+      },
+      "supports": {
+        "a": [
+          -100000,
+          0
+        ],
+        "b": [
+          0,
+          100000
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "52d9d25cbb0990dfd542f3c72e7240a7da288388c9cef7a9428bf333d9fcc63d",
+        "b": "6b223d3cd7bccd63ba1c43849e2568d536c788c7a1a42f82cbe95e55a36f8367"
+      },
+      "coefficient_count": 200001,
+      "degree": 200000,
+      "family": "native_exact_pair",
+      "fixture": "fixtures/native_order200000.h5",
+      "fixture_sha256": "97140f3eca359c8c2664dea49f5ad03a208f6a9f6dc4461db09c9bfa8b80f6ba",
+      "id": "native_order200000",
+      "input_fingerprint": "d3e0bf9cbb0d02c57caa05a2e54c9129072e67cc47e67d1faa164c4c08bfd5f6",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": null,
+      "source": {
+        "fixture": "order200000.json",
+        "fixture_sha256": "9f2e048fc6d43988eebb3dab2ed2f493e7f2a70567a7fe490c0d341553474249",
+        "native_source": "supported exact named solver export",
+        "phase": "preserve source phase; no scaling or trimming",
+        "source_degree": 200000,
+        "transformation": "a=conjugate(reverse(conjugate_complement)); b=canonical_coefficients"
+      },
+      "supports": {
+        "a": [
+          -200000,
+          0
+        ],
+        "b": [
+          0,
+          200000
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "f96d2fd5ffd7b6a2a3824f3d1ae384725fee016b375e6b5ffb491f34eb6413d0",
+        "b": "1269d16c8ca12adf1c4f534c81ac4b75a7d5478f820e0c6c66b18ec26bdc9cbb"
+      },
+      "coefficient_count": 500001,
+      "degree": 500000,
+      "family": "native_exact_pair",
+      "fixture": "fixtures/native_order500000.h5",
+      "fixture_sha256": "27d7da5082046d73db0e19366638d17f03dd261cd0689411b15a1e9d659ebdd5",
+      "id": "native_order500000",
+      "input_fingerprint": "d2aa41fc4f67e4c10f16c42db5d9e4f411257b7bc184142328a2d787965fb490",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": null,
+      "source": {
+        "fixture": "order500000.json",
+        "fixture_sha256": "f9e2729291b7150513d4c7c60f541db1a7515f030ba4ee673402a3ae9992471e",
+        "native_source": "supported exact named solver export",
+        "phase": "preserve source phase; no scaling or trimming",
+        "source_degree": 500000,
+        "transformation": "a=conjugate(reverse(conjugate_complement)); b=canonical_coefficients"
+      },
+      "supports": {
+        "a": [
+          -500000,
+          0
+        ],
+        "b": [
+          0,
+          500000
+        ]
+      }
+    },
+    {
+      "array_sha256": {
+        "a": "688f7428dd60b2e6da98f8ec8d6a08e85d4a867c1972b827e1de5145f94c1655",
+        "b": "b7848848eca94cda244008029ea481ac93a923034a99bfdbe189d76f887929b2"
+      },
+      "coefficient_count": 1000001,
+      "degree": 1000000,
+      "family": "native_exact_pair",
+      "fixture": "fixtures/native_order1000000.h5",
+      "fixture_sha256": "2f586d1480d776efa94bf2815f51e959ac8a85f5a22a3a92a7eadf7ca28f4735",
+      "id": "native_order1000000",
+      "input_fingerprint": "10cef30fa6bb0e6c6599b8a3fb0768c8caf83b57c366c66f0eefb4b3b68cf46a",
+      "operation_version": "nlft-pair-v1",
+      "operations": [
+        "inverse"
+      ],
+      "schema_version": "1.0",
+      "seed": null,
+      "source": {
+        "fixture": "order1000000.json",
+        "fixture_sha256": "123c74db5f2618e712c955d3673e80e6a5055ce77ebc852816f123ffd1456cb9",
+        "native_source": "supported exact named solver export",
+        "phase": "preserve source phase; no scaling or trimming",
+        "source_degree": 1000000,
+        "transformation": "a=conjugate(reverse(conjugate_complement)); b=canonical_coefficients"
+      },
+      "supports": {
+        "a": [
+          -1000000,
+          0
+        ],
+        "b": [
+          0,
+          1000000
+        ]
+      }
+    }
+  ],
+  "operation_version": "nlft-pair-v1",
+  "schema_version": "1.0",
+  "seed": 1337
+}

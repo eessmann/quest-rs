@@ -705,7 +705,10 @@ mod tests {
 					policy.max_work = context.work - 1;
 					assert!(matches!(
 						inverse(&a, &b, &mut Context::new(count, p, policy)?),
-						Err(Error::Budget("offline work"))
+						Err(Error::Resource(quest_numerics::ResourceError::Limit {
+							resource: "cumulative work",
+							..
+						}))
 					));
 				}
 				let mut storage = OfflinePolicy {
@@ -854,7 +857,10 @@ mod tests {
 				)?;
 				expect_true!(matches!(
 					completion(&target, &mut insufficient),
-					Err(Error::Budget("offline work"))
+					Err(Error::Resource(quest_numerics::ResourceError::Limit {
+						resource: "cumulative work",
+						..
+					}))
 				));
 			}
 		}

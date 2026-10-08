@@ -1,0 +1,2 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 17.98s
+     Running `target/debug/xtask generate-quest-bindings --check`

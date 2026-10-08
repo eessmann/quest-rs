@@ -76,7 +76,7 @@ fn offline_rejects_work_budgets_and_does_not_hide_export_rounding_failure() -> R
 			..OfflinePolicy::default()
 		})?
 		.solve();
-	expect_true!(matches!(result, Err(OfflineError::Budget(_))));
+	expect_true!(matches!(result, Err(OfflineError::Resource(_))));
 	let mut policy = OfflinePolicy {
 		max_precision: 128,
 		..OfflinePolicy::default()
@@ -296,16 +296,25 @@ fn mp_request<F: AdmittedFunction>(
 fn shared_remez_enforces_work_and_storage_before_evaluation() -> Result<()> {
 	for limits in [
 		Limits {
-			max_work: 0,
-			..Limits::default()
+			shapes: (Limits::default()).shapes,
+			resources: quest_numerics::ResourceLimits {
+				max_work_units: 0,
+				..(Limits::default()).resources
+			},
 		},
 		Limits {
-			max_work: 1,
-			..Limits::default()
+			shapes: (Limits::default()).shapes,
+			resources: quest_numerics::ResourceLimits {
+				max_work_units: 1,
+				..(Limits::default()).resources
+			},
 		},
 		Limits {
-			max_bytes: 1,
-			..Limits::default()
+			shapes: (Limits::default()).shapes,
+			resources: quest_numerics::ResourceLimits {
+				max_peak_bytes: 1,
+				..(Limits::default()).resources
+			},
 		},
 	] {
 		let result = mp_request(function!(|x| x.exp().sin()), 1)?
@@ -322,12 +331,22 @@ fn shared_remez_enforces_work_and_storage_before_evaluation() -> Result<()> {
 			eq(1.0_f64.sin())
 		);
 		expect_that!(
-			failure.request().configuration().limits.max_work,
-			eq(limits.max_work)
+			failure
+				.request()
+				.configuration()
+				.limits
+				.resources
+				.max_work_units,
+			eq(limits.resources.max_work_units)
 		);
 		expect_that!(
-			failure.request().configuration().limits.max_bytes,
-			eq(limits.max_bytes)
+			failure
+				.request()
+				.configuration()
+				.limits
+				.resources
+				.max_peak_bytes,
+			eq(limits.resources.max_peak_bytes)
 		);
 	}
 	Ok(())

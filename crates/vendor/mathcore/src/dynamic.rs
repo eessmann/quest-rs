@@ -4,8 +4,8 @@
 //! remain separate: simplification keeps its source and differentiation evaluates
 //! the source before its derivative, preserving bindings and domain obligations.
 use crate::{
-	arithmetic::{ArithmeticError as Error, Backend, ExactConstant},
-	exact::Symbol,
+	arithmetic::{ArithmeticError as Error, ArithmeticProfile, Backend, ExactConstant},
+	identity::Symbol,
 	multivariate::{PolynomialLimits, SparsePolynomial, rational_constant},
 	scalar::{BinaryOperation, UnaryOperation},
 	scope::{Scope, ScopePlan},
@@ -519,6 +519,7 @@ impl DynamicExpression {
 			return Err(Error::Budget("expression kernel storage").into());
 		}
 		Ok(ExpressionKernel {
+			profile: backend.profile(),
 			instructions,
 			inputs: symbols.len(),
 			stack_capacity: self.depth,
@@ -570,6 +571,7 @@ enum Instruction<S> {
 }
 #[derive(Clone, Debug)]
 pub struct ExpressionKernel<S> {
+	profile: ArithmeticProfile,
 	instructions: Vec<Instruction<S>>,
 	inputs: usize,
 	stack_capacity: usize,
@@ -584,6 +586,43 @@ impl<S: Clone> ExpressionKernel<S> {
 		backend: &mut B,
 		inputs: &[S],
 	) -> std::result::Result<S, B::Error> {
+		let mut workspace = self.workspace()?;
+		self.evaluate_with_workspace(backend, inputs, &mut workspace)
+	}
+	/// Allocate admitted scratch once for repeated evaluations.
+	/// # Errors
+	/// Rejects storage overflow or allocation failure.
+	pub fn workspace(&self) -> Result<KernelWorkspace<S>> {
+		KernelWorkspace::with_capacity(
+			self.stack_capacity,
+			self.max_bytes
+				.checked_sub(self.retained)
+				.ok_or(Error::Budget("expression workspace"))?,
+		)
+	}
+	#[must_use]
+	pub const fn profile(&self) -> ArithmeticProfile {
+		self.profile
+	}
+	/// Evaluate in original source order without allocating scratch. Stored scalar
+	/// clones and backend operations may allocate. Scratch is cleared on success,
+	/// error and unwinding while its admitted capacity remains reusable.
+	/// # Errors
+	/// Rejects incompatible profiles, insufficient capacity, invalid inputs or
+	/// arithmetic/resource failure before executing the affected operation.
+	pub fn evaluate_with_workspace<B: Backend<Scalar = S>>(
+		&self,
+		backend: &mut B,
+		inputs: &[S],
+		workspace: &mut KernelWorkspace<S>,
+	) -> std::result::Result<S, B::Error> {
+		if backend.profile() != self.profile {
+			return Err(Error::Domain("arithmetic profile mismatch").into());
+		}
+		if workspace.values.capacity() < self.stack_capacity {
+			return Err(Error::Budget("expression workspace capacity").into());
+		}
+
 		if inputs.len() != self.inputs {
 			return Err(Error::Domain("expression input shape").into());
 		}
@@ -601,9 +640,16 @@ impl<S: Clone> ExpressionKernel<S> {
 		let base = self
 			.retained
 			.checked_add(input_bytes)
-			.and_then(|b| b.checked_add(self.stack_capacity.checked_mul(size_of::<Stored<S>>())?))
+			.and_then(|b| {
+				b.checked_add(
+					workspace
+						.values
+						.capacity()
+						.checked_mul(size_of::<Stored<S>>())?,
+				)
+			})
 			.ok_or(Error::Budget("expression stack"))?;
-		let mut stack = ValueStack::new(self.stack_capacity, base, self.max_bytes)?;
+		let mut stack = ValueStack::new(&mut workspace.values, base, self.max_bytes)?;
 		for instruction in &self.instructions {
 			match instruction {
 				Instruction::Visit => backend.visit()?,
@@ -653,25 +699,51 @@ impl<S: Clone> ExpressionKernel<S> {
 		Ok(result)
 	}
 }
-struct Stored<S> {
-	value: S,
-	bytes: usize,
-}
-struct ValueStack<S> {
+/// Opaque reusable execution scratch. Capacity is admitted before evaluation;
+/// evaluation never grows it. Use `ExpressionKernel::workspace` for a matching size.
+pub struct KernelWorkspace<S> {
 	values: Vec<Stored<S>>,
-	bytes: usize,
-	base: usize,
-	limit: usize,
 }
-impl<S> ValueStack<S> {
-	fn new(capacity: usize, base: usize, limit: usize) -> Result<Self> {
-		if base > limit {
-			return Err(Error::Budget("expression stack"));
+impl<S> KernelWorkspace<S> {
+	/// # Errors
+	/// Rejects byte overflow, the requested storage limit or allocation failure.
+	pub fn with_capacity(capacity: usize, max_bytes: usize) -> Result<Self> {
+		if capacity
+			.checked_mul(size_of::<Stored<S>>())
+			.is_none_or(|n| n > max_bytes)
+		{
+			return Err(Error::Budget("expression workspace"));
 		}
 		let mut values = Vec::new();
 		values
 			.try_reserve_exact(capacity)
-			.map_err(|_| Error::Budget("expression stack"))?;
+			.map_err(|_| Error::Budget("expression workspace allocation"))?;
+		if values
+			.capacity()
+			.checked_mul(size_of::<Stored<S>>())
+			.is_none_or(|n| n > max_bytes)
+		{
+			return Err(Error::Budget("expression workspace"));
+		}
+		Ok(Self { values })
+	}
+}
+struct Stored<S> {
+	value: S,
+	bytes: usize,
+}
+struct ValueStack<'a, S> {
+	values: &'a mut Vec<Stored<S>>,
+	bytes: usize,
+	base: usize,
+	limit: usize,
+}
+impl<'a, S> ValueStack<'a, S> {
+	fn new(values: &'a mut Vec<Stored<S>>, base: usize, limit: usize) -> Result<Self> {
+		if base > limit {
+			return Err(Error::Budget("expression stack"));
+		}
+		debug_assert!(values.is_empty());
 		Ok(Self {
 			values,
 			bytes: 0,
@@ -716,6 +788,11 @@ impl<S> ValueStack<S> {
 		Ok(value)
 	}
 }
+impl<S> Drop for ValueStack<'_, S> {
+	fn drop(&mut self) {
+		self.values.clear();
+	}
+}
 fn unary<B: Backend>(
 	b: &mut B,
 	op: UnaryOperation,
@@ -751,6 +828,13 @@ struct ConstructionBackend {
 	constant_bytes: usize,
 }
 impl Backend for ConstructionBackend {
+	fn profile(&self) -> crate::arithmetic::ArithmeticProfile {
+		crate::arithmetic::ArithmeticProfile::new(
+			"mathcore::dynamic::ConstructionBackend",
+			0,
+			"ordered exact source",
+		)
+	}
 	type Scalar = DynamicExpression;
 	type Error = Error;
 	fn visit(&mut self) -> Result<()> {

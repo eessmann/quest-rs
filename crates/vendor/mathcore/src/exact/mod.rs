@@ -21,33 +21,7 @@ use std::ops::{Add, Mul, Neg};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct Owner(u64);
-impl Owner {
-	pub const fn new(id: u64) -> Self {
-		Self(id)
-	}
-	pub const fn id(self) -> u64 {
-		self.0
-	}
-}
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct Symbol {
-	owner: Owner,
-	index: u64,
-}
-impl Symbol {
-	pub const fn new(owner: Owner, index: u64) -> Self {
-		Self { owner, index }
-	}
-	pub const fn owner(self) -> Owner {
-		self.owner
-	}
-	pub const fn index(self) -> u64 {
-		self.index
-	}
-}
+pub use crate::identity::{Owner, Symbol};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[allow(
@@ -174,7 +148,7 @@ impl Context {
 		if u64::try_from(terms.len()).map_err(|_| ExactError::WorkLimit)? > self.limits.max_work {
 			return Err(ExactError::WorkLimit);
 		}
-		if terms.iter().any(|(s, _)| s.owner != self.owner) {
+		if terms.iter().any(|(s, _)| s.owner() != self.owner) {
 			return Err(ExactError::ForeignSymbol);
 		}
 		self.check_coefficient(&constant)?;
@@ -672,7 +646,7 @@ impl Affine {
 			}
 		}
 		for (s, value) in &mapping {
-			if s.owner != self.owner() {
+			if s.owner() != self.owner() {
 				return Err(ExactError::ForeignSymbol);
 			}
 			if value.owner() != target.owner || !Arc::ptr_eq(&value.context.state, &target.state) {

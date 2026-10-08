@@ -372,10 +372,9 @@ impl ConfigurationGrid {
 		{
 			return Err(CfdError::InvalidInput("invalid initial regularization"));
 		}
-		let mut result = Vec::new();
-		result
-			.try_reserve_exact(self.dimension)
-			.map_err(|_| CfdError::InvalidInput("initial state allocation failed"))?;
+		let mut result = crate::storage::reserved(self.dimension, || {
+			CfdError::InvalidInput("initial state allocation failed")
+		})?;
 		for index in 0..self.dimension {
 			let point = self
 				.point(index)
@@ -393,15 +392,9 @@ impl ConfigurationGrid {
 			});
 			result.push(Complex64::new(value, 0.0));
 		}
-		let norm = result.iter().map(Complex64::norm_sqr).sum::<f64>().sqrt();
-		if !norm.is_finite() || norm == 0.0 {
-			return Err(CfdError::InvalidInput(
-				"initial regularization unresolved or underflowed",
-			));
-		}
-		for z in &mut result {
-			*z /= norm;
-		}
+		crate::storage::normalize(&mut result, || {
+			CfdError::InvalidInput("initial regularization unresolved or underflowed")
+		})?;
 		Ok(result)
 	}
 	/// Probability in the outermost configuration cells (counted once at corners).

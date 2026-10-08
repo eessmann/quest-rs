@@ -67,7 +67,10 @@ fn near_contractivity_boundary_is_verified_without_normalizing_export() -> Resul
 	)?;
 	let candidate = SynthesisBuilder::new()
 		.policy(quest_qsp::Policy {
-			contractivity_margin: 1e-14,
+			accuracy: quest_qsp::AccuracyPolicy {
+				contractivity_margin: 1e-14,
+				..(quest_qsp::Policy::default()).accuracy
+			},
 			..quest_qsp::Policy::default()
 		})
 		.unit_circle_response(&target)?

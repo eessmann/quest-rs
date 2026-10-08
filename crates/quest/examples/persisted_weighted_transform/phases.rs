@@ -60,16 +60,41 @@ pub fn compile(
 			},
 		)?;
 		let candidate = polynomial.synthesize(quest_qsp::Policy {
-			algorithm: quest_qsp::SynthesisAlgorithm::InverseNlftDivideConquer,
-			response_tolerance: 1e-11,
-			contractivity_margin: 1e-12,
-			max_completion_grid: 16_384,
-			backend: quest_qsp::FftBackend::Scalar,
-			limits: quest_numerics::Limits {
-				max_len: 16_384,
-				max_bytes: 32 * 1024 * 1024,
-				max_work: 1_000_000_000,
+			limits: quest_numerics::OperationLimits {
+				shapes: quest_numerics::ShapeLimits {
+					max_completion_grid: 16_384,
+					..(quest_numerics::Limits {
+						shapes: quest_numerics::ShapeLimits {
+							max_coefficients: 16_384,
+							max_fft_len: 16_384,
+							..(quest_numerics::OperationLimits::default()).shapes
+						},
+						resources: quest_numerics::ResourceLimits {
+							max_peak_bytes: 32 * 1024 * 1024,
+							max_work_units: 1_000_000_000,
+						},
+					})
+					.shapes
+				},
+				resources: (quest_numerics::Limits {
+					shapes: quest_numerics::ShapeLimits {
+						max_coefficients: 16_384,
+						max_fft_len: 16_384,
+						..(quest_numerics::OperationLimits::default()).shapes
+					},
+					resources: quest_numerics::ResourceLimits {
+						max_peak_bytes: 32 * 1024 * 1024,
+						max_work_units: 1_000_000_000,
+					},
+				})
+				.resources,
 			},
+			accuracy: quest_qsp::AccuracyPolicy {
+				response_tolerance: 1e-11,
+				contractivity_margin: 1e-12,
+			},
+			algorithm: quest_qsp::SynthesisAlgorithm::InverseNlftDivideConquer,
+			backend: quest_qsp::FftBackend::Scalar,
 		})?;
 		let diagnostics = [
 			polynomial.scale(),

@@ -79,16 +79,35 @@ fn typed_dynamic_bridge_and_derivative_retain_domain_obligations() -> Result<()>
 struct TestBackend {
 	working: usize,
 	reject_constants: bool,
+	panic_after_visits: Option<usize>,
+	policy: mathcore::arithmetic::ArithmeticProfile,
 }
 impl Default for TestBackend {
 	fn default() -> Self {
 		Self {
 			working: size_of::<f64>(),
 			reject_constants: false,
+			panic_after_visits: None,
+			policy: mathcore::arithmetic::ArithmeticProfile::new("TestBackend", 53, "fixed"),
 		}
 	}
 }
 impl mathcore::arithmetic::Backend for TestBackend {
+	fn profile(&self) -> mathcore::arithmetic::ArithmeticProfile {
+		self.policy
+	}
+	#[allow(
+		clippy::panic_in_result_fn,
+		reason = "Intentional backend unwind tests workspace RAII"
+	)]
+	fn visit(&mut self) -> std::result::Result<(), Self::Error> {
+		if let Some(left) = &mut self.panic_after_visits {
+			assert!(*left != 0, "intentional backend unwind");
+			*left = left.saturating_sub(1);
+		}
+		Ok(())
+	}
+
 	type Scalar = f64;
 	type Error = mathcore::arithmetic::ArithmeticError;
 	fn working_scalar_bytes(&self) -> usize {
@@ -276,6 +295,8 @@ fn dynamic_kernel_storage_is_admitted_before_lowering_constants() -> Result<()> 
 	let mut backend = TestBackend {
 		working: 4096,
 		reject_constants: true,
+		panic_after_visits: None,
+		policy: mathcore::arithmetic::ArithmeticProfile::new("TestBackend", 53, "fixed"),
 	};
 	verify_eq!(
 		expression.lower(&mut backend, &[]).err(),
@@ -329,5 +350,110 @@ fn prepared_polynomial_accounts_retained_capacity_and_unused_coordinates() -> Re
 	)?;
 	verify_that!(kernel.evaluate(&mut backend, &[2.; 7]), err(anything()))?;
 	verify_eq!(kernel.evaluate(&mut backend, &[2.; 8])?, 6.)?;
+	Ok(())
+}
+
+#[gtest]
+fn workspace_is_reusable_after_domain_failure_and_rejects_small_capacity() -> Result<()> {
+	use mathcore::{
+		dynamic::{DynamicExpression, ExpressionLimits, KernelWorkspace},
+		scalar::UnaryOperation,
+	};
+	let symbol = mathcore::exact::Symbol::new(Owner::new(61), 0);
+	let x = DynamicExpression::variable(symbol, ExpressionLimits::default())?;
+	let source = x.binary(
+		mathcore::scalar::BinaryOperation::Add,
+		&x.unary(UnaryOperation::Ln)?,
+	)?;
+	let mut backend = TestBackend::default();
+	let kernel = source.lower(&mut backend, &[symbol])?;
+	let mut workspace = kernel.workspace()?;
+	verify_that!(
+		kernel.evaluate_with_workspace(&mut backend, &[-1.0], &mut workspace),
+		err(anything())
+	)?;
+	verify_eq!(
+		kernel.evaluate_with_workspace(&mut backend, &[1.0], &mut workspace)?,
+		1.0
+	)?;
+	backend.panic_after_visits = Some(2);
+	let unwind = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+		kernel.evaluate_with_workspace(&mut backend, &[1.0], &mut workspace)
+	}));
+	verify_true!(unwind.is_err())?;
+	backend.panic_after_visits = None;
+	verify_eq!(
+		kernel.evaluate_with_workspace(&mut backend, &[1.0], &mut workspace)?,
+		1.0
+	)?;
+	let mut insufficient = KernelWorkspace::with_capacity(0, 0)?;
+	verify_that!(
+		kernel.evaluate_with_workspace(&mut backend, &[1.0], &mut insufficient),
+		err(anything())
+	)?;
+	Ok(())
+}
+
+#[gtest]
+fn checked_dyadic_parts_cover_extremes_signed_zero_and_nonfinite() -> Result<()> {
+	use mathcore::dyadic::parts;
+	for value in [
+		0.0,
+		-0.0,
+		f64::from_bits(1),
+		-f64::from_bits(1),
+		f64::MIN_POSITIVE,
+		f64::MAX,
+	] {
+		let part = parts(value).ok_or_else(|| std::io::Error::other("finite rejected"))?;
+		verify_eq!(part.negative(), value.is_sign_negative())?;
+		verify_true!(part.mantissa() < (1_u64 << 53))?;
+	}
+	verify_true!(parts(f64::NAN).is_none())?;
+	verify_true!(parts(f64::INFINITY).is_none())?;
+	verify_true!(parts(f64::NEG_INFINITY).is_none())?;
+	let neutral = mathcore::identity::Symbol::new(mathcore::identity::Owner::new(7), 8);
+	let existing: mathcore::exact::Symbol = neutral;
+	verify_eq!(existing.owner().id(), 7)?;
+	verify_ne!(
+		existing,
+		mathcore::identity::Symbol::new(mathcore::identity::Owner::new(8), 8)
+	)?;
+	Ok(())
+}
+
+#[gtest]
+fn kernels_reject_scalar_semantics_and_rounding_changes_before_visiting() -> Result<()> {
+	use mathcore::{
+		arithmetic::{ArithmeticProfile, ExactConstant},
+		dynamic::{DynamicExpression, ExpressionLimits},
+	};
+	let source =
+		DynamicExpression::constant(ExactConstant::Integer(1), ExpressionLimits::default())?;
+	let mut backend = TestBackend::default();
+	let dynamic = source.lower(&mut backend, &[])?;
+	let polynomial = source
+		.polynomial(&[], PolynomialLimits::default())?
+		.lower(&mut backend)?;
+	for profile in [
+		ArithmeticProfile::new("other semantics", 53, "fixed"),
+		ArithmeticProfile::new("TestBackend", 53, "other rounding"),
+	] {
+		backend.policy = profile;
+		// A visit would panic; mismatched profiles must reject before execution.
+		backend.panic_after_visits = Some(0);
+		verify_that!(
+			dynamic.evaluate(&mut backend, &[]),
+			err(eq(&mathcore::arithmetic::ArithmeticError::Domain(
+				"arithmetic profile mismatch"
+			)))
+		)?;
+		verify_that!(
+			polynomial.evaluate(&mut backend, &[]),
+			err(eq(&mathcore::arithmetic::ArithmeticError::Domain(
+				"arithmetic profile mismatch"
+			)))
+		)?;
+	}
 	Ok(())
 }

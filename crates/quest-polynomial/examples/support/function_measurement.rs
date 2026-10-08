@@ -5,31 +5,7 @@
 )]
 use quest_numerics::arithmetic::{F64Backend, Interval64Backend};
 use quest_polynomial::{Expression, Function, GenericFunction, Interval};
-use std::{
-	alloc::{GlobalAlloc, Layout, System},
-	hint::black_box,
-	sync::atomic::{AtomicBool, AtomicUsize, Ordering},
-	time::Instant,
-};
-struct CountingAllocator;
-static TRACK: AtomicBool = AtomicBool::new(false);
-static ALLOCATIONS: AtomicUsize = AtomicUsize::new(0);
-#[global_allocator]
-static ALLOCATOR: CountingAllocator = CountingAllocator;
-// SAFETY: Allocation and deallocation arguments are delegated unchanged to System.
-unsafe impl GlobalAlloc for CountingAllocator {
-	unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-		if TRACK.load(Ordering::Relaxed) {
-			ALLOCATIONS.fetch_add(1, Ordering::Relaxed);
-		}
-		// SAFETY: The caller supplies the valid allocator layout.
-		unsafe { System.alloc(layout) }
-	}
-	unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
-		// SAFETY: The caller supplies the matching pointer and original layout.
-		unsafe { System.dealloc(ptr, layout) }
-	}
-}
+use std::{hint::black_box, time::Instant};
 fn measure(
 	label: &str,
 	phase: &str,
@@ -37,19 +13,19 @@ fn measure(
 	mut action: impl FnMut() -> quest_polynomial::Result<()>,
 ) -> Result<(), Box<dyn std::error::Error>> {
 	action()?;
-	ALLOCATIONS.store(0, Ordering::Relaxed);
 	let started = Instant::now();
-	TRACK.store(true, Ordering::Relaxed);
-	let result: quest_polynomial::Result<()> = (|| {
-		for _ in 0..count {
-			action()?;
-		}
-		Ok(())
-	})();
-	TRACK.store(false, Ordering::Relaxed);
+	let mut result: quest_polynomial::Result<()> = Ok(());
+	let stats = allocation_counter::measure(|| {
+		result = (|| {
+			for _ in 0..count {
+				action()?;
+			}
+			Ok(())
+		})();
+	});
 	let elapsed = started.elapsed().as_nanos();
 	result?;
-	let allocations = ALLOCATIONS.load(Ordering::Relaxed);
+	let allocations = usize::try_from(stats.count_total)?;
 	write_measurement(
 		std::io::stdout().lock(),
 		label,

@@ -1,5 +1,5 @@
 //! Preflighted scope-validation scratch shared by symbolic construction paths.
-use crate::{arithmetic::ArithmeticError as Error, exact::Symbol};
+use crate::{arithmetic::ArithmeticError as Error, identity::Symbol};
 type Result<T> = std::result::Result<T, Error>;
 pub struct ScopePlan {
 	count: usize,

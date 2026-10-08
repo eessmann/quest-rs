@@ -20,6 +20,7 @@ dashu-int = { workspace = true, optional = true }
 dashu-float = { workspace = true, optional = true }
 
 [dev-dependencies]
+hdf5-metno.workspace = true
 mathcore.workspace = true
 criterion.workspace = true
 googletest.workspace = true
@@ -28,6 +29,7 @@ googletest.workspace = true
 workspace = true
 
 [features]
+benchmark-support = ["dep:serde_json"]
 artifact = ["certification", "dep:serde", "dep:serde_json", "dep:sha2"]
 certification = ["dep:dashu-base", "dep:dashu-int", "dep:dashu-float"]
 offline-synthesis = ["certification"]
@@ -37,3 +39,17 @@ simd = ["quest-numerics/simd"]
 [[bench]]
 name = "pipeline"
 harness = false
+
+[[bench]]
+name = "replication"
+harness = false
+required-features = ["benchmark-support"]
+
+[[bench]]
+name = "matched_nlft"
+harness = false
+required-features = ["benchmark-support", "simd"]
+
+[[example]]
+name = "large_polynomial_acceptance"
+required-features = ["benchmark-support", "simd"]

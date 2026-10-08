@@ -1,0 +1,8 @@
+error: failed to select a version for the requirement `private-gemm-x86 = "^0.1.20"`
+  version 0.1.20 is yanked
+location searched: crates.io index
+required by package `faer v0.24.4`
+    ... which satisfies dependency `faer = "^0.24"` of package `quest-rs v0.1.0 (<workspace>/crates/quest)`
+    ... which satisfies path dependency `quest` of package `quest-consumer-facade v0.0.0 (<workspace>/target/quality-native-consumers/facade)`
+note: offline mode (via `--offline`) can sometimes cause surprising resolution failures
+help: if this error is too confusing you may wish to retry without `--offline`

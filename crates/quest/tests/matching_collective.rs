@@ -159,19 +159,9 @@ fn collective_matching_shards_route_all_sectors_without_global_storage() -> goog
 			let before_rejection = environment.view().allocated_bytes();
 			let wide =
 				environment.prepare_matching(shard.clone(), QubitCount::new(16)?, targets.clone());
-			if parts == 1 {
-				expect_true!(wide.is_err());
-			} else {
-				// The prepared descriptor borrows future input scratch on distributed
-				// calls; allocation of that input still obeys the native rank budget.
-				let wide = wide?;
-				expect_true!(
-					environment
-						.state_vector_local(QubitCount::new(16)?)
-						.is_err()
-				);
-				drop(wide);
-			}
+			// Every rank admits owned scratch before publishing the descriptor.
+			// This width exceeds the unchanged rank budget at every tested size.
+			expect_true!(wide.is_err());
 			expect_eq!(environment.view().allocated_bytes(), before_rejection);
 
 			expect_true!(

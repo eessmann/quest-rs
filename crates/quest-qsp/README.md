@@ -272,3 +272,41 @@ readout. Raw imported phase/control sequences remain weaker artifacts.
 `ArtifactLimits` separates encoded bytes, conservative decoded storage and array
 length limits. `LoadPolicy::admission` independently bounds contractivity work.
 Historical verification policy never overrides the loader's resource choices.
+
+## Resource migration and reusable NLFT workspaces
+
+`Policy::accuracy` contains `AccuracyPolicy { response_tolerance,
+contractivity_margin }`. `Policy::limits` is the common `OperationLimits`, with
+independent coefficient, padded FFT, and completion-grid shape gates and shared
+peak-byte/cumulative-work limits. Increasing these limits does not change any
+numerical acceptance threshold or make a quadratic algorithm scalable.
+
+`InverseNlftWorkspace::new(backend, resources, execution)` and
+`ForwardNlftWorkspace::new(backend, resources, execution)` accept the same
+cloneable `OperationResources`. Their plans and scratch persist between calls.
+`cached_plan_count()` and `cached_buffer_bytes()` expose reuse evidence without
+measuring a global allocator. `inverse(a_star, b)` accepts the canonical reversed
+conjugate complement. `inverse_physical(a, b)` accepts the physical ascending
+arrays and includes the charged reverse/conjugate preparation. `forward(gamma)`
+returns canonical `ScatteringPair` arrays. Results are `Accounted<T>`: their owned
+buffers remain charged after workspaces drop and are released when results drop.
+A repeated call spends additional cumulative work while reusing retained plans.
+
+The ordinary synthesis builder begins an operation for its owned target/source
+copies; its borrowed input polynomial belongs to the caller's operation. Admission,
+completion retries, inverse synthesis, and reconstruction use one ledger.
+`SynthesisBuilder::new().resources(polynomial.operation_resources())` explicitly
+shares an earlier operation; the provided ledger's limits take precedence over
+`Policy::limits`. Supply this before target selection to include copied buffers
+and preparation. `resource_report()` on admitted, completed, or frozen stages
+reports that same ledger. Shared exported phase/control sequences keep their own
+buffer reservation after the candidate drops. Offline retries share cumulative
+work and a conservative arbitrary-precision working-storage model, while frozen
+binary64 exports retain individual buffer reservations.
+
+Artifact loading uses caller-owned admission limits for live loaded buffers and
+fresh target admission. New artifacts persist the independent FFT gate. Older
+version-one artifacts without that field explicitly inherit their recorded
+coefficient limit as their FFT gate; omitted-field serialization is retained for
+the original payload digest. Producer policy remains provenance rather than
+permission to raise the loader's limits.

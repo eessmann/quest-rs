@@ -134,6 +134,9 @@ struct StoredPolicy {
 	max_completion_grid: usize,
 	backend: String,
 	max_len: usize,
+	// Missing only in version-one artifacts written before shape separation.
+	#[serde(default, skip_serializing_if = "Option::is_none")]
+	max_fft_len: Option<usize>,
 	max_bytes: usize,
 	max_work: usize,
 }
@@ -174,34 +177,42 @@ fn complex(value: [u64; 2]) -> ArtifactResult<Complex64> {
 }
 fn policy(value: Policy) -> StoredPolicy {
 	StoredPolicy {
-		response_tolerance: value.response_tolerance.to_bits(),
-		contractivity_margin: value.contractivity_margin.to_bits(),
-		max_completion_grid: value.max_completion_grid,
+		response_tolerance: value.accuracy.response_tolerance.to_bits(),
+		contractivity_margin: value.accuracy.contractivity_margin.to_bits(),
+		max_completion_grid: value.limits.shapes.max_completion_grid,
 		backend: match value.backend {
 			FftBackend::Scalar => "scalar",
 			FftBackend::Simd => "simd",
 		}
 		.into(),
-		max_len: value.limits.max_len,
-		max_bytes: value.limits.max_bytes,
-		max_work: value.limits.max_work,
+		max_len: value.limits.shapes.max_coefficients,
+		max_fft_len: Some(value.limits.shapes.max_fft_len),
+		max_bytes: value.limits.resources.max_peak_bytes,
+		max_work: value.limits.resources.max_work_units,
 	}
 }
 fn decode_policy(value: &StoredPolicy, algorithm: SynthesisAlgorithm) -> ArtifactResult<Policy> {
 	let result = Policy {
+		limits: quest_numerics::OperationLimits {
+			shapes: quest_numerics::ShapeLimits {
+				max_coefficients: value.max_len,
+				max_fft_len: value.max_fft_len.unwrap_or(value.max_len),
+				max_completion_grid: value.max_completion_grid,
+			},
+			resources: quest_numerics::ResourceLimits {
+				max_peak_bytes: value.max_bytes,
+				max_work_units: value.max_work,
+			},
+		},
+		accuracy: crate::AccuracyPolicy {
+			response_tolerance: scalar(value.response_tolerance)?,
+			contractivity_margin: scalar(value.contractivity_margin)?,
+		},
 		algorithm,
-		response_tolerance: scalar(value.response_tolerance)?,
-		contractivity_margin: scalar(value.contractivity_margin)?,
-		max_completion_grid: value.max_completion_grid,
 		backend: match value.backend.as_str() {
 			"scalar" => FftBackend::Scalar,
 			"simd" => FftBackend::Simd,
 			_ => return Err(ArtifactError::Invalid("FFT backend")),
-		},
-		limits: quest_numerics::Limits {
-			max_len: value.max_len,
-			max_bytes: value.max_bytes,
-			max_work: value.max_work,
 		},
 	};
 	result.validate()?;
@@ -385,7 +396,7 @@ fn decode<M: ArtifactMode>(
 	};
 	if payload.completion_grid == 0
 		|| !payload.completion_grid.is_power_of_two()
-		|| payload.completion_grid > producer.max_completion_grid
+		|| payload.completion_grid > producer.limits.shapes.max_completion_grid
 	{
 		return Err(ArtifactError::Invalid("completion grid"));
 	}
@@ -443,7 +454,9 @@ fn decode<M: ArtifactMode>(
 	if target.is_empty() || a_star.len() != target.len() || controls.len() != target.len() {
 		return Err(ArtifactError::Invalid("export shape"));
 	}
-	if target.len() > producer.limits.max_len || source.len() > producer.limits.max_len {
+	if target.len() > producer.limits.shapes.max_coefficients
+		|| source.len() > producer.limits.shapes.max_coefficients
+	{
 		return Err(ArtifactError::Invalid("producer coefficient limit"));
 	}
 	if M::CONVENTION == RealParityWx::CONVENTION {
@@ -486,17 +499,47 @@ fn decode<M: ArtifactMode>(
 	// Re-establish target admissibility with loader-owned resources. Recorded
 	// contractivity bounds are not treated as proof from an untrusted file.
 	let mut admission = load.admission;
-	admission.contractivity_margin = admission
+	admission.accuracy.contractivity_margin = admission
+		.accuracy
 		.contractivity_margin
-		.max(producer.contractivity_margin);
+		.max(producer.accuracy.contractivity_margin);
 	admission.validate()?;
-	if target.len() > admission.limits.max_len {
+	if target.len() > admission.limits.shapes.max_coefficients {
 		return Err(ArtifactError::Budget("admission length"));
 	}
-	let norm_upper = crate::admission::contractivity(&target, admission)?;
+	let resources = quest_numerics::OperationResources::from_limits(admission.limits);
+	let buffers = [
+		target.capacity().checked_mul(size_of::<Complex64>()),
+		source.capacity().checked_mul(size_of::<Complex64>()),
+		a_star.capacity().checked_mul(size_of::<Complex64>()),
+		controls.capacity().checked_mul(size_of::<Control>()),
+		phases.capacity().checked_mul(size_of::<f64>()),
+	];
+	let storage: Vec<_> = buffers
+		.into_iter()
+		.map(|bytes| {
+			bytes
+				.map(|n| (n, 0))
+				.ok_or(ArtifactError::Budget("loaded buffer bytes"))
+		})
+		.collect::<ArtifactResult<_>>()?;
+	let mut ownership = resources
+		.reserve_many(&storage)
+		.map_err(quest_numerics::Error::from)
+		.map_err(crate::Error::from)?
+		.into_iter();
+	let admitted_ownership: Vec<_> = ownership.by_ref().take(2).collect();
+	let frozen_ownership: Vec<_> = ownership.collect();
+	let norm_upper =
+		crate::admission::contractivity_with_resources(&target, admission, &resources)?;
 	Ok(FrozenCandidate {
+		ownership: frozen_ownership,
+
 		synthesis_precision: precision,
 		admitted: AdmittedTarget {
+			resources,
+			ownership: admitted_ownership,
+
 			source_offset: payload.original_source_offset,
 			source_length: payload.original_source_length,
 			target: Arc::new(target),

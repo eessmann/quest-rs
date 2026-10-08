@@ -21,7 +21,7 @@ thread_local! {
 pub(super) fn inject_admission_failure(rank: usize) -> crate::Result<()> {
 	if rank == 1 && FAIL_ADMISSION.get() {
 		return Err(crate::Error::Value(
-			"injected matching communication buffer admission",
+			"injected matching owned scratch admission",
 		));
 	}
 	Ok(())
@@ -91,7 +91,7 @@ fn rank_local_buffer_admission_rejects_before_opening_hadamards() -> googletest:
 	let encoding = MatchingEncoding::from_sparse(&matrix, policy)?;
 	let shard = MatchingShard::from_encoding(&encoding, rank, parts, policy)?;
 	let mut prepared = environment.prepare_matching(shard, QubitCount::new(6)?, vec![0, 1, 5])?;
-	assert!(prepared.scratch_deployment().is_none());
+	assert!(prepared.scratch_deployment().is_distributed());
 	let mut register = environment.state_vector_local(QubitCount::new(6)?)?;
 	let deployment = register.deployment();
 	let local = deployment.local_amplitudes();

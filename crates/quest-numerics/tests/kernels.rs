@@ -87,16 +87,26 @@ fn fft_rejects_invalid_lengths_budgets_and_nonfinite_inputs() -> Result<()> {
 	);
 	for limits in [
 		Limits {
-			max_bytes: 1,
-			..Limits::default()
+			shapes: (Limits::default()).shapes,
+			resources: quest_numerics::ResourceLimits {
+				max_peak_bytes: 1,
+				..(Limits::default()).resources
+			},
 		},
 		Limits {
-			max_work: 1,
-			..Limits::default()
+			shapes: (Limits::default()).shapes,
+			resources: quest_numerics::ResourceLimits {
+				max_work_units: 1,
+				..(Limits::default()).resources
+			},
 		},
 		Limits {
-			max_len: 1,
-			..Limits::default()
+			shapes: quest_numerics::ShapeLimits {
+				max_coefficients: 1,
+				max_fft_len: 1,
+				..(Limits::default()).shapes
+			},
+			resources: (Limits::default()).resources,
 		},
 	] {
 		expect_true!(FftWorkspace::new(8, FftBackend::Scalar, limits).is_err());
@@ -235,9 +245,15 @@ fn resource_admission_includes_convolution_buffers_and_three_transforms() -> Res
 		.checked_add(usage.planner_bytes_estimate)
 		.ok_or(Error::Overflow)?;
 	let exact = Limits {
-		max_len: workspace.fft_len(),
-		max_bytes: bytes,
-		max_work: usage.work_units,
+		shapes: quest_numerics::ShapeLimits {
+			max_coefficients: workspace.fft_len(),
+			max_fft_len: workspace.fft_len(),
+			..(quest_numerics::OperationLimits::default()).shapes
+		},
+		resources: quest_numerics::ResourceLimits {
+			max_peak_bytes: bytes,
+			max_work_units: usage.work_units,
+		},
 	};
 	expect_true!(ConvolutionWorkspace::new(4, 3, FftBackend::Scalar, exact).is_ok());
 	expect_true!(
@@ -246,8 +262,11 @@ fn resource_admission_includes_convolution_buffers_and_three_transforms() -> Res
 			3,
 			FftBackend::Scalar,
 			Limits {
-				max_bytes: bytes.checked_sub(1).ok_or(Error::Overflow)?,
-				..exact
+				shapes: (exact).shapes,
+				resources: quest_numerics::ResourceLimits {
+					max_peak_bytes: bytes.checked_sub(1).ok_or(Error::Overflow)?,
+					..(exact).resources
+				}
 			}
 		)
 		.is_err()
@@ -258,8 +277,11 @@ fn resource_admission_includes_convolution_buffers_and_three_transforms() -> Res
 			3,
 			FftBackend::Scalar,
 			Limits {
-				max_work: usage.work_units.checked_sub(1).ok_or(Error::Overflow)?,
-				..exact
+				shapes: (exact).shapes,
+				resources: quest_numerics::ResourceLimits {
+					max_work_units: usage.work_units.checked_sub(1).ok_or(Error::Overflow)?,
+					..(exact).resources
+				}
 			}
 		)
 		.is_err()
@@ -361,11 +383,17 @@ fn caller_owned_parallel_policy_preserves_results_and_error_order() -> Result<()
 fn power_of_two_fft_admits_logarithmic_work_budget_and_keeps_arbitrary_length_accounting()
 -> Result<()> {
 	let limits = Limits {
-		max_work: 4_000_000,
-		..Limits::default()
+		shapes: (Limits::default()).shapes,
+		resources: quest_numerics::ResourceLimits {
+			max_work_units: 4_000_000,
+			..(Limits::default()).resources
+		},
 	};
 	let mut fft = FftWorkspace::new(32_768, FftBackend::Scalar, limits)?;
-	expect_that!(fft.resource_usage().work_units, le(limits.max_work));
+	expect_that!(
+		fft.resource_usage().work_units,
+		le(limits.resources.max_work_units)
+	);
 	let mut impulse = vec![Complex64::new(0.0, 0.0); 32_768];
 	*impulse.first_mut().ok_or(Error::Length("impulse"))? = Complex64::new(1.0, 0.0);
 	fft.transform(&mut impulse, FftDirection::Forward, Normalization::None)?;
@@ -377,8 +405,11 @@ fn power_of_two_fft_admits_logarithmic_work_budget_and_keeps_arbitrary_length_ac
 			17,
 			FftBackend::Scalar,
 			Limits {
-				max_work: 288,
-				..Limits::default()
+				shapes: (Limits::default()).shapes,
+				resources: quest_numerics::ResourceLimits {
+					max_work_units: 288,
+					..(Limits::default()).resources
+				}
 			}
 		)
 		.is_err()
@@ -387,8 +418,11 @@ fn power_of_two_fft_admits_logarithmic_work_budget_and_keeps_arbitrary_length_ac
 		17,
 		FftBackend::Scalar,
 		Limits {
-			max_work: 289,
-			..Limits::default()
+			shapes: (Limits::default()).shapes,
+			resources: quest_numerics::ResourceLimits {
+				max_work_units: 289,
+				..(Limits::default()).resources
+			},
 		},
 	)?;
 	expect_that!(prime.resource_usage().work_units, eq(289));
@@ -397,8 +431,11 @@ fn power_of_two_fft_admits_logarithmic_work_budget_and_keeps_arbitrary_length_ac
 		16_384,
 		FftBackend::Scalar,
 		Limits {
-			max_work: 12_000_000,
-			..Limits::default()
+			shapes: (Limits::default()).shapes,
+			resources: quest_numerics::ResourceLimits {
+				max_work_units: 12_000_000,
+				..(Limits::default()).resources
+			},
 		},
 	)?;
 	expect_that!(convolution.fft_len(), eq(32_768));
@@ -446,8 +483,11 @@ fn prepared_parallel_fft_pair_preserves_bits_and_left_first_input_errors() -> Re
 				right.len(),
 				FftBackend::Scalar,
 				Limits {
-					max_bytes: exact_bytes.saturating_sub(1),
-					..Limits::default()
+					shapes: (Limits::default()).shapes,
+					resources: quest_numerics::ResourceLimits {
+						max_peak_bytes: exact_bytes.saturating_sub(1),
+						..(Limits::default()).resources
+					}
 				},
 				policy
 			)

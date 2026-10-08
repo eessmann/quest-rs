@@ -389,12 +389,13 @@ impl<B: Basis, D: Shape> Polynomial<B, Complex64, D> {
 					.checked_add(v)
 			})
 			.ok_or(Error::Budget("norm storage"))?;
-		if work > self.limits().max_work
-			|| bytes > self.limits().max_bytes
-			|| isize::try_from(bytes).is_err()
-		{
-			return Err(Error::Budget("norm workspace"));
-		}
+		self.operation_resources()
+			.charge_work(work)
+			.map_err(quest_numerics::Error::from)?;
+		let _workspace = self
+			.operation_resources()
+			.reserve(bytes, 0)
+			.map_err(quest_numerics::Error::from)?;
 		let fallback = if pole {
 			Some(laurent_bound(self, domain)?)
 		} else {
@@ -412,9 +413,10 @@ impl<B: Basis, D: Shape> Polynomial<B, Complex64, D> {
 			}
 		};
 		let mut cells = Vec::new();
-		cells
-			.try_reserve_exact(options.max_cells)
-			.map_err(|_| Error::Budget("norm allocation"))?;
+		cells.try_reserve_exact(options.max_cells).map_err(|_| {
+			self.operation_resources().allocation_failed();
+			Error::Interval(quest_numerics::Error::Allocation)
+		})?;
 		cells.push(Cell {
 			parameter,
 			upper: cell_upper(parameter)?,

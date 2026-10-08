@@ -3,10 +3,6 @@
 	clippy::float_cmp,
 	reason = "Box planes and paired source coordinates require exact represented-value equality, not tolerance inference"
 )]
-#![allow(
-	clippy::too_many_lines,
-	reason = "Aggregate geometry admission and exact queries retain their explicit ordering"
-)]
 
 use super::mesh::{
 	AffineMeshView, Counts, PhysicalMeshLimits, PhysicalMeshResources, add, invalid, mul,
@@ -146,6 +142,10 @@ fn fingerprint(view: AffineMeshView<'_>) -> Result<u64, CfdError> {
 	Ok(hash)
 }
 
+#[allow(
+	clippy::too_many_lines,
+	reason = "Aggregate geometry admission and exact queries retain their explicit ordering"
+)]
 pub(super) fn validate(
 	view: AffineMeshView<'_>,
 	count: Counts,

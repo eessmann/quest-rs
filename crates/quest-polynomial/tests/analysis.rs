@@ -291,18 +291,26 @@ fn conversion_evidence_retains_both_immutable_polynomials() -> Result<()> {
 fn basis_conversion_preflights_aggregate_storage_and_work() -> Result<()> {
 	for limits in [
 		Limits {
-			max_bytes: 6_400,
-			..Limits::default()
+			shapes: (Limits::default()).shapes,
+			resources: quest_numerics::ResourceLimits {
+				max_peak_bytes: 6_400,
+				..(Limits::default()).resources
+			},
 		},
 		Limits {
-			max_work: 1_800,
-			..Limits::default()
+			shapes: (Limits::default()).shapes,
+			resources: quest_numerics::ResourceLimits {
+				max_work_units: 1_800,
+				..(Limits::default()).resources
+			},
 		},
 	] {
 		let polynomial = Polynomial::new(Monomial, vec![c(0.001); 20], limits)?;
 		expect_true!(matches!(
 			polynomial.to_basis(Chebyshev),
-			Err(quest_polynomial::Error::Budget(_))
+			Err(quest_polynomial::Error::Interval(
+				quest_numerics::Error::Resource(_)
+			))
 		));
 	}
 	let polynomial = Polynomial::new(Monomial, vec![c(0.001); 20], Limits::default())?;

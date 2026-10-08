@@ -67,8 +67,11 @@ fn admission_rejects_bad_parameters_nonfinite_payloads_and_storage_limits() {
 			Monomial,
 			vec![c(1.0), c(2.0)],
 			Limits {
-				max_coefficients: 1,
-				..Limits::default()
+				shapes: quest_numerics::ShapeLimits {
+					max_coefficients: 1,
+					..(Limits::default()).shapes
+				},
+				resources: (Limits::default()).resources
 			}
 		)
 		.is_err()

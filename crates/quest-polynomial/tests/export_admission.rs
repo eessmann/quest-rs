@@ -18,6 +18,9 @@ struct MutableConversion {
 macro_rules! binary{($($name:ident),*)=>{$(fn $name(&mut self,a:f64,b:f64)->Result<f64,ArithmeticError>{F64Backend.$name(a,b)})*};}
 macro_rules! unary{($($name:ident),*)=>{$(fn $name(&mut self,a:f64)->Result<f64,ArithmeticError>{F64Backend.$name(a)})*};}
 impl Backend for MutableConversion {
+	fn profile(&self) -> mathcore::arithmetic::ArithmeticProfile {
+		mathcore::arithmetic::ArithmeticProfile::new("MutableConversion", 53, "fixed")
+	}
 	type Scalar = f64;
 	type Error = ArithmeticError;
 	fn constant(&mut self, c: &ExactConstant) -> Result<f64, ArithmeticError> {

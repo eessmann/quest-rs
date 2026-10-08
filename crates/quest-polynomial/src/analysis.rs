@@ -143,7 +143,9 @@ impl<B: Basis, D: Shape> Polynomial<B, Complex64, D> {
 			.len()
 			.checked_add(offset)
 			.ok_or(Error::SupportOverflow)?;
-		self.limits().check(count, 12)?;
+		self.operation_resources()
+			.coefficients(count)
+			.map_err(quest_numerics::Error::from)?;
 		let square = count
 			.checked_mul(count)
 			.ok_or(Error::Budget("conversion storage"))?;
@@ -158,17 +160,28 @@ impl<B: Basis, D: Shape> Polynomial<B, Complex64, D> {
 			.checked_mul(size_of::<Interval>())
 			.and_then(|dense| dense.checked_add(linear_bytes))
 			.ok_or(Error::Budget("conversion storage"))?;
-		// Logical coefficient work includes the monomial recurrence (n²),
-		// basis construction and both triangular residual solves (4n²).
-		let work = square
-			.checked_mul(5)
-			.ok_or(Error::Budget("conversion work"))?;
-		if bytes > self.limits().max_bytes
-			|| isize::try_from(bytes).is_err()
-			|| work > self.limits().max_work
-		{
-			return Err(Error::Budget("conversion workspace"));
-		}
+		// Monomial conversion charges its own n² batch. Charge the remaining
+		// basis construction and triangular residual work before allocating.
+		self.operation_resources()
+			.charge_work(
+				square
+					.checked_mul(4)
+					.ok_or(Error::Budget("conversion work"))?,
+			)
+			.map_err(quest_numerics::Error::from)?;
+		let _scratch = self
+			.operation_resources()
+			.reserve(bytes, 0)
+			.map_err(quest_numerics::Error::from)?;
+		let output_ownership = self
+			.operation_resources()
+			.reserve(
+				count
+					.checked_mul(size_of::<Complex64>())
+					.ok_or(Error::Budget("conversion storage"))?,
+				0,
+			)
+			.map_err(quest_numerics::Error::from)?;
 		let source = self.to_monomial()?;
 		let rows = basis_rows(&target, count)?;
 		let zero = Interval::point(0.0)?;
@@ -215,7 +228,12 @@ impl<B: Basis, D: Shape> Polynomial<B, Complex64, D> {
 		}
 		Ok(Conversion {
 			source: self.clone(),
-			polynomial: Polynomial::new(target, coefficients, self.limits())?,
+			polynomial: Polynomial::new_with_reservation(
+				target,
+				coefficients,
+				self.operation_resources(),
+				output_ownership,
+			)?,
 			coefficient_error_bound: error.upper(),
 		})
 	}
@@ -232,14 +250,34 @@ impl<B: Basis, D: Shape> Polynomial<B, Complex64, D> {
 			.len()
 			.checked_add(offset)
 			.ok_or(Error::SupportOverflow)?;
-		self.limits().check(count, 10)?;
-		if count
+		self.operation_resources()
+			.coefficients(count)
+			.map_err(quest_numerics::Error::from)?;
+		let work = count
 			.checked_mul(count)
-			.ok_or(Error::Budget("conversion work"))?
-			> self.limits().max_work
-		{
-			return Err(Error::Budget("conversion work"));
-		}
+			.ok_or(Error::Budget("conversion work"))?;
+		self.operation_resources()
+			.charge_work(work)
+			.map_err(quest_numerics::Error::from)?;
+		let output_ownership = self
+			.operation_resources()
+			.reserve(
+				count
+					.checked_mul(size_of::<Complex64>())
+					.ok_or(Error::Budget("output storage"))?,
+				0,
+			)
+			.map_err(quest_numerics::Error::from)?;
+		let _scratch = self
+			.operation_resources()
+			.reserve(
+				count
+					.checked_mul(5)
+					.and_then(|n| n.checked_mul(size_of::<Interval>()))
+					.ok_or(Error::Budget("scratch storage"))?,
+				0,
+			)
+			.map_err(quest_numerics::Error::from)?;
 		let z = Interval::point(0.0)?;
 		let mut previous = vec![z; count];
 		let mut current = vec![z; count];
@@ -292,7 +330,12 @@ impl<B: Basis, D: Shape> Polynomial<B, Complex64, D> {
 		}
 		Ok(Conversion {
 			source: self.clone(),
-			polynomial: Polynomial::new(Monomial, values, self.limits())?,
+			polynomial: Polynomial::new_with_reservation(
+				Monomial,
+				values,
+				self.operation_resources(),
+				output_ownership,
+			)?,
 			coefficient_error_bound: error.upper(),
 		})
 	}
@@ -301,6 +344,24 @@ impl<D: Shape> Polynomial<Chebyshev, Complex64, D> {
 	/// # Errors
 	/// Rejects nonfinite derivative coefficients or budget overflow.
 	pub fn derivative(&self) -> Result<Polynomial<Chebyshev>> {
+		let count = self.stored_order();
+		self.operation_resources()
+			.charge_work(
+				count
+					.checked_mul(4)
+					.ok_or(Error::Budget("derivative work"))?,
+			)
+			.map_err(quest_numerics::Error::from)?;
+		let output_ownership = self
+			.operation_resources()
+			.reserve(
+				count
+					.checked_mul(size_of::<Complex64>())
+					.ok_or(Error::Budget("derivative storage"))?,
+				0,
+			)
+			.map_err(quest_numerics::Error::from)?;
+
 		let mut c = zeros(self.stored_order(), self.limits())?;
 		let mut next = Complex64::new(0.0, 0.0);
 		let mut after = next;
@@ -323,24 +384,66 @@ impl<D: Shape> Polynomial<Chebyshev, Complex64, D> {
 		if let Some(first) = c.first_mut() {
 			*first = first.mul(0.5);
 		}
-		Polynomial::new(Chebyshev, c, self.limits())
+		Polynomial::new_with_reservation(Chebyshev, c, self.operation_resources(), output_ownership)
 	}
 }
 impl<D: Shape> Polynomial<Monomial, Complex64, D> {
 	/// # Errors
 	/// Rejects nonfinite derivative coefficients.
 	pub fn derivative(&self) -> Result<Polynomial<Monomial>> {
-		Polynomial::new(Monomial, lowered(self, Ok)?, self.limits())
+		let count = self.stored_order();
+		self.operation_resources()
+			.charge_work(
+				count
+					.checked_mul(4)
+					.ok_or(Error::Budget("derivative work"))?,
+			)
+			.map_err(quest_numerics::Error::from)?;
+		let output_ownership = self
+			.operation_resources()
+			.reserve(
+				count
+					.checked_mul(size_of::<Complex64>())
+					.ok_or(Error::Budget("derivative storage"))?,
+				0,
+			)
+			.map_err(quest_numerics::Error::from)?;
+
+		Polynomial::new_with_reservation(
+			Monomial,
+			lowered(self, Ok)?,
+			self.operation_resources(),
+			output_ownership,
+		)
 	}
 }
 impl<D: Shape> Polynomial<Hermite, Complex64, D> {
 	/// # Errors
 	/// Rejects nonfinite derivative coefficients.
 	pub fn derivative(&self) -> Result<Polynomial<Hermite>> {
-		Polynomial::new(
+		let count = self.stored_order();
+		self.operation_resources()
+			.charge_work(
+				count
+					.checked_mul(4)
+					.ok_or(Error::Budget("derivative work"))?,
+			)
+			.map_err(quest_numerics::Error::from)?;
+		let output_ownership = self
+			.operation_resources()
+			.reserve(
+				count
+					.checked_mul(size_of::<Complex64>())
+					.ok_or(Error::Budget("derivative storage"))?,
+				0,
+			)
+			.map_err(quest_numerics::Error::from)?;
+
+		Polynomial::new_with_reservation(
 			*self.basis(),
 			lowered(self, |n| Ok(n * self.basis().scale()))?,
-			self.limits(),
+			self.operation_resources(),
+			output_ownership,
 		)
 	}
 }
@@ -349,6 +452,24 @@ impl<D: Shape> Polynomial<Laguerre, Complex64, D> {
 	/// # Errors
 	/// Rejects nonfinite coefficient arithmetic or exceeded storage limits.
 	pub fn derivative(&self) -> Result<Polynomial<Laguerre>> {
+		let count = self.stored_order();
+		self.operation_resources()
+			.charge_work(
+				count
+					.checked_mul(4)
+					.ok_or(Error::Budget("derivative work"))?,
+			)
+			.map_err(quest_numerics::Error::from)?;
+		let output_ownership = self
+			.operation_resources()
+			.reserve(
+				count
+					.checked_mul(size_of::<Complex64>())
+					.ok_or(Error::Budget("derivative storage"))?,
+				0,
+			)
+			.map_err(quest_numerics::Error::from)?;
+
 		let mut coefficients = zeros(self.stored_order(), self.limits())?;
 		let mut tail = Complex64::new(0.0, 0.0);
 		for (index, value) in coefficients.iter_mut().enumerate().rev() {
@@ -362,7 +483,12 @@ impl<D: Shape> Polynomial<Laguerre, Complex64, D> {
 			)?;
 			*value = tail.mul(-1.0);
 		}
-		Polynomial::new(*self.basis(), coefficients, self.limits())
+		Polynomial::new_with_reservation(
+			*self.basis(),
+			coefficients,
+			self.operation_resources(),
+			output_ownership,
+		)
 	}
 }
 impl<D: Shape> Polynomial<Jacobi, Complex64, D> {
@@ -374,14 +500,34 @@ impl<D: Shape> Polynomial<Jacobi, Complex64, D> {
 	/// Rejects nonfinite recurrence arithmetic or exceeded resource limits.
 	pub fn derivative(&self) -> Result<Polynomial<Jacobi>> {
 		let degree = self.stored_order();
-		self.limits().check(degree, 5)?;
-		if degree
+		self.operation_resources()
+			.coefficients(degree)
+			.map_err(quest_numerics::Error::from)?;
+		let work = degree
 			.checked_mul(degree)
-			.ok_or(Error::Budget("derivative work"))?
-			> self.limits().max_work
-		{
-			return Err(Error::Budget("derivative work"));
-		}
+			.ok_or(Error::Budget("derivative work"))?;
+		self.operation_resources()
+			.charge_work(work)
+			.map_err(quest_numerics::Error::from)?;
+		let output_ownership = self
+			.operation_resources()
+			.reserve(
+				degree
+					.checked_mul(size_of::<Complex64>())
+					.ok_or(Error::Budget("output storage"))?,
+				0,
+			)
+			.map_err(quest_numerics::Error::from)?;
+		let _scratch = self
+			.operation_resources()
+			.reserve(
+				degree
+					.checked_mul(3)
+					.and_then(|n| n.checked_mul(size_of::<Interval>()))
+					.ok_or(Error::Budget("scratch storage"))?,
+				0,
+			)
+			.map_err(quest_numerics::Error::from)?;
 		let mut previous = zeros(degree, self.limits())?;
 		let mut current = previous.clone();
 		let mut next = previous.clone();
@@ -416,7 +562,12 @@ impl<D: Shape> Polynomial<Jacobi, Complex64, D> {
 			std::mem::swap(&mut previous, &mut current);
 			std::mem::swap(&mut current, &mut next);
 		}
-		Polynomial::new(*self.basis(), result, self.limits())
+		Polynomial::new_with_reservation(
+			*self.basis(),
+			result,
+			self.operation_resources(),
+			output_ownership,
+		)
 	}
 }
 fn add_coefficient(values: &mut [Complex64], index: usize, value: Complex64) -> Result<()> {
@@ -442,14 +593,24 @@ impl<D: Shape> Polynomial<Laurent, Complex64, D> {
 			.map_err(|_| Error::SupportOverflow)?
 			.checked_add(1)
 			.ok_or(Error::SupportOverflow)?;
-		self.limits().check(count, 4)?;
-		if count
+		self.operation_resources()
+			.coefficients(count)
+			.map_err(quest_numerics::Error::from)?;
+		let work = count
 			.checked_mul(4)
-			.ok_or(Error::Budget("symmetric conversion work"))?
-			> self.limits().max_work
-		{
-			return Err(Error::Budget("symmetric conversion work"));
-		}
+			.ok_or(Error::Budget("symmetric conversion work"))?;
+		self.operation_resources()
+			.charge_work(work)
+			.map_err(quest_numerics::Error::from)?;
+		let output_ownership = self
+			.operation_resources()
+			.reserve(
+				count
+					.checked_mul(size_of::<Complex64>())
+					.ok_or(Error::Budget("output storage"))?,
+				0,
+			)
+			.map_err(quest_numerics::Error::from)?;
 		let coefficient = |exponent: i64| -> Complex64 {
 			exponent
 				.checked_sub(i64::from(self.basis().offset()))
@@ -479,13 +640,36 @@ impl<D: Shape> Polynomial<Laurent, Complex64, D> {
 		}
 		Ok(Conversion {
 			source: self.clone(),
-			polynomial: Polynomial::new(Chebyshev, output, self.limits())?,
+			polynomial: Polynomial::new_with_reservation(
+				Chebyshev,
+				output,
+				self.operation_resources(),
+				output_ownership,
+			)?,
 			coefficient_error_bound: error.upper(),
 		})
 	}
 	/// # Errors
 	/// Rejects signed support overflow or nonfinite derivative coefficients.
 	pub fn derivative(&self) -> Result<Polynomial<Laurent>> {
+		let count = self.coefficients().len();
+		self.operation_resources()
+			.charge_work(
+				count
+					.checked_mul(4)
+					.ok_or(Error::Budget("derivative work"))?,
+			)
+			.map_err(quest_numerics::Error::from)?;
+		let output_ownership = self
+			.operation_resources()
+			.reserve(
+				count
+					.checked_mul(size_of::<Complex64>())
+					.ok_or(Error::Budget("derivative storage"))?,
+				0,
+			)
+			.map_err(quest_numerics::Error::from)?;
+
 		let offset = self
 			.basis()
 			.offset()
@@ -500,7 +684,12 @@ impl<D: Shape> Polynomial<Laurent, Complex64, D> {
 				.ok_or(Error::SupportOverflow)?;
 			*out = finite(v.mul(f64::from(n)))?;
 		}
-		Polynomial::new(Laurent::new(offset), c, self.limits())
+		Polynomial::new_with_reservation(
+			Laurent::new(offset),
+			c,
+			self.operation_resources(),
+			output_ownership,
+		)
 	}
 }
 fn lowered<B: Basis, D: Shape>(

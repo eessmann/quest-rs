@@ -118,7 +118,13 @@ fn contractivity_failure_distinguishes_witness_from_exhausted_bound()
 	assert!(matches!(
 		SynthesisBuilder::new()
 			.policy(Policy {
-				max_completion_grid: 1,
+				limits: quest_numerics::OperationLimits {
+					shapes: quest_numerics::ShapeLimits {
+						max_completion_grid: 1,
+						..((Policy::default()).limits).shapes
+					},
+					resources: ((Policy::default()).limits).resources
+				},
 				..Policy::default()
 			})
 			.unit_circle_response(&unresolved)?

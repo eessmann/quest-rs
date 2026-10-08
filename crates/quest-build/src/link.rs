@@ -721,7 +721,11 @@ mod tests {
 	fn downstream(root: &Path, link: &NativeLink, expected: i32) -> Result<()> {
 		validate_library_resolution(&link.search_dirs, &link.library_files_by_name)?;
 		let library_source = root.join("native_api.rs");
-		fs::write(&library_source, "unsafe extern \"C\" { fn fixture_value() -> i32; } pub fn value() -> i32 { unsafe { fixture_value() } }").map_err(|error| io(&library_source, error))?;
+		fs::write(
+			&library_source,
+			include_str!("../../quest-sys/tests/fixtures/linkage/native_api.rs"),
+		)
+		.map_err(|error| io(&library_source, error))?;
 		let rlib = root.join("libnative_api.rlib");
 		let mut library = native_rustc_command()?;
 		library

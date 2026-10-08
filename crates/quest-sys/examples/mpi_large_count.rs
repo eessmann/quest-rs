@@ -60,12 +60,11 @@ fn run() -> Result<(), Error> {
 	}
 	let logical_bytes = u64::try_from(bytes)?;
 	let cap = 8_u64 << 30;
-	let limit = libc::rlimit {
-		rlim_cur: cap,
-		rlim_max: cap,
+	let limit = rustix::process::Rlimit {
+		current: Some(cap),
+		maximum: Some(cap),
 	};
-	// SAFETY: a valid immutable rlimit is passed; this constrains this process only.
-	let limited = unsafe { libc::setrlimit(libc::RLIMIT_AS, &raw const limit) } == 0;
+	let limited = rustix::process::setrlimit(rustix::process::Resource::As, limit).is_ok();
 	let available = proc_bytes("/proc/meminfo", "MemAvailable:");
 	let baseline_as = proc_bytes("/proc/self/status", "VmSize:");
 	let budget_ok = baseline_as

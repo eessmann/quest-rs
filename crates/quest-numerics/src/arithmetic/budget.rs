@@ -47,6 +47,9 @@ pub struct BudgetedBackend<'a, B> {
 macro_rules! binary {($($name:ident),*)=>{$(fn $name(&mut self,a:Self::Scalar,b:Self::Scalar)->Result<Self::Scalar,Self::Error>{self.work.charge(1)?;self.inner.$name(a,b)})*};}
 macro_rules! unary {($($name:ident),*)=>{$(fn $name(&mut self,a:Self::Scalar)->Result<Self::Scalar,Self::Error>{self.work.charge(1)?;self.inner.$name(a)})*};}
 impl<B: Backend> Backend for BudgetedBackend<'_, B> {
+	fn profile(&self) -> super::ArithmeticProfile {
+		self.inner.profile()
+	}
 	fn validate(&self, value: &Self::Scalar) -> Result<(), Self::Error> {
 		self.work.charge(1)?;
 		self.inner.validate(value)

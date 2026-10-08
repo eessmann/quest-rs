@@ -46,6 +46,8 @@ pub struct Polynomial<B: Basis, C = Complex64, D: Shape = DynamicShape> {
 	coefficients: Arc<Vec<C>>,
 	shape: D,
 	limits: Limits,
+	resources: quest_numerics::OperationResources,
+	ownership: quest_numerics::MemoryReservation,
 	last_order: i32,
 	effective_support: Option<(i32, i32)>,
 }
@@ -85,6 +87,16 @@ impl<B: Basis, C: Clone, D: Shape> Polynomial<B, C, D> {
 	pub const fn is_zero(&self) -> bool {
 		self.effective_support.is_none()
 	}
+	/// Share this polynomial's operation ledger with subsequent transforms.
+	#[must_use]
+	pub fn operation_resources(&self) -> quest_numerics::OperationResources {
+		self.resources.clone()
+	}
+	/// Shared live storage and cumulative work snapshot.
+	#[must_use]
+	pub fn resource_report(&self) -> quest_numerics::ResourceReport {
+		self.resources.report()
+	}
 	#[must_use]
 	pub const fn limits(&self) -> Limits {
 		self.limits
@@ -104,6 +116,8 @@ impl<B: Basis, C: Clone, D: Shape> Polynomial<B, C, D> {
 			coefficients: self.coefficients,
 			shape,
 			limits: self.limits,
+			resources: self.resources,
+			ownership: self.ownership,
 			last_order: self.last_order,
 			effective_support: self.effective_support,
 		})
@@ -122,19 +136,50 @@ impl<B: Basis, C: Clone, D: Shape> Polynomial<B, C, D> {
 	where
 		A::Error: Into<Error>,
 	{
+		Self::from_scalars_with_resources(
+			basis,
+			coefficients,
+			shape,
+			backend,
+			quest_numerics::OperationResources::from_limits(limits),
+		)
+	}
+	/// Admit real coefficients against a shared operation ledger.
+	/// # Errors
+	/// Rejects backend values, support/storage/work limits or malformed shapes.
+	pub fn from_scalars_with_resources<A: PointBackend<Scalar = C>>(
+		basis: B,
+		coefficients: Vec<C>,
+		shape: D,
+		backend: &mut A,
+		resources: quest_numerics::OperationResources,
+	) -> Result<Self>
+	where
+		A::Error: Into<Error>,
+	{
+		let limits = resources.limits();
 		check_shape(&shape, coefficients.len())?;
 		let count = coefficients.len();
 		let work = count
 			.checked_mul(2)
 			.and_then(|n| n.checked_add(1))
 			.ok_or(Error::Budget("coefficient validation work"))?;
-		if count > limits.max_coefficients
-			|| work > limits.max_work
-			|| i32::try_from(count).is_err()
-		{
-			return Err(Error::Budget("coefficient storage or validation work"));
+		resources
+			.coefficients(count)
+			.map_err(quest_numerics::Error::from)?;
+		resources
+			.admit_work(work)
+			.map_err(quest_numerics::Error::from)?;
+		if i32::try_from(count).is_err() {
+			return Err(Error::SupportOverflow);
 		}
 		let bytes = coefficient_heap_bytes(&coefficients, backend)?;
+		let ownership = resources
+			.reserve(bytes, 0)
+			.map_err(quest_numerics::Error::from)?;
+		resources
+			.charge_work(work)
+			.map_err(quest_numerics::Error::from)?;
 		let zero = backend
 			.constant(&ExactConstant::Integer(0))
 			.map_err(Into::into)?;
@@ -153,7 +198,7 @@ impl<B: Basis, C: Clone, D: Shape> Polynomial<B, C, D> {
 				support = Some((support.map_or(order, |(first, _)| first), order));
 			}
 		}
-		if bytes > limits.max_bytes || isize::try_from(bytes).is_err() {
+		if isize::try_from(bytes).is_err() {
 			return Err(Error::Budget("coefficient storage"));
 		}
 		let last_order = basis
@@ -167,6 +212,8 @@ impl<B: Basis, C: Clone, D: Shape> Polynomial<B, C, D> {
 			coefficients: Arc::new(coefficients),
 			shape,
 			limits,
+			resources,
+			ownership,
 			last_order,
 			effective_support: support,
 		})
@@ -259,40 +306,33 @@ impl<B: Basis, C: Clone, D: Shape> Polynomial<B, C, D> {
 		coefficient_heap_bytes(&self.coefficients, backend)
 	}
 
-	pub(crate) fn evaluate_lifted<A: Backend>(
-		&self,
-		backend: &mut A,
-		argument: A::Scalar,
-		mut lift: impl FnMut(&C, &mut A) -> Result<A::Scalar>,
-	) -> Result<A::Scalar>
-	where
-		A::Error: Into<Error>,
-	{
-		backend.visit().map_err(Into::into)?;
-		let zero = backend
-			.constant(&ExactConstant::Integer(0))
-			.map_err(Into::into)?;
-		// Validate even when the zero polynomial would bypass all recurrence work.
-		backend.validate(&argument).map_err(Into::into)?;
-		let mut offset = self.basis.offset();
-		let mut coefficients = self.coefficients.as_slice();
-		if let Some((_, last)) = self.effective_support {
-			let end = last
-				.checked_sub(offset)
-				.and_then(|index| index.checked_add(1))
-				.and_then(|index| usize::try_from(index).ok())
-				.ok_or(Error::SupportOverflow)?;
-			coefficients = coefficients.get(..end).ok_or(Error::SupportOverflow)?;
-		}
-		if self.is_zero() {
-			offset = 0;
-			coefficients = &[];
-		} else if offset < 0 && self.effective_support.is_some_and(|(first, _)| first >= 0) {
-			let skip =
-				usize::try_from(offset.unsigned_abs()).map_err(|_| Error::SupportOverflow)?;
-			coefficients = coefficients.get(skip..).ok_or(Error::SupportOverflow)?;
-			offset = 0;
-		}
+	/// Select the mathematical support once for every arithmetic backend.
+	fn evaluation_terms(&self) -> Result<(&[C], i32)> {
+		let Some((first, last)) = self.effective_support else {
+			return Ok((&[], 0));
+		};
+		let stored_offset = self.basis.offset();
+		// Remove ineffective negative support, but retain positive zero padding
+		// in Horner order. Factoring x^k separately can overflow or underflow
+		// even when multiplying each step by its coefficient stays representable.
+		let offset = if B::POWER_BASIS && stored_offset < 0 {
+			first.min(0)
+		} else {
+			stored_offset
+		};
+		let begin = offset
+			.checked_sub(stored_offset)
+			.and_then(|index| usize::try_from(index).ok())
+			.ok_or(Error::SupportOverflow)?;
+		let end = last
+			.checked_sub(stored_offset)
+			.and_then(|index| index.checked_add(1))
+			.and_then(|index| usize::try_from(index).ok())
+			.ok_or(Error::SupportOverflow)?;
+		let coefficients = self
+			.coefficients
+			.get(begin..end)
+			.ok_or(Error::SupportOverflow)?;
 		let magnitude = offset.unsigned_abs();
 		let shift_work = if magnitude == 0 {
 			0
@@ -313,9 +353,28 @@ impl<B: Basis, C: Clone, D: Shape> Polynomial<B, C, D> {
 			.checked_mul(2)
 			.and_then(|n| n.checked_add(shift_work))
 			.ok_or(Error::Budget("evaluation work"))?;
-		if work > self.limits.max_work {
-			return Err(Error::Budget("evaluation work"));
-		}
+		self.resources
+			.charge_work(work)
+			.map_err(quest_numerics::Error::from)?;
+		Ok((coefficients, offset))
+	}
+
+	pub(crate) fn evaluate_lifted<A: Backend>(
+		&self,
+		backend: &mut A,
+		argument: A::Scalar,
+		mut lift: impl FnMut(&C, &mut A) -> Result<A::Scalar>,
+	) -> Result<A::Scalar>
+	where
+		A::Error: Into<Error>,
+	{
+		let (coefficients, offset) = self.evaluation_terms()?;
+		backend.visit().map_err(Into::into)?;
+		let zero = backend
+			.constant(&ExactConstant::Integer(0))
+			.map_err(Into::into)?;
+		// A zero polynomial still rejects an invalid argument.
+		backend.validate(&argument).map_err(Into::into)?;
 		if coefficients.len() == 1 {
 			let coefficient = coefficients.first().ok_or(Error::Domain)?;
 			let value = lift(coefficient, backend)?;
@@ -396,7 +455,48 @@ impl<B: Basis> Polynomial<B> {
 	/// # Errors
 	/// Rejects nonfinite coefficients, support overflow, or excessive storage.
 	pub fn new(basis: B, coefficients: Vec<Complex64>, limits: Limits) -> Result<Self> {
-		limits.check(coefficients.len(), 1)?;
+		Self::new_with_resources(
+			basis,
+			coefficients,
+			quest_numerics::OperationResources::from_limits(limits),
+		)
+	}
+	/// Admit immutable binary64 coefficients with shared ownership accounting.
+	/// # Errors
+	/// Rejects nonfinite values, support overflow or shared storage/work limits.
+	pub fn new_with_resources(
+		basis: B,
+		coefficients: Vec<Complex64>,
+		resources: quest_numerics::OperationResources,
+	) -> Result<Self> {
+		resources
+			.coefficients(coefficients.len())
+			.map_err(quest_numerics::Error::from)?;
+		resources
+			.admit_work(coefficients.len())
+			.map_err(quest_numerics::Error::from)?;
+		let bytes = coefficients
+			.capacity()
+			.checked_mul(size_of::<Complex64>())
+			.ok_or(Error::Budget("coefficient storage overflow"))?;
+		let ownership = resources
+			.reserve(bytes, 0)
+			.map_err(quest_numerics::Error::from)?;
+		Self::new_with_reservation(basis, coefficients, resources, ownership)
+	}
+	pub(crate) fn new_with_reservation(
+		basis: B,
+		coefficients: Vec<Complex64>,
+		resources: quest_numerics::OperationResources,
+		ownership: quest_numerics::MemoryReservation,
+	) -> Result<Self> {
+		let limits = resources.limits();
+		resources
+			.coefficients(coefficients.len())
+			.map_err(quest_numerics::Error::from)?;
+		resources
+			.charge_work(coefficients.len())
+			.map_err(quest_numerics::Error::from)?;
 		for value in &coefficients {
 			finite(*value)?;
 		}
@@ -426,6 +526,8 @@ impl<B: Basis> Polynomial<B> {
 			shape: DynamicShape(coefficients.len()),
 			coefficients: Arc::new(coefficients),
 			limits,
+			resources,
+			ownership,
 			last_order,
 			effective_support,
 		})
@@ -437,46 +539,34 @@ impl<B: Basis, D: Shape> Polynomial<B, Complex64, D> {
 	/// Rejects nonfinite arithmetic and Laurent poles at zero.
 	pub fn evaluate(&self, argument: Complex64) -> Result<Complex64> {
 		finite(argument)?;
-		let support = self.effective_support;
-		if support.is_none() {
+		let (coefficients, offset) = self.evaluation_terms()?;
+		if argument == Complex64::new(0.0, 0.0) && offset < 0 {
+			return Err(Error::Domain);
+		}
+		let mut remaining = coefficients.iter().enumerate().rev();
+		let Some((_, leading)) = remaining.next() else {
 			return Ok(Complex64::new(0.0, 0.0));
-		}
-		if argument == Complex64::new(0.0, 0.0) && self.basis.offset() < 0 {
-			if support.is_some_and(|(first, _)| first < 0) {
-				return Err(Error::Domain);
-			}
-			let index = usize::try_from(self.basis.offset().unsigned_abs())
-				.map_err(|_| Error::SupportOverflow)?;
-			return Ok(self.coefficients.get(index).copied().unwrap_or_default());
-		}
-		if self.coefficients.len() == 1 {
-			return finite(
-				self.coefficients
-					.first()
-					.copied()
-					.ok_or(Error::Domain)?
-					.mul(power(argument, self.basis.offset())?),
-			);
-		}
-		let mut following = Complex64::new(0.0, 0.0);
-		let mut after_following = following;
-		for (index, coefficient) in self.coefficients.iter().enumerate().rev() {
+		};
+		let mut following = *leading;
+		let mut after_following = Complex64::new(0.0, 0.0);
+		let mut needs_back = false;
+		for (index, coefficient) in remaining {
 			let order = u32::try_from(index).map_err(|_| Error::SupportOverflow)?;
 			let (a, b, _) = self
 				.basis
 				.recurrence(order.checked_add(1).ok_or(Error::SupportOverflow)?)?;
-			let (_, _, c) = self
-				.basis
-				.recurrence(order.checked_add(2).ok_or(Error::SupportOverflow)?)?;
-			let value = finite(
-				coefficient
-					.add(argument.mul(a).add(b).mul(following))
-					.sub(after_following.mul(c)),
-			)?;
+			let mut value = finite(coefficient.add(argument.mul(a).add(b).mul(following)))?;
+			if needs_back {
+				let (_, _, c) = self
+					.basis
+					.recurrence(order.checked_add(2).ok_or(Error::SupportOverflow)?)?;
+				value = finite(value.sub(after_following.mul(c)))?;
+			}
 			after_following = following;
 			following = value;
+			needs_back = true;
 		}
-		finite(following.mul(power(argument, self.basis.offset())?))
+		finite(following.mul(power(argument, offset)?))
 	}
 
 	/// # Errors
@@ -500,7 +590,7 @@ impl<D: Shape> Polynomial<Chebyshev, Complex64, D> {
 			.checked_mul(2)
 			.and_then(|x| x.checked_add(1))
 			.ok_or(Error::SupportOverflow)?;
-		self.limits.check(count, 2)?;
+		crate::check_storage(self.limits, count, 2)?;
 		let mut coefficients = zeros(count, self.limits)?;
 		for (index, value) in self.coefficients.iter().enumerate() {
 			if index == 0 {
@@ -531,6 +621,17 @@ impl<D: Shape> Polynomial<Chebyshev, Complex64, D> {
 }
 
 fn power(mut base: Complex64, exponent: i32) -> Result<Complex64> {
+	if exponent < 0 {
+		// Scale components before forming the squared norm: neither very large
+		// nor very small finite arguments need an overflowing intermediate.
+		let scale = base.re.abs().max(base.im.abs());
+		if scale == 0.0 {
+			return Err(Error::Domain);
+		}
+		let scaled = base.div(scale);
+		let norm = scaled.norm_sqr();
+		base = finite(scaled.conj().div(norm).div(scale))?;
+	}
 	let mut result = Complex64::new(1.0, 0.0);
 	let mut magnitude = exponent.unsigned_abs();
 	while magnitude != 0 {
@@ -542,14 +643,7 @@ fn power(mut base: Complex64, exponent: i32) -> Result<Complex64> {
 			base = finite(base.mul(base))?;
 		}
 	}
-	if exponent < 0 {
-		if result == Complex64::new(0.0, 0.0) {
-			return Err(Error::Domain);
-		}
-		finite(Complex64::new(1.0, 0.0).div(result))
-	} else {
-		Ok(result)
-	}
+	Ok(result)
 }
 
 fn backend_power<A: Backend>(
@@ -563,7 +657,10 @@ where
 	let one = backend
 		.constant(&ExactConstant::Integer(1))
 		.map_err(Into::into)?;
-	let mut result = one.clone();
+	if exponent < 0 {
+		base = backend.div(one.clone(), base).map_err(Into::into)?;
+	}
+	let mut result = one;
 	let mut magnitude = exponent.unsigned_abs();
 	while magnitude != 0 {
 		if magnitude & 1 != 0 {
@@ -574,9 +671,5 @@ where
 			base = backend.mul(base.clone(), base).map_err(Into::into)?;
 		}
 	}
-	if exponent < 0 {
-		backend.div(one, result).map_err(Into::into)
-	} else {
-		Ok(result)
-	}
+	Ok(result)
 }

@@ -58,7 +58,7 @@ impl<E: Expression, const N: usize> Function<E, N> {
 	/// Rejects duplicate scoped symbols and expression resource limits.
 	pub fn dynamic(
 		&self,
-		symbols: &[mathcore::exact::Symbol; N],
+		symbols: &[mathcore::identity::Symbol; N],
 		limits: mathcore::dynamic::ExpressionLimits,
 	) -> Result<mathcore::dynamic::DynamicExpression, mathcore::arithmetic::ArithmeticError> {
 		mathcore::dynamic::DynamicExpression::from_typed(&self.expression, symbols, limits)

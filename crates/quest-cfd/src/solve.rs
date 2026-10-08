@@ -254,7 +254,8 @@ fn solve_with_spectrum(
 	timings.preprocessing_seconds = started.elapsed().as_secs_f64();
 	let started = std::time::Instant::now();
 	let mut synthesis_policy = quest_qsp::Policy::default();
-	synthesis_policy.limits.max_bytes = remaining_bytes(budget.max_bytes, preprocessing_retained)?;
+	synthesis_policy.limits.resources.max_peak_bytes =
+		remaining_bytes(budget.max_bytes, preprocessing_retained)?;
 	let frozen = polynomial.synthesize(synthesis_policy)?;
 	timings.synthesis_seconds = started.elapsed().as_secs_f64();
 	let started = std::time::Instant::now();

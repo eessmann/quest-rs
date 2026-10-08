@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "source_pins": {
+    "schema_version": 1,
+    "quest_qsvt_revision": "4fc35983138d07a990862a4d83ad16f2b737c98f",
+    "source_files": {
+      "test/qsp_tools/nlft/benchmark_fixture_tests.cpp": "899b99d6b129f7d8e16a91fd4063d063a342bcca2f804ca6d3533d47ba8d06b9",
+      "test/qsp_tools/nlft_inverse_benchmark_fixture.hpp": "0cf7c1029de0ffe22cd646a907f0715a7c145258f8d534b2607e5a599647e084",
+      "test/qsp_tools/nlft_bench_contract.hpp": "d814ec9e71fb6bc8f7505afc3b0efe4f0399b2b85931988771a8922fb5c3ae1a",
+      "test/qsp_tools/nlft_bench_models.hpp": "23960b2a3b6fd1dae431fb7311536284f5243de9484e5e5ec11a2714e281f02a",
+      "test/qsp_tools/critical_root_isolation_benchmarks.cpp": "06dd562c6e98421f97a988022884fdf3e5d61d43b6d40d3f084a10359d5e11d4",
+      "test/qsp_tools/unit_tests_poly.cpp": "936d021430bdfcedf7362bef47e6ee73d32ad8396d0966b14b26aed768b2d122",
+      "test/qsvt_tools/benchmarks/circuit_benchmarks.cpp": "9f3e4754ab2056a012d1b27386dcbcf03c7dcc2f3235d22619de41e3e59e6c24"
+    },
+    "softwarex_revision": "245938a575deac7f232797efdade97ba442a366d",
+    "frozen_corpus_sha256": "806b1557498debe5d409b214609ad30a74a86d529ae36045a2b3c428b9546e6d",
+    "rust_original_revision": "0f95954e7951dca9a8d88a10c1a9764ecb58d91f",
+    "softwarex_case_inventory_sha256": "66b7773cba0cdc4dceca173cbd40590be3941749c7bd0e5e9bf86665d2410ad3",
+    "softwarex_case_inventory_derivation": "case_id, source degree, and source/canonical little-endian IEEE754 hashes extracted from the checksum-verified frozen 62-case corpus"
+  },
+  "current_source_identity": {
+    "git_head": "0f95954e7951dca9a8d88a10c1a9764ecb58d91f",
+    "tracked_diff_sha256": "e3132df056b9e1b7244d31065d221f38a6eaa088e22aec9312d709ab96b0088e",
+    "source_files_sha256": "b1cc0cd889804f6549487a35a242478c79b9464c89d8e268040b76d9f18025b9"
+  },
+  "current_full_source_identity": {
+    "path": "target/quality-campaign/current-full-source-identity.json",
+    "sha256": "1de2fe8dc11108c0972ffed29bec8e0338e7a26f316cdc4dfc2220921365c068"
+  },
+  "executed_canonical_controller": {
+    "path": "target/quality-campaign/executed-canonical-campaign.py",
+    "sha256": "1aa1e8b29fddb174fd7458476d9bd817367271234fe66feea35da059f2c8d9f6",
+    "capture": "Captured while both canonical lanes were running, before future classifier edits; no measurement code changed."
+  },
+  "current_future_controller": {
+    "path": "benchmarks/replication/campaign.py",
+    "sha256": "48be5153610b522546a263d0156836600c221dc5575164ae91c8b8a20edc5b07"
+  },
+  "report_code_sha256": {
+    "benchmarks/replication/report.py": "736f7fcabbd625018d104e30d6b391d4cdca633e14c5409eaf46e8480f561355",
+    "benchmarks/replication/accounting.py": "9e9c9c34913908bed1e120c433651782737e4be688e9932873c9a036fb9584a3"
+  },
+  "unitary_python_provenance": {
+    "description": "The selected pinned lanes retain launch snapshots and launch/final SHA checks for their controller and imported campaign helper.",
+    "raw_path": "target/quality-campaign/unitary-controllers-pinned",
+    "artifacts_sha256": {
+      "controller-pin.json": "df00bd380458af9c503f24c3464f62556a5f47ff878688d43fd8483e8fcd1226",
+      "verified-after.json": "ff2d51c5762af476de8ef587770fd2b93dab8c3b5cda8594212061196c4213fb",
+      "source_suites/run.py": "553dd221567eb3fc6f9a033519fe5302879bc0d9393771c5c00a1d27f61d768c",
+      "campaign.py": "48be5153610b522546a263d0156836600c221dc5575164ae91c8b8a20edc5b07"
+    },
+    "verification": {
+      "schema_version": 1,
+      "observed_after_both_lanes": true,
+      "snapshot_files": {
+        "source_suites/run.py": "553dd221567eb3fc6f9a033519fe5302879bc0d9393771c5c00a1d27f61d768c",
+        "campaign.py": "48be5153610b522546a263d0156836600c221dc5575164ae91c8b8a20edc5b07"
+      },
+      "workspace_files": {
+        "source_suites/run.py": "553dd221567eb3fc6f9a033519fe5302879bc0d9393771c5c00a1d27f61d768c",
+        "campaign.py": "48be5153610b522546a263d0156836600c221dc5575164ae91c8b8a20edc5b07"
+      },
+      "unchanged_since_prelaunch": true,
+      "controller_mapping_sha256": "1b342e781eacf079b676a4cb00df54b6b85008bd32e80228bf6ad4c3ea4b0b8a",
+      "lane_validation": {
+        "original": {
+          "accounting_complete": true,
+          "performance_coverage_complete": true,
+          "expected_rows": 4,
+          "outcomes": {
+            "ok": 4
+          }
+        },
+        "current": {
+          "accounting_complete": true,
+          "performance_coverage_complete": true,
+          "expected_rows": 4,
+          "outcomes": {
+            "ok": 4
+          }
+        }
+      }
+    }
+  },
+  "measurement_protocol": {
+    "criterion_minimum_samples": 10,
+    "warmup_seconds": 0.1,
+    "requested_measurement_seconds": 0.2,
+    "workers": 1,
+    "canonical_backend": "rustfft_scalar",
+    "unitary_backend": "faer_binary64",
+    "all_measured_source_boundary_equivalent": false,
+    "strict_public_admission_margin": 1e-12,
+    "max_completion_grid": 1048576,
+    "requested_accuracy": "1e-12 through source degree10000, 1e-10 above; unitary exact identity Gram residual0",
+    "effective_completion_tolerance": "source request for isolated completion scopes; source request divided by8 for full_pipeline",
+    "memory_high_bytes": 25769803776,
+    "memory_max_bytes": 30064771072,
+    "peak_rss_unit": "KiB",
+    "peak_rss_scope": "largest child process peak RSS across build/discovery/preflight/measurement"
+  },
+  "interpretation": [
+    "Per-case median ratios are descriptive; no aggregate speedup or statistical significance is claimed.",
+    "RSS is not cgroup peak memory or kernel allocation; production modeled-byte budget rejection is not observed system OOM.",
+    "Contractivity upper bounds denote admission not established under configured limits, not proven noncontractivity or achieved response residual.",
+    "Raw legacy statuses are preserved. Detailed categories refine Contractivity and structured Numerics(Budget) outcomes using verified original logs.",
+    "Native exporter and exact native performance remain blocked by unavailable autodiff1.1.2; no dependency workaround or replacement fixture was used.",
+    "The separate fixed-three coordinate protocol remains native-blocked, not replaced by Criterion ten-sample measurements."
+  ],
+  "excluded_prior_lanes": [
+    "target/quality-campaign/original",
+    "target/quality-campaign/original-exact",
+    "target/quality-campaign/original-final",
+    "target/quality-campaign/original-v2",
+    "target/quality-campaign/original-v3",
+    "target/quality-campaign/source-unitary-current",
+    "target/quality-campaign/source-unitary-current-final",
+    "target/quality-campaign/source-unitary-current-final-v2",
+    "target/quality-campaign/source-unitary-original",
+    "target/quality-campaign/source-unitary-original-final",
+    "target/quality-campaign/source-unitary-original-v2"
+  ],
+  "exact_input_artifacts": {
+    "raw_path": "target/quality-campaign/exact-source",
+    "inventory_sha256": "18d296854c506c1bcce16f4d4e4ee48ec0e311fa6a5d0660314b09f008f567f5",
+    "fixture_encoding": "JSON uint64 IEEE754 payload pairs; source and canonical complex coefficients hashed little endian"
+  }
+}

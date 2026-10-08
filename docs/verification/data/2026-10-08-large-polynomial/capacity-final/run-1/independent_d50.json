@@ -1,0 +1,77 @@
+{
+  "additional_reconstruction_status": "ok",
+  "after_workspace_release": {
+    "last_rejection": null,
+    "live_buffer_bytes": 0,
+    "live_bytes": 0,
+    "live_planner_bytes_estimate": 0,
+    "peak_bytes": 144432,
+    "requested_peak_bytes": 144432,
+    "requested_work_units": 504342,
+    "reservations": 1628,
+    "work_units": 504342
+  },
+  "backend": "rustfft-simd-sequential",
+  "cached_after_result_release": {
+    "last_rejection": null,
+    "live_buffer_bytes": 5040,
+    "live_bytes": 133040,
+    "live_planner_bytes_estimate": 128000,
+    "peak_bytes": 144432,
+    "requested_peak_bytes": 144432,
+    "requested_work_units": 504342,
+    "reservations": 1628,
+    "work_units": 504342
+  },
+  "cached_forward_plans": 6,
+  "cached_forward_scratch_bytes": 5040,
+  "coefficient_backward_linf": 6.445958322112079e-16,
+  "degree": 50,
+  "live_result_and_workspaces": {
+    "last_rejection": null,
+    "live_buffer_bytes": 6672,
+    "live_bytes": 134672,
+    "live_planner_bytes_estimate": 128000,
+    "peak_bytes": 144432,
+    "requested_peak_bytes": 144432,
+    "requested_work_units": 252171,
+    "reservations": 823,
+    "work_units": 252171
+  },
+  "main_backward_tolerance": 1e-10,
+  "memory_kind": "modeled live allocations plus retained opaque planner estimate; not process RSS",
+  "operation": "forward",
+  "profile": "million-degree-inverse-forward-v1",
+  "reconstructed_a_constant": [
+    0.9998977676553178,
+    -5.518788110693822e-16
+  ],
+  "reuse": {
+    "coefficient_linf": 6.445958322112079e-16,
+    "plans_after": 6,
+    "plans_before": 6,
+    "resources_after_reuse": {
+      "last_rejection": null,
+      "live_buffer_bytes": 6672,
+      "live_bytes": 134672,
+      "live_planner_bytes_estimate": 128000,
+      "peak_bytes": 144432,
+      "requested_peak_bytes": 144432,
+      "requested_work_units": 504342,
+      "reservations": 1628,
+      "work_units": 504342
+    },
+    "scratch_bytes_after": 5040,
+    "scratch_bytes_before": 5040,
+    "status": "ok"
+  },
+  "source_a_constant": [
+    0.9998977676553175,
+    -0.0
+  ],
+  "source_inverse_check": null,
+  "source_inverse_contract": "finite, size-preserving, max complex reflection error",
+  "source_reflection_linf": null,
+  "status": "ok",
+  "tolerance": 1e-10
+}

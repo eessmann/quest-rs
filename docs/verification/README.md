@@ -8,6 +8,10 @@ and [tutorial validation guide](../book/src/validation.md) for current commands.
 
 | Record | Scope |
 | --- | --- |
+| [Large-polynomial workspace acceptance, 2026-10-08](2026-10-08-large-polynomial-workspace.md) | Final shared-resource source: default/all-feature tests, doctests, strict all-target Clippy and explicit exclusions |
+| [Large-polynomial resource and capacity, 2026-10-08](2026-10-08-large-polynomial.md) | Preserved native inverse checks, independent forward up to degree one million, workspace reuse and modelled/RSS observations |
+| [Native benchmark devenv follow-up, 2026-10-08](2026-10-08-native-devenv.md) | Unchanged C++ source suites, exact inverse fixtures and matched original/current nextest measurements |
+| [Workspace quality and consolidation, 2026-10-08](2026-10-08-workspace-quality.md) | Local acceptance and benchmark accounting; [23-package review](2026-10-08-workspace-review.md) and [migration notes](2026-10-08-workspace-migration.md) |
 | [Portable native builds and Cirrus, 2026-10-06](2026-10-06-portable-cirrus.md) | Compiler/module discovery, ordered native links, shared MPI supervision, central HDF5, exclusive hybrid jobs and explicit capacity gates |
 | [Reviewed portable-native source, 2026-10-06](2026-10-06-portable-reviewed.md) | HDF5 fallback, fatal-drop negative control, safe Rust supervision and separate acceptance ledger for the corrected source |
 | [Explicit scaling mode, 2026-10-06](2026-10-06-scaling-only.md) | Observed process limits, managed budgets, focused local MPI checks and a separately frozen GNU/Cray release campaign; capacity remains open |

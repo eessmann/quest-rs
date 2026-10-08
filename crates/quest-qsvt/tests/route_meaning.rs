@@ -160,8 +160,11 @@ fn explicit_unit_circle_transfer_preserves_offset_and_checks_padding_budget() ->
 		quest_polynomial::Laurent::new(1_024),
 		vec![Complex64::new(0.2, 0.1)],
 		Limits {
-			max_coefficients: 4,
-			..Limits::default()
+			shapes: quest_numerics::ShapeLimits {
+				max_coefficients: 4,
+				..(Limits::default()).shapes
+			},
+			resources: (Limits::default()).resources,
 		},
 	)?;
 	expect_true!(RouteTarget::<GramArgument>::from_unit_circle_coefficients(source).is_err());

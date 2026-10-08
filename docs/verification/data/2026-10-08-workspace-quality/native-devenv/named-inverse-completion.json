@@ -1,0 +1,23 @@
+{
+  "expected_rows": 34,
+  "available_exact_input_pairs": 17,
+  "original_outcomes": {
+    "ok": 13,
+    "resource_limit": 4
+  },
+  "current_outcomes": {
+    "ok": 13,
+    "resource_limit": 4
+  },
+  "compared_rows": 17,
+  "timing_pairs": 13,
+  "ratio_original_over_current_min": 0.9838867638058062,
+  "ratio_original_over_current_max": 1.0109465867167269,
+  "interpretation": "Per-case median ratios are descriptive; no aggregate speedup or statistical significance is claimed.",
+  "preflight_contract": "Existing Rust inverse followed by forward roundtrip coefficient-linf check; also checks expected source reflections when exported. This is stronger than the native Weiss fixture's finite size-preserving inverse preflight.",
+  "resource_limit_detail": "Production modeled-byte budget rejection; not a measured system OOM",
+  "peak_rss_scope": "largest child process peak RSS across build/discovery/preflight/measurement",
+  "peak_rss_unit": "KiB",
+  "historical_280_timing_pairs_modified": false,
+  "native_timing_comparisons": 0
+}

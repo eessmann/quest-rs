@@ -3,6 +3,9 @@ use crate::Complex64;
 /// A rejected numerical domain, shape, or resource request.
 #[derive(Clone, Debug, PartialEq, Eq, thiserror::Error)]
 pub enum Error {
+	/// Shared ownership or cumulative work admission failed.
+	#[error(transparent)]
+	Resource(#[from] crate::ResourceError),
 	/// Dimensions must be positive and representable.
 	#[error("invalid numerical length: {0}")]
 	Length(&'static str),
@@ -36,31 +39,8 @@ pub enum Error {
 /// A checked numerical result.
 pub type Result<T> = std::result::Result<T, Error>;
 
-/// Resource admission for construction and each reusable operation.
-///
-/// Work units are a conservative model, not a measured operation count. Bytes
-/// include exact wrapper-owned data plus a planner allowance. `RustFFT` does not
-/// expose its allocation sizes or fallible planning; `max_bytes` is therefore
-/// not an allocator-enforced cap on the opaque upstream plans.
-#[derive(Clone, Copy, Debug)]
-pub struct Limits {
-	/// Maximum transform length or input coefficient count.
-	pub max_len: usize,
-	/// Maximum accounted bytes, including the modeled planner allowance.
-	pub max_bytes: usize,
-	/// Maximum modeled work units per transform/convolution.
-	pub max_work: usize,
-}
-
-impl Default for Limits {
-	fn default() -> Self {
-		Self {
-			max_len: 1_048_576,
-			max_bytes: 536_870_912,
-			max_work: usize::try_from(68_719_476_736_u64).unwrap_or(usize::MAX),
-		}
-	}
-}
+/// Transitional name for the unified operation configuration.
+pub type Limits = crate::OperationLimits;
 
 /// Auditable admission model for a constructed workspace.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -108,7 +88,7 @@ pub fn checked_len(len: usize, limits: Limits) -> Result<()> {
 	}
 	// u32 conversion supplies an exact f64 normalization factor without casts.
 	u32::try_from(len).map_err(|_| Error::Length("exceeds binary64 FFT indexing policy"))?;
-	check_limit("length", len, limits.max_len)
+	check_limit("length", len, limits.shapes.max_coefficients)
 }
 
 pub fn finite(values: &[Complex64]) -> Result<()> {

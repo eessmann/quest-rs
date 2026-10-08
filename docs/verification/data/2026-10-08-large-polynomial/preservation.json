@@ -1,0 +1,853 @@
+{
+  "schema_version": "1.0",
+  "purpose": "portable preservation; source receipts retained unchanged except explicitly sanitised command headers",
+  "files": [
+    {
+      "file": "capacity-final/run-1/completion.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/completion.json",
+      "source_sha256": "9d78279dc8449be169ebc15c381189cf2287b3cd78d5d1a820e5132949723541",
+      "portable_sha256": "9d78279dc8449be169ebc15c381189cf2287b3cd78d5d1a820e5132949723541",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d0.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d0.json",
+      "source_sha256": "f6358ec6eca0b7d22a4283415532ba586f42f15b7b45013b05b30588fae7cf41",
+      "portable_sha256": "f6358ec6eca0b7d22a4283415532ba586f42f15b7b45013b05b30588fae7cf41",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d0.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d0.rss.txt",
+      "source_sha256": "1d4e1b3c5bae67ae0888efd772b6df83660ce6d96d72b20f45315908dd9a1fb4",
+      "portable_sha256": "3dcd5a163df4d96d3316a812d19d83c858f8de5ee52c892ae04980d2809628c1",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d0.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d0.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d1.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d1.json",
+      "source_sha256": "1c02e92b6b1b18290b2e059d5046a01a7e22ae62fa69f41457931b92326e278d",
+      "portable_sha256": "1c02e92b6b1b18290b2e059d5046a01a7e22ae62fa69f41457931b92326e278d",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d1.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d1.rss.txt",
+      "source_sha256": "ec6842d4229c5009e859c05cfdf0dfc729dcfd939e64e7b13dd370905f12f2ab",
+      "portable_sha256": "fea3d63f270eff4028c6388a81e37f1f1f782d1901603944608e117f3c4c4cdd",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d1.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d1.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d10.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d10.json",
+      "source_sha256": "625859cfbbdc5bb4e477b4428a0a2fc245e1529dc3287d52ee35aa563aa16aa2",
+      "portable_sha256": "625859cfbbdc5bb4e477b4428a0a2fc245e1529dc3287d52ee35aa563aa16aa2",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d10.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d10.rss.txt",
+      "source_sha256": "70aa491e4b2ff79985937c957e68a7d812893b50fb78efbe909807adcf2d432f",
+      "portable_sha256": "4bb4ae8f4a9a10af608e3d458968f2e2d46986313402ce77c2e56235715abbad",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d10.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d10.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d100.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d100.json",
+      "source_sha256": "e35304217ac6b2c752c0832d057c7f1f09ee71e9254dc1c085f75e706cc311a8",
+      "portable_sha256": "e35304217ac6b2c752c0832d057c7f1f09ee71e9254dc1c085f75e706cc311a8",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d100.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d100.rss.txt",
+      "source_sha256": "bbdf8f1029330e796a353e54b2f041d238a231e68aedff471c06fd1c7ebfaae3",
+      "portable_sha256": "b36ca2c7ce39a3a52dde31468061e223bbba1ab50155da7a63eff10127ee8365",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d100.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d100.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d1000.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d1000.json",
+      "source_sha256": "77002e6e83c1b4ea737cdb6bddfa409433f3e6afd957e2cf588e48e5eb0c8558",
+      "portable_sha256": "77002e6e83c1b4ea737cdb6bddfa409433f3e6afd957e2cf588e48e5eb0c8558",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d1000.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d1000.rss.txt",
+      "source_sha256": "23213b92602e543173ea8af8efcb49d6d7d1b41435171262159a4d428bf8b302",
+      "portable_sha256": "503271129d56391ec332e3ad16abd10e47f4cd5a0ab3623cab6ac4a8f47ad6a4",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d1000.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d1000.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d10000.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d10000.json",
+      "source_sha256": "813fdf5a7a5563314f1d26be83cfb0080ed39aa99eeb3fe1ad2afc6c05d04f69",
+      "portable_sha256": "813fdf5a7a5563314f1d26be83cfb0080ed39aa99eeb3fe1ad2afc6c05d04f69",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d10000.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d10000.rss.txt",
+      "source_sha256": "8b62e06b421ca0a518a16eb7d37b439cc494dc58e6bc84d620f6e088ce0b2b13",
+      "portable_sha256": "9f8b6d147df1298e9e03cb8fdd34e0a1d229667019159df6330392fea28b2a93",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d10000.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d10000.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d100000.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d100000.json",
+      "source_sha256": "fcd0c97838722c2772d5cf69a3b9ccc96bb3fbcce954812605689e716db60a12",
+      "portable_sha256": "fcd0c97838722c2772d5cf69a3b9ccc96bb3fbcce954812605689e716db60a12",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d100000.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d100000.rss.txt",
+      "source_sha256": "0e70940a180e23c587952c8081815d869f347896ed665d56f27f6c491773aa18",
+      "portable_sha256": "59c49eae271bfc2b69a9cb88410ca3eaabc32e52ff1714eaa4cfe662762531c1",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d100000.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d100000.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d1000000.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d1000000.json",
+      "source_sha256": "bacc09f061c9607b07cb892000b8d99a5b8ecd55ae652e72da097456969d0932",
+      "portable_sha256": "bacc09f061c9607b07cb892000b8d99a5b8ecd55ae652e72da097456969d0932",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d1000000.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d1000000.rss.txt",
+      "source_sha256": "c3776896640ed0419b10a3061daae0f2466523276d3066c326cd3d2d95c0fbdf",
+      "portable_sha256": "f66703fffbc067bdffb96c1ac5057814e7605fd37856c717a5a4c6f0b3362777",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d1000000.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d1000000.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d20.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d20.json",
+      "source_sha256": "d44c497cbd89967fcba0140467a5542212ba69120d7d5ab88942f89c12523279",
+      "portable_sha256": "d44c497cbd89967fcba0140467a5542212ba69120d7d5ab88942f89c12523279",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d20.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d20.rss.txt",
+      "source_sha256": "035703b3dfbdbc87d48c3f20f9f032bdb7f5f4b213e580b85d38de00c690141c",
+      "portable_sha256": "7a64ba9d304e260624be87ebf56803e737a9173dca1800c88d83b6ac10e5460d",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d20.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d20.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d200.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d200.json",
+      "source_sha256": "d1e8a214ef068955fd2c6d8e1eeeeeb868f6a661e0decf5fc4f6fa3713d62c1f",
+      "portable_sha256": "d1e8a214ef068955fd2c6d8e1eeeeeb868f6a661e0decf5fc4f6fa3713d62c1f",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d200.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d200.rss.txt",
+      "source_sha256": "2b3e8d3b3b05423cd2766c312eaf2301e97f0bd2e86e7ca7b594313ff02b5b22",
+      "portable_sha256": "cff4c9ab68e299f3d5f94e06b0d307751311ff2e932bfbf5c289d0ec96b2e24f",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d200.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d200.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d2000.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d2000.json",
+      "source_sha256": "a479ec8bbb4be45c078fefc33bc988305f3e91273827e006e9ce0a5949444c6b",
+      "portable_sha256": "a479ec8bbb4be45c078fefc33bc988305f3e91273827e006e9ce0a5949444c6b",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d2000.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d2000.rss.txt",
+      "source_sha256": "e60a10cf0999a7c1c6e7134014029098782c9153b1db7b20d864616333b402db",
+      "portable_sha256": "a46016397c07ff7f6d1f4c35958b6e314c2a382e0ad9ca2840c4be7a172aeb84",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d2000.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d2000.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d20000.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d20000.json",
+      "source_sha256": "a265ef5d5a93d8c23961989fda62d24fbf3f4d8ee23a1d629907d158b8304d9c",
+      "portable_sha256": "a265ef5d5a93d8c23961989fda62d24fbf3f4d8ee23a1d629907d158b8304d9c",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d20000.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d20000.rss.txt",
+      "source_sha256": "9dd8c4bdf49c232f5c0d210c6f9c4d9b87e8666a435ccbee39319b358edf55ba",
+      "portable_sha256": "9aa13e000f22a4cdd6048692d7bef628ad316c88bc4b1020190c4822de22b01b",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d20000.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d20000.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d200000.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d200000.json",
+      "source_sha256": "62771867a6ef669d792cc6cb560daea8c30d72c8c98549919c8b52e9bcce3ee4",
+      "portable_sha256": "62771867a6ef669d792cc6cb560daea8c30d72c8c98549919c8b52e9bcce3ee4",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d200000.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d200000.rss.txt",
+      "source_sha256": "8189a3d03fc9ae069f6dbbb46013f9e0ed9a58bfa26405a5d44311778dcb9d96",
+      "portable_sha256": "fabe770e13bc8d1ad6a9dc130a8c701ff1bc3549122a6f69ebf7d05938753cfa",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d200000.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d200000.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d5.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d5.json",
+      "source_sha256": "ffe0ce0bb1143ca67ddf8de10ee4a3487b66df7549f2a518d55ebbc4d8bc93c4",
+      "portable_sha256": "ffe0ce0bb1143ca67ddf8de10ee4a3487b66df7549f2a518d55ebbc4d8bc93c4",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d5.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d5.rss.txt",
+      "source_sha256": "22b9d5a05e8b310552dea6a5a080aa3d1069c313f1a2c13a38cdb2a7a6301793",
+      "portable_sha256": "aed7a889eb89713328860a7d400eec97e83d93075c4f873c047fbe0fd226c73d",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d5.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d5.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d50.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d50.json",
+      "source_sha256": "93177bc722927f7cdedf2acbeb9b9a013747a8b46213122b80de6e7a5a0e68a1",
+      "portable_sha256": "93177bc722927f7cdedf2acbeb9b9a013747a8b46213122b80de6e7a5a0e68a1",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d50.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d50.rss.txt",
+      "source_sha256": "fe4bf649a72b4c8e38a9aab06d71b548ce28bd4418286e3cc3c04629041172a1",
+      "portable_sha256": "b3c82ea38f62a1473945a859d45000591cbf6769aa8016d566a4f422d549ca3d",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d50.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d50.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d500.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d500.json",
+      "source_sha256": "18b8ff1862d67348a67317cebb3bc8271226b9bc34f768b1614dd751ca42976c",
+      "portable_sha256": "18b8ff1862d67348a67317cebb3bc8271226b9bc34f768b1614dd751ca42976c",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d500.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d500.rss.txt",
+      "source_sha256": "26499b4b4dcfc3e92e072eed5f74d7e544a0600f341d25978699e770970eef35",
+      "portable_sha256": "0516d6df9138b315c44f5d7352e0b180996fe212201a7f6a06846788c621b1fe",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d500.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d500.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d5000.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d5000.json",
+      "source_sha256": "c6e0a2bd2182d9f9d99e2fea1138c4007b53f700d6ad4da4c4eaf5cb2bd1dce4",
+      "portable_sha256": "c6e0a2bd2182d9f9d99e2fea1138c4007b53f700d6ad4da4c4eaf5cb2bd1dce4",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d5000.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d5000.rss.txt",
+      "source_sha256": "431b6802d44e517de665712ac9fe187f4f7e6b6c41e3331695d2bcda36ff5684",
+      "portable_sha256": "66c9d7251ef7ff107dc8878f4e975ec1cd14a17d9db084d37835e597ec434186",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d5000.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d5000.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d50000.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d50000.json",
+      "source_sha256": "1644ea1f2998bc79cf9fb2df79e955ca3ce92fcdda514bc9f3011f28c6fb5815",
+      "portable_sha256": "1644ea1f2998bc79cf9fb2df79e955ca3ce92fcdda514bc9f3011f28c6fb5815",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d50000.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d50000.rss.txt",
+      "source_sha256": "4fbcef824ce4aaa67a8d34c8a2f915d2d7fbc9cd544846e82b8a62bb88ca8fc0",
+      "portable_sha256": "23210c5001dde7b1654a2f81e40f0ea506cb44808aa4ad7694482637c613f0ed",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d50000.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d50000.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d500000.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d500000.json",
+      "source_sha256": "b20e841d57bfe4244be1ccc818d4c36bd6483b332d619ccf0f84af6fe8f500dc",
+      "portable_sha256": "b20e841d57bfe4244be1ccc818d4c36bd6483b332d619ccf0f84af6fe8f500dc",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d500000.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d500000.rss.txt",
+      "source_sha256": "85a068b9221292aceaf664e8da61077e8855d29ff0eb73fcd1a57fa7e24f708c",
+      "portable_sha256": "54aa94ead99d697a23dae91ad921031e8b51a0244ace8864e9ceebcaec36153e",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d500000.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d500000.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d64.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d64.json",
+      "source_sha256": "0c3f12aee5e4511cf3f31c15c72d2cbf28cdbf5e2af2dc8c3bb434c8e3f397bf",
+      "portable_sha256": "0c3f12aee5e4511cf3f31c15c72d2cbf28cdbf5e2af2dc8c3bb434c8e3f397bf",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d64.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d64.rss.txt",
+      "source_sha256": "d4a57a0ad506a356bae853281ff88b696451594319914c42a203d2a2ab5cc04e",
+      "portable_sha256": "1828229e73ac487d97db1dfc22c596f7e7c55d60c9cfb9953d048b14ce24e48b",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/independent_d64.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/independent_d64.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d10.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d10.json",
+      "source_sha256": "13f98243924026f25cdc47a60d5863c13e16048d01888864ecc7834800361353",
+      "portable_sha256": "13f98243924026f25cdc47a60d5863c13e16048d01888864ecc7834800361353",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d10.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d10.rss.txt",
+      "source_sha256": "127490bad77b7cf1fee0f98bfa010db0bf09efc431fe83027db5a21b36bb511a",
+      "portable_sha256": "2d6ec2668dd0a3912e64b7d68e32b687b401ec0bb433d692bd6c7fc9302527ff",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/native_d10.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d10.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d100.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d100.json",
+      "source_sha256": "b183cfd136820391adf34d948a5e1fd44cda7b8d941e011bd4bd9cd5cb80406d",
+      "portable_sha256": "b183cfd136820391adf34d948a5e1fd44cda7b8d941e011bd4bd9cd5cb80406d",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d100.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d100.rss.txt",
+      "source_sha256": "107a72231de953ee398b2bcdd6c3bf359a7639f812bab030bb499a2b22ec3f8a",
+      "portable_sha256": "e9ca3a0fd91b834fd637595528804779e69af873519327055cd1b4461ed386c8",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/native_d100.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d100.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d1000.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d1000.json",
+      "source_sha256": "d97d98ed4067c21ebeddc16a43ad4c1796f390dd962aee28d0ebc2292eb9729f",
+      "portable_sha256": "d97d98ed4067c21ebeddc16a43ad4c1796f390dd962aee28d0ebc2292eb9729f",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d1000.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d1000.rss.txt",
+      "source_sha256": "bf267f9501e0a79191e988105ccb7fa1979e4f40b0453b30ae6925b4ebce3489",
+      "portable_sha256": "bfe94b1f124f0c9f161623e0934d628306d7635a0ad2ba5b3c7e31a08e02e0d4",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/native_d1000.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d1000.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d10000.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d10000.json",
+      "source_sha256": "c3e82b7d584a70fe2804528fa93a0ed4e4ce91572c81d437acbba60eebc2bbda",
+      "portable_sha256": "c3e82b7d584a70fe2804528fa93a0ed4e4ce91572c81d437acbba60eebc2bbda",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d10000.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d10000.rss.txt",
+      "source_sha256": "7531451e9a111170bb5f847c50f58fea9b528626bb50ebd99ae0e038e2b6ebe7",
+      "portable_sha256": "1d2b9dab02a529ccb52b32be82aafe17305ebfbeab893b3449a8fa3e80774780",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/native_d10000.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d10000.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d100000.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d100000.json",
+      "source_sha256": "4048de656c3a4abca5e47eff8924694e3ffc3ac5d1df8353da23bb71a67b7e73",
+      "portable_sha256": "4048de656c3a4abca5e47eff8924694e3ffc3ac5d1df8353da23bb71a67b7e73",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d100000.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d100000.rss.txt",
+      "source_sha256": "b6c351ebc7139d0fa6172c43764f0d23f85556278448f1bc3001876240438570",
+      "portable_sha256": "257fa93beae530f116ffca353ea139e02cc4e7e35af0d7e87dff25aea6c87280",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/native_d100000.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d100000.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d1000000.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d1000000.json",
+      "source_sha256": "9038577137f61d667d7edf61f68d88ca68db079ac22fa7bf90f277f6d52866cc",
+      "portable_sha256": "9038577137f61d667d7edf61f68d88ca68db079ac22fa7bf90f277f6d52866cc",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d1000000.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d1000000.rss.txt",
+      "source_sha256": "dbc989d004d2441683db188d65e5b0d5aff184977310376c40329d64e5721d11",
+      "portable_sha256": "51de5cc17b08ac2dd9864395382605c20d5366a5b067d5012ffc039f6642ecf8",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/native_d1000000.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d1000000.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d20.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d20.json",
+      "source_sha256": "1fd09ee421f25ad95785f1395ba6bbefba7d4899a412bf0aa6b9263e4d62693c",
+      "portable_sha256": "1fd09ee421f25ad95785f1395ba6bbefba7d4899a412bf0aa6b9263e4d62693c",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d20.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d20.rss.txt",
+      "source_sha256": "0e9e28456cf317a8ffba945b6c25a8ef57280b1d95938cc9f3d792aa98f1e7a9",
+      "portable_sha256": "30d095d7b0143776d94defc1613cb1a1a0d38640d6fd1690f37ba5531032cb1f",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/native_d20.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d20.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d200.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d200.json",
+      "source_sha256": "b0ed256d1f808de13f94409556d22bedff7d5ff29c5f55af48701dfbe46d7ad3",
+      "portable_sha256": "b0ed256d1f808de13f94409556d22bedff7d5ff29c5f55af48701dfbe46d7ad3",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d200.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d200.rss.txt",
+      "source_sha256": "d16cd05c79652057b8fe7b84ae6e0acc2ea520ba32b7f60304cd7b354a18d144",
+      "portable_sha256": "672936cf71944bb5cf18727faca6f81f3d2ae784d94d9e4aeded0abafa10d401",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/native_d200.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d200.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d2000.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d2000.json",
+      "source_sha256": "cd8df24359c3f39a602504efe431d38d2207015b538bf71cbdf652dd06c54434",
+      "portable_sha256": "cd8df24359c3f39a602504efe431d38d2207015b538bf71cbdf652dd06c54434",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d2000.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d2000.rss.txt",
+      "source_sha256": "68111d9ccd8e50427e1b2401a0b3c5588c9a7f33561e50c6d0cde1438cdafcbf",
+      "portable_sha256": "3b30fd46dedbc05616b1cb791c77609f88c1fd2c4e9487c5a50271017ee89b4f",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/native_d2000.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d2000.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d20000.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d20000.json",
+      "source_sha256": "754065704e1b61fadbd3678b35d1bfc89ba25ea7984d00bd8c9d754c45d16ebe",
+      "portable_sha256": "754065704e1b61fadbd3678b35d1bfc89ba25ea7984d00bd8c9d754c45d16ebe",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d20000.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d20000.rss.txt",
+      "source_sha256": "ca47001c0571a9badd68c9372b3e3be8d17f9abe661f95a35e50e75085a99fcf",
+      "portable_sha256": "e67c6f7941cae95b069727a2edb0a8822290f066218fcca67e66d5c594079995",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/native_d20000.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d20000.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d200000.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d200000.json",
+      "source_sha256": "499bd67f6674950d78dd272ea2e0f5d4c3e398bc7f9e6cff43bf2f489cb4cf96",
+      "portable_sha256": "499bd67f6674950d78dd272ea2e0f5d4c3e398bc7f9e6cff43bf2f489cb4cf96",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d200000.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d200000.rss.txt",
+      "source_sha256": "e1c1d5c82d507cbb2f83422209d7f29a78ea2b95d23d66bee8f110e0f30703d1",
+      "portable_sha256": "231d62e0ce8a8c270e8fc0deda64128182b0776561c75bd4bea78f46cf406dbb",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/native_d200000.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d200000.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d5.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d5.json",
+      "source_sha256": "367c7a990e6ed331fca498a9f27e748f358ec36e470a53e9481fea03f96bdc9d",
+      "portable_sha256": "367c7a990e6ed331fca498a9f27e748f358ec36e470a53e9481fea03f96bdc9d",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d5.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d5.rss.txt",
+      "source_sha256": "8190195178a7e77e44bc6411ff5b25282a326dfc68786428b900caaa707a66e8",
+      "portable_sha256": "d59e878b5d5b634f780d74edf2730a383e912460a49204ba1352657b21add72e",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/native_d5.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d5.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d50.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d50.json",
+      "source_sha256": "f2fc178c2003d25e8be31680d252a02104331bf7ae6cfc49799e91b97fbdece2",
+      "portable_sha256": "f2fc178c2003d25e8be31680d252a02104331bf7ae6cfc49799e91b97fbdece2",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d50.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d50.rss.txt",
+      "source_sha256": "d0a9f9e7a2512ed31932e8efb472b988f90b4ca58a6e4cefd4d4b5c41adcc202",
+      "portable_sha256": "619390ee06101e02dbf92da274db39c32c4663c75221ba884ebfb0370ed6648b",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/native_d50.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d50.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d500.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d500.json",
+      "source_sha256": "6b6f44cfafe0305aaa214b4a3aa1abc8d0bd4e189249642471d87c0ece229309",
+      "portable_sha256": "6b6f44cfafe0305aaa214b4a3aa1abc8d0bd4e189249642471d87c0ece229309",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d500.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d500.rss.txt",
+      "source_sha256": "cadab20bab11d332285714b34ac16c342489469eef3982216d48f4a9637c686e",
+      "portable_sha256": "87e13226e32c19b0ffdf490edf35dadc5e634f5deb2bbd3c118e55b02fe2795f",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/native_d500.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d500.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d5000.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d5000.json",
+      "source_sha256": "88b5c27f1a425313cc62c4a67a95e900235025d4f03323c338d04d1a5e0d848a",
+      "portable_sha256": "88b5c27f1a425313cc62c4a67a95e900235025d4f03323c338d04d1a5e0d848a",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d5000.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d5000.rss.txt",
+      "source_sha256": "111812b0dadbf7b8df4ef9cf560b9010110f209fcb5625029d17a746c1ec520b",
+      "portable_sha256": "e8be4df72e4687d2de030c716a29eba9fa376f7ca9e8eae3e40dd4f1a5fbc9cc",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/native_d5000.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d5000.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d50000.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d50000.json",
+      "source_sha256": "81b030cf4d10b5584baed58e7d01a84f776f96761e8c99523ead3582ccb90386",
+      "portable_sha256": "81b030cf4d10b5584baed58e7d01a84f776f96761e8c99523ead3582ccb90386",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d50000.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d50000.rss.txt",
+      "source_sha256": "ea1403ff7573059685570d15d349d2f68ca84fb808e3a1585e47651ad5fc6abb",
+      "portable_sha256": "0e7ae61401ca711ab1f1a260c8b95e74a252ebfa2c5da9bf0eee8bb1b1a82f24",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/native_d50000.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d50000.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d500000.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d500000.json",
+      "source_sha256": "e9b08a6fbcdb0136dd05836d208b0f98343d7d4e4ddeed7d65c295949c5b3ee9",
+      "portable_sha256": "e9b08a6fbcdb0136dd05836d208b0f98343d7d4e4ddeed7d65c295949c5b3ee9",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/native_d500000.rss.txt",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d500000.rss.txt",
+      "source_sha256": "b13875b7a1230310f5bee491c4f072f0b1cd6f4774bf9eca758ab01dfa583443",
+      "portable_sha256": "509b1e5badd6a22d010cb7996046df623a53ddf47be510c785f9f49527553bf7",
+      "transformation": "generic command placeholders in GNU time header"
+    },
+    {
+      "file": "capacity-final/run-1/native_d500000.stderr",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/native_d500000.stderr",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "portable_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "capacity-final/run-1/summary.json",
+      "source": "<quest-rs>/target/matched-capacity-final/run-1/summary.json",
+      "source_sha256": "5728c8391f4f16a7d8e4015b1fe203be2e724d61cef081557d60f0f339939162",
+      "portable_sha256": "5728c8391f4f16a7d8e4015b1fe203be2e724d61cef081557d60f0f339939162",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "native-index.json",
+      "source": "<softwarex>/data/benchmarks/nlft/20261008-matched-v1/native-regression/index.json",
+      "source_sha256": "bb9a94a52ff5e09832c4b2cafd72408945253b04afed44f5cefc2962eff84202",
+      "portable_sha256": "bb9a94a52ff5e09832c4b2cafd72408945253b04afed44f5cefc2962eff84202",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "corpus-manifest.json",
+      "source": "<softwarex>/data/benchmarks/nlft/20261008-matched-v1/corpus/manifest.json",
+      "source_sha256": "b7b9842066ced783599a21bba61169629f1e232115dfde52256bbe3833f343a6",
+      "portable_sha256": "b7b9842066ced783599a21bba61169629f1e232115dfde52256bbe3833f343a6",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "exploratory/all17/summary.json",
+      "source": "<quest-rs>/target/large-acceptance-exploratory/all17/summary.json",
+      "source_sha256": "1b7642d31548313e3a7f8abc35fa5be676808bc2b7a9e8e232de8bf146364a94",
+      "portable_sha256": "1b7642d31548313e3a7f8abc35fa5be676808bc2b7a9e8e232de8bf146364a94",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "exploratory/all17/order500000.json",
+      "source": "<quest-rs>/target/large-acceptance-exploratory/all17/order500000.json",
+      "source_sha256": "6d215b3efe4274d0d8a69c02d1862e1240440bef52c48be8dfb33592c3e4f75e",
+      "portable_sha256": "6d215b3efe4274d0d8a69c02d1862e1240440bef52c48be8dfb33592c3e4f75e",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "exploratory/all17/order500000.stderr",
+      "source": "<quest-rs>/target/large-acceptance-exploratory/all17/order500000.stderr",
+      "source_sha256": "5d3189ad3f059d88e9c5ed66da2abf1f05808eeeebd89047dc9c63f4eed17930",
+      "portable_sha256": "5d3189ad3f059d88e9c5ed66da2abf1f05808eeeebd89047dc9c63f4eed17930",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "exploratory/all17/order1000000.json",
+      "source": "<quest-rs>/target/large-acceptance-exploratory/all17/order1000000.json",
+      "source_sha256": "b4ec5a2e7d0a52f5d785efc34cfe6a5a42008a1252187105d3d6e8645bbe06a6",
+      "portable_sha256": "b4ec5a2e7d0a52f5d785efc34cfe6a5a42008a1252187105d3d6e8645bbe06a6",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "exploratory/all17/order1000000.stderr",
+      "source": "<quest-rs>/target/large-acceptance-exploratory/all17/order1000000.stderr",
+      "source_sha256": "070ce5404e080775fbfee81b3b72b4c7513c34dc1c703c24f381d3750a34ed88",
+      "portable_sha256": "070ce5404e080775fbfee81b3b72b4c7513c34dc1c703c24f381d3750a34ed88",
+      "transformation": "exact bytes"
+    },
+    {
+      "file": "exploratory/native-million-normalization-mp100.json",
+      "source": "<quest-rs>/target/large-acceptance-exploratory/native-million-normalization-mp100.json",
+      "source_sha256": "f74f73750d853bb39e7ecb6917d1fcb5a1b412c2fa6839186b97528832c0e89a",
+      "portable_sha256": "f74f73750d853bb39e7ecb6917d1fcb5a1b412c2fa6839186b97528832c0e89a",
+      "transformation": "exact bytes"
+    }
+  ]
+}

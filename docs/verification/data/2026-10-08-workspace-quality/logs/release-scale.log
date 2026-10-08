@@ -1,0 +1,50 @@
+ Nextest run ID 63815366-8f4c-4f4d-bf7e-fc1700b1ef5f with nextest profile: default
+    Starting 6 tests across 293 binaries (1733 tests skipped)
+        FAIL [   4.164s] (1/6) quest-cfd box_kvn_history::tests::resolved_nonlinear_generated_history_inverse
+  stdout ───
+
+    running 1 test
+
+    running 1 test
+    test box_kvn_history::tests::resolved_nonlinear_generated_history_inverse ... nonlinear RHS coupling: ||G_NL z0||=0.00001166269712767888 relative=0.010703628813128266 center=[.04,-.03,.02,.05,-.01] width=.55 boundary_resolved=false
+    FAILED
+
+    failures:
+
+    failures:
+        box_kvn_history::tests::resolved_nonlinear_generated_history_inverse
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 35 filtered out; finished in 3.61s
+
+    test box_kvn_history::tests::resolved_nonlinear_generated_history_inverse ... FAILED
+
+    failures:
+
+    failures:
+        box_kvn_history::tests::resolved_nonlinear_generated_history_inverse
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 35 filtered out; finished in 3.89s
+
+  stderr ───
+    MPI supervisor: launcher=Local { program: "mpiexec", args: [] }, ranks=1, elapsed=3.890632659s, status=exit status: 101, timed_out=false, stdout_truncated=false, stderr_truncated=false, slurm_step=None, cancellation=None
+    Error: Unsupported("collective history runtime: certification resource budget: modeled verification memory")
+
+    thread 'box_kvn_history::tests::resolved_nonlinear_generated_history_inverse' (574889) panicked at crates/quest-cfd/src/box_kvn_history_tests.rs:961:9:
+    fixed resolved inverse ranks=1 failed/timed out; budgets will not be relaxed
+    note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+        PASS [  10.217s] (2/6) quest-qsp certification::tests::degree_8192_analytic_product_is_certified_by_interval_fft
+        PASS [  14.346s] (3/6) quest-cfd box_kvn_history::tests::nonlinear_generated_history_inverse
+        SLOW [> 60.000s] (───) quest-cfd box_kvn_history::tests::higher_budget_resolved_nonlinear_generated_history_inverse
+        SLOW [> 60.000s] (───) quest-qsp::parallel degree_8105_catalog_preserves_canonical_and_generalized_bits
+        SLOW [> 60.000s] (───) quest-qsp::offline offline_original_degree_8105_catalog_exports_and_certifies
+        PASS [  71.949s] (4/6) quest-cfd box_kvn_history::tests::higher_budget_resolved_nonlinear_generated_history_inverse
+        SLOW [>120.000s] (───) quest-qsp::offline offline_original_degree_8105_catalog_exports_and_certifies
+        SLOW [>120.000s] (───) quest-qsp::parallel degree_8105_catalog_preserves_canonical_and_generalized_bits
+        PASS [ 126.446s] (5/6) quest-qsp::offline offline_original_degree_8105_catalog_exports_and_certifies
+        SLOW [>180.000s] (───) quest-qsp::parallel degree_8105_catalog_preserves_canonical_and_generalized_bits
+        PASS [ 204.056s] (6/6) quest-qsp::parallel degree_8105_catalog_preserves_canonical_and_generalized_bits
+────────────
+     Summary [ 204.058s] 6 tests run: 5 passed (3 slow), 1 failed, 1733 skipped
+        FAIL [   4.164s] (1/6) quest-cfd box_kvn_history::tests::resolved_nonlinear_generated_history_inverse
+error: test run failed

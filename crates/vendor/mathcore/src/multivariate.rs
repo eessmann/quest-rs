@@ -2,8 +2,8 @@
 //! Canonical algebra is mathematical construction, not floating-point reassociation.
 use crate::{
 	RBig,
-	arithmetic::{ArithmeticError as Error, Backend, ExactConstant},
-	exact::Symbol,
+	arithmetic::{ArithmeticError as Error, ArithmeticProfile, Backend, ExactConstant},
+	identity::Symbol,
 	scope::ScopePlan,
 };
 use dashu_base::BitTest;
@@ -519,6 +519,7 @@ impl SparsePolynomial {
 			terms.push((powers.clone(), coefficient));
 		}
 		Ok(PolynomialKernel {
+			profile: backend.profile(),
 			variables: self.symbols.len(),
 			terms,
 			max_bytes: self.limits.max_bytes,
@@ -531,12 +532,17 @@ impl SparsePolynomial {
 
 #[derive(Debug, Clone)]
 pub struct PolynomialKernel<S> {
+	profile: ArithmeticProfile,
 	variables: usize,
 	terms: Vec<(Vec<u32>, S)>,
 	max_bytes: usize,
 	retained: usize,
 }
 impl<S> PolynomialKernel<S> {
+	#[must_use]
+	pub const fn profile(&self) -> ArithmeticProfile {
+		self.profile
+	}
 	/// Complete input coordinate count, including variables absent from the terms.
 	#[must_use]
 	pub const fn variables(&self) -> usize {
@@ -562,6 +568,9 @@ impl<S: Clone> PolynomialKernel<S> {
 		backend: &mut B,
 		inputs: &[S],
 	) -> std::result::Result<S, B::Error> {
+		if backend.profile() != self.profile {
+			return Err(Error::Domain("arithmetic profile mismatch").into());
+		}
 		if inputs.len() != self.variables {
 			return Err(Error::Domain("polynomial kernel input shape").into());
 		}

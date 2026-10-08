@@ -1,6 +1,7 @@
 //! Full constrained BDM1 incompressible DG foundation.
 
 mod bdm;
+mod storage;
 pub use bdm::{AssemblyDiagnostics, PeriodicBdm1, PressureRecovery};
 pub mod configuration;
 pub mod configuration_diagnostics;

@@ -2,8 +2,11 @@ use std::{fmt, ops::Mul, sync::Arc};
 
 use rustfft::{Fft, FftPlannerScalar};
 
-use crate::policy::{check_limit, checked_len, finite, zeros};
-use crate::{Complex64, Error, ExecutionPolicy, Limits, ResourceUsage, Result};
+use crate::policy::{checked_len, finite, zeros};
+use crate::{
+	Complex64, Error, ExecutionPolicy, Limits, MemoryReservation, OperationResources,
+	ResourceUsage, Result,
+};
 
 mod shared;
 pub use shared::{SharedConvolutionSession, SharedConvolutionWorkspace};
@@ -51,6 +54,8 @@ pub struct FftWorkspace {
 	inverse_len: f64,
 	usage: ResourceUsage,
 	backend: FftBackend,
+	resources: OperationResources,
+	_reservations: [MemoryReservation; 2],
 }
 
 impl fmt::Debug for FftWorkspace {
@@ -122,15 +127,6 @@ fn plan_allowance(len: usize) -> Result<usize> {
 	bytes(len.checked_mul(64).ok_or(Error::Overflow)?)
 }
 
-fn admit(usage: ResourceUsage, limits: Limits) -> Result<()> {
-	let total = usage
-		.buffer_bytes
-		.checked_add(usage.planner_bytes_estimate)
-		.ok_or(Error::Overflow)?;
-	check_limit("bytes", total, limits.max_bytes)?;
-	check_limit("work", usage.work_units, limits.max_work)
-}
-
 impl FftWorkspace {
 	/// Plan both directions and allocate reusable scratch.
 	///
@@ -139,21 +135,62 @@ impl FftWorkspace {
 	/// failed wrapper allocations. `RustFFT`'s opaque planner uses infallible
 	/// allocation internally; allocation failure there cannot be recovered here.
 	pub fn new(len: usize, backend: FftBackend, limits: Limits) -> Result<Self> {
-		checked_len(len, limits)?;
+		Self::new_with_resources(len, backend, OperationResources::from_limits(limits))
+	}
+	/// Plan against one caller-owned ledger, retaining plan and scratch charges.
+	/// # Errors
+	/// Rejects unsupported shapes, overflow, allocation failures and shared admission.
+	pub fn new_with_resources(
+		len: usize,
+		backend: FftBackend,
+		resources: OperationResources,
+	) -> Result<Self> {
+		resources.fft(len)?;
+		Self::new_with_gate(len, backend, resources)
+	}
+	/// Plan a completion transform under the independent completion-grid gate.
+	/// # Errors
+	/// Rejects completion shape or shared storage/work admission failures.
+	pub fn new_for_completion(
+		len: usize,
+		backend: FftBackend,
+		resources: OperationResources,
+	) -> Result<Self> {
+		resources.completion(len)?;
+		Self::new_with_gate(len, backend, resources)
+	}
+	fn new_with_gate(
+		len: usize,
+		backend: FftBackend,
+		resources: OperationResources,
+	) -> Result<Self> {
+		let limits = resources.limits();
+		checked_len(
+			len,
+			Limits {
+				shapes: crate::ShapeLimits {
+					max_coefficients: len,
+					..limits.shapes
+				},
+				..limits
+			},
+		)?;
 		let mut usage = ResourceUsage {
 			buffer_bytes: 0,
 			planner_bytes_estimate: plan_allowance(len)?,
 			work_units: work(len, 1)?,
 		};
 		// Reject work and the plan allowance before calling the planner.
-		admit(usage, limits)?;
+		resources.admit_work(usage.work_units)?;
+		let plan_reservation = resources.reserve(0, usage.planner_bytes_estimate)?;
 		let (forward, inverse) = plans(len, backend)?;
 		let scratch_len = forward
 			.get_inplace_scratch_len()
 			.max(inverse.get_inplace_scratch_len());
 		usage.buffer_bytes = bytes(scratch_len)?;
-		admit(usage, limits)?;
-		let scratch = zeros(scratch_len)?;
+
+		let scratch_reservation = resources.reserve(usage.buffer_bytes, 0)?;
+		let scratch = zeros(scratch_len).inspect_err(|_| resources.allocation_failed())?;
 		let length = f64::from(u32::try_from(len).map_err(|_| Error::Overflow)?);
 		Ok(Self {
 			forward,
@@ -163,6 +200,8 @@ impl FftWorkspace {
 			inverse_len: 1.0 / length,
 			usage,
 			backend,
+			resources,
+			_reservations: [plan_reservation, scratch_reservation],
 		})
 	}
 
@@ -189,6 +228,19 @@ impl FftWorkspace {
 	/// # Errors
 	/// Rejects a wrong slice length or the first nonfinite input/output entry.
 	pub fn transform(
+		&mut self,
+		values: &mut [Complex64],
+		direction: FftDirection,
+		normalization: Normalization,
+	) -> Result<()> {
+		if values.len() != self.len {
+			return Err(Error::Length("slice does not match FFT plan"));
+		}
+		finite(values)?;
+		self.resources.charge_work(self.usage.work_units)?;
+		self.transform_inner(values, direction, normalization)
+	}
+	fn transform_inner(
 		&mut self,
 		values: &mut [Complex64],
 		direction: FftDirection,
@@ -227,6 +279,7 @@ pub struct ConvolutionWorkspace {
 	#[cfg(feature = "rayon")]
 	second_scratch: Option<Vec<Complex64>>,
 	usage: ResourceUsage,
+	_reservation: MemoryReservation,
 }
 
 impl ConvolutionWorkspace {
@@ -262,26 +315,43 @@ impl ConvolutionWorkspace {
 		limits: Limits,
 		execution: ExecutionPolicy<'_>,
 	) -> Result<Self> {
+		Self::new_with_resources(
+			max_left,
+			max_right,
+			backend,
+			&OperationResources::from_limits(limits),
+			execution,
+		)
+	}
+	/// Construct reusable convolution with shared lifetime and work accounting.
+	/// # Errors
+	/// Rejects shape, overflow, planner or shared resource admission failures.
+	pub fn new_with_resources(
+		max_left: usize,
+		max_right: usize,
+		backend: FftBackend,
+		resources: &OperationResources,
+		execution: ExecutionPolicy<'_>,
+	) -> Result<Self> {
+		let limits = resources.limits();
+		resources.coefficients(max_left)?;
 		checked_len(max_left, limits)?;
+		resources.coefficients(max_right)?;
 		checked_len(max_right, limits)?;
 		let support = support_len(max_left, max_right)?;
 		let len = support.checked_next_power_of_two().ok_or(Error::Overflow)?;
-		checked_len(len, limits)?;
+		resources.fft(len)?;
 		let data_bytes = bytes(len.checked_mul(2).ok_or(Error::Overflow)?)?;
 		let mut usage = ResourceUsage {
 			buffer_bytes: data_bytes,
 			planner_bytes_estimate: plan_allowance(len)?,
 			work_units: work(len, 3)?.checked_add(len).ok_or(Error::Overflow)?,
 		};
-		admit(usage, limits)?;
-		let fft_limits = Limits {
-			max_bytes: limits
-				.max_bytes
-				.checked_sub(data_bytes)
-				.ok_or(Error::Overflow)?,
-			..limits
-		};
-		let fft = FftWorkspace::new(len, backend, fft_limits)?;
+		resources.admit_work(usage.work_units)?;
+		resources.admit_peak(usage.buffer_bytes, usage.planner_bytes_estimate)?;
+		#[allow(unused_mut)]
+		let mut reservation = resources.reserve(data_bytes, 0)?;
+		let fft = FftWorkspace::new_with_resources(len, backend, resources.clone())?;
 		usage.buffer_bytes = data_bytes
 			.checked_add(fft.resource_usage().buffer_bytes)
 			.ok_or(Error::Overflow)?;
@@ -296,7 +366,14 @@ impl ConvolutionWorkspace {
 				.checked_add(bytes(fft.scratch.len())?)
 				.ok_or(Error::Overflow)?;
 		}
-		admit(usage, limits)?;
+
+		#[cfg(feature = "rayon")]
+		if parallel {
+			let extra = bytes(fft.scratch.len())?;
+			drop(reservation);
+			reservation =
+				resources.reserve(data_bytes.checked_add(extra).ok_or(Error::Overflow)?, 0)?;
+		}
 		#[cfg(feature = "rayon")]
 		let second_scratch = if parallel {
 			Some(zeros(fft.scratch.len())?)
@@ -307,11 +384,12 @@ impl ConvolutionWorkspace {
 			fft,
 			#[cfg(feature = "rayon")]
 			second_scratch,
-			left: zeros(len)?,
-			right: zeros(len)?,
+			left: zeros(len).inspect_err(|_| resources.allocation_failed())?,
+			right: zeros(len).inspect_err(|_| resources.allocation_failed())?,
 			max_left,
 			max_right,
 			usage,
+			_reservation: reservation,
 		})
 	}
 
@@ -366,6 +444,7 @@ impl ConvolutionWorkspace {
 		finite(left)?;
 		finite(right)?;
 		let support = support_len(left.len(), right.len())?;
+		self.fft.resources.charge_work(self.usage.work_units)?;
 		self.left.fill(Complex64::new(0.0, 0.0));
 		self.right.fill(Complex64::new(0.0, 0.0));
 		self.left
@@ -378,7 +457,7 @@ impl ConvolutionWorkspace {
 			.copy_from_slice(right);
 		self.forward_pair(policy)?;
 		multiply(&mut self.left, &self.right, policy);
-		self.fft.transform(
+		self.fft.transform_inner(
 			&mut self.left,
 			FftDirection::Inverse,
 			Normalization::ByLength,
@@ -409,9 +488,9 @@ impl ConvolutionWorkspace {
 		#[cfg(not(feature = "rayon"))]
 		let _ = policy;
 		self.fft
-			.transform(&mut self.left, FftDirection::Forward, Normalization::None)?;
+			.transform_inner(&mut self.left, FftDirection::Forward, Normalization::None)?;
 		self.fft
-			.transform(&mut self.right, FftDirection::Forward, Normalization::None)
+			.transform_inner(&mut self.right, FftDirection::Forward, Normalization::None)
 	}
 }
 

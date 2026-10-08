@@ -3,7 +3,7 @@ use crate::{Complex64, Error, Interval, Limits, Monomial, Polynomial, Result};
 use mathcore::{
 	arithmetic::ExactConstant,
 	dynamic::DynamicExpression,
-	exact::Symbol,
+	identity::Symbol,
 	multivariate::{PolynomialLimits, SparsePolynomial},
 };
 use quest_numerics::arithmetic::{Backend, F64Backend, Interval64Backend};
@@ -36,7 +36,7 @@ impl ExactMonomialTarget {
 			.map_err(|_| Error::SupportOverflow)?
 			.checked_add(1)
 			.ok_or(Error::SupportOverflow)?;
-		limits.check(count, 1)?;
+		crate::check_storage(limits, count, 1)?;
 		let work = exact
 			.logical_work()
 			.checked_add(count)
@@ -47,7 +47,7 @@ impl ExactMonomialTarget {
 			.and_then(|b| b.checked_add(count.checked_mul(size_of::<Complex64>())?))
 			.and_then(|b| b.checked_add(size_of::<Self>()))
 			.ok_or(Error::Budget("exact target storage"))?;
-		if work > limits.max_work || bytes > limits.max_bytes {
+		if work > limits.resources.max_work_units || bytes > limits.resources.max_peak_bytes {
 			return Err(Error::Budget("exact target construction"));
 		}
 		let mut coefficients = crate::zeros(count, limits)?;

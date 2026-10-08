@@ -54,61 +54,88 @@ impl Control {
 	}
 }
 
-/// Built-in gates use the `OpenQASM` 3.1 phase convention.
-#[derive(Debug, Clone, PartialEq)]
-pub enum Gate {
-	Id,
-	X,
-	Y,
-	Z,
-	H,
-	S,
-	Sdg,
-	T,
-	Tdg,
-	Sx,
-	Sxdg,
-	Swap,
-	Rx(Angle),
-	Ry(Angle),
-	Rz(Angle),
-	Phase(Angle),
-	U {
-		theta: Angle,
-		phi: Angle,
-		lambda: Angle,
-	},
+// Identity, parameter order and construction are generated from the semantic
+// registry. Formulas in gate_matrix and verifier oracles stay independent.
+macro_rules! define_circuit_adapters {
+    (fixed { $($fixed:ident => ($($fm:tt)*);)* }
+     angle { $($angle:ident => ($($am:tt)*);)* }
+     euler { $euler:ident => ($($em:tt)*); }) => {
+        /// Built-in gates use the `OpenQASM` 3.1 phase convention.
+        #[derive(Debug, Clone, PartialEq)]
+        pub enum Gate {
+            $($fixed,)*
+            $($angle(Angle),)*
+            $euler { theta: Angle, phi: Angle, lambda: Angle },
+        }
+        #[derive(Debug, Clone, PartialEq)]
+        pub enum BoundGate {
+            $($fixed,)*
+            $($angle(f64),)*
+            $euler { theta: f64, phi: f64, lambda: f64 },
+        }
+        define_circuit_adapters!(@methods Gate, Angle; $($fixed),*; $($angle),*; $euler);
+        define_circuit_adapters!(@methods BoundGate, f64; $($fixed),*; $($angle),*; $euler);
+        impl Gate {
+            /// Lift bound radians without assigning symbolic identities.
+            /// # Errors
+            /// Rejects nonfinite bound angles.
+            pub fn from_bound(gate: &BoundGate) -> Result<Self> {
+                Self::from_parameter_fn(gate.kind(), |index| {
+                    let value = gate.parameters().nth(index)
+                        .ok_or(Error::Unsupported("gate parameter index"))?;
+                    Ok(Angle::radians(value)?)
+                })
+            }
+            /// Parameters in registry order without allocating storage.
+            pub fn angles(&self) -> impl Iterator<Item = &Angle> + Clone {
+                self.parameter_refs()
+            }
+        }
+        impl BoundGate {
+            /// Parameters in registry order without allocating storage.
+            pub fn parameters(&self) -> impl Iterator<Item = f64> + Clone {
+                self.parameter_refs().copied()
+            }
+        }
+    };
+    (@methods $name:ident, $parameter:ty; $($fixed:ident),*; $($angle:ident),*; $euler:ident) => {
+        impl $name {
+            /// Identity from the shared semantic registry.
+            #[must_use]
+            pub const fn kind(&self) -> crate::GateKind {
+                match self {
+                    $(Self::$fixed => crate::GateKind::$fixed,)*
+                    $(Self::$angle(..) => crate::GateKind::$angle,)*
+                    Self::$euler { .. } => crate::GateKind::$euler,
+                }
+            }
+            fn parameter_refs(&self) -> impl Iterator<Item = &$parameter> + Clone {
+                match self {
+                    $(Self::$fixed => [None, None, None],)*
+                    $(Self::$angle(value) => [Some(value), None, None],)*
+                    Self::$euler { theta, phi, lambda } => [Some(theta), Some(phi), Some(lambda)],
+                }.into_iter().flatten()
+            }
+            fn from_parameter_fn(
+                kind: crate::GateKind,
+                mut parameter: impl FnMut(usize) -> Result<$parameter>,
+            ) -> Result<Self> {
+                Ok(match kind {
+                    $(crate::GateKind::$fixed => Self::$fixed,)*
+                    $(crate::GateKind::$angle => Self::$angle(parameter(0)?),)*
+                    crate::GateKind::$euler => Self::$euler {
+                        theta: parameter(0)?, phi: parameter(1)?, lambda: parameter(2)?,
+                    },
+                    crate::GateKind::GlobalPhase => return Err(Error::Unsupported("global phase requires scalar dispatch")),
+                    _ => return Err(Error::Unsupported("registry control base")),
+                })
+            }
+        }
+    };
 }
+crate::gates::circuit_registry!(define_circuit_adapters);
 
 impl Gate {
-	/// Lift a bound gate without assigning exact symbolic identities to radians.
-	/// # Errors
-	/// Rejects nonfinite bound angle values.
-	pub fn from_bound(gate: &BoundGate) -> Result<Self> {
-		Ok(match *gate {
-			BoundGate::Id => Self::Id,
-			BoundGate::X => Self::X,
-			BoundGate::Y => Self::Y,
-			BoundGate::Z => Self::Z,
-			BoundGate::H => Self::H,
-			BoundGate::S => Self::S,
-			BoundGate::Sdg => Self::Sdg,
-			BoundGate::T => Self::T,
-			BoundGate::Tdg => Self::Tdg,
-			BoundGate::Sx => Self::Sx,
-			BoundGate::Sxdg => Self::Sxdg,
-			BoundGate::Swap => Self::Swap,
-			BoundGate::Rx(value) => Self::Rx(Angle::radians(value)?),
-			BoundGate::Ry(value) => Self::Ry(Angle::radians(value)?),
-			BoundGate::Rz(value) => Self::Rz(Angle::radians(value)?),
-			BoundGate::Phase(value) => Self::Phase(Angle::radians(value)?),
-			BoundGate::U { theta, phi, lambda } => Self::U {
-				theta: Angle::radians(theta)?,
-				phi: Angle::radians(phi)?,
-				lambda: Angle::radians(lambda)?,
-			},
-		})
-	}
 	/// # Errors
 	/// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
 	pub fn equivalent_checked(&self, other: &Self) -> Result<bool> {
@@ -154,59 +181,31 @@ impl Gate {
 	pub const fn arity(&self) -> usize {
 		self.kind().definition().target_count
 	}
-	/// Shared semantic registry identity for this circuit adapter.
-	#[must_use]
-	pub const fn kind(&self) -> crate::GateKind {
-		match self {
-			Self::Id => crate::GateKind::Id,
-			Self::X => crate::GateKind::X,
-			Self::Y => crate::GateKind::Y,
-			Self::Z => crate::GateKind::Z,
-			Self::H => crate::GateKind::H,
-			Self::S => crate::GateKind::S,
-			Self::Sdg => crate::GateKind::Sdg,
-			Self::T => crate::GateKind::T,
-			Self::Tdg => crate::GateKind::Tdg,
-			Self::Sx => crate::GateKind::Sx,
-			Self::Sxdg => crate::GateKind::Sxdg,
-			Self::Swap => crate::GateKind::Swap,
-			Self::Rx(..) => crate::GateKind::Rx,
-			Self::Ry(..) => crate::GateKind::Ry,
-			Self::Rz(..) => crate::GateKind::Rz,
-			Self::Phase(..) => crate::GateKind::Phase,
-			Self::U { .. } => crate::GateKind::U,
-		}
-	}
 	/// # Errors
 	/// Rejects exhausted exact angle budgets during negation.
 	pub fn adjoint(&self) -> Result<Self> {
-		Ok(match self {
-			Self::S => Self::Sdg,
-			Self::Sdg => Self::S,
-			Self::T => Self::Tdg,
-			Self::Tdg => Self::T,
-			Self::Sx => Self::Sxdg,
-			Self::Sxdg => Self::Sx,
-			Self::Rx(x) => Self::Rx(x.negated()?),
-			Self::Ry(x) => Self::Ry(x.negated()?),
-			Self::Rz(x) => Self::Rz(x.negated()?),
-			Self::Phase(x) => Self::Phase(x.negated()?),
-			Self::U { theta, phi, lambda } => Self::U {
-				theta: theta.negated()?,
-				phi: lambda.negated()?,
-				lambda: phi.negated()?,
-			},
-			other => other.clone(),
-		})
-	}
-	pub fn angles(&self) -> impl Iterator<Item = &Angle> + Clone {
-		match self {
-			Self::Rx(x) | Self::Ry(x) | Self::Rz(x) | Self::Phase(x) => [Some(x), None, None],
-			Self::U { theta, phi, lambda } => [Some(theta), Some(phi), Some(lambda)],
-			_ => [None, None, None],
+		match self.kind().definition().adjoint {
+			crate::Adjoint::SelfInverse => Ok(self.clone()),
+			crate::Adjoint::Gate(kind) => Self::from_parameter_fn(kind, |_| {
+				Err(Error::Unsupported("fixed adjoint parameter"))
+			}),
+			crate::Adjoint::Parameters(transforms) => {
+				Self::from_parameter_fn(self.kind(), |index| {
+					let transform = transforms
+						.get(index)
+						.ok_or(Error::Unsupported("adjoint parameter mapping"))?;
+					let angle = self
+						.angles()
+						.nth(transform.input)
+						.ok_or(Error::Unsupported("adjoint parameter index"))?;
+					if transform.negate {
+						angle.negated().map_err(Into::into)
+					} else {
+						Ok(angle.clone())
+					}
+				})
+			}
 		}
-		.into_iter()
-		.flatten()
 	}
 	/// # Errors
 	/// Rejects invalid semantic candidates, incompatible interfaces, and configured resource limits.
@@ -228,57 +227,13 @@ impl Gate {
 	}
 }
 
-#[derive(Debug, Clone, PartialEq)]
-pub enum BoundGate {
-	Id,
-	X,
-	Y,
-	Z,
-	H,
-	S,
-	Sdg,
-	T,
-	Tdg,
-	Sx,
-	Sxdg,
-	Swap,
-	Rx(f64),
-	Ry(f64),
-	Rz(f64),
-	Phase(f64),
-	U { theta: f64, phi: f64, lambda: f64 },
-}
-
 impl BoundGate {
-	/// Shared semantic registry identity for this circuit adapter.
-	#[must_use]
-	pub const fn kind(&self) -> crate::GateKind {
-		match self {
-			Self::Id => crate::GateKind::Id,
-			Self::X => crate::GateKind::X,
-			Self::Y => crate::GateKind::Y,
-			Self::Z => crate::GateKind::Z,
-			Self::H => crate::GateKind::H,
-			Self::S => crate::GateKind::S,
-			Self::Sdg => crate::GateKind::Sdg,
-			Self::T => crate::GateKind::T,
-			Self::Tdg => crate::GateKind::Tdg,
-			Self::Sx => crate::GateKind::Sx,
-			Self::Sxdg => crate::GateKind::Sxdg,
-			Self::Swap => crate::GateKind::Swap,
-			Self::Rx(..) => crate::GateKind::Rx,
-			Self::Ry(..) => crate::GateKind::Ry,
-			Self::Rz(..) => crate::GateKind::Rz,
-			Self::Phase(..) => crate::GateKind::Phase,
-			Self::U { .. } => crate::GateKind::U,
-		}
-	}
 	/// Adapt a registry gate after intrinsic controls have been separated into operands.
 	/// Global phase is a scalar operation and must use the caller's scalar dispatch.
 	/// # Errors
 	/// Rejects missing/extra or nonfinite parameters and scalar global phase.
 	pub fn from_kind(kind: crate::GateKind, parameters: &[f64]) -> Result<Self> {
-		use crate::{Decomposition, GateKind as G};
+		use crate::Decomposition;
 		let expected = kind.definition().parameter_count;
 		if parameters.len() != expected {
 			return Err(Error::ParameterArity {
@@ -298,45 +253,7 @@ impl BoundGate {
 				actual: parameters.len(),
 			})
 		};
-		Ok(match kind {
-			G::Id => Self::Id,
-			G::X => Self::X,
-			G::Y => Self::Y,
-			G::Z => Self::Z,
-			G::H => Self::H,
-			G::S => Self::S,
-			G::Sdg => Self::Sdg,
-			G::T => Self::T,
-			G::Tdg => Self::Tdg,
-			G::Sx => Self::Sx,
-			G::Sxdg => Self::Sxdg,
-			G::Swap => Self::Swap,
-			G::Rx => Self::Rx(parameter(0)?),
-			G::Ry => Self::Ry(parameter(0)?),
-			G::Rz => Self::Rz(parameter(0)?),
-			G::Phase => Self::Phase(parameter(0)?),
-			G::U => Self::U {
-				theta: parameter(0)?,
-				phi: parameter(1)?,
-				lambda: parameter(2)?,
-			},
-			G::GlobalPhase => {
-				return Err(Error::Unsupported("global phase requires scalar dispatch"));
-			}
-			G::Cx | G::Cy | G::Cz | G::Ccx => {
-				return Err(Error::Unsupported("registry control base"));
-			}
-		})
-	}
-	/// Parameters in shared-registry order, without allocating a temporary list.
-	pub fn parameters(&self) -> impl Iterator<Item = f64> + Clone {
-		match self {
-			Self::Rx(x) | Self::Ry(x) | Self::Rz(x) | Self::Phase(x) => [Some(*x), None, None],
-			Self::U { theta, phi, lambda } => [Some(*theta), Some(*phi), Some(*lambda)],
-			_ => [None, None, None],
-		}
-		.into_iter()
-		.flatten()
+		Self::from_parameter_fn(kind, parameter)
 	}
 }
 

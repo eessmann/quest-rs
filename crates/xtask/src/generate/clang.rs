@@ -21,8 +21,8 @@ pub struct QuestRoot {
 impl QuestRoot {
 	pub fn from_package(package: &quest_build::NativePackage) -> Self {
 		Self {
-			path: package.prefix.clone(),
-			source: source_label(&package.prefix),
+			path: package.prefix().to_owned(),
+			source: source_label(package.prefix()),
 		}
 	}
 
@@ -44,7 +44,7 @@ pub fn fixture_root(path: PathBuf) -> QuestRoot {
 }
 
 pub fn collect_quest_api(package: &quest_build::NativePackage) -> Result<Vec<ApiItem>, DynError> {
-	let include_root = package.prefix.join("include");
+	let include_root = package.prefix().join("include");
 	let quest_h = include_root.join("quest.h");
 
 	if !quest_h.is_file() {
@@ -112,7 +112,7 @@ pub fn parser_diagnostics(
 	Ok(serde_json::json!({
 		"libclang_version": clang::get_version(),
 		"driver": clang_command(),
-		"arguments": clang_arguments(package, &package.prefix.join("include"))?,
+		"arguments": clang_arguments(package, &package.prefix().join("include"))?,
 		"parsed_declarations": items.len(),
 		"evidence": "Installed QuEST C++ headers parsed successfully; ordinary MPI bindgen has a separate C header context."
 	}))
@@ -167,8 +167,8 @@ fn clang_arguments(
 		format!("-I{}", include_root.join("quest/include").display()),
 	];
 	args.extend(header_context_arguments(
-		&package.headers,
-		&package.compiler_arguments,
+		package.headers(),
+		package.compiler_arguments(),
 	));
 
 	if let Some(resource_dir) = clang_resource_dir() {
@@ -177,9 +177,9 @@ fn clang_arguments(
 	}
 
 	args.push("-target".to_owned());
-	args.push(package.target.clone());
+	args.push(package.target().to_owned());
 
-	if let Some(sdk_path) = parser_sysroot(&package.headers, macos_sdk_path) {
+	if let Some(sdk_path) = parser_sysroot(package.headers(), macos_sdk_path) {
 		args.push("-isysroot".to_owned());
 		args.push(sdk_path.display().to_string());
 		let sdk_include = sdk_path.join("usr").join("include");

@@ -1,0 +1,36 @@
+ Nextest run ID 3b102b7c-6ded-43e3-a9b2-56919589b82a with nextest profile: default
+    Starting 1733 tests across 293 binaries (6 tests skipped)
+        PASS [   0.451s] ( 190/1733) quest-cfd::constructed_resources rejected_reciprocal_retains_the_attempted_stage_memory_envelope
+        PASS [   0.009s] ( 795/1733) quest-mathcore::scope_admission capture_admits_aggregate_nodes_even_when_scope_scratch_fits
+        PASS [   0.009s] ( 797/1733) quest-mathcore::scope_admission allocation_measurement_observes_count_and_peak
+        PASS [   0.011s] ( 798/1733) quest-mathcore::scope_admission admitted_constant_capture_preserves_entire_input_validation_contract
+        PASS [   0.007s] ( 799/1733) quest-mathcore::scope_admission capture_admits_scope_work_before_allocating
+        PASS [   0.011s] ( 800/1733) quest-mathcore::scope_admission capture_admits_complete_scope_storage_before_allocating
+        PASS [   0.008s] ( 801/1733) quest-mathcore::scope_admission capture_rejects_heap_constant_payload_before_cloning
+        PASS [   0.007s] ( 802/1733) quest-mathcore::scope_admission duplicate_scopes_are_rejected_with_admitted_bounded_scratch
+        PASS [   0.008s] ( 804/1733) quest-mathcore::scope_admission expression_polynomial_rejects_scope_before_cloning_it
+        PASS [   0.010s] ( 805/1733) quest-mathcore::scope_admission capture_scope_work_boundary_is_charged_and_original_binding_order_survives
+        PASS [   0.006s] ( 806/1733) quest-mathcore::scope_admission sparse_import_rejects_retained_capacity_before_uniqueness_or_terms
+        PASS [   0.010s] ( 807/1733) quest-mathcore::scope_admission lower_admits_scope_scratch_before_allocating_or_backend_callbacks
+        PASS [   0.012s] ( 808/1733) quest-mathcore::scope_admission lowering_work_rejection_precedes_scope_allocation_and_backend_callbacks
+        PASS [   0.011s] ( 809/1733) quest-mathcore::scope_admission polynomial_convenience_constructors_preflight_scope_work_before_exponents
+        PASS [   0.007s] ( 843/1733) quest-numerics::kernel_profiles changing_resource_limits_does_not_change_scalar_policy_and_relowering_preserves_precision
+        PASS [   0.011s] ( 844/1733) quest-numerics::kernel_profiles ad_profiles_preserve_precision_and_distinguish_scalar_shapes
+        PASS [   0.006s] ( 845/1733) quest-numerics::kernel_profiles neutral_errors_retain_structured_sources
+        PASS [   0.009s] ( 846/1733) quest-numerics::kernel_profiles warm_binary64_workspace_evaluation_has_no_scratch_allocations
+        PASS [   0.017s] ( 847/1733) quest-numerics::kernel_profiles lowered_constants_reject_a_changed_precision_before_execution
+        PASS [   0.014s] ( 986/1733) quest-polynomial::extreme_laurent negative_powers_use_a_scaled_reciprocal
+        PASS [   0.019s] ( 989/1733) quest-polynomial::extreme_laurent positive_powers_preserve_representable_horner_scaling
+        PASS [   0.026s] (1047/1733) quest-qasm::finite_conditionals both_finite_conditional_polarities_export_as_admitted_qasm
+        PASS [   0.013s] (1269/1733) quest-qsvt::reciprocal reciprocal_rejects_inconsistent_spectrum_and_preserves_physical_scale
+        PASS [   0.024s] (1270/1733) quest-qsvt::reciprocal reciprocal_is_odd_bounded_and_has_independent_error_bound
+        PASS [   0.019s] (1273/1733) quest-qsvt::reciprocal_review reciprocal_admits_large_byte_budget_and_reports_contractivity
+        PASS [   0.022s] (1274/1733) quest-qsvt::reciprocal_review reciprocal_residual_budget_keeps_response_and_execution_errors_explicit
+        PASS [   0.035s] (1275/1733) quest-qsvt::reciprocal_review exported_matching_schedule_owns_only_phase_payload_and_scalar_header
+        PASS [   0.016s] (1276/1733) quest-qsvt::reciprocal_review reciprocal_storage_admission_includes_retained_spectral_provenance
+        PASS [   0.019s] (1277/1733) quest-qsvt::reciprocal_review replay_rejects_nonfinite_amplitudes_generated_by_unitary_arithmetic
+        PASS [   0.084s] (1278/1733) quest-qsvt::reciprocal_review certified_schedule_uses_the_frozen_projector_payload
+        PASS [   0.303s] (1302/1733) quest-qsvt::reciprocal_review truncated_positive_binomial_reciprocal_bounds_a_small_spectral_gap
+        PASS [   2.555s] (1541/1733) quest-rs qsvt::matching::collective::failure_tests::native_rank_local_failure_aborts_blocked_peer
+        PASS [   2.636s] (1604/1733) quest-rs::matching_collective buffer_reuse::distributed_matching_owns_and_accounts_partition_scratch
+     Summary [ 334.860s] 1733 tests run: 1733 passed (6 slow), 6 skipped

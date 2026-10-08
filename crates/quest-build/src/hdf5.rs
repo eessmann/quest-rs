@@ -9,11 +9,40 @@ use std::{
 /// Serial HDF5 installation selected with the locked dependency's rules.
 #[derive(Clone, Debug)]
 pub struct SerialHdf5 {
-	pub header: PathBuf,
-	pub include_dirs: Vec<PathBuf>,
-	pub library_dirs: Vec<PathBuf>,
-	pub version: Option<String>,
-	pub source: String,
+	library_files: Vec<PathBuf>,
+	pub(crate) header: PathBuf,
+	pub(crate) include_dirs: Vec<PathBuf>,
+	pub(crate) library_dirs: Vec<PathBuf>,
+	pub(crate) version: Option<String>,
+	pub(crate) source: String,
+}
+
+impl SerialHdf5 {
+	/// Read the evaluated `header`.
+	#[must_use]
+	pub fn header(&self) -> &Path {
+		&self.header
+	}
+	/// Read the evaluated `include_dirs`.
+	#[must_use]
+	pub fn include_dirs(&self) -> &[PathBuf] {
+		&self.include_dirs
+	}
+	/// Read the evaluated `library_dirs`.
+	#[must_use]
+	pub fn library_dirs(&self) -> &[PathBuf] {
+		&self.library_dirs
+	}
+	/// Read the evaluated `version`.
+	#[must_use]
+	pub fn version(&self) -> Option<&str> {
+		self.version.as_deref()
+	}
+	/// Read the evaluated `source`.
+	#[must_use]
+	pub fn source(&self) -> &str {
+		&self.source
+	}
 }
 
 const LINUX_DEFAULTS: &[(&str, &str)] = &[
@@ -52,15 +81,6 @@ pub fn emit_serial_hdf5_runtime_paths() -> Result<()> {
 }
 
 fn emit_runtime_paths(linux_defaults: &[(&str, &str)]) -> Result<()> {
-	let selected = discover_with_defaults(linux_defaults)?;
-	let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap_or_else(|_| env::consts::OS.into());
-	for argument in runtime_link_args(&target_os, &selected.library_dirs)? {
-		println!("cargo::rustc-link-arg={argument}");
-	}
-	Ok(())
-}
-
-fn discover_with_defaults(linux_defaults: &[(&str, &str)]) -> Result<SerialHdf5> {
 	for key in [
 		"HDF5_DIR",
 		"HDF5_VERSION",
@@ -70,6 +90,26 @@ fn discover_with_defaults(linux_defaults: &[(&str, &str)]) -> Result<SerialHdf5>
 	] {
 		println!("cargo::rerun-if-env-changed={key}");
 	}
+
+	let selected = discover_with_env_metadata(linux_defaults, true)?;
+	for path in std::iter::once(&selected.header).chain(&selected.library_files) {
+		println!("cargo::rerun-if-changed={}", path.display());
+	}
+	let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap_or_else(|_| env::consts::OS.into());
+	for argument in runtime_link_args(&target_os, &selected.library_dirs)? {
+		println!("cargo::rustc-link-arg={argument}");
+	}
+	Ok(())
+}
+
+fn discover_with_defaults(linux_defaults: &[(&str, &str)]) -> Result<SerialHdf5> {
+	discover_with_env_metadata(linux_defaults, false)
+}
+
+fn discover_with_env_metadata(
+	linux_defaults: &[(&str, &str)],
+	emit_env_metadata: bool,
+) -> Result<SerialHdf5> {
 	let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap_or_else(|_| env::consts::OS.into());
 	let (includes, mut libraries) = if let Some(root) = env::var_os("HDF5_DIR") {
 		let root = PathBuf::from(root);
@@ -87,7 +127,7 @@ fn discover_with_defaults(linux_defaults: &[(&str, &str)]) -> Result<SerialHdf5>
 			vec![root.join("lib"), root.join("bin")],
 		)
 	} else {
-		pkg_config_or_system(&target_os, linux_defaults)?
+		pkg_config_or_system(&target_os, linux_defaults, emit_env_metadata)?
 	};
 	let header = includes
 		.iter()
@@ -106,7 +146,7 @@ fn discover_with_defaults(linux_defaults: &[(&str, &str)]) -> Result<SerialHdf5>
 		libraries.extend([root.join("lib"), root.join("bin")]);
 	}
 	check_serial_header(&header)?;
-	println!("cargo::rerun-if-changed={}", header.display());
+
 	let library_name = match target_os.as_str() {
 		"linux" => "libhdf5.so",
 		"macos" => "libhdf5.dylib",
@@ -117,10 +157,11 @@ fn discover_with_defaults(linux_defaults: &[(&str, &str)]) -> Result<SerialHdf5>
 		}
 	};
 	let mut directories = Vec::new();
+	let mut library_files = Vec::new();
 	for directory in libraries {
 		let library = directory.join(library_name);
 		if library.is_file() {
-			println!("cargo::rerun-if-changed={}", library.display());
+			library_files.push(library);
 			directories.push(directory);
 		}
 	}
@@ -145,6 +186,7 @@ fn discover_with_defaults(linux_defaults: &[(&str, &str)]) -> Result<SerialHdf5>
 		"pkg-config or system layout"
 	};
 	Ok(SerialHdf5 {
+		library_files,
 		header,
 		include_dirs: includes,
 		library_dirs: directories,
@@ -156,11 +198,13 @@ fn discover_with_defaults(linux_defaults: &[(&str, &str)]) -> Result<SerialHdf5>
 fn pkg_config_or_system(
 	target_os: &str,
 	linux_defaults: &[(&str, &str)],
+	emit_env_metadata: bool,
 ) -> Result<(Vec<PathBuf>, Vec<PathBuf>)> {
 	// Match hdf5-metno-sys, including system paths and target-specific
 	// pkg-config environment variables. Raw queries can omit standard paths.
 	match pkg_config::Config::new()
 		.cargo_metadata(false)
+		.env_metadata(emit_env_metadata)
 		.probe("hdf5")
 	{
 		Ok(library)
@@ -269,6 +313,46 @@ fn check_serial_header(header: &Path) -> Result<()> {
 mod tests {
 	use super::*;
 	use googletest::prelude::*;
+	#[gtest]
+	fn discovery_does_not_write_cargo_directives_to_stdout() -> googletest::Result<()> {
+		const CHILD: &str = "QUEST_HDF5_QUIET_CHILD";
+		if env::var_os(CHILD).is_some() {
+			discover_serial_hdf5()?;
+			return Ok(());
+		}
+		let fixture = tempfile::tempdir()?;
+		fs::create_dir_all(fixture.path().join("include"))?;
+		fs::create_dir_all(fixture.path().join("lib"))?;
+		fs::write(
+			fixture.path().join("include/H5pubconf.h"),
+			"#define H5_VERSION \"1.14.3\"\n",
+		)?;
+		fs::write(
+			fixture.path().join(if cfg!(target_os = "macos") {
+				"lib/libhdf5.dylib"
+			} else {
+				"lib/libhdf5.so"
+			}),
+			"fixture",
+		)?;
+		let output = Command::new(env::current_exe()?)
+			.args([
+				"--exact",
+				"hdf5::tests::discovery_does_not_write_cargo_directives_to_stdout",
+				"--nocapture",
+			])
+			.env(CHILD, "1")
+			.env("HDF5_DIR", fixture.path())
+			.output()?;
+		expect_true!(
+			output.status.success(),
+			"{}",
+			String::from_utf8_lossy(&output.stderr)
+		);
+		expect_false!(String::from_utf8_lossy(&output.stdout).contains("cargo:"));
+		Ok(())
+	}
+
 	#[cfg(unix)]
 	#[gtest]
 	fn darwin_homebrew_discovery_matches_dependency_selection() -> googletest::Result<()> {
@@ -443,6 +527,8 @@ case "$2" in hdf5@1.14) printf '%s\n' "$QUEST_HDF5_BREW_FIXTURE";; *) exit 1;; e
 			"hdf5::tests::linux_pkg_config_empty_link_paths_use_selected_header_root",
 			&root,
 		)?
+		.env("HOST", "x86_64-unknown-linux-gnu")
+		.env("TARGET", "x86_64-unknown-linux-gnu")
 		.output()?;
 		verify_that!(output.status.success(), eq(true)).with_failure_message(|| {
 			format!(
@@ -459,6 +545,25 @@ case "$2" in hdf5@1.14) printf '%s\n' "$QUEST_HDF5_BREW_FIXTURE";; *) exit 1;; e
 				root.join("selected/bin").display()
 			))
 		)?;
+		for base in [
+			"PKG_CONFIG",
+			"PKG_CONFIG_PATH",
+			"PKG_CONFIG_LIBDIR",
+			"PKG_CONFIG_SYSROOT_DIR",
+		] {
+			for key in [
+				format!("{base}_x86_64-unknown-linux-gnu"),
+				format!("{base}_x86_64_unknown_linux_gnu"),
+				format!("HOST_{base}"),
+				base.to_owned(),
+			] {
+				expect_true!(
+					String::from_utf8_lossy(&output.stdout)
+						.contains(&format!("rerun-if-env-changed={key}")),
+					"missing input watch for {key}"
+				);
+			}
+		}
 		Ok(())
 	}
 	#[cfg(target_os = "linux")]

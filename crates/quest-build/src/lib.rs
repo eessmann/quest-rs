@@ -9,7 +9,7 @@ mod context;
 mod hdf5;
 mod link;
 mod probe;
-pub use context::NativeBuildContext;
+pub use context::{NativeBuildContext, NativeBuildRequest};
 pub use hdf5::{SerialHdf5, discover_serial_hdf5, emit_serial_hdf5_runtime_paths};
 
 mod package;

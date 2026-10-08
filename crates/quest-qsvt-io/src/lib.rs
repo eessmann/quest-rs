@@ -114,9 +114,14 @@ impl IoPolicy {
 	}
 	fn polynomial_limits(self) -> quest_polynomial::Limits {
 		quest_polynomial::Limits {
-			max_coefficients: self.max_coefficients,
-			max_bytes: self.max_bytes,
-			..quest_polynomial::Limits::default()
+			shapes: quest_numerics::ShapeLimits {
+				max_coefficients: self.max_coefficients,
+				..(quest_polynomial::Limits::default()).shapes
+			},
+			resources: quest_numerics::ResourceLimits {
+				max_peak_bytes: self.max_bytes,
+				..(quest_polynomial::Limits::default()).resources
+			},
 		}
 	}
 }

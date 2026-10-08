@@ -70,9 +70,9 @@ fn main() -> Result<()> {
 	})?;
 	println!(
 		"cargo:warning=Using QuEST {} from {} with {}",
-		native.version,
-		native.prefix.display(),
-		native.compiler.display()
+		native.version(),
+		native.prefix().display(),
+		native.compiler().display()
 	);
 	native.emit_native_capability_cfg();
 	if mpi_feature && mpi_enabled != native.supports_mpi_subcommunicators() {

@@ -1,0 +1,77 @@
+{
+  "additional_reconstruction_status": "ok",
+  "after_workspace_release": {
+    "last_rejection": null,
+    "live_buffer_bytes": 0,
+    "live_bytes": 0,
+    "live_planner_bytes_estimate": 0,
+    "peak_bytes": 128,
+    "requested_peak_bytes": 128,
+    "requested_work_units": 2,
+    "reservations": 10,
+    "work_units": 2
+  },
+  "backend": "rustfft-simd-sequential",
+  "cached_after_result_release": {
+    "last_rejection": null,
+    "live_buffer_bytes": 0,
+    "live_bytes": 0,
+    "live_planner_bytes_estimate": 0,
+    "peak_bytes": 128,
+    "requested_peak_bytes": 128,
+    "requested_work_units": 2,
+    "reservations": 10,
+    "work_units": 2
+  },
+  "cached_forward_plans": 0,
+  "cached_forward_scratch_bytes": 0,
+  "coefficient_backward_linf": 0.0,
+  "degree": 0,
+  "live_result_and_workspaces": {
+    "last_rejection": null,
+    "live_buffer_bytes": 32,
+    "live_bytes": 32,
+    "live_planner_bytes_estimate": 0,
+    "peak_bytes": 128,
+    "requested_peak_bytes": 128,
+    "requested_work_units": 1,
+    "reservations": 5,
+    "work_units": 1
+  },
+  "main_backward_tolerance": 1e-10,
+  "memory_kind": "modeled live allocations plus retained opaque planner estimate; not process RSS",
+  "operation": "forward",
+  "profile": "million-degree-inverse-forward-v1",
+  "reconstructed_a_constant": [
+    0.9903860941828676,
+    -0.0
+  ],
+  "reuse": {
+    "coefficient_linf": 0.0,
+    "plans_after": 0,
+    "plans_before": 0,
+    "resources_after_reuse": {
+      "last_rejection": null,
+      "live_buffer_bytes": 32,
+      "live_bytes": 32,
+      "live_planner_bytes_estimate": 0,
+      "peak_bytes": 128,
+      "requested_peak_bytes": 128,
+      "requested_work_units": 2,
+      "reservations": 10,
+      "work_units": 2
+    },
+    "scratch_bytes_after": 0,
+    "scratch_bytes_before": 0,
+    "status": "ok"
+  },
+  "source_a_constant": [
+    0.9903860941828676,
+    -0.0
+  ],
+  "source_inverse_check": null,
+  "source_inverse_contract": "finite, size-preserving, max complex reflection error",
+  "source_reflection_linf": null,
+  "status": "ok",
+  "tolerance": 1e-10
+}

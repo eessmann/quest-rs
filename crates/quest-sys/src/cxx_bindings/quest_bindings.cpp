@@ -903,29 +903,6 @@ void require_local_range(const ::Qureg& raw,
   }
 }
 
-std::size_t require_cpu_communication_buffer(const ::Qureg& raw) {
-  require_local_cpu_state(raw);
-  if (!raw.isDistributed || raw.cpuCommBuffer == nullptr)
-    throw std::invalid_argument(
-        "communication buffer adapter requires a distributed CPU statevector");
-
-  // Native QuEST allocates both CPU arrays with numAmpsPerNode entries. Check
-  // the complete byte ranges before using either for pointer arithmetic.
-  const auto count = static_cast<std::uint64_t>(raw.numAmpsPerNode);
-  if (count > std::numeric_limits<std::size_t>::max() / sizeof(qcomp) ||
-      count > static_cast<std::uint64_t>(
-                  std::numeric_limits<std::ptrdiff_t>::max()) / sizeof(qcomp))
-    throw std::overflow_error("communication buffer byte count overflows");
-  const auto bytes = static_cast<std::size_t>(count) * sizeof(qcomp);
-  const auto amplitudes = reinterpret_cast<std::uintptr_t>(raw.cpuAmps);
-  const auto buffer = reinterpret_cast<std::uintptr_t>(raw.cpuCommBuffer);
-  const auto maximum = std::numeric_limits<std::uintptr_t>::max();
-  if (bytes > maximum - amplitudes || bytes > maximum - buffer)
-    throw std::overflow_error("communication buffer address range overflows");
-  if (amplitudes < buffer + bytes && buffer < amplitudes + bytes)
-    throw std::invalid_argument("communication buffer aliases local amplitudes");
-  return static_cast<std::size_t>(count);
-}
 }  // namespace
 
 void read_local_qureg_amps(const Qureg& qureg,
@@ -1023,43 +1000,6 @@ void write_local_indexed_qureg_amps(Qureg& qureg,
       throw std::invalid_argument("indexed amplitude must be finite");
   for (std::size_t i = 0; i < indices.size(); ++i)
     raw.cpuAmps[indices[i]] = qcomp{values[i].re, values[i].im};
-}
-
-void validate_cpu_communication_buffer(const Qureg& qureg) {
-  const auto admission = admit_native_call();
-  require_cpu_communication_buffer(qureg.raw());
-}
-
-void stage_cpu_communication_buffer(Qureg& qureg) {
-  const auto admission = admit_native_call();
-  const auto raw = qureg.raw();
-  const auto count = require_cpu_communication_buffer(raw);
-  std::copy_n(raw.cpuAmps, count, raw.cpuCommBuffer);
-}
-
-void set_cpu_communication_buffer_indexed(
-    Qureg& qureg, rust::Slice<const std::int64_t> indices,
-    rust::Slice<const QuestComplex> values) {
-  const auto admission = admit_native_call();
-  const auto raw = qureg.raw();
-  require_cpu_communication_buffer(raw);
-  if (indices.size() != values.size())
-    throw std::invalid_argument("communication buffer dimensions differ");
-  for (const auto index : indices)
-    if (index < 0 || index >= raw.numAmpsPerNode)
-      throw std::invalid_argument("communication buffer index exceeds local partition");
-  for (const auto& value : values)
-    if (!std::isfinite(value.re) || !std::isfinite(value.im))
-      throw std::invalid_argument("communication buffer value must be finite");
-  for (std::size_t i = 0; i < indices.size(); ++i)
-    raw.cpuCommBuffer[indices[i]] = qcomp{values[i].re, values[i].im};
-}
-
-void commit_cpu_communication_buffer(Qureg& qureg) {
-  const auto admission = admit_native_call();
-  const auto raw = qureg.raw();
-  const auto count = require_cpu_communication_buffer(raw);
-  std::copy_n(raw.cpuCommBuffer, count, raw.cpuAmps);
 }
 
 void add_qureg(Qureg& out, const Qureg& source) {

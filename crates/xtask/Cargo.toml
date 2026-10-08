@@ -11,6 +11,8 @@ name = "xtask"
 path = "src/main.rs"
 
 [dependencies]
+clap = { workspace = true, features = ["derive"] }
+cargo_metadata.workspace = true
 quest-build = { workspace = true }
 clang = { workspace = true, features = ["runtime"] }
 serde = { workspace = true, features = ["derive", "std"] }

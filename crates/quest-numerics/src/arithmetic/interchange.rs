@@ -7,6 +7,7 @@ use super::{ArithmeticError, Binary};
 use dashu_base::{BitTest, Sign, UnsignedAbs};
 use dashu_float::{Context, Repr};
 use dashu_int::{IBig, UBig};
+use mathcore::arithmetic::ArithmeticError as CoreError;
 /// Requested direction for checked dyadic-to-binary64 export.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BinaryRounding {
@@ -23,44 +24,37 @@ type Result<T> = std::result::Result<T, ArithmeticError>;
 /// Rejects nonfinite input and precision outside 53..=1,048,576 bits.
 pub fn exact_from_f64(value: f64, precision: u32) -> Result<Binary> {
 	if !value.is_finite() {
-		return Err(ArithmeticError::Nonfinite);
+		return Err(ArithmeticError::Core(CoreError::Nonfinite));
 	}
 	if !(53..=1_048_576).contains(&precision) {
-		return Err(ArithmeticError::Interchange(
+		return Err(ArithmeticError::Core(CoreError::Interchange(
 			"binary64 precision must be 53..=1048576 bits",
-		));
+		)));
 	}
-	let bits = value.to_bits();
-	let negative = bits >> 63 != 0;
-	let exponent = (bits >> 52) & 0x7ff;
-	let fraction = bits & ((1 << 52) - 1);
-	let repr = if exponent == 0 && fraction == 0 {
-		if negative {
+	let parts = mathcore::dyadic::parts(value).ok_or(CoreError::Nonfinite)?;
+	let repr = if parts.mantissa() == 0 {
+		if parts.negative() {
 			Repr::neg_zero()
 		} else {
 			Repr::zero()
 		}
 	} else {
-		let significand = if exponent == 0 {
-			fraction
-		} else {
-			fraction | (1 << 52)
-		};
-		let significand = IBig::from(significand);
-		let e = if exponent == 0 {
-			-1074
-		} else {
-			isize::try_from(exponent)
-				.map_err(|_| ArithmeticError::Interchange("binary64 exponent"))?
-				- 1075
-		};
-		Repr::new(if negative { -significand } else { significand }, e)
+		let significand = IBig::from(parts.mantissa());
+		Repr::new(
+			if parts.negative() {
+				-significand
+			} else {
+				significand
+			},
+			isize::try_from(parts.exponent())
+				.map_err(|_| CoreError::Interchange("binary64 exponent"))?,
+		)
 	};
 	Ok(Binary::from_repr(
 		repr,
 		Context::new(
 			usize::try_from(precision)
-				.map_err(|_| ArithmeticError::Interchange("binary64 precision"))?,
+				.map_err(|_| ArithmeticError::Core(CoreError::Interchange("binary64 precision")))?,
 		),
 	))
 }
@@ -80,7 +74,7 @@ fn overflow(negative: bool, direction: BinaryRounding) -> f64 {
 pub fn to_f64(value: &Binary, direction: BinaryRounding) -> Result<f64> {
 	let repr = value.repr();
 	if !repr.is_finite() {
-		return Err(ArithmeticError::Nonfinite);
+		return Err(ArithmeticError::Core(CoreError::Nonfinite));
 	}
 	let negative = repr.sign() == Sign::Negative;
 	let sign = if negative { 1u64 << 63 } else { 0 };
@@ -90,9 +84,9 @@ pub fn to_f64(value: &Binary, direction: BinaryRounding) -> Result<f64> {
 	let significand = repr.significand().unsigned_abs();
 	// i128 admits every isize exponent plus usize-sized bit length.
 	let top = i128::try_from(significand.bit_len())
-		.map_err(|_| ArithmeticError::Interchange("binary64 significand"))?
+		.map_err(|_| ArithmeticError::Core(CoreError::Interchange("binary64 significand")))?
 		+ i128::try_from(repr.exponent())
-			.map_err(|_| ArithmeticError::Interchange("binary64 exponent"))?;
+			.map_err(|_| ArithmeticError::Core(CoreError::Interchange("binary64 exponent")))?;
 	if top > 1024 {
 		return Ok(overflow(negative, direction));
 	}
@@ -106,16 +100,16 @@ pub fn to_f64(value: &Binary, direction: BinaryRounding) -> Result<f64> {
 	let quantum = (top - 53).max(-1074);
 	let shift = quantum
 		- i128::try_from(repr.exponent())
-			.map_err(|_| ArithmeticError::Interchange("binary64 exponent"))?;
+			.map_err(|_| ArithmeticError::Core(CoreError::Interchange("binary64 exponent")))?;
 	let (mut quotient, remainder, halfway) = if shift > 0 {
-		let shift =
-			usize::try_from(shift).map_err(|_| ArithmeticError::Interchange("binary64 shift"))?;
+		let shift = usize::try_from(shift)
+			.map_err(|_| ArithmeticError::Core(CoreError::Interchange("binary64 shift")))?;
 		let quotient = &significand >> shift;
 		let remainder = &significand - (&quotient << shift);
 		(quotient, remainder, UBig::ONE << shift.saturating_sub(1))
 	} else {
-		let shift =
-			usize::try_from(-shift).map_err(|_| ArithmeticError::Interchange("binary64 shift"))?;
+		let shift = usize::try_from(-shift)
+			.map_err(|_| ArithmeticError::Core(CoreError::Interchange("binary64 shift")))?;
 		(significand << shift, UBig::ZERO, UBig::ZERO)
 	};
 	let increment = if remainder == UBig::ZERO {
@@ -133,7 +127,7 @@ pub fn to_f64(value: &Binary, direction: BinaryRounding) -> Result<f64> {
 		quotient += UBig::ONE;
 	}
 	let q = u64::try_from(quotient)
-		.map_err(|_| ArithmeticError::Interchange("binary64 significand"))?;
+		.map_err(|_| ArithmeticError::Core(CoreError::Interchange("binary64 significand")))?;
 	if q == 0 {
 		return Ok(f64::from_bits(sign));
 	}
@@ -149,11 +143,12 @@ pub fn to_f64(value: &Binary, direction: BinaryRounding) -> Result<f64> {
 		let normalized = if length > 53 {
 			q >> 1
 		} else {
-			q << u32::try_from(53 - length)
-				.map_err(|_| ArithmeticError::Interchange("binary64 normalization"))?
+			q << u32::try_from(53 - length).map_err(|_| {
+				ArithmeticError::Core(CoreError::Interchange("binary64 normalization"))
+			})?
 		};
 		let exponent = u64::try_from(rounded_top + 1022)
-			.map_err(|_| ArithmeticError::Interchange("binary64 exponent"))?;
+			.map_err(|_| ArithmeticError::Core(CoreError::Interchange("binary64 exponent")))?;
 		(exponent << 52) | (normalized & ((1 << 52) - 1))
 	};
 	Ok(f64::from_bits(sign | encoded))

@@ -1,0 +1,231 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-08",
+  "base_revision": "0f95954e7951dca9a8d88a10c1a9764ecb58d91f",
+  "source_identity": "acceptance-source.json",
+  "all_acceptance_gates_passed": false,
+  "local_only": true,
+  "heavy_execution": {
+    "launcher": "systemd-run --user --scope",
+    "MemoryHigh": "24G",
+    "MemoryMax": "28G",
+    "serialization_lock": "/tmp/quest-quality-build.lock",
+    "cargo_build_jobs": 4
+  },
+  "platform": {
+    "system": "Linux x86-64",
+    "rustc": "1.101.0-nightly (8d1a76430 2026-10-06)",
+    "cargo": "1.101.0-nightly",
+    "nextest": "0.9.143",
+    "cmake": "4.3.0",
+    "quest": "4.3.0",
+    "mpi": "MPICH 4.2.2",
+    "hdf5": "serial 1.14.6; standard Linux discovery fallback"
+  },
+  "source_timing_note": "Default/all-feature suites preceded final lint-only helper visibility, checked test division, unused test scratch removal and benchmark map_or changes; final Clippy and focused native regressions validate those deltas. No subsequent Rust source changes.",
+  "checks": [
+    {
+      "name": "default",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": {
+        "local_raw_path": "target/quality-acceptance-final/default.log",
+        "raw_sha256": "12f5e91fcb6a27ed14fdb379627ae8b96f8e875a58ab8a2e3dbad29466f98c75",
+        "published_path": "logs/default.log",
+        "published_sha256": "db39b94a1a382dc3aa008e01809d918ff29d78d3210ee5ea20432e95ae852f2d",
+        "sanitized": true,
+        "excerpt": true
+      },
+      "passed": 1538,
+      "skipped": 1,
+      "command": "cargo nextest run --offline --locked --workspace --no-fail-fast"
+    },
+    {
+      "name": "all-features",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": {
+        "local_raw_path": "target/quality-allfeatures-final/all-features.log",
+        "raw_sha256": "057ce4c3dc251ec82ecddbcbb755e03b37f96a6b38fbae9a681f2ad103ed5ed4",
+        "published_path": "logs/all-features.log",
+        "published_sha256": "7bb639c9619ec45c3744f2587fad72ead68d18539261e96ebe3aab0afd3c581d",
+        "sanitized": true,
+        "excerpt": true
+      },
+      "passed": 1733,
+      "skipped": 6,
+      "command": "cargo nextest run --offline --locked --workspace --all-features --no-fail-fast"
+    },
+    {
+      "name": "doctests",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": {
+        "local_raw_path": "target/quality-acceptance/doctests.log",
+        "raw_sha256": "05e622f938a4ff9ee0da37de45562f3060f1a5dd1df28e805c35af92dea9ec60",
+        "published_path": "logs/doctests.log",
+        "published_sha256": "bd5e76836f490b5acff941bec1c6eb12f07bc6c860f4840d28dd660723c9e86a",
+        "sanitized": true,
+        "excerpt": true
+      },
+      "passed": 67,
+      "ignored": 1,
+      "command": "cargo test --offline --locked --workspace --all-features --doc"
+    },
+    {
+      "name": "clippy",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": {
+        "local_raw_path": "target/quality-clippy-final-v2.log",
+        "raw_sha256": "f47102a4e1b71fee8698ee37ee47f538d6532c6a4e4d5e082ecc67b047fe7f4d",
+        "published_path": "logs/clippy.log",
+        "published_sha256": "5f79b10eb123edc21e398e3295f7012ef7b8f984d3112c589a449ca062f59dc8",
+        "sanitized": true,
+        "excerpt": true
+      },
+      "command": "cargo clippy --offline --locked --workspace --all-targets --all-features --keep-going -- -D warnings"
+    },
+    {
+      "name": "release-scale",
+      "status": "failed_known_capacity_limit",
+      "exit_code": 100,
+      "evidence": {
+        "local_raw_path": "target/quality-acceptance/release-scale.log",
+        "raw_sha256": "06765fd9f8ca1d86646cce90804983277e874feb5433940a2bbd337ca33a0cb6",
+        "published_path": "logs/release-scale.log",
+        "published_sha256": "afb03687260ae42c96a8a64ef8e9f45ab47bf55f9b572f3200186c28cdd2eb0f",
+        "sanitized": true,
+        "excerpt": true
+      },
+      "passed": 5,
+      "failed": 1,
+      "skipped": 1733,
+      "command": "cargo nextest run --offline --locked --release --workspace --all-features --run-ignored only --no-fail-fast",
+      "failure": "resolved_nonlinear_generated_history_inverse: modeled certification memory exceeds unchanged 64 MiB envelope",
+      "historical_evidence": "../../2026-10-06-resolved-nonlinear-box.md"
+    },
+    {
+      "name": "bindings",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": {
+        "local_raw_path": "target/quality-acceptance/bindings.log",
+        "raw_sha256": "a246384cbdaf4512f06b12d617cbede7a7e98f0bc3124c085cab79cd582e07b4",
+        "published_path": "logs/bindings.log",
+        "published_sha256": "ca5766d532b07789a706c5617b6f733161f1ad89a5f2d2f91c61790eaee8de67",
+        "sanitized": true,
+        "excerpt": true
+      },
+      "command": "cargo run --offline --locked -p xtask -- generate-quest-bindings --check"
+    },
+    {
+      "name": "native-consumers",
+      "status": "blocked_dependency_resolution",
+      "exit_code": 1,
+      "evidence": {
+        "local_raw_path": "target/quality-acceptance/native-consumers.log",
+        "raw_sha256": "6678928febfa9a54b928d06a4547b45652fc43e489577a9f2ad3e9be3bf93fbc",
+        "published_path": "logs/native-consumers.log",
+        "published_sha256": "b1d5f07e918b9dfce7876fadf63a2735e4562c7117838099eb0754e29222ad65",
+        "sanitized": true,
+        "excerpt": true
+      },
+      "command": "cargo run --offline --locked -p xtask -- check-native-consumers --backends cpu,omp --loader-isolated --work-dir target/quality-native-consumers",
+      "failure": "Fresh offline lock resolution rejects yanked private-gemm-x86 0.1.20 through faer 0.24.4",
+      "build_executed": false,
+      "runtime_executed": false,
+      "lock_evidence": {
+        "local_raw_path": "target/quality-native-consumers/lock.log",
+        "raw_sha256": "9721d8ca98d7cd84217b9355764374171594120c661497852cdb71ea2a6933cb",
+        "published_path": "logs/native-consumer-lock.log",
+        "published_sha256": "b23bddc6cf4d72c9962d0e743931d1438395258f5f4c704c7fda2434ccf83d53",
+        "sanitized": true,
+        "excerpt": true
+      }
+    },
+    {
+      "name": "format",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": {
+        "local_raw_path": "target/quality-acceptance/format.log",
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "published_path": "logs/format.log",
+        "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sanitized": true,
+        "excerpt": true
+      },
+      "command": "cargo fmt --all -- --check"
+    },
+    {
+      "name": "final-native-regressions",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": {
+        "local_raw_path": "target/quality-final-native-regressions.log",
+        "raw_sha256": "2d03de2e5b123812ebff5873d2e6f38bd5c6f30d9e9637b3c9e033d3fcbbbe09",
+        "published_path": "logs/final-native-regressions.log",
+        "published_sha256": "a1ed21c55346ae96020a4eebbd2d5cc28bef3324a2c8bf7ec1a7d8d58abd8e73",
+        "sanitized": true,
+        "excerpt": true
+      },
+      "passed": 2,
+      "skipped": 146,
+      "command": "cargo nextest run --offline --locked -p quest-rs --all-features -E 'test(distributed_matching_owns_and_accounts_partition_scratch) | test(native_rank_local_failure_aborts_blocked_peer)'"
+    }
+  ],
+  "failing_before_fix_regressions": [
+    {
+      "regression": "laurent-qasm",
+      "evidence": {
+        "local_raw_path": "target/quality-regressions-red.log",
+        "raw_sha256": "de61b107b8fb8b59a79ef5f5ef4f2e51575e15b70187a9a9ce22f50fa2615066",
+        "published_path": "logs/red-laurent-qasm.log",
+        "published_sha256": "5e7c341c19b89e63d8846c3ba04ab7ed9cf52190c0a9e7205766dcee108c9044",
+        "sanitized": true,
+        "excerpt": true
+      }
+    },
+    {
+      "regression": "owned-scratch",
+      "evidence": {
+        "local_raw_path": "target/quality-scratch-red.log",
+        "raw_sha256": "da5c46a65f86d5855ca2481d8d9dfb7346a48787caeb0f62a83e90fbe7eb38be",
+        "published_path": "logs/red-owned-scratch.log",
+        "published_sha256": "1742b6d21b0d4bba703d32aee88a13eabbc88f692c6bc6e495f95e200ba53a9d",
+        "sanitized": true,
+        "excerpt": true
+      }
+    },
+    {
+      "regression": "positive-horner",
+      "evidence": {
+        "local_raw_path": "target/quality-horner-review-red.log",
+        "raw_sha256": "82dcbbb4f5537e495cffc40666b502bea14619aec25ec8eec254450ca832176e",
+        "published_path": "logs/red-positive-horner.log",
+        "published_sha256": "8e8d9a0c6eb8020c4ff42aa1925b979a06431353a48d2db87816f123eb1d6468",
+        "sanitized": true,
+        "excerpt": true
+      }
+    },
+    {
+      "regression": "native-watches",
+      "evidence": {
+        "local_raw_path": "target/quality-native-watches-red.log",
+        "raw_sha256": "c1922f8844c36b506f656b048518759db36ae24569dce93571dbb28b5622b161",
+        "published_path": "logs/red-native-watches.log",
+        "published_sha256": "1dfbbb9f68f4566441606bc4b3625e24a300022d4d96a52c369d87428be5747a",
+        "sanitized": true,
+        "excerpt": true
+      }
+    }
+  ],
+  "unverified": [
+    "independent installed-consumer compilation and loader-isolated runtime",
+    "GPU",
+    "macOS",
+    "multi-host capacity"
+  ],
+  "sanitization": "Published excerpts retain result summaries and relevant regression/failure output, remove build-progress noise and terminal colors, replace workspace paths with <workspace>, native install with <quest-prefix>, and personal home prefixes with /home/user. Full raw transcripts remain in local target output; raw and published hashes are separate."
+}

@@ -11,81 +11,44 @@ use mathcore::{
 	multivariate::{PolynomialLimits, SparsePolynomial},
 	typed,
 };
-use std::{
-	alloc::{GlobalAlloc, Layout, System},
-	cell::Cell,
-};
-
+use std::cell::Cell;
 #[derive(Clone, Copy, Default, Debug)]
 struct AllocationStats {
-	live: usize,
 	peak: usize,
-	allocations: usize,
+	allocations: u64,
 }
-thread_local! {
-	static TRACK:Cell<bool>=const {Cell::new(false)};
-	static STATS:Cell<AllocationStats>=const {Cell::new(AllocationStats {live:0,peak:0,allocations:0})};
-}
-fn allocated(bytes: usize) {
-	let _ = TRACK.try_with(|active| {
-		if active.get() {
-			let _ = STATS.try_with(|stats| {
-				let mut value = stats.get();
-				value.live = value.live.saturating_add(bytes);
-				value.peak = value.peak.max(value.live);
-				value.allocations = value.allocations.saturating_add(1);
-				stats.set(value);
-			});
-		}
-	});
-}
-fn released(bytes: usize) {
-	let _ = TRACK.try_with(|active| {
-		if active.get() {
-			let _ = STATS.try_with(|stats| {
-				let mut value = stats.get();
-				value.live = value.live.saturating_sub(bytes);
-				stats.set(value);
-			});
-		}
-	});
-}
-struct TrackingAllocator;
-// SAFETY: All allocations and deallocations are forwarded unchanged to System.
-// The thread-local counters neither allocate nor change the returned pointers.
-unsafe impl GlobalAlloc for TrackingAllocator {
-	unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-		// SAFETY: The caller supplies a valid layout; System owns this allocation.
-		let pointer = unsafe { System.alloc(layout) };
-		if !pointer.is_null() {
-			allocated(layout.size());
-		}
-		pointer
-	}
-	unsafe fn dealloc(&self, pointer: *mut u8, layout: Layout) {
-		released(layout.size());
-		// SAFETY: The pointer/layout pair is forwarded from the allocator caller.
-		unsafe { System.dealloc(pointer, layout) };
-	}
-	unsafe fn realloc(&self, pointer: *mut u8, layout: Layout, new_size: usize) -> *mut u8 {
-		// SAFETY: The original pointer/layout and new size come from the caller.
-		let result = unsafe { System.realloc(pointer, layout, new_size) };
-		if !result.is_null() {
-			released(layout.size());
-			allocated(new_size);
-		}
-		result
-	}
-}
-#[global_allocator]
-static ALLOCATOR: TrackingAllocator = TrackingAllocator;
+
 fn measured<T>(operation: impl FnOnce() -> T) -> (T, AllocationStats) {
-	STATS.set(AllocationStats::default());
-	TRACK.set(true);
-	let result = operation();
-	TRACK.set(false);
-	(result, STATS.get())
+	let mut result = None;
+	// Finish the measurement before propagating a panic, so the external
+	// thread-local counter is reusable even when the operation unwinds.
+	let stats = allocation_counter::measure(|| {
+		result = Some(std::panic::catch_unwind(std::panic::AssertUnwindSafe(
+			operation,
+		)));
+	});
+	let result = result
+		.unwrap()
+		.unwrap_or_else(|panic| std::panic::resume_unwind(panic));
+	(
+		result,
+		AllocationStats {
+			peak: usize::try_from(stats.bytes_max).unwrap(),
+			allocations: stats.count_total,
+		},
+	)
 }
+
+#[test]
+fn allocation_measurement_observes_count_and_peak() {
+	let ((), stats) = measured(|| {
+		let value = std::hint::black_box(vec![0_u8; 4096]);
+		std::hint::black_box(&value);
+	});
+	assert!(stats.allocations > 0);
+	assert!(stats.peak >= 4096);
+}
+
 fn symbols(count: u64) -> Vec<Symbol> {
 	(0..count)
 		.map(|index| Symbol::new(Owner::new(91), index))
@@ -357,6 +320,9 @@ struct CountingBackend {
 	callbacks: usize,
 }
 impl Backend for CountingBackend {
+	fn profile(&self) -> mathcore::arithmetic::ArithmeticProfile {
+		mathcore::arithmetic::ArithmeticProfile::new("scope-test-f64", 53, "nearest-even")
+	}
 	type Scalar = f64;
 	type Error = ArithmeticError;
 	fn validate(&self, value: &f64) -> Result<(), Self::Error> {

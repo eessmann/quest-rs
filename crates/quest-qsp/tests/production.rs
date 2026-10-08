@@ -141,7 +141,10 @@ fn target_admission_rejects_negative_support_and_noncontractivity() -> Result<()
 			.is_err()
 	);
 	let invalid = Policy {
-		response_tolerance: 0.0,
+		accuracy: quest_qsp::AccuracyPolicy {
+			response_tolerance: 0.0,
+			..(Policy::default()).accuracy
+		},
 		..Policy::default()
 	};
 	let small = Polynomial::new(
@@ -214,8 +217,17 @@ fn canonical_freezing_checks_actual_exported_phase_trigonometry() -> Result<()> 
 		Limits::default(),
 	)?;
 	let policy = Policy {
-		response_tolerance: 1e-18,
-		max_completion_grid: 32,
+		limits: quest_numerics::OperationLimits {
+			shapes: quest_numerics::ShapeLimits {
+				max_completion_grid: 32,
+				..((Policy::default()).limits).shapes
+			},
+			resources: ((Policy::default()).limits).resources,
+		},
+		accuracy: quest_qsp::AccuracyPolicy {
+			response_tolerance: 1e-18,
+			..(Policy::default()).accuracy
+		},
 		..Policy::default()
 	};
 	let completed = SynthesisBuilder::new()
@@ -266,7 +278,7 @@ fn target_admission_rechecks_retained_storage_after_policy_changes() -> Result<(
 		Limits::default(),
 	)?;
 	let mut policy = Policy::default();
-	policy.limits.max_len = 1;
+	policy.limits.shapes.max_coefficients = 1;
 	expect_true!(
 		SynthesisBuilder::new()
 			.policy(policy)
@@ -287,7 +299,7 @@ fn target_admission_rechecks_retained_storage_after_policy_changes() -> Result<(
 		Limits::default(),
 	)?;
 	policy = Policy::default();
-	policy.limits.max_bytes = size_of::<Complex64>();
+	policy.limits.resources.max_peak_bytes = size_of::<Complex64>();
 	// The converted target and the retained original source are separate owners.
 	expect_true!(
 		SynthesisBuilder::new()
@@ -310,14 +322,14 @@ fn completion_accounts_for_live_payload_beside_fft_plan_and_repeated_work() -> g
 {
 	let target = Polynomial::new(Chebyshev, vec![Complex64::new(0.1, 0.0)], Limits::default())?;
 	let mut policy = Policy::default();
-	policy.limits.max_bytes = 32_768;
+	policy.limits.resources.max_peak_bytes = 32_768;
 	let admitted = SynthesisBuilder::new()
 		.policy(policy)
 		.real_parity_wx(&target)?
 		.admit()?;
 	expect_true!(admitted.complete().is_err());
 	let mut policy = Policy::default();
-	policy.limits.max_work = 1_280; // One size32 FFT fits; four transforms do not.
+	policy.limits.resources.max_work_units = 1_280; // One size32 FFT fits; four transforms do not.
 	let admitted = SynthesisBuilder::new()
 		.policy(policy)
 		.real_parity_wx(&target)?

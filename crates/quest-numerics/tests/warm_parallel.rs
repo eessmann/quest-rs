@@ -1,29 +1,12 @@
 #![cfg(feature = "rayon")]
 use googletest::prelude::*;
 use quest_numerics::{Complex64, ConvolutionWorkspace, ExecutionPolicy, FftBackend, Limits};
-use std::{
-	alloc::{GlobalAlloc, Layout, System},
-	sync::atomic::{AtomicBool, AtomicUsize, Ordering},
-};
-struct CountingAllocator;
-static TRACK: AtomicBool = AtomicBool::new(false);
-static ALLOCATIONS: AtomicUsize = AtomicUsize::new(0);
+use stats_alloc::{INSTRUMENTED_SYSTEM, Region, StatsAlloc};
+use std::alloc::System;
+
 #[global_allocator]
-static ALLOCATOR: CountingAllocator = CountingAllocator;
-// SAFETY: Every allocation and deallocation is delegated unchanged to System.
-unsafe impl GlobalAlloc for CountingAllocator {
-	unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-		if TRACK.load(Ordering::Relaxed) {
-			ALLOCATIONS.fetch_add(1, Ordering::Relaxed);
-		}
-		// SAFETY: The caller supplied the allocator contract's valid layout.
-		unsafe { System.alloc(layout) }
-	}
-	unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
-		// SAFETY: The caller supplies the pointer and matching original layout.
-		unsafe { System.dealloc(ptr, layout) }
-	}
-}
+static ALLOCATOR: &StatsAlloc<System> = &INSTRUMENTED_SYSTEM;
+
 #[gtest]
 fn warmed_pool_fft_pairs_reuse_storage_and_measure_scheduler_allocations() -> Result<()> {
 	for workers in [1, 4] {
@@ -49,8 +32,7 @@ fn warmed_pool_fft_pairs_reuse_storage_and_measure_scheduler_allocations() -> Re
 			for _ in 0..4 {
 				workspace.convolve_with_policy(&left, &right, execution)?;
 			}
-			ALLOCATIONS.store(0, Ordering::SeqCst);
-			TRACK.store(true, Ordering::SeqCst);
+			let region = Region::new(ALLOCATOR);
 			let result = (|| -> quest_numerics::Result<_> {
 				let mut first = Complex64::new(0.0, 0.0);
 				let mut length = 0;
@@ -69,8 +51,11 @@ fn warmed_pool_fft_pairs_reuse_storage_and_measure_scheduler_allocations() -> Re
 				}
 				Ok((first, length, reused))
 			})();
-			TRACK.store(false, Ordering::SeqCst);
-			Ok::<_, quest_numerics::Error>((result, ALLOCATIONS.load(Ordering::SeqCst)))
+			let stats = region.change();
+			Ok::<_, quest_numerics::Error>((
+				result,
+				stats.allocations.saturating_add(stats.reallocations),
+			))
 		})?;
 		let (first, length, reused) = result?;
 		expect_that!(first.re, near(0.0005, 1e-14));

@@ -1,0 +1,68 @@
+ Nextest run ID 6020e225-f74a-4979-bc53-15ec9c7de0ea with nextest profile: default
+    Starting 3 tests across 2 binaries
+        FAIL [   0.003s] (1/3) quest-polynomial::extreme_laurent negative_powers_use_a_scaled_reciprocal
+  stdout ───
+
+    running 1 test
+    polynomial value or arithmetic result is not finite
+      at crates/quest-polynomial/tests/extreme_laurent.rs:17:21
+
+    test negative_powers_use_a_scaled_reciprocal ... FAILED
+
+    failures:
+
+    failures:
+        negative_powers_use_a_scaled_reciprocal
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+  stderr ───
+    Error: See failure output above
+
+
+        FAIL [   0.004s] (2/3) quest-polynomial::extreme_laurent zero_padding_does_not_create_a_pole_or_underflow
+  stdout ───
+
+    running 1 test
+    polynomial operation is undefined at the requested argument
+      at crates/quest-polynomial/tests/extreme_laurent.rs:8:20
+
+    test zero_padding_does_not_create_a_pole_or_underflow ... FAILED
+
+    failures:
+
+    failures:
+        zero_padding_does_not_create_a_pole_or_underflow
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+  stderr ───
+    Error: See failure output above
+
+
+        FAIL [   0.004s] (3/3) quest-qasm::finite_conditionals both_finite_conditional_polarities_export_as_admitted_qasm
+  stdout ───
+
+    running 1 test
+    scalar operation requires compatible types
+      at crates/quest-qasm/tests/finite_conditionals.rs:15:24
+
+    test both_finite_conditional_polarities_export_as_admitted_qasm ... FAILED
+
+    failures:
+
+    failures:
+        both_finite_conditional_polarities_export_as_admitted_qasm
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+  stderr ───
+    Error: See failure output above
+
+
+────────────
+     Summary [   0.004s] 3 tests run: 0 passed, 3 failed, 0 skipped
+        FAIL [   0.003s] (1/3) quest-polynomial::extreme_laurent negative_powers_use_a_scaled_reciprocal
+        FAIL [   0.004s] (2/3) quest-polynomial::extreme_laurent zero_padding_does_not_create_a_pole_or_underflow
+        FAIL [   0.004s] (3/3) quest-qasm::finite_conditionals both_finite_conditional_polarities_export_as_admitted_qasm
+error: test run failed

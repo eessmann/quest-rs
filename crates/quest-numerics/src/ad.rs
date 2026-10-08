@@ -67,6 +67,11 @@ impl<B: Backend> JetBackend<'_, B> {
 	}
 }
 impl<B: Backend> Backend for JetBackend<'_, B> {
+	fn profile(&self) -> mathcore::arithmetic::ArithmeticProfile {
+		self.0
+			.profile()
+			.with_representation(std::any::type_name::<Self::Scalar>())
+	}
 	fn validate(&self, value: &Self::Scalar) -> Result<(), Self::Error> {
 		self.0.validate(&value.value)?;
 		self.0.validate(&value.first)?;
@@ -239,6 +244,11 @@ impl<B: Backend, const N: usize> GradientBackend<'_, B, N> {
 	}
 }
 impl<B: Backend, const N: usize> Backend for GradientBackend<'_, B, N> {
+	fn profile(&self) -> mathcore::arithmetic::ArithmeticProfile {
+		self.0
+			.profile()
+			.with_representation(std::any::type_name::<Self::Scalar>())
+	}
 	fn validate(&self, value: &Self::Scalar) -> Result<(), Self::Error> {
 		self.0.validate(&value.value)?;
 		for derivative in value.gradient.as_slice() {
@@ -382,6 +392,11 @@ impl<B: Backend> FirstBackend<'_, B> {
 	}
 }
 impl<B: Backend> Backend for FirstBackend<'_, B> {
+	fn profile(&self) -> mathcore::arithmetic::ArithmeticProfile {
+		self.0
+			.profile()
+			.with_representation(std::any::type_name::<Self::Scalar>())
+	}
 	fn validate(&self, value: &Self::Scalar) -> Result<(), Self::Error> {
 		self.0.validate(&value.value)?;
 		self.0.validate(&value.first)

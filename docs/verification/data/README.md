@@ -13,6 +13,13 @@ not every current platform or feature combination.
   execution measurements, including failed or incomplete cases.
 - [Grace Hopper](2026-09-29-grace-hopper/checks.json): workspace commands and
   standalone CPU/OpenMP/GPU consumer results.
+- [Workspace quality, 2026-10-08](2026-10-08-workspace-quality/acceptance.json):
+  source hashes, compact result excerpts, mathematical regressions and explicit
+  capacity/dependency gates; full transcripts and benchmark samples remain local.
+
+- [Native devenv follow-up](2026-10-08-workspace-quality/native-devenv/native-completion.json):
+  separate native source accounting, exact-input Rust comparisons and scoped failure
+  diagnoses; preserves the initial 811-row campaign.
 
 Numerical JSONL samples are preserved unchanged. Measurement summaries retain
 their numerical values. Metadata omits temporary checkout paths and duplicated

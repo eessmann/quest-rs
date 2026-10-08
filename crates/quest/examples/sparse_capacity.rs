@@ -305,7 +305,7 @@ mod experiment {
 		let allocated = env.view().allocated_bytes();
 		let native_array_payload = super::support::native_array_payload(
 			register.deployment(),
-			prepared.scratch_deployment(),
+			Some(prepared.scratch_deployment()),
 		)?;
 		let global_amplitudes = 1usize
 			.checked_shl(u32::try_from(active + 1)?)

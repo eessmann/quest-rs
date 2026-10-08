@@ -7,6 +7,7 @@ license.workspace = true
 repository.workspace = true
 
 [dependencies]
+rustc_version.workspace = true
 build-probe-mpi.workspace = true
 cc.workspace = true
 pkg-config.workspace = true

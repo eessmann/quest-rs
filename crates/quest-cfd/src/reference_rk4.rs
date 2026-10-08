@@ -1,10 +1,4 @@
 //! Internal fixed-step RK4, shared by typed, independently admitted reference owners.
-#![allow(
-	clippy::arithmetic_side_effects,
-	clippy::indexing_slicing,
-	clippy::suboptimal_flops,
-	reason = "Bounded checked shapes preserve the existing RK4 operation order; candidates are validated before acceptance"
-)]
 use crate::CfdError;
 /// Progress of complete accepted states, separate from callback completion.
 #[derive(Clone, Debug, Default, serde::Serialize)]
@@ -26,8 +20,7 @@ const fn invalid() -> CfdError {
 }
 fn audit(vectors: &[&Vec<f64>], bytes: usize) -> Result<(), CfdError> {
 	let total = vectors.iter().try_fold(0usize, |sum, v| {
-		v.capacity()
-			.checked_mul(8)
+		crate::storage::bytes::<f64>(v.capacity())
 			.and_then(|n| sum.checked_add(n))
 			.ok_or_else(invalid)
 	})?;
@@ -36,12 +29,6 @@ fn audit(vectors: &[&Vec<f64>], bytes: usize) -> Result<(), CfdError> {
 	} else {
 		Ok(())
 	}
-}
-fn clone_values(values: &[f64]) -> Result<Vec<f64>, CfdError> {
-	let mut out = Vec::new();
-	out.try_reserve_exact(values.len()).map_err(|_| invalid())?;
-	out.extend_from_slice(values);
-	Ok(out)
 }
 fn valid(values: &[f64], dimension: usize) -> Result<(), CfdError> {
 	if values.len() != dimension || values.iter().any(|x| !x.is_finite()) {
@@ -53,7 +40,9 @@ fn valid(values: &[f64], dimension: usize) -> Result<(), CfdError> {
 /// Callers own source/query accounting; this private helper audits all retained vector capacities.
 #[allow(
 	clippy::too_many_lines,
-	reason = "One fixed-step transaction keeps every acceptance/failure boundary explicit"
+	clippy::arithmetic_side_effects,
+	clippy::suboptimal_flops,
+	reason = "One admitted fixed-step transaction retains the established floating operation order and checks before acceptance"
 )]
 pub fn integrate(
 	mut state: Vec<f64>,
@@ -80,6 +69,9 @@ pub fn integrate(
 		}
 		valid(&state, dimension)?;
 		audit(&[&state], scratch_bytes)?;
+		// One buffer is reused for every intermediate and candidate. It never
+		// aliases the accepted state, which is published only after validation.
+		let mut candidate = Vec::new();
 		for step in 0..steps {
 			progress.attempted_step = Some(step + 1);
 			let time = f64::from(step) * dt;
@@ -91,45 +83,45 @@ pub fn integrate(
 			};
 			progress.failure_phase = Some("drift stage 1");
 			let k1 = call(time, &state)?;
-			audit(&[&state, &k1], scratch_bytes)?;
-			let shift = |k: &[f64], factor: f64| -> Result<Vec<f64>, CfdError> {
-				let mut out = clone_values(&state)?;
+			audit(&[&state, &k1, &candidate], scratch_bytes)?;
+			let shift = |out: &mut Vec<f64>, k: &[f64], factor: f64| -> Result<(), CfdError> {
+				out.clear();
+				out.try_reserve_exact(dimension).map_err(|_| invalid())?;
+				out.extend_from_slice(&state);
 				for (x, v) in out.iter_mut().zip(k) {
 					*x += factor * dt * v;
 				}
-				valid(&out, dimension)?;
-				Ok(out)
+				valid(out, dimension)
 			};
 			progress.failure_phase = Some("drift stage 2");
-			let intermediate = shift(&k1, 0.5)?;
-			audit(&[&state, &k1, &intermediate], scratch_bytes)?;
-			let k2 = call(time + 0.5 * dt, &intermediate)?;
-			audit(&[&state, &k1, &k2, &intermediate], scratch_bytes)?;
-			drop(intermediate);
+			shift(&mut candidate, &k1, 0.5)?;
+			audit(&[&state, &k1, &candidate], scratch_bytes)?;
+			let k2 = call(time + 0.5 * dt, &candidate)?;
+			audit(&[&state, &k1, &k2, &candidate], scratch_bytes)?;
 			progress.failure_phase = Some("drift stage 3");
-			let intermediate = shift(&k2, 0.5)?;
-			audit(&[&state, &k1, &k2, &intermediate], scratch_bytes)?;
-			let k3 = call(time + 0.5 * dt, &intermediate)?;
-			audit(&[&state, &k1, &k2, &k3, &intermediate], scratch_bytes)?;
-			drop(intermediate);
+			shift(&mut candidate, &k2, 0.5)?;
+			audit(&[&state, &k1, &k2, &candidate], scratch_bytes)?;
+			let k3 = call(time + 0.5 * dt, &candidate)?;
+			audit(&[&state, &k1, &k2, &k3, &candidate], scratch_bytes)?;
 			progress.failure_phase = Some("drift stage 4");
-			let intermediate = shift(&k3, 1.)?;
-			audit(&[&state, &k1, &k2, &k3, &intermediate], scratch_bytes)?;
-			let k4 = call(time + dt, &intermediate)?;
-			audit(&[&state, &k1, &k2, &k3, &k4, &intermediate], scratch_bytes)?;
-			drop(intermediate);
-			progress.failure_phase = Some("candidate combination");
-			let mut candidate = clone_values(&state)?;
+			shift(&mut candidate, &k3, 1.)?;
+			audit(&[&state, &k1, &k2, &k3, &candidate], scratch_bytes)?;
+			let k4 = call(time + dt, &candidate)?;
 			audit(&[&state, &k1, &k2, &k3, &k4, &candidate], scratch_bytes)?;
-			for i in 0..dimension {
-				candidate[i] += dt * (k1[i] + 2. * k2[i] + 2. * k3[i] + k4[i]) / 6.;
+			progress.failure_phase = Some("candidate combination");
+			candidate.copy_from_slice(&state);
+			audit(&[&state, &k1, &k2, &k3, &k4, &candidate], scratch_bytes)?;
+			for ((((value, a), b), c), d) in
+				candidate.iter_mut().zip(&k1).zip(&k2).zip(&k3).zip(&k4)
+			{
+				*value += dt * (a + 2. * b + 2. * c + d) / 6.;
 			}
 			valid(&candidate, dimension)?;
 			let accepted_time = time + dt;
 			if !accepted_time.is_finite() {
 				return Err(invalid());
 			}
-			state = candidate;
+			std::mem::swap(&mut state, &mut candidate);
 			drop(k1);
 			drop(k2);
 			drop(k3);
@@ -154,6 +146,9 @@ pub fn integrate(
 mod tests {
 	#![allow(
 		clippy::panic_in_result_fn,
+		clippy::arithmetic_side_effects,
+		clippy::indexing_slicing,
+		clippy::suboptimal_flops,
 		reason = "Independent analytic and injected-failure assertions fail the bounded test directly"
 	)]
 	use super::*;

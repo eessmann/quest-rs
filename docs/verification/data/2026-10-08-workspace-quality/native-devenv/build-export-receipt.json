@@ -1,0 +1,48 @@
+{
+  "source_revision": "4fc35983138d07a990862a4d83ad16f2b737c98f",
+  "build_exit_code": 0,
+  "fixture_tests": {
+    "exit_code": 0,
+    "cases": 6,
+    "assertions": 23
+  },
+  "runtime_probe_exit_code": 0,
+  "export_build_attempts": [
+    1,
+    0
+  ],
+  "export_exit_code": 0,
+  "export_fixture_count": 17,
+  "export_elapsed_seconds": 497.86,
+  "export_peak_rss_kib": 497036,
+  "export_scope": "largest child process peak RSS; not cgroup memory",
+  "artifacts": {
+    "configure.log": "6fd05b357c2e0923ecbf49fccad632e42aea13299c13b88718ed8be121797520",
+    "native-configure.log": "84eab9e8cc6c257f62af7aa072c5719aa61b03521ec3756425a92899bbc67108",
+    "native-build.log": "72b02b2f74f45cf681dede109d71c0398cff1059657635832a903014d5b5dc93",
+    "native-fixture-tests.log": "0140f7a761eeb24de5d8545408038c167b5f2e2792167ed6beba01737aa10871",
+    "native-runtime-probe.log": "399005b986bf6954fc20e4d35e932e67420b9ebe50abbc9d6b7ffcae74c25bec",
+    "export-build.log": "f3f213483ffc685b0a7ea27e0c09ff89b80a955f50a195d76cc146b77a691160",
+    "export-build-v2.log": "84b31405d8488a8f7f21af2266d3f0ddea46785cc557bf5359fc2458907da1b6",
+    "export-run.log": "0c0363823cb13b4247a844e0dc1ef1ce6e99ec3835237bd4db5357cf03ded93a",
+    "out/build/nix-release/export_named": "27da818e134a1cf1e8c80730954b6b0e8f538c8d7980f79f0fee36fee8ab1bed",
+    "named-fixtures/named-solver-export-status.json": "3873822e2d7962a4c5de23711316401d2683ae0beb67b7b8a0d94ff110d34c64",
+    "named-fixtures/order10.json": "9bd57de21dcd54dc578cd5e9575cc3456bd8e37b0591d1ff793dae820c078384",
+    "named-fixtures/order100.json": "a8a6b2621472f70224edfcf55be06268bc837aa487c674c8df08369fb4ce309b",
+    "named-fixtures/order1000.json": "82cd2a41241665a9e40f4ed1f7929086443562081aef47202b1ff2d14a3f9830",
+    "named-fixtures/order10000.json": "645ba779c84f0c911c33c06909bd0f19547dffbfd09faf50e434b521196139d8",
+    "named-fixtures/order100000.json": "0727af05f6a049b054efb5a9d5f060476750f58a7dca58808be9784da46a9696",
+    "named-fixtures/order1000000.json": "123c74db5f2618e712c955d3673e80e6a5055ce77ebc852816f123ffd1456cb9",
+    "named-fixtures/order20.json": "a8f3658e9f508f81ffa43452d25acaa448ad74d951681b4d49dc5f6a2093b296",
+    "named-fixtures/order200.json": "11e6913baaccd3a8a6481228187a301b4b157fff1faf5ec6f67c8edeaa5315c3",
+    "named-fixtures/order2000.json": "ee0bce22cf6b1a4eae91aeac8eca6add56733dab3cff66efd3e2fd71f7a1d238",
+    "named-fixtures/order20000.json": "0177b03dca5d2aa9814451b7eaa7a35855f33ef3bfe5019a32dd297e00a8884d",
+    "named-fixtures/order200000.json": "9f2e048fc6d43988eebb3dab2ed2f493e7f2a70567a7fe490c0d341553474249",
+    "named-fixtures/order5.json": "1bbde14d8ff036f8e6156e8ba926c9aa4e54a9ad647e57fba3985554543eb994",
+    "named-fixtures/order50.json": "ecfe4896fa41bfa771e4ab1a5764bc279d8391b79a93e2405f2c0857ee27f7c4",
+    "named-fixtures/order500.json": "f374de04bba1eba96b03a9f99ce209602dfac07e3234433c7fb58f8002ac3bcf",
+    "named-fixtures/order5000.json": "d674048afa1af5d35078fbbf6133b2db5ec3113a395fb5983036abad66fd7673",
+    "named-fixtures/order50000.json": "4db83c0a9269d60e76c82e08bf13beb63ce8da091ef7c6aa5065c23296e2c073",
+    "named-fixtures/order500000.json": "f9e2729291b7150513d4c7c60f541db1a7515f030ba4ee673402a3ae9992471e"
+  }
+}

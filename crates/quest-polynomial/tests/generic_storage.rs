@@ -182,8 +182,11 @@ fn admission_accounts_for_retained_high_precision_mantissas_and_vec_capacity()
 		..Precision::default()
 	})?;
 	let limits = Limits {
-		max_bytes: 256,
-		..Limits::default()
+		shapes: (Limits::default()).shapes,
+		resources: quest_numerics::ResourceLimits {
+			max_peak_bytes: 256,
+			..(Limits::default()).resources
+		},
 	};
 	expect_true!(
 		Polynomial::from_scalars(
@@ -235,8 +238,11 @@ fn constant_and_zero_padding_avoid_irrelevant_basis_domain_arithmetic() -> googl
 fn generic_admission_and_signed_shift_obey_work_and_support_limits() -> googletest::Result<()> {
 	let mut backend = F64Backend;
 	let limits = Limits {
-		max_work: 3,
-		..Limits::default()
+		shapes: (Limits::default()).shapes,
+		resources: quest_numerics::ResourceLimits {
+			max_work_units: 3,
+			..(Limits::default()).resources
+		},
 	};
 	let polynomial = Polynomial::from_scalars(
 		quest_polynomial::Laurent::new(1024),
@@ -247,7 +253,9 @@ fn generic_admission_and_signed_shift_obey_work_and_support_limits() -> googlete
 	)?;
 	expect_true!(matches!(
 		polynomial.evaluate_with(&mut backend, 1.0),
-		Err(quest_polynomial::Error::Budget(_))
+		Err(quest_polynomial::Error::Interval(
+			quest_numerics::Error::Resource(_)
+		))
 	));
 	expect_true!(
 		Polynomial::from_scalars(

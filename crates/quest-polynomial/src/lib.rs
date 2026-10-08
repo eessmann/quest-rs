@@ -61,37 +61,27 @@ pub enum Error {
 	NotReal,
 }
 
-/// Caller limits for owned coefficient storage and cold transformations.
-#[derive(Debug, Clone, Copy)]
-pub struct Limits {
-	pub max_coefficients: usize,
-	pub max_bytes: usize,
-	pub max_work: usize,
-}
-impl Default for Limits {
-	fn default() -> Self {
-		Self {
-			max_coefficients: 1_048_576,
-			max_bytes: 1_073_741_824,
-			max_work: 8_589_934_592,
-		}
+/// Transitional name for the shared operation configuration.
+pub type Limits = quest_numerics::OperationLimits;
+pub use quest_numerics::{
+	OperationLimits, OperationResources, ResourceLimits, ResourceReport, ShapeLimits,
+};
+fn check_storage(limits: Limits, count: usize, copies: usize) -> Result<()> {
+	limits
+		.shapes
+		.coefficients(count)
+		.map_err(quest_numerics::Error::from)?;
+	let bytes = count
+		.checked_mul(size_of::<Complex64>())
+		.and_then(|n| n.checked_mul(copies))
+		.ok_or(Error::Budget("coefficient storage overflow"))?;
+	if bytes > limits.resources.max_peak_bytes
+		|| i32::try_from(count).is_err()
+		|| isize::try_from(bytes).is_err()
+	{
+		return Err(Error::Budget("coefficient storage"));
 	}
-}
-impl Limits {
-	fn check(self, count: usize, copies: usize) -> Result<()> {
-		let bytes = count
-			.checked_mul(size_of::<Complex64>())
-			.and_then(|value| value.checked_mul(copies))
-			.ok_or(Error::Budget("coefficient size overflow"))?;
-		if count > self.max_coefficients
-			|| bytes > self.max_bytes
-			|| i32::try_from(count).is_err()
-			|| isize::try_from(bytes).is_err()
-		{
-			return Err(Error::Budget("coefficient storage"));
-		}
-		Ok(())
-	}
+	Ok(())
 }
 
 const fn finite(value: Complex64) -> Result<Complex64> {
@@ -103,7 +93,7 @@ const fn finite(value: Complex64) -> Result<Complex64> {
 }
 
 fn zeros(count: usize, limits: Limits) -> Result<Vec<Complex64>> {
-	limits.check(count, 1)?;
+	check_storage(limits, count, 1)?;
 	let mut values = Vec::new();
 	values
 		.try_reserve_exact(count)

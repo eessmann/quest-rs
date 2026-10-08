@@ -209,26 +209,46 @@ fn shared_admission_accounts_three_arrays_and_cold_product_work() -> Result<()> 
 		eq(ordinary.resource_usage().planner_bytes_estimate)
 	);
 	let exact = Limits {
-		max_len: 8,
-		max_bytes: usage
-			.buffer_bytes
-			.checked_add(usage.planner_bytes_estimate)
-			.ok_or(Error::Overflow)?,
-		max_work: 584,
+		shapes: quest_numerics::ShapeLimits {
+			max_coefficients: 8,
+			max_fft_len: 8,
+			..(quest_numerics::OperationLimits::default()).shapes
+		},
+		resources: quest_numerics::ResourceLimits {
+			max_peak_bytes: usage
+				.buffer_bytes
+				.checked_add(usage.planner_bytes_estimate)
+				.ok_or(Error::Overflow)?,
+			max_work_units: 584,
+		},
 	};
 	expect_true!(SharedConvolutionWorkspace::new(4, 4, FftBackend::Scalar, exact).is_ok());
 	for limits in [
 		Limits {
-			max_bytes: exact.max_bytes.checked_sub(1).ok_or(Error::Overflow)?,
-			..exact
+			shapes: (exact).shapes,
+			resources: quest_numerics::ResourceLimits {
+				max_peak_bytes: exact
+					.resources
+					.max_peak_bytes
+					.checked_sub(1)
+					.ok_or(Error::Overflow)?,
+				..(exact).resources
+			},
 		},
 		Limits {
-			max_work: 583,
-			..exact
+			shapes: (exact).shapes,
+			resources: quest_numerics::ResourceLimits {
+				max_work_units: 583,
+				..(exact).resources
+			},
 		},
 		Limits {
-			max_len: 7,
-			..exact
+			shapes: quest_numerics::ShapeLimits {
+				max_coefficients: 7,
+				max_fft_len: 7,
+				..(exact).shapes
+			},
+			resources: (exact).resources,
 		},
 	] {
 		expect_true!(SharedConvolutionWorkspace::new(4, 4, FftBackend::Scalar, limits).is_err());
@@ -285,12 +305,18 @@ fn shared_parallel_admission_matches_owned_scratch_and_exact_budget() -> Result<
 				.ok_or(Error::Overflow)?)
 		);
 		let exact = Limits {
-			max_len: shared.fft_len(),
-			max_bytes: usage
-				.buffer_bytes
-				.checked_add(usage.planner_bytes_estimate)
-				.ok_or(Error::Overflow)?,
-			max_work: usage.work_units,
+			shapes: quest_numerics::ShapeLimits {
+				max_coefficients: shared.fft_len(),
+				max_fft_len: shared.fft_len(),
+				..(quest_numerics::OperationLimits::default()).shapes
+			},
+			resources: quest_numerics::ResourceLimits {
+				max_peak_bytes: usage
+					.buffer_bytes
+					.checked_add(usage.planner_bytes_estimate)
+					.ok_or(Error::Overflow)?,
+				max_work_units: usage.work_units,
+			},
 		};
 		expect_true!(
 			SharedConvolutionWorkspace::new_with_policy(
@@ -308,8 +334,15 @@ fn shared_parallel_admission_matches_owned_scratch_and_exact_budget() -> Result<
 				1025,
 				FftBackend::Scalar,
 				Limits {
-					max_bytes: exact.max_bytes.checked_sub(1).ok_or(Error::Overflow)?,
-					..exact
+					shapes: (exact).shapes,
+					resources: quest_numerics::ResourceLimits {
+						max_peak_bytes: exact
+							.resources
+							.max_peak_bytes
+							.checked_sub(1)
+							.ok_or(Error::Overflow)?,
+						..(exact).resources
+					}
 				},
 				execution
 			)

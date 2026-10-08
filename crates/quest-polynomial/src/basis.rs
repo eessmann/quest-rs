@@ -16,6 +16,8 @@ mod sealed {
 
 /// A three-term basis, with signed support supplied only by Laurent.
 pub trait Basis: sealed::Sealed + Clone + std::fmt::Debug {
+	/// Whether removing leading zero coefficients is an exact exponent shift.
+	const POWER_BASIS: bool = false;
 	/// Compute the three-term recurrence in the selected arithmetic backend.
 	/// Integer factors are imported exactly before division or multiplication.
 	/// # Errors
@@ -125,11 +127,13 @@ fn monomial<A: Backend>(backend: &mut A) -> RecurrenceResult<A> {
 	))
 }
 impl Basis for Monomial {
+	const POWER_BASIS: bool = true;
 	fn recurrence_with<A: Backend>(&self, _: u32, backend: &mut A) -> RecurrenceResult<A> {
 		monomial(backend)
 	}
 }
 impl Basis for Laurent {
+	const POWER_BASIS: bool = true;
 	fn recurrence_with<A: Backend>(&self, _: u32, backend: &mut A) -> RecurrenceResult<A> {
 		monomial(backend)
 	}

@@ -64,7 +64,9 @@ pub fn run(
 
 	let manifest = work.join("Cargo.toml");
 	let target = work.join("target");
-	let mut lock = cargo_command(&work, &package.prefix, &package.compiler_invocation);
+	let mut lock = cargo_command(&work, package.prefix(), package.compiler_invocation());
+	context.apply_environment(&mut lock);
+	pin_native_environment(&mut lock, package.prefix(), package.compiler_invocation());
 	lock.args(["generate-lockfile", "--offline", "--manifest-path"])
 		.arg(&manifest);
 	run_logged(
@@ -73,7 +75,9 @@ pub fn run(
 		"consumer dependency locking",
 	)?;
 
-	let mut build = cargo_command(&work, &package.prefix, &package.compiler_invocation);
+	let mut build = cargo_command(&work, package.prefix(), package.compiler_invocation());
+	context.apply_environment(&mut build);
+	pin_native_environment(&mut build, package.prefix(), package.compiler_invocation());
 	build
 		.args([
 			"build",
@@ -91,9 +95,9 @@ pub fn run(
 
 	println!(
 		"Checked QuEST {} from {} with {}.",
-		package.version,
-		package.prefix.display(),
-		package.compiler.display()
+		package.version(),
+		package.prefix().display(),
+		package.compiler().display()
 	);
 	println!(
 		"Preserved consumer fixture and evidence: {}",
@@ -243,6 +247,8 @@ struct ToolchainSettings {
 #[derive(serde::Serialize)]
 struct ConsumerManifest {
 	#[serde(skip_serializing_if = "Option::is_none")]
+	lints: Option<ConsumerLints>,
+	#[serde(skip_serializing_if = "Option::is_none")]
 	workspace: Option<ConsumerWorkspace>,
 	#[serde(skip_serializing_if = "Option::is_none")]
 	package: Option<ConsumerPackage>,
@@ -253,6 +259,11 @@ struct ConsumerManifest {
 		skip_serializing_if = "std::collections::BTreeMap::is_empty"
 	)]
 	build_dependencies: std::collections::BTreeMap<String, ConsumerDependency>,
+}
+
+#[derive(serde::Serialize)]
+struct ConsumerLints {
+	rust: std::collections::BTreeMap<&'static str, &'static str>,
 }
 
 #[derive(serde::Serialize)]
@@ -294,7 +305,7 @@ fn write_toml(path: &Path, document: &impl serde::Serialize) -> Result<(), DynEr
 }
 
 fn cargo_command(work: &Path, quest_prefix: &Path, compiler: &Path) -> Command {
-	let mut command = Command::new("cargo");
+	let mut command = Command::new(env::var_os("CARGO").unwrap_or_else(|| "cargo".into()));
 	command.current_dir(work);
 	pin_native_environment(&mut command, quest_prefix, compiler);
 	command
@@ -334,6 +345,7 @@ fn write_consumer_workspace(
 	write_toml(
 		&work.join("Cargo.toml"),
 		&ConsumerManifest {
+			lints: None,
 			workspace: Some(ConsumerWorkspace {
 				resolver: "3".to_owned(),
 				members: ["direct", "facade", "wrapper", "wrapped", "renamed"]
@@ -436,6 +448,9 @@ fn write_package(
 	build_script: Option<&str>,
 ) -> Result<(), DynError> {
 	let manifest = ConsumerManifest {
+		lints: Some(ConsumerLints {
+			rust: std::collections::BTreeMap::from([("unsafe_code", "forbid")]),
+		}),
 		workspace: None,
 		package: Some(ConsumerPackage {
 			name: format!("quest-consumer-{name}"),
@@ -648,7 +663,7 @@ fn inspect_macho(
 	)?;
 
 	let mut quest_id = Command::new("otool");
-	quest_id.arg("-D").arg(&package.library).current_dir(work);
+	quest_id.arg("-D").arg(package.library()).current_dir(work);
 	clean_loader_environment(&mut quest_id);
 	let quest_id = run_captured(
 		&mut quest_id,
@@ -659,7 +674,7 @@ fn inspect_macho(
 	let mut quest_libraries = Command::new("otool");
 	quest_libraries
 		.arg("-L")
-		.arg(&package.library)
+		.arg(package.library())
 		.current_dir(work);
 	clean_loader_environment(&mut quest_libraries);
 	let quest_libraries = run_captured(
@@ -671,7 +686,7 @@ fn inspect_macho(
 	let mut quest_load_commands = Command::new("otool");
 	quest_load_commands
 		.arg("-l")
-		.arg(&package.library)
+		.arg(package.library())
 		.current_dir(work);
 	clean_loader_environment(&mut quest_load_commands);
 	let quest_load_commands = run_captured(
@@ -711,7 +726,7 @@ fn inspect_macho(
 		)),
 		loaded_paths: parse_dyld_loaded_paths(&loaded_text),
 	};
-	validate_macho_evidence(&evidence, &package.library, &package.runtime_library_dirs).map_err(
+	validate_macho_evidence(&evidence, package.library(), package.runtime_library_dirs()).map_err(
 		|error| {
 			format!(
 				"{fixture}: {error}; inspect {}/{}-*.log",
@@ -1004,6 +1019,44 @@ mod tests {
 	use std::ffi::OsStr;
 	use std::fs;
 	use std::process::Command;
+
+	#[cfg(unix)]
+	#[gtest]
+	fn consumer_build_executes_the_selected_cargo_path_with_spaces() -> googletest::Result<()> {
+		use std::os::unix::fs::PermissionsExt as _;
+		const CHILD: &str = "QUEST_SELECTED_CARGO_CHILD";
+		if let Some(work) = env::var_os(CHILD) {
+			let output = cargo_command(Path::new(&work), Path::new("/opt/quest"), Path::new("c++"))
+				.arg("--version")
+				.output()?;
+			expect_eq!(output.status.code(), Some(42));
+			expect_eq!(output.stdout, b"selected cargo fixture\n");
+			return Ok(());
+		}
+		let fixture = tempfile::tempdir()?;
+		let selected = fixture.path().join("selected cargo");
+		fs::write(
+			&selected,
+			"#!/bin/sh\nprintf 'selected cargo fixture\\n'\nexit 42\n",
+		)?;
+		fs::set_permissions(&selected, fs::Permissions::from_mode(0o755))?;
+		let output = Command::new(env::current_exe()?)
+			.args([
+				"--exact",
+				"native_consumers::tests::consumer_build_executes_the_selected_cargo_path_with_spaces",
+				"--nocapture",
+			])
+			.env(CHILD, fixture.path())
+			.env("CARGO", &selected)
+			.output()?;
+		expect_true!(
+			output.status.success(),
+			"{} {}",
+			String::from_utf8_lossy(&output.stdout),
+			String::from_utf8_lossy(&output.stderr)
+		);
+		Ok(())
+	}
 
 	#[gtest]
 	fn toolchain_channel_uses_toml_syntax_and_section() -> googletest::Result<()> {
@@ -1370,7 +1423,12 @@ mod tests {
 			.get_args()
 			.map(|argument| argument.to_string_lossy().into_owned())
 			.collect::<Vec<_>>();
-		expect_that!(command.get_program(), eq(OsStr::new("cargo")));
+		expect_that!(
+			command.get_program(),
+			eq(env::var_os("CARGO")
+				.unwrap_or_else(|| "cargo".into())
+				.as_os_str())
+		);
 		verify_that!(arguments, elements_are![eq("build")])
 	}
 

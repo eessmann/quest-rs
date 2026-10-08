@@ -1,0 +1,11 @@
+{
+  "degree": 1000000,
+  "precision_decimal_digits": 100,
+  "identity": "a constant coefficient equals product (1+abs(gamma)^2)^(-1/2)",
+  "reference_real": "0.9999995000001250002915951349265494294147453070039553221566189036857895107052372800926680808652517176",
+  "source_real": 0.9999995000551695,
+  "source_imaginary": -9.512577044359818e-23,
+  "absolute_difference": "0.00000000005504446542600204206368952024174120422651342784338109631421048929476271990733191913474828239320812634",
+  "elapsed_seconds": 13.397749719995772,
+  "kind": "high-precision necessary-identity diagnostic; not a formal certificate"
+}

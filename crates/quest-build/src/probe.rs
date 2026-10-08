@@ -24,10 +24,11 @@ pub fn discover(
 	target: &str,
 	inputs: Option<&BridgeInputs>,
 ) -> Result<NativePackage> {
-	let mut context =
+	let context =
 		NativeBuildContext::capture(work, host, target, env::var_os("OUT_DIR").is_some())?;
-	context.cargo = true;
-	discover_context(&context, inputs)
+	let package = discover_context(&context, inputs)?;
+	package.emit_cargo_input_metadata()?;
+	Ok(package)
 }
 
 pub fn discover_context(
@@ -67,13 +68,9 @@ pub fn discover_context(
 	// Use the evaluated toolchain rather than assuming GCC or Clang defaults.
 	let stdlib = compiler.standard_library;
 	link.libraries.push(stdlib);
-	watch_inputs(
-		&reader,
-		&probe,
-		&link.linked_files,
-		&exported_includes,
-		context.cargo,
-	)?;
+	let mut watched_inputs =
+		collect_input_watches(&reader, &probe, &link.linked_files, &exported_includes)?;
+	watched_inputs.extend(bridge_input_watches(inputs)?);
 	let bridge_archive = inputs
 		.map(|_| {
 			read_target(&reader, &setup.profile, "quest_bridge").and_then(|bridge| {
@@ -86,6 +83,8 @@ pub fn discover_context(
 		})
 		.transpose()?;
 	let package = NativePackage {
+		context: context.clone(),
+		watched_inputs,
 		target: target.to_owned(),
 		profile: setup.profile.clone(),
 		prefix,
@@ -127,6 +126,14 @@ pub fn discover_context(
 	};
 	package.validate_link_search()?;
 	Ok(package)
+}
+
+fn bridge_input_watches(inputs: Option<&BridgeInputs>) -> Result<BTreeSet<PathBuf>> {
+	inputs
+		.into_iter()
+		.flat_map(|inputs| inputs.sources.iter().chain(&inputs.include_directories))
+		.map(|path| absolute(path))
+		.collect()
 }
 
 struct Setup {
@@ -180,7 +187,7 @@ fn configure_context(
 		.join(";");
 	let package_directory = explicit.map(find_package_directory).transpose()?;
 	let build_directory = work.join("build");
-	prepare_project(&source, &build_directory, inputs, context.cargo)?;
+	prepare_project(&source, &build_directory, inputs, false)?;
 	let cmake = context.cmake();
 	let mut command = context.command(&cmake);
 	command
@@ -643,16 +650,12 @@ fn inspect_link(
 	Ok(link)
 }
 
-fn watch_inputs(
+fn collect_input_watches(
 	reader: &reply::Reader,
 	probe: &Target,
 	linked_files: &BTreeSet<PathBuf>,
 	exported_includes: &[PathBuf],
-	cargo: bool,
-) -> Result<()> {
-	if !cargo {
-		return Ok(());
-	}
+) -> Result<BTreeSet<PathBuf>> {
 	let mut inputs = linked_files.clone();
 	for include in probe
 		.compile_groups
@@ -673,11 +676,18 @@ fn watch_inputs(
 			inputs.insert(input.path);
 		}
 	}
-	emit_input_watches(inputs)
+	Ok(inputs)
 }
 
-fn emit_input_watches(inputs: BTreeSet<PathBuf>) -> Result<()> {
-	let output = env::var_os("OUT_DIR")
+pub fn emit_input_watches(inputs: BTreeSet<PathBuf>) -> Result<()> {
+	emit_input_watches_in(inputs, env::var_os("OUT_DIR").as_deref())
+}
+
+pub fn emit_input_watches_in(
+	inputs: BTreeSet<PathBuf>,
+	output: Option<&std::ffi::OsStr>,
+) -> Result<()> {
+	let output = output
 		.map(|path| {
 			let path = Path::new(&path);
 			fs::canonicalize(path).map_err(|error| io(path, error))
@@ -816,12 +826,20 @@ set_target_properties(QuEST::QuEST PROPERTIES
 				&source,
 				"#include <environment_marker.h>\nstatic_assert(QUEST_ENV_FLAG == 31);\nstatic_assert(QUEST_CPATH_MARKER == 47);\nstatic_assert(QUEST_WRAPPER_ARG == 59);\n",
 			)?;
-			let context = NativeBuildContext::for_tooling(root.join("work"), None)?;
+			let context = NativeBuildContext::for_tooling(root.join("work"), None)?
+				.request()
+				.capture()?;
 			let native = context.build_bridge(&BridgeInputs {
 				sources: vec![source],
 				include_directories: Vec::new(),
 			})?;
 			expect_eq!(&native.compiler_invocation, &root.join("CC"));
+			expect_true!(native.watched_inputs.contains(&native.library));
+			expect_true!(
+				native
+					.watched_inputs
+					.contains(&root.join("package/include/quest.h"))
+			);
 			expect_eq!(&native.compiler, &root.join("dispatcher"));
 			expect_eq!(
 				&native.compiler_arguments,
@@ -980,6 +998,14 @@ set_target_properties(QuEST::QuEST PROPERTIES
 		let host = fixture_host()?;
 		let work = output.join("quest-native");
 		let setup = configure(&work, &host, &host, Some(&prefix), Some(&inputs), &[]).or_fail()?;
+		emit_input_watches(
+			inputs
+				.sources
+				.iter()
+				.chain(&inputs.include_directories)
+				.cloned()
+				.collect(),
+		)?;
 		let bridge_inputs =
 			fs::read_to_string(work.join("source/bridge-inputs.cmake")).or_fail()?;
 		expect_that!(
@@ -993,7 +1019,13 @@ set_target_properties(QuEST::QuEST PROPERTIES
 		} else {
 			"lib/libQuEST.so"
 		});
-		watch_inputs(&reader, &probe, &BTreeSet::from([native]), &[], true).or_fail()?;
+		emit_input_watches(collect_input_watches(
+			&reader,
+			&probe,
+			&BTreeSet::from([native]),
+			&[],
+		)?)
+		.or_fail()?;
 		Ok(())
 	}
 
@@ -1636,7 +1668,7 @@ set_target_properties(QuEST::QuEST PROPERTIES
 		let rust = root.join("main.rs");
 		fs::write(
 			&rust,
-			"unsafe extern \"C\" { fn native_value() -> i32; } fn main() { assert_eq!(unsafe { native_value() }, 73); }",
+			include_str!("../../quest-sys/tests/fixtures/linkage/darwin_consumer.rs"),
 		)?;
 		let mut link = NativeLink {
 			target_os: Some("macos"),

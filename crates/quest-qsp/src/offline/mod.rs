@@ -67,6 +67,8 @@ pub type OfflineResult<T> = std::result::Result<T, OfflineError>;
 #[non_exhaustive]
 pub enum OfflineError {
 	#[error(transparent)]
+	Resource(#[from] quest_numerics::ResourceError),
+	#[error(transparent)]
 	Precision(#[from] crate::precision::PrecisionError),
 	#[error("offline policy: {0}")]
 	Policy(&'static str),
@@ -350,6 +352,7 @@ impl<M> OfflineSolution<M> {
 /// Immutable last exported bytes, retained even if certification fails.
 #[derive(Debug, Clone)]
 pub struct ExportSnapshot {
+	_ownership: Vec<quest_numerics::MemoryReservation>,
 	target: Arc<Vec<Complex64>>,
 	complement: Arc<Vec<Complex64>>,
 	controls: Arc<Vec<Control>>,
@@ -378,6 +381,12 @@ impl ExportSnapshot {
 	}
 	fn from_candidate<M>(candidate: &FrozenCandidate<M>) -> Self {
 		Self {
+			_ownership: candidate
+				.ownership
+				.iter()
+				.cloned()
+				.chain(candidate.admitted.ownership.first().cloned())
+				.collect(),
 			target: Arc::clone(&candidate.admitted.target),
 			complement: Arc::clone(&candidate.a_star),
 			controls: Arc::clone(&candidate.controls),
@@ -430,6 +439,7 @@ impl OfflineAttempt {
 /// Retained source and attempts for an offline result or reported final failure.
 #[derive(Debug, Clone)]
 pub struct OfflineReport {
+	_source_ownership: quest_numerics::MemoryReservation,
 	source: Arc<Vec<Complex64>>,
 	attempts: Vec<OfflineAttempt>,
 	last_export: Option<ExportSnapshot>,
@@ -457,7 +467,22 @@ impl OfflineReport {
 		self.contractivity_upper.as_ref()
 	}
 }
+const fn operation_limits(policy: OfflinePolicy) -> quest_numerics::OperationLimits {
+	quest_numerics::OperationLimits {
+		shapes: quest_numerics::ShapeLimits {
+			max_coefficients: policy.max_coefficients,
+			max_fft_len: policy.max_grid,
+			max_completion_grid: policy.max_grid,
+		},
+		resources: quest_numerics::ResourceLimits {
+			max_peak_bytes: policy.max_bytes,
+			max_work_units: policy.max_work,
+		},
+	}
+}
 struct Context {
+	resources: quest_numerics::OperationResources,
+	working_ownership: Vec<quest_numerics::MemoryReservation>,
 	precision: u32,
 	policy: OfflinePolicy,
 	work: usize,
@@ -480,10 +505,26 @@ fn modeled_scalar_bytes(precision: u32) -> OfflineResult<usize> {
 }
 impl Context {
 	fn new(count: usize, precision: u32, policy: OfflinePolicy) -> OfflineResult<Self> {
+		Self::with_resources(
+			count,
+			precision,
+			policy,
+			quest_numerics::OperationResources::from_limits(operation_limits(policy)),
+		)
+	}
+	fn with_resources(
+		count: usize,
+		precision: u32,
+		policy: OfflinePolicy,
+		resources: quest_numerics::OperationResources,
+	) -> OfflineResult<Self> {
+		resources.coefficients(count)?;
 		let grid = count
 			.checked_next_power_of_two()
 			.ok_or(OfflineError::Budget("offline source support"))?;
+		resources.completion(grid)?;
 		let bytes = Self::modeled_storage(count, precision, policy, grid)?;
+		let ownership = resources.reserve(bytes, 0)?;
 		Ok(Self {
 			precision,
 			policy,
@@ -492,7 +533,23 @@ impl Context {
 			count,
 			cache: ConstCache::default(),
 			roots: BTreeMap::new(),
+			resources,
+			working_ownership: vec![ownership],
 		})
+	}
+	fn retain_working_bytes(&mut self, bytes: usize) -> OfflineResult<()> {
+		if bytes > self.bytes {
+			self.working_ownership.push(
+				self.resources.reserve(
+					bytes
+						.checked_sub(self.bytes)
+						.ok_or(OfflineError::Budget("offline memory"))?,
+					0,
+				)?,
+			);
+			self.bytes = bytes;
+		}
+		Ok(())
 	}
 	// Called once at the end of each owned-cache attempt; include actual retained words.
 	fn admit_cache(&mut self) -> OfflineResult<()> {
@@ -502,13 +559,11 @@ impl Context {
 			.checked_mul(size_of::<dashu_int::Word>())
 			.and_then(|n| n.checked_add(size_of::<ConstCache>()))
 			.ok_or(OfflineError::Budget("constant cache storage"))?;
-		self.bytes = self
-			.bytes
-			.checked_add(cache_bytes)
-			.ok_or(OfflineError::Budget("constant cache storage"))?;
-		if self.bytes > self.policy.max_bytes {
-			return Err(OfflineError::Budget("constant cache storage"));
-		}
+		self.retain_working_bytes(
+			self.bytes
+				.checked_add(cache_bytes)
+				.ok_or(OfflineError::Budget("constant cache storage"))?,
+		)?;
 		Ok(())
 	}
 	fn charge(&mut self, units: usize) -> OfflineResult<()> {
@@ -522,22 +577,21 @@ impl Context {
 		)
 	}
 	fn consume(&mut self, units: usize) -> OfflineResult<()> {
+		self.resources.charge_work(units)?;
 		self.work = self
 			.work
 			.checked_add(units)
 			.ok_or(OfflineError::Budget("offline work"))?;
-		if self.work > self.policy.max_work {
-			return Err(OfflineError::Budget("offline work"));
-		}
 		Ok(())
 	}
 	fn admit_grid(&mut self, grid: usize) -> OfflineResult<()> {
-		self.bytes = self.bytes.max(Self::modeled_storage(
+		self.resources.completion(grid)?;
+		self.retain_working_bytes(Self::modeled_storage(
 			self.count,
 			self.precision,
 			self.policy,
 			grid,
-		)?);
+		)?)?;
 		Ok(())
 	}
 	fn modeled_storage(
@@ -675,7 +729,7 @@ fn contractivity(target: &[Number], context: &mut Context) -> OfflineResult<Bina
 		};
 		let (samples, work, bytes) = crate::certification::circle_values(&exact, grid, p, policy)?;
 		context.consume(work)?;
-		context.bytes = context.bytes.max(bytes);
+		context.retain_working_bytes(bytes)?;
 		let mut maximum = zero(p);
 		for value in samples {
 			let magnitude = value.magnitude()?;
@@ -704,6 +758,40 @@ fn contractivity(target: &[Number], context: &mut Context) -> OfflineResult<Bina
 		"strict contractivity not established on complete circle",
 	))
 }
+fn export_values<T, U>(
+	values: &[T],
+	resources: &quest_numerics::OperationResources,
+	mut convert: impl FnMut(&T) -> OfflineResult<U>,
+) -> OfflineResult<Vec<U>> {
+	let mut exported = Vec::new();
+	exported.try_reserve_exact(values.len()).map_err(|_| {
+		resources.allocation_failed();
+		OfflineError::Resource(quest_numerics::ResourceError::Allocation)
+	})?;
+	for value in values {
+		exported.push(convert(value)?);
+	}
+	Ok(exported)
+}
+fn reserve_export_buffers(
+	context: &Context,
+	target: usize,
+	complement: usize,
+	controls: usize,
+	phases: usize,
+) -> OfflineResult<Vec<quest_numerics::MemoryReservation>> {
+	let bytes = |count: usize, size: usize| {
+		count
+			.checked_mul(size)
+			.ok_or(OfflineError::Budget("export storage"))
+	};
+	Ok(context.resources.reserve_many(&[
+		(bytes(target, size_of::<Complex64>())?, 0),
+		(bytes(complement, size_of::<Complex64>())?, 0),
+		(bytes(controls, size_of::<Control>())?, 0),
+		(bytes(phases, size_of::<f64>())?, 0),
+	])?)
+}
 #[expect(
 	clippy::too_many_arguments,
 	reason = "The freeze boundary names each original arbitrary-precision stage result explicitly"
@@ -717,6 +805,7 @@ fn freeze<M: CertificationMode>(
 	residual: &Binary,
 	grid: usize,
 	context: &mut Context,
+	source_ownership: &quest_numerics::MemoryReservation,
 ) -> OfflineResult<FrozenCandidate<M>> {
 	let (phases, mut matrices) = if M::CANONICAL {
 		kernels::real_parity_wx_phases(gamma, context)?
@@ -728,28 +817,30 @@ fn freeze<M: CertificationMode>(
 		.ok_or(OfflineError::Numerical("empty offline export"))?;
 	let [a, b, c, d] = last.clone();
 	*last = [b, a.neg(), d, c.neg()];
-	let controls: Vec<_> = matrices
-		.iter()
-		.map(|matrix| {
-			let [a, b, c, d] = matrix;
-			Ok([
-				[a.binary64()?, b.binary64()?],
-				[c.binary64()?, d.binary64()?],
-			])
-		})
-		.collect::<OfflineResult<_>>()?;
-	let target: Vec<_> = target
-		.iter()
-		.map(Number::binary64)
-		.collect::<OfflineResult<_>>()?;
-	let astar: Vec<_> = astar
-		.iter()
-		.map(Number::binary64)
-		.collect::<OfflineResult<_>>()?;
-	let phases: Vec<_> = phases
-		.iter()
-		.map(|phase| to_f64(phase, BinaryRounding::Nearest))
-		.collect::<std::result::Result<_, _>>()?;
+	let mut export_ownership = reserve_export_buffers(
+		context,
+		target.len(),
+		astar.len(),
+		matrices.len(),
+		phases.len(),
+	)?
+	.into_iter();
+	let target_ownership = export_ownership
+		.next()
+		.ok_or(OfflineError::Budget("export ownership"))?;
+	let frozen_ownership: Vec<_> = export_ownership.collect();
+	let controls = export_values(&matrices, &context.resources, |matrix| {
+		let [a, b, c, d] = matrix;
+		Ok([
+			[a.binary64()?, b.binary64()?],
+			[c.binary64()?, d.binary64()?],
+		])
+	})?;
+	let target = export_values(target, &context.resources, Number::binary64)?;
+	let astar = export_values(astar, &context.resources, Number::binary64)?;
+	let phases = export_values(&phases, &context.resources, |phase| {
+		Ok(to_f64(phase, BinaryRounding::Nearest)?)
+	})?;
 	if controls
 		.iter()
 		.flatten()
@@ -762,18 +853,18 @@ fn freeze<M: CertificationMode>(
 		return Err(OfflineError::Numerical("nonfinite binary64 export"));
 	}
 	let policy = crate::Policy {
-		algorithm: context.policy.algorithm,
-		response_tolerance: context.policy.certification.response_tolerance,
-		contractivity_margin: context.policy.contractivity_margin,
-		max_completion_grid: context.policy.max_grid,
-		limits: quest_numerics::Limits {
-			max_len: context.policy.max_coefficients,
-			max_bytes: context.policy.max_bytes,
-			max_work: context.policy.max_work,
+		limits: context.resources.limits(),
+		accuracy: crate::AccuracyPolicy {
+			response_tolerance: context.policy.certification.response_tolerance,
+			contractivity_margin: context.policy.contractivity_margin,
 		},
+		algorithm: context.policy.algorithm,
 		..crate::Policy::default()
 	};
 	let admitted = AdmittedTarget {
+		resources: context.resources.clone(),
+		ownership: vec![target_ownership, source_ownership.clone()],
+
 		source_offset: original.source_offset,
 		source_length: original.source_length,
 		source: Arc::clone(&original.source),
@@ -783,6 +874,8 @@ fn freeze<M: CertificationMode>(
 		_mode: PhantomData,
 	};
 	Ok(FrozenCandidate {
+		ownership: frozen_ownership,
+
 		synthesis_precision: crate::SynthesisPrecision::Arbitrary {
 			bits: context.precision,
 		},
@@ -809,21 +902,26 @@ fn solve<M: CertificationMode>(
 		.degree
 		.checked_add(1)
 		.ok_or(OfflineError::Budget("source degree"))?;
+	let resources = quest_numerics::OperationResources::from_limits(operation_limits(policy));
+	let source_ownership = resources.reserve(
+		source
+			.source
+			.capacity()
+			.checked_mul(size_of::<Complex64>())
+			.ok_or(OfflineError::Budget("source storage"))?,
+		0,
+	)?;
 	let mut report = OfflineReport {
+		_source_ownership: source_ownership.clone(),
 		source: Arc::clone(&source.source),
 		attempts: Vec::new(),
 		last_export: None,
 		contractivity_upper: None,
 	};
 	let mut precision = policy.initial_precision;
-	let mut total_work = 0_usize;
 	loop {
 		let started = Instant::now();
-		let mut context = Context::new(count, precision, policy)?;
-		context.policy.max_work = policy
-			.max_work
-			.checked_sub(total_work)
-			.ok_or(OfflineError::Budget("offline retry work"))?;
+		let mut context = Context::with_resources(count, precision, policy, resources.clone())?;
 		let computed = (|| -> OfflineResult<_> {
 			let target = original(source, &mut context)?;
 			let norm = contractivity(&target, &mut context)?;
@@ -845,13 +943,11 @@ fn solve<M: CertificationMode>(
 				&residual,
 				grid,
 				&mut context,
+				&source_ownership,
 			)?;
 			Ok((candidate, residual, norm, grid))
 		})();
 		context.admit_cache()?;
-		total_work = total_work
-			.checked_add(context.work)
-			.ok_or(OfflineError::Budget("offline cumulative work"))?;
 		let mut attempt = OfflineAttempt {
 			precision,
 			grid: 0,

@@ -8,24 +8,12 @@ pub use dashu_ratio::RBig;
 /// the caller's source identity because a rational has only one zero.
 #[must_use]
 pub fn dyadic_from_bits(bits: u64) -> Option<RBig> {
-	let exponent = (bits >> 52) & 0x7ff;
-	if exponent == 0x7ff {
-		return None;
-	}
-	let fraction = bits & 0x000f_ffff_ffff_ffff;
-	let mantissa = if exponent == 0 {
-		fraction
-	} else {
-		fraction | 0x0010_0000_0000_0000
-	};
+	let parts = mathcore::dyadic::parts(f64::from_bits(bits))?;
+	let mantissa = parts.mantissa();
 	if mantissa == 0 {
 		return Some(RBig::ZERO);
 	}
-	let shift = if exponent == 0 {
-		-1074i32
-	} else {
-		i32::try_from(exponent).ok()?.checked_sub(1075)?
-	};
+	let shift = parts.exponent();
 	let mut numerator = IBig::from(mantissa);
 	let mut denominator = IBig::from(1);
 	if shift >= 0 {
@@ -33,7 +21,7 @@ pub fn dyadic_from_bits(bits: u64) -> Option<RBig> {
 	} else {
 		denominator = std::ops::Shl::shl(denominator, usize::try_from(shift.unsigned_abs()).ok()?);
 	}
-	if bits >> 63 != 0 {
+	if parts.negative() {
 		numerator = std::ops::Neg::neg(numerator);
 	}
 	Some(RBig::from_parts_signed(numerator, denominator))

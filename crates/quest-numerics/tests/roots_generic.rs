@@ -121,7 +121,11 @@ fn backend_failure_retains_partial_cover() {
 	let r = cover(
 		&mut b,
 		x,
-		|_, _| Err(ArithmeticError::Budget("test arithmetic")),
+		|_, _| {
+			Err(ArithmeticError::Core(
+				mathcore::arithmetic::ArithmeticError::Budget("test arithmetic"),
+			))
+		},
 		CoverLimits::default(),
 		&1e-10,
 		quest_numerics::roots::Premise::EnclosesContinuouslyDifferentiableFunction,
@@ -443,7 +447,9 @@ fn mp_limb_storage_is_admitted_before_callback_execution() {
 		input,
 		|_, _| {
 			called.set(true);
-			Err(ArithmeticError::Domain("should not execute"))
+			Err(ArithmeticError::Core(
+				mathcore::arithmetic::ArithmeticError::Domain("should not execute"),
+			))
 		},
 		CoverLimits {
 			max_bytes: 1024,
@@ -581,11 +587,16 @@ macro_rules! forward_ref {
     )*};
 }
 impl Backend for FailingMetadata {
+	fn profile(&self) -> mathcore::arithmetic::ArithmeticProfile {
+		mathcore::arithmetic::ArithmeticProfile::new("FailingMetadata", 53, "fixed")
+	}
 	type Scalar = Interval;
 	type Error = ArithmeticError;
 	fn storage_bytes(&self, _: &Interval) -> Result<usize, ArithmeticError> {
 		if self.fail {
-			Err(ArithmeticError::Budget("test metadata"))
+			Err(ArithmeticError::Core(
+				mathcore::arithmetic::ArithmeticError::Budget("test metadata"),
+			))
 		} else {
 			Ok(std::mem::size_of::<Interval>())
 		}
@@ -662,7 +673,11 @@ fn initial_backend_budget_failure_retains_domain() {
 	let report = cover(
 		&mut backend,
 		input,
-		|_, _| Err(ArithmeticError::Domain("callback must not run")),
+		|_, _| {
+			Err(ArithmeticError::Core(
+				mathcore::arithmetic::ArithmeticError::Domain("callback must not run"),
+			))
+		},
 		CoverLimits::default(),
 		&1e-10,
 		quest_numerics::roots::Premise::EnclosesContinuouslyDifferentiableFunction,

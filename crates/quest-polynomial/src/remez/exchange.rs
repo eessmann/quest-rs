@@ -23,7 +23,7 @@ fn storage<T>(count: usize, limits: Limits) -> Result<Vec<T>> {
 	let bytes = count
 		.checked_mul(size_of::<T>())
 		.ok_or(Error::Budget("Remez allocation size"))?;
-	if bytes > limits.max_bytes || isize::try_from(bytes).is_err() {
+	if bytes > limits.resources.max_peak_bytes || isize::try_from(bytes).is_err() {
 		return Err(Error::Budget("Remez allocation"));
 	}
 	let mut values = Vec::new();
@@ -303,7 +303,7 @@ where
 	if coefficients == 0 || options.max_iterations == 0 || options.max_subdivisions == 0 {
 		return Err(Error::Domain);
 	}
-	options.limits.check(n, 10)?;
+	crate::check_storage(options.limits, n, 10)?;
 	let scalar_bytes = p.working_scalar_bytes().max(b.working_scalar_bytes());
 	let cells = n
 		.checked_mul(n)
@@ -316,7 +316,7 @@ where
 		.checked_add(expression_scalars)
 		.and_then(|n| n.checked_mul(scalar_bytes))
 		.ok_or(Error::Budget("Remez workspace"))?;
-	if bytes > options.limits.max_bytes {
+	if bytes > options.limits.resources.max_peak_bytes {
 		return Err(Error::Budget("Remez QR workspace"));
 	}
 	let proof::AdmittedDomain {
@@ -335,7 +335,12 @@ where
 	let mut cover_options = options.clone();
 	// Reserve the remaining three quarters for live endpoint copies, extrema,
 	// root-proof temporaries and sorting; the cover owns at most one quarter.
-	cover_options.limits.max_bytes = options.limits.max_bytes.saturating_sub(bytes) / 4;
+	cover_options.limits.resources.max_peak_bytes = options
+		.limits
+		.resources
+		.max_peak_bytes
+		.saturating_sub(bytes)
+		/ 4;
 	for iteration in 0..options.max_iterations {
 		let Candidate { polynomial, export } =
 			reference(f, p, solver, shape.clone(), &points, options)?;

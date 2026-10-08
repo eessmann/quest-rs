@@ -419,7 +419,7 @@ where
 	/// # Errors
 	/// Returns the owning request, last candidate, root coverage and accounting.
 	pub fn run(mut self) -> RemezOutcome<F, P, I, D, L, A> {
-		let work = Budget::new(self.options.limits.max_work);
+		let work = Budget::new(self.options.limits.resources.max_work_units);
 		let mut attempt = Attempt {
 			precision_bits: self.point.precision_bits(),
 			iterations: 0,
@@ -524,8 +524,8 @@ where
 			});
 		}
 		self.precision_policy = Some(policy.clone());
-		let original_limit = self.options.limits.max_work;
-		let original_bytes = self.options.limits.max_bytes;
+		let original_limit = self.options.limits.resources.max_work_units;
+		let original_bytes = self.options.limits.resources.max_peak_bytes;
 		if let Err(error) = reserve_history(&mut history, policy.attempts.len(), original_bytes) {
 			return Err(RemezFailure {
 				request: Box::new(self),
@@ -580,14 +580,14 @@ where
 			}
 			self.point = point;
 			self.enclosure = enclosure;
-			self.options.limits.max_work = original_limit.min(remaining);
-			self.options.limits.max_bytes = remaining_bytes;
+			self.options.limits.resources.max_work_units = original_limit.min(remaining);
+			self.options.limits.resources.max_peak_bytes = remaining_bytes;
 			match self.run() {
 				Ok(mut report) => {
 					history.append(&mut report.attempts);
 					report.attempts = history;
-					report.request.options.limits.max_work = original_limit;
-					report.request.options.limits.max_bytes = original_bytes;
+					report.request.options.limits.resources.max_work_units = original_limit;
+					report.request.options.limits.resources.max_peak_bytes = original_bytes;
 					return Ok(report);
 				}
 				Err(mut failure) => {
@@ -597,13 +597,13 @@ where
 					history.append(&mut failure.attempts);
 					last_error = failure.error;
 					self = *failure.request;
-					self.options.limits.max_work = original_limit;
-					self.options.limits.max_bytes = original_bytes;
+					self.options.limits.resources.max_work_units = original_limit;
+					self.options.limits.resources.max_peak_bytes = original_bytes;
 				}
 			}
 		}
-		self.options.limits.max_work = original_limit;
-		self.options.limits.max_bytes = original_bytes;
+		self.options.limits.resources.max_work_units = original_limit;
+		self.options.limits.resources.max_peak_bytes = original_bytes;
 		Err(RemezFailure {
 			request: Box::new(self),
 			error: last_error,

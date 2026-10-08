@@ -23,8 +23,28 @@ supply dependencies alongside an explicit `QUEST_ROOT`. The removed `QUEST_DIR`,
 and select the prefix through `QUEST_ROOT`.
 `NativeBuildContext::from_cargo_env()` and `NativeBuildContext::for_tooling()`
 capture the native target, profile and environment for package discovery and
-bridge compilation. Existing `NativePackage` helpers delegate to this context.
-Standalone tooling discovery does not write Cargo directives to stdout.
+bridge compilation. `NativeBuildContext`, `NativePackage`, `MpiSelection`, and
+`SerialHdf5` expose borrowed getters rather than editable evaluated fields. Use
+`context.request()` to obtain an editable `NativeBuildRequest`, then `capture()`
+and discover again after edits. MPI compatibility checks reject an environment
+that differs from the original discovery, and both witness processes receive
+that captured environment.
+
+Discovery returns data. Explicit `emit_cargo_input_metadata()`, link metadata,
+and runtime-path helpers emit Cargo directives, including external input watches
+without watching generated outputs. Standalone QuEST and HDF5 discovery do not
+write Cargo directives to stdout. `build-probe-mpi` can still print pkg-config
+invalidation directives; the doctor isolates this upstream probe in a child
+with the captured environment so `native-doctor --json` always produces one
+JSON receipt, including setup and dependency failures.
+
+Tooling uses `clap` derives for command options, `cargo_metadata` for the selected
+workspace and Cargo executable, and `rustc_version` for the selected Rust
+compiler. `CARGO` and `RUSTC` are executable paths, including paths with spaces.
+The CMake launcher remains a narrow fallible `Command` wrapper with captured
+child environments and structured errors. The inspected `cmake` crate lacks
+fallible execution and environment-clearing APIs, so it cannot replace that
+launcher without weakening these requirements.
 The compiled admission source verifies the supported version, configuration,
 architecture, platform and pointer width using the actual selected toolchain.
 On Darwin, `SDKROOT` must name an absolute installed macOS SDK; when absent,
@@ -157,3 +177,11 @@ discovery dependencies. Report ordinary and loader-isolated results separately:
 a module-environment pass does not establish loader isolation. `--work-dir PATH`
 selects the preserved fixture/log directory. Actual GPU execution is separate
 from resolving GPU runtime libraries.
+
+
+Native-link regression tests are workspace integration tests. Their minimal
+C ABI Rust fixtures live under `quest-sys/tests/fixtures/linkage`, beside the
+audited FFI boundary, and expose safe calls to their test consumers. Production
+and packaged `quest-build` compilation does not consume those assets; running
+the full native-link tests from a standalone source package requires the
+workspace fixture assets.

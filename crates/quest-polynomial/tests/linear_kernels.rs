@@ -131,8 +131,11 @@ fn rank_shape_and_every_input_are_checked() {
 #[test]
 fn both_kernels_obey_local_and_enclosing_work_budgets() -> Result<(), Box<dyn std::error::Error>> {
 	let tiny = Limits {
-		max_work: 2,
-		..Limits::default()
+		shapes: (Limits::default()).shapes,
+		resources: quest_numerics::ResourceLimits {
+			max_work_units: 2,
+			..(Limits::default()).resources
+		},
 	};
 	assert!(
 		PivotedQr
@@ -145,8 +148,11 @@ fn both_kernels_obey_local_and_enclosing_work_budgets() -> Result<(), Box<dyn st
 			.is_err()
 	);
 	let tiny = Limits {
-		max_bytes: 1,
-		..Limits::default()
+		shapes: (Limits::default()).shapes,
+		resources: quest_numerics::ResourceLimits {
+			max_peak_bytes: 1,
+			..(Limits::default()).resources
+		},
 	};
 	assert!(matches!(
 		MpHouseholder.solve(&mut F64Backend, &[1.0], &[2.0], 1, tiny),
@@ -187,16 +193,22 @@ fn faer_padding_and_scratch_are_admitted_for_tiny_systems() -> Result<(), Box<dy
 	// Three 1x1 faer matrices each retain a 64-byte padded column, before
 	// factor/solve scratch, permutations, or the scaled system are counted.
 	let tight = Limits {
-		max_bytes: 256,
-		..Limits::default()
+		shapes: (Limits::default()).shapes,
+		resources: quest_numerics::ResourceLimits {
+			max_peak_bytes: 256,
+			..(Limits::default()).resources
+		},
 	};
 	assert!(matches!(
 		PivotedQr.solve(&mut F64Backend, &[1.0], &[2.0], 1, tight),
 		Err(Error::Budget(_))
 	));
 	let admitted = Limits {
-		max_bytes: 1024,
-		..Limits::default()
+		shapes: (Limits::default()).shapes,
+		resources: quest_numerics::ResourceLimits {
+			max_peak_bytes: 1024,
+			..(Limits::default()).resources
+		},
 	};
 	let solution = PivotedQr.solve(&mut F64Backend, &[1.0], &[2.0], 1, admitted)?;
 	assert_eq!(solution.values.len(), 1);

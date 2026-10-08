@@ -59,8 +59,18 @@ pub fn read_compiled_qsp_json(
 		},
 		..LoadPolicy::default()
 	};
-	load.admission.limits.max_bytes = load.admission.limits.max_bytes.min(io.max_bytes);
-	load.admission.limits.max_len = load.admission.limits.max_len.min(io.max_coefficients);
+	load.admission.limits.resources.max_peak_bytes = load
+		.admission
+		.limits
+		.resources
+		.max_peak_bytes
+		.min(io.max_bytes);
+	load.admission.limits.shapes.max_coefficients = load
+		.admission
+		.limits
+		.shapes
+		.max_coefficients
+		.min(io.max_coefficients);
 	let certified = load_certified(source.as_bytes(), load, verification)?;
 	Ok(CompiledInput {
 		json: Arc::new(source.to_owned()),

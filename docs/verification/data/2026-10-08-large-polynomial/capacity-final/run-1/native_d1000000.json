@@ -1,0 +1,59 @@
+{
+  "additional_reconstruction_status": "accuracy_failure",
+  "after_workspace_release": {
+    "last_rejection": null,
+    "live_buffer_bytes": 0,
+    "live_bytes": 0,
+    "live_planner_bytes_estimate": 0,
+    "peak_bytes": 7051541504,
+    "requested_peak_bytes": 7051541504,
+    "requested_work_units": 97027214126,
+    "reservations": 28000127,
+    "work_units": 97027214126
+  },
+  "backend": "rustfft-simd-sequential",
+  "cached_after_result_release": {
+    "last_rejection": null,
+    "live_buffer_bytes": 369096496,
+    "live_bytes": 6811541296,
+    "live_planner_bytes_estimate": 6442444800,
+    "peak_bytes": 7051541504,
+    "requested_peak_bytes": 7051541504,
+    "requested_work_units": 97027214126,
+    "reservations": 28000127,
+    "work_units": 97027214126
+  },
+  "cached_forward_plans": 20,
+  "cached_forward_scratch_bytes": 100662192,
+  "coefficient_backward_linf": 5.409406757634787e-11,
+  "degree": 1000000,
+  "live_result_and_workspaces": {
+    "last_rejection": null,
+    "live_buffer_bytes": 417096544,
+    "live_bytes": 6859541344,
+    "live_planner_bytes_estimate": 6442444800,
+    "peak_bytes": 7051541504,
+    "requested_peak_bytes": 7051541504,
+    "requested_work_units": 97027214126,
+    "reservations": 28000127,
+    "work_units": 97027214126
+  },
+  "main_backward_tolerance": 1e-10,
+  "memory_kind": "modeled live allocations plus retained opaque planner estimate; not process RSS",
+  "operation": "inverse",
+  "profile": "million-degree-inverse-forward-v1",
+  "reconstructed_a_constant": [
+    0.9999995000056131,
+    -2.1687218078823134e-11
+  ],
+  "reuse": null,
+  "source_a_constant": [
+    0.9999995000551695,
+    -9.512577044359818e-23
+  ],
+  "source_inverse_check": "ok",
+  "source_inverse_contract": "finite, size-preserving, max complex reflection error",
+  "source_reflection_linf": 2.543718508157025e-18,
+  "status": "ok",
+  "tolerance": 1.9037152025719928e-11
+}

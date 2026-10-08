@@ -1,10 +1,18 @@
 //! Shared finite binary64 decomposition; callers retain their own admission policy.
-#[derive(Clone, Copy)]
+/// Checked binary64 decomposition. Fields are read-only outside `MathCore`.
+///
+/// ```compile_fail
+/// let mut value = mathcore::dyadic::parts(1.0).unwrap();
+/// value.mantissa = 0;
+/// ```
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Parts {
-	pub negative: bool,
-	pub mantissa: u64,
-	pub exponent: i32,
+	pub(crate) negative: bool,
+	pub(crate) mantissa: u64,
+	pub(crate) exponent: i32,
 }
+/// Decode a finite binary64 value without rounding; reject NaN and infinities.
+#[must_use]
 pub fn parts(value: f64) -> Option<Parts> {
 	if !value.is_finite() {
 		return None;
@@ -27,6 +35,20 @@ pub fn parts(value: f64) -> Option<Parts> {
 	})
 }
 impl Parts {
+	#[must_use]
+	pub const fn negative(self) -> bool {
+		self.negative
+	}
+	#[must_use]
+	pub const fn mantissa(self) -> u64 {
+		self.mantissa
+	}
+	#[must_use]
+	pub const fn exponent(self) -> i32 {
+		self.exponent
+	}
+
+	#[must_use]
 	pub fn normalized(self) -> Self {
 		if self.mantissa == 0 {
 			return Self {

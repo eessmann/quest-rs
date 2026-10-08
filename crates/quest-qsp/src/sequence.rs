@@ -60,6 +60,7 @@ impl PhaseConvention for WxImaginaryU00 {
 #[derive(Debug, Clone)]
 pub struct PhaseSequence<C: PhaseConvention> {
 	pub(crate) values: Arc<Vec<f64>>,
+	ownership: Vec<quest_numerics::MemoryReservation>,
 	conversion_roundoff_estimate: f64,
 	_convention: PhantomData<C>,
 }
@@ -138,6 +139,7 @@ impl<C: PhaseConvention> PhaseSequenceBuilder<C> {
 		}
 		Ok(PhaseSequence {
 			values: Arc::new(self.values),
+			ownership: Vec::new(),
 			conversion_roundoff_estimate: 0.0,
 			_convention: PhantomData,
 		})
@@ -150,6 +152,7 @@ impl PhaseSequence<WxSymmetric> {
 	pub fn real_parity_wx(&self) -> PhaseSequence<WxImaginaryU00> {
 		PhaseSequence {
 			values: Arc::clone(&self.values),
+			ownership: self.ownership.clone(),
 			conversion_roundoff_estimate: self.conversion_roundoff_estimate,
 			_convention: PhantomData,
 		}
@@ -237,6 +240,7 @@ impl PhaseSequence<WxLaurent> {
 		}
 		PhaseSequence {
 			values: Arc::new(values),
+			ownership: Vec::new(),
 			conversion_roundoff_estimate: estimate,
 			_convention: PhantomData,
 		}
@@ -278,6 +282,7 @@ impl FrozenCandidate<RealParityWx> {
 	pub fn phase_sequence(&self) -> PhaseSequence<WxSymmetric> {
 		PhaseSequence {
 			values: Arc::clone(&self.phases),
+			ownership: self.ownership.get(2).cloned().into_iter().collect(),
 			conversion_roundoff_estimate: 0.0,
 			_convention: PhantomData,
 		}
@@ -291,6 +296,7 @@ impl FrozenCandidate<RealParityWx> {
 #[derive(Debug, Clone)]
 pub struct ControlSequence {
 	matrices: Arc<Vec<Control>>,
+	_ownership: Vec<quest_numerics::MemoryReservation>,
 }
 /// Builder state before any matrices or paired angles are supplied.
 #[derive(Debug)]
@@ -394,6 +400,7 @@ impl ControlSequenceBuilder<SuppliedControls> {
 		}
 		Ok(ControlSequence {
 			matrices: Arc::new(self.state.matrices),
+			_ownership: Vec::new(),
 		})
 	}
 }
@@ -404,6 +411,7 @@ impl FrozenCandidate<UnitCircleResponse> {
 	pub fn control_sequence(&self) -> ControlSequence {
 		ControlSequence {
 			matrices: Arc::clone(&self.controls),
+			_ownership: self.ownership.get(1).cloned().into_iter().collect(),
 		}
 	}
 }

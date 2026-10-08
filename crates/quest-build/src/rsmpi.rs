@@ -23,12 +23,45 @@ pub enum MpiSource {
 /// Evaluated MPI discovery, shared by build verification and diagnostics.
 #[derive(Clone, Debug)]
 pub struct MpiSelection {
-	pub source: MpiSource,
-	pub wrapper: Option<PathBuf>,
-	pub include_dirs: Vec<PathBuf>,
-	pub library_dirs: Vec<PathBuf>,
-	pub libraries: Vec<String>,
-	pub version: String,
+	pub(crate) source: MpiSource,
+	pub(crate) wrapper: Option<PathBuf>,
+	pub(crate) include_dirs: Vec<PathBuf>,
+	pub(crate) library_dirs: Vec<PathBuf>,
+	pub(crate) libraries: Vec<String>,
+	pub(crate) version: String,
+}
+
+impl MpiSelection {
+	/// Read the evaluated `source`.
+	#[must_use]
+	pub const fn source(&self) -> &MpiSource {
+		&self.source
+	}
+	/// Read the evaluated `wrapper`.
+	#[must_use]
+	pub fn wrapper(&self) -> Option<&Path> {
+		self.wrapper.as_deref()
+	}
+	/// Read the evaluated `include_dirs`.
+	#[must_use]
+	pub fn include_dirs(&self) -> &[PathBuf] {
+		&self.include_dirs
+	}
+	/// Read the evaluated `library_dirs`.
+	#[must_use]
+	pub fn library_dirs(&self) -> &[PathBuf] {
+		&self.library_dirs
+	}
+	/// Read the evaluated `libraries`.
+	#[must_use]
+	pub fn libraries(&self) -> &[String] {
+		&self.libraries
+	}
+	/// Read the evaluated `version`.
+	#[must_use]
+	pub fn version(&self) -> &str {
+		&self.version
+	}
 }
 
 /// Use the identical locked discovery implementation as `mpi-sys`.
@@ -108,6 +141,7 @@ fn discovery_source(library: &build_probe_mpi::Library, wrapper: Option<&Path>) 
 /// # Errors
 /// Returns discovery, compilation, execution or MPI ABI/library mismatch errors.
 pub fn verify_rsmpi_compatibility(native: &NativePackage) -> Result<()> {
+	native.context.validate_current_environment()?;
 	for key in [
 		"MPICC",
 		"MPICH_CC",
@@ -124,7 +158,17 @@ pub fn verify_rsmpi_compatibility(native: &NativePackage) -> Result<()> {
 		println!("cargo:rerun-if-env-changed={key}");
 	}
 	let selection = probe_rsmpi()?;
+	if let Some(wrapper) = &selection.wrapper {
+		println!("cargo:rerun-if-changed={}", wrapper.display());
+		println!(
+			"cargo:rerun-if-changed={}",
+			fs::canonicalize(wrapper)
+				.map_err(|error| io(wrapper, error))?
+				.display()
+		);
+	}
 	let reference = build_native_mpi_witness(
+		&native.context,
 		&native.cmake,
 		&native.build_directory,
 		&native.profile,
@@ -151,6 +195,7 @@ pub fn verify_rsmpi_compatibility(native: &NativePackage) -> Result<()> {
 		.try_get_compiler()
 		.map_err(|error| invalid(format!("rsmpi C compiler: {error}")))?;
 	let mut compile = compiler.to_command();
+	native.context.apply_environment(&mut compile);
 	compile.arg(&source).arg("-o").arg(&executable);
 	for directory in &selection.library_dirs {
 		compile.arg("-L").arg(directory);
@@ -173,7 +218,7 @@ pub fn verify_rsmpi_compatibility(native: &NativePackage) -> Result<()> {
 		&selection.library_dirs,
 	)?);
 	run(&mut compile)?;
-	let selected = run(&mut Command::new(&executable))?;
+	let selected = run(&mut native.context.command(&executable))?;
 	let library = compare_witnesses(&reference.stdout, &selected.stdout)?;
 	println!("cargo:rustc-env=QUEST_RSMPI_LIBRARY={}", library.display());
 	println!(
@@ -184,16 +229,18 @@ pub fn verify_rsmpi_compatibility(native: &NativePackage) -> Result<()> {
 }
 
 fn build_native_mpi_witness(
+	context: &crate::NativeBuildContext,
 	cmake: &Path,
 	build_directory: &Path,
 	profile: &str,
 	executable: &Path,
 ) -> Result<std::process::Output> {
-	run(Command::new(cmake)
+	run(context
+		.command(cmake)
 		.arg("--build")
 		.arg(build_directory)
 		.args(["--target", "quest_mpi_abi", "--config", profile]))?;
-	run(&mut Command::new(executable))
+	run(&mut context.command(executable))
 }
 
 fn verified_wrapper(wrapper: &Path) -> Result<PathBuf> {
@@ -215,8 +262,7 @@ fn verified_wrapper(wrapper: &Path) -> Result<PathBuf> {
 			})?
 	};
 	let canonical = fs::canonicalize(&invocation).map_err(|error| io(&invocation, error))?;
-	println!("cargo:rerun-if-changed={}", canonical.display());
-	println!("cargo:rerun-if-changed={}", invocation.display());
+	let _ = canonical;
 	// Open MPI and Cray wrappers can dispatch by basename. Never execute realpath.
 	Ok(invocation)
 }
@@ -277,7 +323,9 @@ mod tests {
 			.arg(&build)
 			.args(["-G", "Ninja Multi-Config", "-DCMAKE_BUILD_TYPE=Release"]))?;
 		for profile in ["Release", "Debug", "RelWithDebInfo"] {
+			let context = crate::NativeBuildContext::for_tooling(fixture.path(), None)?;
 			let output = build_native_mpi_witness(
+				&context,
 				Path::new("cmake"),
 				&build,
 				profile,
